@@ -34,9 +34,33 @@
 
 ---
 
-## 📸 Screenshots
+## 📱 الشاشات الرئيسية · Key Screens
 
-> *(Add screenshots here after first build)*
+The application's interface was meticulously crafted as seen in the [`muhasaba_ui_preview.html`](muhasaba_ui_preview.html) design system. It consists of four primary screens:
+
+### 1. Onboarding (مرحباً بك)
+
+- **Welcome Message:** Greets users with the profound quote of Umar ibn Al-Khattab: *"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"*
+- **Feature Highlights:** Introduces tracking for daily worship, statistics, and reminders.
+
+### 2. Home Dashboard (الرئيسية)
+
+- **Header:** Displays current Hijri/Gregorian date and a dynamic greeting.
+- **Next Prayer Card:** Highlights the upcoming prayer with an active countdown timer.
+- **Taqwa Ring:** A circular progress indicator summarizing the day's total completion percentage and current streak.
+- **Quick Ibadah:** A fast-access grid marking completed daily tasks like Fajr, Dhuhr, and Quran reading.
+- **Daily Inspiration:** A dedicated card for a Quranic verse or quote of the day.
+
+### 3. Daily Checklist (محاسبة اليوم)
+
+- **Detailed Accountability:** Grouped lists for Prayers (الصلوات), Quran & Adhkar (القرآن والأذكار), and Prohibitions (المحظورات).
+- **Gamification:** Displays the points gained (`+10`) for good deeds or lost (`-10`) for prohibitions, directly on the checklist items.
+
+### 4. Statistics (تقرير الأداء)
+
+- **Taqwa Score Card:** Shows the user's current spiritual level (e.g., مجاهد ⚔️) and total monthly points.
+- **Weekly Chart:** A visual bar chart indicating performance over the last 7 days.
+- **Continuous Streak:** Badges indicating how many consecutive days the user has maintained their habits.
 
 ---
 
