@@ -1,0 +1,8 @@
+flutter_native_splash:
+  color: '#03122F'
+  image: 'assets/images/hasib_nafsak.png'
+  android: true
+  ios: true
+
+  color_dark: '#03122F'
+  image_dark: 'assets/images/hasib_nafsak.png'
