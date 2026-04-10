@@ -4,15 +4,24 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:muhasabah/core/notifications/notifications_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/features/onboarding/onboarding_screen.dart';
+import 'package:muhasabah/features/splash/splash_screen.dart';
 import 'package:muhasabah/app/main_shell.dart';
+
+// تلقي الإشعارات والتطبيق في الخلفية
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse response) {
+  NotificationRouter.route(response.payload ?? '');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,111 +47,72 @@ void main() async {
     ),
   );
 
+  // تهيئة الإشعارات
+  await NotificationsService.initialize();
+
   runApp(const ProviderScope(child: MuhasabahApp()));
 }
 
-class MuhasabahApp extends StatelessWidget {
+class MuhasabahApp extends ConsumerWidget {
   const MuhasabahApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       title: 'محاسبة النفس',
       debugShowCheckedModeBanner: false,
+      navigatorKey: NotificationRouter.navigatorKey,
       theme: AppTheme.dark,
-      locale: const Locale('ar'),
+      locale: const Locale('ar', 'SA'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('ar')],
+      supportedLocales: const [Locale('ar', 'SA'), Locale('ar')],
       builder: (context, child) {
         return Directionality(textDirection: TextDirection.rtl, child: child!);
       },
-      home: const _AppEntry(),
+      initialRoute: '/',
+      routes: {
+        '/':          (_) => const SplashScreen(),
+        '/home':      (_) => const MainShell(),
+        '/checklist': (_) => const _ChecklistRoute(),
+        '/statistics':(_) => const _StatisticsRoute(),
+        '/settings':  (_) => const _SettingsRoute(),
+        '/onboarding':(_) => const _OnboardingRoute(),
+      },
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          default:
+            return MaterialPageRoute(builder: (_) => const MainShell());
+        }
+      },
     );
   }
 }
 
-/// Checks if onboarding is done, else shows onboarding
-class _AppEntry extends StatefulWidget {
-  const _AppEntry();
-
+// Lazy route wrappers
+class _ChecklistRoute extends StatelessWidget {
+  const _ChecklistRoute();
   @override
-  State<_AppEntry> createState() => _AppEntryState();
+  Widget build(BuildContext context) => const MainShell(initialIndex: 1);
 }
 
-class _AppEntryState extends State<_AppEntry> {
-  bool _loading = true;
-  bool _onboardingDone = false;
-
+class _StatisticsRoute extends StatelessWidget {
+  const _StatisticsRoute();
   @override
-  void initState() {
-    super.initState();
-    _checkOnboarding();
-  }
-
-  Future<void> _checkOnboarding() async {
-    // Simple check via SharedPreferences
-    // For now always show onboarding on first run
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) {
-      setState(() {
-        _loading = false;
-        _onboardingDone =
-            false; // change to true after shared prefs integration
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loading) {
-      return const _SplashScreen();
-    }
-    return _onboardingDone ? const MainShell() : const OnboardingScreen();
-  }
+  Widget build(BuildContext context) => const MainShell(initialIndex: 2);
 }
 
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
-
+class _SettingsRoute extends StatelessWidget {
+  const _SettingsRoute();
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.night,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.gold, AppColors.teal],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: AppShadows.goldGlow,
-              ),
-              child: const Center(
-                child: Text('☪️', style: TextStyle(fontSize: 42)),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'محاسبة النفس',
-              style: AppTypography.displayLarge.copyWith(
-                fontSize: 28,
-                color: AppColors.gold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const MainShell(initialIndex: 3);
+}
+
+class _OnboardingRoute extends StatelessWidget {
+  const _OnboardingRoute();
+  @override
+  Widget build(BuildContext context) => const OnboardingScreen();
 }

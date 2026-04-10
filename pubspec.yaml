@@ -25,9 +25,9 @@ dependencies:
   # ── UI & Fonts ──
   google_fonts: ^6.2.1
 
-  # ── Date & Time ──
-  intl: ^0.20.2
+  # ── Calendar ──
   hijri: ^3.0.0
+
   flutter_localizations:
     sdk: flutter
 
@@ -36,8 +36,19 @@ dependencies:
 
   # ── Notifications ──
   flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+
+  # ── Prayer Times ──
+  adhan: ^2.0.0+1
+
+  # ── Location ──
+  geolocator: ^12.0.0
+
+  # ── Permissions ──
+  permission_handler: ^11.3.1
 
   # ── Utils ──
+  intl: ^0.20.2
   shared_preferences: ^2.3.2
 
   # ── Supabase (Cloud Sync) ──
@@ -61,8 +72,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
   assets:
-    - assets/fonts/
+    - assets/sounds/Adhan-Makkah.mp3
+    - assets/sounds/notification.mp3
     - assets/images/
+    - assets/
     - .env
+  fonts:
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700

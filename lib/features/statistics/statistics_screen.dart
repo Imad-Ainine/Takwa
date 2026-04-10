@@ -1,17 +1,50 @@
 // ═══════════════════════════════════════════════════════════════
-//  lib/statistics_screen.dart — شاشة الإحصائيات
+//  lib/features/statistics/presentation/screens/statistics_screen.dart
+//  محاسبة النفس — Statistics Screen (شاشة الإحصائيات)
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
+
+import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:hijri/hijri_calendar.dart';
+import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/database/daos.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:muhasabah/core/theme/app_theme.dart';
 
+// ═══════════════════════════════════════════════════════════════
+//  LOCAL PROVIDERS
+// ═══════════════════════════════════════════════════════════════
+
+/// فلتر الفترة الزمنية
+enum StatsPeriod { week, month, ramadan }
+
+final _statsPeriodProvider = StateProvider<StatsPeriod>(
+  (ref) => StatsPeriod.week,
+);
+
+final _unseenAchievementsProvider = StreamProvider<List<Achievement>>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(db.achievements)
+        ..where((a) => a.seen.equals(false))
+        ..orderBy([(a) => OrderingTerm.desc(a.earnedAt)]))
+      .watch();
+});
+
+final _allAchievementsProvider = StreamProvider<List<Achievement>>((ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return (db.select(
+    db.achievements,
+  )..orderBy([(a) => OrderingTerm.desc(a.earnedAt)])).watch();
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  STATISTICS SCREEN
+// ═══════════════════════════════════════════════════════════════
 class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
 
@@ -20,15 +53,47 @@ class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _entryCtrl;
+  late final List<Animation<double>> _fadeAnims;
+  late final List<Animation<Offset>> _slideAnims;
+  static const _sectionCount = 6;
 
   @override
   void initState() {
     super.initState();
     _entryCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900))
-      ..forward();
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    _fadeAnims = List.generate(_sectionCount, (i) {
+      final s = i * 0.12, e = (s + 0.40).clamp(0.0, 1.0);
+      return Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(
+          parent: _entryCtrl,
+          curve: Interval(s, e, curve: Curves.easeOut),
+        ),
+      );
+    });
+    _slideAnims = List.generate(_sectionCount, (i) {
+      final s = i * 0.12, e = (s + 0.40).clamp(0.0, 1.0);
+      return Tween<Offset>(
+        begin: const Offset(0, 0.08),
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _entryCtrl,
+          curve: Interval(s, e, curve: Curves.easeOutCubic),
+        ),
+      );
+    });
+
+    // check and grant achievements on load
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(statsDaoProvider).checkAndGrantAchievements();
+      _entryCtrl.forward();
+    });
   }
 
   @override
@@ -37,15 +102,25 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
     super.dispose();
   }
 
+  Widget _anim(int i, Widget child) => FadeTransition(
+    opacity: _fadeAnims[i],
+    child: SlideTransition(position: _slideAnims[i], child: child),
+  );
+
   @override
   Widget build(BuildContext context) {
+    // final period = ref.watch(_statsPeriodProvider);
+    final statsAsync = ref.watch(monthStatsProvider);
+    final weekAsync = ref.watch(weeklyPointsProvider);
     final streakAsync = ref.watch(currentStreakProvider);
-    final weeklyAsync = ref.watch(weeklyPointsProvider);
-    final monthAsync = ref.watch(monthStatsProvider);
+    final unseenAsync = ref.watch(_unseenAchievementsProvider);
+
+    final hijri = HijriCalendar.now();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light
-          .copyWith(statusBarColor: Colors.transparent),
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
       child: Scaffold(
         backgroundColor: AppColors.night,
         body: Stack(
@@ -54,47 +129,16 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                // ── App Bar ──
+                // ── AppBar ──
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
+                  expandedHeight: 120,
+                  pinned: true,
                   elevation: 0,
                   surfaceTintColor: Colors.transparent,
-                  pinned: true,
-                  expandedHeight: 100,
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      padding: const EdgeInsets.fromLTRB(20, 56, 20, 12),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0x20C8A96E), Colors.transparent],
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Text('📊', style: TextStyle(fontSize: 28)),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'إحصائياتك',
-                                style: GoogleFonts.amiri(
-                                    fontSize: 22, color: AppColors.gold),
-                              ),
-                              Text(
-                                'مراجعة النتائج',
-                                style: GoogleFonts.notoNaskhArabic(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    collapseMode: CollapseMode.pin,
+                    background: _StatsTopBar(hijri: hijri),
                   ),
                 ),
 
@@ -102,54 +146,944 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      // ① Streak + Score cards
-                      streakAsync.when(
-                        loading: () => const _Skeleton(height: 100),
-                        error: (_, __) => const SizedBox(),
-                        data: (streak) => _FadeIn(
-                          ctrl: _entryCtrl,
-                          delay: 0.0,
-                          child: _TopStatsRow(streak: streak),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 8),
 
-                      // ② Weekly Chart
-                      weeklyAsync.when(
-                        loading: () => const _Skeleton(height: 200),
-                        error: (_, __) => const SizedBox(),
-                        data: (weekly) => _FadeIn(
-                          ctrl: _entryCtrl,
-                          delay: 0.15,
-                          child: _WeeklyChart(data: weekly),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
+                      // ① Period Selector
+                      _anim(0, _PeriodSelector()),
+                      const SizedBox(height: 16),
 
-                      // ③ Month Summary
-                      monthAsync.when(
-                        loading: () => const _Skeleton(height: 160),
-                        error: (_, __) => const SizedBox(),
-                        data: (month) => _FadeIn(
-                          ctrl: _entryCtrl,
-                          delay: 0.3,
-                          child: _MonthSummary(stats: month),
+                      // ② Taqwa Score Hero Card
+                      _anim(
+                        1,
+                        statsAsync.when(
+                          loading: () => const _StatSkeleton(height: 150),
+                          error: (_, __) => const SizedBox(),
+                          data: (s) => streakAsync.when(
+                            loading: () => const _StatSkeleton(height: 150),
+                            error: (_, __) => const SizedBox(),
+                            data: (streak) =>
+                                _TaqwaHeroCard(stats: s, streak: streak),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
 
-                      // ④ Taqwa meter
-                      monthAsync.when(
-                        loading: () => const _Skeleton(height: 140),
-                        error: (_, __) => const SizedBox(),
-                        data: (month) => _FadeIn(
-                          ctrl: _entryCtrl,
-                          delay: 0.45,
-                          child: _TaqwaMeter(totalPoints: month.totalPoints),
+                      // ③ Weekly Bar Chart
+                      _anim(
+                        2,
+                        weekAsync.when(
+                          loading: () => const _StatSkeleton(height: 180),
+                          error: (_, __) => const SizedBox(),
+                          data: (pts) => _WeeklyChart(points: pts),
                         ),
                       ),
+                      const SizedBox(height: 16),
+
+                      // ④ Stats Cards Grid
+                      _anim(
+                        3,
+                        statsAsync.when(
+                          loading: () => const _StatSkeleton(height: 120),
+                          error: (_, __) => const SizedBox(),
+                          data: (s) => _StatsCardsGrid(stats: s),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ⑤ Prayer Attendance Radial
+                      _anim(
+                        4,
+                        statsAsync.when(
+                          loading: () => const _StatSkeleton(height: 150),
+                          error: (_, __) => const SizedBox(),
+                          data: (s) => _PrayerAttendanceCard(stats: s),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // ⑥ Achievements
+                      _anim(5, _AchievementsSection()),
                       const SizedBox(height: 100),
                     ]),
+                  ),
+                ),
+              ],
+            ),
+
+            // ── Unseen Achievement Overlay ──
+            unseenAsync.when(
+              loading: () => const SizedBox(),
+              error: (_, __) => const SizedBox(),
+              data: (list) => list.isNotEmpty
+                  ? _AchievementToast(achievement: list.first)
+                  : const SizedBox(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOP BAR
+// ═══════════════════════════════════════════════════════════════
+class _StatsTopBar extends StatelessWidget {
+  final HijriCalendar hijri;
+  const _StatsTopBar({required this.hijri});
+
+  @override
+  Widget build(BuildContext context) {
+    final isRamadan = hijri.hMonth == 9;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 52, 16, 14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            isRamadan ? const Color(0x28C8A96E) : const Color(0x1A3AAFA9),
+            Colors.transparent,
+          ],
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isRamadan ? 'تقرير رمضان 🌙' : 'الإحصائيات',
+                style: GoogleFonts.amiri(
+                  fontSize: 24,
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                '${hijri.hDay} ${_month(hijri.hMonth)} ${hijri.hYear}',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          if (isRamadan) _RamadanProgress(day: hijri.hDay),
+        ],
+      ),
+    );
+  }
+
+  static String _month(int m) => const [
+    'محرم',
+    'صفر',
+    'ربيع الأول',
+    'ربيع الآخر',
+    'جمادى الأولى',
+    'جمادى الآخرة',
+    'رجب',
+    'شعبان',
+    'رمضان',
+    'شوال',
+    'ذو القعدة',
+    'ذو الحجة',
+  ][m - 1];
+}
+
+class _RamadanProgress extends StatelessWidget {
+  final int day;
+  const _RamadanProgress({required this.day});
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = day / 30.0;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'يوم $day من ٣٠',
+          style: GoogleFonts.notoNaskhArabic(
+            fontSize: 10,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          width: 80,
+          height: 80,
+          child: CustomPaint(
+            painter: _SmallRingPainter(progress: pct),
+            child: Center(
+              child: Text(
+                '${(pct * 100).round()}%',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 13,
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PERIOD SELECTOR
+// ═══════════════════════════════════════════════════════════════
+class _PeriodSelector extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(_statsPeriodProvider);
+    final options = [
+      (StatsPeriod.week, 'هذا الأسبوع'),
+      (StatsPeriod.month, 'هذا الشهر'),
+      (StatsPeriod.ramadan, 'رمضان 🌙'),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: options.map((opt) {
+          final selected = current == opt.$1;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                ref.read(_statsPeriodProvider.notifier).state = opt.$1;
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                decoration: BoxDecoration(
+                  gradient: selected
+                      ? const LinearGradient(
+                          colors: [Color(0xFFC8A96E), Color(0xFFB8920E)],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Center(
+                  child: Text(
+                    opt.$2,
+                    style: GoogleFonts.notoNaskhArabic(
+                      fontSize: 12,
+                      color: selected
+                          ? AppColors.night
+                          : AppColors.textSecondary,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAQWA HERO CARD
+// ═══════════════════════════════════════════════════════════════
+class _TaqwaHeroCard extends StatelessWidget {
+  final MonthStats stats;
+  final int streak;
+  const _TaqwaHeroCard({required this.stats, required this.streak});
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = (stats.totalPoints / 3000.0).clamp(0.0, 1.0);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [Color(0x22C8A96E), Color(0x0F3AAFA9)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gold.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // دائرة التقوى
+          _TaqwaScoreRing(
+            progress: pct,
+            points: stats.totalPoints,
+            levelEmoji: _levelEmoji(stats.level),
+          ),
+          const SizedBox(width: 16),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stats.levelLabel,
+                  style: GoogleFonts.amiri(
+                    fontSize: 20,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${stats.totalPoints} نقطة هذا الشهر',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // حاجز للمستوى التالي
+                _LevelProgressBar(stats: stats),
+                const SizedBox(height: 10),
+
+                // Streak
+                if (streak > 0) _StreakBadgeLarge(days: streak),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _levelEmoji(TaqwaLevel l) => switch (l) {
+    TaqwaLevel.mubtadi => '🌱',
+    TaqwaLevel.salik => '🌿',
+    TaqwaLevel.mujahid => '⚔️',
+    TaqwaLevel.mutaqi => '✨',
+  };
+}
+
+class _TaqwaScoreRing extends StatefulWidget {
+  final double progress;
+  final int points;
+  final String levelEmoji;
+  const _TaqwaScoreRing({
+    required this.progress,
+    required this.points,
+    required this.levelEmoji,
+  });
+
+  @override
+  State<_TaqwaScoreRing> createState() => _TaqwaScoreRingState();
+}
+
+class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late Animation<double> _anim;
+  late Animation<int> _countAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    );
+    _anim = Tween<double>(
+      begin: 0,
+      end: widget.progress,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _countAnim = IntTween(
+      begin: 0,
+      end: widget.points,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _ctrl,
+    builder: (_, __) => SizedBox(
+      width: 100,
+      height: 100,
+      child: CustomPaint(
+        painter: _TaqwaRingPainter(progress: _anim.value),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.levelEmoji, style: const TextStyle(fontSize: 20)),
+              Text(
+                '${_countAnim.value}',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.gold,
+                  height: 1,
+                ),
+              ),
+              Text(
+                'نقطة',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 9,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+class _TaqwaRingPainter extends CustomPainter {
+  final double progress;
+  _TaqwaRingPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = (size.width - 12) / 2;
+
+    // bg track
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..color = AppColors.border
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8,
+    );
+
+    if (progress <= 0) return;
+
+    final rect = Rect.fromCircle(center: c, radius: r);
+    // outer glow
+    canvas.drawArc(
+      rect,
+      -math.pi / 2,
+      2 * math.pi * progress,
+      false,
+      Paint()
+        ..shader = const SweepGradient(
+          startAngle: -math.pi / 2,
+          endAngle: 3 * math.pi / 2,
+          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 14
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+    );
+
+    // solid arc
+    canvas.drawArc(
+      rect,
+      -math.pi / 2,
+      2 * math.pi * progress,
+      false,
+      Paint()
+        ..shader = const SweepGradient(
+          startAngle: -math.pi / 2,
+          endAngle: 3 * math.pi / 2,
+          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8
+        ..strokeCap = StrokeCap.round,
+    );
+
+    // end dot
+    final angle = -math.pi / 2 + 2 * math.pi * progress;
+    final dx = c.dx + r * math.cos(angle);
+    final dy = c.dy + r * math.sin(angle);
+    canvas.drawCircle(
+      Offset(dx, dy),
+      6,
+      Paint()
+        ..color = AppColors.goldLight
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+    canvas.drawCircle(Offset(dx, dy), 3.5, Paint()..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(_TaqwaRingPainter old) => old.progress != progress;
+}
+
+class _LevelProgressBar extends StatelessWidget {
+  final MonthStats stats;
+  const _LevelProgressBar({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final thresholds = [0, 100, 300, 600, 1000];
+    int nextThreshold = 1000;
+    int prevThreshold = 0;
+
+    for (int i = 0; i < thresholds.length - 1; i++) {
+      if (stats.totalPoints < thresholds[i + 1]) {
+        prevThreshold = thresholds[i];
+        nextThreshold = thresholds[i + 1];
+        break;
+      }
+    }
+
+    final pct =
+        ((stats.totalPoints - prevThreshold) / (nextThreshold - prevThreshold))
+            .clamp(0.0, 1.0);
+    final remaining = nextThreshold - stats.totalPoints;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'المستوى التالي',
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 10,
+                color: AppColors.textDim,
+              ),
+            ),
+            Text(
+              remaining > 0 ? '$remaining نقطة متبقية' : 'أقصى مستوى ✨',
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 10,
+                color: AppColors.gold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Stack(
+            children: [
+              Container(height: 6, color: AppColors.border),
+              FractionallySizedBox(
+                widthFactor: pct,
+                child: Container(
+                  height: 6,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.gold, AppColors.teal],
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StreakBadgeLarge extends StatelessWidget {
+  final int days;
+  const _StreakBadgeLarge({required this.days});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(
+      color: AppColors.success.withOpacity(0.12),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: AppColors.success.withOpacity(0.3)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('🔥', style: TextStyle(fontSize: 14)),
+        const SizedBox(width: 6),
+        Text(
+          '$days يوم متواصل',
+          style: GoogleFonts.notoNaskhArabic(
+            fontSize: 12,
+            color: AppColors.success,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  WEEKLY BAR CHART
+// ═══════════════════════════════════════════════════════════════
+class _WeeklyChart extends StatefulWidget {
+  final List<WeeklyPoint> points;
+  const _WeeklyChart({required this.points});
+
+  @override
+  State<_WeeklyChart> createState() => _WeeklyChartState();
+}
+
+class _WeeklyChartState extends State<_WeeklyChart>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late Animation<double> _anim;
+  int? _hoveredIdx;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.points.isEmpty) return const SizedBox();
+    final maxPts = widget.points.map((p) => p.points).fold(0, math.max);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: AppDecorations.card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'أداء الأسبوع',
+                style: GoogleFonts.amiri(
+                  fontSize: 16,
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'آخر ٧ أيام',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 10,
+                  color: AppColors.textDim,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Chart area
+          AnimatedBuilder(
+            animation: _anim,
+            builder: (_, __) => SizedBox(
+              height: 120,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: List.generate(widget.points.length, (i) {
+                  final pt = widget.points[i];
+                  final ratio = maxPts > 0
+                      ? (pt.points / maxPts) * _anim.value
+                      : 0.0;
+                  final isToday = i == widget.points.length - 1;
+                  final isHovered = _hoveredIdx == i;
+
+                  return Expanded(
+                    child: GestureDetector(
+                      onTapDown: (_) => setState(() => _hoveredIdx = i),
+                      onTapUp: (_) => setState(() => _hoveredIdx = null),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Tooltip
+                            AnimatedOpacity(
+                              opacity: isHovered ? 1 : 0,
+                              duration: const Duration(milliseconds: 150),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 3,
+                                ),
+                                margin: const EdgeInsets.only(bottom: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.card2,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Text(
+                                  '${pt.points}',
+                                  style: GoogleFonts.notoNaskhArabic(
+                                    fontSize: 9,
+                                    color: AppColors.gold,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Bar
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              height: (100 * ratio).clamp(4.0, 100.0),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: isToday
+                                      ? [AppColors.gold, AppColors.goldLight]
+                                      : isHovered
+                                      ? [
+                                          AppColors.teal,
+                                          AppColors.teal.withOpacity(0.6),
+                                        ]
+                                      : [AppColors.border, AppColors.card2],
+                                ),
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(6),
+                                ),
+                                boxShadow: isToday
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.gold.withOpacity(
+                                            0.3,
+                                          ),
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+                            Text(
+                              pt.dayLabel,
+                              style: GoogleFonts.notoNaskhArabic(
+                                fontSize: 9,
+                                color: isToday
+                                    ? AppColors.gold
+                                    : AppColors.textDim,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          // Legend
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _ChartLegend(color: AppColors.gold, label: 'اليوم'),
+              SizedBox(width: 16),
+              _ChartLegend(color: AppColors.border, label: 'أيام سابقة'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChartLegend extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _ChartLegend({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(2),
+        ),
+      ),
+      const SizedBox(width: 5),
+      Text(
+        label,
+        style: GoogleFonts.notoNaskhArabic(
+          fontSize: 10,
+          color: AppColors.textSecondary,
+        ),
+      ),
+    ],
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATS CARDS GRID
+// ═══════════════════════════════════════════════════════════════
+class _StatsCardsGrid extends StatelessWidget {
+  final MonthStats stats;
+  const _StatsCardsGrid({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = [
+      _StatCardData(
+        '📖',
+        'صفحات القرآن',
+        '${stats.quranPages}',
+        AppColors.teal,
+      ),
+      _StatCardData(
+        '🕌',
+        'حضور الصلوات',
+        '${stats.prayerPercent}%',
+        AppColors.gold,
+      ),
+      _StatCardData(
+        '🔥',
+        'أطول سلسلة',
+        '${stats.longestStreak} يوم',
+        AppColors.success,
+      ),
+      _StatCardData(
+        '🌟',
+        'نقاط التقوى',
+        '${stats.totalPoints}',
+        AppColors.gold,
+      ),
+    ];
+
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      childAspectRatio: 1.55,
+      children: cards.map((c) => _StatCard(data: c)).toList(),
+    );
+  }
+}
+
+class _StatCardData {
+  final String emoji, label, value;
+  final Color color;
+  const _StatCardData(this.emoji, this.label, this.value, this.color);
+}
+
+class _StatCard extends StatefulWidget {
+  final _StatCardData data;
+  const _StatCard({required this.data});
+
+  @override
+  State<_StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<_StatCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _scale = Tween<double>(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scale,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Text(widget.data.emoji, style: const TextStyle(fontSize: 18)),
+                const Spacer(),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: widget.data.color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.data.value,
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: widget.data.color,
+                  ),
+                ),
+                Text(
+                  widget.data.label,
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -162,387 +1096,627 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  TOP STATS ROW
+//  PRAYER ATTENDANCE RADIAL
 // ═══════════════════════════════════════════════════════════════
-class _TopStatsRow extends StatelessWidget {
-  final int streak;
-  const _TopStatsRow({required this.streak});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _StatCard(
-            emoji: '🔥',
-            value: '$streak',
-            label: 'أيام متتالية',
-            color: const Color(0xFFFF6B35),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            emoji: '⭐',
-            value: '${streak * 15}',
-            label: 'نقطة تقوى',
-            color: AppColors.gold,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _StatCard(
-            emoji: '🌟',
-            value: streak >= 30
-                ? 'متقي'
-                : streak >= 14
-                    ? 'مجاهد'
-                    : streak >= 7
-                        ? 'سالك'
-                        : 'مبتدئ',
-            label: 'مستواك',
-            color: AppColors.teal,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String emoji;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _StatCard({
-    required this.emoji,
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.22)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 24)),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: GoogleFonts.amiri(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 10,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  WEEKLY CHART  (bar chart — no fl_chart needed)
-// ═══════════════════════════════════════════════════════════════
-class _WeeklyChart extends StatelessWidget {
-  final List<WeeklyPoint> data;
-  const _WeeklyChart({required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    final days = [
-      'الأحد',
-      'الاثن',
-      'الثلا',
-      'الأربع',
-      'الخمي',
-      'الجمع',
-      'السبت'
-    ];
-    final values = data.isNotEmpty
-        ? data.map((d) => d.points.toDouble()).toList()
-        : List.filled(7, 0.0);
-    final maxVal = values.isEmpty
-        ? 1.0
-        : (values.reduce(math.max)).clamp(1.0, double.infinity);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.gold.withOpacity(0.18)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('📈', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
-              Text(
-                'نقاط الأسبوع',
-                style: GoogleFonts.amiri(fontSize: 18, color: AppColors.gold),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 130,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(7, (i) {
-                final val = i < values.length ? values[i] : 0.0;
-                final pct = val / maxVal;
-                final isToday = i == DateTime.now().weekday % 7;
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      val.toInt().toString(),
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 9,
-                        color: isToday ? AppColors.gold : AppColors.textDim,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 600),
-                      curve: Curves.easeOutCubic,
-                      width: 28,
-                      height: (pct * 100).clamp(4.0, 100.0),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: isToday
-                              ? [AppColors.gold, AppColors.teal]
-                              : [AppColors.border, AppColors.border],
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      i < days.length ? days[i] : '',
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 9,
-                        color: isToday ? AppColors.gold : AppColors.textDim,
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  MONTH SUMMARY
-// ═══════════════════════════════════════════════════════════════
-class _MonthSummary extends StatelessWidget {
+class _PrayerAttendanceCard extends StatelessWidget {
   final MonthStats stats;
-  const _MonthSummary({required this.stats});
+  const _PrayerAttendanceCard({required this.stats});
 
-  @override
-  Widget build(BuildContext context) {
-    const daysCount = 0; // days tracked this month
-    const fullDays = 0;
-    final avgPoints =
-        stats.totalPoints > 0 ? stats.totalPoints.toDouble() / 30 : 0.0;
-    final totalPages = stats.quranPages;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.teal.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text('🗓️', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
-              Text(
-                'ملخّص الشهر',
-                style: GoogleFonts.amiri(fontSize: 18, color: AppColors.teal),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              const _MonthStat('📅', '$daysCount', 'يوم مسجّل'),
-              const _MonthStat('✅', '$fullDays', 'يوم مكتمل'),
-              _MonthStat('⭐', avgPoints.toStringAsFixed(0), 'متوسط النقاط'),
-              _MonthStat('📖', '$totalPages', 'صفحة قرآن'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MonthStat extends StatelessWidget {
-  final String emoji;
-  final String value;
-  final String label;
-  const _MonthStat(this.emoji, this.value, this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: (MediaQuery.of(context).size.width - 80) / 2,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.night,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: GoogleFonts.amiri(
-                  fontSize: 18,
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                label,
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  TAQWA METER
-// ═══════════════════════════════════════════════════════════════
-class _TaqwaMeter extends StatelessWidget {
-  final int totalPoints;
-  const _TaqwaMeter({required this.totalPoints});
-
-  static const _levels = [
-    (0, 100, 'مبتدئ 🌱', AppColors.textDim),
-    (100, 300, 'سالك 🌿', AppColors.teal),
-    (300, 600, 'مجاهد ⚔️', AppColors.gold),
-    (600, 1000, 'متقي ✨', Color(0xFF7D5FFF)),
+  // mock per-prayer data (يُستبدل بـ DAO حقيقي)
+  static const _prayerRates = [
+    ('الفجر', 0.72, '🌅'),
+    ('الظهر', 0.91, '☀️'),
+    ('العصر', 0.85, '🌤'),
+    ('المغرب', 0.96, '🌆'),
+    ('العشاء', 0.88, '🌃'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.gold.withOpacity(0.18)),
+      decoration: AppDecorations.card,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'حضور الصلوات',
+            style: GoogleFonts.amiri(
+              fontSize: 16,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ..._prayerRates.map(
+            (p) => _PrayerRateRow(name: p.$1, rate: p.$2, emoji: p.$3),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _PrayerRateRow extends StatefulWidget {
+  final String name, emoji;
+  final double rate;
+  const _PrayerRateRow({
+    required this.name,
+    required this.rate,
+    required this.emoji,
+  });
+
+  @override
+  State<_PrayerRateRow> createState() => _PrayerRateRowState();
+}
+
+class _PrayerRateRowState extends State<_PrayerRateRow>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _anim = Tween<double>(
+      begin: 0,
+      end: widget.rate,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Color get _color {
+    if (widget.rate >= 0.9) return AppColors.success;
+    if (widget.rate >= 0.7) return AppColors.gold;
+    return AppColors.danger;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Text(widget.emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 44,
+            child: Text(
+              widget.name,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 11,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: AnimatedBuilder(
+              animation: _anim,
+              builder: (_, __) => ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Stack(
+                  children: [
+                    Container(height: 8, color: AppColors.border),
+                    FractionallySizedBox(
+                      widthFactor: _anim.value,
+                      child: Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [_color, _color.withOpacity(0.6)],
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _color.withOpacity(0.3),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 34,
+            child: AnimatedBuilder(
+              animation: _anim,
+              builder: (_, __) => Text(
+                '${(_anim.value * 100).round()}%',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 11,
+                  color: _color,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ACHIEVEMENTS SECTION
+// ═══════════════════════════════════════════════════════════════
+class _AchievementsSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allAsync = ref.watch(_allAchievementsProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: AppDecorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Text('🏆', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
-              Text('مقياس التقوى',
-                  style:
-                      GoogleFonts.amiri(fontSize: 18, color: AppColors.gold)),
+              Text(
+                'الإنجازات والشارات',
+                style: GoogleFonts.amiri(
+                  fontSize: 16,
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              allAsync.when(
+                loading: () => const SizedBox(),
+                error: (_, __) => const SizedBox(),
+                data: (list) => Text(
+                  '${list.length} إنجاز',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 11,
+                    color: AppColors.textDim,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          ..._levels.map((lvl) {
-            final pct =
-                ((totalPoints - lvl.$1) / (lvl.$2 - lvl.$1)).clamp(0.0, 1.0);
-            final reached = totalPoints >= lvl.$1;
+          const SizedBox(height: 12),
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          allAsync.when(
+            loading: () => const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.gold,
+                strokeWidth: 2,
+              ),
+            ),
+            error: (_, __) => const SizedBox(),
+            data: (list) => list.isEmpty
+                ? _EmptyAchievements()
+                : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: list
+                        .map((a) => _AchievementBadge(achievement: a))
+                        .toList(),
+                  ),
+          ),
+
+          const SizedBox(height: 14),
+          _LockedAchievementsRow(),
+        ],
+      ),
+    );
+  }
+}
+
+class _AchievementBadge extends ConsumerWidget {
+  final Achievement achievement;
+  const _AchievementBadge({required this.achievement});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () => _showDetail(context, ref),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0x22C8A96E), Color(0x113AAFA9)],
+          ),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(achievement.emoji, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 6),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  achievement.titleAr,
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 11,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '+${achievement.pointsReward} نقطة',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 9,
+                    color: AppColors.textDim,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDetail(BuildContext context, WidgetRef ref) {
+    // Mark as seen
+    ref
+        .read(appDatabaseProvider)
+        .update(ref.read(appDatabaseProvider).achievements)
+      ..where((a) => a.id.equals(achievement.id))
+      ..write(const AchievementsCompanion(seen: Value(true)));
+
+    showDialog(
+      context: context,
+      builder: (_) => _AchievementDialog(achievement: achievement),
+    );
+  }
+}
+
+class _AchievementDialog extends StatelessWidget {
+  final Achievement achievement;
+  const _AchievementDialog({required this.achievement});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: AppColors.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: AppColors.gold.withOpacity(0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(achievement.emoji, style: const TextStyle(fontSize: 48)),
+            const SizedBox(height: 12),
+            Text(
+              achievement.titleAr,
+              style: GoogleFonts.amiri(
+                fontSize: 20,
+                color: AppColors.gold,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              achievement.descAr,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.7,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.goldDim,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+              ),
+              child: Text(
+                '+${achievement.pointsReward} نقطة مكافأة 🌟',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 13,
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.night,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'شكراً لله 🤲',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyAchievements extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 20),
+    child: Column(
+      children: [
+        const Text('🏆', style: TextStyle(fontSize: 32)),
+        const SizedBox(height: 8),
+        Text(
+          'لا إنجازات بعد',
+          style: GoogleFonts.notoNaskhArabic(
+            fontSize: 13,
+            color: AppColors.textDim,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'حافظ على العبادات لتحصل على أول إنجاز',
+          style: GoogleFonts.notoNaskhArabic(
+            fontSize: 11,
+            color: AppColors.textDim,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// إنجازات مقفلة
+class _LockedAchievementsRow extends StatelessWidget {
+  static const _locked = [
+    ('streak_30', '🌙', 'شهر المجاهد', '٣٠ يوم متواصل'),
+    ('quran_khatma', '📖', 'ختمة كاملة', 'إتمام القرآن'),
+    ('full_week', '⭐', 'أسبوع مثالي', '٧ أيام مكتملة'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            children: [
+              Container(width: 24, height: 1, color: AppColors.border),
+              const SizedBox(width: 8),
+              Text(
+                'قادم قريباً 🔒',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 10,
+                  color: AppColors.textDim,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Container(height: 1, color: AppColors.border)),
+            ],
+          ),
+        ),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _locked
+              .map(
+                (l) => Opacity(
+                  opacity: 0.4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.card2,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🔒', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 6),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              l.$3,
+                              style: GoogleFonts.notoNaskhArabic(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                            Text(
+                              l.$4,
+                              style: GoogleFonts.notoNaskhArabic(
+                                fontSize: 9,
+                                color: AppColors.textDim,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ACHIEVEMENT TOAST (overlay for new achievements)
+// ═══════════════════════════════════════════════════════════════
+class _AchievementToast extends ConsumerStatefulWidget {
+  final Achievement achievement;
+  const _AchievementToast({required this.achievement});
+
+  @override
+  ConsumerState<_AchievementToast> createState() => _AchievementToastState();
+}
+
+class _AchievementToastState extends ConsumerState<_AchievementToast>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+
+    _ctrl.forward();
+    // Auto dismiss after 4 sec
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        _ctrl.reverse().then((_) {
+          // Mark as seen
+          ref
+              .read(appDatabaseProvider)
+              .update(ref.read(appDatabaseProvider).achievements)
+            ..where((a) => a.id.equals(widget.achievement.id))
+            ..write(const AchievementsCompanion(seen: Value(true)));
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 70,
+      left: 16,
+      right: 16,
+      child: SlideTransition(
+        position: _slide,
+        child: FadeTransition(
+          opacity: _fade,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1E2D40), Color(0xFF1A2332)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.gold.withOpacity(0.4)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.gold.withOpacity(0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Text(
+                  widget.achievement.emoji,
+                  style: const TextStyle(fontSize: 28),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(lvl.$3,
-                          style: GoogleFonts.notoNaskhArabic(
-                            fontSize: 13,
-                            color: reached ? lvl.$4 : AppColors.textDim,
-                          )),
                       Text(
-                        reached ? '${lvl.$1}–${lvl.$2}' : 'محجوب',
+                        'إنجاز جديد! 🎉',
+                        style: GoogleFonts.notoNaskhArabic(
+                          fontSize: 10,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        widget.achievement.titleAr,
+                        style: GoogleFonts.amiri(
+                          fontSize: 16,
+                          color: AppColors.gold,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        widget.achievement.descAr,
                         style: GoogleFonts.notoNaskhArabic(
                           fontSize: 11,
-                          color: AppColors.textDim,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: reached ? pct : 0,
-                      backgroundColor: AppColors.border,
-                      valueColor: AlwaysStoppedAnimation(
-                          reached ? lvl.$4 : AppColors.border),
-                      minHeight: 8,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.goldDim,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '+${widget.achievement.pointsReward}',
+                    style: GoogleFonts.notoNaskhArabic(
+                      fontSize: 12,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                ],
-              ),
-            );
-          }),
-        ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -551,73 +1725,77 @@ class _TaqwaMeter extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════
 //  HELPERS
 // ═══════════════════════════════════════════════════════════════
-class _FadeIn extends StatelessWidget {
-  final AnimationController ctrl;
-  final double delay;
-  final Widget child;
-
-  const _FadeIn({
-    required this.ctrl,
-    required this.delay,
-    required this.child,
-  });
+class _SmallRingPainter extends CustomPainter {
+  final double progress;
+  _SmallRingPainter({required this.progress});
 
   @override
-  Widget build(BuildContext context) {
-    final end = (delay + 0.4).clamp(0.0, 1.0);
-    final fade = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-          parent: ctrl, curve: Interval(delay, end, curve: Curves.easeOut)),
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = (size.width - 10) / 2;
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..color = AppColors.border
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5,
     );
-    final slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: ctrl, curve: Interval(delay, end)));
-
-    return FadeTransition(
-        opacity: fade, child: SlideTransition(position: slide, child: child));
+    if (progress <= 0) return;
+    final rect = Rect.fromCircle(center: c, radius: r);
+    canvas.drawArc(
+      rect,
+      -math.pi / 2,
+      2 * math.pi * progress,
+      false,
+      Paint()
+        ..shader = const SweepGradient(
+          startAngle: -math.pi / 2,
+          endAngle: 3 * math.pi / 2,
+          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..strokeCap = StrokeCap.round,
+    );
   }
+
+  @override
+  bool shouldRepaint(_SmallRingPainter o) => o.progress != progress;
 }
 
-class _Skeleton extends StatelessWidget {
+class _StatSkeleton extends StatelessWidget {
   final double height;
-  const _Skeleton({required this.height});
+  const _StatSkeleton({required this.height});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(18),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+    height: height,
+    decoration: BoxDecoration(
+      color: AppColors.card,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: AppColors.border),
+    ),
+    child: const Center(
+      child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+    ),
+  );
 }
 
-// ── Background Painter ─────────────────────────────────────────
 class _StatsBgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(
-      Offset(0, size.height * 0.15),
-      200,
-      Paint()
-        ..shader = const RadialGradient(
-          colors: [Color(0x0A7D5FFF), Colors.transparent],
-        ).createShader(Rect.fromCircle(
-            center: Offset(0, size.height * 0.15), radius: 200)),
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint()..color = AppColors.night,
     );
-    canvas.drawCircle(
-      Offset(size.width, size.height * 0.65),
-      180,
-      Paint()
-        ..shader = const RadialGradient(
-          colors: [Color(0x0AC8A96E), Colors.transparent],
-        ).createShader(Rect.fromCircle(
-            center: Offset(size.width, size.height * 0.65), radius: 180)),
-    );
+    // dots grid
+    final p = Paint()..color = const Color(0x0AC8A96E);
+    for (double x = 16; x < size.width; x += 28) {
+      for (double y = 16; y < size.height; y += 28) {
+        canvas.drawCircle(Offset(x, y), 1, p);
+      }
+    }
   }
 
   @override

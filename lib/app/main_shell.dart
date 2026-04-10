@@ -1,90 +1,163 @@
 // ═══════════════════════════════════════════════════════════════
-//  lib/main_shell.dart — Shell with BottomNavigationBar
+//  lib/app/main_shell.dart — Shell with BottomNavigationBar
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/features/home/home_screen.dart';
-import 'package:muhasabah/features/checklist/checklist_screen.dart';
-import 'package:muhasabah/features/statistics/statistics_screen.dart';
+import '../core/theme/app_theme.dart';
+import '../core/providers/database_providers.dart';
+import '../core/notifications/notifications_service.dart';
+import '../features/home/home_screen.dart';
+import '../features/checklist/checklist_screen.dart';
+import '../features/statistics/statistics_screen.dart';
+import '../features/settings/settings_screen.dart';
+import '../features/onboarding/onboarding_screen.dart';
 
-class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+// ─────────────────────────────────────────
+//  CURRENT TAB PROVIDER
+// ─────────────────────────────────────────
+final _currentTabProvider = StateProvider<int>((ref) => 0);
+
+// ─────────────────────────────────────────
+//  ONBOARDING CHECK
+// ─────────────────────────────────────────
+final onboardingDoneProvider = FutureProvider<bool>((ref) async {
+  final v = await ref.watch(settingsDaoProvider).get('onboardingDone');
+  return v == 'true';
+});
+
+// ─────────────────────────────────────────
+//  APP SHELL
+// ─────────────────────────────────────────
+class MainShell extends ConsumerStatefulWidget {
+  final int initialIndex;
+  const MainShell({super.key, this.initialIndex = 0});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell>
-    with SingleTickerProviderStateMixin {
-  int _currentIndex = 0;
+class _MainShellState extends ConsumerState<MainShell>
+    with TickerProviderStateMixin {
   late final PageController _pageCtrl;
+  late final List<AnimationController> _tabAnims;
 
-  final _screens = const [
-    HomeScreen(),
-    ChecklistScreen(),
-    StatisticsScreen(),
-  ];
-
-  final _navItems = const [
-    _NavItem('الرئيسية', '🏠', 'home'),
-    _NavItem('تفاصيل اليوم', '📋', 'checklist'),
-    _NavItem('إحصائيات', '📊', 'stats'),
+  static const _tabs = [
+    _TabInfo('🏠', 'الرئيسية',   0),
+    _TabInfo('✅', 'المحاسبة',   1),
+    _TabInfo('📊', 'إحصائيات',  2),
+    _TabInfo('⚙️', 'الإعدادات', 3),
   ];
 
   @override
   void initState() {
     super.initState();
-    _pageCtrl = PageController(initialPage: _currentIndex);
+    _pageCtrl = PageController(initialPage: widget.initialIndex);
+
+    _tabAnims = List.generate(_tabs.length, (i) =>
+      AnimationController(vsync: this,
+          duration: const Duration(milliseconds: 300)));
+
+    // تفعيل التبويب الأول
+    _tabAnims[widget.initialIndex].forward();
+
+    // جدولة الإشعارات عند أول تشغيل
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationsManager.scheduleAll(ref);
+    });
   }
 
   @override
   void dispose() {
     _pageCtrl.dispose();
+    for (final a in _tabAnims) { a.dispose(); }
     super.dispose();
   }
 
-  void _onTabTap(int i) {
-    HapticFeedback.lightImpact();
-    setState(() => _currentIndex = i);
-    _pageCtrl.animateToPage(
-      i,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+  void _switchTab(int idx) {
+    final current = ref.read(_currentTabProvider);
+    if (current == idx) return;
+
+    HapticFeedback.selectionClick();
+
+    // Animate out current, animate in new
+    _tabAnims[current].reverse();
+    _tabAnims[idx].forward();
+
+    ref.read(_currentTabProvider.notifier).state = idx;
+    _pageCtrl.animateToPage(idx,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Avoid rebuilding unnecessarily on each new frame
+    final onboardAsync = ref.watch(onboardingDoneProvider);
+
+    return onboardAsync.when(
+      loading: () => const _SplashScreen(),
+      error: (_, __) => const _SplashScreen(),
+      data: (done) {
+        if (!done) {
+          // SAFE WAY: Returns OnboardingScreen without an imperative Push inside build!
+          return const OnboardingScreen();
+        }
+        return _buildShell();
+      },
+    );
+  }
+
+  Widget _buildShell() {
+    final currentIdx = ref.watch(_currentTabProvider);
+
     return Scaffold(
       backgroundColor: AppColors.night,
       body: PageView(
         controller: _pageCtrl,
-        physics: const NeverScrollableScrollPhysics(),
-        children: _screens,
+        physics: const NeverScrollableScrollPhysics(), // manual nav only
+        children: const [
+          HomeScreen(),
+          ChecklistScreen(),
+          StatisticsScreen(),
+          SettingsScreen(),
+        ],
+        onPageChanged: (idx) {
+          // If swiped
+          if (ref.read(_currentTabProvider) != idx) {
+            _tabAnims[ref.read(_currentTabProvider)].reverse();
+            _tabAnims[idx].forward();
+            ref.read(_currentTabProvider.notifier).state = idx;
+          }
+        },
       ),
       bottomNavigationBar: _BottomNav(
-        items: _navItems,
-        currentIndex: _currentIndex,
-        onTap: _onTabTap,
+        currentIndex: currentIdx,
+        tabs: _tabs,
+        onTap: _switchTab,
+        tabAnims: _tabAnims,
       ),
     );
   }
 }
 
-// ─── Bottom Nav ───────────────────────────────────────────────
+// ─────────────────────────────────────────
+//  CUSTOM BOTTOM NAV
+// ─────────────────────────────────────────
 class _BottomNav extends StatelessWidget {
-  final List<_NavItem> items;
   final int currentIndex;
-  final ValueChanged<int> onTap;
+  final List<_TabInfo> tabs;
+  final void Function(int) onTap;
+  final List<AnimationController> tabAnims;
 
   const _BottomNav({
-    required this.items,
     required this.currentIndex,
+    required this.tabs,
     required this.onTap,
+    required this.tabAnims,
   });
 
   @override
@@ -92,11 +165,10 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.card,
-        border:
-            const Border(top: BorderSide(color: AppColors.border, width: 1)),
+        border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -107,14 +179,148 @@ class _BottomNav extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-              items.length,
-              (i) => _NavChip(
-                item: items[i],
-                isActive: currentIndex == i,
-                onTap: () => onTap(i),
-              ),
+            children: List.generate(tabs.length, (i) {
+              final tab = tabs[i];
+              final isActive = currentIndex == i;
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onTap(i),
+                  child: AnimatedBuilder(
+                    animation: tabAnims[i],
+                    builder: (_, __) {
+                      final t = tabAnims[i].value;
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Active indicator
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            width: isActive ? 28 : 0,
+                            height: 2,
+                            margin: const EdgeInsets.only(bottom: 4),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                  colors: [AppColors.gold, AppColors.teal]),
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+
+                          // Icon with scale bounce
+                          Transform.scale(
+                            scale: isActive ? 1.0 + 0.1 * t : 1.0,
+                            child: Text(
+                              tab.emoji,
+                              style: TextStyle(
+                                fontSize: 22,
+                                shadows: isActive ? [
+                                  Shadow(
+                                    color: AppColors.gold.withOpacity(0.5 * t),
+                                    blurRadius: 10,
+                                  ),
+                                ] : null,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+
+                          // Label
+                          AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 200),
+                            style: GoogleFonts.notoNaskhArabic(
+                              fontSize: 10,
+                              color: isActive ? AppColors.gold : AppColors.textDim,
+                              fontWeight: isActive
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                            child: Text(tab.label),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  SPLASH SCREEN
+// ─────────────────────────────────────────
+class _SplashScreen extends StatefulWidget {
+  const _SplashScreen();
+
+  @override
+  State<_SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<_SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fade;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this,
+        duration: const Duration(milliseconds: 800));
+    _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _scale = Tween<double>(begin: 0.8, end: 1.0).animate(
+        CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.night,
+      body: Center(
+        child: FadeTransition(
+          opacity: _fade,
+          child: ScaleTransition(
+            scale: _scale,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logo ring
+                SizedBox(
+                  width: 100, height: 100,
+                  child: Stack(alignment: Alignment.center, children: [
+                    ...List.generate(3, (i) => Container(
+                      width: 100 - i * 20.0,
+                      height: 100 - i * 20.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.gold.withOpacity(0.3 - i * 0.08),
+                          width: 1,
+                        ),
+                      ),
+                    )),
+                    const Text('🌙', style: TextStyle(fontSize: 32)),
+                  ]),
+                ),
+                const SizedBox(height: 24),
+                Text('محاسبة النفس',
+                    style: GoogleFonts.amiri(
+                        fontSize: 32, color: AppColors.gold,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Text('"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
+                    style: GoogleFonts.amiri(
+                        fontSize: 14, color: AppColors.textSecondary),
+                    textAlign: TextAlign.center),
+              ],
             ),
           ),
         ),
@@ -123,65 +329,11 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
-class _NavChip extends StatelessWidget {
-  final _NavItem item;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavChip({
-    required this.item,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          gradient: isActive
-              ? const LinearGradient(
-                  colors: [Color(0x22C8A96E), Color(0x113AAFA9)],
-                )
-              : null,
-          borderRadius: BorderRadius.circular(14),
-          border: isActive
-              ? Border.all(color: AppColors.gold.withOpacity(0.3))
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
-              style: TextStyle(
-                fontSize: isActive ? 22 : 20,
-              ),
-              child: Text(item.emoji),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              item.label,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 10,
-                color: isActive ? AppColors.gold : AppColors.textDim,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem {
-  final String label;
-  final String emoji;
-  final String key;
-  const _NavItem(this.label, this.emoji, this.key);
+// ─────────────────────────────────────────
+//  DATA CLASSES
+// ─────────────────────────────────────────
+class _TabInfo {
+  final String emoji, label;
+  final int index;
+  const _TabInfo(this.emoji, this.label, this.index);
 }
