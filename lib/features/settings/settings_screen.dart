@@ -38,31 +38,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final s = ref.read(settingsDaoProvider);
-    setState(() async {
-      _prayerReminder = await s.getBool('prayerReminder', defaultVal: true);
-      _muhasabaReminder = await s.getBool(
-        'eveningMuhasabaReminder',
-        defaultVal: true,
-      );
-      _morningAdhkar = await s.getBool(
-        'morningAdhkarReminder',
-        defaultVal: true,
-      );
-      _eveningAdhkar = await s.getBool(
-        'eveningAdhkarReminder',
-        defaultVal: true,
-      );
-      _wakeUpFajr = await s.getBool('wakeUpBeforeFajr', defaultVal: false);
-      _ramadanMode = await s.getBool('ramadanMode', defaultVal: false);
-      _madhab = await s.get('madhab') ?? 'shafi';
-      _method = await s.get('calcMethod') ?? 'MWL';
-      final tStr = await s.get('eveningReminderTime') ?? '21:00';
-      final parts = tStr.split(':');
-      _muhasabaTime = TimeOfDay(
-        hour: int.parse(parts[0]),
-        minute: int.parse(parts[1]),
-      );
-    });
+    
+    final prayerReminder = await s.getBool('prayerReminder', defaultVal: true);
+    final muhasabaReminder = await s.getBool(
+      'eveningMuhasabaReminder',
+      defaultVal: true,
+    );
+    final morningAdhkar = await s.getBool(
+      'morningAdhkarReminder',
+      defaultVal: true,
+    );
+    final eveningAdhkar = await s.getBool(
+      'eveningAdhkarReminder',
+      defaultVal: true,
+    );
+    final wakeUpFajr = await s.getBool('wakeUpBeforeFajr', defaultVal: false);
+    final ramadanMode = await s.getBool('ramadanMode', defaultVal: false);
+    final madhab = await s.get('madhab') ?? 'shafi';
+    final method = await s.get('calcMethod') ?? 'MWL';
+    final tStr = await s.get('eveningReminderTime') ?? '21:00';
+    final parts = tStr.split(':');
+    final muhasabaTime = TimeOfDay(
+      hour: int.parse(parts[0]),
+      minute: int.parse(parts[1]),
+    );
+
+    if (mounted) {
+      setState(() {
+        _prayerReminder = prayerReminder;
+        _muhasabaReminder = muhasabaReminder;
+        _morningAdhkar = morningAdhkar;
+        _eveningAdhkar = eveningAdhkar;
+        _wakeUpFajr = wakeUpFajr;
+        _ramadanMode = ramadanMode;
+        _madhab = madhab;
+        _method = method;
+        _muhasabaTime = muhasabaTime;
+      });
+    }
   }
 
   Future<void> _save(String key, dynamic value) async {

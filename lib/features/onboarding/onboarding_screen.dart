@@ -9,14 +9,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/app/main_shell.dart';
 
-class OnboardingScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:muhasabah/core/providers/database_providers.dart';
+
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     with TickerProviderStateMixin {
   final _pageCtrl = PageController();
   int _currentPage = 0;
@@ -76,15 +79,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     }
   }
 
-  void _goToApp() {
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const MainShell(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 600),
-      ),
-    );
+  void _goToApp() async {
+    await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
+    if (mounted) {
+      ref.invalidate(onboardingDoneProvider);
+    }
   }
 
   @override

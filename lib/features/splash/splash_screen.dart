@@ -8,7 +8,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -69,6 +70,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     // Premium drop shadow effect around the logo
                     Container(
                       decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -90,7 +94,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     const Text(
                       'محاسبة النفس',
                       style: TextStyle(
-                        fontFamily: 'Cairo', // Assuming Cairo is used, fallback is standard font
+                        fontFamily:
+                            'Cairo', // Assuming Cairo is used, fallback is standard font
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

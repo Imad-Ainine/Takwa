@@ -802,12 +802,11 @@ class _WeeklyChartState extends State<_WeeklyChart>
             ],
           ),
           const SizedBox(height: 16),
-
           // Chart area
           AnimatedBuilder(
             animation: _anim,
             builder: (_, __) => SizedBox(
-              height: 120,
+              height: 170,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: List.generate(widget.points.length, (i) {
@@ -904,8 +903,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
               ),
             ),
           ),
-
-          const SizedBox(height: 12),
+          const SizedBox(height: 30),
           // Legend
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
