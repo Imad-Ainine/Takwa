@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/widgets/geometric_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -66,20 +68,50 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF03122F),
+      backgroundColor: AppColors.night,
       body: Stack(
         children: [
-          // Elegant animated custom background
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _bgController,
-              builder: (context, _) => CustomPaint(
-                painter: _AwesomeSplashPainter(time: _bgController.value),
+          // ── Geometric Background (Shared) ──
+          const GeometricBackground(
+            opacity: 0.1,
+            strokeWidth: 0.8,
+            spacing: 42,
+          ),
+
+          // ── Gradient Glows ──
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [AppColors.teal.withOpacity(0.1), Colors.transparent],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -150,
+            right: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.gold.withOpacity(0.12),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
           ),
 
-          // Main Content
+          // ── Main Content ──
           Center(
             child: AnimatedBuilder(
               animation: _mainController,
@@ -97,24 +129,15 @@ class _SplashScreenState extends State<SplashScreen>
                           children: [
                             // Soft Glow behind logo
                             Container(
-                              width: 160,
-                              height: 160,
+                              width: 180,
+                              height: 180,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(
-                                      0xFFC8A96E,
-                                    ).withOpacity(0.3),
-                                    blurRadius: 50,
-                                    spreadRadius: 15,
-                                  ),
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFF3AAFA9,
-                                    ).withOpacity(0.2),
-                                    blurRadius: 80,
-                                    spreadRadius: 30,
+                                    color: AppColors.gold.withOpacity(0.25),
+                                    blurRadius: 60,
+                                    spreadRadius: 10,
                                   ),
                                 ],
                               ),
@@ -123,40 +146,39 @@ class _SplashScreenState extends State<SplashScreen>
                             // The transparent animated logo
                             Image.asset(
                               'assets/images/hasib_nafsak_transparent_bg.png',
-                              width: 170,
-                              height: 170,
+                              width: 180,
+                              height: 180,
                               fit: BoxFit.contain,
                             ),
                           ],
                         ),
                         const SizedBox(height: 40),
 
-                        // Elegant typography
+                        // Title
                         Text(
                           'محاسبة النفس',
-                          style: TextStyle(
-                            fontFamily: 'Amiri', // Using Amiri as per pubspec
-                            fontSize: 34,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFC8A96E), // Gold text
-                            letterSpacing: 1.5,
+                          style: GoogleFonts.amiri(
+                            fontSize: 38,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.gold,
+                            letterSpacing: 1.2,
+                            height: 1.1,
                             shadows: [
                               Shadow(
-                                color: const Color(0xFFC8A96E).withOpacity(0.5),
-                                blurRadius: 12,
-                                offset: const Offset(0, 2),
+                                color: AppColors.gold.withOpacity(0.3),
+                                blurRadius: 15,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 14),
-                        Text(
-                          'رحلتك نحو الطمأنينة',
-                          style: TextStyle(
-                            fontFamily: 'Amiri',
-                            fontSize: 18,
-                            color: Colors.white.withOpacity(0.85),
-                            letterSpacing: 0.5,
+
+                        const SizedBox(height: 24),
+
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: _VerseCard(
+                            verse: '﴿ حاسبوا أنفسكم قبل أن تُحاسبوا﴾',
                           ),
                         ),
                       ],
@@ -172,111 +194,61 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// ─────────────────────────────────────────
-//  AWESOME BACKGROUND PAINTER
-// ─────────────────────────────────────────
-class _AwesomeSplashPainter extends CustomPainter {
-  final double time;
-
-  _AwesomeSplashPainter({required this.time});
+// ═══════════════════════════════════════════════════════════════
+//  VERSE CARD
+// ═══════════════════════════════════════════════════════════════
+class _VerseCard extends StatelessWidget {
+  final String verse;
+  const _VerseCard({required this.verse});
 
   @override
-  void paint(Canvas canvas, Size size) {
-    // We already have the dark blue #03122F as scaffold background.
-    // Creating some soft floating glowing orbs and shapes
-
-    // 1. Top left Teal Glow
-    final paint1 = Paint()
-      ..shader =
-          RadialGradient(
-            colors: [
-              const Color(0xFF3AAFA9).withOpacity(0.15),
-              Colors.transparent,
-            ],
-          ).createShader(
-            Rect.fromCircle(
-              center: Offset(
-                size.width * 0.1 + math.sin(time * 2 * math.pi) * 30,
-                size.height * 0.1 + math.cos(time * 2 * math.pi) * 30,
-              ),
-              radius: 200,
-            ),
-          );
-    canvas.drawCircle(
-      Offset(
-        size.width * 0.1 + math.sin(time * 2 * math.pi) * 30,
-        size.height * 0.1 + math.cos(time * 2 * math.pi) * 30,
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [Color(0x1CC8A96E), Color(0x0E3AAFA9)],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gold.withOpacity(0.18)),
       ),
-      200,
-      paint1,
-    );
-
-    // 2. Bottom right Gold Glow
-    final paint2 = Paint()
-      ..shader =
-          RadialGradient(
-            colors: [
-              const Color(0xFFC8A96E).withOpacity(0.12),
-              Colors.transparent,
-            ],
-          ).createShader(
-            Rect.fromCircle(
-              center: Offset(
-                size.width * 0.9 + math.cos(time * 2 * math.pi) * 40,
-                size.height * 0.85 + math.sin(time * 2 * math.pi) * 40,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 28,
+                height: 1,
+                color: AppColors.gold.withOpacity(0.3),
               ),
-              radius: 250,
+              const SizedBox(width: 8),
+              const Text(
+                '❁',
+                style: TextStyle(color: AppColors.gold, fontSize: 14),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 28,
+                height: 1,
+                color: AppColors.gold.withOpacity(0.3),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            verse,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.amiri(
+              fontSize: 18,
+              color: AppColors.goldLight,
+              height: 2.0,
             ),
-          );
-    canvas.drawCircle(
-      Offset(
-        size.width * 0.9 + math.cos(time * 2 * math.pi) * 40,
-        size.height * 0.85 + math.sin(time * 2 * math.pi) * 40,
+          ),
+        ],
       ),
-      250,
-      paint2,
     );
-
-    // 3. Draw a subtle geometric Islamic pattern grid / stars
-    final paintGrid = Paint()
-      ..color = const Color(0xFFC8A96E).withOpacity(0.04)
-      ..strokeWidth = 1.0
-      ..style = PaintingStyle.stroke;
-
-    final spacing = size.width / 6;
-    for (double i = -size.height; i < size.width * 2; i += spacing) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paintGrid,
-      );
-      canvas.drawLine(
-        Offset(i + size.height, 0),
-        Offset(i, size.height),
-        paintGrid,
-      );
-    }
-
-    // Draw some floating particles
-    final particlePaint = Paint()
-      ..color = const Color(0xFF3AAFA9).withOpacity(0.4);
-    for (int i = 0; i < 15; i++) {
-      // Pseudo-random deterministic movement
-      double particleX =
-          (size.width * (i * 0.1 + 0.1) +
-              math.sin(time * 2 * math.pi + i) * 20) %
-          size.width;
-      double particleY =
-          (size.height - (time * size.height * 0.4 + i * 50)) % size.height;
-
-      canvas.drawCircle(
-        Offset(particleX, particleY),
-        1.5 + (i % 3),
-        particlePaint,
-      );
-    }
   }
-
-  @override
-  bool shouldRepaint(covariant _AwesomeSplashPainter old) => old.time != time;
 }

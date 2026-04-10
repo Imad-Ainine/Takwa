@@ -12,7 +12,7 @@ import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
 
-import 'presentation/widgets/location_picker_sheet.dart';
+import '../widgets/location_picker_sheet.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -271,6 +271,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         label: 'اختبار الإشعارات',
                         sublabel: 'تأكد من عمل الإشعارات',
                         onTap: _testNotification,
+                      ),
+                      _Divider(),
+                      _ActionSetting(
+                        icon: '👨‍💻',
+                        label: 'عن المطور',
+                        sublabel: 'تعرف على مبرمج التطبيق',
+                        onTap: () => Navigator.pushNamed(context, '/about-me'),
                       ),
                       _Divider(),
                       _ActionSetting(

@@ -11,11 +11,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
-import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/app/animated_drawer.dart';
 import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:muhasabah/core/widgets/geometric_background.dart';
+import 'package:muhasabah/core/widgets/adhkar_overlay_notification.dart';
+import 'package:muhasabah/core/providers/adhkar_providers.dart';
 import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
-import 'package:muhasabah/app/animated_drawer.dart';
+
+import '../../core/theme/app_theme.dart';
 
 const _kVerses = [
   '﴿ وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ﴾',
@@ -52,6 +56,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dailyRecordDaoProvider).getOrCreateToday();
       _staggerCtrl.forward();
+
+      // Demo trigger for Adhkar Overlay Notification
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          AdhkarOverlayNotification.show(
+            context,
+            AdhkarCategory.evening,
+            kAdhkarData[AdhkarCategory.evening]![1], // "أصبحنا وأصبح الملك لله"
+          );
+        }
+      });
     });
   }
 
@@ -143,7 +158,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         body: Stack(
           children: [
             // ── خلفية هندسية ──
-            const _GeomBg(),
+            const GeometricBackground(),
 
             // ── المحتوى ──
             CustomScrollView(
@@ -243,47 +258,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ),
     );
   }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  BACKGROUND
-// ═══════════════════════════════════════════════════════════════
-class _GeomBg extends StatelessWidget {
-  const _GeomBg();
-
-  @override
-  Widget build(BuildContext context) =>
-      Positioned.fill(child: CustomPaint(painter: _GeomPainter()));
-}
-
-class _GeomPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = const Color(0x09C8A96E)
-      ..strokeWidth = 0.7
-      ..style = PaintingStyle.stroke;
-
-    for (double x = -size.height; x < size.width + size.height; x += 48) {
-      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), p);
-      canvas.drawLine(Offset(x, 0), Offset(x - size.height, size.height), p);
-    }
-
-    canvas.drawCircle(
-      Offset(size.width / 2, -60),
-      240,
-      Paint()
-        ..shader =
-            const RadialGradient(
-              colors: [Color(0x1AC8A96E), Colors.transparent],
-            ).createShader(
-              Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 240),
-            ),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter o) => false;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -956,7 +930,13 @@ class _QuickIbadahGrid extends ConsumerWidget {
           itemCount: items.length,
           itemBuilder: (_, i) => _IbadahChip(
             item: items[i],
-            onTap: () => HapticFeedback.lightImpact(),
+            onTap: () {
+              if (items[i].label == 'الأذكار') {
+                Navigator.of(context).pushNamed('/adhkar');
+              } else {
+                HapticFeedback.lightImpact();
+              }
+            },
           ),
         ),
       ],

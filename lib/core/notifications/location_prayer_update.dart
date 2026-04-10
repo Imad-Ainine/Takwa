@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:adhan/adhan.dart' as adhan;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
@@ -486,18 +487,4 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
       ),
     );
   }
-}
-
-// فئة AppColors مستوردة من app_theme.dart
-class AppColors {
-  static const gold = Color(0xFFC8A96E);
-  static const teal = Color(0xFF3AAFA9);
-  static const success = Color(0xFF4CAF7D);
-  static const danger = Color(0xFFE07070);
-  static const night = Color(0xFF0D1117);
-  static const goldDim = Color(0x26C8A96E);
-  static const border = Color(0xFF2A3A50);
-  static const textPrimary = Color(0xFFE8EDF3);
-  static const textSecondary = Color(0xFF8FA3BB);
-  static const textDim = Color(0xFF4A6070);
 }

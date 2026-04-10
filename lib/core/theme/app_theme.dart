@@ -13,6 +13,17 @@ import 'package:google_fonts/google_fonts.dart';
 class AppColors {
   AppColors._();
 
+  // static const gold = Color(0xFFC8A96E);
+  // static const teal = Color(0xFF3AAFA9);
+  // static const success = Color(0xFF4CAF7D);
+  // static const danger = Color(0xFFE07070);
+  // static const night = Color(0xFF0D1117);
+  // static const goldDim = Color(0x26C8A96E);
+  // static const border = Color(0xFF2A3A50);
+  // static const textPrimary = Color(0xFFE8EDF3);
+  // static const textSecondary = Color(0xFF8FA3BB);
+  // static const textDim = Color(0xFF4A6070);
+
   // Backgrounds
   static const Color night = Color(0xFF0D1117);
   static const Color deep = Color(0xFF111827);
@@ -76,84 +87,84 @@ class AppTypography {
 
   // Amiri for headings & decorative Arabic text
   static TextStyle get displayLarge => GoogleFonts.amiri(
-        fontSize: 36,
-        fontWeight: FontWeight.w700,
-        color: AppColors.gold,
-        height: 1.3,
-      );
+    fontSize: 36,
+    fontWeight: FontWeight.w700,
+    color: AppColors.gold,
+    height: 1.3,
+  );
 
   static TextStyle get displayMedium => GoogleFonts.amiri(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        height: 1.4,
-      );
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
 
   static TextStyle get headingLarge => GoogleFonts.amiri(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        height: 1.4,
-      );
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
 
   static TextStyle get headingMedium => GoogleFonts.amiri(
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-      );
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+  );
 
   // Noto Naskh Arabic for body text
   static TextStyle get bodyLarge => GoogleFonts.notoNaskhArabic(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-        height: 1.8,
-      );
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.8,
+  );
 
   static TextStyle get bodyMedium => GoogleFonts.notoNaskhArabic(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-        height: 1.6,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textPrimary,
+    height: 1.6,
+  );
 
   static TextStyle get bodySmall => GoogleFonts.notoNaskhArabic(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
-        height: 1.5,
-      );
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textSecondary,
+    height: 1.5,
+  );
 
   static TextStyle get labelLarge => GoogleFonts.notoNaskhArabic(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
 
   static TextStyle get labelMedium => GoogleFonts.notoNaskhArabic(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
-      );
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
+  );
 
   static TextStyle get caption => GoogleFonts.notoNaskhArabic(
-        fontSize: 11,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textDim,
-      );
+    fontSize: 11,
+    fontWeight: FontWeight.w400,
+    color: AppColors.textDim,
+  );
 
   static TextStyle get quranicVerse => GoogleFonts.amiri(
-        fontSize: 20,
-        fontWeight: FontWeight.w400,
-        color: AppColors.goldLight,
-        height: 2.0,
-      );
+    fontSize: 20,
+    fontWeight: FontWeight.w400,
+    color: AppColors.goldLight,
+    height: 2.0,
+  );
 
   static TextStyle get taqwaScore => GoogleFonts.notoNaskhArabic(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: AppColors.gold,
-      );
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    color: AppColors.gold,
+  );
 }
 
 // ─────────────────────────────────────────
@@ -173,8 +184,10 @@ class AppSpacing {
   // Screen padding
   static const EdgeInsets screenPadding = EdgeInsets.symmetric(horizontal: 16);
   static const EdgeInsets cardPadding = EdgeInsets.all(16);
-  static const EdgeInsets chipPadding =
-      EdgeInsets.symmetric(horizontal: 12, vertical: 6);
+  static const EdgeInsets chipPadding = EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 6,
+  );
 }
 
 // ─────────────────────────────────────────
@@ -203,27 +216,24 @@ class AppShadows {
   AppShadows._();
 
   static List<BoxShadow> get card => [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.3),
-          blurRadius: 16,
-          offset: const Offset(0, 4),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withOpacity(0.3),
+      blurRadius: 16,
+      offset: const Offset(0, 4),
+    ),
+  ];
 
   static List<BoxShadow> get goldGlow => [
-        BoxShadow(
-          color: AppColors.gold.withOpacity(0.25),
-          blurRadius: 20,
-          spreadRadius: 0,
-        ),
-      ];
+    BoxShadow(
+      color: AppColors.gold.withOpacity(0.25),
+      blurRadius: 20,
+      spreadRadius: 0,
+    ),
+  ];
 
   static List<BoxShadow> get tealGlow => [
-        BoxShadow(
-          color: AppColors.teal.withOpacity(0.2),
-          blurRadius: 16,
-        ),
-      ];
+    BoxShadow(color: AppColors.teal.withOpacity(0.2), blurRadius: 16),
+  ];
 }
 
 // ─────────────────────────────────────────
@@ -233,233 +243,229 @@ class AppTheme {
   AppTheme._();
 
   static ThemeData get dark => ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
+    useMaterial3: true,
+    brightness: Brightness.dark,
 
-        // Color Scheme
-        colorScheme: const ColorScheme.dark(
-          primary: AppColors.gold,
-          onPrimary: AppColors.night,
-          secondary: AppColors.teal,
-          onSecondary: AppColors.night,
-          surface: AppColors.card,
-          onSurface: AppColors.textPrimary,
-          error: AppColors.danger,
-          outline: AppColors.border,
-          primaryContainer: AppColors.goldDim,
-          secondaryContainer: AppColors.tealDim,
+    // Color Scheme
+    colorScheme: const ColorScheme.dark(
+      primary: AppColors.gold,
+      onPrimary: AppColors.night,
+      secondary: AppColors.teal,
+      onSecondary: AppColors.night,
+      surface: AppColors.card,
+      onSurface: AppColors.textPrimary,
+      error: AppColors.danger,
+      outline: AppColors.border,
+      primaryContainer: AppColors.goldDim,
+      secondaryContainer: AppColors.tealDim,
+    ),
+
+    scaffoldBackgroundColor: AppColors.night,
+
+    // AppBar
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.deep,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: AppTypography.headingMedium,
+      iconTheme: const IconThemeData(color: AppColors.gold),
+      systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    ),
+
+    // Card
+    cardTheme: CardThemeData(
+      color: AppColors.card,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.card,
+        side: const BorderSide(color: AppColors.border, width: 1),
+      ),
+      margin: EdgeInsets.zero,
+    ),
+
+    // Bottom Navigation
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: AppColors.card,
+      selectedItemColor: AppColors.gold,
+      unselectedItemColor: AppColors.textDim,
+      elevation: 0,
+      selectedLabelStyle: AppTypography.caption.copyWith(color: AppColors.gold),
+      unselectedLabelStyle: AppTypography.caption,
+    ),
+
+    // NavigationBar (Material 3)
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: AppColors.card,
+      indicatorColor: AppColors.goldDim,
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: AppColors.gold, size: 24);
+        }
+        return const IconThemeData(color: AppColors.textDim, size: 24);
+      }),
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return AppTypography.caption.copyWith(color: AppColors.gold);
+        }
+        return AppTypography.caption;
+      }),
+    ),
+
+    // Elevated Button
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.gold,
+        foregroundColor: AppColors.night,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
+        textStyle: AppTypography.labelLarge.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.night,
         ),
+      ),
+    ),
 
-        scaffoldBackgroundColor: AppColors.night,
+    // Outlined Button
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.gold,
+        side: const BorderSide(color: AppColors.gold, width: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
+        textStyle: AppTypography.labelLarge,
+      ),
+    ),
 
-        // AppBar
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.deep,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: AppTypography.headingMedium,
-          iconTheme: const IconThemeData(color: AppColors.gold),
-          systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
-            statusBarColor: Colors.transparent,
-          ),
-        ),
+    // Text Button
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.teal,
+        textStyle: AppTypography.labelMedium.copyWith(color: AppColors.teal),
+      ),
+    ),
 
-        // Card
-        cardTheme: CardThemeData(
-          color: AppColors.card,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.card,
-            side: const BorderSide(color: AppColors.border, width: 1),
-          ),
-          margin: EdgeInsets.zero,
-        ),
+    // Checkbox
+    checkboxTheme: CheckboxThemeData(
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return AppColors.success;
+        return Colors.transparent;
+      }),
+      checkColor: WidgetStateProperty.all(Colors.white),
+      side: const BorderSide(color: AppColors.border, width: 2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    ),
 
-        // Bottom Navigation
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: AppColors.card,
-          selectedItemColor: AppColors.gold,
-          unselectedItemColor: AppColors.textDim,
-          elevation: 0,
-          selectedLabelStyle:
-              AppTypography.caption.copyWith(color: AppColors.gold),
-          unselectedLabelStyle: AppTypography.caption,
-        ),
+    // Switch
+    switchTheme: SwitchThemeData(
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return Colors.white;
+        return AppColors.textDim;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) return AppColors.success;
+        return AppColors.border;
+      }),
+    ),
 
-        // NavigationBar (Material 3)
-        navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: AppColors.card,
-          indicatorColor: AppColors.goldDim,
-          iconTheme: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return const IconThemeData(color: AppColors.gold, size: 24);
-            }
-            return const IconThemeData(color: AppColors.textDim, size: 24);
-          }),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return AppTypography.caption.copyWith(color: AppColors.gold);
-            }
-            return AppTypography.caption;
-          }),
-        ),
+    // Input Decoration
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.card2,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: AppRadius.input,
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: AppRadius.input,
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: AppRadius.input,
+        borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
+      ),
+      hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textDim),
+      labelStyle: AppTypography.labelMedium,
+    ),
 
-        // Elevated Button
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.gold,
-            foregroundColor: AppColors.night,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
-            textStyle: AppTypography.labelLarge.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.night,
-            ),
-          ),
-        ),
+    // Divider
+    dividerTheme: const DividerThemeData(
+      color: AppColors.border,
+      thickness: 1,
+      space: 0,
+    ),
 
-        // Outlined Button
-        outlinedButtonTheme: OutlinedButtonThemeData(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.gold,
-            side: const BorderSide(color: AppColors.gold, width: 1),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
-            textStyle: AppTypography.labelLarge,
-          ),
-        ),
+    // Chip
+    chipTheme: ChipThemeData(
+      backgroundColor: AppColors.card,
+      side: const BorderSide(color: AppColors.border),
+      labelStyle: AppTypography.labelMedium,
+      padding: AppSpacing.chipPadding,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.chip),
+    ),
 
-        // Text Button
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.teal,
-            textStyle:
-                AppTypography.labelMedium.copyWith(color: AppColors.teal),
-          ),
-        ),
+    // Progress Indicator
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      color: AppColors.gold,
+      linearTrackColor: AppColors.border,
+      circularTrackColor: AppColors.border,
+    ),
 
-        // Checkbox
-        checkboxTheme: CheckboxThemeData(
-          fillColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return AppColors.success;
-            return Colors.transparent;
-          }),
-          checkColor: WidgetStateProperty.all(Colors.white),
-          side: const BorderSide(color: AppColors.border, width: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        ),
+    // Slider
+    sliderTheme: const SliderThemeData(
+      activeTrackColor: AppColors.gold,
+      inactiveTrackColor: AppColors.border,
+      thumbColor: AppColors.gold,
+      overlayColor: AppColors.goldDim,
+    ),
 
-        // Switch
-        switchTheme: SwitchThemeData(
-          thumbColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return Colors.white;
-            return AppColors.textDim;
-          }),
-          trackColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return AppColors.success;
-            return AppColors.border;
-          }),
-        ),
+    // Tab Bar
+    tabBarTheme: TabBarThemeData(
+      labelColor: AppColors.gold,
+      unselectedLabelColor: AppColors.textDim,
+      indicatorColor: AppColors.gold,
+      indicatorSize: TabBarIndicatorSize.label,
+      labelStyle: AppTypography.labelLarge,
+      unselectedLabelStyle: AppTypography.labelMedium,
+    ),
 
-        // Input Decoration
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: AppColors.card2,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          border: OutlineInputBorder(
-            borderRadius: AppRadius.input,
-            borderSide: const BorderSide(color: AppColors.border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: AppRadius.input,
-            borderSide: const BorderSide(color: AppColors.border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: AppRadius.input,
-            borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
-          ),
-          hintStyle:
-              AppTypography.bodyMedium.copyWith(color: AppColors.textDim),
-          labelStyle: AppTypography.labelMedium,
-        ),
+    // Dialog
+    dialogTheme: DialogThemeData(
+      backgroundColor: AppColors.card,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.card,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      titleTextStyle: AppTypography.headingMedium,
+      contentTextStyle: AppTypography.bodyMedium,
+    ),
 
-        // Divider
-        dividerTheme: const DividerThemeData(
-          color: AppColors.border,
-          thickness: 1,
-          space: 0,
-        ),
+    // SnackBar
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: AppColors.card2,
+      contentTextStyle: AppTypography.bodyMedium,
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+      behavior: SnackBarBehavior.floating,
+    ),
 
-        // Chip
-        chipTheme: ChipThemeData(
-          backgroundColor: AppColors.card,
-          side: const BorderSide(color: AppColors.border),
-          labelStyle: AppTypography.labelMedium,
-          padding: AppSpacing.chipPadding,
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.chip),
-        ),
-
-        // Progress Indicator
-        progressIndicatorTheme: const ProgressIndicatorThemeData(
-          color: AppColors.gold,
-          linearTrackColor: AppColors.border,
-          circularTrackColor: AppColors.border,
-        ),
-
-        // Slider
-        sliderTheme: const SliderThemeData(
-          activeTrackColor: AppColors.gold,
-          inactiveTrackColor: AppColors.border,
-          thumbColor: AppColors.gold,
-          overlayColor: AppColors.goldDim,
-        ),
-
-        // Tab Bar
-        tabBarTheme: TabBarThemeData(
-          labelColor: AppColors.gold,
-          unselectedLabelColor: AppColors.textDim,
-          indicatorColor: AppColors.gold,
-          indicatorSize: TabBarIndicatorSize.label,
-          labelStyle: AppTypography.labelLarge,
-          unselectedLabelStyle: AppTypography.labelMedium,
-        ),
-
-        // Dialog
-        dialogTheme: DialogThemeData(
-          backgroundColor: AppColors.card,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.card,
-            side: const BorderSide(color: AppColors.border),
-          ),
-          titleTextStyle: AppTypography.headingMedium,
-          contentTextStyle: AppTypography.bodyMedium,
-        ),
-
-        // SnackBar
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: AppColors.card2,
-          contentTextStyle: AppTypography.bodyMedium,
-          shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
-          behavior: SnackBarBehavior.floating,
-        ),
-
-        // Text Theme
-        textTheme: TextTheme(
-          displayLarge: AppTypography.displayLarge,
-          displayMedium: AppTypography.displayMedium,
-          headlineLarge: AppTypography.headingLarge,
-          headlineMedium: AppTypography.headingMedium,
-          bodyLarge: AppTypography.bodyLarge,
-          bodyMedium: AppTypography.bodyMedium,
-          bodySmall: AppTypography.bodySmall,
-          labelLarge: AppTypography.labelLarge,
-          labelMedium: AppTypography.labelMedium,
-          labelSmall: AppTypography.caption,
-        ),
-      );
+    // Text Theme
+    textTheme: TextTheme(
+      displayLarge: AppTypography.displayLarge,
+      displayMedium: AppTypography.displayMedium,
+      headlineLarge: AppTypography.headingLarge,
+      headlineMedium: AppTypography.headingMedium,
+      bodyLarge: AppTypography.bodyLarge,
+      bodyMedium: AppTypography.bodyMedium,
+      bodySmall: AppTypography.bodySmall,
+      labelLarge: AppTypography.labelLarge,
+      labelMedium: AppTypography.labelMedium,
+      labelSmall: AppTypography.caption,
+    ),
+  );
 }
 
 // ─────────────────────────────────────────
@@ -470,48 +476,47 @@ class AppDecorations {
 
   /// Standard dark card
   static BoxDecoration get card => BoxDecoration(
-        color: AppColors.card,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.border),
-      );
+    color: AppColors.card,
+    borderRadius: AppRadius.card,
+    border: Border.all(color: AppColors.border),
+  );
 
   /// Glowing gold card (for highlights)
   static BoxDecoration get goldCard => BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0x20C8A96E), Color(0x0D3AAFA9)],
-        ),
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.gold.withOpacity(0.2)),
-        boxShadow: AppShadows.goldGlow,
-      );
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0x20C8A96E), Color(0x0D3AAFA9)],
+    ),
+    borderRadius: AppRadius.card,
+    border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+    boxShadow: AppShadows.goldGlow,
+  );
 
   /// Teal-accented card
   static BoxDecoration get tealCard => BoxDecoration(
-        color: AppColors.card,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.teal.withOpacity(0.25)),
-      );
+    color: AppColors.card,
+    borderRadius: AppRadius.card,
+    border: Border.all(color: AppColors.teal.withOpacity(0.25)),
+  );
 
   /// Success (done) row
   static BoxDecoration get successRow => BoxDecoration(
-        color: AppColors.successDim,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.success.withOpacity(0.25)),
-      );
+    color: AppColors.successDim,
+    borderRadius: AppRadius.card,
+    border: Border.all(color: AppColors.success.withOpacity(0.25)),
+  );
 
   /// Danger row
   static BoxDecoration get dangerRow => BoxDecoration(
-        color: AppColors.dangerDim,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: AppColors.danger.withOpacity(0.2)),
-      );
+    color: AppColors.dangerDim,
+    borderRadius: AppRadius.card,
+    border: Border.all(color: AppColors.danger.withOpacity(0.2)),
+  );
 
   /// Background with geometric overlay
-  static BoxDecoration get appBackground => const BoxDecoration(
-        gradient: AppColors.backgroundGradient,
-      );
+  static BoxDecoration get appBackground =>
+      const BoxDecoration(gradient: AppColors.backgroundGradient);
 }
 
 // ─────────────────────────────────────────
@@ -524,12 +529,7 @@ class TaqwaBadge extends StatelessWidget {
   final Color? color;
   final Color? bgColor;
 
-  const TaqwaBadge({
-    super.key,
-    required this.label,
-    this.color,
-    this.bgColor,
-  });
+  const TaqwaBadge({super.key, required this.label, this.color, this.bgColor});
 
   @override
   Widget build(BuildContext context) {
@@ -542,10 +542,7 @@ class TaqwaBadge extends StatelessWidget {
         borderRadius: AppRadius.chip,
         border: Border.all(color: c.withOpacity(0.3)),
       ),
-      child: Text(
-        label,
-        style: AppTypography.caption.copyWith(color: c),
-      ),
+      child: Text(label, style: AppTypography.caption.copyWith(color: c)),
     );
   }
 }
@@ -593,14 +590,9 @@ class SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(color: c),
-          ),
+          Text(label, style: AppTypography.caption.copyWith(color: c)),
           const SizedBox(width: 8),
-          Expanded(
-            child: Container(height: 1, color: c.withOpacity(0.2)),
-          ),
+          Expanded(child: Container(height: 1, color: c.withOpacity(0.2))),
         ],
       ),
     );

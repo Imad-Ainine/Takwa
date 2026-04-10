@@ -1,0 +1,351 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../widgets/geometric_background.dart';
+import '../theme/app_theme.dart';
+import '../providers/adhkar_providers.dart';
+
+// ═══════════════════════════════════════════════════════════════
+//  CUSTOM IN-APP ADHKAR OVERLAY NOTIFICATION
+// ═══════════════════════════════════════════════════════════════
+
+class AdhkarOverlayNotification {
+  static OverlayEntry? _overlayEntry;
+  static bool get isShowing => _overlayEntry != null;
+
+  /// Shows the custom in-app notification.
+  /// Automatically dismisses after [duration].
+  static void show(
+    BuildContext context,
+    AdhkarCategory category,
+    DhikrItem dhikr, {
+    Duration duration = const Duration(seconds: 5),
+  }) {
+    // Dismiss any existing notification first
+    dismiss();
+
+    final overlayState = Overlay.of(context, rootOverlay: true);
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return _NotifCardOverlay(
+          category: category,
+          dhikr: dhikr,
+          duration: duration,
+          onDismiss: dismiss,
+          onTap: () {
+            dismiss();
+            Navigator.of(context).pushNamed(
+              '/adhkar',
+              arguments: category.index, // pass category index
+            );
+          },
+        );
+      },
+    );
+
+    overlayState.insert(_overlayEntry!);
+  }
+
+  /// Manually dismisses the notification.
+  static void dismiss() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+}
+
+class _NotifCardOverlay extends StatefulWidget {
+  final AdhkarCategory category;
+  final DhikrItem dhikr;
+  final Duration duration;
+  final VoidCallback onDismiss;
+  final VoidCallback onTap;
+
+  const _NotifCardOverlay({
+    required this.category,
+    required this.dhikr,
+    required this.duration,
+    required this.onDismiss,
+    required this.onTap,
+  });
+
+  @override
+  State<_NotifCardOverlay> createState() => _NotifCardOverlayState();
+}
+
+class _NotifCardOverlayState extends State<_NotifCardOverlay>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+  late final Animation<Offset> _slideAnim;
+  late final Animation<double> _fadeAnim;
+
+  Timer? _autoDismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    _slideAnim =
+        Tween<Offset>(
+          begin: const Offset(1.5, 0), // Start from right
+          end: Offset.zero, // Center
+        ).animate(
+          CurvedAnimation(
+            parent: _animController,
+            curve: Curves.elasticOut,
+            reverseCurve: Curves.easeInBack,
+          ),
+        );
+
+    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeIn);
+
+    _animController.forward();
+
+    _autoDismissTimer = Timer(widget.duration, _triggerDismiss);
+  }
+
+  void _triggerDismiss() {
+    _autoDismissTimer?.cancel();
+    if (mounted) {
+      _animController.reverse().then((_) => widget.onDismiss());
+    }
+  }
+
+  void _handleSwipe(DragUpdateDetails details) {
+    if (details.primaryDelta! > 10) {
+      _triggerDismiss();
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoDismissTimer?.cancel();
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 80,
+      left: 16,
+      right: 16,
+      child: Material(
+        color: Colors.transparent,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          onHorizontalDragUpdate: _handleSwipe,
+          child: SlideTransition(
+            position: _slideAnim,
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // ── Premium Card ──
+                  Container(
+                    decoration: AppDecorations.card.copyWith(
+                      color: AppColors.card.withOpacity(0.9),
+                      border: Border.all(
+                        color: AppColors.gold.withOpacity(0.4),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.gold.withOpacity(0.12),
+                          blurRadius: 25,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      children: [
+                        // ── Geometric Pattern (from Home) ──
+                        const GeometricBackground(
+                          opacity: 0.1,
+                          strokeWidth: 0.8,
+                          spacing: 32,
+                        ),
+
+                        // ── Content ──
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.gold.withOpacity(0.12),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(
+                                      _getCategoryIcon(widget.category),
+                                      style: const TextStyle(fontSize: 22),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getCategoryName(widget.category),
+                                          style: GoogleFonts.amiri(
+                                            fontSize: 18,
+                                            color: AppColors.gold,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        Text(
+                                          'انقر للمتابعة',
+                                          style: AppTypography.caption.copyWith(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: AppColors.textDim,
+                                      size: 20,
+                                    ),
+                                    onPressed: _triggerDismiss,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              Text(
+                                widget.dhikr.arabic,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.quranicVerse.copyWith(
+                                  fontSize: 19,
+                                  color: AppColors.textPrimary,
+                                  height: 1.7,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.right,
+                              ),
+                              if (widget.dhikr.source != null) ...[
+                                const SizedBox(height: 14),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.teal.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.menu_book_rounded,
+                                        color: AppColors.teal,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          widget.dhikr.source!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppTypography.caption.copyWith(
+                                            color: AppColors.teal,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── Progress Bar ──
+                  Positioned(
+                    bottom: 0,
+                    left: 20,
+                    right: 20,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(AppRadius.lg),
+                      ),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 1.0, end: 0.0),
+                        duration: widget.duration,
+                        builder: (context, value, _) {
+                          return LinearProgressIndicator(
+                            value: value,
+                            minHeight: 3,
+                            backgroundColor: Colors.transparent,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.gold.withOpacity(0.6),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getCategoryIcon(AdhkarCategory cat) {
+    switch (cat) {
+      case AdhkarCategory.morning:
+        return '🌅';
+      case AdhkarCategory.evening:
+        return '🌆';
+      case AdhkarCategory.sleep:
+        return '🌙';
+      case AdhkarCategory.afterPrayer:
+        return '🕌';
+      case AdhkarCategory.misc:
+        return '📿';
+    }
+  }
+
+  String _getCategoryName(AdhkarCategory cat) {
+    switch (cat) {
+      case AdhkarCategory.morning:
+        return 'أذكار الصباح';
+      case AdhkarCategory.evening:
+        return 'أذكار المساء';
+      case AdhkarCategory.sleep:
+        return 'أذكار النوم';
+      case AdhkarCategory.afterPrayer:
+        return 'أذكار ما بعد الصلاة';
+      case AdhkarCategory.misc:
+        return 'أذكار عامة';
+    }
+  }
+}

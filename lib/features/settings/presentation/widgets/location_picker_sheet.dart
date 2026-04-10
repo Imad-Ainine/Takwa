@@ -6,8 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/database_providers.dart';
-import '../../../../core/notifications/location_prayer_update.dart' hide AppColors;
-
+import '../../../../core/notifications/location_prayer_update.dart';
 
 class LocationPickerSheet extends ConsumerStatefulWidget {
   const LocationPickerSheet({super.key});
@@ -23,7 +22,8 @@ class LocationPickerSheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<LocationPickerSheet> createState() => _LocationPickerSheetState();
+  ConsumerState<LocationPickerSheet> createState() =>
+      _LocationPickerSheetState();
 }
 
 class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
@@ -116,40 +116,45 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     if (result.isSuccess) {
       Navigator.pop(context);
     }
-    
+
     _showSnackBar(result.messageAr, result.isSuccess);
   }
 
   Future<void> _selectManualLocation(Map<String, dynamic> cityData) async {
     HapticFeedback.selectionClick();
-    
+
     final s = ref.read(settingsDaoProvider);
     await s.set('latitude', cityData['lat'].toString());
     await s.set('longitude', cityData['lng'].toString());
     await s.set('timezone', cityData['tz'].toString());
     await s.set('cityName', cityData['name'].toString());
-    
+
     // Set Timezone
     TimezoneResolver.setLocalTimezone(cityData['tz'] as String);
-    
-    // We can't elegantly call private `_scheduleForLocation` directly, 
+
+    // We can't elegantly call private `_scheduleForLocation` directly,
     // but initializing works, or we can just rely on state notifications.
     // For now we will trigger a fake 'refreshLocation' or call schedule functions if public
     // Since LocationPrayerManager doesn't expose manual schedule, we just save and rely on the UI/providers refreshing it.
-    
+
     if (!mounted) return;
     Navigator.pop(context);
     _showSnackBar('تم تحيين الموقع إلى ${cityData['name']} ✓', true);
   }
 
   void _showSnackBar(String message, bool isSuccess) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message, style: GoogleFonts.notoNaskhArabic(fontSize: 13)),
-      backgroundColor: isSuccess ? AppColors.success : AppColors.danger,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      duration: const Duration(seconds: 3),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.notoNaskhArabic(fontSize: 13),
+        ),
+        backgroundColor: isSuccess ? AppColors.success : AppColors.danger,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
@@ -190,7 +195,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               ),
             ).blurred(blur: 70),
           ),
-          
+
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -206,10 +211,13 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                   ),
                 ),
               ),
-              
+
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -218,7 +226,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       decoration: BoxDecoration(
                         color: AppColors.teal.withOpacity(0.1),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.teal.withOpacity(0.2)),
+                        border: Border.all(
+                          color: AppColors.teal.withOpacity(0.2),
+                        ),
                       ),
                       child: const Center(
                         child: Text('🌍', style: TextStyle(fontSize: 18)),
@@ -249,17 +259,20 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded, color: AppColors.textDim),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: AppColors.textDim,
+                      ),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white.withOpacity(0.05),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               Expanded(
                 child: ListView(
                   physics: const BouncingScrollPhysics(),
@@ -270,13 +283,17 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       isLoading: _isLoading,
                       onTap: _autoDetectLocation,
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Divider
                     Row(
                       children: [
-                        Expanded(child: Divider(color: AppColors.border.withOpacity(0.5))),
+                        Expanded(
+                          child: Divider(
+                            color: AppColors.border.withOpacity(0.5),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
@@ -287,17 +304,23 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                             ),
                           ),
                         ),
-                        Expanded(child: Divider(color: AppColors.border.withOpacity(0.5))),
+                        Expanded(
+                          child: Divider(
+                            color: AppColors.border.withOpacity(0.5),
+                          ),
+                        ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Curated Cities Grid / List
-                    ..._cities.map((city) => _CityCard(
-                      cityData: city,
-                      onTap: () => _selectManualLocation(city),
-                    )),
+                    ..._cities.map(
+                      (city) => _CityCard(
+                        cityData: city,
+                        onTap: () => _selectManualLocation(city),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -346,15 +369,19 @@ class _AutoDetectCard extends StatefulWidget {
   State<_AutoDetectCard> createState() => _AutoDetectCardState();
 }
 
-class _AutoDetectCardState extends State<_AutoDetectCard> with SingleTickerProviderStateMixin {
+class _AutoDetectCardState extends State<_AutoDetectCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _hoverCtrl;
 
   @override
   void initState() {
     super.initState();
-    _hoverCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _hoverCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
   }
-  
+
   @override
   void dispose() {
     _hoverCtrl.dispose();
@@ -364,8 +391,16 @@ class _AutoDetectCardState extends State<_AutoDetectCard> with SingleTickerProvi
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) { if (!widget.isLoading) _hoverCtrl.forward(); HapticFeedback.selectionClick(); },
-      onTapUp: (_) { if (!widget.isLoading) { _hoverCtrl.reverse(); widget.onTap(); } },
+      onTapDown: (_) {
+        if (!widget.isLoading) _hoverCtrl.forward();
+        HapticFeedback.selectionClick();
+      },
+      onTapUp: (_) {
+        if (!widget.isLoading) {
+          _hoverCtrl.reverse();
+          widget.onTap();
+        }
+      },
       onTapCancel: () => _hoverCtrl.reverse(),
       child: AnimatedBuilder(
         animation: _hoverCtrl,
@@ -386,8 +421,8 @@ class _AutoDetectCardState extends State<_AutoDetectCard> with SingleTickerProvi
                   color: AppColors.teal.withOpacity(0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
-                )
-              ]
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -400,15 +435,18 @@ class _AutoDetectCardState extends State<_AutoDetectCard> with SingleTickerProvi
                   ),
                   child: Center(
                     child: widget.isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.my_location_rounded,
                             color: Colors.white,
                           ),
-                        )
-                      : const Icon(Icons.my_location_rounded, color: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -435,7 +473,10 @@ class _AutoDetectCardState extends State<_AutoDetectCard> with SingleTickerProvi
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_left_rounded, color: Colors.white.withOpacity(0.8)),
+                Icon(
+                  Icons.chevron_left_rounded,
+                  color: Colors.white.withOpacity(0.8),
+                ),
               ],
             ),
           ),

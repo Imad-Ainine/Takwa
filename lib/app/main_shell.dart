@@ -13,7 +13,7 @@ import '../core/notifications/notifications_service.dart';
 import '../features/home/home_screen.dart';
 import '../features/checklist/checklist_screen.dart';
 import '../features/statistics/statistics_screen.dart';
-import '../features/settings/settings_screen.dart';
+import '../features/settings/presentation/screens/settings_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
 

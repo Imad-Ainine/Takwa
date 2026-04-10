@@ -14,6 +14,7 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:muhasabah/core/routes/app_routes.dart';
 
 // ─────────────────────────────────────────
 //  NOTIFICATION IDs  (ثابتة لا تتغير)
@@ -589,16 +590,17 @@ class NotificationRouter {
       case 'prayer':
       case 'wakeup':
         // انتقل لشاشة المحاسبة
-        Navigator.pushNamed(ctx, '/checklist');
+        Navigator.pushNamed(ctx, Routes.checklist);
         break;
       case 'muhasaba':
-        Navigator.pushNamed(ctx, '/checklist');
+        Navigator.pushNamed(ctx, Routes.checklist);
         break;
       case 'adhkar':
-        Navigator.pushNamed(ctx, '/checklist');
+        // انتقل لشاشة الأذكار
+        Navigator.pushNamed(ctx, Routes.adhkar);
         break;
       case 'achievement':
-        Navigator.pushNamed(ctx, '/statistics');
+        Navigator.pushNamed(ctx, Routes.statistics);
         break;
     }
   }
