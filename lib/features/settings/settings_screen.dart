@@ -12,6 +12,8 @@ import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
 
+import 'presentation/widgets/location_picker_sheet.dart';
+
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
   @override
@@ -38,7 +40,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final s = ref.read(settingsDaoProvider);
-    
+
     final prayerReminder = await s.getBool('prayerReminder', defaultVal: true);
     final muhasabaReminder = await s.getBool(
       'eveningMuhasabaReminder',
@@ -118,7 +120,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 8),
 
                   // ── التذكيرات ──
-                  const _SectionHeader(title: 'التذكيرات والإشعارات', icon: '🔔'),
+                  const _SectionHeader(
+                    title: 'التذكيرات والإشعارات',
+                    icon: '🔔',
+                  ),
                   _SettingsCard(
                     children: [
                       _ToggleSetting(
@@ -251,7 +256,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         icon: '📍',
                         label: 'تحديث الموقع الجغرافي',
                         sublabel: 'للحصول على أدق أوقات الصلاة',
-                        onTap: _updateLocation,
+                        onTap: () => LocationPickerSheet.show(context),
                       ),
                     ],
                   ),
@@ -309,32 +314,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _updateLocation() async {
-    final pos = await PrayerTimesService.getLocation();
-    if (pos != null && mounted) {
-      await ref
-          .read(settingsDaoProvider)
-          .set('latitude', pos.latitude.toString());
-      await ref
-          .read(settingsDaoProvider)
-          .set('longitude', pos.longitude.toString());
-      ref.invalidate(prayerTimesProvider);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'تم تحديث الموقع ✓',
-            style: GoogleFonts.notoNaskhArabic(fontSize: 13),
-          ),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-    }
   }
 
   Future<void> _testNotification() async {

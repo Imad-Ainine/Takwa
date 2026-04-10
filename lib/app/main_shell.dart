@@ -15,6 +15,7 @@ import '../features/checklist/checklist_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
+import '../app/animated_drawer.dart';
 
 // ─────────────────────────────────────────
 //  CURRENT TAB PROVIDER
@@ -46,9 +47,9 @@ class _MainShellState extends ConsumerState<MainShell>
   late final List<AnimationController> _tabAnims;
 
   static const _tabs = [
-    _TabInfo('🏠', 'الرئيسية',   0),
-    _TabInfo('✅', 'المحاسبة',   1),
-    _TabInfo('📊', 'إحصائيات',  2),
+    _TabInfo('🏠', 'الرئيسية', 0),
+    _TabInfo('✅', 'المحاسبة', 1),
+    _TabInfo('📊', 'إحصائيات', 2),
     _TabInfo('⚙️', 'الإعدادات', 3),
   ];
 
@@ -57,9 +58,13 @@ class _MainShellState extends ConsumerState<MainShell>
     super.initState();
     _pageCtrl = PageController(initialPage: widget.initialIndex);
 
-    _tabAnims = List.generate(_tabs.length, (i) =>
-      AnimationController(vsync: this,
-          duration: const Duration(milliseconds: 300)));
+    _tabAnims = List.generate(
+      _tabs.length,
+      (i) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
 
     // تفعيل التبويب الأول
     _tabAnims[widget.initialIndex].forward();
@@ -73,7 +78,9 @@ class _MainShellState extends ConsumerState<MainShell>
   @override
   void dispose() {
     _pageCtrl.dispose();
-    for (final a in _tabAnims) { a.dispose(); }
+    for (final a in _tabAnims) {
+      a.dispose();
+    }
     super.dispose();
   }
 
@@ -88,9 +95,11 @@ class _MainShellState extends ConsumerState<MainShell>
     _tabAnims[idx].forward();
 
     ref.read(_currentTabProvider.notifier).state = idx;
-    _pageCtrl.animateToPage(idx,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOutCubic);
+    _pageCtrl.animateToPage(
+      idx,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOutCubic,
+    );
   }
 
   @override
@@ -114,31 +123,33 @@ class _MainShellState extends ConsumerState<MainShell>
   Widget _buildShell() {
     final currentIdx = ref.watch(_currentTabProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.night,
-      body: PageView(
-        controller: _pageCtrl,
-        physics: const NeverScrollableScrollPhysics(), // manual nav only
-        children: const [
-          HomeScreen(),
-          ChecklistScreen(),
-          StatisticsScreen(),
-          SettingsScreen(),
-        ],
-        onPageChanged: (idx) {
-          // If swiped
-          if (ref.read(_currentTabProvider) != idx) {
-            _tabAnims[ref.read(_currentTabProvider)].reverse();
-            _tabAnims[idx].forward();
-            ref.read(_currentTabProvider.notifier).state = idx;
-          }
-        },
-      ),
-      bottomNavigationBar: _BottomNav(
-        currentIndex: currentIdx,
-        tabs: _tabs,
-        onTap: _switchTab,
-        tabAnims: _tabAnims,
+    return DrawerScaffold(
+      child: Scaffold(
+        backgroundColor: AppColors.night,
+        body: PageView(
+          controller: _pageCtrl,
+          physics: const NeverScrollableScrollPhysics(), // manual nav only
+          children: const [
+            HomeScreen(),
+            ChecklistScreen(),
+            StatisticsScreen(),
+            SettingsScreen(),
+          ],
+          onPageChanged: (idx) {
+            // If swiped
+            if (ref.read(_currentTabProvider) != idx) {
+              _tabAnims[ref.read(_currentTabProvider)].reverse();
+              _tabAnims[idx].forward();
+              ref.read(_currentTabProvider.notifier).state = idx;
+            }
+          },
+        ),
+        bottomNavigationBar: _BottomNav(
+          currentIndex: currentIdx,
+          tabs: _tabs,
+          onTap: _switchTab,
+          tabAnims: _tabAnims,
+        ),
       ),
     );
   }
@@ -165,7 +176,9 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.card,
-        border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
+        border: const Border(
+          top: BorderSide(color: AppColors.border, width: 1),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -201,7 +214,8 @@ class _BottomNav extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                  colors: [AppColors.gold, AppColors.teal]),
+                                colors: [AppColors.gold, AppColors.teal],
+                              ),
                               borderRadius: BorderRadius.circular(1),
                             ),
                           ),
@@ -213,12 +227,16 @@ class _BottomNav extends StatelessWidget {
                               tab.emoji,
                               style: TextStyle(
                                 fontSize: 22,
-                                shadows: isActive ? [
-                                  Shadow(
-                                    color: AppColors.gold.withOpacity(0.5 * t),
-                                    blurRadius: 10,
-                                  ),
-                                ] : null,
+                                shadows: isActive
+                                    ? [
+                                        Shadow(
+                                          color: AppColors.gold.withOpacity(
+                                            0.5 * t,
+                                          ),
+                                          blurRadius: 10,
+                                        ),
+                                      ]
+                                    : null,
                               ),
                             ),
                           ),
@@ -229,7 +247,9 @@ class _BottomNav extends StatelessWidget {
                             duration: const Duration(milliseconds: 200),
                             style: GoogleFonts.notoNaskhArabic(
                               fontSize: 10,
-                              color: isActive ? AppColors.gold : AppColors.textDim,
+                              color: isActive
+                                  ? AppColors.gold
+                                  : AppColors.textDim,
                               fontWeight: isActive
                                   ? FontWeight.w600
                                   : FontWeight.w400,
@@ -269,16 +289,23 @@ class _SplashScreenState extends State<_SplashScreen>
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this,
-        duration: const Duration(milliseconds: 800));
-    _fade  = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
-    _scale = Tween<double>(begin: 0.8, end: 1.0).animate(
-        CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    _scale = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
     _ctrl.forward();
   }
 
   @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -294,32 +321,47 @@ class _SplashScreenState extends State<_SplashScreen>
               children: [
                 // Logo ring
                 SizedBox(
-                  width: 100, height: 100,
-                  child: Stack(alignment: Alignment.center, children: [
-                    ...List.generate(3, (i) => Container(
-                      width: 100 - i * 20.0,
-                      height: 100 - i * 20.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.gold.withOpacity(0.3 - i * 0.08),
-                          width: 1,
+                  width: 100,
+                  height: 100,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ...List.generate(
+                        3,
+                        (i) => Container(
+                          width: 100 - i * 20.0,
+                          height: 100 - i * 20.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.gold.withOpacity(0.3 - i * 0.08),
+                              width: 1,
+                            ),
+                          ),
                         ),
                       ),
-                    )),
-                    const Text('🌙', style: TextStyle(fontSize: 32)),
-                  ]),
+                      const Text('🌙', style: TextStyle(fontSize: 32)),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
-                Text('محاسبة النفس',
-                    style: GoogleFonts.amiri(
-                        fontSize: 32, color: AppColors.gold,
-                        fontWeight: FontWeight.w700)),
+                Text(
+                  'محاسبة النفس',
+                  style: GoogleFonts.amiri(
+                    fontSize: 32,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
-                    style: GoogleFonts.amiri(
-                        fontSize: 14, color: AppColors.textSecondary),
-                    textAlign: TextAlign.center),
+                Text(
+                  '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
+                  style: GoogleFonts.amiri(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),

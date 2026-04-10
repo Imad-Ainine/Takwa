@@ -14,18 +14,8 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
-
-// ─────────────────────────────────────────
-//  STATIC DATA
-// ─────────────────────────────────────────
-const _kPrayers = [
-  _PrayerInfo('الفجر', '04:32', 'fajr', '🌅'),
-  _PrayerInfo('الشروق', '06:01', 'sunrise', '☀️'),
-  _PrayerInfo('الظهر', '12:18', 'dhuhr', '🌤'),
-  _PrayerInfo('العصر', '15:44', 'asr', '🌇'),
-  _PrayerInfo('المغرب', '18:26', 'maghrib', '🌆'),
-  _PrayerInfo('العشاء', '19:58', 'isha', '🌃'),
-];
+import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
+import 'package:muhasabah/app/animated_drawer.dart';
 
 const _kVerses = [
   '﴿ وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا ﴾',
@@ -86,10 +76,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       return Tween<Offset>(
         begin: const Offset(0, 0.10),
         end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: _staggerCtrl,
-        curve: Interval(start, end, curve: Curves.easeOutCubic),
-      ));
+      ).animate(
+        CurvedAnimation(
+          parent: _staggerCtrl,
+          curve: Interval(start, end, curve: Curves.easeOutCubic),
+        ),
+      );
     });
   }
 
@@ -108,40 +100,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _anim(int i, Widget child) => FadeTransition(
-        opacity: _fadeAnims[i],
-        child: SlideTransition(position: _slideAnims[i], child: child),
-      );
+    opacity: _fadeAnims[i],
+    child: SlideTransition(position: _slideAnims[i], child: child),
+  );
 
   static String _hijriMonthName(int m) => const [
-        'محرم',
-        'صفر',
-        'ربيع الأول',
-        'ربيع الآخر',
-        'جمادى الأولى',
-        'جمادى الآخرة',
-        'رجب',
-        'شعبان',
-        'رمضان',
-        'شوال',
-        'ذو القعدة',
-        'ذو الحجة',
-      ][m - 1];
+    'محرم',
+    'صفر',
+    'ربيع الأول',
+    'ربيع الآخر',
+    'جمادى الأولى',
+    'جمادى الآخرة',
+    'رجب',
+    'شعبان',
+    'رمضان',
+    'شوال',
+    'ذو القعدة',
+    'ذو الحجة',
+  ][m - 1];
 
   @override
   Widget build(BuildContext context) {
     final todayAsync = ref.watch(todayRecordProvider);
     final streakAsync = ref.watch(currentStreakProvider);
+    final prayerState = ref.watch(prayerScreenProvider);
 
     final hijri = HijriCalendar.now();
     final hijriStr =
         '${hijri.hDay} ${_hijriMonthName(hijri.hMonth)} ${hijri.hYear}';
-    final miladiStr =
-        DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.now());
+    final miladiStr = DateFormat(
+      'EEEE، d MMMM yyyy',
+      'ar',
+    ).format(DateTime.now());
     final verse = _kVerses[DateTime.now().day % _kVerses.length];
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light
-          .copyWith(statusBarColor: Colors.transparent),
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
       child: Scaffold(
         backgroundColor: AppColors.night,
         body: Stack(
@@ -162,6 +158,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   pinned: true,
                   elevation: 0,
                   surfaceTintColor: Colors.transparent,
+                  leading: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: DrawerMenuButton(),
+                  ),
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: _anim(
@@ -174,7 +174,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       child: Text(
                         hijriStr,
                         style: GoogleFonts.amiri(
-                            fontSize: 14, color: AppColors.gold),
+                          fontSize: 14,
+                          color: AppColors.gold,
+                        ),
                       ),
                     ),
                     centerTitle: true,
@@ -187,8 +189,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       // ① الصلاة القادمة
-                      _anim(1, _NextPrayerCard(prayer: _kPrayers[4])),
-                      const SizedBox(height: 14),
+                      if (prayerState.next != null)
+                        _anim(1, _NextPrayerCard(prayerState: prayerState)),
+                      if (prayerState.next != null) const SizedBox(height: 14),
 
                       // ② حلقة التقوى
                       _anim(
@@ -205,8 +208,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(height: 14),
 
                       // ③ أوقات الصلاة
-                      _anim(3, const _PrayerTimesRow()),
-                      const SizedBox(height: 14),
+                      if (prayerState.prayers.isNotEmpty)
+                        _anim(
+                          3,
+                          _PrayerTimesRow(
+                            prayers: prayerState.prayers,
+                            currentKey: prayerState.next?.name ?? '',
+                          ),
+                        ),
+                      if (prayerState.prayers.isNotEmpty)
+                        const SizedBox(height: 14),
 
                       // ④ عبادات اليوم
                       _anim(
@@ -262,10 +273,12 @@ class _GeomPainter extends CustomPainter {
       Offset(size.width / 2, -60),
       240,
       Paint()
-        ..shader = const RadialGradient(
-          colors: [Color(0x1AC8A96E), Colors.transparent],
-        ).createShader(
-            Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 240)),
+        ..shader =
+            const RadialGradient(
+              colors: [Color(0x1AC8A96E), Colors.transparent],
+            ).createShader(
+              Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 240),
+            ),
     );
   }
 
@@ -287,11 +300,11 @@ class _DateHeader extends StatelessWidget {
     final greeting = h < 12
         ? 'صباح الخير 🌅'
         : h < 18
-            ? 'مساء الخير 🌤'
-            : 'مساء النور 🌙';
+        ? 'مساء الخير 🌤'
+        : 'مساء النور 🌙';
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 56, 16, 12),
+      padding: const EdgeInsets.fromLTRB(16, 50, 56, 12),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -307,13 +320,22 @@ class _DateHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(hijriStr,
-                  style: GoogleFonts.amiri(
-                      fontSize: 19, color: AppColors.gold, height: 1.2)),
+              Text(
+                hijriStr,
+                style: GoogleFonts.amiri(
+                  fontSize: 19,
+                  color: AppColors.gold,
+                  height: 1.2,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(miladiStr,
-                  style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 11, color: AppColors.textSecondary)),
+              Text(
+                miladiStr,
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+              ),
             ],
           ),
           Container(
@@ -323,9 +345,13 @@ class _DateHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.gold.withOpacity(0.22)),
             ),
-            child: Text(greeting,
-                style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 12, color: AppColors.goldLight)),
+            child: Text(
+              greeting,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 12,
+                color: AppColors.goldLight,
+              ),
+            ),
           ),
         ],
       ),
@@ -337,8 +363,8 @@ class _DateHeader extends StatelessWidget {
 //  NEXT PRAYER CARD
 // ═══════════════════════════════════════════════════════════════
 class _NextPrayerCard extends StatefulWidget {
-  final _PrayerInfo prayer;
-  const _NextPrayerCard({required this.prayer});
+  final PrayerScreenState prayerState;
+  const _NextPrayerCard({required this.prayerState});
 
   @override
   State<_NextPrayerCard> createState() => _NextPrayerCardState();
@@ -347,31 +373,14 @@ class _NextPrayerCard extends StatefulWidget {
 class _NextPrayerCardState extends State<_NextPrayerCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulse;
-  String _countdown = '';
 
   @override
   void initState() {
     super.initState();
-    _pulse =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2))
-          ..repeat(reverse: true);
-    _updateCountdown();
-  }
-
-  void _updateCountdown() {
-    if (!mounted) return;
-    final now = DateTime.now();
-    final target = DateTime(now.year, now.month, now.day, 18, 26);
-    final diff = target.difference(now);
-    if (diff.isNegative) {
-      _countdown = 'حان الوقت الآن';
-    } else {
-      final h = diff.inHours;
-      final m = diff.inMinutes % 60;
-      _countdown = h > 0 ? 'بعد $hس $mد' : 'بعد $m دقيقة';
-    }
-    setState(() {});
-    Future.delayed(const Duration(seconds: 60), _updateCountdown);
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
   }
 
   @override
@@ -380,8 +389,62 @@ class _NextPrayerCardState extends State<_NextPrayerCard>
     super.dispose();
   }
 
+  String _getEmoji(String key) {
+    switch (key) {
+      case 'fajr':
+        return '🌅';
+      case 'sunrise':
+        return '☀️';
+      case 'dhuhr':
+        return '🌤';
+      case 'asr':
+        return '🌇';
+      case 'maghrib':
+        return '🌆';
+      case 'isha':
+        return '🌃';
+      default:
+        return '🕌';
+    }
+  }
+
+  String _getArabicName(String key) {
+    if (widget.prayerState.next != null) {
+      // In location_prayer_update.dart PrayerTimeInfo we might not have localized names if it's dynamic
+      switch (key) {
+        case 'fajr':
+          return 'الفجر';
+        case 'sunrise':
+          return 'الشروق';
+        case 'dhuhr':
+          return 'الظهر';
+        case 'asr':
+          return 'العصر';
+        case 'maghrib':
+          return 'المغرب';
+        case 'isha':
+          return 'العشاء';
+      }
+    }
+    return key;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final next = widget.prayerState.next!;
+    final diff = widget.prayerState.remaining ?? const Duration();
+    String countdown;
+    if (diff.isNegative || diff.inSeconds == 0) {
+      countdown = 'حان الوقت الآن';
+    } else {
+      final h = diff.inHours;
+      final m = diff.inMinutes % 60;
+      countdown = h > 0 ? 'بعد $hس $mد' : 'بعد $m دقيقة';
+    }
+
+    final String emoji = _getEmoji(next.name);
+    final String timeStr = DateFormat('HH:mm').format(next.time);
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -397,7 +460,7 @@ class _NextPrayerCardState extends State<_NextPrayerCard>
             color: AppColors.gold.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -413,15 +476,15 @@ class _NextPrayerCardState extends State<_NextPrayerCard>
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color:
-                        AppColors.gold.withOpacity(0.08 + 0.14 * _pulse.value),
+                    color: AppColors.gold.withOpacity(
+                      0.08 + 0.14 * _pulse.value,
+                    ),
                     blurRadius: 10 + 10 * _pulse.value,
-                  )
+                  ),
                 ],
               ),
               child: Center(
-                child: Text(widget.prayer.emoji,
-                    style: const TextStyle(fontSize: 24)),
+                child: Text(emoji, style: const TextStyle(fontSize: 24)),
               ),
             ),
           ),
@@ -432,17 +495,28 @@ class _NextPrayerCardState extends State<_NextPrayerCard>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('الصلاة القادمة',
-                    style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 10, color: AppColors.textSecondary)),
-                Text('صلاة ${widget.prayer.name}',
-                    style: GoogleFonts.amiri(
-                        fontSize: 19,
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700)),
-                Text(widget.prayer.time,
-                    style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 12, color: AppColors.textSecondary)),
+                Text(
+                  'الصلاة القادمة',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 10,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                Text(
+                  'صلاة ${_getArabicName(next.name)}',
+                  style: GoogleFonts.amiri(
+                    fontSize: 19,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  timeStr,
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -455,11 +529,16 @@ class _NextPrayerCardState extends State<_NextPrayerCard>
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.gold.withOpacity(0.25)),
             ),
-            child: Text(_countdown,
-                style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 11,
-                    color: AppColors.goldLight,
-                    fontWeight: FontWeight.w600)),
+            child: Text(
+              countdown,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 11,
+                color: widget.prayerState.isIqamaPhase
+                    ? Colors.redAccent
+                    : AppColors.goldLight,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -495,15 +574,18 @@ class _TaqwaSection extends ConsumerWidget {
                 Text(
                   _msg(pct),
                   style: GoogleFonts.amiri(
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700),
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   'أنجزت $done من ١٠ عبادات',
                   style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 12, color: AppColors.textSecondary),
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 _LevelBadge(label: _level(net)),
@@ -555,9 +637,13 @@ class _TaqwaRingState extends State<_TaqwaRing>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1400));
-    _anim = Tween<double>(begin: 0, end: widget.progress)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+    _anim = Tween<double>(
+      begin: 0,
+      end: widget.progress,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
     _ctrl.forward();
   }
 
@@ -565,8 +651,10 @@ class _TaqwaRingState extends State<_TaqwaRing>
   void didUpdateWidget(_TaqwaRing old) {
     super.didUpdateWidget(old);
     if (old.progress != widget.progress) {
-      _anim = Tween<double>(begin: old.progress, end: widget.progress)
-          .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+      _anim = Tween<double>(
+        begin: old.progress,
+        end: widget.progress,
+      ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
       _ctrl
         ..reset()
         ..forward();
@@ -595,14 +683,19 @@ class _TaqwaRingState extends State<_TaqwaRing>
                 Text(
                   '${(_anim.value * 100).round()}%',
                   style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.gold,
-                      height: 1),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.gold,
+                    height: 1,
+                  ),
                 ),
-                Text('اليوم',
-                    style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 9, color: AppColors.textSecondary)),
+                Text(
+                  'اليوم',
+                  style: GoogleFonts.notoNaskhArabic(
+                    fontSize: 9,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -622,12 +715,13 @@ class _RingPainter extends CustomPainter {
     final r = (size.width - 10) / 2;
 
     canvas.drawCircle(
-        c,
-        r,
-        Paint()
-          ..color = AppColors.border
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 7);
+      c,
+      r,
+      Paint()
+        ..color = AppColors.border
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 7,
+    );
 
     if (progress <= 0) return;
 
@@ -653,11 +747,12 @@ class _RingPainter extends CustomPainter {
     final dx = c.dx + r * math.cos(angle);
     final dy = c.dy + r * math.sin(angle);
     canvas.drawCircle(
-        Offset(dx, dy),
-        5,
-        Paint()
-          ..color = AppColors.goldLight
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4));
+      Offset(dx, dy),
+      5,
+      Paint()
+        ..color = AppColors.goldLight
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
     canvas.drawCircle(Offset(dx, dy), 3, Paint()..color = AppColors.goldLight);
   }
 
@@ -669,7 +764,9 @@ class _RingPainter extends CustomPainter {
 //  PRAYER TIMES ROW
 // ═══════════════════════════════════════════════════════════════
 class _PrayerTimesRow extends StatelessWidget {
-  const _PrayerTimesRow();
+  final dynamic prayers;
+  final String currentKey;
+  const _PrayerTimesRow({required this.prayers, required this.currentKey});
 
   @override
   Widget build(BuildContext context) {
@@ -682,14 +779,20 @@ class _PrayerTimesRow extends StatelessWidget {
           height: 84,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            reverse: true,
+            reverse: true, // RTL
             physics: const BouncingScrollPhysics(),
-            itemCount: _kPrayers.length,
+            itemCount: prayers.length,
             separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (_, i) => _PrayerChip(
-              prayer: _kPrayers[i],
-              isActive: _kPrayers[i].key == 'maghrib',
-            ),
+            itemBuilder: (_, i) {
+              final prayer = prayers[i];
+              return _PrayerChip(
+                prayer: prayer,
+                isActive: prayer.name == currentKey,
+                onTap: () {
+                  Navigator.of(context).pushNamed('/prayer');
+                },
+              );
+            },
           ),
         ),
       ],
@@ -698,48 +801,106 @@ class _PrayerTimesRow extends StatelessWidget {
 }
 
 class _PrayerChip extends StatelessWidget {
-  final _PrayerInfo prayer;
+  final dynamic prayer;
   final bool isActive;
-  const _PrayerChip({required this.prayer, required this.isActive});
+  final VoidCallback onTap;
+  const _PrayerChip({
+    required this.prayer,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  String _getEmoji(String key) {
+    switch (key) {
+      case 'fajr':
+        return '🌅';
+      case 'sunrise':
+        return '☀️';
+      case 'dhuhr':
+        return '🌤';
+      case 'asr':
+        return '🌇';
+      case 'maghrib':
+        return '🌆';
+      case 'isha':
+        return '🌃';
+      default:
+        return '🕌';
+    }
+  }
+
+  String _getArabicName(String key) {
+    switch (key) {
+      case 'fajr':
+        return 'الفجر';
+      case 'sunrise':
+        return 'الشروق';
+      case 'dhuhr':
+        return 'الظهر';
+      case 'asr':
+        return 'العصر';
+      case 'maghrib':
+        return 'المغرب';
+      case 'isha':
+        return 'العشاء';
+      default:
+        return key;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
-      width: 66,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-      decoration: BoxDecoration(
-        gradient: isActive
-            ? const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0x28C8A96E), Color(0x143AAFA9)],
-              )
-            : null,
-        color: isActive ? null : AppColors.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isActive ? AppColors.gold.withOpacity(0.35) : AppColors.border,
-          width: isActive ? 1.5 : 1,
+    final emoji = _getEmoji(prayer.name);
+    final name = _getArabicName(prayer.name);
+    final timeStr = DateFormat('HH:mm').format(prayer.time);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: 66,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        decoration: BoxDecoration(
+          gradient: isActive
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0x28C8A96E), Color(0x143AAFA9)],
+                )
+              : null,
+          color: isActive ? null : AppColors.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isActive
+                ? AppColors.gold.withOpacity(0.35)
+                : AppColors.border,
+            width: isActive ? 1.5 : 1,
+          ),
+          boxShadow: isActive ? AppShadows.goldGlow : null,
         ),
-        boxShadow: isActive ? AppShadows.goldGlow : null,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(prayer.emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 4),
-          Text(prayer.name,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 4),
+            Text(
+              name,
               style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10,
-                  color: isActive ? AppColors.gold : AppColors.textSecondary,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400)),
-          const SizedBox(height: 2),
-          Text(prayer.time,
+                fontSize: 10,
+                color: isActive ? AppColors.gold : AppColors.textSecondary,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              timeStr,
               style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10,
-                  color: isActive ? AppColors.goldLight : AppColors.textDim)),
-        ],
+                fontSize: 10,
+                color: isActive ? AppColors.goldLight : AppColors.textDim,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -760,17 +921,25 @@ class _QuickIbadahGrid extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text('عبادات اليوم',
-                style: GoogleFonts.amiri(
-                    fontSize: 16, color: AppColors.textPrimary)),
+            Text(
+              'عبادات اليوم',
+              style: GoogleFonts.amiri(
+                fontSize: 16,
+                color: AppColors.textPrimary,
+              ),
+            ),
             const SizedBox(width: 8),
             Expanded(child: Container(height: 1, color: AppColors.border)),
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () {},
-              child: Text('عرض الكل ←',
-                  style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 11, color: AppColors.teal)),
+              child: Text(
+                'عرض الكل ←',
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 11,
+                  color: AppColors.teal,
+                ),
+              ),
             ),
           ],
         ),
@@ -795,14 +964,17 @@ class _QuickIbadahGrid extends ConsumerWidget {
   }
 
   List<_IbadahItem> _items(DailyRecord? r) => [
-        _IbadahItem('🌅', 'الفجر', r?.fajrStatus == PrayerStatus.performed),
-        _IbadahItem('📖', 'القرآن', (r?.quranPages ?? 0) > 0),
-        _IbadahItem('☀️', 'الظهر', r?.dhuhrStatus == PrayerStatus.performed),
-        _IbadahItem('🌤', 'العصر', r?.asrStatus == PrayerStatus.performed),
-        _IbadahItem('⭐', 'الأذكار',
-            (r?.morningAdhkar ?? false) && (r?.eveningAdhkar ?? false)),
-        _IbadahItem('🌌', 'قيام الليل', r?.nightPrayer ?? false),
-      ];
+    _IbadahItem('🌅', 'الفجر', r?.fajrStatus == PrayerStatus.performed),
+    _IbadahItem('📖', 'القرآن', (r?.quranPages ?? 0) > 0),
+    _IbadahItem('☀️', 'الظهر', r?.dhuhrStatus == PrayerStatus.performed),
+    _IbadahItem('🌤', 'العصر', r?.asrStatus == PrayerStatus.performed),
+    _IbadahItem(
+      '⭐',
+      'الأذكار',
+      (r?.morningAdhkar ?? false) && (r?.eveningAdhkar ?? false),
+    ),
+    _IbadahItem('🌌', 'قيام الليل', r?.nightPrayer ?? false),
+  ];
 }
 
 class _IbadahChip extends StatelessWidget {
@@ -818,17 +990,21 @@ class _IbadahChip extends StatelessWidget {
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeOutBack,
         decoration: BoxDecoration(
-          color:
-              item.done ? AppColors.success.withOpacity(0.1) : AppColors.card,
+          color: item.done
+              ? AppColors.success.withOpacity(0.1)
+              : AppColors.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-              color: item.done
-                  ? AppColors.success.withOpacity(0.3)
-                  : AppColors.border),
+            color: item.done
+                ? AppColors.success.withOpacity(0.3)
+                : AppColors.border,
+          ),
           boxShadow: item.done
               ? [
                   BoxShadow(
-                      color: AppColors.success.withOpacity(0.1), blurRadius: 8)
+                    color: AppColors.success.withOpacity(0.1),
+                    blurRadius: 8,
+                  ),
                 ]
               : null,
         ),
@@ -849,19 +1025,23 @@ class _IbadahChip extends StatelessWidget {
                       border: Border.all(color: AppColors.card, width: 1.5),
                     ),
                     child: const Center(
-                        child: Text('✓',
-                            style:
-                                TextStyle(fontSize: 8, color: Colors.white))),
+                      child: Text(
+                        '✓',
+                        style: TextStyle(fontSize: 8, color: Colors.white),
+                      ),
+                    ),
                   ),
               ],
             ),
             const SizedBox(height: 5),
-            Text(item.label,
-                style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 10,
-                    color:
-                        item.done ? AppColors.success : AppColors.textSecondary,
-                    fontWeight: item.done ? FontWeight.w600 : FontWeight.w400)),
+            Text(
+              item.label,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 10,
+                color: item.done ? AppColors.success : AppColors.textSecondary,
+                fontWeight: item.done ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
           ],
         ),
       ),
@@ -895,24 +1075,41 @@ class _VerseCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                  width: 28, height: 1, color: AppColors.gold.withOpacity(0.3)),
+                width: 28,
+                height: 1,
+                color: AppColors.gold.withOpacity(0.3),
+              ),
               const SizedBox(width: 8),
-              const Text('❁',
-                  style: TextStyle(color: AppColors.gold, fontSize: 14)),
+              const Text(
+                '❁',
+                style: TextStyle(color: AppColors.gold, fontSize: 14),
+              ),
               const SizedBox(width: 8),
               Container(
-                  width: 28, height: 1, color: AppColors.gold.withOpacity(0.3)),
+                width: 28,
+                height: 1,
+                color: AppColors.gold.withOpacity(0.3),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          Text(verse,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.amiri(
-                  fontSize: 18, color: AppColors.goldLight, height: 2.0)),
+          Text(
+            verse,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.amiri(
+              fontSize: 18,
+              color: AppColors.goldLight,
+              height: 2.0,
+            ),
+          ),
           const SizedBox(height: 10),
-          Text('آية اليوم',
-              style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10, color: AppColors.textDim)),
+          Text(
+            'آية اليوم',
+            style: GoogleFonts.notoNaskhArabic(
+              fontSize: 10,
+              color: AppColors.textDim,
+            ),
+          ),
         ],
       ),
     );
@@ -930,9 +1127,10 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(title,
-            style:
-                GoogleFonts.amiri(fontSize: 16, color: AppColors.textPrimary)),
+        Text(
+          title,
+          style: GoogleFonts.amiri(fontSize: 16, color: AppColors.textPrimary),
+        ),
         const SizedBox(width: 8),
         Expanded(child: Container(height: 1, color: AppColors.border)),
       ],
@@ -946,16 +1144,17 @@ class _LevelBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.goldDim,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.gold.withOpacity(0.2)),
-        ),
-        child: Text(label,
-            style: GoogleFonts.notoNaskhArabic(
-                fontSize: 11, color: AppColors.gold)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: AppColors.goldDim,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+    ),
+    child: Text(
+      label,
+      style: GoogleFonts.notoNaskhArabic(fontSize: 11, color: AppColors.gold),
+    ),
+  );
 }
 
 class _StreakBadge extends StatelessWidget {
@@ -964,23 +1163,27 @@ class _StreakBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.success.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.success.withOpacity(0.3)),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: AppColors.success.withOpacity(0.12),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: AppColors.success.withOpacity(0.3)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('🔥', style: TextStyle(fontSize: 12)),
+        const SizedBox(width: 4),
+        Text(
+          '$days يوم متواصل',
+          style: GoogleFonts.notoNaskhArabic(
+            fontSize: 11,
+            color: AppColors.success,
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('🔥', style: TextStyle(fontSize: 12)),
-            const SizedBox(width: 4),
-            Text('$days يوم متواصل',
-                style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 11, color: AppColors.success)),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 }
 
 class _Skeleton extends StatelessWidget {
@@ -989,26 +1192,21 @@ class _Skeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: height,
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: const Center(
-          child:
-              CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
-        ),
-      );
+    height: height,
+    decoration: BoxDecoration(
+      color: AppColors.card,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: AppColors.border),
+    ),
+    child: const Center(
+      child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+    ),
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════
 //  MODELS
 // ═══════════════════════════════════════════════════════════════
-class _PrayerInfo {
-  final String name, time, key, emoji;
-  const _PrayerInfo(this.name, this.time, this.key, this.emoji);
-}
 
 class _IbadahItem {
   final String emoji, label;

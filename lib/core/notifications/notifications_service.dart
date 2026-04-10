@@ -303,7 +303,7 @@ class NotificationsService {
           priority: Priority.high,
           styleInformation: BigTextStyleInformation('$body — +$points نقطة 🌟'),
           color: const Color(0xFFC8A96E),
-          largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+          // largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,

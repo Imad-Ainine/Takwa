@@ -15,6 +15,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/features/onboarding/onboarding_screen.dart';
 import 'package:muhasabah/features/splash/splash_screen.dart';
+import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
 import 'package:muhasabah/app/main_shell.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
@@ -75,12 +76,13 @@ class MuhasabahApp extends ConsumerWidget {
       },
       initialRoute: '/',
       routes: {
-        '/':          (_) => const SplashScreen(),
-        '/home':      (_) => const MainShell(),
+        '/': (_) => const SplashScreen(),
+        '/home': (_) => const MainShell(),
         '/checklist': (_) => const _ChecklistRoute(),
-        '/statistics':(_) => const _StatisticsRoute(),
-        '/settings':  (_) => const _SettingsRoute(),
-        '/onboarding':(_) => const _OnboardingRoute(),
+        '/statistics': (_) => const _StatisticsRoute(),
+        '/settings': (_) => const _SettingsRoute(),
+        '/onboarding': (_) => const _OnboardingRoute(),
+        '/prayer': (_) => const PrayerScreen(),
       },
       onGenerateRoute: (settings) {
         switch (settings.name) {
