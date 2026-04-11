@@ -3,12 +3,12 @@
 //  محاسبة النفس — شاشة الأذكار الكاملة
 // ═══════════════════════════════════════════════════════════════
 
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:muhasabah/core/providers/adhkar_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR SCREEN
@@ -71,14 +71,7 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _AdhkarBgPainter(
-                  nightColor: context.colors.background,
-                  goldColor: context.colors.gold,
-                ),
-              ),
-            ),
+            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             Column(
               children: [
                 _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs),
@@ -759,66 +752,6 @@ class _NotifSettingsButton extends ConsumerWidget {
       builder: (_) => const _AdhkarNotifSheet(),
     );
   }
-}
-
-// ─────────────────────────────────────────
-//  BACKGROUND PAINTER
-// ─────────────────────────────────────────
-class _AdhkarBgPainter extends CustomPainter {
-  final Color nightColor;
-  final Color goldColor;
-
-  _AdhkarBgPainter({required this.nightColor, required this.goldColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = nightColor,
-    );
-
-    // أنماط هندسية إسلامية
-    final p = Paint()
-      ..color = goldColor.withOpacity(0.04)
-      ..strokeWidth = 0.6
-      ..style = PaintingStyle.stroke;
-
-    const s = 60.0;
-    for (double x = 0; x < size.width + s; x += s) {
-      for (double y = 0; y < size.height + s; y += s) {
-        _drawStar(canvas, Offset(x, y), s * 0.35, p);
-      }
-    }
-
-    // glow رأس الصفحة
-    canvas.drawCircle(
-      Offset(size.width / 2, -40),
-      200,
-      Paint()
-        ..shader =
-            RadialGradient(
-              colors: [goldColor.withOpacity(0.07), Colors.transparent],
-            ).createShader(
-              Rect.fromCircle(center: Offset(size.width / 2, -40), radius: 200),
-            ),
-    );
-  }
-
-  void _drawStar(Canvas canvas, Offset c, double r, Paint p) {
-    final path = Path();
-    for (int i = 0; i < 8; i++) {
-      final angle = i * math.pi / 4;
-      final rr = i.isEven ? r : r * 0.5;
-      final x = c.dx + rr * math.cos(angle - math.pi / 2);
-      final y = c.dy + rr * math.sin(angle - math.pi / 2);
-      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
-    }
-    path.close();
-    canvas.drawPath(path, p);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter o) => false;
 }
 
 // ─────────────────────────────────────────

@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hijri/hijri_calendar.dart';
 
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 
@@ -96,14 +97,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _SubtleBgPainter(
-                  nightColor: context.colors.background,
-                  goldColor: context.colors.gold,
-                ),
-              ),
-            ),
+            const CustomPatternBackground(pattern: BackgroundPattern.checklist),
             todayAsync.when(
               loading: () => Center(
                 child: CircularProgressIndicator(
@@ -1689,29 +1683,3 @@ class _MiniPts extends StatelessWidget {
   );
 }
 
-// ── Subtle background grid ──
-class _SubtleBgPainter extends CustomPainter {
-  final Color nightColor, goldColor;
-  _SubtleBgPainter({required this.nightColor, required this.goldColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = nightColor,
-    );
-    final p = Paint()
-      ..color = goldColor.withOpacity(0.04)
-      ..strokeWidth = 0.6
-      ..style = PaintingStyle.stroke;
-    for (double x = 0; x < size.width; x += 32) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), p);
-    }
-    for (double y = 0; y < size.height; y += 32) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

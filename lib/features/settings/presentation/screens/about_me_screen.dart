@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/widgets/geometric_background.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutMeScreen extends StatelessWidget {
@@ -19,11 +19,7 @@ class AboutMeScreen extends StatelessWidget {
       backgroundColor: context.colors.background,
       body: Stack(
         children: [
-          const GeometricBackground(
-            opacity: 0.1,
-            strokeWidth: 0.8,
-            spacing: 32,
-          ),
+          const CustomPatternBackground(pattern: BackgroundPattern.geometric),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [

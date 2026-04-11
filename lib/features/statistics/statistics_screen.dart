@@ -15,6 +15,7 @@ import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/database/daos.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  LOCAL PROVIDERS
@@ -128,14 +129,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(
-              child: CustomPaint(
-                painter: _StatsBgPainter(
-                  nightColor: context.colors.background,
-                  dotColor: context.colors.gold.withOpacity(0.05),
-                ),
-              ),
-            ),
+            const CustomPatternBackground(pattern: BackgroundPattern.stats),
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
@@ -1788,28 +1782,3 @@ class _StatSkeleton extends StatelessWidget {
   );
 }
 
-class _StatsBgPainter extends CustomPainter {
-  final Color nightColor;
-  final Color dotColor;
-
-  _StatsBgPainter({required this.nightColor, required this.dotColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = nightColor,
-    );
-    // dots grid
-    final p = Paint()..color = dotColor;
-    for (double x = 16; x < size.width; x += 28) {
-      for (double y = 16; y < size.height; y += 28) {
-        canvas.drawCircle(Offset(x, y), 1, p);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _StatsBgPainter o) =>
-      o.nightColor != nightColor || o.dotColor != dotColor;
-}

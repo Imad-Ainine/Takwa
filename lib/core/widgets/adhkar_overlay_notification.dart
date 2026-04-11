@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../widgets/geometric_background.dart';
+import '../widgets/custom_pattern_background.dart';
 import '../theme/app_theme.dart';
 import '../providers/adhkar_providers.dart';
 
@@ -167,10 +167,8 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                     child: Stack(
                       children: [
                         // ── Geometric Pattern (from Home) ──
-                        const GeometricBackground(
-                          opacity: 0.1,
-                          strokeWidth: 0.8,
-                          spacing: 32,
+                        const CustomPatternBackground(
+                          pattern: BackgroundPattern.geometric,
                         ),
 
                         // ── Content ──
@@ -185,7 +183,9 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: context.colors.gold.withOpacity(0.12),
+                                      color: context.colors.gold.withOpacity(
+                                        0.12,
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Text(
@@ -199,22 +199,25 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                          Text(
-                                            _getCategoryName(widget.category),
-                                            style: GoogleFonts.amiri(
-                                              fontSize: 18,
-                                              color: context.colors.gold,
-                                              fontWeight: FontWeight.w700,
-                                              height: 1.2,
-                                            ),
+                                        Text(
+                                          _getCategoryName(widget.category),
+                                          style: GoogleFonts.amiri(
+                                            fontSize: 18,
+                                            color: context.colors.gold,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1.2,
                                           ),
-                                          Text(
-                                            'انقر للمتابعة',
-                                            style: context.typography.caption.copyWith(
-                                              color: context.colors.textSecondary,
-                                              fontSize: 10,
-                                            ),
-                                          ),
+                                        ),
+                                        Text(
+                                          'انقر للمتابعة',
+                                          style: context.typography.caption
+                                              .copyWith(
+                                                color: context
+                                                    .colors
+                                                    .textSecondary,
+                                                fontSize: 10,
+                                              ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -231,18 +234,18 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                                 ],
                               ),
                               const SizedBox(height: 18),
-                                Text(
-                                  widget.dhikr.arabic,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.typography.quranicVerse.copyWith(
-                                    fontSize: 19,
-                                    color: context.colors.textPrimary,
-                                    height: 1.7,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.right,
+                              Text(
+                                widget.dhikr.arabic,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: context.typography.quranicVerse.copyWith(
+                                  fontSize: 19,
+                                  color: context.colors.textPrimary,
+                                  height: 1.7,
+                                  fontWeight: FontWeight.w600,
                                 ),
+                                textAlign: TextAlign.right,
+                              ),
                               if (widget.dhikr.source != null) ...[
                                 const SizedBox(height: 14),
                                 Container(
@@ -264,15 +267,16 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                                       ),
                                       const SizedBox(width: 6),
                                       Flexible(
-                                          child: Text(
-                                            widget.dhikr.source!,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: context.typography.caption.copyWith(
-                                              color: context.colors.teal,
-                                              fontSize: 11,
-                                            ),
-                                          ),
+                                        child: Text(
+                                          widget.dhikr.source!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: context.typography.caption
+                                              .copyWith(
+                                                color: context.colors.teal,
+                                                fontSize: 11,
+                                              ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -303,8 +307,8 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                             minHeight: 3,
                             backgroundColor: Colors.transparent,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                                context.colors.gold.withOpacity(0.6),
-                              ),
+                              context.colors.gold.withOpacity(0.6),
+                            ),
                           );
                         },
                       ),

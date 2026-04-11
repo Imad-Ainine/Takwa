@@ -3,13 +3,15 @@
 //  محاسبة النفس — شاشة الأدعية
 // ═══════════════════════════════════════════════════════════════
 
-import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:muhasabah/core/theme/ramadan_theme.dart';
+
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 
 // ─────────────────────────────────────────
@@ -268,18 +270,13 @@ class DuasScreen extends ConsumerStatefulWidget {
 }
 
 class _DuasScreenState extends ConsumerState<DuasScreen>
-    with TickerProviderStateMixin {
-  late final AnimationController _bgCtrl;
+    with SingleTickerProviderStateMixin {
   late final AnimationController _entryCtrl;
   final _searchCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _bgCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat();
     _entryCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -288,7 +285,6 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
 
   @override
   void dispose() {
-    _bgCtrl.dispose();
     _entryCtrl.dispose();
     _searchCtrl.dispose();
     super.dispose();
@@ -328,16 +324,7 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
         backgroundColor: style.bg,
         body: Stack(
           children: [
-            Positioned.fill(
-              child: isRamadan
-                  ? AnimatedBuilder(
-                      animation: _bgCtrl,
-                      builder: (_, __) => CustomPaint(
-                        painter: RamadanBgPainter(animT: _bgCtrl.value),
-                      ),
-                    )
-                  : CustomPaint(painter: _DuasBgPainter()),
-            ),
+            const CustomPatternBackground(pattern: BackgroundPattern.duas),
 
             Column(
               children: [
@@ -766,27 +753,3 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
   }
 }
 
-class _DuasBgPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = const Color(0x07C8A96E)
-      ..strokeWidth = 0.5
-      ..style = PaintingStyle.stroke;
-    for (double x = 0; x < size.width + 52; x += 52) {
-      for (double y = 0; y < size.height + 52; y += 52) {
-        final path = Path();
-        for (int i = 0; i < 6; i++) {
-          final a = i * math.pi / 3;
-          final pt = Offset(x + 16 * math.cos(a), y + 16 * math.sin(a));
-          i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
-        }
-        path.close();
-        canvas.drawPath(path, p);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DuasBgPainter o) => false;
-}

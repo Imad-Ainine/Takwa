@@ -18,8 +18,8 @@ class RamadanColors {
   // Deep lapis + gold + emerald — ألوان الفسيفساء الإسلامية
   static const deepLapis = Color(0xFF0A1628);
   static const lapis = Color(0xFF0F2044);
-  static const lapisLight = Color(0xFF162B5A);
-  static const lapisCard = Color(0xFF1A3068);
+  static const lapisLight = Color(0xFF0C1B3C);
+  static const lapisCard = Color(0xBD101A32);
 
   static const goldenAura = Color(0xFFD4A843);
   static const goldenLight = Color(0xFFEDD278);
@@ -57,7 +57,7 @@ class RamadanColors {
   static const LinearGradient cardGlow = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF0F2044), Color(0xFF162B5A)],
+    colors: [Color(0xFF0F2044), Color.fromARGB(255, 3, 18, 52)],
   );
 }
 
@@ -444,88 +444,6 @@ class _RamadanToggleState extends ConsumerState<RamadanToggle>
       ),
     );
   }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN ANIMATED BACKGROUND WIDGET
-// ═══════════════════════════════════════════════════════════════
-class RamadanBackground extends StatefulWidget {
-  final Widget child;
-  final bool enabled;
-  const RamadanBackground({
-    super.key,
-    required this.child,
-    this.enabled = true,
-  });
-
-  @override
-  State<RamadanBackground> createState() => _RamadanBackgroundState();
-}
-
-class _RamadanBackgroundState extends State<RamadanBackground>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.enabled) {
-      return Stack(
-        children: [
-          Positioned.fill(child: CustomPaint(painter: _DefaultBgPainter())),
-          widget.child,
-        ],
-      );
-    }
-
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: _ctrl,
-            builder: (_, __) =>
-                CustomPaint(painter: RamadanBgPainter(animT: _ctrl.value)),
-          ),
-        ),
-        widget.child,
-      ],
-    );
-  }
-}
-
-class _DefaultBgPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
-    );
-    final p = Paint()
-      ..color = const Color(0x09C8A96E)
-      ..strokeWidth = 0.6
-      ..style = PaintingStyle.stroke;
-    for (double x = -size.height; x < size.width + size.height; x += 48) {
-      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), p);
-      canvas.drawLine(Offset(x, 0), Offset(x - size.height, size.height), p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DefaultBgPainter o) => false;
 }
 
 // ═══════════════════════════════════════════════════════════════

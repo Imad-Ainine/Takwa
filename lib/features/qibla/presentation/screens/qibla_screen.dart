@@ -13,6 +13,7 @@ import 'package:adhan/adhan.dart' as adhan;
 
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/theme/ramadan_theme.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 
 // ─────────────────────────────────────────
@@ -43,7 +44,6 @@ class QiblaScreen extends ConsumerStatefulWidget {
 
 class _QiblaScreenState extends ConsumerState<QiblaScreen>
     with TickerProviderStateMixin {
-  late final AnimationController _bgCtrl;
   late final AnimationController _pulseCtrl;
   late final AnimationController _entryCtrl;
   late final Animation<double> _pulse;
@@ -52,10 +52,6 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
   @override
   void initState() {
     super.initState();
-    _bgCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 6),
-    )..repeat();
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -72,7 +68,6 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
 
   @override
   void dispose() {
-    _bgCtrl.dispose();
     _pulseCtrl.dispose();
     _entryCtrl.dispose();
     super.dispose();
@@ -94,17 +89,7 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
         body: Stack(
           children: [
             // Background
-            Positioned.fill(
-              child: isRamadan
-                  ? AnimatedBuilder(
-                      animation: _bgCtrl,
-                      builder: (_, __) => CustomPaint(
-                        painter: RamadanBgPainter(animT: _bgCtrl.value),
-                      ),
-                    )
-                  : CustomPaint(painter: _QiblaBgPainter()),
-            ),
-
+            const CustomPatternBackground(pattern: BackgroundPattern.qibla),
             SafeArea(
               child: Column(
                 children: [
@@ -675,25 +660,4 @@ class _QiblaCompassError extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _QiblaBgPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Concentric rings
-    final c = Offset(size.width / 2, size.height * 0.45);
-    for (int i = 1; i <= 6; i++) {
-      canvas.drawCircle(
-        c,
-        i * 52.0,
-        Paint()
-          ..color = AppColors.gold.withOpacity(0.03)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.8,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _QiblaBgPainter o) => false;
 }

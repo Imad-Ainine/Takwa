@@ -17,7 +17,7 @@ import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/providers/adhkar_providers.dart';
-import 'package:muhasabah/core/widgets/geometric_background.dart';
+import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:muhasabah/core/widgets/adhkar_overlay_notification.dart';
 import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
 
@@ -34,7 +34,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with TickerProviderStateMixin {
   late final AnimationController _staggerCtrl;
-  late final AnimationController _bgCtrl;
   late final List<Animation<double>> _fadeAnims;
   late final List<Animation<Offset>> _slideAnims;
   final _scrollCtrl = ScrollController();
@@ -67,10 +66,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _initAnimations() {
-    _bgCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    )..repeat();
     _staggerCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
@@ -105,7 +100,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   void dispose() {
-    _bgCtrl.dispose();
     _staggerCtrl.dispose();
     _scrollCtrl.dispose();
     super.dispose();
@@ -137,16 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         body: Stack(
           children: [
             // ── Dynamic Background ──
-            Positioned.fill(
-              child: isRamadan
-                  ? AnimatedBuilder(
-                      animation: _bgCtrl,
-                      builder: (_, __) => CustomPaint(
-                        painter: RamadanBgPainter(animT: _bgCtrl.value),
-                      ),
-                    )
-                  : const GeometricBackground(),
-            ),
+            const CustomPatternBackground(pattern: BackgroundPattern.geometric),
 
             CustomScrollView(
               controller: _scrollCtrl,
