@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:muhasabah/core/providers/adhkar_providers.dart';
+import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -25,7 +27,6 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     with TickerProviderStateMixin {
   late final AnimationController _entryCtrl;
   late final TabController _tabCtrl;
-
   static const _tabs = [
     ('🌅', 'الصباح'),
     ('🌆', 'المساء'),
@@ -63,12 +64,15 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: context.colors.background,
+        backgroundColor: style.bg,
         body: Stack(
           children: [
             const CustomPatternBackground(pattern: BackgroundPattern.adhkar),

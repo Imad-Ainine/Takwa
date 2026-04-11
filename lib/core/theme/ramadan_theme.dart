@@ -34,6 +34,7 @@ class RamadanColors {
   static const rubyLight = Color(0xFFB03040);
 
   static const ivory = Color(0xFFF5ECD7);
+  static const ivoryLight = Color(0xFFFCF9F2);
   static const ivoryDim = Color(0xFFD4C4A0);
   static const ivoryGhost = Color(0x15F5ECD7);
 
@@ -48,6 +49,12 @@ class RamadanColors {
     stops: [0.0, 0.5, 1.0],
   );
 
+  static const LinearGradient daySky = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFFCF9F2), Color(0xFFF5ECD7), Color(0xFFE8DDC3)],
+  );
+
   static const LinearGradient goldenGlow = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -59,100 +66,229 @@ class RamadanColors {
     end: Alignment.bottomRight,
     colors: [Color(0xFF0F2044), Color.fromARGB(255, 3, 18, 52)],
   );
+
+  static const LinearGradient cardGlowLight = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFFFFF), Color(0xFFFCF9F2)],
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════
 //  RAMADAN THEME DATA
 // ═══════════════════════════════════════════════════════════════
 class RamadanTheme {
-  static ThemeData get theme => ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    colorScheme: const ColorScheme.dark(
-      primary: RamadanColors.goldenAura,
-      onPrimary: RamadanColors.deepLapis,
-      secondary: RamadanColors.emeraldLight,
-      onSecondary: RamadanColors.deepLapis,
-      surface: RamadanColors.lapisCard,
-      onSurface: RamadanColors.ivory,
-      error: RamadanColors.rubyLight,
-      outline: RamadanColors.border,
-      primaryContainer: RamadanColors.goldenDim,
-      secondaryContainer: RamadanColors.emeraldDim,
+  static ThemeData theme(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    return brightness == Brightness.dark ? dark : light;
+  }
+
+  static ThemeData get dark {
+    final colors = AppColorsExtension(
+      background: RamadanColors.deepLapis,
+      deep: RamadanColors.lapis,
+      card: RamadanColors.lapisCard,
+      card2: RamadanColors.lapisCard,
+      border: RamadanColors.border,
+      night: RamadanColors.deepLapis,
+      gold: RamadanColors.goldenAura,
+      goldLight: RamadanColors.goldenLight,
+      goldDark: RamadanColors.goldenDeep,
+      goldDim: RamadanColors.goldenDim,
+      teal: RamadanColors.emeraldLight,
+      tealDim: RamadanColors.emeraldDim,
+      success: RamadanColors.emeraldLight,
+      successDim: RamadanColors.emeraldDim,
+      danger: RamadanColors.rubyLight,
+      dangerDim: RamadanColors.rubyLight.withOpacity(0.1),
+      warning: RamadanColors.goldenAura,
+      textPrimary: RamadanColors.ivory,
+      textSecondary: RamadanColors.ivoryDim,
+      textDim: RamadanColors.ivoryDim.withOpacity(0.5),
+      backgroundGradient: RamadanColors.nightSky,
+      cardGradient: RamadanColors.cardGlow,
+      goldGradient: AppColorsExtension.dark.goldGradient,
+      tealGoldGradient: AppColorsExtension.dark.tealGoldGradient,
+    );
+
+    final typography = AppTypographyExtension.fromColors(colors);
+    final shadows = AppShadowsExtension.fromColors(colors);
+    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      extensions: [colors, typography, shadows, decorations],
+      colorScheme: const ColorScheme.dark(
+        primary: RamadanColors.goldenAura,
+        onPrimary: RamadanColors.deepLapis,
+        secondary: RamadanColors.emeraldLight,
+        onSecondary: RamadanColors.deepLapis,
+        surface: RamadanColors.lapisCard,
+        onSurface: RamadanColors.ivory,
+        error: RamadanColors.rubyLight,
+        outline: RamadanColors.border,
+        primaryContainer: RamadanColors.goldenDim,
+        secondaryContainer: RamadanColors.emeraldDim,
+      ),
+      scaffoldBackgroundColor: RamadanColors.deepLapis,
+      cardTheme: CardThemeData(
+        color: RamadanColors.lapisCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: RamadanColors.border, width: 1),
+        ),
+      ),
+      textTheme: _buildTextTheme(RamadanColors.ivory, RamadanColors.goldenAura),
+      elevatedButtonTheme: _buildButtonTheme(
+        RamadanColors.goldenAura,
+        RamadanColors.deepLapis,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: RamadanColors.lapis,
+        selectedItemColor: RamadanColors.goldenAura,
+        unselectedItemColor: RamadanColors.ivoryDim.withOpacity(0.4),
+      ),
+      dividerTheme: const DividerThemeData(color: RamadanColors.border),
+      appBarTheme: _buildAppBarTheme(RamadanColors.goldenAura),
+    );
+  }
+
+  static ThemeData get light {
+    final colors = AppColorsExtension(
+      background: RamadanColors.ivoryLight,
+      deep: RamadanColors.ivory,
+      card: Colors.white,
+      card2: RamadanColors.ivoryLight,
+      border: RamadanColors.border,
+      night: RamadanColors.deepLapis,
+      gold: RamadanColors.goldenAura,
+      goldLight: RamadanColors.goldenLight,
+      goldDark: RamadanColors.goldenDeep,
+      goldDim: RamadanColors.goldenDim,
+      teal: RamadanColors.emerald,
+      tealDim: RamadanColors.emeraldDim,
+      success: RamadanColors.emerald,
+      successDim: RamadanColors.emeraldDim,
+      danger: RamadanColors.ruby,
+      dangerDim: RamadanColors.ruby.withOpacity(0.1),
+      warning: RamadanColors.goldenAura,
+      textPrimary: RamadanColors.deepLapis,
+      textSecondary: RamadanColors.deepLapis.withOpacity(0.7),
+      textDim: RamadanColors.deepLapis.withOpacity(0.4),
+      backgroundGradient: RamadanColors.daySky,
+      cardGradient: RamadanColors.cardGlowLight,
+      goldGradient: AppColorsExtension.light.goldGradient,
+      tealGoldGradient: AppColorsExtension.light.tealGoldGradient,
+    );
+
+    final typography = AppTypographyExtension.fromColors(colors);
+    final shadows = AppShadowsExtension.fromColors(colors);
+    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      extensions: [colors, typography, shadows, decorations],
+      colorScheme: const ColorScheme.light(
+        primary: RamadanColors.goldenAura,
+        onPrimary: Colors.white,
+        secondary: RamadanColors.emerald,
+        onSecondary: Colors.white,
+        surface: Colors.white,
+        onSurface: RamadanColors.deepLapis,
+        error: RamadanColors.ruby,
+        outline: RamadanColors.border,
+        primaryContainer: RamadanColors.goldenDim,
+        secondaryContainer: RamadanColors.emeraldDim,
+      ),
+      scaffoldBackgroundColor: RamadanColors.ivoryLight,
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: RamadanColors.border, width: 1),
+        ),
+      ),
+      textTheme: _buildTextTheme(
+        RamadanColors.deepLapis,
+        RamadanColors.goldenDeep,
+      ),
+      elevatedButtonTheme: _buildButtonTheme(
+        RamadanColors.goldenAura,
+        Colors.white,
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: RamadanColors.goldenDeep,
+        unselectedItemColor: RamadanColors.deepLapis.withOpacity(0.4),
+      ),
+      dividerTheme: const DividerThemeData(color: RamadanColors.border),
+      appBarTheme: _buildAppBarTheme(RamadanColors.goldenDeep),
+    );
+  }
+
+  static TextTheme _buildTextTheme(Color main, Color accent) => TextTheme(
+    displayLarge: GoogleFonts.amiri(
+      fontSize: 36,
+      fontWeight: FontWeight.w700,
+      color: accent,
     ),
-    scaffoldBackgroundColor: RamadanColors.deepLapis,
-    cardTheme: CardThemeData(
-      color: RamadanColors.lapisCard,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: RamadanColors.border, width: 1),
-      ),
+    displayMedium: GoogleFonts.amiri(
+      fontSize: 28,
+      fontWeight: FontWeight.w700,
+      color: main,
     ),
-    textTheme: TextTheme(
-      displayLarge: GoogleFonts.amiri(
-        fontSize: 36,
-        fontWeight: FontWeight.w700,
-        color: RamadanColors.goldenAura,
-      ),
-      displayMedium: GoogleFonts.amiri(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: RamadanColors.ivory,
-      ),
-      headlineLarge: GoogleFonts.amiri(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: RamadanColors.ivory,
-      ),
-      headlineMedium: GoogleFonts.amiri(
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: RamadanColors.ivory,
-      ),
-      bodyLarge: GoogleFonts.notoNaskhArabic(
-        fontSize: 16,
-        color: RamadanColors.ivory,
-        height: 1.9,
-      ),
-      bodyMedium: GoogleFonts.notoNaskhArabic(
-        fontSize: 14,
-        color: RamadanColors.ivory,
-      ),
-      bodySmall: GoogleFonts.notoNaskhArabic(
-        fontSize: 12,
-        color: RamadanColors.ivoryDim,
-      ),
-      labelLarge: GoogleFonts.notoNaskhArabic(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: RamadanColors.ivory,
-      ),
+    headlineLarge: GoogleFonts.amiri(
+      fontSize: 22,
+      fontWeight: FontWeight.w700,
+      color: main,
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: RamadanColors.goldenAura,
-        foregroundColor: RamadanColors.deepLapis,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-      ),
+    headlineMedium: GoogleFonts.amiri(
+      fontSize: 18,
+      fontWeight: FontWeight.w700,
+      color: main,
     ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: RamadanColors.lapis,
-      selectedItemColor: RamadanColors.goldenAura,
-      unselectedItemColor: RamadanColors.ivoryDim.withOpacity(0.4),
+    bodyLarge: GoogleFonts.notoNaskhArabic(
+      fontSize: 16,
+      color: main,
+      height: 1.9,
     ),
-    dividerTheme: const DividerThemeData(color: RamadanColors.border),
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      titleTextStyle: GoogleFonts.amiri(
-        fontSize: 20,
-        color: RamadanColors.goldenAura,
-        fontWeight: FontWeight.w700,
-      ),
-      iconTheme: const IconThemeData(color: RamadanColors.goldenAura),
+    bodyMedium: GoogleFonts.notoNaskhArabic(fontSize: 14, color: main),
+    bodySmall: GoogleFonts.notoNaskhArabic(
+      fontSize: 12,
+      color: main.withOpacity(0.7),
     ),
+    labelLarge: GoogleFonts.notoNaskhArabic(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: main,
+    ),
+  );
+
+  static ElevatedButtonThemeData _buildButtonTheme(Color bg, Color fg) =>
+      ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: bg,
+          foregroundColor: fg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        ),
+      );
+
+  static AppBarTheme _buildAppBarTheme(Color accent) => AppBarTheme(
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    titleTextStyle: GoogleFonts.amiri(
+      fontSize: 20,
+      color: accent,
+      fontWeight: FontWeight.w700,
+    ),
+    iconTheme: IconThemeData(color: accent),
   );
 }
 
@@ -201,25 +337,39 @@ class RamadanDecorations {
 // ═══════════════════════════════════════════════════════════════
 class RamadanBgPainter extends CustomPainter {
   final double animT;
-  RamadanBgPainter({this.animT = 0});
+  final Brightness brightness;
+  RamadanBgPainter({this.animT = 0, this.brightness = Brightness.dark});
 
   static final _rng = math.Random(7);
   static List<Offset>? _stars;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Sky gradient
+    final isDark = brightness == Brightness.dark;
+
+    // Background gradient
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
       Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF030810), Color(0xFF0A1628), Color(0xFF0F2044)],
-        ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
+        ..shader = (isDark ? RamadanColors.nightSky : RamadanColors.daySky)
+            .createShader(Rect.fromLTWH(0, 0, size.width, size.height)),
     );
 
-    // Stars
+    if (isDark) {
+      _drawNightElements(canvas, size);
+    } else {
+      _drawDayElements(canvas, size);
+    }
+
+    // Pattern
+    _drawArabesque(canvas, size, isDark);
+
+    // Lanterns (Fanoos)
+    _drawLantern(canvas, Offset(size.width * 0.15, 60), 1.0, isDark);
+    _drawLantern(canvas, Offset(size.width * 0.85, 40), 0.8, isDark);
+  }
+
+  void _drawNightElements(Canvas canvas, Size size) {
     _stars ??= List.generate(
       120,
       (_) => Offset(
@@ -236,39 +386,86 @@ class RamadanBgPainter extends CustomPainter {
         Paint()..color = RamadanColors.ivory.withOpacity(0.1 + 0.5 * t),
       );
     }
+    _drawCrescent(canvas, Offset(size.width * 0.82, size.height * 0.09), true);
+  }
 
-    // Crescent
-    _drawCrescent(canvas, Offset(size.width * 0.82, size.height * 0.09));
-
-    // Geometric arabesque border top
-    _drawArabesque(canvas, size);
-
-    // Golden glow at horizon
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height * 0.6, size.width, size.height * 0.4),
+  void _drawDayElements(Canvas canvas, Size size) {
+    // Subtle sun glow
+    final sunCenter = Offset(size.width * 0.82, size.height * 0.12);
+    canvas.drawCircle(
+      sunCenter,
+      40,
       Paint()
-        ..shader =
-            LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                RamadanColors.goldenAura.withOpacity(0.04),
-              ],
-            ).createShader(
-              Rect.fromLTWH(
-                0,
-                size.height * 0.6,
-                size.width,
-                size.height * 0.4,
-              ),
-            ),
+        ..shader = RadialGradient(
+          colors: [
+            RamadanColors.goldenAura.withOpacity(0.15),
+            Colors.transparent,
+          ],
+        ).createShader(Rect.fromCircle(center: sunCenter, radius: 40)),
     );
   }
 
-  void _drawCrescent(Canvas canvas, Offset center) {
+  void _drawLantern(Canvas canvas, Offset pos, double scale, bool isDark) {
+    final flicker = (math.sin(animT * 2 * math.pi * 1.5) + 1) / 2;
+    final p = Paint()
+      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.8 : 0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    final glowP = Paint()
+      ..color = RamadanColors.goldenLight.withOpacity(
+        isDark ? 0.3 * flicker : 0.15 * flicker,
+      )
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
+
+    canvas.drawCircle(pos + const Offset(0, 15), 15 * scale, glowP);
+
+    final path = Path();
+    final w = 12.0 * scale;
+    final h = 25.0 * scale;
+
+    // Top
+    path.moveTo(pos.dx - w * 0.5, pos.dy);
+    path.lineTo(pos.dx + w * 0.5, pos.dy);
+    path.lineTo(pos.dx + w * 0.2, pos.dy - 8 * scale);
+    path.lineTo(pos.dx - w * 0.2, pos.dy - 8 * scale);
+    path.close();
+
+    // Body
+    path.moveTo(pos.dx - w * 0.5, pos.dy);
+    path.lineTo(pos.dx - w, pos.dy + h * 0.4);
+    path.lineTo(pos.dx - w * 0.6, pos.dy + h);
+    path.lineTo(pos.dx + w * 0.6, pos.dy + h);
+    path.lineTo(pos.dx + w, pos.dy + h * 0.4);
+    path.lineTo(pos.dx + w * 0.5, pos.dy);
+
+    // Bottom
+    path.moveTo(pos.dx - w * 0.6, pos.dy + h);
+    path.lineTo(pos.dx + w * 0.6, pos.dy + h);
+    path.lineTo(pos.dx + w * 0.3, pos.dy + h + 6 * scale);
+    path.lineTo(pos.dx - w * 0.3, pos.dy + h + 6 * scale);
+    path.close();
+
+    canvas.drawPath(path, p);
+
+    // Inner light
+    final innerP = Paint()
+      ..color = RamadanColors.goldenLight.withOpacity(
+        isDark ? 0.5 * flicker : 0.3 * flicker,
+      )
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(
+      Rect.fromCenter(
+        center: pos + Offset(0, h * 0.5),
+        width: w * 0.6,
+        height: h * 0.4,
+      ),
+      innerP,
+    );
+  }
+
+  void _drawCrescent(Canvas canvas, Offset center, bool isDark) {
     const r = 20.0;
-    // Outer glow
     canvas.drawCircle(
       center,
       r + 8,
@@ -276,55 +473,55 @@ class RamadanBgPainter extends CustomPainter {
         ..color = RamadanColors.goldenAura.withOpacity(0.08)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
     );
-    // Moon body
     canvas.drawCircle(center, r, Paint()..color = const Color(0xFFFFF0B3));
-    // Cut
     canvas.drawCircle(
       Offset(center.dx + r * 0.55, center.dy - r * 0.05),
       r * 0.88,
       Paint()..color = const Color(0xFF040C1E),
     );
-    // Stars near moon
-    for (int i = 0; i < 5; i++) {
-      final angle = i * math.pi * 0.4 - math.pi * 0.2;
-      final dist = 30.0 + i * 8;
-      final sx = center.dx + dist * math.cos(angle);
-      final sy = center.dy + dist * math.sin(angle);
-      canvas.drawCircle(
-        Offset(sx, sy),
-        1.2 - i * 0.15,
-        Paint()..color = RamadanColors.goldenLight.withOpacity(0.6),
-      );
-    }
   }
 
-  void _drawArabesque(Canvas canvas, Size size) {
+  void _drawArabesque(Canvas canvas, Size size, bool isDark) {
     final p = Paint()
-      ..color = RamadanColors.goldenAura.withOpacity(0.06)
+      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.06 : 0.04)
       ..strokeWidth = 0.8
       ..style = PaintingStyle.stroke;
-    const s = 48.0;
+    const s = 64.0;
     for (double x = 0; x < size.width + s; x += s) {
       for (double y = 0; y < size.height + s; y += s) {
-        _drawGeomStar(canvas, Offset(x, y), s * 0.3, p);
+        _drawGeomStar(canvas, Offset(x, y), s * 0.35, p);
       }
     }
   }
 
   void _drawGeomStar(Canvas canvas, Offset c, double r, Paint p) {
     final path = Path();
+    // 8-pointed star
     for (int i = 0; i < 8; i++) {
-      final a = i * math.pi / 4 - math.pi / 8;
-      final rr = i.isEven ? r : r * 0.42;
-      final pt = Offset(c.dx + rr * math.cos(a), c.dy + rr * math.sin(a));
+      final a = i * math.pi / 4;
+      final pt = Offset(c.dx + r * math.cos(a), c.dy + r * math.sin(a));
       i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
     }
     path.close();
     canvas.drawPath(path, p);
+
+    // Inner 8-pointed star (rotated)
+    final path2 = Path();
+    for (int i = 0; i < 8; i++) {
+      final a = i * math.pi / 4 + math.pi / 8;
+      final pt = Offset(
+        c.dx + r * 0.7 * math.cos(a),
+        c.dy + r * 0.7 * math.sin(a),
+      );
+      i == 0 ? path2.moveTo(pt.dx, pt.dy) : path2.lineTo(pt.dx, pt.dy);
+    }
+    path2.close();
+    canvas.drawPath(path2, p);
   }
 
   @override
-  bool shouldRepaint(RamadanBgPainter old) => old.animT != animT;
+  bool shouldRepaint(RamadanBgPainter old) =>
+      old.animT != animT || old.brightness != brightness;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -368,8 +565,8 @@ class _RamadanToggleState extends ConsumerState<RamadanToggle>
 
   @override
   Widget build(BuildContext context) {
-    // Uses ramadanModeProvider from database_providers.dart
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
 
     return GestureDetector(
       onTap: () async {
@@ -388,27 +585,20 @@ class _RamadanToggleState extends ConsumerState<RamadanToggle>
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
               gradient: isRamadan
-                  ? const LinearGradient(
-                      colors: [
-                        RamadanColors.goldenDeep,
-                        RamadanColors.goldenAura,
-                      ],
-                    )
+                  ? LinearGradient(colors: [style.goldDark, style.gold])
                   : null,
-              color: isRamadan ? null : AppColors.card,
+              color: isRamadan ? null : style.card,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isRamadan
-                    ? RamadanColors.goldenLight.withOpacity(_glow.value)
-                    : AppColors.border,
+                    ? style.goldLight.withOpacity(_glow.value)
+                    : style.border,
                 width: isRamadan ? 1.5 : 1,
               ),
               boxShadow: isRamadan
                   ? [
                       BoxShadow(
-                        color: RamadanColors.goldenAura.withOpacity(
-                          0.3 * _glow.value,
-                        ),
+                        color: style.gold.withOpacity(0.3 * _glow.value),
                         blurRadius: 16,
                         spreadRadius: 2,
                       ),
@@ -431,9 +621,7 @@ class _RamadanToggleState extends ConsumerState<RamadanToggle>
                   isRamadan ? 'رمضان كريم' : 'وضع رمضان',
                   style: GoogleFonts.amiri(
                     fontSize: 13,
-                    color: isRamadan
-                        ? RamadanColors.deepLapis
-                        : AppColors.textSecondary,
+                    color: isRamadan ? RamadanColors.deepLapis : style.textSec,
                     fontWeight: isRamadan ? FontWeight.w700 : FontWeight.w400,
                   ),
                 ),
@@ -455,33 +643,26 @@ class AdaptiveStyle {
   const AdaptiveStyle(this.context, this.isRamadan);
 
   AppColorsExtension get _colors =>
-      Theme.of(context).extension<AppColorsExtension>() ??
-      AppColorsExtension.dark;
+      Theme.of(context).extension<AppColorsExtension>()!;
   AppDecorationsExtension get _decorations =>
-      Theme.of(context).extension<AppDecorationsExtension>() ??
-      AppDecorationsExtension.fromColors(
-        _colors,
-        AppShadowsExtension.fromColors(_colors),
-      );
+      Theme.of(context).extension<AppDecorationsExtension>()!;
 
-  Color get gold => isRamadan ? RamadanColors.goldenAura : _colors.gold;
-  Color get goldLight =>
-      isRamadan ? RamadanColors.goldenLight : _colors.goldLight;
-  Color get goldDim => isRamadan ? RamadanColors.goldenDim : _colors.goldDim;
-  Color get teal => isRamadan ? RamadanColors.emeraldLight : _colors.teal;
-  Color get bg => isRamadan ? RamadanColors.deepLapis : _colors.background;
-  Color get card => isRamadan ? RamadanColors.lapisCard : _colors.card;
-  Color get border => isRamadan ? RamadanColors.border : _colors.border;
-  Color get text => isRamadan ? RamadanColors.ivory : _colors.textPrimary;
-  Color get textSec =>
-      isRamadan ? RamadanColors.ivoryDim : _colors.textSecondary;
-  Color get success => isRamadan ? RamadanColors.emeraldLight : _colors.success;
+  Color get gold => _colors.gold;
+  Color get goldLight => _colors.goldLight;
+  Color get goldDark => _colors.goldDark;
+  Color get goldDim => _colors.goldDim;
+  Color get teal => _colors.teal;
+  Color get success => _colors.success;
+  Color get danger => _colors.danger;
+  Color get bg => _colors.background;
+  Color get deep => _colors.deep;
+  Color get card => _colors.card;
+  Color get border => _colors.border;
+  Color get text => _colors.textPrimary;
+  Color get textSec => _colors.textSecondary;
 
-  BoxDecoration get cardDeco =>
-      isRamadan ? RamadanDecorations.card : _decorations.card;
-
-  BoxDecoration get heroDeco =>
-      isRamadan ? RamadanDecorations.heroCard : _decorations.goldCard;
+  BoxDecoration get cardDeco => _decorations.card;
+  BoxDecoration get heroDeco => _decorations.goldCard;
 
   TextStyle amiri(double size, {Color? color, FontWeight? weight}) =>
       GoogleFonts.amiri(
@@ -489,14 +670,19 @@ class AdaptiveStyle {
         color: color ?? gold,
         fontWeight: weight ?? FontWeight.w700,
         shadows: isRamadan
-            ? [Shadow(color: gold.withOpacity(0.3), blurRadius: 10)]
+            ? [
+                Shadow(
+                  color: gold.withOpacity(size > 20 ? 0.4 : 0.2),
+                  blurRadius: size > 20 ? 12 : 8,
+                ),
+              ]
             : null,
       );
 
   TextStyle naskh(double size, {Color? color, FontWeight? weight}) =>
       GoogleFonts.notoNaskhArabic(
         fontSize: size,
-        color: color ?? text,
+        color: color ?? (size < 12 ? textSec : text),
         fontWeight: weight ?? FontWeight.w400,
       );
 }

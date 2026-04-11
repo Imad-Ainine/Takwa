@@ -12,7 +12,6 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
 import 'package:muhasabah/app/animated_drawer.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
@@ -131,7 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         body: Stack(
           children: [
             // ── Dynamic Background ──
-            const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+            const CustomPatternBackground(pattern: BackgroundPattern.qibla),
 
             CustomScrollView(
               controller: _scrollCtrl,
@@ -413,52 +412,44 @@ class _RamadanBannerState extends State<_RamadanBanner>
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              RamadanColors.goldenAura.withOpacity(0.2 + 0.05 * _ctrl.value),
-              RamadanColors.emerald.withOpacity(0.12),
+              s.gold.withOpacity(0.15 + 0.05 * _ctrl.value),
+              s.success.withOpacity(0.08),
             ],
           ),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: RamadanColors.goldenAura.withOpacity(
-              0.3 + 0.2 * _ctrl.value,
-            ),
+            color: s.gold.withOpacity(0.25 + 0.15 * _ctrl.value),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: RamadanColors.goldenAura.withOpacity(0.1 * _ctrl.value),
+              color: s.gold.withOpacity(0.08 * _ctrl.value),
               blurRadius: 16,
             ),
           ],
         ),
         child: Row(
           children: [
-            const Text('🌙', style: TextStyle(fontSize: 28)),
+            Text('🌙', style: TextStyle(fontSize: 28, color: s.goldLight)),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'رمضان كريم',
-                    style: s.amiri(18, color: RamadanColors.goldenLight),
-                  ),
+                  Text('رمضان كريم', style: s.amiri(18, color: s.goldLight)),
                   Text(
                     'اليوم ${widget.day} من شهر رمضان المبارك',
-                    style: s.naskh(11, color: RamadanColors.ivoryDim),
+                    style: s.naskh(11, color: s.textSec),
                   ),
                 ],
               ),
             ),
             Column(
               children: [
-                Text(
-                  '${30 - widget.day}',
-                  style: s.amiri(22, color: RamadanColors.goldenAura),
-                ),
+                Text('${30 - widget.day}', style: s.amiri(22, color: s.gold)),
                 Text(
                   'يوم\nمتبقي',
-                  style: s.naskh(9, color: RamadanColors.ivoryDim),
+                  style: s.naskh(9, color: s.textSec),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -1006,7 +997,7 @@ class _RingPainterV2 extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = const Color(0x252A3A50)
+        ..color = gold.withOpacity(0.12)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7,
     );
@@ -1390,16 +1381,10 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
             children: [
-              Text(
-                'مواقيت رمضان',
-                style: s.amiri(15, color: RamadanColors.goldenAura),
-              ),
+              Text('مواقيت رمضان', style: s.amiri(15, color: s.gold)),
               const SizedBox(width: 8),
               Expanded(
-                child: Container(
-                  height: 1,
-                  color: RamadanColors.goldenAura.withOpacity(0.3),
-                ),
+                child: Container(height: 1, color: s.gold.withOpacity(0.2)),
               ),
             ],
           ),
@@ -1411,7 +1396,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
                 label: 'الإفطار',
                 countdown: _iftarCountdown,
                 icon: '🌙',
-                color: RamadanColors.goldenAura,
+                color: s.gold,
                 style: s,
               ),
             ),
@@ -1421,7 +1406,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
                 label: 'السحور',
                 countdown: _suhoorCountdown,
                 icon: '🌅',
-                color: RamadanColors.emeraldLight,
+                color: s.success,
                 style: s,
               ),
             ),
@@ -1539,8 +1524,8 @@ class _Skeleton extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: style.border),
     ),
-    child: const Center(
-      child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+    child: Center(
+      child: CircularProgressIndicator(color: style.gold, strokeWidth: 2),
     ),
   );
 }

@@ -13,7 +13,10 @@ class GeometricPainter extends CustomPainter {
     this.opacity = 0.08,
     this.strokeWidth = 0.7,
     this.spacing = 48.0,
+    this.blur = 0.0,
   });
+
+  final double blur;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -21,6 +24,10 @@ class GeometricPainter extends CustomPainter {
       ..color = color.withOpacity(opacity)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke;
+
+    if (blur > 0) {
+      p.maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+    }
 
     for (double x = -size.height; x < size.width + size.height; x += spacing) {
       canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), p);
@@ -65,7 +72,8 @@ class StatsBgPainter extends CustomPainter {
 // ── Duas Pattern ──
 class DuasBgPainter extends CustomPainter {
   final Color goldColor;
-  DuasBgPainter({required this.goldColor});
+  final double blur;
+  DuasBgPainter({required this.goldColor, this.blur = 0.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -73,6 +81,10 @@ class DuasBgPainter extends CustomPainter {
       ..color = goldColor.withOpacity(0.04)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
+
+    if (blur > 0) {
+      p.maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+    }
     for (double x = 0; x < size.width + 52; x += 52) {
       for (double y = 0; y < size.height + 52; y += 52) {
         final path = Path();
@@ -94,7 +106,8 @@ class DuasBgPainter extends CustomPainter {
 // ── Qibla Pattern ──
 class QiblaBgPainter extends CustomPainter {
   final Color goldColor;
-  QiblaBgPainter({required this.goldColor});
+  final double blur;
+  QiblaBgPainter({required this.goldColor, this.blur = 0.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -106,7 +119,10 @@ class QiblaBgPainter extends CustomPainter {
         Paint()
           ..color = goldColor.withOpacity(0.03)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.8,
+          ..strokeWidth = 0.8
+          ..maskFilter = blur > 0
+              ? MaskFilter.blur(BlurStyle.normal, blur)
+              : null,
       );
     }
   }
@@ -175,11 +191,12 @@ class AdhkarBgPainter extends CustomPainter {
       Offset(size.width / 2, -40),
       200,
       Paint()
-        ..shader = RadialGradient(
-          colors: [goldColor.withOpacity(0.07), Colors.transparent],
-        ).createShader(
-          Rect.fromCircle(center: Offset(size.width / 2, -40), radius: 200),
-        ),
+        ..shader =
+            RadialGradient(
+              colors: [goldColor.withOpacity(0.07), Colors.transparent],
+            ).createShader(
+              Rect.fromCircle(center: Offset(size.width / 2, -40), radius: 200),
+            ),
     );
   }
 

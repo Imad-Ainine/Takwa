@@ -11,7 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:adhan/adhan.dart' as adhan;
 
-import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
@@ -275,9 +274,9 @@ class _QiblaCompassPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = (isRamadan
-            ? const Color(0xFF0F2044)
-            : const Color(0xFF1A2332))
+        ..color = isRamadan
+            ? primaryColor.withOpacity(0.05)
+            : tealColor.withOpacity(0.05)
         ..style = PaintingStyle.fill,
     );
 
@@ -313,8 +312,8 @@ class _QiblaCompassPainter extends CustomPainter {
         p2,
         Paint()
           ..color = isMajor
-              ? primaryColor.withOpacity(0.8)
-              : primaryColor.withOpacity(0.2)
+              ? primaryColor.withOpacity(isAligned ? 0.9 : 0.6)
+              : primaryColor.withOpacity(0.3)
           ..strokeWidth = isMajor ? 2 : 0.8,
       );
     }
@@ -611,12 +610,16 @@ class _QiblaHint extends StatelessWidget {
 }
 
 // ── Error / Loading states ──
-class _QiblaLoading extends StatelessWidget {
+class _QiblaLoading extends ConsumerWidget {
   const _QiblaLoading();
   @override
-  Widget build(BuildContext context) => const Center(
-    child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+    return Center(
+      child: CircularProgressIndicator(color: style.gold, strokeWidth: 2),
+    );
+  }
 }
 
 class _QiblaLocationError extends StatelessWidget {

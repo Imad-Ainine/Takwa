@@ -8,12 +8,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/providers/theme_provider.dart';
+import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/routes/app_routes.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
@@ -57,13 +58,15 @@ class MuhasabahApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+
     return MaterialApp(
       title: 'محاسبة النفس',
       debugShowCheckedModeBanner: false,
       navigatorKey: NotificationRouter.navigatorKey,
       themeMode: ref.watch(themeModeProvider),
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
+      theme: isRamadan ? RamadanTheme.light : AppTheme.light,
+      darkTheme: isRamadan ? RamadanTheme.dark : AppTheme.dark,
       locale: const Locale('ar', 'SA'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

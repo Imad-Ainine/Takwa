@@ -3,16 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/theme/ramadan_theme.dart';
+import 'dart:ui';
 import 'background_painters.dart';
 
 enum BackgroundPattern { geometric, stats, duas, adhkar, checklist, qibla }
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
   final BackgroundPattern pattern;
+  final double blurAmount;
 
   const CustomPatternBackground({
     super.key,
     this.pattern = BackgroundPattern.geometric,
+    this.blurAmount = 2.0,
   });
 
   @override
@@ -45,11 +48,32 @@ class _CustomPatternBackgroundState
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
 
     if (isRamadan) {
+      final brightness = Theme.of(context).brightness;
       return Positioned.fill(
-        child: AnimatedBuilder(
-          animation: _ctrl,
-          builder: (_, __) =>
-              CustomPaint(painter: RamadanBgPainter(animT: _ctrl.value)),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedBuilder(
+                animation: _ctrl,
+                builder: (_, __) => CustomPaint(
+                  painter: RamadanBgPainter(
+                    animT: _ctrl.value,
+                    brightness: brightness,
+                  ),
+                ),
+              ),
+            ),
+            if (widget.blurAmount > 0)
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: widget.blurAmount,
+                    sigmaY: widget.blurAmount,
+                  ),
+                  child: const SizedBox.expand(),
+                ),
+              ),
+          ],
         ),
       );
     }
@@ -59,7 +83,7 @@ class _CustomPatternBackgroundState
 
     switch (widget.pattern) {
       case BackgroundPattern.geometric:
-        painter = GeometricPainter(color: colors.gold);
+        painter = GeometricPainter(color: colors.gold, blur: 0.5);
         break;
       case BackgroundPattern.stats:
         painter = StatsBgPainter(
@@ -68,7 +92,7 @@ class _CustomPatternBackgroundState
         );
         break;
       case BackgroundPattern.duas:
-        painter = DuasBgPainter(goldColor: colors.gold);
+        painter = DuasBgPainter(goldColor: colors.gold, blur: 0.8);
         break;
       case BackgroundPattern.adhkar:
         painter = AdhkarBgPainter(
@@ -83,10 +107,26 @@ class _CustomPatternBackgroundState
         );
         break;
       case BackgroundPattern.qibla:
-        painter = QiblaBgPainter(goldColor: colors.gold);
+        painter = QiblaBgPainter(goldColor: colors.gold, blur: 1.0);
         break;
     }
 
-    return Positioned.fill(child: CustomPaint(painter: painter));
+    return Positioned.fill(
+      child: Stack(
+        children: [
+          Positioned.fill(child: CustomPaint(painter: painter)),
+          if (widget.blurAmount > 0)
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: widget.blurAmount,
+                  sigmaY: widget.blurAmount,
+                ),
+                child: const SizedBox.expand(),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
