@@ -7,17 +7,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:muhasabah/core/providers/adhkar_providers.dart';
-
-import '../../../../core/theme/app_theme.dart';
+import 'package:muhasabah/core/theme/app_theme.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR SCREEN
 // ═══════════════════════════════════════════════════════════════
 class AdhkarScreen extends ConsumerStatefulWidget {
   final int initialCategoryIndex;
-  
+
   const AdhkarScreen({super.key, this.initialCategoryIndex = 0});
   @override
   ConsumerState<AdhkarScreen> createState() => _AdhkarScreenState();
@@ -41,8 +39,8 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     super.initState();
     _tabCtrl = TabController(
       initialIndex: widget.initialCategoryIndex,
-      length: _tabs.length, 
-      vsync: this
+      length: _tabs.length,
+      vsync: this,
     );
     _entryCtrl = AnimationController(
       vsync: this,
@@ -70,10 +68,17 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(child: CustomPaint(painter: _AdhkarBgPainter())),
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _AdhkarBgPainter(
+                  nightColor: context.colors.background,
+                  goldColor: context.colors.gold,
+                ),
+              ),
+            ),
             Column(
               children: [
                 _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs),
@@ -115,7 +120,7 @@ class _AdhkarTopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.gold.withOpacity(0.1), Colors.transparent],
+          colors: [context.colors.gold.withOpacity(0.1), Colors.transparent],
         ),
       ),
       child: SafeArea(
@@ -132,13 +137,13 @@ class _AdhkarTopBar extends StatelessWidget {
                       children: [
                         Text(
                           'الأذكار والأدعية',
-                          style: GoogleFonts.amiri(
+                          style: context.typography.headingMedium.copyWith(
                             fontSize: 22,
-                            color: AppColors.gold,
+                            color: context.colors.gold,
                             fontWeight: FontWeight.w700,
                             shadows: [
                               Shadow(
-                                color: AppColors.gold.withOpacity(0.3),
+                                color: context.colors.gold.withOpacity(0.3),
                                 blurRadius: 12,
                               ),
                             ],
@@ -146,9 +151,8 @@ class _AdhkarTopBar extends StatelessWidget {
                         ),
                         Text(
                           'حصن المسلم',
-                          style: GoogleFonts.notoNaskhArabic(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
+                          style: context.typography.caption.copyWith(
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ],
@@ -166,8 +170,8 @@ class _AdhkarTopBar extends StatelessWidget {
               tabAlignment: TabAlignment.start,
               dividerColor: Colors.transparent,
               indicator: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.gold, AppColors.teal],
+                gradient: LinearGradient(
+                  colors: [context.colors.gold, context.colors.teal],
                 ),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -176,13 +180,12 @@ class _AdhkarTopBar extends StatelessWidget {
                 vertical: 6,
                 horizontal: 0,
               ),
-              labelStyle: GoogleFonts.notoNaskhArabic(
-                fontSize: 12,
+              labelStyle: context.typography.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
               ),
-              unselectedLabelStyle: GoogleFonts.notoNaskhArabic(fontSize: 12),
-              labelColor: AppColors.night,
-              unselectedLabelColor: AppColors.textSecondary,
+              unselectedLabelStyle: context.typography.bodySmall,
+              labelColor: context.colors.night,
+              unselectedLabelColor: context.colors.textSecondary,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               tabs: tabs
                   .map((t) => Tab(text: '${t.$1} ${t.$2}', height: 36))
@@ -306,10 +309,14 @@ class _CategoryProgressBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: isDone ? AppColors.success.withOpacity(0.1) : AppColors.card,
+        color: isDone
+            ? context.colors.success.withOpacity(0.1)
+            : context.colors.card,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDone ? AppColors.success.withOpacity(0.3) : AppColors.border,
+          color: isDone
+              ? context.colors.success.withOpacity(0.3)
+              : context.colors.border,
         ),
       ),
       child: Column(
@@ -318,9 +325,10 @@ class _CategoryProgressBar extends StatelessWidget {
             children: [
               Text(
                 isDone ? '✅ مكتمل الحمد لله!' : '$done / $total ذكر',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 12,
-                  color: isDone ? AppColors.success : AppColors.textPrimary,
+                style: context.typography.bodySmall.copyWith(
+                  color: isDone
+                      ? context.colors.success
+                      : context.colors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -333,9 +341,8 @@ class _CategoryProgressBar extends StatelessWidget {
                   },
                   child: Text(
                     'إعادة',
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 11,
-                      color: AppColors.textDim,
+                    style: context.typography.caption.copyWith(
+                      color: context.colors.textDim,
                     ),
                   ),
                 ),
@@ -346,7 +353,7 @@ class _CategoryProgressBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: Stack(
               children: [
-                Container(height: 5, color: AppColors.border),
+                Container(height: 5, color: context.colors.border),
                 AnimatedFractionallySizedBox(
                   duration: const Duration(milliseconds: 400),
                   widthFactor: pct,
@@ -355,14 +362,17 @@ class _CategoryProgressBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isDone
-                            ? [AppColors.success, AppColors.teal]
-                            : [AppColors.gold, AppColors.teal],
+                            ? [context.colors.success, context.colors.teal]
+                            : [context.colors.gold, context.colors.teal],
                       ),
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
                         BoxShadow(
-                          color: (isDone ? AppColors.success : AppColors.gold)
-                              .withOpacity(0.4),
+                          color:
+                              (isDone
+                                      ? context.colors.success
+                                      : context.colors.gold)
+                                  .withOpacity(0.4),
                           blurRadius: 6,
                         ),
                       ],
@@ -448,23 +458,23 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
             gradient: isDone
                 ? LinearGradient(
                     colors: [
-                      AppColors.success.withOpacity(0.08),
-                      AppColors.teal.withOpacity(0.05),
+                      context.colors.success.withOpacity(0.08),
+                      context.colors.teal.withOpacity(0.05),
                     ],
                   )
                 : null,
-            color: isDone ? null : AppColors.card,
+            color: isDone ? null : context.colors.card,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDone
-                  ? AppColors.success.withOpacity(0.3)
-                  : AppColors.border,
+                  ? context.colors.success.withOpacity(0.3)
+                  : context.colors.border,
               width: isDone ? 1.5 : 1,
             ),
             boxShadow: isDone
                 ? [
                     BoxShadow(
-                      color: AppColors.success.withOpacity(0.1),
+                      color: context.colors.success.withOpacity(0.1),
                       blurRadius: 10,
                     ),
                   ]
@@ -481,11 +491,11 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                     Text(
                       widget.dhikr.arabic,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.amiri(
+                      style: context.typography.headingMedium.copyWith(
                         fontSize: 20,
                         color: isDone
-                            ? AppColors.success.withOpacity(0.8)
-                            : AppColors.textPrimary,
+                            ? context.colors.success.withOpacity(0.8)
+                            : context.colors.textPrimary,
                         height: 2.0,
                       ),
                     ),
@@ -503,17 +513,15 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             const SizedBox(height: 8),
                             Container(
                               height: 1,
-                              color: AppColors.border,
+                              color: context.colors.border,
                               margin: const EdgeInsets.symmetric(horizontal: 8),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               widget.dhikr.transliteration!,
                               textAlign: TextAlign.center,
-                              style: GoogleFonts.notoNaskhArabic(
-                                fontSize: 11,
-                                color: AppColors.textSecondary,
-                                height: 1.7,
+                              style: context.typography.caption.copyWith(
+                                color: context.colors.textSecondary,
                                 fontStyle: FontStyle.italic,
                               ),
                             ),
@@ -526,10 +534,10 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                                 vertical: 7,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.goldDim,
+                                color: context.colors.gold.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: AppColors.gold.withOpacity(0.15),
+                                  color: context.colors.gold.withOpacity(0.15),
                                 ),
                               ),
                               child: Row(
@@ -542,11 +550,8 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                                   Expanded(
                                     child: Text(
                                       widget.dhikr.fadl!,
-                                      style: GoogleFonts.notoNaskhArabic(
-                                        fontSize: 11,
-                                        color: AppColors.goldLight,
-                                        height: 1.7,
-                                      ),
+                                      style: context.typography.caption
+                                          .copyWith(color: context.colors.gold),
                                     ),
                                   ),
                                 ],
@@ -559,9 +564,8 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 '— ${widget.dhikr.source}',
-                                style: GoogleFonts.amiri(
-                                  fontSize: 11,
-                                  color: AppColors.textDim,
+                                style: context.typography.caption.copyWith(
+                                  color: context.colors.textDim,
                                 ),
                               ),
                             ),
@@ -584,9 +588,8 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                           const SizedBox(width: 8),
                           Text(
                             '$remaining متبقي',
-                            style: GoogleFonts.notoNaskhArabic(
-                              fontSize: 10,
-                              color: AppColors.textDim,
+                            style: context.typography.caption.copyWith(
+                              color: context.colors.textDim,
                             ),
                           ),
                         ] else ...[
@@ -596,26 +599,25 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.success.withOpacity(0.15),
+                              color: context.colors.success.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: AppColors.success.withOpacity(0.3),
+                                color: context.colors.success.withOpacity(0.3),
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.check_rounded,
                                   size: 14,
-                                  color: AppColors.success,
+                                  color: context.colors.success,
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   'مكتمل ${widget.dhikr.count}×',
-                                  style: GoogleFonts.notoNaskhArabic(
-                                    fontSize: 11,
-                                    color: AppColors.success,
+                                  style: context.typography.bodySmall.copyWith(
+                                    color: context.colors.success,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -628,19 +630,18 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                         // expand hint
                         Text(
                           _expanded ? 'إخفاء' : 'الفضل',
-                          style: GoogleFonts.notoNaskhArabic(
-                            fontSize: 10,
-                            color: AppColors.textDim,
+                          style: context.typography.caption.copyWith(
+                            color: context.colors.textDim,
                           ),
                         ),
                         const SizedBox(width: 4),
                         AnimatedRotation(
                           turns: _expanded ? 0.5 : 0,
                           duration: const Duration(milliseconds: 250),
-                          child: const Icon(
+                          child: Icon(
                             Icons.expand_more_rounded,
                             size: 16,
-                            color: AppColors.textDim,
+                            color: context.colors.textDim,
                           ),
                         ),
                       ],
@@ -663,9 +664,9 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                         : 0,
                     child: Container(
                       height: 3,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [AppColors.gold, AppColors.teal],
+                          colors: [context.colors.gold, context.colors.teal],
                         ),
                       ),
                     ),
@@ -689,26 +690,24 @@ class _CounterBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.gold.withOpacity(0.1),
+        color: context.colors.gold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+        border: Border.all(color: context.colors.gold.withOpacity(0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '$current',
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 13,
-              color: AppColors.gold,
+            style: context.typography.bodyMedium.copyWith(
+              color: context.colors.gold,
               fontWeight: FontWeight.w700,
             ),
           ),
           Text(
             ' / $total',
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 10,
-              color: AppColors.textDim,
+            style: context.typography.caption.copyWith(
+              color: context.colors.textDim,
             ),
           ),
         ],
@@ -729,10 +728,14 @@ class _NotifSettingsButton extends ConsumerWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: enabled ? AppColors.goldDim : AppColors.card,
+          color: enabled
+              ? context.colors.gold.withOpacity(0.1)
+              : context.colors.card,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: enabled ? AppColors.gold.withOpacity(0.3) : AppColors.border,
+            color: enabled
+                ? context.colors.gold.withOpacity(0.3)
+                : context.colors.border,
           ),
         ),
         child: Center(
@@ -748,7 +751,7 @@ class _NotifSettingsButton extends ConsumerWidget {
   void _showNotifSettings(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.card,
+      backgroundColor: context.colors.card,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -762,16 +765,21 @@ class _NotifSettingsButton extends ConsumerWidget {
 //  BACKGROUND PAINTER
 // ─────────────────────────────────────────
 class _AdhkarBgPainter extends CustomPainter {
+  final Color nightColor;
+  final Color goldColor;
+
+  _AdhkarBgPainter({required this.nightColor, required this.goldColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
+      Paint()..color = nightColor,
     );
 
     // أنماط هندسية إسلامية
     final p = Paint()
-      ..color = const Color(0x07C8A96E)
+      ..color = goldColor.withOpacity(0.04)
       ..strokeWidth = 0.6
       ..style = PaintingStyle.stroke;
 
@@ -789,7 +797,7 @@ class _AdhkarBgPainter extends CustomPainter {
       Paint()
         ..shader =
             RadialGradient(
-              colors: [AppColors.gold.withOpacity(0.07), Colors.transparent],
+              colors: [goldColor.withOpacity(0.07), Colors.transparent],
             ).createShader(
               Rect.fromCircle(center: Offset(size.width / 2, -40), radius: 200),
             ),
@@ -829,9 +837,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
     final sleepTime = ref.watch(adhkarSleepTimeProvider);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -842,7 +850,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
               height: 4,
               margin: const EdgeInsets.only(top: 12),
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -853,9 +861,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
               children: [
                 Text(
                   'إشعارات الأذكار',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.headingMedium.copyWith(
                     fontSize: 18,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -866,15 +874,15 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     ref.read(adhkarNotifEnabledProvider.notifier).set(v);
                     if (!v) AdhkarNotificationService.cancelAll();
                   },
-                  activeColor: AppColors.gold,
-                  activeTrackColor: AppColors.gold.withOpacity(0.3),
-                  inactiveTrackColor: AppColors.border,
-                  inactiveThumbColor: AppColors.textDim,
+                  activeColor: context.colors.gold,
+                  activeTrackColor: context.colors.gold.withOpacity(0.3),
+                  inactiveTrackColor: context.colors.border,
+                  inactiveThumbColor: context.colors.textDim,
                 ),
               ],
             ),
           ),
-          const Divider(color: AppColors.border, height: 20),
+          const Divider(height: 20),
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 250),
             crossFadeState: enabled
@@ -888,9 +896,8 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   const SizedBox(width: 10),
                   Text(
                     'الإشعارات متوقفة',
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 13,
-                      color: AppColors.textDim,
+                    style: context.typography.bodyMedium.copyWith(
+                      color: context.colors.textDim,
                     ),
                   ),
                 ],
@@ -937,7 +944,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 12),
-                Container(height: 1, color: AppColors.border),
+                const Divider(),
                 const SizedBox(height: 12),
                 _ToggleRow(
                   icon: '🌅',
@@ -965,13 +972,14 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     icon: const Text('🔔', style: TextStyle(fontSize: 16)),
                     label: Text(
                       'اختبار إشعار ذكر الآن',
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 13,
-                        color: AppColors.gold,
+                      style: context.typography.bodySmall.copyWith(
+                        color: context.colors.gold,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.gold.withOpacity(0.3)),
+                      side: BorderSide(
+                        color: context.colors.gold.withOpacity(0.3),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -993,7 +1001,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
         initialTime: current,
         builder: (ctx, child) => Theme(
           data: Theme.of(ctx).copyWith(
-            colorScheme: const ColorScheme.dark(primary: AppColors.gold),
+            colorScheme: ColorScheme.dark(primary: context.colors.gold),
           ),
           child: child!,
         ),
@@ -1025,9 +1033,8 @@ class _NotifRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 13,
-                color: AppColors.textPrimary,
+              style: context.typography.bodyMedium.copyWith(
+                color: context.colors.textPrimary,
               ),
             ),
           ),
@@ -1036,15 +1043,16 @@ class _NotifRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: AppColors.goldDim,
+                color: context.colors.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+                border: Border.all(
+                  color: context.colors.gold.withOpacity(0.25),
+                ),
               ),
               child: Text(
                 '$h:$m',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 15,
-                  color: AppColors.gold,
+                style: context.typography.bodyLarge.copyWith(
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -1078,19 +1086,18 @@ class _ToggleRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 13,
-              color: AppColors.textPrimary,
+            style: context.typography.bodyMedium.copyWith(
+              color: context.colors.textPrimary,
             ),
           ),
         ),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: AppColors.teal,
-          activeTrackColor: AppColors.teal.withOpacity(0.3),
-          inactiveTrackColor: AppColors.border,
-          inactiveThumbColor: AppColors.textDim,
+          activeColor: context.colors.teal,
+          activeTrackColor: context.colors.teal.withOpacity(0.3),
+          inactiveTrackColor: context.colors.border,
+          inactiveThumbColor: context.colors.textDim,
         ),
       ],
     ),

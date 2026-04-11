@@ -5,12 +5,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 
 import '../core/theme/app_theme.dart';
 import '../core/providers/database_providers.dart';
 import '../core/notifications/notifications_service.dart';
-import '../features/home/home_screen.dart';
+import '../features/home/presentation/screens/home_screen.dart';
 import '../features/checklist/checklist_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
@@ -125,7 +125,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
     return DrawerScaffold(
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.night,
         body: PageView(
           controller: _pageCtrl,
           physics: const NeverScrollableScrollPhysics(), // manual nav only
@@ -175,9 +175,9 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
-        border: const Border(
-          top: BorderSide(color: AppColors.border, width: 1),
+        color: context.colors.card,
+        border: Border(
+          top: BorderSide(color: context.colors.border, width: 1),
         ),
         boxShadow: [
           BoxShadow(
@@ -213,8 +213,8 @@ class _BottomNav extends StatelessWidget {
                             height: 2,
                             margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppColors.gold, AppColors.teal],
+                              gradient: LinearGradient(
+                                colors: [context.colors.gold, context.colors.teal],
                               ),
                               borderRadius: BorderRadius.circular(1),
                             ),
@@ -230,7 +230,7 @@ class _BottomNav extends StatelessWidget {
                                 shadows: isActive
                                     ? [
                                         Shadow(
-                                          color: AppColors.gold.withOpacity(
+                                          color: context.colors.gold.withOpacity(
                                             0.5 * t,
                                           ),
                                           blurRadius: 10,
@@ -245,11 +245,11 @@ class _BottomNav extends StatelessWidget {
                           // Label
                           AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 200),
-                            style: GoogleFonts.notoNaskhArabic(
+                            style: context.typography.caption.copyWith(
                               fontSize: 10,
                               color: isActive
-                                  ? AppColors.gold
-                                  : AppColors.textDim,
+                                  ? context.colors.gold
+                                  : context.colors.textDim,
                               fontWeight: isActive
                                   ? FontWeight.w600
                                   : FontWeight.w400,
@@ -310,7 +310,7 @@ class _SplashScreenState extends State<_SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.night,
+      backgroundColor: context.colors.night,
       body: Center(
         child: FadeTransition(
           opacity: _fade,
@@ -334,7 +334,7 @@ class _SplashScreenState extends State<_SplashScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: AppColors.gold.withOpacity(0.3 - i * 0.08),
+                              color: context.colors.gold.withOpacity(0.3 - i * 0.08),
                               width: 1,
                             ),
                           ),
@@ -347,18 +347,18 @@ class _SplashScreenState extends State<_SplashScreen>
                 const SizedBox(height: 24),
                 Text(
                   'محاسبة النفس',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.displayMedium.copyWith(
                     fontSize: 32,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.quranicVerse.copyWith(
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),

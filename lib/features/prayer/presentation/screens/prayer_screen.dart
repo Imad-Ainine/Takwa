@@ -2,18 +2,10 @@
 //  lib/features/prayer/presentation/screens/prayer_screen.dart
 //  محاسبة النفس — شاشة الأذان والصلاة القادمة
 // ═══════════════════════════════════════════════════════════════
-//
-//  Dependencies:
-//    adhan: ^1.1.0
-//    geolocator: ^12.0.0
-//    timezone: ^0.9.4
-//    google_fonts: ^6.2.1
-//    flutter_riverpod: ^2.5.1
-// ═══════════════════════════════════════════════════════════════
+
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:geocoding/geocoding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
+import 'package:muhasabah/core/notifications/location_prayer_update.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -157,36 +150,28 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
   Future<void> _init() async {
     state = state.copyWith(loading: true);
     try {
-      final pos = await PrayerTimesService.getLocation();
       final settings = _ref.read(settingsDaoProvider);
-      final madhab = await settings.get('madhab') ?? 'shafi';
-      final method = await settings.get('calcMethod') ?? 'MWL';
 
-      double lat, lng;
-      String city = '';
+      // جلب الموقع المحفوظ أو تحديثه
+      final savedLat = await settings.get('latitude');
+      final savedLng = await settings.get('longitude');
+      String city = await settings.get('cityName') ?? 'غير محدد';
 
-      if (pos != null) {
-        lat = pos.latitude;
-        lng = pos.longitude;
-        await settings.set('latitude', lat.toString());
-        await settings.set('longitude', lng.toString());
-        // reverse geocode (simple)
-        city = await _getCityName(lat, lng);
-        await settings.set('cityName', city);
-      } else {
-        lat = double.tryParse(await settings.get('latitude') ?? '') ?? 36.7;
-        lng = double.tryParse(await settings.get('longitude') ?? '') ?? 3.0;
-        city = await settings.get('cityName') ?? 'الجزائر';
+      if (savedLat == null || savedLng == null || city == 'غير محدد') {
+        final result = await LocationPrayerManager.refreshLocation(_ref);
+        if (result == LocationResult.success) {
+          city = await settings.get('cityName') ?? city;
+        }
       }
 
-      final prayers = await PrayerTimesService.calculate(
-        latitude: lat,
-        longitude: lng,
-        madhab: madhab,
-        method: method,
-      );
+      // حساب أوقات الصلاة باستخدام الـ provider لإبقاء البيانات متزامنة
+      final prayers = await _ref.read(prayerTimesProvider.future);
 
-      state = state.copyWith(prayers: prayers, cityName: city, loading: false);
+      state = state.copyWith(
+        prayers: prayers,
+        cityName: city,
+        loading: false,
+      );
 
       _startTicker();
     } catch (e) {
@@ -194,7 +179,11 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
     }
   }
 
-  Future<void> refresh() => _init();
+  Future<void> refresh() async {
+    state = state.copyWith(loading: true);
+    await LocationPrayerManager.refreshLocation(_ref);
+    await _init();
+  }
 
   void _startTicker() {
     _ticker?.cancel();
@@ -225,27 +214,6 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
     );
   }
 
-  Future<String> _getCityName(double lat, double lng) async {
-    try {
-      final placemarks = await placemarkFromCoordinates(lat, lng);
-      if (placemarks.isNotEmpty) {
-        final place = placemarks.first;
-        final parts = [
-          place.locality,
-          place.country,
-        ].where((p) => p?.isNotEmpty == true).toList();
-        if (parts.isNotEmpty) {
-          return parts.join(', ').toUpperCase(); // ex: EL ABADIA, ALGERIA
-        }
-      }
-    } catch (_) {}
-
-    // Fallback
-    if (lat > 35 && lat < 37 && lng > 2 && lng < 4) return 'ALGIERS, ALGERIA';
-    if (lat > 35 && lng > 6) return 'CONSTANTINE, ALGERIA';
-    if (lat > 35 && lng < 0) return 'ORAN, ALGERIA';
-    return 'CURRENT LOCATION';
-  }
 
   @override
   void dispose() {
@@ -341,7 +309,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.night,
         body: Stack(
           children: [
             // ── خلفية السماء الديناميكية ──
@@ -794,11 +762,11 @@ class _TopBar extends StatelessWidget {
                     'أوقات الصلاة',
                     style: GoogleFonts.amiri(
                       fontSize: 22,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                       shadows: [
                         Shadow(
-                          color: AppColors.gold.withOpacity(0.4),
+                          color: context.colors.gold.withOpacity(0.4),
                           blurRadius: 12,
                         ),
                       ],
@@ -806,17 +774,17 @@ class _TopBar extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_rounded,
                         size: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         cityName,
                         style: GoogleFonts.notoNaskhArabic(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -834,10 +802,10 @@ class _TopBar extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.my_location_rounded,
                   size: 18,
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                 ),
               ),
             ),
@@ -1047,6 +1015,8 @@ class _CountdownRing extends StatelessWidget {
               painter: _CountdownArcPainter(
                 progress: _progress,
                 primaryColor: visual.secondaryColor,
+                successColor: context.colors.success,
+                tealColor: context.colors.teal,
                 isIqama: isIqama,
               ),
             ),
@@ -1124,11 +1094,15 @@ class _CountdownRing extends StatelessWidget {
 class _CountdownArcPainter extends CustomPainter {
   final double progress;
   final Color primaryColor;
+  final Color successColor;
+  final Color tealColor;
   final bool isIqama;
 
   _CountdownArcPainter({
     required this.progress,
     required this.primaryColor,
+    required this.successColor,
+    required this.tealColor,
     required this.isIqama,
   });
 
@@ -1161,7 +1135,11 @@ class _CountdownArcPainter extends CustomPainter {
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
           colors: isIqama
-              ? [AppColors.success, AppColors.teal, AppColors.success]
+              ? [
+                  successColor,
+                  tealColor,
+                  successColor,
+                ]
               : [primaryColor, Colors.white.withOpacity(0.9), primaryColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
@@ -1181,7 +1159,11 @@ class _CountdownArcPainter extends CustomPainter {
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
           colors: isIqama
-              ? [AppColors.success, AppColors.teal, AppColors.success]
+              ? [
+                  successColor,
+                  tealColor,
+                  successColor,
+                ]
               : [primaryColor, Colors.white, primaryColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
@@ -1203,7 +1185,7 @@ class _CountdownArcPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(dx, dy),
       5,
-      Paint()..color = isIqama ? AppColors.success : primaryColor,
+      Paint()..color = isIqama ? successColor : primaryColor,
     );
   }
 
@@ -1242,7 +1224,7 @@ class _AdhanIqamaRow extends StatelessWidget {
             label: 'وقت الأذان',
             time: _fmt(adhanTime),
             icon: '📢',
-            color: AppColors.gold,
+            color: context.colors.gold,
             isActive: !isIqamaPhase,
           ),
         ),
@@ -1252,7 +1234,7 @@ class _AdhanIqamaRow extends StatelessWidget {
             label: 'وقت الإقامة',
             time: iqamaTime != null ? _fmt(iqamaTime!) : '+$iqamaOffsetد',
             icon: '🕌',
-            color: AppColors.success,
+            color: context.colors.success,
             isActive: isIqamaPhase,
             subtitle: 'بعد $iqamaOffset دقيقة',
           ),
@@ -1388,7 +1370,7 @@ class _DailyPrayersTable extends StatelessWidget {
                       'جدول الصلوات اليوم',
                       style: GoogleFonts.amiri(
                         fontSize: 15,
-                        color: AppColors.gold,
+                        color: context.colors.gold,
                       ),
                     ),
                     Text(
@@ -1542,7 +1524,7 @@ class _PrayerTableRow extends StatelessWidget {
                       style: GoogleFonts.notoNaskhArabic(
                         fontSize: 14,
                         color: isNext
-                            ? AppColors.success
+                            ? context.colors.success
                             : isPast
                             ? Colors.white.withOpacity(0.25)
                             : Colors.white.withOpacity(0.5),
@@ -1565,7 +1547,7 @@ class _PrayerTableRow extends StatelessWidget {
                   Icon(
                     Icons.check_circle_rounded,
                     size: 16,
-                    color: AppColors.success.withOpacity(0.4),
+                    color: context.colors.success.withOpacity(0.4),
                   ),
                 ],
               ],
@@ -1621,7 +1603,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
               child: SizedBox(
                 width: 60,
                 height: 60,
-                child: CustomPaint(painter: _LoadingRingPainter(_ctrl.value)),
+                child: CustomPaint(painter: _LoadingRingPainter(_ctrl.value, context.colors.gold)),
               ),
             ),
           ),
@@ -1630,7 +1612,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
             'جارٍ تحديد موقعك...',
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           const SizedBox(height: 4),
@@ -1638,7 +1620,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
             'لحساب أوقات الصلاة',
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 11,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ),
         ],
@@ -1649,7 +1631,8 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
 
 class _LoadingRingPainter extends CustomPainter {
   final double t;
-  _LoadingRingPainter(this.t);
+  final Color color;
+  _LoadingRingPainter(this.t, this.color);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1661,8 +1644,8 @@ class _LoadingRingPainter extends CustomPainter {
       math.pi * 1.5,
       false,
       Paint()
-        ..shader = const SweepGradient(
-          colors: [AppColors.gold, Colors.transparent],
+        ..shader = SweepGradient(
+          colors: [color, Colors.transparent],
         ).createShader(Rect.fromCircle(center: c, radius: r))
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
@@ -1690,7 +1673,7 @@ class _ErrorView extends StatelessWidget {
             'تعذّر تحديد الموقع',
             style: GoogleFonts.amiri(
               fontSize: 18,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -1698,15 +1681,15 @@ class _ErrorView extends StatelessWidget {
             'تأكد من تفعيل GPS',
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: onRetry,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.gold,
-              foregroundColor: AppColors.night,
+              backgroundColor: context.colors.gold,
+              foregroundColor: context.colors.night,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),

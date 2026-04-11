@@ -4,7 +4,6 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/app/main_shell.dart';
@@ -91,7 +90,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     final page = _pages[_currentPage];
 
     return Scaffold(
-      backgroundColor: AppColors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // ── Animated Background ──
@@ -118,8 +117,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     onPressed: _goToApp,
                     child: Text(
                       'تخطّ',
-                      style: GoogleFonts.notoNaskhArabic(
-                        color: AppColors.textSecondary,
+                      style: context.typography.caption.copyWith(
+                        color: context.colors.textSecondary,
                         fontSize: 14,
                       ),
                     ),
@@ -149,7 +148,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       decoration: BoxDecoration(
                         color: _currentPage == i
                             ? page.color
-                            : AppColors.border,
+                            : context.colors.border,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -187,9 +186,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               _currentPage == _pages.length - 1
                                   ? 'ابدأ الآن 🚀'
                                   : 'التالي ←',
-                              style: GoogleFonts.notoNaskhArabic(
+                              style: context.typography.bodyLarge.copyWith(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
@@ -239,7 +238,7 @@ class _OnboardingPage extends StatelessWidget {
           // Title
           Text(
             data.title,
-            style: GoogleFonts.amiri(
+            style: context.typography.headingLarge.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: data.color,
@@ -251,9 +250,9 @@ class _OnboardingPage extends StatelessWidget {
           Text(
             data.subtitle,
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoNaskhArabic(
+            style: context.typography.bodyMedium.copyWith(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               height: 1.6,
             ),
           ),
@@ -263,7 +262,7 @@ class _OnboardingPage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: context.colors.card,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: data.color.withOpacity(0.2)),
             ),
@@ -272,16 +271,16 @@ class _OnboardingPage extends StatelessWidget {
                 Text(
                   data.hadith,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.amiri(
+                  style: context.typography.quranicVerse.copyWith(
                     fontSize: 17,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     height: 1.7,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   data.hadithSource,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.caption.copyWith(
                     fontSize: 11,
                     color: data.color,
                     fontStyle: FontStyle.italic,

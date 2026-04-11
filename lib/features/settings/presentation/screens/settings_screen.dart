@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:muhasabah/core/providers/theme_provider.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
 
 import '../widgets/location_picker_sheet.dart';
@@ -98,7 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.background,
         body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
@@ -107,7 +108,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               pinned: true,
               title: Text(
                 'الإعدادات',
-                style: GoogleFonts.amiri(fontSize: 20, color: AppColors.gold),
+                style: context.typography.headingMedium.copyWith(
+                  color: context.colors.gold,
+                ),
               ),
               centerTitle: true,
               elevation: 0,
@@ -198,6 +201,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // ── المظهر ──
+                  const _SectionHeader(title: 'المظهر', icon: '🎨'),
+                  _SettingsCard(
+                    children: [
+                      _SelectSetting(
+                        icon: '🌓',
+                        label: 'وضع المظهر',
+                        value: ref.watch(themeModeProvider).name,
+                        options: const {
+                          'system': 'تلقائي (حسب النظام)',
+                          'light': 'الوضع الفاتح',
+                          'dark': 'الوضع الداكن',
+                        },
+                        onChanged: (v) {
+                          final mode = ThemeMode.values.firstWhere(
+                            (e) => e.name == v,
+                          );
+                          ref.read(themeModeProvider.notifier).setTheme(mode);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // ── وضع رمضان ──
                   const _SectionHeader(title: 'وضع رمضان', icon: '🌙'),
                   _SettingsCard(
@@ -211,7 +238,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           setState(() => _ramadanMode = v);
                           _save('ramadanMode', v);
                         },
-                        accentColor: AppColors.gold,
+                        accentColor: context.colors.gold,
                       ),
                     ],
                   ),
@@ -299,7 +326,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           'بسم الله الرحمن الرحيم',
                           style: GoogleFonts.amiri(
                             fontSize: 14,
-                            color: AppColors.gold,
+                            color: context.colors.gold,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -307,7 +334,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           'محاسبة النفس — v1.0.0',
                           style: GoogleFonts.notoNaskhArabic(
                             fontSize: 11,
-                            color: AppColors.textDim,
+                            color: context.colors.textDim,
                           ),
                         ),
                       ],
@@ -336,20 +363,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.card,
+        backgroundColor: context.colors.card,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.border),
+          side: BorderSide(color: context.colors.border),
         ),
         title: Text(
           'إعادة الضبط',
-          style: GoogleFonts.amiri(fontSize: 18, color: AppColors.danger),
+          style: GoogleFonts.amiri(fontSize: 18, color: context.colors.danger),
         ),
         content: Text(
           'هل تريد حذف جميع الإعدادات؟',
           style: GoogleFonts.notoNaskhArabic(
             fontSize: 13,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         actions: [
@@ -359,7 +386,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'إلغاء',
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ),
@@ -369,7 +396,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'حذف',
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 13,
-                color: AppColors.danger,
+                color: context.colors.danger,
               ),
             ),
           ),
@@ -396,7 +423,7 @@ class _SectionHeader extends StatelessWidget {
           title,
           style: GoogleFonts.amiri(
             fontSize: 15,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
       ],
@@ -411,9 +438,9 @@ class _SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     decoration: BoxDecoration(
-      color: AppColors.card,
+      color: context.colors.card,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: context.colors.border),
     ),
     child: Column(children: children),
   );
@@ -424,7 +451,7 @@ class _Divider extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     height: 1,
     margin: const EdgeInsets.only(right: 50),
-    color: AppColors.border,
+    color: context.colors.border,
   );
 }
 
@@ -453,7 +480,7 @@ class _ToggleSetting extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: (accentColor ?? AppColors.teal).withOpacity(0.12),
+              color: (accentColor ?? context.colors.teal).withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
@@ -469,14 +496,14 @@ class _ToggleSetting extends StatelessWidget {
                   label,
                   style: GoogleFonts.notoNaskhArabic(
                     fontSize: 13,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
                   sublabel,
                   style: GoogleFonts.notoNaskhArabic(
                     fontSize: 10,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -488,10 +515,12 @@ class _ToggleSetting extends StatelessWidget {
               HapticFeedback.selectionClick();
               onChanged(v);
             },
-            activeColor: accentColor ?? AppColors.teal,
-            activeTrackColor: (accentColor ?? AppColors.teal).withOpacity(0.3),
-            inactiveTrackColor: AppColors.border,
-            inactiveThumbColor: AppColors.textDim,
+            activeColor: accentColor ?? context.colors.teal,
+            activeTrackColor: (accentColor ?? context.colors.teal).withOpacity(
+              0.3,
+            ),
+            inactiveTrackColor: context.colors.border,
+            inactiveThumbColor: context.colors.textDim,
           ),
         ],
       ),
@@ -523,7 +552,7 @@ class _TimeSetting extends StatelessWidget {
           initialTime: time,
           builder: (ctx, child) => Theme(
             data: Theme.of(ctx).copyWith(
-              colorScheme: const ColorScheme.dark(primary: AppColors.gold),
+              colorScheme: ColorScheme.dark(primary: context.colors.gold),
             ),
             child: child!,
           ),
@@ -538,7 +567,7 @@ class _TimeSetting extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.gold.withOpacity(0.12),
+                color: context.colors.gold.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -551,22 +580,24 @@ class _TimeSetting extends StatelessWidget {
                 label,
                 style: GoogleFonts.notoNaskhArabic(
                   fontSize: 13,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.goldDim,
+                color: context.colors.goldDim,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+                border: Border.all(
+                  color: context.colors.gold.withOpacity(0.25),
+                ),
               ),
               child: Text(
                 '$h:$m',
                 style: GoogleFonts.notoNaskhArabic(
                   fontSize: 14,
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -603,7 +634,7 @@ class _SelectSetting extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.teal.withOpacity(0.12),
+                color: context.colors.teal.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -619,23 +650,23 @@ class _SelectSetting extends StatelessWidget {
                     label,
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 13,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     options[value] ?? value,
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 10,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_left_rounded,
               size: 18,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ],
         ),
@@ -646,7 +677,7 @@ class _SelectSetting extends StatelessWidget {
   void _showPicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.card,
+      backgroundColor: context.colors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -659,14 +690,17 @@ class _SelectSetting extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
             const SizedBox(height: 14),
             Text(
               label,
-              style: GoogleFonts.amiri(fontSize: 18, color: AppColors.gold),
+              style: GoogleFonts.amiri(
+                fontSize: 18,
+                color: context.colors.gold,
+              ),
             ),
             const SizedBox(height: 14),
             ...options.entries.map(
@@ -684,13 +718,13 @@ class _SelectSetting extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: value == e.key
-                        ? AppColors.teal.withOpacity(0.12)
-                        : AppColors.card2,
+                        ? context.colors.teal.withOpacity(0.12)
+                        : context.colors.background,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: value == e.key
-                          ? AppColors.teal.withOpacity(0.35)
-                          : AppColors.border,
+                          ? context.colors.teal.withOpacity(0.35)
+                          : context.colors.border,
                     ),
                   ),
                   child: Row(
@@ -701,8 +735,8 @@ class _SelectSetting extends StatelessWidget {
                           style: GoogleFonts.notoNaskhArabic(
                             fontSize: 13,
                             color: value == e.key
-                                ? AppColors.teal
-                                : AppColors.textPrimary,
+                                ? context.colors.teal
+                                : context.colors.textPrimary,
                             fontWeight: value == e.key
                                 ? FontWeight.w600
                                 : FontWeight.w400,
@@ -710,9 +744,9 @@ class _SelectSetting extends StatelessWidget {
                         ),
                       ),
                       if (value == e.key)
-                        const Icon(
+                        Icon(
                           Icons.check_circle_rounded,
-                          color: AppColors.teal,
+                          color: context.colors.teal,
                           size: 18,
                         ),
                     ],
@@ -742,7 +776,9 @@ class _ActionSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? AppColors.danger : AppColors.textPrimary;
+    final color = isDestructive
+        ? context.colors.danger
+        : context.colors.textPrimary;
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -753,8 +789,11 @@ class _ActionSetting extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: (isDestructive ? AppColors.danger : AppColors.gold)
-                    .withOpacity(0.12),
+                color:
+                    (isDestructive
+                            ? context.colors.danger
+                            : context.colors.gold)
+                        .withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -777,16 +816,16 @@ class _ActionSetting extends StatelessWidget {
                     sublabel,
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 10,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_left_rounded,
               size: 18,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ],
         ),

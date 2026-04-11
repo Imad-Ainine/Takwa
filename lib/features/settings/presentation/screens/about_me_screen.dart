@@ -16,7 +16,7 @@ class AboutMeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           const GeometricBackground(
@@ -37,24 +37,25 @@ class AboutMeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildProfileHeader(),
+                      _buildProfileHeader(context),
                       const SizedBox(height: 24),
-                      _buildSectionTitle('عن المطور', 'About Developer'),
+                      _buildSectionTitle(context, 'عن المطور', 'About Developer'),
                       const SizedBox(height: 12),
-                      _buildBioCard(),
+                      _buildBioCard(context),
                       const SizedBox(height: 24),
                       _buildSectionTitle(
+                        context,
                         'المهارات التقنية',
                         'Technical Skills',
                       ),
                       const SizedBox(height: 12),
-                      _buildSkillsGrid(),
+                      _buildSkillsGrid(context),
                       const SizedBox(height: 24),
-                      _buildSectionTitle('تواصل معي', 'Connect With Me'),
+                      _buildSectionTitle(context, 'تواصل معي', 'Connect With Me'),
                       const SizedBox(height: 12),
-                      _buildSocialLinks(),
+                      _buildSocialLinks(context),
                       const SizedBox(height: 40),
-                      _buildFooter(),
+                      _buildFooter(context),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -73,27 +74,27 @@ class AboutMeScreen extends StatelessWidget {
       elevation: 0,
       pinned: true,
       leading: IconButton(
-        icon: const Icon(
+        icon: Icon(
           Icons.arrow_back_ios_new_rounded,
-          color: AppColors.gold,
+          color: context.colors.gold,
           size: 20,
         ),
         onPressed: () => Navigator.pop(context),
       ),
       title: Text(
         'عن المطور',
-        style: AppTypography.headingMedium.copyWith(color: AppColors.gold),
+        style: context.typography.headingMedium.copyWith(color: context.colors.gold),
       ),
       centerTitle: true,
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
-      decoration: AppDecorations.goldCard.copyWith(
-        color: AppColors.card.withOpacity(0.85),
+      decoration: context.decorations.goldCard.copyWith(
+        color: context.colors.card.withOpacity(0.85),
       ),
       child: Column(
         children: [
@@ -103,8 +104,8 @@ class AboutMeScreen extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.gold, width: 3),
-              boxShadow: AppShadows.goldGlow,
+              border: Border.all(color: context.colors.gold, width: 3),
+              boxShadow: context.shadows.goldGlow,
               image: const DecorationImage(
                 image: AssetImage('assets/images/dev.png'),
                 fit: BoxFit.cover,
@@ -119,7 +120,7 @@ class AboutMeScreen extends StatelessWidget {
             style: GoogleFonts.amiri(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
             ),
           ),
           // English Name
@@ -127,7 +128,7 @@ class AboutMeScreen extends StatelessWidget {
             'Imadeddine Ainine',
             style: GoogleFonts.poppins(
               fontSize: 18,
-              color: AppColors.goldLight,
+              color: context.colors.goldLight,
               letterSpacing: 0.5,
               fontWeight: FontWeight.w500,
             ),
@@ -140,19 +141,19 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String arabic, String english) {
+  Widget _buildSectionTitle(BuildContext context, String arabic, String english) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           arabic,
-          style: AppTypography.headingMedium.copyWith(color: AppColors.teal),
+          style: context.typography.headingMedium.copyWith(color: context.colors.teal),
         ),
         Text(
           english,
           style: GoogleFonts.poppins(
             fontSize: 12,
-            color: AppColors.textDim,
+            color: context.colors.textDim,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -160,21 +161,21 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBioCard() {
+  Widget _buildBioCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: AppDecorations.card.copyWith(
-        color: AppColors.card.withOpacity(0.85),
+      decoration: context.decorations.card.copyWith(
+        color: context.colors.card.withOpacity(0.85),
       ),
       child: Text(
         'مطور برمجيات شغوف ببناء تطبيقات الهاتف والمواقع الإلكترونية بأحدث التقنيات. أهتم بجودة الكود وتجربة المستخدم، وأسعى دوماً لتقديم حلول تقنية مبتكرة تخدم المجتمع المسلم.',
-        style: AppTypography.bodyMedium.copyWith(height: 1.8),
+        style: context.typography.bodyMedium.copyWith(height: 1.8),
         textAlign: TextAlign.justify,
       ),
     );
   }
 
-  Widget _buildSkillsGrid() {
+  Widget _buildSkillsGrid(BuildContext context) {
     final skills = [
       'Flutter',
       'Dart',
@@ -197,14 +198,14 @@ class AboutMeScreen extends StatelessWidget {
             (skill) => Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.card2,
+                color: context.colors.card2,
                 borderRadius: AppRadius.chip,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: context.colors.border),
               ),
               child: Text(
                 skill,
-                style: AppTypography.labelMedium.copyWith(
-                  color: AppColors.textPrimary,
+                style: context.typography.labelMedium.copyWith(
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),
@@ -213,25 +214,28 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialLinks() {
+  Widget _buildSocialLinks(BuildContext context) {
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSocialIcon(
+              context,
               Icons.code_rounded,
               'GitHub',
               url: 'https://github.com/Imad-Ainine',
             ),
             const SizedBox(width: 16),
             _buildSocialIcon(
+              context,
               Icons.business_center_rounded,
               'LinkedIn',
               url: 'https://www.linkedin.com/in/imadeddine-ainine',
             ),
             const SizedBox(width: 16),
             _buildSocialIcon(
+              context,
               Icons.facebook_rounded,
               'Facebook',
               url: 'https://www.facebook.com/imad.ainine1',
@@ -243,12 +247,14 @@ class AboutMeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildSocialIcon(
+              context,
               Icons.mail_outline_rounded,
               'Email',
               url: 'mailto:imad.ainine11@gmail.com',
             ),
             const SizedBox(width: 16),
             _buildSocialIcon(
+              context,
               Icons.phone_android_rounded,
               'Phone',
               url: 'tel:+213773843669',
@@ -259,7 +265,7 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, String tooltip, {String? url}) {
+  Widget _buildSocialIcon(BuildContext context, IconData icon, String tooltip, {String? url}) {
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
@@ -285,30 +291,30 @@ class AboutMeScreen extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.colors.border),
           ),
-          child: Icon(icon, color: AppColors.gold, size: 24),
+          child: Icon(icon, color: context.colors.gold, size: 24),
         ),
       ),
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Center(
       child: Column(
         children: [
-          Container(height: 1, width: 80, color: AppColors.border),
+          Container(height: 1, width: 80, color: context.colors.border),
           const SizedBox(height: 20),
           Text(
             'ادعوا لي من خالص دعائكم',
-            style: AppTypography.headingMedium.copyWith(color: AppColors.gold),
+            style: context.typography.headingMedium.copyWith(color: context.colors.gold),
           ),
           const SizedBox(height: 12),
           Text(
             'صنع بكل حب للأمة الإسلامية',
-            style: AppTypography.caption.copyWith(color: AppColors.textDim),
+            style: context.typography.caption.copyWith(color: context.colors.textDim),
           ),
           const SizedBox(height: 6),
           Row(
@@ -320,7 +326,7 @@ class AboutMeScreen extends StatelessWidget {
                 '© 2026 - Imadeddine Ainine',
                 style: GoogleFonts.poppins(
                   fontSize: 11,
-                  color: AppColors.textDim,
+                  color: context.colors.textDim,
                 ),
               ),
             ],

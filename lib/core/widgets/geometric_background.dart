@@ -20,7 +20,7 @@ class GeometricBackground extends StatelessWidget {
     return Positioned.fill(
       child: CustomPaint(
         painter: GeometricPainter(
-          color: color ?? AppColors.gold,
+          color: color ?? context.colors.gold,
           opacity: opacity ?? 0.08,
           strokeWidth: strokeWidth ?? 0.7,
           spacing: spacing ?? 48.0,

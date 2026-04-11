@@ -12,6 +12,7 @@ import 'package:muhasabah/core/theme/app_theme.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
+import 'package:geocoding/geocoding.dart';
 import '../providers/database_providers.dart';
 import 'notifications_service.dart';
 
@@ -80,7 +81,7 @@ class LocationPrayerManager {
   static DateTime? _lastUpdate;
 
   /// التهيئة الكاملة عند بدء التطبيق
-  static Future<void> initialize(WidgetRef ref) async {
+  static Future<void> initialize(dynamic ref) async {
     TimezoneResolver.ensureInitialized();
 
     final settings = ref.read(settingsDaoProvider);
@@ -112,7 +113,7 @@ class LocationPrayerManager {
   }
 
   /// تحديث الموقع يدوياً
-  static Future<LocationResult> refreshLocation(WidgetRef ref) async {
+  static Future<LocationResult> refreshLocation(dynamic ref) async {
     try {
       // تحقق من الإذن
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -144,11 +145,23 @@ class LocationPrayerManager {
       final tzName = TimezoneResolver.resolveFromCoordinates(lat, lng);
       TimezoneResolver.setLocalTimezone(tzName);
 
+      // حل اسم المدينة (Reverse Geocoding)
+      String cityName = 'غير محدد';
+      try {
+        final placemarks = await placemarkFromCoordinates(lat, lng);
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          cityName = '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
+          if (cityName.startsWith(', ')) cityName = cityName.substring(2);
+        }
+      } catch (_) {}
+
       // حفظ في الإعدادات
       final settings = ref.read(settingsDaoProvider);
       await settings.set('latitude', lat.toString());
       await settings.set('longitude', lng.toString());
       await settings.set('timezone', tzName);
+      await settings.set('cityName', cityName);
       await settings.set(
         'lastLocationUpdate',
         DateTime.now().toIso8601String(),
@@ -169,7 +182,7 @@ class LocationPrayerManager {
 
   /// جدولة إشعارات الصلاة لموقع محدد
   static Future<void> _scheduleForLocation(
-    WidgetRef ref,
+    dynamic ref,
     double lat,
     double lng,
   ) async {
@@ -211,7 +224,7 @@ class LocationPrayerManager {
   }
 
   /// إعادة الجدولة عند منتصف الليل (لليوم الجديد)
-  static Future<void> scheduleMidnightReschedule(WidgetRef ref) async {
+  static Future<void> scheduleMidnightReschedule(dynamic ref) async {
     final now = DateTime.now();
     final midnight = DateTime(now.year, now.month, now.day + 1);
     final diff = midnight.difference(now);
@@ -392,13 +405,18 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
 
   Future<void> _loadSaved() async {
     final s = ref.read(settingsDaoProvider);
-    setState(() async {
-      _lastCity = await s.get('cityName') ?? 'غير محدد';
-      final tz = await s.get('timezone') ?? '';
-      _lastTimezone = tz.isNotEmpty
-          ? PrayerTimesWithTimezone.timezoneDisplayName(tz)
-          : null;
-    });
+    final city = await s.get('cityName') ?? 'غير محدد';
+    final tz = await s.get('timezone') ?? '';
+    final tzDisplay = tz.isNotEmpty
+        ? PrayerTimesWithTimezone.timezoneDisplayName(tz)
+        : null;
+
+    if (mounted) {
+      setState(() {
+        _lastCity = city;
+        _lastTimezone = tzDisplay;
+      });
+    }
   }
 
   Future<void> _update() async {
@@ -415,8 +433,8 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
           style: GoogleFonts.notoNaskhArabic(fontSize: 13),
         ),
         backgroundColor: result.isSuccess
-            ? AppColors.success
-            : AppColors.danger,
+            ? context.colors.success
+            : context.colors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
@@ -438,16 +456,16 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.teal.withOpacity(0.12),
+                color: context.colors.teal.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
-                          color: AppColors.teal,
+                          color: context.colors.teal,
                           strokeWidth: 2,
                         ),
                       )
@@ -463,7 +481,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                     'تحديث الموقع وأوقات الصلاة',
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 13,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                   if (_lastCity != null)
@@ -471,7 +489,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                       '$_lastCity${_lastTimezone != null ? " · $_lastTimezone" : ""}',
                       style: GoogleFonts.notoNaskhArabic(
                         fontSize: 10,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                 ],
@@ -480,7 +498,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
             Icon(
               Icons.refresh_rounded,
               size: 18,
-              color: AppColors.teal.withOpacity(0.7),
+              color: context.colors.teal.withOpacity(0.7),
             ),
           ],
         ),

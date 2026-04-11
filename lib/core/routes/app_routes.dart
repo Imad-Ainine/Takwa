@@ -5,6 +5,8 @@ import 'package:muhasabah/features/onboarding/onboarding_screen.dart';
 import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
 import 'package:muhasabah/features/adhkar/adhkar _screen.dart';
 import 'package:muhasabah/features/settings/presentation/screens/about_me_screen.dart';
+import 'package:muhasabah/features/qibla/presentation/screens/qibla_screen.dart';
+import 'package:muhasabah/features/duas/presentation/screens/duas_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -17,6 +19,8 @@ class Routes {
   static const String onboarding = '/onboarding';
   static const String prayer = '/prayer';
   static const String adhkar = '/adhkar';
+  static const String qibla = '/qibla';
+  static const String duas = '/duas';
 }
 
 /// Centralized route generation and management.
@@ -46,6 +50,10 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => AdhkarScreen(initialCategoryIndex: index),
         );
+      case Routes.qibla:
+        return MaterialPageRoute(builder: (_) => const QiblaScreen());
+      case Routes.duas:
+        return MaterialPageRoute(builder: (_) => const DuasScreen());
       default:
         return MaterialPageRoute(builder: (_) => const Scaffold(
           body: Center(child: Text('Route not found')),

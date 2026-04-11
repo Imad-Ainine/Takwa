@@ -68,15 +68,11 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // ── Geometric Background (Shared) ──
-          const GeometricBackground(
-            opacity: 0.1,
-            strokeWidth: 0.8,
-            spacing: 42,
-          ),
+          const GeometricBackground(opacity: 0.1, strokeWidth: 0.8, spacing: 42),
 
           // ── Gradient Glows ──
           Positioned(
@@ -88,7 +84,10 @@ class _SplashScreenState extends State<SplashScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [AppColors.teal.withOpacity(0.1), Colors.transparent],
+                  colors: [
+                    context.colors.teal.withOpacity(0.1),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
@@ -103,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.gold.withOpacity(0.12),
+                    context.colors.gold.withOpacity(0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -135,7 +134,9 @@ class _SplashScreenState extends State<SplashScreen>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.gold.withOpacity(0.25),
+                                    color: context.colors.gold.withOpacity(
+                                      0.25,
+                                    ),
                                     blurRadius: 60,
                                     spreadRadius: 10,
                                   ),
@@ -160,12 +161,12 @@ class _SplashScreenState extends State<SplashScreen>
                           style: GoogleFonts.amiri(
                             fontSize: 38,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.gold,
+                            color: context.colors.gold,
                             letterSpacing: 1.2,
                             height: 1.1,
                             shadows: [
                               Shadow(
-                                color: AppColors.gold.withOpacity(0.3),
+                                color: context.colors.gold.withOpacity(0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 4),
                               ),
@@ -212,7 +213,7 @@ class _VerseCard extends StatelessWidget {
           colors: [Color(0x1CC8A96E), Color(0x0E3AAFA9)],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.gold.withOpacity(0.18)),
+        border: Border.all(color: context.colors.gold.withOpacity(0.18)),
       ),
       child: Column(
         children: [
@@ -222,18 +223,18 @@ class _VerseCard extends StatelessWidget {
               Container(
                 width: 28,
                 height: 1,
-                color: AppColors.gold.withOpacity(0.3),
+                color: context.colors.gold.withOpacity(0.3),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 '❁',
-                style: TextStyle(color: AppColors.gold, fontSize: 14),
+                style: TextStyle(color: context.colors.gold, fontSize: 14),
               ),
               const SizedBox(width: 8),
               Container(
                 width: 28,
                 height: 1,
-                color: AppColors.gold.withOpacity(0.3),
+                color: context.colors.gold.withOpacity(0.3),
               ),
             ],
           ),
@@ -243,7 +244,7 @@ class _VerseCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.amiri(
               fontSize: 18,
-              color: AppColors.goldLight,
+              color: context.colors.gold,
               height: 2.0,
             ),
           ),

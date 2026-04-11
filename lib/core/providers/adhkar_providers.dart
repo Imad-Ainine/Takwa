@@ -759,9 +759,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
     final sleepTime = ref.watch(adhkarSleepTimeProvider);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -773,7 +773,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
               height: 4,
               margin: const EdgeInsets.only(top: 12),
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -787,7 +787,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   'إشعارات الأذكار',
                   style: GoogleFonts.amiri(
                     fontSize: 18,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -798,16 +798,16 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     ref.read(adhkarNotifEnabledProvider.notifier).set(v);
                     if (!v) AdhkarNotificationService.cancelAll();
                   },
-                  activeColor: AppColors.gold,
-                  activeTrackColor: AppColors.gold.withOpacity(0.3),
-                  inactiveTrackColor: AppColors.border,
-                  inactiveThumbColor: AppColors.textDim,
+                  activeColor: context.colors.gold,
+                  activeTrackColor: context.colors.gold.withOpacity(0.3),
+                  inactiveTrackColor: context.colors.border,
+                  inactiveThumbColor: context.colors.textDim,
                 ),
               ],
             ),
           ),
 
-          const Divider(color: AppColors.border, height: 20),
+          Divider(color: context.colors.border, height: 20),
 
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 250),
@@ -824,7 +824,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     'الإشعارات متوقفة',
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 13,
-                      color: AppColors.textDim,
+                      color: context.colors.textDim,
                     ),
                   ),
                 ],
@@ -872,7 +872,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   },
                 ),
                 const SizedBox(height: 12),
-                Container(height: 1, color: AppColors.border),
+                Container(height: 1, color: context.colors.border),
                 const SizedBox(height: 12),
                 _ToggleRow(
                   icon: '🌅',
@@ -904,7 +904,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                             'تم إرسال إشعار تجريبي ✓',
                             style: GoogleFonts.notoNaskhArabic(fontSize: 13),
                           ),
-                          backgroundColor: AppColors.success,
+                          backgroundColor: context.colors.success,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -917,11 +917,11 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                       'اختبار إشعار ذكر الآن',
                       style: GoogleFonts.notoNaskhArabic(
                         fontSize: 13,
-                        color: AppColors.gold,
+                        color: context.colors.gold,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.gold.withOpacity(0.3)),
+                      side: BorderSide(color: context.colors.gold.withOpacity(0.3)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -943,7 +943,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
       initialTime: current,
       builder: (ctx, child) => Theme(
         data: Theme.of(ctx).copyWith(
-          colorScheme: const ColorScheme.dark(primary: AppColors.gold),
+          colorScheme: ColorScheme.dark(primary: context.colors.gold),
         ),
         child: child!,
       ),
@@ -978,7 +978,7 @@ class _NotifRow extends StatelessWidget {
               label,
               style: GoogleFonts.notoNaskhArabic(
                 fontSize: 13,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
           ),
@@ -987,15 +987,15 @@ class _NotifRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: AppColors.goldDim,
+                color: context.colors.goldDim,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+                border: Border.all(color: context.colors.gold.withOpacity(0.25)),
               ),
               child: Text(
                 '$h:$m',
                 style: GoogleFonts.notoNaskhArabic(
                   fontSize: 15,
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -1031,17 +1031,17 @@ class _ToggleRow extends StatelessWidget {
             label,
             style: GoogleFonts.notoNaskhArabic(
               fontSize: 13,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
         ),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: AppColors.teal,
-          activeTrackColor: AppColors.teal.withOpacity(0.3),
-          inactiveTrackColor: AppColors.border,
-          inactiveThumbColor: AppColors.textDim,
+          activeColor: context.colors.teal,
+          activeTrackColor: context.colors.teal.withOpacity(0.3),
+          inactiveTrackColor: context.colors.border,
+          inactiveThumbColor: context.colors.textDim,
         ),
       ],
     ),

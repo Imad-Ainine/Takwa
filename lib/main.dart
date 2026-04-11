@@ -13,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:muhasabah/core/providers/theme_provider.dart';
 import 'package:muhasabah/core/routes/app_routes.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
@@ -60,7 +61,9 @@ class MuhasabahApp extends ConsumerWidget {
       title: 'محاسبة النفس',
       debugShowCheckedModeBanner: false,
       navigatorKey: NotificationRouter.navigatorKey,
-      theme: AppTheme.dark,
+      themeMode: ref.watch(themeModeProvider),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       locale: const Locale('ar', 'SA'),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

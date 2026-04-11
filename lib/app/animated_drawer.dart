@@ -6,7 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:hijri/hijri_calendar.dart';
 
 import '../core/theme/app_theme.dart';
@@ -101,7 +101,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF060A10),
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // ── الـ Drawer (خلف الشاشة) ──
@@ -170,11 +170,11 @@ class _DrawerContent extends ConsumerWidget {
     final hijri = HijriCalendar.now();
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0A0F1A), Color(0xFF111827)],
+          colors: [context.colors.deep, context.colors.deep],
         ),
       ),
       child: Stack(
@@ -194,7 +194,7 @@ class _DrawerContent extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 8),
-                Container(height: 1, color: AppColors.border),
+                Container(height: 1, color: context.colors.border),
                 const SizedBox(height: 8),
 
                 // ── قائمة التنقل ──
@@ -257,12 +257,12 @@ class _DrawerHeader extends ConsumerWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppColors.gold.withOpacity(0.2),
-                      AppColors.gold.withOpacity(0.05),
+                      context.colors.gold.withOpacity(0.2),
+                      context.colors.gold.withOpacity(0.05),
                     ],
                   ),
                   border: Border.all(
-                    color: AppColors.gold.withOpacity(0.3),
+                    color: context.colors.gold.withOpacity(0.3),
                     width: 1.5,
                   ),
                 ),
@@ -277,17 +277,17 @@ class _DrawerHeader extends ConsumerWidget {
                 children: [
                   Text(
                     'محاسبة النفس',
-                    style: GoogleFonts.amiri(
+                    style: context.typography.headingLarge.copyWith(
                       fontSize: 18,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     isRamadan ? '🌙 رمضان كريم' : 'رفيقك اليومي',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.caption.copyWith(
                       fontSize: 10,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -300,9 +300,9 @@ class _DrawerHeader extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.goldDim,
+              color: context.colors.goldDim,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.gold.withOpacity(0.15)),
+              border: Border.all(color: context.colors.gold.withOpacity(0.15)),
             ),
             child: Row(
               children: [
@@ -310,9 +310,9 @@ class _DrawerHeader extends ConsumerWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${hijri.hDay} ${_hijriMonth(hijri.hMonth)} ${hijri.hYear}',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.headingMedium.copyWith(
                     fontSize: 14,
-                    color: AppColors.goldLight,
+                    color: context.colors.goldLight,
                   ),
                 ),
               ],
@@ -331,7 +331,7 @@ class _DrawerHeader extends ConsumerWidget {
                     value: '${s.totalPoints}',
                     label: 'نقطة التقوى',
                     icon: '🌟',
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                   ),
                 ),
               ),
@@ -344,7 +344,7 @@ class _DrawerHeader extends ConsumerWidget {
                     value: '$s',
                     label: 'يوم متواصل',
                     icon: '🔥',
-                    color: AppColors.success,
+                    color: context.colors.success,
                   ),
                 ),
               ),
@@ -385,7 +385,7 @@ class _MiniStatCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: GoogleFonts.notoNaskhArabic(
+              style: context.typography.bodyLarge.copyWith(
                 fontSize: 14,
                 color: color,
                 fontWeight: FontWeight.w700,
@@ -393,9 +393,9 @@ class _MiniStatCard extends StatelessWidget {
             ),
             Text(
               label,
-              style: GoogleFonts.notoNaskhArabic(
+              style: context.typography.caption.copyWith(
                 fontSize: 9,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -550,15 +550,18 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
             decoration: BoxDecoration(
               gradient: widget.isActive
-                  ? const LinearGradient(
-                      colors: [Color(0x22C8A96E), Color(0x113AAFA9)],
+                  ? LinearGradient(
+                      colors: [
+                        context.colors.gold.withOpacity(0.15),
+                        context.colors.teal.withOpacity(0.08),
+                      ],
                     )
                   : null,
               color: widget.isActive ? null : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: widget.isActive
-                    ? AppColors.gold.withOpacity(0.25)
+                    ? context.colors.gold.withOpacity(0.25)
                     : Colors.transparent,
               ),
             ),
@@ -570,10 +573,10 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                   width: 3,
                   height: widget.isActive ? 22 : 0,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [AppColors.gold, AppColors.teal],
+                      colors: [context.colors.gold, context.colors.teal],
                     ),
                     borderRadius: BorderRadius.circular(2),
                   ),
@@ -587,7 +590,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                     shadows: widget.isActive
                         ? [
                             Shadow(
-                              color: AppColors.gold.withOpacity(0.5),
+                              color: context.colors.gold.withOpacity(0.5),
                               blurRadius: 8,
                             ),
                           ]
@@ -598,11 +601,11 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: Text(
                     widget.item.label,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 14,
                       color: widget.isActive
-                          ? AppColors.gold
-                          : AppColors.textPrimary.withOpacity(0.75),
+                          ? context.colors.gold
+                          : context.colors.textPrimary.withOpacity(0.75),
                       fontWeight: widget.isActive
                           ? FontWeight.w600
                           : FontWeight.w400,
@@ -611,7 +614,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                 ),
 
                 if (widget.isActive)
-                  const Icon(Icons.circle, size: 6, color: AppColors.gold),
+                  Icon(Icons.circle, size: 6, color: context.colors.gold),
               ],
             ),
           ),
@@ -629,38 +632,38 @@ class _DrawerFooter extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
         children: [
-          Container(height: 1, color: AppColors.border),
+          Container(height: 1, color: context.colors.border),
           const SizedBox(height: 12),
           Row(
             children: [
-              const Text(
+              Text(
                 '❁',
-                style: TextStyle(color: AppColors.gold, fontSize: 12),
+                style: TextStyle(color: context.colors.gold, fontSize: 12),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.bodySmall.copyWith(
                     fontSize: 11,
-                    color: AppColors.textDim,
+                    color: context.colors.textDim,
                     height: 1.6,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 '❁',
-                style: TextStyle(color: AppColors.gold, fontSize: 12),
+                style: TextStyle(color: context.colors.gold, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
             'محاسبة النفس v1.0',
-            style: GoogleFonts.notoNaskhArabic(
+            style: context.typography.caption.copyWith(
               fontSize: 10,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ),
         ],
@@ -684,11 +687,13 @@ class DrawerMenuButton extends ConsumerWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isOpen ? AppColors.goldDim : Colors.white.withOpacity(0.08),
+          color: isOpen
+              ? context.colors.goldDim
+              : Colors.white.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isOpen
-                ? AppColors.gold.withOpacity(0.3)
+                ? context.colors.gold.withOpacity(0.3)
                 : Colors.white.withOpacity(0.12),
           ),
         ),
@@ -696,15 +701,15 @@ class DrawerMenuButton extends ConsumerWidget {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: isOpen
-                ? const Icon(
+                ? Icon(
                     Icons.close_rounded,
-                    key: ValueKey('close'),
+                    key: const ValueKey('close'),
                     size: 18,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                   )
-                : const _HamburgerIcon(
-                    key: ValueKey('menu'),
-                    color: AppColors.textPrimary,
+                : _HamburgerIcon(
+                    key: const ValueKey('menu'),
+                    color: context.colors.textPrimary,
                   ),
           ),
         ),

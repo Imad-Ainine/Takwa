@@ -149,7 +149,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
           message,
           style: GoogleFonts.notoNaskhArabic(fontSize: 13),
         ),
-        backgroundColor: isSuccess ? AppColors.success : AppColors.danger,
+        backgroundColor: isSuccess ? context.colors.success : context.colors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
@@ -164,9 +164,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Stack(
         children: [
@@ -179,7 +179,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.teal.withOpacity(0.15),
+                color: context.colors.teal.withOpacity(0.15),
               ),
             ).blurred(blur: 50),
           ),
@@ -191,7 +191,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.gold.withOpacity(0.08),
+                color: context.colors.gold.withOpacity(0.08),
               ),
             ).blurred(blur: 70),
           ),
@@ -206,7 +206,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                   height: 5,
                   width: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.border,
+                    color: context.colors.border,
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -224,10 +224,10 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.teal.withOpacity(0.1),
+                        color: context.colors.teal.withOpacity(0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: AppColors.teal.withOpacity(0.2),
+                          color: context.colors.teal.withOpacity(0.2),
                         ),
                       ),
                       child: const Center(
@@ -243,7 +243,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                             'تحديث الموقع الجغرافي',
                             style: GoogleFonts.amiri(
                               fontSize: 18,
-                              color: AppColors.gold,
+                              color: context.colors.gold,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -251,7 +251,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                             'اختر موقعك بدقة لحساب أوقات الصلاة',
                             style: GoogleFonts.notoNaskhArabic(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -259,9 +259,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close_rounded,
-                        color: AppColors.textDim,
+                        color: context.colors.textDim,
                       ),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.white.withOpacity(0.05),
@@ -291,7 +291,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       children: [
                         Expanded(
                           child: Divider(
-                            color: AppColors.border.withOpacity(0.5),
+                            color: context.colors.border.withOpacity(0.5),
                           ),
                         ),
                         Padding(
@@ -300,13 +300,13 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                             'أو اختر مدينة رئيسية',
                             style: GoogleFonts.notoNaskhArabic(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ),
                         Expanded(
                           child: Divider(
-                            color: AppColors.border.withOpacity(0.5),
+                            color: context.colors.border.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -415,10 +415,10 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.teal.withOpacity(0.5)),
+              border: Border.all(color: context.colors.teal.withOpacity(0.5)),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.teal.withOpacity(0.15),
+                  color: context.colors.teal.withOpacity(0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -501,9 +501,9 @@ class _CityCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: context.colors.border),
         ),
         child: Row(
           children: [
@@ -517,7 +517,7 @@ class _CityCard extends StatelessWidget {
                     cityData['name'],
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 14,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -525,7 +525,7 @@ class _CityCard extends StatelessWidget {
                     cityData['country'],
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -534,14 +534,14 @@ class _CityCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.textDim.withOpacity(0.1),
+                color: context.colors.textDim.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 'اختر',
                 style: GoogleFonts.notoNaskhArabic(
                   fontSize: 11,
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                 ),
               ),
             ),

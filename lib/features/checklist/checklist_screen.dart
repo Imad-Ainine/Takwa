@@ -7,7 +7,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:hijri/hijri_calendar.dart';
 
 import 'package:muhasabah/core/theme/app_theme.dart';
@@ -93,21 +93,30 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(child: CustomPaint(painter: _SubtleBgPainter())),
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _SubtleBgPainter(
+                  nightColor: context.colors.background,
+                  goldColor: context.colors.gold,
+                ),
+              ),
+            ),
             todayAsync.when(
-              loading: () => const Center(
+              loading: () => Center(
                 child: CircularProgressIndicator(
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                   strokeWidth: 2,
                 ),
               ),
               error: (e, _) => Center(
                 child: Text(
                   'خطأ: $e',
-                  style: GoogleFonts.notoNaskhArabic(color: AppColors.danger),
+                  style: context.typography.bodyMedium.copyWith(
+                    color: context.colors.danger,
+                  ),
                 ),
               ),
               data: (record) => _buildBody(context, record, hijriStr),
@@ -211,11 +220,11 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 52, 16, 12),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x22C8A96E), Colors.transparent],
+          colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
         ),
       ),
       child: Row(
@@ -228,17 +237,16 @@ class _TopBar extends StatelessWidget {
               children: [
                 Text(
                   'محاسبة اليوم',
-                  style: GoogleFonts.amiri(
+                  style: context.typography.headingMedium.copyWith(
                     fontSize: 22,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
                   hijriStr,
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                  style: context.typography.caption.copyWith(
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -251,7 +259,9 @@ class _TopBar extends StatelessWidget {
               _PointsPill(
                 label: 'الصافي',
                 value: netPoints,
-                color: netPoints >= 0 ? AppColors.gold : AppColors.danger,
+                color: netPoints >= 0
+                    ? context.colors.gold
+                    : context.colors.danger,
               ),
               const SizedBox(height: 4),
               Row(
@@ -259,14 +269,14 @@ class _TopBar extends StatelessWidget {
                   _PointsPill(
                     label: '+',
                     value: grossPoints,
-                    color: AppColors.success,
+                    color: context.colors.success,
                     small: true,
                   ),
                   const SizedBox(width: 4),
                   _PointsPill(
                     label: '-',
                     value: deducted,
-                    color: AppColors.danger,
+                    color: context.colors.danger,
                     small: true,
                   ),
                 ],
@@ -305,7 +315,7 @@ class _PointsPill extends StatelessWidget {
       ),
       child: Text(
         '$label$value نقطة',
-        style: GoogleFonts.notoNaskhArabic(
+        style: context.typography.bodySmall.copyWith(
           fontSize: small ? 10 : 12,
           color: color,
           fontWeight: FontWeight.w600,
@@ -343,9 +353,9 @@ class _DayProgressBar extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         children: [
@@ -354,16 +364,14 @@ class _DayProgressBar extends ConsumerWidget {
             children: [
               Text(
                 'إنجاز اليوم',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
+                style: context.typography.bodySmall.copyWith(
+                  color: context.colors.textSecondary,
                 ),
               ),
               Text(
                 '$done / $totalIbadah',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 12,
-                  color: AppColors.gold,
+                style: context.typography.bodySmall.copyWith(
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -377,16 +385,16 @@ class _DayProgressBar extends ConsumerWidget {
             children: [
               Text(
                 _motivate(pct),
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 11,
-                  color: AppColors.textDim,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textDim,
                 ),
               ),
               Text(
                 '${(pct * 100).round()}%',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 11,
-                  color: pct >= 0.8 ? AppColors.success : AppColors.textDim,
+                style: context.typography.caption.copyWith(
+                  color: pct >= 0.8
+                      ? context.colors.success
+                      : context.colors.textDim,
                 ),
               ),
             ],
@@ -458,7 +466,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
       borderRadius: BorderRadius.circular(6),
       child: Stack(
         children: [
-          Container(height: 10, color: AppColors.border),
+          Container(height: 10, color: context.colors.border),
           FractionallySizedBox(
             widthFactor: _anim.value.clamp(0.0, 1.0),
             child: Container(
@@ -466,14 +474,16 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.gold,
-                    _anim.value >= 0.8 ? AppColors.success : AppColors.teal,
+                    context.colors.gold,
+                    _anim.value >= 0.8
+                        ? context.colors.success
+                        : context.colors.teal,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.gold.withOpacity(0.3),
+                    color: context.colors.gold.withOpacity(0.3),
                     blurRadius: 6,
                   ),
                 ],
@@ -521,8 +531,8 @@ class _PrayersGroup extends ConsumerWidget {
     return _GroupCard(
       icon: '🕌',
       title: 'الصلوات الخمس',
-      trailingColor: AppColors.gold,
       trailing: '$_countPerformed / ٥',
+      trailingColor: context.colors.gold,
       children: _prayers.map((p) {
         final status = _statusOf(p.$3);
         return _PrayerRow(
@@ -560,11 +570,11 @@ class _PrayerRow extends StatelessWidget {
     required this.onStatusChange,
   });
 
-  Color get _rowColor => switch (status) {
-    PrayerStatus.performed => AppColors.success,
-    PrayerStatus.qadaa => AppColors.warning,
-    PrayerStatus.missed => AppColors.danger,
-    _ => AppColors.textDim,
+  Color _rowColor(BuildContext context) => switch (status) {
+    PrayerStatus.performed => context.colors.success,
+    PrayerStatus.qadaa => context.colors.warning,
+    PrayerStatus.missed => context.colors.danger,
+    _ => context.colors.textDim,
   };
 
   String get _statusLabel => switch (status) {
@@ -589,21 +599,21 @@ class _PrayerRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         decoration: BoxDecoration(
           color: isDone
-              ? AppColors.success.withOpacity(0.08)
+              ? context.colors.success.withOpacity(0.08)
               : isQadaa
-              ? AppColors.warning.withOpacity(0.07)
+              ? context.colors.warning.withOpacity(0.07)
               : isMissed
-              ? AppColors.danger.withOpacity(0.07)
-              : AppColors.card2,
+              ? context.colors.danger.withOpacity(0.07)
+              : context.colors.card,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDone
-                ? AppColors.success.withOpacity(0.25)
+                ? context.colors.success.withOpacity(0.25)
                 : isQadaa
-                ? AppColors.warning.withOpacity(0.22)
+                ? context.colors.warning.withOpacity(0.22)
                 : isMissed
-                ? AppColors.danger.withOpacity(0.22)
-                : AppColors.border,
+                ? context.colors.danger.withOpacity(0.22)
+                : context.colors.border,
           ),
         ),
         child: Row(
@@ -614,8 +624,11 @@ class _PrayerRow extends StatelessWidget {
               height: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDone ? AppColors.success : Colors.transparent,
-                border: Border.all(color: _rowColor, width: isDone ? 0 : 1.8),
+                color: isDone ? context.colors.success : Colors.transparent,
+                border: Border.all(
+                  color: _rowColor(context),
+                  width: isDone ? 0 : 1.8,
+                ),
               ),
               child: isDone
                   ? const Center(
@@ -635,31 +648,31 @@ class _PrayerRow extends StatelessWidget {
                 children: [
                   Text(
                     name,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontWeight: isDone ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                   Text(
                     _statusLabel,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.caption.copyWith(
                       fontSize: 10,
-                      color: _rowColor,
+                      color: _rowColor(context),
                     ),
                   ),
                 ],
               ),
             ),
             if (isDone)
-              const _MiniPts('+١٠', AppColors.success)
+              _MiniPts('+١٠', context.colors.success)
             else if (isMissed)
-              const _MiniPts('-٥', AppColors.danger),
+              _MiniPts('-٥', context.colors.danger),
             const SizedBox(width: 4),
-            const Icon(
+            Icon(
               Icons.chevron_left_rounded,
               size: 18,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ],
         ),
@@ -671,7 +684,7 @@ class _PrayerRow extends StatelessWidget {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.card,
+      backgroundColor: context.colors.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -696,12 +709,13 @@ class _PrayerStatusSheet extends StatelessWidget {
     required this.onSelect,
   });
 
-  static const _options = [
-    (PrayerStatus.performed, 'أُديت في وقتها', '✅', AppColors.success),
-    (PrayerStatus.qadaa, 'قُضيت خارج الوقت', '🔄', AppColors.warning),
-    (PrayerStatus.missed, 'فاتت (استغفر الله)', '❌', AppColors.danger),
-    (PrayerStatus.pending, 'لم تُؤدَّ بعد', '⏳', AppColors.textDim),
-  ];
+  List<(PrayerStatus, String, String, Color)> _options(BuildContext context) =>
+      [
+        (PrayerStatus.performed, 'أُديت في وقتها', '✅', context.colors.success),
+        (PrayerStatus.qadaa, 'قُضيت خارج الوقت', '🔄', context.colors.warning),
+        (PrayerStatus.missed, 'فاتت (استغفر الله)', '❌', context.colors.danger),
+        (PrayerStatus.pending, 'لم تُؤدَّ بعد', '⏳', context.colors.textDim),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -710,21 +724,15 @@ class _PrayerStatusSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 16),
           Text(
             'صلاة $prayerName',
-            style: GoogleFonts.amiri(fontSize: 18, color: AppColors.gold),
+            style: context.typography.headingMedium.copyWith(
+              fontSize: 18,
+              color: context.colors.gold,
+            ),
           ),
           const SizedBox(height: 14),
-          ..._options.map(
+          ..._options(context).map(
             (opt) => _StatusOption(
               status: opt.$1,
               label: opt.$2,
@@ -768,10 +776,10 @@ class _StatusOption extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.12) : AppColors.card2,
+          color: isSelected ? color.withOpacity(0.12) : context.colors.card,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color.withOpacity(0.4) : AppColors.border,
+            color: isSelected ? color.withOpacity(0.4) : context.colors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -782,9 +790,9 @@ class _StatusOption extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.notoNaskhArabic(
+                style: context.typography.bodyMedium.copyWith(
                   fontSize: 13,
-                  color: isSelected ? color : AppColors.textPrimary,
+                  color: isSelected ? color : context.colors.textPrimary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
@@ -897,10 +905,14 @@ class _QuranInput extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: hasPages ? AppColors.teal.withOpacity(0.07) : AppColors.card2,
+        color: hasPages
+            ? context.colors.teal.withOpacity(0.07)
+            : context.colors.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: hasPages ? AppColors.teal.withOpacity(0.3) : AppColors.border,
+          color: hasPages
+              ? context.colors.teal.withOpacity(0.3)
+              : context.colors.border,
         ),
       ),
       child: Row(
@@ -913,16 +925,16 @@ class _QuranInput extends ConsumerWidget {
               children: [
                 Text(
                   'تلاوة القرآن الكريم',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.bodyMedium.copyWith(
                     fontSize: 13,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
                   'أدخل عدد الصفحات التي قرأتها',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.caption.copyWith(
                     fontSize: 10,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -934,35 +946,35 @@ class _QuranInput extends ConsumerWidget {
               controller: ctrl,
               textAlign: TextAlign.center,
               keyboardType: TextInputType.number,
-              style: GoogleFonts.notoNaskhArabic(
+              style: context.typography.bodyMedium.copyWith(
                 fontSize: 15,
-                color: AppColors.teal,
+                color: context.colors.teal,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
                 hintText: '٠',
-                hintStyle: GoogleFonts.notoNaskhArabic(
+                hintStyle: context.typography.caption.copyWith(
                   fontSize: 13,
-                  color: AppColors.textDim,
+                  color: context.colors.textDim,
                 ),
                 filled: true,
-                fillColor: AppColors.card,
+                fillColor: context.colors.card,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 8,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.colors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.colors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: AppColors.teal,
+                  borderSide: BorderSide(
+                    color: context.colors.teal,
                     width: 1.5,
                   ),
                 ),
@@ -981,16 +993,16 @@ class _QuranInput extends ConsumerWidget {
           const SizedBox(width: 4),
           Text(
             '+١',
-            style: GoogleFonts.notoNaskhArabic(
+            style: context.typography.caption.copyWith(
               fontSize: 10,
-              color: AppColors.teal,
+              color: context.colors.teal,
             ),
           ),
           Text(
             '/صفحة',
-            style: GoogleFonts.notoNaskhArabic(
+            style: context.typography.caption.copyWith(
               fontSize: 9,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ),
         ],
@@ -1026,12 +1038,14 @@ class _ToggleRow extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 7),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         decoration: BoxDecoration(
-          color: value ? AppColors.success.withOpacity(0.08) : AppColors.card2,
+          color: value
+              ? context.colors.success.withOpacity(0.08)
+              : context.colors.card,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: value
-                ? AppColors.success.withOpacity(0.25)
-                : AppColors.border,
+                ? context.colors.success.withOpacity(0.25)
+                : context.colors.border,
           ),
         ),
         child: Row(
@@ -1042,9 +1056,9 @@ class _ToggleRow extends StatelessWidget {
               height: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: value ? AppColors.success : Colors.transparent,
+                color: value ? context.colors.success : Colors.transparent,
                 border: Border.all(
-                  color: value ? AppColors.success : AppColors.border,
+                  color: value ? context.colors.success : context.colors.border,
                   width: 1.8,
                 ),
               ),
@@ -1066,23 +1080,23 @@ class _ToggleRow extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontWeight: value ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
                   Text(
                     sublabel,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.caption.copyWith(
                       fontSize: 10,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            if (value) _MiniPts(points, AppColors.success),
+            if (value) _MiniPts(points, context.colors.success),
           ],
         ),
       ),
@@ -1104,13 +1118,13 @@ class _FastingSelector extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
       decoration: BoxDecoration(
         color: current != FastingType.none
-            ? AppColors.teal.withOpacity(0.07)
-            : AppColors.card2,
+            ? context.colors.teal.withOpacity(0.07)
+            : context.colors.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: current != FastingType.none
-              ? AppColors.teal.withOpacity(0.25)
-              : AppColors.border,
+              ? context.colors.teal.withOpacity(0.25)
+              : context.colors.border,
         ),
       ),
       child: Column(
@@ -1122,16 +1136,16 @@ class _FastingSelector extends ConsumerWidget {
               Expanded(
                 child: Text(
                   'الصيام',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.bodyMedium.copyWith(
                     fontSize: 13,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
               ),
               if (current != FastingType.none)
                 _MiniPts(
                   current == FastingType.fard ? '+٢٠' : '+١٠',
-                  AppColors.teal,
+                  context.colors.teal,
                 ),
             ],
           ),
@@ -1142,24 +1156,27 @@ class _FastingSelector extends ConsumerWidget {
                 'فريضة',
                 FastingType.fard,
                 current,
-                AppColors.gold,
+                context.colors.gold,
                 ref,
+                context,
               ),
               const SizedBox(width: 6),
               _fastChip(
                 'نافلة',
                 FastingType.nafl,
                 current,
-                AppColors.teal,
+                context.colors.teal,
                 ref,
+                context,
               ),
               const SizedBox(width: 6),
               _fastChip(
                 'لم أصم',
                 FastingType.none,
                 current,
-                AppColors.textDim,
+                context.colors.textDim,
                 ref,
+                context,
               ),
             ],
           ),
@@ -1174,6 +1191,7 @@ class _FastingSelector extends ConsumerWidget {
     FastingType current,
     Color color,
     WidgetRef ref,
+    BuildContext context,
   ) {
     final selected = current == value;
     return Expanded(
@@ -1187,19 +1205,19 @@ class _FastingSelector extends ConsumerWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
-            color: selected ? color.withOpacity(0.15) : AppColors.card,
+            color: selected ? color.withOpacity(0.15) : context.colors.card,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: selected ? color.withOpacity(0.4) : AppColors.border,
+              color: selected ? color.withOpacity(0.4) : context.colors.border,
               width: selected ? 1.5 : 1,
             ),
           ),
           child: Center(
             child: Text(
               label,
-              style: GoogleFonts.notoNaskhArabic(
+              style: context.typography.caption.copyWith(
                 fontSize: 11,
-                color: selected ? color : AppColors.textDim,
+                color: selected ? color : context.colors.textDim,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
@@ -1236,15 +1254,15 @@ class _ProhibitionsGroup extends ConsumerWidget {
     return _GroupCard(
       icon: '⚠️',
       title: 'المحظورات والمهلكات',
-      titleColor: AppColors.danger,
+      titleColor: context.colors.danger,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: AppColors.danger.withOpacity(0.07),
+            color: context.colors.danger.withOpacity(0.07),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.danger.withOpacity(0.2)),
+            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
           ),
           child: Row(
             children: [
@@ -1253,9 +1271,9 @@ class _ProhibitionsGroup extends ConsumerWidget {
               Expanded(
                 child: Text(
                   'حدد ما وقعت فيه اليوم بصدق مع نفسك',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.caption.copyWith(
                     fontSize: 11,
-                    color: AppColors.danger.withOpacity(0.8),
+                    color: context.colors.danger.withOpacity(0.8),
                   ),
                 ),
               ),
@@ -1338,13 +1356,13 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
       decoration: BoxDecoration(
         color: _committed
-            ? AppColors.danger.withOpacity(0.07)
-            : AppColors.card2,
+            ? context.colors.danger.withOpacity(0.07)
+            : context.colors.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _committed
-              ? AppColors.danger.withOpacity(0.25)
-              : AppColors.border,
+              ? context.colors.danger.withOpacity(0.25)
+              : context.colors.border,
         ),
       ),
       child: Row(
@@ -1357,9 +1375,11 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
               height: 26,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                color: _committed ? AppColors.danger : Colors.transparent,
+                color: _committed ? context.colors.danger : Colors.transparent,
                 border: Border.all(
-                  color: _committed ? AppColors.danger : AppColors.border,
+                  color: _committed
+                      ? context.colors.danger
+                      : context.colors.border,
                   width: 1.8,
                 ),
               ),
@@ -1382,19 +1402,19 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
               children: [
                 Text(
                   widget.name,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.bodyMedium.copyWith(
                     fontSize: 13,
                     color: _committed
-                        ? AppColors.danger
-                        : AppColors.textPrimary,
+                        ? context.colors.danger
+                        : context.colors.textPrimary,
                     fontWeight: _committed ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
                 Text(
                   widget.desc,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.caption.copyWith(
                     fontSize: 10,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -1409,33 +1429,35 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withOpacity(0.12),
+                  color: context.colors.danger.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.danger.withOpacity(0.3)),
+                  border: Border.all(
+                    color: context.colors.danger.withOpacity(0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       '$_count×',
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: context.typography.bodySmall.copyWith(
                         fontSize: 12,
-                        color: AppColors.danger,
+                        color: context.colors.danger,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(
+                    Icon(
                       Icons.add_rounded,
                       size: 14,
-                      color: AppColors.danger,
+                      color: context.colors.danger,
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(width: 6),
-            const _MiniPts('-١٠', AppColors.danger),
+            _MiniPts('-١٠', context.colors.danger),
           ],
         ],
       ),
@@ -1480,34 +1502,34 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
           controller: _ctrl,
           maxLines: 3,
           maxLength: 300,
-          style: GoogleFonts.notoNaskhArabic(
+          style: context.typography.bodyMedium.copyWith(
             fontSize: 13,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
             height: 1.8,
           ),
           decoration: InputDecoration(
             hintText: 'اكتب ملاحظتك أو دعاءك لهذا اليوم...',
-            hintStyle: GoogleFonts.notoNaskhArabic(
+            hintStyle: context.typography.caption.copyWith(
               fontSize: 12,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
-            counterStyle: GoogleFonts.notoNaskhArabic(
+            counterStyle: context.typography.caption.copyWith(
               fontSize: 10,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
             filled: true,
-            fillColor: AppColors.card2,
+            fillColor: context.colors.card,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.colors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: context.colors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
+              borderSide: BorderSide(color: context.colors.gold, width: 1.5),
             ),
           ),
           onChanged: (_) => setState(() {}),
@@ -1518,25 +1540,25 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
           child: ElevatedButton(
             onPressed: _saving ? null : _save,
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.gold,
-              foregroundColor: AppColors.night,
+              backgroundColor: context.colors.gold,
+              foregroundColor: context.colors.night,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: _saving
-                ? const SizedBox(
+                ? SizedBox(
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(
-                      color: AppColors.night,
+                      color: context.colors.night,
                       strokeWidth: 2,
                     ),
                   )
                 : Text(
                     'حفظ الملاحظة',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                     ),
@@ -1564,9 +1586,9 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
         SnackBar(
           content: Text(
             'تم الحفظ ✓',
-            style: GoogleFonts.notoNaskhArabic(fontSize: 13),
+            style: context.typography.bodySmall.copyWith(fontSize: 13),
           ),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colors.success,
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -1601,9 +1623,9 @@ class _GroupCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1614,9 +1636,9 @@ class _GroupCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: GoogleFonts.amiri(
+                style: context.typography.headingMedium.copyWith(
                   fontSize: 16,
-                  color: titleColor ?? AppColors.textPrimary,
+                  color: titleColor ?? context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -1624,9 +1646,9 @@ class _GroupCard extends StatelessWidget {
               if (trailing != null)
                 Text(
                   trailing!,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: context.typography.bodySmall.copyWith(
                     fontSize: 12,
-                    color: trailingColor ?? AppColors.textSecondary,
+                    color: trailingColor ?? context.colors.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -1634,7 +1656,7 @@ class _GroupCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Container(height: 1, color: AppColors.border),
+            child: Container(height: 1, color: context.colors.border),
           ),
           ...children,
         ],
@@ -1658,7 +1680,7 @@ class _MiniPts extends StatelessWidget {
     ),
     child: Text(
       label,
-      style: GoogleFonts.notoNaskhArabic(
+      style: context.typography.caption.copyWith(
         fontSize: 10,
         color: color,
         fontWeight: FontWeight.w600,
@@ -1669,14 +1691,17 @@ class _MiniPts extends StatelessWidget {
 
 // ── Subtle background grid ──
 class _SubtleBgPainter extends CustomPainter {
+  final Color nightColor, goldColor;
+  _SubtleBgPainter({required this.nightColor, required this.goldColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
+      Paint()..color = nightColor,
     );
     final p = Paint()
-      ..color = const Color(0x06C8A96E)
+      ..color = goldColor.withOpacity(0.04)
       ..strokeWidth = 0.6
       ..style = PaintingStyle.stroke;
     for (double x = 0; x < size.width; x += 32) {
@@ -1688,5 +1713,5 @@ class _SubtleBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter o) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

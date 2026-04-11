@@ -118,14 +118,24 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
     final hijri = HijriCalendar.now();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
+      value: (Theme.of(context).brightness == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark)
+          .copyWith(
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: AppColors.night,
+        backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            Positioned.fill(child: CustomPaint(painter: _StatsBgPainter())),
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _StatsBgPainter(
+                  nightColor: context.colors.background,
+                  dotColor: context.colors.gold.withOpacity(0.05),
+                ),
+              ),
+            ),
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
@@ -242,7 +252,9 @@ class _StatsTopBar extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            isRamadan ? const Color(0x28C8A96E) : const Color(0x1A3AAFA9),
+            isRamadan
+                ? context.colors.gold.withOpacity(0.15)
+                : context.colors.teal.withOpacity(0.1),
             Colors.transparent,
           ],
         ),
@@ -257,17 +269,15 @@ class _StatsTopBar extends StatelessWidget {
             children: [
               Text(
                 isRamadan ? 'تقرير رمضان 🌙' : 'الإحصائيات',
-                style: GoogleFonts.amiri(
-                  fontSize: 24,
-                  color: AppColors.gold,
+                style: context.typography.displayMedium.copyWith(
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
                 '${hijri.hDay} ${_month(hijri.hMonth)} ${hijri.hYear}',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
+                style: context.typography.bodySmall.copyWith(
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
@@ -306,9 +316,8 @@ class _RamadanProgress extends StatelessWidget {
       children: [
         Text(
           'يوم $day من ٣٠',
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 10,
-            color: AppColors.textSecondary,
+          style: context.typography.caption.copyWith(
+            color: context.colors.textSecondary,
           ),
         ),
         const SizedBox(height: 4),
@@ -316,13 +325,17 @@ class _RamadanProgress extends StatelessWidget {
           width: 80,
           height: 80,
           child: CustomPaint(
-            painter: _SmallRingPainter(progress: pct),
+            painter: _SmallRingPainter(
+              progress: pct,
+              borderColor: context.colors.border,
+              goldColor: context.colors.gold,
+              tealColor: context.colors.teal,
+            ),
             child: Center(
               child: Text(
                 '${(pct * 100).round()}%',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 13,
-                  color: AppColors.gold,
+                style: context.typography.labelLarge.copyWith(
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -350,9 +363,9 @@ class _PeriodSelector extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.colors.card,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
       ),
       child: Row(
         children: options.map((opt) {
@@ -368,8 +381,8 @@ class _PeriodSelector extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
                   gradient: selected
-                      ? const LinearGradient(
-                          colors: [Color(0xFFC8A96E), Color(0xFFB8920E)],
+                      ? LinearGradient(
+                          colors: [context.colors.gold, context.colors.goldDark],
                         )
                       : null,
                   borderRadius: BorderRadius.circular(9),
@@ -377,11 +390,10 @@ class _PeriodSelector extends ConsumerWidget {
                 child: Center(
                   child: Text(
                     opt.$2,
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 12,
+                    style: context.typography.bodySmall.copyWith(
                       color: selected
-                          ? AppColors.night
-                          : AppColors.textSecondary,
+                          ? context.colors.background
+                          : context.colors.textSecondary,
                       fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
                     ),
                   ),
@@ -410,20 +422,17 @@ class _TaqwaHeroCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0x22C8A96E), Color(0x0F3AAFA9)],
+          colors: [
+            context.colors.gold.withOpacity(0.15),
+            context.colors.teal.withOpacity(0.08),
+          ],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.gold.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withOpacity(0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+        boxShadow: context.shadows.card,
       ),
       child: Row(
         children: [
@@ -441,18 +450,16 @@ class _TaqwaHeroCard extends StatelessWidget {
               children: [
                 Text(
                   stats.levelLabel,
-                  style: GoogleFonts.amiri(
-                    fontSize: 20,
-                    color: AppColors.gold,
+                  style: context.typography.headingMedium.copyWith(
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${stats.totalPoints} نقطة هذا الشهر',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -530,7 +537,13 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
       width: 100,
       height: 100,
       child: CustomPaint(
-        painter: _TaqwaRingPainter(progress: _anim.value),
+        painter: _TaqwaRingPainter(
+          progress: _anim.value,
+          borderColor: context.colors.border,
+          goldColor: context.colors.gold,
+          goldLightColor: context.colors.goldLight,
+          tealColor: context.colors.teal,
+        ),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -538,18 +551,16 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
               Text(widget.levelEmoji, style: const TextStyle(fontSize: 20)),
               Text(
                 '${_countAnim.value}',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 14,
+                style: context.typography.labelLarge.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.gold,
+                  color: context.colors.gold,
                   height: 1,
                 ),
               ),
               Text(
                 'نقطة',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 9,
-                  color: AppColors.textSecondary,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
@@ -562,7 +573,18 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
 
 class _TaqwaRingPainter extends CustomPainter {
   final double progress;
-  _TaqwaRingPainter({required this.progress});
+  final Color borderColor;
+  final Color goldColor;
+  final Color goldLightColor;
+  final Color tealColor;
+
+  _TaqwaRingPainter({
+    required this.progress,
+    required this.borderColor,
+    required this.goldColor,
+    required this.goldLightColor,
+    required this.tealColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -574,7 +596,7 @@ class _TaqwaRingPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = AppColors.border
+        ..color = borderColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 8,
     );
@@ -589,10 +611,10 @@ class _TaqwaRingPainter extends CustomPainter {
       2 * math.pi * progress,
       false,
       Paint()
-        ..shader = const SweepGradient(
+        ..shader = SweepGradient(
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
-          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+          colors: [goldColor, tealColor, goldColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 14
@@ -607,10 +629,10 @@ class _TaqwaRingPainter extends CustomPainter {
       2 * math.pi * progress,
       false,
       Paint()
-        ..shader = const SweepGradient(
+        ..shader = SweepGradient(
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
-          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+          colors: [goldColor, tealColor, goldColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 8
@@ -625,7 +647,7 @@ class _TaqwaRingPainter extends CustomPainter {
       Offset(dx, dy),
       6,
       Paint()
-        ..color = AppColors.goldLight
+        ..color = goldLightColor
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
     );
     canvas.drawCircle(Offset(dx, dy), 3.5, Paint()..color = Colors.white);
@@ -666,16 +688,14 @@ class _LevelProgressBar extends StatelessWidget {
           children: [
             Text(
               'المستوى التالي',
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 10,
-                color: AppColors.textDim,
+              style: context.typography.caption.copyWith(
+                color: context.colors.textDim,
               ),
             ),
             Text(
               remaining > 0 ? '$remaining نقطة متبقية' : 'أقصى مستوى ✨',
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 10,
-                color: AppColors.gold,
+              style: context.typography.caption.copyWith(
+                color: context.colors.gold,
               ),
             ),
           ],
@@ -685,14 +705,14 @@ class _LevelProgressBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: Stack(
             children: [
-              Container(height: 6, color: AppColors.border),
+              Container(height: 6, color: context.colors.border),
               FractionallySizedBox(
                 widthFactor: pct,
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.gold, AppColors.teal],
+                    gradient: LinearGradient(
+                      colors: [context.colors.gold, context.colors.teal],
                     ),
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -714,9 +734,9 @@ class _StreakBadgeLarge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: AppColors.success.withOpacity(0.12),
+      color: context.colors.success.withOpacity(0.12),
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: AppColors.success.withOpacity(0.3)),
+      border: Border.all(color: context.colors.success.withOpacity(0.3)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -725,9 +745,8 @@ class _StreakBadgeLarge extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           '$days يوم متواصل',
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 12,
-            color: AppColors.success,
+          style: context.typography.bodySmall.copyWith(
+            color: context.colors.success,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -777,7 +796,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -785,18 +804,16 @@ class _WeeklyChartState extends State<_WeeklyChart>
             children: [
               Text(
                 'أداء الأسبوع',
-                style: GoogleFonts.amiri(
-                  fontSize: 16,
-                  color: AppColors.textPrimary,
+                style: context.typography.headingMedium.copyWith(
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               const Spacer(),
               Text(
                 'آخر ٧ أيام',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10,
-                  color: AppColors.textDim,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textDim,
                 ),
               ),
             ],
@@ -837,15 +854,14 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                 ),
                                 margin: const EdgeInsets.only(bottom: 4),
                                 decoration: BoxDecoration(
-                                  color: AppColors.card2,
+                                  color: context.colors.card2,
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: AppColors.border),
+                                  border: Border.all(color: context.colors.border),
                                 ),
                                 child: Text(
                                   '${pt.points}',
-                                  style: GoogleFonts.notoNaskhArabic(
-                                    fontSize: 9,
-                                    color: AppColors.gold,
+                                  style: context.typography.caption.copyWith(
+                                    color: context.colors.gold,
                                   ),
                                 ),
                               ),
@@ -860,13 +876,13 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
                                   colors: isToday
-                                      ? [AppColors.gold, AppColors.goldLight]
+                                      ? [context.colors.gold, context.colors.goldLight]
                                       : isHovered
                                       ? [
-                                          AppColors.teal,
-                                          AppColors.teal.withOpacity(0.6),
+                                          context.colors.teal,
+                                          context.colors.teal.withOpacity(0.6),
                                         ]
-                                      : [AppColors.border, AppColors.card2],
+                                      : [context.colors.border, context.colors.card2],
                                 ),
                                 borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(6),
@@ -874,7 +890,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                 boxShadow: isToday
                                     ? [
                                         BoxShadow(
-                                          color: AppColors.gold.withOpacity(
+                                          color: context.colors.gold.withOpacity(
                                             0.3,
                                           ),
                                           blurRadius: 8,
@@ -887,11 +903,10 @@ class _WeeklyChartState extends State<_WeeklyChart>
                             const SizedBox(height: 6),
                             Text(
                               pt.dayLabel,
-                              style: GoogleFonts.notoNaskhArabic(
-                                fontSize: 9,
+                              style: context.typography.caption.copyWith(
                                 color: isToday
-                                    ? AppColors.gold
-                                    : AppColors.textDim,
+                                    ? context.colors.gold
+                                    : context.colors.textDim,
                               ),
                             ),
                           ],
@@ -905,12 +920,12 @@ class _WeeklyChartState extends State<_WeeklyChart>
           ),
           const SizedBox(height: 30),
           // Legend
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ChartLegend(color: AppColors.gold, label: 'اليوم'),
-              SizedBox(width: 16),
-              _ChartLegend(color: AppColors.border, label: 'أيام سابقة'),
+              _ChartLegend(color: context.colors.gold, label: 'اليوم'),
+              const SizedBox(width: 16),
+              _ChartLegend(color: context.colors.border, label: 'أيام سابقة'),
             ],
           ),
         ],
@@ -939,9 +954,8 @@ class _ChartLegend extends StatelessWidget {
       const SizedBox(width: 5),
       Text(
         label,
-        style: GoogleFonts.notoNaskhArabic(
-          fontSize: 10,
-          color: AppColors.textSecondary,
+        style: context.typography.caption.copyWith(
+          color: context.colors.textSecondary,
         ),
       ),
     ],
@@ -962,25 +976,25 @@ class _StatsCardsGrid extends StatelessWidget {
         '📖',
         'صفحات القرآن',
         '${stats.quranPages}',
-        AppColors.teal,
+        context.colors.teal,
       ),
       _StatCardData(
         '🕌',
         'حضور الصلوات',
         '${stats.prayerPercent}%',
-        AppColors.gold,
+        context.colors.gold,
       ),
       _StatCardData(
         '🔥',
         'أطول سلسلة',
         '${stats.longestStreak} يوم',
-        AppColors.success,
+        context.colors.success,
       ),
       _StatCardData(
         '🌟',
         'نقاط التقوى',
         '${stats.totalPoints}',
-        AppColors.gold,
+        context.colors.gold,
       ),
     ];
 
@@ -1044,9 +1058,9 @@ class _StatCardState extends State<_StatCard>
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1071,17 +1085,15 @@ class _StatCardState extends State<_StatCard>
               children: [
                 Text(
                   widget.data.value,
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 22,
+                  style: context.typography.headingMedium.copyWith(
                     fontWeight: FontWeight.w700,
                     color: widget.data.color,
                   ),
                 ),
                 Text(
                   widget.data.label,
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 10,
-                    color: AppColors.textSecondary,
+                  style: context.typography.caption.copyWith(
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -1113,15 +1125,14 @@ class _PrayerAttendanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'حضور الصلوات',
-            style: GoogleFonts.amiri(
-              fontSize: 16,
-              color: AppColors.textPrimary,
+            style: context.typography.headingMedium.copyWith(
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1175,10 +1186,10 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
     super.dispose();
   }
 
-  Color get _color {
-    if (widget.rate >= 0.9) return AppColors.success;
-    if (widget.rate >= 0.7) return AppColors.gold;
-    return AppColors.danger;
+  Color _color(BuildContext context) {
+    if (widget.rate >= 0.9) return context.colors.success;
+    if (widget.rate >= 0.7) return context.colors.gold;
+    return context.colors.danger;
   }
 
   @override
@@ -1193,9 +1204,8 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
             width: 44,
             child: Text(
               widget.name,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 11,
-                color: AppColors.textSecondary,
+              style: context.typography.bodySmall.copyWith(
+                color: context.colors.textSecondary,
               ),
             ),
           ),
@@ -1207,19 +1217,19 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
                 borderRadius: BorderRadius.circular(4),
                 child: Stack(
                   children: [
-                    Container(height: 8, color: AppColors.border),
+                    Container(height: 8, color: context.colors.border),
                     FractionallySizedBox(
                       widthFactor: _anim.value,
                       child: Container(
                         height: 8,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [_color, _color.withOpacity(0.6)],
+                            colors: [_color(context), _color(context).withOpacity(0.6)],
                           ),
                           borderRadius: BorderRadius.circular(4),
                           boxShadow: [
                             BoxShadow(
-                              color: _color.withOpacity(0.3),
+                              color: _color(context).withOpacity(0.3),
                               blurRadius: 4,
                             ),
                           ],
@@ -1238,9 +1248,8 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
               animation: _anim,
               builder: (_, __) => Text(
                 '${(_anim.value * 100).round()}%',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 11,
-                  color: _color,
+                style: context.typography.bodySmall.copyWith(
+                  color: _color(context),
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.end,
@@ -1263,7 +1272,7 @@ class _AchievementsSection extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppDecorations.card,
+      decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1271,9 +1280,8 @@ class _AchievementsSection extends ConsumerWidget {
             children: [
               Text(
                 'الإنجازات والشارات',
-                style: GoogleFonts.amiri(
-                  fontSize: 16,
-                  color: AppColors.textPrimary,
+                style: context.typography.headingMedium.copyWith(
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -1283,9 +1291,8 @@ class _AchievementsSection extends ConsumerWidget {
                 error: (_, __) => const SizedBox(),
                 data: (list) => Text(
                   '${list.length} إنجاز',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 11,
-                    color: AppColors.textDim,
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.textDim,
                   ),
                 ),
               ),
@@ -1294,9 +1301,9 @@ class _AchievementsSection extends ConsumerWidget {
           const SizedBox(height: 12),
 
           allAsync.when(
-            loading: () => const Center(
+            loading: () => Center(
               child: CircularProgressIndicator(
-                color: AppColors.gold,
+                color: context.colors.gold,
                 strokeWidth: 2,
               ),
             ),
@@ -1331,11 +1338,16 @@ class _AchievementBadge extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0x22C8A96E), Color(0x113AAFA9)],
+          gradient: LinearGradient(
+            colors: [
+              context.colors.gold.withOpacity(0.12),
+              Colors.transparent,
+            ],
           ),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.gold.withOpacity(0.25)),
+          border: Border.all(
+            color: context.colors.gold.withOpacity(0.25),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1348,17 +1360,15 @@ class _AchievementBadge extends ConsumerWidget {
               children: [
                 Text(
                   achievement.titleAr,
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 11,
-                    color: AppColors.gold,
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '+${achievement.pointsReward} نقطة',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 9,
-                    color: AppColors.textDim,
+                  style: context.typography.caption.copyWith(
+                    color: context.colors.textDim,
                   ),
                 ),
               ],
@@ -1391,10 +1401,11 @@ class _AchievementDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.card,
+      backgroundColor: context.colors.card,
+      surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: AppColors.gold.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -1405,9 +1416,9 @@ class _AchievementDialog extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               achievement.titleAr,
-              style: GoogleFonts.amiri(
+              style: context.typography.headingMedium.copyWith(
                 fontSize: 20,
-                color: AppColors.gold,
+                color: context.colors.gold,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1415,9 +1426,8 @@ class _AchievementDialog extends StatelessWidget {
             Text(
               achievement.descAr,
               textAlign: TextAlign.center,
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 13,
-                color: AppColors.textSecondary,
+              style: context.typography.bodyMedium.copyWith(
+                color: context.colors.textSecondary,
                 height: 1.7,
               ),
             ),
@@ -1425,15 +1435,14 @@ class _AchievementDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.goldDim,
+                color: context.colors.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+                border: Border.all(color: context.colors.gold.withOpacity(0.2)),
               ),
               child: Text(
                 '+${achievement.pointsReward} نقطة مكافأة 🌟',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 13,
-                  color: AppColors.gold,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.gold,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -1444,16 +1453,14 @@ class _AchievementDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.night,
+                    foregroundColor: context.colors.background,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: Text(
                   'شكراً لله 🤲',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 13,
+                  style: context.typography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -1474,21 +1481,19 @@ class _EmptyAchievements extends StatelessWidget {
       children: [
         const Text('🏆', style: TextStyle(fontSize: 32)),
         const SizedBox(height: 8),
-        Text(
-          'لا إنجازات بعد',
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 13,
-            color: AppColors.textDim,
+          Text(
+            'لا إنجازات بعد',
+            style: context.typography.bodyMedium.copyWith(
+              color: context.colors.textDim,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'حافظ على العبادات لتحصل على أول إنجاز',
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 11,
-            color: AppColors.textDim,
+          const SizedBox(height: 4),
+          Text(
+            'حافظ على العبادات لتحصل على أول إنجاز',
+            style: context.typography.caption.copyWith(
+              color: context.colors.textDim,
+            ),
           ),
-        ),
       ],
     ),
   );
@@ -1511,17 +1516,16 @@ class _LockedAchievementsRow extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
             children: [
-              Container(width: 24, height: 1, color: AppColors.border),
+              Container(width: 24, height: 1, color: context.colors.border),
               const SizedBox(width: 8),
               Text(
                 'قادم قريباً 🔒',
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 10,
-                  color: AppColors.textDim,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textDim,
                 ),
               ),
               const SizedBox(width: 8),
-              Expanded(child: Container(height: 1, color: AppColors.border)),
+              Expanded(child: Container(height: 1, color: context.colors.border)),
             ],
           ),
         ),
@@ -1538,9 +1542,9 @@ class _LockedAchievementsRow extends StatelessWidget {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.card2,
+                      color: context.colors.card2,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: context.colors.border),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1553,16 +1557,14 @@ class _LockedAchievementsRow extends StatelessWidget {
                           children: [
                             Text(
                               l.$3,
-                              style: GoogleFonts.notoNaskhArabic(
-                                fontSize: 11,
-                                color: AppColors.textSecondary,
+                              style: context.typography.bodySmall.copyWith(
+                                color: context.colors.textSecondary,
                               ),
                             ),
                             Text(
                               l.$4,
-                              style: GoogleFonts.notoNaskhArabic(
-                                fontSize: 9,
-                                color: AppColors.textDim,
+                              style: context.typography.caption.copyWith(
+                                color: context.colors.textDim,
                               ),
                             ),
                           ],
@@ -1644,14 +1646,14 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1E2D40), Color(0xFF1A2332)],
+              gradient: LinearGradient(
+                colors: [context.colors.gold, context.colors.goldDim],
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.gold.withOpacity(0.4)),
+              border: Border.all(color: context.colors.gold.withOpacity(0.4)),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.gold.withOpacity(0.15),
+                  color: context.colors.gold.withOpacity(0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -1670,24 +1672,21 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                     children: [
                       Text(
                         'إنجاز جديد! 🎉',
-                        style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 10,
-                          color: AppColors.textSecondary,
+                        style: context.typography.caption.copyWith(
+                          color: context.colors.textSecondary,
                         ),
                       ),
                       Text(
                         widget.achievement.titleAr,
-                        style: GoogleFonts.amiri(
-                          fontSize: 16,
-                          color: AppColors.gold,
+                        style: context.typography.headingMedium.copyWith(
+                          color: context.colors.background, // Contrast against gold gradient
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         widget.achievement.descAr,
-                        style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
+                        style: context.typography.bodySmall.copyWith(
+                          color: context.colors.background.withOpacity(0.8),
                         ),
                       ),
                     ],
@@ -1699,14 +1698,14 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.goldDim,
+                    color: context.colors.goldDim,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '+${widget.achievement.pointsReward}',
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 12,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1725,7 +1724,16 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
 // ═══════════════════════════════════════════════════════════════
 class _SmallRingPainter extends CustomPainter {
   final double progress;
-  _SmallRingPainter({required this.progress});
+  final Color borderColor;
+  final Color goldColor;
+  final Color tealColor;
+
+  _SmallRingPainter({
+    required this.progress,
+    required this.borderColor,
+    required this.goldColor,
+    required this.tealColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1735,7 +1743,7 @@ class _SmallRingPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = AppColors.border
+        ..color = borderColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = 5,
     );
@@ -1747,10 +1755,10 @@ class _SmallRingPainter extends CustomPainter {
       2 * math.pi * progress,
       false,
       Paint()
-        ..shader = const SweepGradient(
+        ..shader = SweepGradient(
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
-          colors: [AppColors.gold, AppColors.teal, AppColors.gold],
+          colors: [goldColor, tealColor, goldColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 5
@@ -1770,25 +1778,30 @@ class _StatSkeleton extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     height: height,
     decoration: BoxDecoration(
-      color: AppColors.card,
+      color: context.colors.card,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: context.colors.border),
     ),
-    child: const Center(
-      child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+    child: Center(
+      child: CircularProgressIndicator(color: context.colors.gold, strokeWidth: 2),
     ),
   );
 }
 
 class _StatsBgPainter extends CustomPainter {
+  final Color nightColor;
+  final Color dotColor;
+
+  _StatsBgPainter({required this.nightColor, required this.dotColor});
+
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
+      Paint()..color = nightColor,
     );
     // dots grid
-    final p = Paint()..color = const Color(0x0AC8A96E);
+    final p = Paint()..color = dotColor;
     for (double x = 16; x < size.width; x += 28) {
       for (double y = 16; y < size.height; y += 28) {
         canvas.drawCircle(Offset(x, y), 1, p);
@@ -1797,5 +1810,6 @@ class _StatsBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter o) => false;
+  bool shouldRepaint(covariant _StatsBgPainter o) =>
+      o.nightColor != nightColor || o.dotColor != dotColor;
 }

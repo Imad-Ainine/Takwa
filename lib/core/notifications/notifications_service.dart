@@ -26,7 +26,21 @@ class NotifIds {
   static const asr = 102;
   static const maghrib = 103;
   static const isha = 104;
-  static const fajrWakeUp = 105; // تنبيه قبل الفجر بـ 15 دقيقة
+  static const fajrWakeUp = 105; // تنبيه قبل الفجر بـ 15 دقيقة (قديم)
+
+  // تنبيهات جديدة قبل الأذان بـ 15 دقيقة
+  static const preFajr = 110;
+  static const preDhuhr = 111;
+  static const preAsr = 112;
+  static const preMaghrib = 113;
+  static const preIsha = 114;
+
+  // تنبيهات الإقامة (بعد الأذان)
+  static const iqamaFajr = 120;
+  static const iqamaDhuhr = 121;
+  static const iqamaAsr = 122;
+  static const iqamaMaghrib = 123;
+  static const iqamaIsha = 124;
 
   // محاسبة مسائية
   static const eveningMuhasaba = 200;
@@ -52,6 +66,16 @@ class NotifChannels {
     description: 'تذكيرات أوقات الصلوات الخمس',
     importance: Importance.high,
     sound: RawResourceAndroidNotificationSound('adhan'),
+    playSound: true,
+    enableVibration: true,
+  );
+
+  static const AndroidNotificationChannel alert = AndroidNotificationChannel(
+    'prayer_alerts',
+    'تنبيهات الصلاة',
+    description: 'تنبيهات قبل الأذان وبوقت الإقامة',
+    importance: Importance.high,
+    sound: RawResourceAndroidNotificationSound('notification'),
     playSound: true,
     enableVibration: true,
   );
@@ -136,6 +160,7 @@ class NotificationsService {
             AndroidFlutterLocalNotificationsPlugin
           >();
       await androidPlugin?.createNotificationChannel(NotifChannels.prayer);
+      await androidPlugin?.createNotificationChannel(NotifChannels.alert);
       await androidPlugin?.createNotificationChannel(NotifChannels.muhasaba);
       await androidPlugin?.createNotificationChannel(NotifChannels.adhkar);
       await androidPlugin?.createNotificationChannel(NotifChannels.achievement);
@@ -172,40 +197,65 @@ class NotificationsService {
     required List<PrayerTimeInfo> prayers,
     required bool wakeUpBeforeFajr,
   }) async {
-    // إلغاء القديمة أولاً
-    for (final id in [100, 101, 102, 103, 104, 105]) {
+    // إلغاء القديمة
+    final idsToCancel = [
+      100, 101, 102, 103, 104, 105, 110, 111, 112, 113, 114, 120, 121, 122, 123, 124
+    ];
+    for (final id in idsToCancel) {
       await _plugin.cancel(id);
     }
 
-    for (final prayer in prayers) {
-      if (prayer.time.isBefore(DateTime.now())) continue;
+    final iqamaOffsets = {
+      'fajr': 20,
+      'dhuhr': 15,
+      'asr': 15,
+      'maghrib': 5,
+      'isha': 15,
+    };
 
-      await _scheduleExact(
-        id: prayer.notifId,
-        title: 'حان وقت ${prayer.nameAr} ${prayer.emoji}',
-        body: 'الله أكبر، الله أكبر، حي على الصلاة',
-        scheduledTime: prayer.time,
-        channelId: NotifChannels.prayer.id,
-        sound: 'adhan',
-        payload: 'prayer:${prayer.name}',
-      );
-    }
+    for (int i = 0; i < prayers.length; i++) {
+      final prayer = prayers[i];
+      final now = DateTime.now();
 
-    // تنبيه قبل الفجر
-    if (wakeUpBeforeFajr) {
-      final fajr = prayers.firstWhere(
-        (p) => p.name == 'fajr',
-        orElse: () => prayers.first,
-      );
-      final wakeUpTime = fajr.time.subtract(const Duration(minutes: 15));
-      if (wakeUpTime.isAfter(DateTime.now())) {
+      // 1. التنبيه قبل الأذان بـ 15 دقيقة
+      final preTime = prayer.time.subtract(const Duration(minutes: 15));
+      if (preTime.isAfter(now)) {
         await _scheduleExact(
-          id: NotifIds.fajrWakeUp,
-          title: 'استيقظ لصلاة الفجر 🌙',
-          body: 'بعد ١٥ دقيقة يؤذن الفجر، لا تفوتك',
-          scheduledTime: wakeUpTime,
+          id: 110 + i,
+          title: 'اقترب وقت ${prayer.nameAr} ⏳',
+          body: '١٥ دقيقة ويؤذن لـ ${prayer.nameAr}، استعد للصلاة',
+          scheduledTime: preTime,
+          channelId: NotifChannels.alert.id,
+          sound: 'notification',
+          payload: 'pre_prayer:${prayer.name}',
+        );
+      }
+
+      // 2. الأذان الفعلي
+      if (prayer.time.isAfter(now)) {
+        await _scheduleExact(
+          id: prayer.notifId,
+          title: 'حان وقت ${prayer.nameAr} ${prayer.emoji}',
+          body: 'الله أكبر، الله أكبر، حي على الصلاة',
+          scheduledTime: prayer.time,
           channelId: NotifChannels.prayer.id,
-          payload: 'wakeup:fajr',
+          sound: 'adhan',
+          payload: 'prayer:${prayer.name}',
+        );
+      }
+
+      // 3. تنبيه الإقامة
+      final offset = iqamaOffsets[prayer.name] ?? 15;
+      final iqamaTime = prayer.time.add(Duration(minutes: offset));
+      if (iqamaTime.isAfter(now)) {
+        await _scheduleExact(
+          id: 120 + i,
+          title: 'وقت الإقامة — ${prayer.nameAr} 🤲',
+          body: 'حان الآن وقت إقامة صلاة ${prayer.nameAr}',
+          scheduledTime: iqamaTime,
+          channelId: NotifChannels.alert.id,
+          sound: 'notification',
+          payload: 'iqama:${prayer.name}',
         );
       }
     }
