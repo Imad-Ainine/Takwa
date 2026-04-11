@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import '../core/theme/app_theme.dart';
 import '../core/providers/database_providers.dart';
 import '../core/notifications/notifications_service.dart';
@@ -176,9 +175,7 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.colors.card,
-        border: Border(
-          top: BorderSide(color: context.colors.border, width: 1),
-        ),
+        border: Border(top: BorderSide(color: context.colors.border, width: 1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -214,7 +211,10 @@ class _BottomNav extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [context.colors.gold, context.colors.teal],
+                                colors: [
+                                  context.colors.gold,
+                                  context.colors.teal,
+                                ],
                               ),
                               borderRadius: BorderRadius.circular(1),
                             ),
@@ -230,9 +230,8 @@ class _BottomNav extends StatelessWidget {
                                 shadows: isActive
                                     ? [
                                         Shadow(
-                                          color: context.colors.gold.withOpacity(
-                                            0.5 * t,
-                                          ),
+                                          color: context.colors.gold
+                                              .withOpacity(0.5 * t),
                                           blurRadius: 10,
                                         ),
                                       ]
@@ -334,7 +333,9 @@ class _SplashScreenState extends State<_SplashScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: context.colors.gold.withOpacity(0.3 - i * 0.08),
+                              color: context.colors.gold.withOpacity(
+                                0.3 - i * 0.08,
+                              ),
                               width: 1,
                             ),
                           ),

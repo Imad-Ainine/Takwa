@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -72,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Stack(
         children: [
           // ── Geometric Background (Shared) ──
-          const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+          // const CustomPatternBackground(pattern: BackgroundPattern.geometric),
 
           // ── Gradient Glows ──
           Positioned(

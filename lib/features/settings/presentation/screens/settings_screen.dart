@@ -43,24 +43,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadSettings() async {
     final s = ref.read(settingsDaoProvider);
 
-    final prayerReminder = await s.getBool('prayerReminder', defaultVal: true);
-    final muhasabaReminder = await s.getBool(
-      'eveningMuhasabaReminder',
-      defaultVal: true,
-    );
-    final morningAdhkar = await s.getBool(
-      'morningAdhkarReminder',
-      defaultVal: true,
-    );
-    final eveningAdhkar = await s.getBool(
-      'eveningAdhkarReminder',
-      defaultVal: true,
-    );
-    final wakeUpFajr = await s.getBool('wakeUpBeforeFajr', defaultVal: false);
-    final ramadanMode = await s.getBool('ramadanMode', defaultVal: false);
-    final madhab = await s.get('madhab') ?? 'shafi';
-    final method = await s.get('calcMethod') ?? 'MWL';
-    final tStr = await s.get('eveningReminderTime') ?? '21:00';
+    final results = await Future.wait([
+      s.getBool('prayerReminder', defaultVal: true),
+      s.getBool('eveningMuhasabaReminder', defaultVal: true),
+      s.getBool('morningAdhkarReminder', defaultVal: true),
+      s.getBool('eveningAdhkarReminder', defaultVal: true),
+      s.getBool('wakeUpBeforeFajr', defaultVal: false),
+      s.getBool('ramadanMode', defaultVal: false),
+      s.get('madhab'),
+      s.get('calcMethod'),
+      s.get('eveningReminderTime'),
+    ]);
+
+    final prayerReminder = results[0] as bool;
+    final muhasabaReminder = results[1] as bool;
+    final morningAdhkar = results[2] as bool;
+    final eveningAdhkar = results[3] as bool;
+    final wakeUpFajr = results[4] as bool;
+    final ramadanMode = results[5] as bool;
+    final madhab = (results[6] as String?) ?? 'shafi';
+    final method = (results[7] as String?) ?? 'MWL';
+    final tStr = (results[8] as String?) ?? '21:00';
+
     final parts = tStr.split(':');
     final muhasabaTime = TimeOfDay(
       hour: int.parse(parts[0]),
@@ -103,7 +107,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [

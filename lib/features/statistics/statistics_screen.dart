@@ -4,7 +4,6 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
-
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,7 +14,6 @@ import 'package:muhasabah/core/database/app_database.dart';
 import 'package:muhasabah/core/database/daos.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -112,9 +110,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
-    final style = AdaptiveStyle(context, isRamadan);
-
+    // final period = ref.watch(_statsPeriodProvider);
     final statsAsync = ref.watch(monthStatsProvider);
     final weekAsync = ref.watch(weeklyPointsProvider);
     final streakAsync = ref.watch(currentStreakProvider);
@@ -129,7 +125,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                   : SystemUiOverlayStyle.dark)
               .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: style.bg,
+        backgroundColor: context.colors.background,
         body: Stack(
           children: [
             const CustomPatternBackground(pattern: BackgroundPattern.stats),
@@ -145,7 +141,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                   surfaceTintColor: Colors.transparent,
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
-                    background: _StatsTopBar(hijri: hijri, style: style),
+                    background: _StatsTopBar(hijri: hijri),
                   ),
                 ),
 
@@ -156,7 +152,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                       const SizedBox(height: 8),
 
                       // ① Period Selector
-                      _anim(0, _PeriodSelector(style: style)),
+                      _anim(0, _PeriodSelector()),
                       const SizedBox(height: 16),
 
                       // ② Taqwa Score Hero Card
@@ -168,11 +164,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           data: (s) => streakAsync.when(
                             loading: () => const _StatSkeleton(height: 150),
                             error: (_, __) => const SizedBox(),
-                            data: (streak) => _TaqwaHeroCard(
-                              stats: s,
-                              streak: streak,
-                              style: style,
-                            ),
+                            data: (streak) =>
+                                _TaqwaHeroCard(stats: s, streak: streak),
                           ),
                         ),
                       ),
@@ -184,8 +177,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         weekAsync.when(
                           loading: () => const _StatSkeleton(height: 180),
                           error: (_, __) => const SizedBox(),
-                          data: (pts) =>
-                              _WeeklyChart(points: pts, style: style),
+                          data: (pts) => _WeeklyChart(points: pts),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -196,7 +188,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         statsAsync.when(
                           loading: () => const _StatSkeleton(height: 120),
                           error: (_, __) => const SizedBox(),
-                          data: (s) => _StatsCardsGrid(stats: s, style: style),
+                          data: (s) => _StatsCardsGrid(stats: s),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -207,14 +199,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         statsAsync.when(
                           loading: () => const _StatSkeleton(height: 150),
                           error: (_, __) => const SizedBox(),
-                          data: (s) =>
-                              _PrayerAttendanceCard(stats: s, style: style),
+                          data: (s) => _PrayerAttendanceCard(stats: s),
                         ),
                       ),
                       const SizedBox(height: 16),
 
                       // ⑥ Achievements
-                      _anim(5, _AchievementsSection(style: style)),
+                      _anim(5, _AchievementsSection()),
                       const SizedBox(height: 100),
                     ]),
                   ),
@@ -242,8 +233,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
 // ═══════════════════════════════════════════════════════════════
 class _StatsTopBar extends StatelessWidget {
   final HijriCalendar hijri;
-  final AdaptiveStyle style;
-  const _StatsTopBar({required this.hijri, required this.style});
+  const _StatsTopBar({required this.hijri});
 
   @override
   Widget build(BuildContext context) {
@@ -256,8 +246,8 @@ class _StatsTopBar extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             isRamadan
-                ? style.gold.withOpacity(0.15)
-                : style.teal.withOpacity(0.1),
+                ? context.colors.gold.withOpacity(0.15)
+                : context.colors.teal.withOpacity(0.1),
             Colors.transparent,
           ],
         ),
@@ -272,15 +262,20 @@ class _StatsTopBar extends StatelessWidget {
             children: [
               Text(
                 isRamadan ? 'تقرير رمضان 🌙' : 'الإحصائيات',
-                style: style.amiri(26, color: style.gold),
+                style: context.typography.displayMedium.copyWith(
+                  color: context.colors.gold,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               Text(
                 '${hijri.hDay} ${_month(hijri.hMonth)} ${hijri.hYear}',
-                style: style.naskh(12, color: style.textSec),
+                style: context.typography.bodySmall.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
             ],
           ),
-          if (isRamadan) _RamadanProgress(day: hijri.hDay, style: style),
+          if (isRamadan) _RamadanProgress(day: hijri.hDay),
         ],
       ),
     );
@@ -304,8 +299,7 @@ class _StatsTopBar extends StatelessWidget {
 
 class _RamadanProgress extends StatelessWidget {
   final int day;
-  final AdaptiveStyle style;
-  const _RamadanProgress({required this.day, required this.style});
+  const _RamadanProgress({required this.day});
 
   @override
   Widget build(BuildContext context) {
@@ -313,7 +307,12 @@ class _RamadanProgress extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('يوم $day من ٣٠', style: style.naskh(11, color: style.textSec)),
+        Text(
+          'يوم $day من ٣٠',
+          style: context.typography.caption.copyWith(
+            color: context.colors.textSecondary,
+          ),
+        ),
         const SizedBox(height: 4),
         SizedBox(
           width: 80,
@@ -321,17 +320,16 @@ class _RamadanProgress extends StatelessWidget {
           child: CustomPaint(
             painter: _SmallRingPainter(
               progress: pct,
-              borderColor: style.border,
-              goldColor: style.gold,
-              tealColor: style.teal,
+              borderColor: context.colors.border,
+              goldColor: context.colors.gold,
+              tealColor: context.colors.teal,
             ),
             child: Center(
               child: Text(
                 '${(pct * 100).round()}%',
-                style: style.naskh(
-                  14,
-                  color: style.gold,
-                  weight: FontWeight.w700,
+                style: context.typography.labelLarge.copyWith(
+                  color: context.colors.gold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -346,9 +344,6 @@ class _RamadanProgress extends StatelessWidget {
 //  PERIOD SELECTOR
 // ═══════════════════════════════════════════════════════════════
 class _PeriodSelector extends ConsumerWidget {
-  final AdaptiveStyle style;
-  const _PeriodSelector({required this.style});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final current = ref.watch(_statsPeriodProvider);
@@ -414,12 +409,7 @@ class _PeriodSelector extends ConsumerWidget {
 class _TaqwaHeroCard extends StatelessWidget {
   final MonthStats stats;
   final int streak;
-  final AdaptiveStyle style;
-  const _TaqwaHeroCard({
-    required this.stats,
-    required this.streak,
-    required this.style,
-  });
+  const _TaqwaHeroCard({required this.stats, required this.streak});
 
   @override
   Widget build(BuildContext context) {
@@ -431,13 +421,14 @@ class _TaqwaHeroCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [style.gold.withOpacity(0.15), style.teal.withOpacity(0.08)],
+          colors: [
+            context.colors.gold.withOpacity(0.15),
+            context.colors.teal.withOpacity(0.08),
+          ],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: style.gold.withOpacity(0.2)),
-        boxShadow: style.isRamadan
-            ? []
-            : [], // We'll handle shadows later if needed
+        border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+        boxShadow: context.shadows.card,
       ),
       child: Row(
         children: [
@@ -446,7 +437,6 @@ class _TaqwaHeroCard extends StatelessWidget {
             progress: pct,
             points: stats.totalPoints,
             levelEmoji: _levelEmoji(stats.level),
-            style: style,
           ),
           const SizedBox(width: 16),
 
@@ -456,21 +446,26 @@ class _TaqwaHeroCard extends StatelessWidget {
               children: [
                 Text(
                   stats.levelLabel,
-                  style: style.amiri(20, color: style.gold),
+                  style: context.typography.headingMedium.copyWith(
+                    color: context.colors.gold,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${stats.totalPoints} نقطة هذا الشهر',
-                  style: style.naskh(12, color: style.textSec),
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 10),
 
                 // حاجز للمستوى التالي
-                _LevelProgressBar(stats: stats, style: style),
+                _LevelProgressBar(stats: stats),
                 const SizedBox(height: 10),
 
                 // Streak
-                if (streak > 0) _StreakBadgeLarge(days: streak, style: style),
+                if (streak > 0) _StreakBadgeLarge(days: streak),
               ],
             ),
           ),
@@ -491,12 +486,10 @@ class _TaqwaScoreRing extends StatefulWidget {
   final double progress;
   final int points;
   final String levelEmoji;
-  final AdaptiveStyle style;
   const _TaqwaScoreRing({
     required this.progress,
     required this.points,
     required this.levelEmoji,
-    required this.style,
   });
 
   @override
@@ -542,10 +535,10 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
       child: CustomPaint(
         painter: _TaqwaRingPainter(
           progress: _anim.value,
-          borderColor: widget.style.border,
-          goldColor: widget.style.gold,
-          goldLightColor: widget.style.goldLight,
-          tealColor: widget.style.teal,
+          borderColor: context.colors.border,
+          goldColor: context.colors.gold,
+          goldLightColor: context.colors.goldLight,
+          tealColor: context.colors.teal,
         ),
         child: Center(
           child: Column(
@@ -554,15 +547,17 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
               Text(widget.levelEmoji, style: const TextStyle(fontSize: 20)),
               Text(
                 '${_countAnim.value}',
-                style: widget.style.naskh(
-                  18,
-                  color: widget.style.gold,
-                  weight: FontWeight.w700,
+                style: context.typography.labelLarge.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.gold,
+                  height: 1,
                 ),
               ),
               Text(
                 'نقطة',
-                style: widget.style.naskh(10, color: widget.style.textSec),
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -660,8 +655,7 @@ class _TaqwaRingPainter extends CustomPainter {
 
 class _LevelProgressBar extends StatelessWidget {
   final MonthStats stats;
-  final AdaptiveStyle style;
-  const _LevelProgressBar({required this.stats, required this.style});
+  const _LevelProgressBar({required this.stats});
 
   @override
   Widget build(BuildContext context) {
@@ -690,11 +684,15 @@ class _LevelProgressBar extends StatelessWidget {
           children: [
             Text(
               'المستوى التالي',
-              style: style.naskh(10, color: style.textSec.withOpacity(0.5)),
+              style: context.typography.caption.copyWith(
+                color: context.colors.textDim,
+              ),
             ),
             Text(
               remaining > 0 ? '$remaining نقطة متبقية' : 'أقصى مستوى ✨',
-              style: style.naskh(10, color: style.gold),
+              style: context.typography.caption.copyWith(
+                color: context.colors.gold,
+              ),
             ),
           ],
         ),
@@ -703,13 +701,15 @@ class _LevelProgressBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: Stack(
             children: [
-              Container(height: 6, color: style.border),
+              Container(height: 6, color: context.colors.border),
               FractionallySizedBox(
                 widthFactor: pct,
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [style.gold, style.teal]),
+                    gradient: LinearGradient(
+                      colors: [context.colors.gold, context.colors.teal],
+                    ),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -724,16 +724,15 @@ class _LevelProgressBar extends StatelessWidget {
 
 class _StreakBadgeLarge extends StatelessWidget {
   final int days;
-  final AdaptiveStyle style;
-  const _StreakBadgeLarge({required this.days, required this.style});
+  const _StreakBadgeLarge({required this.days});
 
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
-      color: style.success.withOpacity(0.12),
+      color: context.colors.success.withOpacity(0.12),
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: style.success.withOpacity(0.3)),
+      border: Border.all(color: context.colors.success.withOpacity(0.3)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -742,7 +741,10 @@ class _StreakBadgeLarge extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           '$days يوم متواصل',
-          style: style.naskh(12, color: style.success, weight: FontWeight.w600),
+          style: context.typography.bodySmall.copyWith(
+            color: context.colors.success,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     ),
@@ -754,8 +756,7 @@ class _StreakBadgeLarge extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════
 class _WeeklyChart extends StatefulWidget {
   final List<WeeklyPoint> points;
-  final AdaptiveStyle style;
-  const _WeeklyChart({required this.points, required this.style});
+  const _WeeklyChart({required this.points});
 
   @override
   State<_WeeklyChart> createState() => _WeeklyChartState();
@@ -799,14 +800,16 @@ class _WeeklyChartState extends State<_WeeklyChart>
             children: [
               Text(
                 'أداء الأسبوع',
-                style: widget.style.amiri(20, color: widget.style.gold),
+                style: context.typography.headingMedium.copyWith(
+                  color: context.colors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const Spacer(),
               Text(
                 'آخر ٧ أيام',
-                style: widget.style.naskh(
-                  11,
-                  color: widget.style.textSec.withOpacity(0.5),
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textDim,
                 ),
               ),
             ],
@@ -847,17 +850,16 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                 ),
                                 margin: const EdgeInsets.only(bottom: 4),
                                 decoration: BoxDecoration(
-                                  color: widget.style.card,
+                                  color: context.colors.card2,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                    color: widget.style.border,
+                                    color: context.colors.border,
                                   ),
                                 ),
                                 child: Text(
                                   '${pt.points}',
-                                  style: widget.style.naskh(
-                                    10,
-                                    color: widget.style.gold,
+                                  style: context.typography.caption.copyWith(
+                                    color: context.colors.gold,
                                   ),
                                 ),
                               ),
@@ -873,17 +875,17 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                   end: Alignment.topCenter,
                                   colors: isToday
                                       ? [
-                                          widget.style.gold,
-                                          widget.style.goldLight,
+                                          context.colors.gold,
+                                          context.colors.goldLight,
                                         ]
                                       : isHovered
                                       ? [
-                                          widget.style.teal,
-                                          widget.style.teal.withOpacity(0.6),
+                                          context.colors.teal,
+                                          context.colors.teal.withOpacity(0.6),
                                         ]
                                       : [
-                                          widget.style.border,
-                                          widget.style.card,
+                                          context.colors.border,
+                                          context.colors.card2,
                                         ],
                                 ),
                                 borderRadius: const BorderRadius.vertical(
@@ -892,9 +894,8 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                 boxShadow: isToday
                                     ? [
                                         BoxShadow(
-                                          color: widget.style.gold.withOpacity(
-                                            0.3,
-                                          ),
+                                          color: context.colors.gold
+                                              .withOpacity(0.3),
                                           blurRadius: 8,
                                         ),
                                       ]
@@ -905,11 +906,10 @@ class _WeeklyChartState extends State<_WeeklyChart>
                             const SizedBox(height: 6),
                             Text(
                               pt.dayLabel,
-                              style: widget.style.naskh(
-                                10,
+                              style: context.typography.caption.copyWith(
                                 color: isToday
-                                    ? widget.style.gold
-                                    : widget.style.textSec,
+                                    ? context.colors.gold
+                                    : context.colors.textDim,
                               ),
                             ),
                           ],
@@ -926,17 +926,9 @@ class _WeeklyChartState extends State<_WeeklyChart>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ChartLegend(
-                color: widget.style.gold,
-                label: 'اليوم',
-                style: widget.style,
-              ),
+              _ChartLegend(color: context.colors.gold, label: 'اليوم'),
               const SizedBox(width: 16),
-              _ChartLegend(
-                color: widget.style.border,
-                label: 'أيام سابقة',
-                style: widget.style,
-              ),
+              _ChartLegend(color: context.colors.border, label: 'أيام سابقة'),
             ],
           ),
         ],
@@ -948,12 +940,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
 class _ChartLegend extends StatelessWidget {
   final Color color;
   final String label;
-  final AdaptiveStyle style;
-  const _ChartLegend({
-    required this.color,
-    required this.label,
-    required this.style,
-  });
+  const _ChartLegend({required this.color, required this.label});
 
   @override
   Widget build(BuildContext context) => Row(
@@ -968,7 +955,12 @@ class _ChartLegend extends StatelessWidget {
         ),
       ),
       const SizedBox(width: 5),
-      Text(label, style: style.naskh(10, color: style.textSec)),
+      Text(
+        label,
+        style: context.typography.caption.copyWith(
+          color: context.colors.textSecondary,
+        ),
+      ),
     ],
   );
 }
@@ -978,26 +970,35 @@ class _ChartLegend extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════
 class _StatsCardsGrid extends StatelessWidget {
   final MonthStats stats;
-  final AdaptiveStyle style;
-  const _StatsCardsGrid({required this.stats, required this.style});
+  const _StatsCardsGrid({required this.stats});
 
   @override
   Widget build(BuildContext context) {
     final cards = [
-      _StatCardData('📖', 'صفحات القرآن', '${stats.quranPages}', style.teal),
+      _StatCardData(
+        '📖',
+        'صفحات القرآن',
+        '${stats.quranPages}',
+        context.colors.teal,
+      ),
       _StatCardData(
         '🕌',
         'حضور الصلوات',
         '${stats.prayerPercent}%',
-        style.gold,
+        context.colors.gold,
       ),
       _StatCardData(
         '🔥',
         'أطول سلسلة',
         '${stats.longestStreak} يوم',
-        style.success,
+        context.colors.success,
       ),
-      _StatCardData('🌟', 'نقاط التقوى', '${stats.totalPoints}', style.gold),
+      _StatCardData(
+        '🌟',
+        'نقاط التقوى',
+        '${stats.totalPoints}',
+        context.colors.gold,
+      ),
     ];
 
     return GridView.count(
@@ -1007,7 +1008,7 @@ class _StatsCardsGrid extends StatelessWidget {
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       childAspectRatio: 1.55,
-      children: cards.map((c) => _StatCard(data: c, style: style)).toList(),
+      children: cards.map((c) => _StatCard(data: c)).toList(),
     );
   }
 }
@@ -1020,8 +1021,7 @@ class _StatCardData {
 
 class _StatCard extends StatefulWidget {
   final _StatCardData data;
-  final AdaptiveStyle style;
-  const _StatCard({required this.data, required this.style});
+  const _StatCard({required this.data});
 
   @override
   State<_StatCard> createState() => _StatCardState();
@@ -1061,9 +1061,9 @@ class _StatCardState extends State<_StatCard>
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: widget.style.card,
+          color: context.colors.card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: widget.style.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1088,15 +1088,16 @@ class _StatCardState extends State<_StatCard>
               children: [
                 Text(
                   widget.data.value,
-                  style: widget.style.naskh(
-                    18,
-                    weight: FontWeight.w700,
+                  style: context.typography.headingMedium.copyWith(
+                    fontWeight: FontWeight.w700,
                     color: widget.data.color,
                   ),
                 ),
                 Text(
                   widget.data.label,
-                  style: widget.style.naskh(10, color: widget.style.textSec),
+                  style: context.typography.caption.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -1112,8 +1113,7 @@ class _StatCardState extends State<_StatCard>
 // ═══════════════════════════════════════════════════════════════
 class _PrayerAttendanceCard extends StatelessWidget {
   final MonthStats stats;
-  final AdaptiveStyle style;
-  const _PrayerAttendanceCard({required this.stats, required this.style});
+  const _PrayerAttendanceCard({required this.stats});
 
   // mock per-prayer data (يُستبدل بـ DAO حقيقي)
   static const _prayerRates = [
@@ -1128,23 +1128,20 @@ class _PrayerAttendanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: style.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: style.border),
-      ),
+      decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('حضور الصلوات', style: style.amiri(20, color: style.gold)),
+          Text(
+            'حضور الصلوات',
+            style: context.typography.headingMedium.copyWith(
+              color: context.colors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 14),
           ..._prayerRates.map(
-            (p) => _PrayerRateRow(
-              name: p.$1,
-              rate: p.$2,
-              emoji: p.$3,
-              style: style,
-            ),
+            (p) => _PrayerRateRow(name: p.$1, rate: p.$2, emoji: p.$3),
           ),
         ],
       ),
@@ -1155,12 +1152,10 @@ class _PrayerAttendanceCard extends StatelessWidget {
 class _PrayerRateRow extends StatefulWidget {
   final String name, emoji;
   final double rate;
-  final AdaptiveStyle style;
   const _PrayerRateRow({
     required this.name,
     required this.rate,
     required this.emoji,
-    required this.style,
   });
 
   @override
@@ -1195,9 +1190,9 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
   }
 
   Color _color(BuildContext context) {
-    if (widget.rate >= 0.9) return widget.style.success;
-    if (widget.rate >= 0.7) return widget.style.gold;
-    return widget.style.danger;
+    if (widget.rate >= 0.9) return context.colors.success;
+    if (widget.rate >= 0.7) return context.colors.gold;
+    return context.colors.danger;
   }
 
   @override
@@ -1212,7 +1207,9 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
             width: 44,
             child: Text(
               widget.name,
-              style: widget.style.naskh(10, color: widget.style.textSec),
+              style: context.typography.bodySmall.copyWith(
+                color: context.colors.textSecondary,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -1223,7 +1220,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
                 borderRadius: BorderRadius.circular(4),
                 child: Stack(
                   children: [
-                    Container(height: 8, color: widget.style.border),
+                    Container(height: 8, color: context.colors.border),
                     FractionallySizedBox(
                       widthFactor: _anim.value,
                       child: Container(
@@ -1257,10 +1254,9 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
               animation: _anim,
               builder: (_, __) => Text(
                 '${(_anim.value * 100).round()}%',
-                style: widget.style.naskh(
-                  10,
+                style: context.typography.bodySmall.copyWith(
                   color: _color(context),
-                  weight: FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.end,
               ),
@@ -1276,16 +1272,13 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
 //  ACHIEVEMENTS SECTION
 // ═══════════════════════════════════════════════════════════════
 class _AchievementsSection extends ConsumerWidget {
-  final AdaptiveStyle style;
-  const _AchievementsSection({required this.style});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allAsync = ref.watch(_allAchievementsProvider);
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: style.cardDeco,
+      decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1293,7 +1286,10 @@ class _AchievementsSection extends ConsumerWidget {
             children: [
               Text(
                 'الإنجازات والشارات',
-                style: style.amiri(20, color: style.gold),
+                style: context.typography.headingMedium.copyWith(
+                  color: context.colors.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const Spacer(),
               allAsync.when(
@@ -1301,7 +1297,9 @@ class _AchievementsSection extends ConsumerWidget {
                 error: (_, __) => const SizedBox(),
                 data: (list) => Text(
                   '${list.length} إنجاز',
-                  style: style.naskh(11, color: style.textSec.withOpacity(0.5)),
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.textDim,
+                  ),
                 ),
               ),
             ],
@@ -1311,7 +1309,7 @@ class _AchievementsSection extends ConsumerWidget {
           allAsync.when(
             loading: () => Center(
               child: CircularProgressIndicator(
-                color: style.gold,
+                color: context.colors.gold,
                 strokeWidth: 2,
               ),
             ),
@@ -1322,16 +1320,13 @@ class _AchievementsSection extends ConsumerWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: list
-                        .map(
-                          (a) =>
-                              _AchievementBadge(achievement: a, style: style),
-                        )
+                        .map((a) => _AchievementBadge(achievement: a))
                         .toList(),
                   ),
           ),
 
           const SizedBox(height: 14),
-          _LockedAchievementsRow(style: style),
+          _LockedAchievementsRow(),
         ],
       ),
     );
@@ -1340,8 +1335,7 @@ class _AchievementsSection extends ConsumerWidget {
 
 class _AchievementBadge extends ConsumerWidget {
   final Achievement achievement;
-  final AdaptiveStyle style;
-  const _AchievementBadge({required this.achievement, required this.style});
+  const _AchievementBadge({required this.achievement});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1351,10 +1345,10 @@ class _AchievementBadge extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [style.gold.withOpacity(0.12), Colors.transparent],
+            colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
           ),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: style.gold.withOpacity(0.25)),
+          border: Border.all(color: context.colors.gold.withOpacity(0.25)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1367,15 +1361,16 @@ class _AchievementBadge extends ConsumerWidget {
               children: [
                 Text(
                   achievement.titleAr,
-                  style: style.naskh(
-                    12,
-                    color: style.gold,
-                    weight: FontWeight.w600,
+                  style: context.typography.bodySmall.copyWith(
+                    color: context.colors.gold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
                   '+${achievement.pointsReward} نقطة',
-                  style: style.naskh(10, color: style.textSec.withOpacity(0.5)),
+                  style: context.typography.caption.copyWith(
+                    color: context.colors.textDim,
+                  ),
                 ),
               ],
             ),
@@ -1395,25 +1390,23 @@ class _AchievementBadge extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (_) =>
-          _AchievementDialog(achievement: achievement, style: style),
+      builder: (_) => _AchievementDialog(achievement: achievement),
     );
   }
 }
 
 class _AchievementDialog extends StatelessWidget {
   final Achievement achievement;
-  final AdaptiveStyle style;
-  const _AchievementDialog({required this.achievement, required this.style});
+  const _AchievementDialog({required this.achievement});
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: style.card,
+      backgroundColor: context.colors.card,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: style.border),
+        side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -1424,28 +1417,34 @@ class _AchievementDialog extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               achievement.titleAr,
-              style: style.amiri(20, color: style.gold),
+              style: context.typography.headingMedium.copyWith(
+                fontSize: 20,
+                color: context.colors.gold,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               achievement.descAr,
               textAlign: TextAlign.center,
-              style: style.naskh(14, color: style.textSec),
+              style: context.typography.bodyMedium.copyWith(
+                color: context.colors.textSecondary,
+                height: 1.7,
+              ),
             ),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: style.gold.withOpacity(0.1),
+                color: context.colors.gold.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: style.gold.withOpacity(0.2)),
+                border: Border.all(color: context.colors.gold.withOpacity(0.2)),
               ),
               child: Text(
                 '+${achievement.pointsReward} نقطة مكافأة 🌟',
-                style: style.naskh(
-                  11,
-                  color: style.gold,
-                  weight: FontWeight.w600,
+                style: context.typography.caption.copyWith(
+                  color: context.colors.gold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -1503,8 +1502,6 @@ class _EmptyAchievements extends StatelessWidget {
 
 // إنجازات مقفلة
 class _LockedAchievementsRow extends StatelessWidget {
-  final AdaptiveStyle style;
-  const _LockedAchievementsRow({required this.style});
   static const _locked = [
     ('streak_30', '🌙', 'شهر المجاهد', '٣٠ يوم متواصل'),
     ('quran_khatma', '📖', 'ختمة كاملة', 'إتمام القرآن'),
@@ -1520,14 +1517,18 @@ class _LockedAchievementsRow extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
             children: [
-              Container(width: 24, height: 1, color: style.border),
+              Container(width: 24, height: 1, color: context.colors.border),
               const SizedBox(width: 8),
               Text(
                 'قادم قريباً 🔒',
-                style: style.naskh(10, color: style.textSec.withOpacity(0.5)),
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textDim,
+                ),
               ),
               const SizedBox(width: 8),
-              Expanded(child: Container(height: 1, color: style.border)),
+              Expanded(
+                child: Container(height: 1, color: context.colors.border),
+              ),
             ],
           ),
         ),
@@ -1544,9 +1545,9 @@ class _LockedAchievementsRow extends StatelessWidget {
                       vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: style.card,
+                      color: context.colors.card2,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: style.border),
+                      border: Border.all(color: context.colors.border),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1559,13 +1560,14 @@ class _LockedAchievementsRow extends StatelessWidget {
                           children: [
                             Text(
                               l.$3,
-                              style: style.naskh(11, color: style.textSec),
+                              style: context.typography.bodySmall.copyWith(
+                                color: context.colors.textSecondary,
+                              ),
                             ),
                             Text(
                               l.$4,
-                              style: style.naskh(
-                                9,
-                                color: style.textSec.withOpacity(0.5),
+                              style: context.typography.caption.copyWith(
+                                color: context.colors.textDim,
                               ),
                             ),
                           ],
