@@ -13,6 +13,7 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/checklist/checklist_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
+import '../features/asma/presentation/screens/asma_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
 
@@ -20,14 +21,6 @@ import '../app/animated_drawer.dart';
 //  CURRENT TAB PROVIDER
 // ─────────────────────────────────────────
 final _currentTabProvider = StateProvider<int>((ref) => 0);
-
-// ─────────────────────────────────────────
-//  ONBOARDING CHECK
-// ─────────────────────────────────────────
-final onboardingDoneProvider = FutureProvider<bool>((ref) async {
-  final v = await ref.watch(settingsDaoProvider).get('onboardingDone');
-  return v == 'true';
-});
 
 // ─────────────────────────────────────────
 //  APP SHELL
@@ -49,7 +42,8 @@ class _MainShellState extends ConsumerState<MainShell>
     _TabInfo('🏠', 'الرئيسية', 0),
     _TabInfo('✅', 'المحاسبة', 1),
     _TabInfo('📊', 'إحصائيات', 2),
-    _TabInfo('⚙️', 'الإعدادات', 3),
+    _TabInfo('✨', 'أسماء الله', 3),
+    _TabInfo('⚙️', 'الإعدادات', 4),
   ];
 
   @override
@@ -132,6 +126,7 @@ class _MainShellState extends ConsumerState<MainShell>
             HomeScreen(),
             ChecklistScreen(),
             StatisticsScreen(),
+            AsmaScreen(),
             SettingsScreen(),
           ],
           onPageChanged: (idx) {

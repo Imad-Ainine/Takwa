@@ -8,7 +8,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:muhasabah/core/notifications/notifications_service.dart';
 import 'package:muhasabah/core/theme/app_theme.dart';
@@ -16,6 +15,7 @@ import 'package:muhasabah/core/theme/ramadan_theme.dart';
 import 'package:muhasabah/core/providers/theme_provider.dart';
 import 'package:muhasabah/core/providers/database_providers.dart';
 import 'package:muhasabah/core/routes/app_routes.dart';
+import 'package:muhasabah/core/supabase/supabase_config.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
@@ -28,10 +28,8 @@ void main() async {
   await dotenv.load(fileName: ".env");
   await initializeDateFormatting('ar', null);
 
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+  // تهيئة Supabase
+  await SupabaseConfig.initialize();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

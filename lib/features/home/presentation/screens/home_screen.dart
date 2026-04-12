@@ -838,17 +838,36 @@ class _TaqwaSectionMerged extends StatelessWidget {
                   style: s.naskh(11, color: s.textSec),
                 ),
                 const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: s.goldDim,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: s.gold.withOpacity(0.2)),
-                  ),
-                  child: Text(_level(net), style: s.naskh(11, color: s.gold)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: s.goldDim,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: s.gold.withOpacity(0.2)),
+                      ),
+                      child: Text(_level(net), style: s.naskh(11, color: s.gold)),
+                    ),
+                    const SizedBox(width: 8),
+                    InkWell(
+                      onTap: () => Navigator.pushNamed(context, '/achievements'),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: s.gold.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.emoji_events_outlined,
+                            size: 16, color: s.gold),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 6),
                 streakAsync.when(

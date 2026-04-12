@@ -60,3 +60,9 @@ final ramadanModeProvider = StreamProvider<bool>((ref) {
       .watch('ramadanMode')
       .map((v) => v == 'true');
 });
+
+// ── فحص إكمال التهيئة ──
+final onboardingDoneProvider = FutureProvider<bool>((ref) async {
+  final v = await ref.watch(settingsDaoProvider).get('onboardingDone');
+  return v == 'true';
+});

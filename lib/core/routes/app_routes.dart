@@ -7,6 +7,9 @@ import 'package:muhasabah/features/adhkar/adhkar _screen.dart';
 import 'package:muhasabah/features/settings/presentation/screens/about_me_screen.dart';
 import 'package:muhasabah/features/qibla/presentation/screens/qibla_screen.dart';
 import 'package:muhasabah/features/duas/presentation/screens/duas_screen.dart';
+import 'package:muhasabah/features/asma/presentation/screens/asma_screen.dart';
+import 'package:muhasabah/features/auth/presentation/screens/auth_screen.dart';
+import 'package:muhasabah/features/achievements/presentation/screens/achievements_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -21,6 +24,9 @@ class Routes {
   static const String adhkar = '/adhkar';
   static const String qibla = '/qibla';
   static const String duas = '/duas';
+  static const String asma = '/asma';
+  static const String auth = '/auth';
+  static const String achievements = '/achievements';
 }
 
 /// Centralized route generation and management.
@@ -33,11 +39,17 @@ class AppRoutes {
       case Routes.home:
         return MaterialPageRoute(builder: (_) => const MainShell());
       case Routes.checklist:
-        return MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 1));
+        return MaterialPageRoute(
+          builder: (_) => const MainShell(initialIndex: 1),
+        );
       case Routes.statistics:
-        return MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 2));
+        return MaterialPageRoute(
+          builder: (_) => const MainShell(initialIndex: 2),
+        );
       case Routes.settings:
-        return MaterialPageRoute(builder: (_) => const MainShell(initialIndex: 3));
+        return MaterialPageRoute(
+          builder: (_) => const MainShell(initialIndex: 3),
+        );
       case Routes.aboutMe:
         return MaterialPageRoute(builder: (_) => const AboutMeScreen());
       case Routes.onboarding:
@@ -54,10 +66,17 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const QiblaScreen());
       case Routes.duas:
         return MaterialPageRoute(builder: (_) => const DuasScreen());
+      case Routes.asma:
+        return MaterialPageRoute(builder: (_) => const AsmaScreen());
+      case Routes.auth:
+        return MaterialPageRoute(builder: (_) => const AuthScreen());
+      case Routes.achievements:
+        return MaterialPageRoute(builder: (_) => const AchievementsScreen());
       default:
-        return MaterialPageRoute(builder: (_) => const Scaffold(
-          body: Center(child: Text('Route not found')),
-        ));
+        return MaterialPageRoute(
+          builder: (_) =>
+              const Scaffold(body: Center(child: Text('Route not found'))),
+        );
     }
   }
 }

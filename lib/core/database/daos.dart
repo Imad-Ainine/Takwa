@@ -400,25 +400,60 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   Future<List<Achievement>> checkAndGrantAchievements() async {
     final newAchievements = <Achievement>[];
     final streak = await getCurrentStreak();
+    final now = DateTime.now();
 
+    // 1. Streaks
     if (streak >= 3) {
-      await _tryGrant(
-          'streak_3', '٣ أيام متواصلة', 'حافظت على المحاسبة ٣ أيام', '🌱', 20);
+      await _tryGrant('streak_3', 'البداية الطيبة',
+          'حافظت على المحاسبة لثلاثة أيام متواصلة', '🌱', 20);
     }
     if (streak >= 7) {
       await _tryGrant(
-          'streak_7', 'أسبوع كامل', 'سبعة أيام بلا انقطاع', '🌿', 50);
+          'streak_7', 'الأسبوع المثالي', 'سبعة أيام من الالتزام والمحاسبة', '🌿', 50);
     }
     if (streak >= 30) {
       await _tryGrant(
-          'streak_30', 'شهر المجاهد', 'ثلاثون يومًا متواصلة', '⚔️', 200);
+          'streak_30', 'المجاهد المثابر', 'ثلاثون يوماً من مراقبة النفس والتقوى', '⚔️', 200);
     }
 
-    final quranPages =
-        await getMonthlyQuranPages(DateTime.now().year, DateTime.now().month);
+    // 2. Quran
+    final quranPages = await getMonthlyQuranPages(now.year, now.month);
     if (quranPages >= 30) {
       await _tryGrant(
-          'quran_juz', 'جزء كامل', 'ختمت جزءًا كاملًا هذا الشهر', '📖', 100);
+          'quran_juz', 'أهل القرآن', 'ختمت جزءاً كاملاً من كتاب الله', '📖', 100);
+    }
+
+    // 3. Today's tasks (Dynamic)
+    final todayDate = DateTime(now.year, now.month, now.day);
+    final today = await (select(dailyRecords)..where((r) => r.date.equals(todayDate)))
+        .getSingleOrNull();
+
+    if (today != null) {
+      if (today.netPoints > 0) {
+        await _tryGrant('daily_muhasaba', 'المحاسب المجتهد',
+            'أكملت محاسبة النفس لهذا اليوم', '📝', 10);
+      }
+      if (today.morningAdhkar) {
+        await _tryGrant('morning_adhkar', 'نور الصباح',
+            'أكملت أذكار الصباح بالكامل', '🌅', 5);
+      }
+      if (today.eveningAdhkar) {
+        await _tryGrant('evening_adhkar', 'تحصين المساء',
+            'أكملت أذكار المساء بالكامل', '🌙', 5);
+      }
+      if (today.sadaqah) {
+        await _tryGrant('first_sadaqah', 'اليد المعطية',
+            'أخرجت أول صدقة لك عبر التطبيق', '💰', 30);
+      }
+    }
+
+    // 4. Points Milestones
+    final totalPoints = await getMonthlyPoints(now.year, now.month);
+    if (totalPoints >= 100) {
+      await _tryGrant('points_100', 'مئة خطوة', 'جمعت أول 100 نقطة تقوى', '🎖️', 50);
+    }
+    if (totalPoints >= 3000) {
+       await _tryGrant('points_1000', 'فارس التقوى', 'بلغت 1000 نقطة في مسيرتك', '🏆', 500);
     }
 
     return newAchievements;

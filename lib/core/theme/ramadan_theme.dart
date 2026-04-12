@@ -660,15 +660,17 @@ class AdaptiveStyle {
   Color get border => _colors.border;
   Color get text => _colors.textPrimary;
   Color get textSec => _colors.textSecondary;
+  Color get textDim => _colors.textDim;
 
   BoxDecoration get cardDeco => _decorations.card;
   BoxDecoration get heroDeco => _decorations.goldCard;
 
-  TextStyle amiri(double size, {Color? color, FontWeight? weight}) =>
+  TextStyle amiri(double size, {Color? color, FontWeight? weight, double? height}) =>
       GoogleFonts.amiri(
         fontSize: size,
         color: color ?? gold,
         fontWeight: weight ?? FontWeight.w700,
+        height: height,
         shadows: isRamadan
             ? [
                 Shadow(
@@ -679,11 +681,12 @@ class AdaptiveStyle {
             : null,
       );
 
-  TextStyle naskh(double size, {Color? color, FontWeight? weight}) =>
+  TextStyle naskh(double size, {Color? color, FontWeight? weight, double? height}) =>
       GoogleFonts.notoNaskhArabic(
         fontSize: size,
         color: color ?? (size < 12 ? textSec : text),
         fontWeight: weight ?? FontWeight.w400,
+        height: height,
       );
 }
 
