@@ -6,11 +6,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:muhasabah/core/providers/adhkar_providers.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR SCREEN

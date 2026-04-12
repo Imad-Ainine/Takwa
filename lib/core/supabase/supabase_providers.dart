@@ -31,6 +31,19 @@ final connectivityProvider = StreamProvider<bool>((ref) async* {
   }
 });
 
+/// Fetches the user's profile information (username, avatar, etc.)
+final userProfileProvider = StreamProvider<Map<String, dynamic>?>((ref) {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return Stream.value(null);
+
+  // Return a stream of the profile for the current user
+  return SupabaseConfig.client
+      .from('profiles')
+      .stream(primaryKey: ['id'])
+      .eq('id', user.id)
+      .map((list) => list.isNotEmpty ? list.first : null);
+});
+
 // Remote Data Streams
 final remoteStatsProvider = StreamProvider<Map<String, dynamic>?>((ref) {
   final uid = ref.watch(currentUserProvider)?.id;

@@ -11,14 +11,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
-import 'package:muhasabah/app/animated_drawer.dart';
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
-import 'package:muhasabah/core/database/app_database.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/providers/adhkar_providers.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
-import 'package:muhasabah/core/widgets/adhkar_overlay_notification.dart';
-import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
+import 'package:takwa/app/animated_drawer.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/adhkar_overlay_notification.dart';
+import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  HOME SCREEN
@@ -851,11 +851,15 @@ class _TaqwaSectionMerged extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: s.gold.withOpacity(0.2)),
                       ),
-                      child: Text(_level(net), style: s.naskh(11, color: s.gold)),
+                      child: Text(
+                        _level(net),
+                        style: s.naskh(11, color: s.gold),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     InkWell(
-                      onTap: () => Navigator.pushNamed(context, '/achievements'),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/achievements'),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         padding: const EdgeInsets.all(6),
@@ -863,8 +867,11 @@ class _TaqwaSectionMerged extends StatelessWidget {
                           color: s.gold.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(Icons.emoji_events_outlined,
-                            size: 16, color: s.gold),
+                        child: Icon(
+                          Icons.emoji_events_outlined,
+                          size: 16,
+                          color: s.gold,
+                        ),
                       ),
                     ),
                   ],

@@ -1,4 +1,4 @@
-package com.muhasabah
+package com.takwa
 
 import io.flutter.embedding.android.FlutterActivity
 

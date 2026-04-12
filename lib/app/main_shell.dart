@@ -16,6 +16,8 @@ import '../features/settings/presentation/screens/settings_screen.dart';
 import '../features/asma/presentation/screens/asma_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
+import '../core/providers/auth_providers.dart';
+import '../features/auth/presentation/pages/auth_choice_screen.dart';
 
 // ─────────────────────────────────────────
 //  CURRENT TAB PROVIDER
@@ -105,9 +107,15 @@ class _MainShellState extends ConsumerState<MainShell>
       error: (_, __) => const _SplashScreen(),
       data: (done) {
         if (!done) {
-          // SAFE WAY: Returns OnboardingScreen without an imperative Push inside build!
           return const OnboardingScreen();
         }
+
+        // Check Auth Status
+        final authStatus = ref.watch(authStatusProvider);
+        if (authStatus == AuthStatus.unauthenticated) {
+          return const AuthChoiceScreen();
+        }
+
         return _buildShell();
       },
     );
@@ -342,7 +350,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'محاسبة النفس',
+                  'تقوى',
                   style: context.typography.displayMedium.copyWith(
                     fontSize: 32,
                     color: context.colors.gold,

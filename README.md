@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌙 محاسبة النفس — Muhasabah
+# 🌙 تقوى — Takwa
 
 **A premium Islamic self-accountability app built with Flutter**
 

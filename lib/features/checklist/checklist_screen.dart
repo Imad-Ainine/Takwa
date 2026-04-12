@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/checklist/checklist_screen.dart
-//  محاسبة النفس — Daily Checklist (قائمة المحاسبة اليومية)
+//  تقوى — Daily Checklist (قائمة المحاسبة اليومية)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:drift/drift.dart' show Value;
@@ -10,10 +10,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:hijri/hijri_calendar.dart';
 
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
-import 'package:muhasabah/core/database/app_database.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/widgets/guest_mode_guard.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  CHECKLIST SCREEN
@@ -113,7 +114,8 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
                   ),
                 ),
               ),
-              data: (record) => _buildBody(context, record, hijriStr),
+              data: (record) =>
+                  GuestModeGuard(child: _buildBody(context, record, hijriStr)),
             ),
           ],
         ),
@@ -1682,4 +1684,3 @@ class _MiniPts extends StatelessWidget {
     ),
   );
 }
-

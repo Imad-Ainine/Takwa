@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:muhasabah/features/splash/splash_screen.dart';
-import 'package:muhasabah/app/main_shell.dart';
-import 'package:muhasabah/features/onboarding/onboarding_screen.dart';
-import 'package:muhasabah/features/prayer/presentation/screens/prayer_screen.dart';
-import 'package:muhasabah/features/adhkar/adhkar _screen.dart';
-import 'package:muhasabah/features/settings/presentation/screens/about_me_screen.dart';
-import 'package:muhasabah/features/qibla/presentation/screens/qibla_screen.dart';
-import 'package:muhasabah/features/duas/presentation/screens/duas_screen.dart';
-import 'package:muhasabah/features/asma/presentation/screens/asma_screen.dart';
-import 'package:muhasabah/features/auth/presentation/screens/auth_screen.dart';
-import 'package:muhasabah/features/achievements/presentation/screens/achievements_screen.dart';
+import 'package:takwa/features/asma/presentation/screens/asma_screen.dart';
+import 'package:takwa/features/splash/splash_screen.dart';
+import 'package:takwa/app/main_shell.dart';
+import 'package:takwa/features/onboarding/onboarding_screen.dart';
+import 'package:takwa/features/auth/presentation/pages/auth_choice_screen.dart';
+import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
+import 'package:takwa/features/adhkar/adhkar _screen.dart';
+import 'package:takwa/features/settings/presentation/screens/about_me_screen.dart';
+import 'package:takwa/features/qibla/presentation/screens/qibla_screen.dart';
+import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
+import 'package:takwa/features/auth/presentation/screens/auth_screen.dart';
+import 'package:takwa/features/achievements/presentation/screens/achievements_screen.dart';
+import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -27,6 +29,8 @@ class Routes {
   static const String asma = '/asma';
   static const String auth = '/auth';
   static const String achievements = '/achievements';
+  static const String authChoice = '/auth-choice';
+  static const String profile = '/profile';
 }
 
 /// Centralized route generation and management.
@@ -72,6 +76,10 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const AuthScreen());
       case Routes.achievements:
         return MaterialPageRoute(builder: (_) => const AchievementsScreen());
+      case Routes.authChoice:
+        return MaterialPageRoute(builder: (_) => const AuthChoiceScreen());
+      case Routes.profile:
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(
           builder: (_) =>

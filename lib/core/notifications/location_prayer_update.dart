@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:adhan/adhan.dart' as adhan;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 
@@ -151,7 +151,8 @@ class LocationPrayerManager {
         final placemarks = await placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
-          cityName = '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
+          cityName =
+              '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
           if (cityName.startsWith(', ')) cityName = cityName.substring(2);
         }
       } catch (_) {}

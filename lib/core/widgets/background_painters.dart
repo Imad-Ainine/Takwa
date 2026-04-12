@@ -217,3 +217,44 @@ class AdhkarBgPainter extends CustomPainter {
   bool shouldRepaint(covariant AdhkarBgPainter o) =>
       o.nightColor != nightColor || o.goldColor != goldColor;
 }
+
+// ── Asma Pattern (Geometric Octagons) ──
+class AsmaBgPainter extends CustomPainter {
+  final Color goldColor;
+  final double blur;
+  AsmaBgPainter({required this.goldColor, this.blur = 0.0});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = goldColor.withOpacity(0.045)
+      ..strokeWidth = 0.6
+      ..style = PaintingStyle.stroke;
+
+    if (blur > 0) {
+      p.maskFilter = MaskFilter.blur(BlurStyle.normal, blur);
+    }
+
+    const s = 58.0;
+    for (double x = 0; x < size.width + s; x += s) {
+      for (double y = 0; y < size.height + s; y += s) {
+        _drawOctagon(canvas, Offset(x, y), s * 0.38, p);
+      }
+    }
+  }
+
+  void _drawOctagon(Canvas canvas, Offset c, double r, Paint p) {
+    final path = Path();
+    for (int i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+      final x = c.dx + r * math.cos(angle);
+      final y = c.dy + r * math.sin(angle);
+      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
+    }
+    path.close();
+    canvas.drawPath(path, p);
+  }
+
+  @override
+  bool shouldRepaint(covariant AsmaBgPainter o) => o.goldColor != goldColor;
+}

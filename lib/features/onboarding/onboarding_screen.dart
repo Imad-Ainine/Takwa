@@ -32,11 +32,7 @@ class OnboardState {
   final String? gender;
   final bool loading;
 
-  OnboardState({
-    required this.step,
-    this.gender,
-    this.loading = false,
-  });
+  OnboardState({required this.step, this.gender, this.loading = false});
 
   OnboardState copyWith({OnboardStep? step, String? gender, bool? loading}) {
     return OnboardState(
@@ -72,8 +68,9 @@ class OnboardNotifier extends StateNotifier<OnboardState> {
   }
 }
 
-final onboardProvider =
-    StateNotifierProvider<OnboardNotifier, OnboardState>((ref) {
+final onboardProvider = StateNotifierProvider<OnboardNotifier, OnboardState>((
+  ref,
+) {
   return OnboardNotifier();
 });
 
@@ -120,23 +117,18 @@ class OnboardingScreen extends ConsumerWidget {
       step == OnboardStep.intro2 ||
       step == OnboardStep.intro3;
 
-  Widget _buildStep(OnboardState state, OnboardNotifier notifier, WidgetRef ref) {
+  Widget _buildStep(
+    OnboardState state,
+    OnboardNotifier notifier,
+    WidgetRef ref,
+  ) {
     switch (state.step) {
       case OnboardStep.intro1:
-        return _IntroStep(
-          data: _onboardPages[0],
-          onNext: notifier.next,
-        );
+        return _IntroStep(data: _onboardPages[0], onNext: notifier.next);
       case OnboardStep.intro2:
-        return _IntroStep(
-          data: _onboardPages[1],
-          onNext: notifier.next,
-        );
+        return _IntroStep(data: _onboardPages[1], onNext: notifier.next);
       case OnboardStep.intro3:
-        return _IntroStep(
-          data: _onboardPages[2],
-          onNext: notifier.next,
-        );
+        return _IntroStep(data: _onboardPages[2], onNext: notifier.next);
       case OnboardStep.location:
         return _LocationStep(
           onAllow: () async {
@@ -213,7 +205,7 @@ class _StepIndicator extends StatelessWidget {
                         BoxShadow(
                           color: AppColors.gold.withOpacity(0.4),
                           blurRadius: 8,
-                        )
+                        ),
                       ]
                     : null,
               ),
@@ -240,10 +232,7 @@ class _IntroStep extends StatelessWidget {
           const SizedBox(height: 60),
           Expanded(
             child: Center(
-              child: Text(
-                data.emoji,
-                style: const TextStyle(fontSize: 100),
-              ),
+              child: Text(data.emoji, style: const TextStyle(fontSize: 100)),
             ),
           ),
           _InfoCard(
@@ -308,7 +297,8 @@ class _LocationStep extends StatelessWidget {
           _InfoCard(
             title: 'تحديد الموقع',
             titleColor: AppColors.gold,
-            subtitle: 'نحتاج لموقعك لنحدد لك أوقات الصلاة واتجاه القبلة بدقة متناهية',
+            subtitle:
+                'نحتاج لموقعك لنحدد لك أوقات الصلاة واتجاه القبلة بدقة متناهية',
             hint: 'بيانات موقعك تبقى في جهازك ولا نطلع عليها أبداً',
             primaryLabel: 'تفعيل الموقع 📍',
             onPrimary: onAllow,
@@ -339,8 +329,9 @@ class _NotificationsStepState extends State<_NotificationsStep>
   void initState() {
     super.initState();
     _bellCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600))
-      ..repeat(min: 0, max: 1, period: const Duration(seconds: 3));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..repeat(min: 0, max: 1, period: const Duration(seconds: 3));
   }
 
   @override
@@ -373,7 +364,8 @@ class _NotificationsStepState extends State<_NotificationsStep>
           _InfoCard(
             title: 'السماح بإرسال التنبيهات',
             titleColor: AppColors.gold,
-            subtitle: 'يمكننا من تذكيرك بالصلاة والأذكار والمحاسبة المسائية والمزيد',
+            subtitle:
+                'يمكننا من تذكيرك بالصلاة والأذكار والمحاسبة المسائية والمزيد',
             hint: 'يمكنك تغيير هذا لاحقًا من الإعدادات',
             primaryLabel: 'السماح بالتنبيهات 🔔',
             primaryIcon: Icons.notifications_active_rounded,
@@ -414,9 +406,10 @@ class _GenderStep extends StatelessWidget {
                 Text(
                   'حدد الجنس',
                   style: GoogleFonts.amiri(
-                      fontSize: 26,
-                      color: AppColors.gold,
-                      fontWeight: FontWeight.w700),
+                    fontSize: 26,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Row(
@@ -443,11 +436,16 @@ class _GenderStep extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.goldDim,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+                      border: Border.all(
+                        color: AppColors.gold.withOpacity(0.2),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -508,9 +506,13 @@ class _GenderCardState extends State<_GenderCard>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
-    _scale = Tween<double>(begin: 0.95, end: 1.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scale = Tween<double>(
+      begin: 0.95,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut));
   }
 
   @override
@@ -560,7 +562,7 @@ class _GenderCardState extends State<_GenderCard>
                       color: AppColors.gold.withOpacity(0.2),
                       blurRadius: 16,
                       spreadRadius: 2,
-                    )
+                    ),
                   ]
                 : null,
           ),
@@ -574,10 +576,12 @@ class _GenderCardState extends State<_GenderCard>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: widget.selected
-                      ? RadialGradient(colors: [
-                          AppColors.gold.withOpacity(0.25),
-                          AppColors.gold.withOpacity(0.05),
-                        ])
+                      ? RadialGradient(
+                          colors: [
+                            AppColors.gold.withOpacity(0.25),
+                            AppColors.gold.withOpacity(0.05),
+                          ],
+                        )
                       : null,
                   color: widget.selected ? null : AppColors.card2,
                   border: Border.all(
@@ -588,7 +592,10 @@ class _GenderCardState extends State<_GenderCard>
                   ),
                 ),
                 child: Center(
-                  child: Text(widget.emoji, style: const TextStyle(fontSize: 36)),
+                  child: Text(
+                    widget.emoji,
+                    style: const TextStyle(fontSize: 36),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -596,7 +603,9 @@ class _GenderCardState extends State<_GenderCard>
                 widget.label,
                 style: GoogleFonts.amiri(
                   fontSize: 18,
-                  color: widget.selected ? AppColors.gold : AppColors.textSecondary,
+                  color: widget.selected
+                      ? AppColors.gold
+                      : AppColors.textSecondary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -609,15 +618,22 @@ class _GenderCardState extends State<_GenderCard>
                   height: 24,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                        colors: [AppColors.gold, AppColors.teal]),
+                      colors: [AppColors.gold, AppColors.teal],
+                    ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                          color: AppColors.gold.withOpacity(0.4), blurRadius: 8)
+                        color: AppColors.gold.withOpacity(0.4),
+                        blurRadius: 8,
+                      ),
                     ],
                   ),
                   child: const Center(
-                    child: Icon(Icons.check_rounded, size: 14, color: AppColors.night),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: AppColors.night,
+                    ),
                   ),
                 ),
               ),
@@ -648,12 +664,17 @@ class _AuthStepState extends State<_AuthStep>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 800))
-      ..forward();
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..forward();
     _anims = List.generate(5, (i) {
       final s = i * 0.1, e = (s + 0.4).clamp(0.0, 1.0);
-      return Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-          parent: _ctrl, curve: Interval(s, e, curve: Curves.easeOut)));
+      return Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(
+          parent: _ctrl,
+          curve: Interval(s, e, curve: Curves.easeOut),
+        ),
+      );
     });
   }
 
@@ -664,18 +685,22 @@ class _AuthStepState extends State<_AuthStep>
   }
 
   Widget _anim(int i, Widget w) => FadeTransition(
-        opacity: _anims[i.clamp(0, 4)],
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 0.1),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
+    opacity: _anims[i.clamp(0, 4)],
+    child: SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+          .animate(
+            CurvedAnimation(
               parent: _ctrl,
-              curve: Interval(i * 0.1, (i * 0.1 + 0.4).clamp(0, 1),
-                  curve: Curves.easeOutCubic))),
-          child: w,
-        ),
-      );
+              curve: Interval(
+                i * 0.1,
+                (i * 0.1 + 0.4).clamp(0, 1),
+                curve: Curves.easeOutCubic,
+              ),
+            ),
+          ),
+      child: w,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -686,110 +711,127 @@ class _AuthStepState extends State<_AuthStep>
           children: [
             const SizedBox(height: 80),
             _anim(
-                0,
-                Center(
-                  child: Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const RadialGradient(
-                          colors: [Color(0x30C8A96E), Color(0x10C8A96E)]),
-                      border: Border.all(
-                          color: AppColors.gold.withOpacity(0.4), width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                            color: AppColors.gold.withOpacity(0.2), blurRadius: 20)
-                      ],
-                    ),
-                    child: const Center(
-                        child: Text('🌙', style: TextStyle(fontSize: 38))),
-                  ),
-                )),
-            const SizedBox(height: 20),
-            _anim(
-                1,
-                Column(
-                  children: [
-                    Text(
-                      'محاسبة النفس',
-                      style: GoogleFonts.amiri(
-                          fontSize: 28,
-                          color: AppColors.gold,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'سجّل دخولك لحفظ بياناتك ومزامنتها',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 13, color: AppColors.textSecondary),
-                    ),
-                  ],
-                )),
-            const SizedBox(height: 16),
-            _anim(
-                2,
-                Container(
-                  padding: const EdgeInsets.all(14),
+              0,
+              Center(
+                child: Container(
+                  width: 90,
+                  height: 90,
                   decoration: BoxDecoration(
-                    color: AppColors.card,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: const Column(
-                    children: [
-                      _BenefitRow('💾', 'حفظ بياناتك وتقدمك'),
-                      SizedBox(height: 8),
-                      _BenefitRow('🏆', 'التنافس مع المسلمين حول العالم'),
-                      SizedBox(height: 8),
-                      _BenefitRow('📊', 'إحصائيات مفصلة ومتقدمة'),
-                      SizedBox(height: 8),
-                      _BenefitRow('🌙', 'مزامنة تلقائية بين أجهزتك'),
+                    shape: BoxShape.circle,
+                    gradient: const RadialGradient(
+                      colors: [Color(0x30C8A96E), Color(0x10C8A96E)],
+                    ),
+                    border: Border.all(
+                      color: AppColors.gold.withOpacity(0.4),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.gold.withOpacity(0.2),
+                        blurRadius: 20,
+                      ),
                     ],
                   ),
-                )),
-            const Spacer(),
+                  child: const Center(
+                    child: Text('🌙', style: TextStyle(fontSize: 38)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             _anim(
-                3,
-                Column(
-                  children: [
-                    _SocialAuthBtn(
-                      icon: '🔵',
-                      label: 'تسجيل الدخول بـ Facebook',
-                      gradient: const LinearGradient(
-                          colors: [Color(0xFF1877F2), Color(0xFF0D65E0)]),
-                      onTap: () => widget.onAuth('facebook'),
-                    ),
-                    const SizedBox(height: 10),
-                    _SocialAuthBtn(
-                      icon: '🔴',
-                      label: 'تسجيل الدخول بـ Google',
-                      isOutline: true,
-                      onTap: () => widget.onAuth('google'),
-                    ),
-                    const SizedBox(height: 10),
-                    _SocialAuthBtn(
-                      icon: '📧',
-                      label: 'تسجيل بالبريد الإلكتروني',
-                      isOutline: true,
-                      onTap: () => widget.onAuth('email'),
-                    ),
-                  ],
-                )),
-            _anim(
-                4,
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: GestureDetector(
-                    onTap: widget.onSkip,
-                    child: Text(
-                      'متابعة بدون حساب',
-                      style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 13, color: AppColors.textDim),
+              1,
+              Column(
+                children: [
+                  Text(
+                    'محاسبة النفس',
+                    style: GoogleFonts.amiri(
+                      fontSize: 28,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                )),
+                  const SizedBox(height: 6),
+                  Text(
+                    'سجّل دخولك لحفظ بياناتك ومزامنتها',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.notoNaskhArabic(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _anim(
+              2,
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.card,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Column(
+                  children: [
+                    _BenefitRow('💾', 'حفظ بياناتك وتقدمك'),
+                    SizedBox(height: 8),
+                    _BenefitRow('🏆', 'التنافس مع المسلمين حول العالم'),
+                    SizedBox(height: 8),
+                    _BenefitRow('📊', 'إحصائيات مفصلة ومتقدمة'),
+                    SizedBox(height: 8),
+                    _BenefitRow('🌙', 'مزامنة تلقائية بين أجهزتك'),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
+            _anim(
+              3,
+              Column(
+                children: [
+                  _SocialAuthBtn(
+                    icon: '🔵',
+                    label: 'تسجيل الدخول بـ Facebook',
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1877F2), Color(0xFF0D65E0)],
+                    ),
+                    onTap: () => widget.onAuth('facebook'),
+                  ),
+                  const SizedBox(height: 10),
+                  _SocialAuthBtn(
+                    icon: '🔴',
+                    label: 'تسجيل الدخول بـ Google',
+                    isOutline: true,
+                    onTap: () => widget.onAuth('google'),
+                  ),
+                  const SizedBox(height: 10),
+                  _SocialAuthBtn(
+                    icon: '📧',
+                    label: 'تسجيل بالبريد الإلكتروني',
+                    isOutline: true,
+                    onTap: () => widget.onAuth('email'),
+                  ),
+                ],
+              ),
+            ),
+            _anim(
+              4,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: GestureDetector(
+                  onTap: widget.onSkip,
+                  child: Text(
+                    'متابعة بدون حساب',
+                    style: GoogleFonts.notoNaskhArabic(
+                      fontSize: 13,
+                      color: AppColors.textDim,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -803,17 +845,24 @@ class _BenefitRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 10),
-          Text(label,
-              style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 13, color: AppColors.textPrimary)),
-          const Spacer(),
-          const Icon(Icons.check_circle_rounded,
-              size: 16, color: AppColors.success),
-        ],
-      );
+    children: [
+      Text(icon, style: const TextStyle(fontSize: 16)),
+      const SizedBox(width: 10),
+      Text(
+        label,
+        style: GoogleFonts.notoNaskhArabic(
+          fontSize: 13,
+          color: AppColors.textPrimary,
+        ),
+      ),
+      const Spacer(),
+      const Icon(
+        Icons.check_circle_rounded,
+        size: 16,
+        color: AppColors.success,
+      ),
+    ],
+  );
 }
 
 class _SocialAuthBtn extends StatelessWidget {
@@ -832,43 +881,49 @@ class _SocialAuthBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: isOutline ? null : gradient,
-            color: isOutline ? Colors.transparent : null,
-            borderRadius: BorderRadius.circular(14),
-            border: isOutline
-                ? Border.all(color: AppColors.border, width: 1.5)
-                : null,
-            boxShadow: !isOutline
-                ? [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3))
-                  ]
-                : null,
+    onTap: () {
+      HapticFeedback.selectionClick();
+      onTap();
+    },
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+      decoration: BoxDecoration(
+        gradient: isOutline ? null : gradient,
+        color: isOutline ? Colors.transparent : null,
+        borderRadius: BorderRadius.circular(14),
+        border: isOutline
+            ? Border.all(color: AppColors.border, width: 1.5)
+            : null,
+        boxShadow: !isOutline
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
+      ),
+      child: Row(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 20)),
+          Expanded(
+            child: Center(
+              child: Text(
+                label,
+                style: GoogleFonts.notoNaskhArabic(
+                  fontSize: 13,
+                  color: isOutline ? AppColors.textPrimary : Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
-          child: Row(
-            children: [
-              Text(icon, style: const TextStyle(fontSize: 20)),
-              Expanded(
-                  child: Center(
-                      child: Text(label,
-                          style: GoogleFonts.notoNaskhArabic(
-                              fontSize: 13,
-                              color: isOutline ? AppColors.textPrimary : Colors.white,
-                              fontWeight: FontWeight.w600)))),
-            ],
-          ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }
 
 // ── STEP 5: Plan ──
@@ -889,8 +944,9 @@ class _PlanStepState extends State<_PlanStep>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 900))
-      ..forward();
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..forward();
   }
 
   @override
@@ -908,7 +964,10 @@ class _PlanStepState extends State<_PlanStep>
           children: [
             const SizedBox(height: 72),
             FadeTransition(
-              opacity: CurvedAnimation(parent: _ctrl, curve: const Interval(0, 0.5)),
+              opacity: CurvedAnimation(
+                parent: _ctrl,
+                curve: const Interval(0, 0.5),
+              ),
               child: Center(
                 child: SizedBox(
                   width: 200,
@@ -919,73 +978,86 @@ class _PlanStepState extends State<_PlanStep>
             ),
             const SizedBox(height: 16),
             FadeTransition(
-              opacity:
-                  CurvedAnimation(parent: _ctrl, curve: const Interval(0.2, 0.7)),
+              opacity: CurvedAnimation(
+                parent: _ctrl,
+                curve: const Interval(0.2, 0.7),
+              ),
               child: Column(
                 children: [
                   Text(
                     'اختر خطتك',
                     style: GoogleFonts.amiri(
-                        fontSize: 26,
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700),
+                      fontSize: 26,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'انضم إلى عائلة محاسبة النفس',
                     style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 13, color: AppColors.textSecondary),
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             Expanded(
-                child: FadeTransition(
-              opacity:
-                  CurvedAnimation(parent: _ctrl, curve: const Interval(0.3, 0.9)),
-              child: Column(
-                children: [
-                  _PlanCard(
-                    id: 'premium',
-                    title: 'محاسبة النفس ⭐ Premium',
-                    desc: 'بلا إعلانات + إحصائيات متقدمة + مزامنة سحابية + دعم أولوي',
-                    badge: 'الأفضل',
-                    badgeColor: AppColors.gold,
-                    price: '99 دج / شهر',
-                    features: const [
-                      'بلا إعلانات نهائياً',
-                      'إحصائيات متقدمة ورسوم بيانية',
-                      'مزامنة سحابية تلقائية',
-                      'تذكيرات مخصصة لا نهاية لها',
-                      'أولوية في الدعم الفني',
-                    ],
-                    selected: _selected == 'premium',
-                    onTap: () => setState(() => _selected = 'premium'),
-                  ),
-                  const SizedBox(height: 10),
-                  _PlanCard(
-                    id: 'free',
-                    title: 'محاسبة النفس 🌙 مجاني',
-                    desc: 'جميع الميزات الأساسية مع إعلانات بسيطة للإبقاء على الخدمة',
-                    features: const [
-                      'جميع ميزات المحاسبة',
-                      'أوقات الصلاة والقبلة',
-                      'الأذكار والأدعية',
-                      'إعلانات بسيطة',
-                    ],
-                    selected: _selected == 'free',
-                    onTap: () => setState(() => _selected = 'free'),
-                  ),
-                ],
+              child: FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: _ctrl,
+                  curve: const Interval(0.3, 0.9),
+                ),
+                child: Column(
+                  children: [
+                    _PlanCard(
+                      id: 'premium',
+                      title: 'محاسبة النفس ⭐ Premium',
+                      desc:
+                          'بلا إعلانات + إحصائيات متقدمة + مزامنة سحابية + دعم أولوي',
+                      badge: 'الأفضل',
+                      badgeColor: AppColors.gold,
+                      price: '99 دج / شهر',
+                      features: const [
+                        'بلا إعلانات نهائياً',
+                        'إحصائيات متقدمة ورسوم بيانية',
+                        'مزامنة سحابية تلقائية',
+                        'تذكيرات مخصصة لا نهاية لها',
+                        'أولوية في الدعم الفني',
+                      ],
+                      selected: _selected == 'premium',
+                      onTap: () => setState(() => _selected = 'premium'),
+                    ),
+                    const SizedBox(height: 10),
+                    _PlanCard(
+                      id: 'free',
+                      title: 'محاسبة النفس 🌙 مجاني',
+                      desc:
+                          'جميع الميزات الأساسية مع إعلانات بسيطة للإبقاء على الخدمة',
+                      features: const [
+                        'جميع ميزات المحاسبة',
+                        'أوقات الصلاة والقبلة',
+                        'الأذكار والأدعية',
+                        'إعلانات بسيطة',
+                      ],
+                      selected: _selected == 'free',
+                      onTap: () => setState(() => _selected = 'free'),
+                    ),
+                  ],
+                ),
               ),
-            )),
+            ),
             FadeTransition(
-              opacity:
-                  CurvedAnimation(parent: _ctrl, curve: const Interval(0.6, 1.0)),
+              opacity: CurvedAnimation(
+                parent: _ctrl,
+                curve: const Interval(0.6, 1.0),
+              ),
               child: _PrimaryButton(
-                label:
-                    _selected == 'premium' ? 'ابدأ Premium 🌟' : 'ابدأ مجاناً 🤲',
+                label: _selected == 'premium'
+                    ? 'ابدأ Premium 🌟'
+                    : 'ابدأ مجاناً 🤲',
                 onTap: widget.onStart,
               ),
             ),
@@ -1030,19 +1102,28 @@ class _PlanCard extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: selected
-              ? LinearGradient(colors: [
-                  AppColors.gold.withOpacity(0.12),
-                  AppColors.teal.withOpacity(0.06),
-                ])
+              ? LinearGradient(
+                  colors: [
+                    AppColors.gold.withOpacity(0.12),
+                    AppColors.teal.withOpacity(0.06),
+                  ],
+                )
               : null,
           color: selected ? null : AppColors.card,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? AppColors.gold.withOpacity(0.5) : AppColors.border,
+            color: selected
+                ? AppColors.gold.withOpacity(0.5)
+                : AppColors.border,
             width: selected ? 2 : 1,
           ),
           boxShadow: selected
-              ? [BoxShadow(color: AppColors.gold.withOpacity(0.15), blurRadius: 12)]
+              ? [
+                  BoxShadow(
+                    color: AppColors.gold.withOpacity(0.15),
+                    blurRadius: 12,
+                  ),
+                ]
               : null,
         ),
         child: Column(
@@ -1064,8 +1145,12 @@ class _PlanCard extends StatelessWidget {
                   ),
                   child: selected
                       ? const Center(
-                          child:
-                              Icon(Icons.check_rounded, size: 12, color: AppColors.night))
+                          child: Icon(
+                            Icons.check_rounded,
+                            size: 12,
+                            color: AppColors.night,
+                          ),
+                        )
                       : null,
                 ),
                 const SizedBox(width: 10),
@@ -1073,26 +1158,32 @@ class _PlanCard extends StatelessWidget {
                   child: Text(
                     title,
                     style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 13,
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600),
+                      fontSize: 13,
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 if (badge != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: (badgeColor ?? AppColors.gold).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: (badgeColor ?? AppColors.gold).withOpacity(0.3)),
+                        color: (badgeColor ?? AppColors.gold).withOpacity(0.3),
+                      ),
                     ),
                     child: Text(
                       badge!,
                       style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 10,
-                          color: badgeColor ?? AppColors.gold,
-                          fontWeight: FontWeight.w600),
+                        fontSize: 10,
+                        color: badgeColor ?? AppColors.gold,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 if (price != null) ...[
@@ -1100,9 +1191,10 @@ class _PlanCard extends StatelessWidget {
                   Text(
                     price!,
                     style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 11,
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700),
+                      fontSize: 11,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ],
@@ -1111,7 +1203,10 @@ class _PlanCard extends StatelessWidget {
             Text(
               desc,
               style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 11, color: AppColors.textSecondary, height: 1.6),
+                fontSize: 11,
+                color: AppColors.textSecondary,
+                height: 1.6,
+              ),
             ),
           ],
         ),
@@ -1148,12 +1243,15 @@ class _InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card.withOpacity(0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: const Border(top: BorderSide(color: AppColors.border, width: 1)),
+        border: const Border(
+          top: BorderSide(color: AppColors.border, width: 1),
+        ),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, -4))
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
         ],
       ),
       child: Column(
@@ -1173,23 +1271,30 @@ class _InfoCard extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.amiri(
-                fontSize: 22, color: titleColor, fontWeight: FontWeight.w700),
+              fontSize: 22,
+              color: titleColor,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             subtitle,
             textAlign: TextAlign.center,
             style: GoogleFonts.notoNaskhArabic(
-                fontSize: 14,
-                color: AppColors.textPrimary,
-                height: 1.7,
-                fontWeight: FontWeight.w600),
+              fontSize: 14,
+              color: AppColors.textPrimary,
+              height: 1.7,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 6),
           Text(
             hint,
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoNaskhArabic(fontSize: 11, color: AppColors.textDim),
+            style: GoogleFonts.notoNaskhArabic(
+              fontSize: 11,
+              color: AppColors.textDim,
+            ),
           ),
           const SizedBox(height: 20),
           _PrimaryButton(
@@ -1204,7 +1309,9 @@ class _InfoCard extends StatelessWidget {
               child: Text(
                 skipLabel!,
                 style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 13, color: AppColors.textDim),
+                  fontSize: 13,
+                  color: AppColors.textDim,
+                ),
               ),
             ),
           ],
@@ -1234,7 +1341,9 @@ class _PrimaryButtonState extends State<_PrimaryButton>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 100));
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
   }
 
   @override
@@ -1248,20 +1357,26 @@ class _PrimaryButtonState extends State<_PrimaryButton>
     final disabled = widget.onTap == null;
 
     return GestureDetector(
-      onTapDown: disabled ? null : (_) {
-        _ctrl.forward();
-        HapticFeedback.mediumImpact();
-      },
-      onTapUp: disabled ? null : (_) async {
-        _ctrl.reverse();
-        setState(() => _loading = true);
-        await widget.onTap!();
-        if (mounted) setState(() => _loading = false);
-      },
+      onTapDown: disabled
+          ? null
+          : (_) {
+              _ctrl.forward();
+              HapticFeedback.mediumImpact();
+            },
+      onTapUp: disabled
+          ? null
+          : (_) async {
+              _ctrl.reverse();
+              setState(() => _loading = true);
+              await widget.onTap!();
+              if (mounted) setState(() => _loading = false);
+            },
       onTapCancel: () => _ctrl.reverse(),
       child: ScaleTransition(
-        scale: Tween<double>(begin: 1, end: 0.96)
-            .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
+        scale: Tween<double>(
+          begin: 1,
+          end: 0.96,
+        ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: double.infinity,
@@ -1269,25 +1384,32 @@ class _PrimaryButtonState extends State<_PrimaryButton>
           decoration: BoxDecoration(
             gradient: disabled
                 ? null
-                : const LinearGradient(colors: [AppColors.gold, Color(0xFFB8920E)]),
+                : const LinearGradient(
+                    colors: [AppColors.gold, Color(0xFFB8920E)],
+                  ),
             color: disabled ? AppColors.border : null,
             borderRadius: BorderRadius.circular(16),
             boxShadow: disabled
                 ? null
                 : [
                     BoxShadow(
-                        color: AppColors.gold.withOpacity(0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4))
+                      color: AppColors.gold.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
           ),
           child: _loading
               ? const Center(
                   child: SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                          color: AppColors.night, strokeWidth: 2)))
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      color: AppColors.night,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1298,9 +1420,10 @@ class _PrimaryButtonState extends State<_PrimaryButton>
                     Text(
                       widget.label,
                       style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: disabled ? AppColors.textDim : AppColors.night),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: disabled ? AppColors.textDim : AppColors.night,
+                      ),
                     ),
                   ],
                 ),
@@ -1325,28 +1448,30 @@ class _BottomActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _PrimaryButton(
-              label: primaryLabel,
-              onTap: onPrimary != null ? () async => onPrimary!() : null,
-            ),
-            if (skipLabel != null) ...[
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: onSkip,
-                child: Text(
-                  skipLabel!,
-                  style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 13, color: AppColors.textDim),
-                ),
-              ),
-            ],
-          ],
+    padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _PrimaryButton(
+          label: primaryLabel,
+          onTap: onPrimary != null ? () async => onPrimary!() : null,
         ),
-      );
+        if (skipLabel != null) ...[
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: onSkip,
+            child: Text(
+              skipLabel!,
+              style: GoogleFonts.notoNaskhArabic(
+                fontSize: 13,
+                color: AppColors.textDim,
+              ),
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 // ── CUSTOM PAINTERS ──
@@ -1359,34 +1484,51 @@ class _OnboardBgPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height),
-        Paint()..color = AppColors.night);
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Paint()..color = AppColors.night,
+    );
 
     _stars ??= List.generate(
-        80,
-        (_) => Offset(
-              _rng.nextDouble() * size.width,
-              _rng.nextDouble() * size.height,
-            ));
+      80,
+      (_) => Offset(
+        _rng.nextDouble() * size.width,
+        _rng.nextDouble() * size.height,
+      ),
+    );
 
     for (int i = 0; i < _stars!.length; i++) {
       final op = 0.05 + 0.2 * ((math.sin(t * 2 * math.pi + i * 0.4) + 1) / 2);
-      canvas.drawCircle(_stars![i], 0.8 + _rng.nextDouble(),
-          Paint()..color = AppColors.gold.withOpacity(op));
+      canvas.drawCircle(
+        _stars![i],
+        0.8 + _rng.nextDouble(),
+        Paint()..color = AppColors.gold.withOpacity(op),
+      );
     }
 
     final cx = size.width * 0.84, cy = size.height * 0.08;
-    canvas.drawCircle(Offset(cx, cy), 18, Paint()..color = const Color(0xFFFFF3CC));
-    canvas.drawCircle(Offset(cx + 10, cy - 4), 15, Paint()..color = AppColors.night);
+    canvas.drawCircle(
+      Offset(cx, cy),
+      18,
+      Paint()..color = const Color(0xFFFFF3CC),
+    );
+    canvas.drawCircle(
+      Offset(cx + 10, cy - 4),
+      15,
+      Paint()..color = AppColors.night,
+    );
 
     canvas.drawCircle(
-        Offset(size.width / 2, -60),
-        200,
-        Paint()
-          ..shader = RadialGradient(
-            colors: [AppColors.gold.withOpacity(0.06), Colors.transparent],
-          ).createShader(
-              Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 200)));
+      Offset(size.width / 2, -60),
+      200,
+      Paint()
+        ..shader =
+            RadialGradient(
+              colors: [AppColors.gold.withOpacity(0.06), Colors.transparent],
+            ).createShader(
+              Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 200),
+            ),
+    );
   }
 
   @override
@@ -1403,11 +1545,12 @@ class _LocationIllustration extends CustomPainter {
     );
     canvas.drawRRect(phone, Paint()..color = const Color(0xFF1A2332));
     canvas.drawRRect(
-        phone,
-        Paint()
-          ..color = AppColors.gold.withOpacity(0.3)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2);
+      phone,
+      Paint()
+        ..color = AppColors.gold.withOpacity(0.3)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
 
     for (int i = 0; i < 4; i++) {
       canvas.drawLine(
@@ -1422,15 +1565,19 @@ class _LocationIllustration extends CustomPainter {
     _drawPin(canvas, Offset(cx - 20, cy - 20), 16, AppColors.gold);
     _drawPin(canvas, Offset(cx + 10, cy + 20), 10, AppColors.teal);
 
-    canvas.drawCircle(Offset(cx + 60, cy + 20), 30,
-        Paint()..color = AppColors.teal.withOpacity(0.15));
     canvas.drawCircle(
-        Offset(cx + 60, cy + 20),
-        30,
-        Paint()
-          ..color = AppColors.teal
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5);
+      Offset(cx + 60, cy + 20),
+      30,
+      Paint()..color = AppColors.teal.withOpacity(0.15),
+    );
+    canvas.drawCircle(
+      Offset(cx + 60, cy + 20),
+      30,
+      Paint()
+        ..color = AppColors.teal
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5,
+    );
     canvas.drawLine(
       Offset(cx + 60, cy + 20),
       Offset(cx + 60, cy + 6),
@@ -1452,11 +1599,12 @@ class _LocationIllustration extends CustomPainter {
       ..moveTo(cx + 10, cy + 20)
       ..quadraticBezierTo(cx, cy, cx - 20, cy - 20);
     canvas.drawPath(
-        path,
-        Paint()
-          ..color = AppColors.gold.withOpacity(0.5)
-          ..strokeWidth = 1.5
-          ..style = PaintingStyle.stroke);
+      path,
+      Paint()
+        ..color = AppColors.gold.withOpacity(0.5)
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke,
+    );
   }
 
   void _drawPin(Canvas canvas, Offset pos, double r, Color color) {
@@ -1475,8 +1623,11 @@ class _BellIllustration extends CustomPainter {
     final cx = size.width / 2, cy = size.height / 2;
 
     for (int i = 3; i >= 0; i--) {
-      canvas.drawCircle(Offset(cx, cy), 40.0 + i * 12,
-          Paint()..color = AppColors.gold.withOpacity(0.03 + i * 0.02));
+      canvas.drawCircle(
+        Offset(cx, cy),
+        40.0 + i * 12,
+        Paint()..color = AppColors.gold.withOpacity(0.03 + i * 0.02),
+      );
     }
 
     final bell = Path();
@@ -1490,15 +1641,21 @@ class _BellIllustration extends CustomPainter {
 
     canvas.drawPath(bell, Paint()..color = AppColors.gold.withOpacity(0.85));
     canvas.drawPath(
-        bell,
-        Paint()
-          ..color = AppColors.goldLight
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2);
+      bell,
+      Paint()
+        ..color = AppColors.goldLight
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
 
     canvas.drawCircle(Offset(cx, cy + 44), 10, Paint()..color = AppColors.gold);
-    canvas.drawLine(Offset(cx, cy + 35), Offset(cx, cy + 34),
-        Paint()..color = AppColors.goldLight..strokeWidth = 3);
+    canvas.drawLine(
+      Offset(cx, cy + 35),
+      Offset(cx, cy + 34),
+      Paint()
+        ..color = AppColors.goldLight
+        ..strokeWidth = 3,
+    );
 
     canvas.drawArc(
       Rect.fromCenter(center: Offset(cx, cy - 58), width: 16, height: 12),
@@ -1511,12 +1668,20 @@ class _BellIllustration extends CustomPainter {
         ..strokeWidth = 3,
     );
 
-    canvas.drawCircle(Offset(cx + 44, cy - 44), 20, Paint()..color = AppColors.teal);
+    canvas.drawCircle(
+      Offset(cx + 44, cy - 44),
+      20,
+      Paint()..color = AppColors.teal,
+    );
     final tp = TextPainter(
       text: const TextSpan(
-          text: '1',
-          style: TextStyle(
-              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        text: '1',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       textDirection: TextDirection.ltr,
     )..layout();
     tp.paint(canvas, Offset(cx + 44 - tp.width / 2, cy - 44 - tp.height / 2));
@@ -1524,9 +1689,10 @@ class _BellIllustration extends CustomPainter {
     for (int i = 0; i < 3; i++) {
       canvas.drawArc(
         Rect.fromCenter(
-            center: Offset(cx - 70, cy - 10),
-            width: 20.0 + i * 12,
-            height: 20.0 + i * 12),
+          center: Offset(cx - 70, cy - 10),
+          width: 20.0 + i * 12,
+          height: 20.0 + i * 12,
+        ),
         -math.pi / 4,
         -math.pi / 2,
         false,
@@ -1548,8 +1714,9 @@ class _PlanIllustration extends CustomPainter {
     final cx = size.width / 2, cy = size.height / 2;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
-          Rect.fromCenter(center: Offset(cx, cy + 20), width: 80, height: 80),
-          const Radius.circular(12)),
+        Rect.fromCenter(center: Offset(cx, cy + 20), width: 80, height: 80),
+        const Radius.circular(12),
+      ),
       Paint()..color = const Color(0xFF1A2332),
     );
     for (int i = 0; i < 5; i++) {

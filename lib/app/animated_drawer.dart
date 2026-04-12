@@ -12,6 +12,10 @@ import 'package:hijri/hijri_calendar.dart';
 import '../core/theme/app_theme.dart';
 import '../core/providers/database_providers.dart';
 import '../core/database/daos.dart';
+import '../core/supabase/sync_manager.dart';
+import '../core/supabase/supabase_providers.dart';
+import '../core/widgets/custom_pattern_background.dart';
+import '../core/routes/app_routes.dart';
 
 // ─────────────────────────────────────────
 //  DRAWER STATE PROVIDER
@@ -85,6 +89,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
     HapticFeedback.mediumImpact();
     ref.read(drawerOpenProvider.notifier).state = true;
     _ctrl.forward();
+    SyncManager.fullSync(ref); // Trigger sync when opening
   }
 
   void _close() {
@@ -179,8 +184,11 @@ class _DrawerContent extends ConsumerWidget {
       ),
       child: Stack(
         children: [
-          // نمط خلفية
-          Positioned.fill(child: CustomPaint(painter: _DrawerBgPainter())),
+          // نمط خلفية عصري
+          const CustomPatternBackground(
+            pattern: BackgroundPattern.geometric,
+            blurAmount: 0.5,
+          ),
 
           SafeArea(
             child: Column(
@@ -241,60 +249,92 @@ class _DrawerHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isRamadan = hijri.hMonth == 9;
+    final profileAsync = ref.watch(userProfileProvider);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // App logo + name
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      context.colors.gold.withOpacity(0.2),
-                      context.colors.gold.withOpacity(0.05),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: context.colors.gold.withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Center(
-                  child: Text('🌙', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'محاسبة النفس',
-                    style: context.typography.headingLarge.copyWith(
-                      fontSize: 18,
-                      color: context.colors.gold,
-                      fontWeight: FontWeight.w700,
+          // Profile section in header
+          profileAsync.when(
+            data: (profile) {
+              final username = profile?['username'] ?? 'مستخدم تقوى';
+              final avatar = profile?['avatar_emoji'] ?? '🌙';
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context); // Close drawer
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    Navigator.pushNamed(context, Routes.profile);
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.colors.goldDim,
+                        border: Border.all(
+                          color: context.colors.gold.withOpacity(0.4),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: context.colors.gold.withOpacity(0.1),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(avatar, style: const TextStyle(fontSize: 24)),
+                      ),
                     ),
-                  ),
-                  Text(
-                    isRamadan ? '🌙 رمضان كريم' : 'رفيقك اليومي',
-                    style: context.typography.caption.copyWith(
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            username,
+                            style: context.typography.headingLarge.copyWith(
+                              fontSize: 18,
+                              color: context.colors.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                'عرض البروفايل',
+                                style: context.typography.caption.copyWith(
+                                  fontSize: 11,
+                                  color: context.colors.gold,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 8,
+                                color: context.colors.gold,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              );
+            },
+            loading: () => const SizedBox(height: 52),
+            error: (_, __) => const SizedBox(height: 52),
           ),
-          const SizedBox(height: 14),
+          
+          const SizedBox(height: 20),
 
           // التاريخ الهجري
           Container(
@@ -349,6 +389,46 @@ class _DrawerHeader extends ConsumerWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+
+          // Level & Progress
+          statsAsync.when(
+            loading: () => const SizedBox(),
+            error: (_, __) => const SizedBox(),
+            data: (s) => Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'المستوى: ${s.levelLabel}',
+                      style: context.typography.caption.copyWith(
+                        color: context.colors.gold,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${s.totalPoints} / 600',
+                      style: context.typography.caption.copyWith(
+                        fontSize: 9,
+                        color: context.colors.textDim,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: (s.totalPoints / 600).clamp(0, 1),
+                    backgroundColor: context.colors.gold.withOpacity(0.1),
+                    color: context.colors.gold,
+                    minHeight: 4,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -425,7 +505,8 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     _NavItem('🕌', 'أوقات الصلاة', '/prayer', 2),
     _NavItem('📊', 'الإحصائيات', '/statistics', 3),
     _NavItem('🏆', 'الإنجازات', '/achievements', 4),
-    _NavItem('⚙️', 'الإعدادات', '/settings', 5),
+    _NavItem('👤', 'الملف الشخصي', '/profile', 5),
+    _NavItem('⚙️', 'الإعدادات', '/settings', 6),
   ];
 
   @override

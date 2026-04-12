@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/providers/theme_provider.dart';
-import 'package:muhasabah/core/notifications/notifications_service.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/theme_provider.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 import '../widgets/location_picker_sheet.dart';
 

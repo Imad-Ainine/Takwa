@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -145,7 +145,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                             // The transparent animated logo
                             Image.asset(
-                              'assets/images/hasib_nafsak_transparent_bg.png',
+                              'assets/images/takwa_transparent_bg.png',
                               width: 180,
                               height: 180,
                               fit: BoxFit.contain,

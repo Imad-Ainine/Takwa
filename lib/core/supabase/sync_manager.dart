@@ -23,7 +23,7 @@ class SyncManager {
     try {
       await _syncDailyRecords(ref);
       await _syncSettings(ref);
-      // await _syncStats(ref);
+      await _syncStats(ref);
     } finally {
       _syncing = false;
     }
@@ -31,15 +31,15 @@ class SyncManager {
 
   static Future<void> _syncDailyRecords(WidgetRef ref) async {
     final from = DateTime.now().subtract(const Duration(days: 30));
-    final remote = await SupabaseService.getRecordsRange(
+    final remoteRecords = await SupabaseService.getRecordsRange(
       from: from,
       to: DateTime.now(),
     );
 
-    // Syncing logic: update local if remote is newer, or simple upsert
-    // for (final record in remote) {
-    //   await ref.read(dailyRecordDaoProvider).upsertFromRemote(record);
-    // }
+    final dao = ref.read(dailyRecordDaoProvider);
+    for (final record in remoteRecords) {
+      await dao.upsertFromRemote(record);
+    }
   }
 
   static Future<void> _syncSettings(WidgetRef ref) async {
@@ -47,11 +47,21 @@ class SyncManager {
     if (remote == null) return;
 
     final dao = ref.read(settingsDaoProvider);
-    // Example: syncing specific keys
-    if (remote['madhab'] != null) await dao.set('madhab', remote['madhab']);
-    if (remote['ramadan_mode'] != null) {
-      await dao.set('ramadanMode', remote['ramadan_mode'].toString());
-    }
+    await dao.upsertFromRemote(remote);
+  }
+
+  static Future<void> _syncStats(WidgetRef ref) async {
+    final stats = await ref.read(statsDaoProvider).getMonthStats(
+      DateTime.now().year,
+      DateTime.now().month,
+    );
+
+    await SupabaseService.updateUserStats(
+      totalPoints: stats.totalPoints,
+      currentStreak: stats.currentStreak,
+      longestStreak: stats.longestStreak,
+      quranPages: stats.quranPages,
+    );
   }
 
   /// Single record sync (call after local update)

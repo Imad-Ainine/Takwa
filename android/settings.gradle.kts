@@ -1,4 +1,4 @@
-rootProject.name = "muhasabah_android"
+rootProject.name = "takwa_android"
 
 pluginManagement {
     val flutterSdkPath =

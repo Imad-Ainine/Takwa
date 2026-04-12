@@ -4,8 +4,8 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/features/achievements/providers/achievements_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/features/achievements/providers/achievements_providers.dart';
 import 'package:intl/intl.dart' as intl;
 
 class AchievementCard extends StatelessWidget {
@@ -28,48 +28,46 @@ class AchievementCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isEarned ? colors.card : colors.card.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(20),
+          gradient: isEarned ? colors.cardGradient : null,
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: isEarned
                 ? colors.gold.withOpacity(0.4)
-                : colors.border.withOpacity(0.5),
+                : colors.border.withOpacity(0.6),
             width: isEarned ? 1.5 : 1,
           ),
-          boxShadow: isEarned
-              ? [
-                  BoxShadow(
-                    color: colors.gold.withOpacity(0.08),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
+          boxShadow: isEarned ? context.shadows.card : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Emoji / Badge Icon
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: isEarned
-                    ? colors.goldDim
+                    ? colors.gold.withOpacity(0.12)
                     : colors.border.withOpacity(0.2),
                 shape: BoxShape.circle,
+                boxShadow: isEarned ? context.shadows.goldGlow : null,
                 border: isEarned
                     ? Border.all(color: colors.gold.withOpacity(0.2))
                     : null,
               ),
               child: Opacity(
-                opacity: isEarned ? 1.0 : 0.3,
-                child: Text(def.emoji, style: const TextStyle(fontSize: 32)),
+                opacity: isEarned ? 1.0 : 0.4,
+                child: Text(
+                  def.emoji,
+                  style: const TextStyle(fontSize: 34),
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
             // Title
             Text(
@@ -78,36 +76,45 @@ class AchievementCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: typography.labelLarge.copyWith(
-                color: isEarned ? colors.textPrimary : colors.textDim,
+                color: isEarned ? colors.gold : colors.textDim,
                 fontWeight: isEarned ? FontWeight.w700 : FontWeight.w500,
-                fontSize: 13,
+                fontSize: 14,
               ),
             ),
 
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
 
             // Points Reward (only if earned or descriptive)
             if (isEarned) ...[
-              Text(
-                '+${def.pointsReward} نقطة',
-                style: typography.caption.copyWith(
-                  color: colors.gold,
-                  fontWeight: FontWeight.w600,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colors.gold.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '+${def.pointsReward} نقطة',
+                  style: typography.caption.copyWith(
+                    color: colors.gold,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                  ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 intl.DateFormat('yyyy/MM/dd').format(achievement.earnedAt!),
                 style: typography.caption.copyWith(
-                  fontSize: 9,
-                  color: colors.textDim.withOpacity(0.6),
+                  fontSize: 10,
+                  color: colors.textSecondary.withOpacity(0.7),
                 ),
               ),
             ] else ...[
               Text(
-                'مغلق',
+                'قيد الانتظار',
                 style: typography.caption.copyWith(
                   color: colors.textDim.withOpacity(0.5),
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

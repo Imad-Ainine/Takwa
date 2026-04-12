@@ -236,6 +236,31 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       _ => const DailyRecordsCompanion(),
     };
   }
+
+  /// Sync from remote Supabase record
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final date = DateTime.parse(data['date']);
+    final companion = DailyRecordsCompanion(
+      date: Value(date),
+      fajrStatus: Value(PrayerStatus.values[data['fajr_status'] as int]),
+      dhuhrStatus: Value(PrayerStatus.values[data['dhuhr_status'] as int]),
+      asrStatus: Value(PrayerStatus.values[data['asr_status'] as int]),
+      maghribStatus: Value(PrayerStatus.values[data['maghrib_status'] as int]),
+      ishaStatus: Value(PrayerStatus.values[data['isha_status'] as int]),
+      nightPrayer: Value(data['night_prayer'] as bool),
+      quranPages: Value(data['quran_pages'] as int),
+      morningAdhkar: Value(data['morning_adhkar'] as bool),
+      eveningAdhkar: Value(data['evening_adhkar'] as bool),
+      fastingType: Value(FastingType.values[data['fasting_type'] as int]),
+      sadaqah: Value(data['sadaqah'] as bool),
+      netPoints: Value(data['net_points'] as int),
+      taqwaPoints: Value(data['taqwa_points'] as int),
+      notes: Value(data['notes'] as String?),
+      updatedAt: Value(DateTime.now()),
+    );
+
+    await into(dailyRecords).insertOnConflictUpdate(companion);
+  }
 }
 
 // ─────────────────────────────────────────
@@ -506,6 +531,23 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
     return (select(userSettings)..where((s) => s.key.equals(key)))
         .watchSingleOrNull()
         .map((r) => r?.value);
+  }
+
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    // Map remote database keys to local keys if necessary
+    final mapping = {
+      'madhab': 'madhab',
+      'ramadan_mode': 'ramadanMode',
+      'calc_method': 'calcMethod',
+      'prayer_reminder': 'prayerReminder',
+      'muhasaba_reminder': 'eveningMuhasabaReminder',
+    };
+
+    for (final entry in mapping.entries) {
+      if (data.containsKey(entry.key)) {
+        await set(entry.value, data[entry.key].toString());
+      }
+    }
   }
 }
 

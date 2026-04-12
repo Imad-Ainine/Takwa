@@ -1,12 +1,12 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/auth/presentation/screens/auth_screen.dart
-//  محاسبة النفس — تسجيل الدخول وإنشاء الحساب
+//  تقوى — تسجيل الدخول وإنشاء الحساب
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/supabase/supabase_service.dart';
@@ -20,8 +20,9 @@ class AuthScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthScreenState extends ConsumerState<AuthScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final TabController _tabs;
+  late final AnimationController _entryCtrl;
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
@@ -32,11 +33,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void initState() {
     super.initState();
     _tabs = TabController(length: 2, vsync: this);
+    _tabs.addListener(() => setState(() {}));
+
+    _entryCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..forward();
   }
 
   @override
   void dispose() {
     _tabs.dispose();
+    _entryCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _userCtrl.dispose();
@@ -44,6 +52,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Future<void> _signIn() async {
+    if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
+      setState(() => _error = 'أدخل البريد وكلمة المرور');
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
@@ -55,15 +67,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       );
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
-      setState(() => _error = _authError(e.message));
+      if (mounted) setState(() => _error = _authError(e.message));
+    } catch (e) {
+      if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _signUp() async {
     if (_userCtrl.text.trim().isEmpty) {
       setState(() => _error = 'أدخل اسم المستخدم');
+      return;
+    }
+    if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
+      setState(() => _error = 'أدخل البريد وكلمة المرور');
       return;
     }
     setState(() {
@@ -78,9 +96,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       );
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
-      setState(() => _error = _authError(e.message));
+      if (mounted) setState(() => _error = _authError(e.message));
+    } catch (e) {
+      if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -95,9 +115,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Navigator.pushReplacementNamed(context, '/');
       }
     } catch (e) {
-      setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل');
+      if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل');
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -114,224 +134,354 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
-    final s = AdaptiveStyle(context, isRamadan); // Fixed: added context
+    final s = AdaptiveStyle(context, isRamadan);
 
     return Scaffold(
       backgroundColor: s.bg,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: isRamadan
-                ? const _RamadanBg()
-                : CustomPaint(painter: _AuthBgPainter()),
+          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              // ── AppBar / Header ──
+              SliverAppBar(
+                expandedHeight: 240,
+                pinned: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _AuthHeader(style: s),
+                  collapseMode: CollapseMode.pin,
+                ),
+              ),
+
+              // ── Content ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                  child: Column(
+                    children: [
+                      // ① Form Card
+                      _anim(0, _buildFormCard(s)),
+                      const SizedBox(height: 24),
+
+                      // ② Social Separator
+                      _anim(1, _buildSeparator(s)),
+                      const SizedBox(height: 20),
+
+                      // ③ Social Button
+                      _anim(
+                        2,
+                        _SocialBtn(
+                          onTap: _loading ? null : _signInGoogle,
+                          icon: 'assets/images/google_logo.png',
+                          label: 'Google الدخول عبر',
+                          style: s,
+                          isGoogle: true,
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+                      _anim(
+                        3,
+                        GestureDetector(
+                          onTap: () =>
+                              Navigator.pushReplacementNamed(context, '/'),
+                          child: Text(
+                            'متابعة كضيف — استكشف التطبيق ➜',
+                            style: s.naskh(
+                              13,
+                              color: s.textSec,
+                              weight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_loading)
+            Container(
+              color: Colors.black26,
+              child: Center(child: CircularProgressIndicator(color: s.gold)),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _anim(int i, Widget child) {
+    final delay = i * 0.1, duration = (delay + 0.5).clamp(0.0, 1.0);
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(
+          parent: _entryCtrl,
+          curve: Interval(delay, duration, curve: Curves.easeOut),
+        ),
+      ),
+      child: SlideTransition(
+        position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+            .animate(
+              CurvedAnimation(
+                parent: _entryCtrl,
+                curve: Interval(delay, duration, curve: Curves.easeOutCubic),
+              ),
+            ),
+        child: child,
+      ),
+    );
+  }
+
+  Widget _buildFormCard(AdaptiveStyle s) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: s.cardDeco.copyWith(
+        border: Border.all(color: s.gold.withOpacity(0.2)),
+        boxShadow: context.shadows.card,
+      ),
+      child: Column(
+        children: [
+          // ── Tab Bar ──
+          Container(
+            height: 52,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: s.bg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: s.border),
+            ),
+            child: TabBar(
+              controller: _tabs,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [s.gold, s.teal],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: s.gold.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              labelColor: s.bg,
+              unselectedLabelColor: s.textSec,
+              dividerColor: Colors.transparent,
+              labelStyle: s.naskh(13, weight: FontWeight.bold),
+              tabs: const [
+                Tab(text: 'تسجيل الدخول'),
+                Tab(text: 'حساب جديد'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // ── Fields ──
+          _AuthField(
+            ctrl: _emailCtrl,
+            hint: 'عنوان البريد الإلكتروني',
+            icon: Icons.alternate_email_rounded,
+            style: s,
+          ),
+          const SizedBox(height: 16),
+          _AuthField(
+            ctrl: _passCtrl,
+            hint: 'كلمة المرور',
+            icon: Icons.lock_outline_rounded,
+            style: s,
+            isPassword: true,
+          ),
+          const SizedBox(height: 16),
+
+          // Username always visible as requested "without hide username"
+          _AuthField(
+            ctrl: _userCtrl,
+            hint: _tabs.index == 0
+                ? 'اسم المستخدم (اختياري للجدد)'
+                : 'اسم المستخدم للملف الشخصي',
+            icon: Icons.person_outline_rounded,
+            style: s,
+            labelSuffix: _tabs.index == 0 ? 'جديد؟' : '*',
           ),
 
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  const SizedBox(height: 40),
-                  // Logo
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [s.gold.withOpacity(0.2), Colors.transparent],
-                      ),
-                      border: Border.all(
-                        color: s.gold.withOpacity(0.4),
-                        width: 2,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text('🌙', style: TextStyle(fontSize: 32)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text('محاسبة النفس', style: s.amiri(28)),
-                  Text(
-                    'سجّل دخولك لمزامنة بياناتك',
-                    style: s.naskh(12, color: s.textSec),
-                  ),
-                  const SizedBox(height: 32),
+          if (_error != null) _buildError(s),
 
-                  // Tabs
-                  Container(
-                    decoration: BoxDecoration(
-                      color: s.card,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: s.border),
-                    ),
-                    child: TabBar(
-                      controller: _tabs,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      indicator: BoxDecoration(
-                        gradient: LinearGradient(colors: [s.gold, s.teal]),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      indicatorPadding: const EdgeInsets.all(3),
-                      labelColor: s.bg,
-                      unselectedLabelColor: s.textSec,
-                      labelStyle: GoogleFonts.notoNaskhArabic(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      tabs: const [
-                        Tab(text: 'تسجيل الدخول'),
-                        Tab(text: 'حساب جديد'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+          const SizedBox(height: 32),
 
-                  // Fields
-                  _AuthField(
-                    ctrl: _emailCtrl,
-                    hint: 'البريد الإلكتروني',
-                    icon: Icons.email_rounded,
-                    style: s,
-                  ),
-                  const SizedBox(height: 12),
-                  _AuthField(
-                    ctrl: _passCtrl,
-                    hint: 'كلمة المرور',
-                    icon: Icons.lock_rounded,
-                    style: s,
-                    isPassword: true,
-                  ),
-
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 250),
-                    child: _tabs.index == 1
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: _AuthField(
-                              ctrl: _userCtrl,
-                              hint: 'اسم المستخدم',
-                              icon: Icons.person_rounded,
-                              style: s,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-
-                  if (_error != null) ...[
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.danger.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: AppColors.danger.withOpacity(0.3),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.error_outline_rounded,
-                            size: 16,
-                            color: AppColors.danger,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _error!,
-                            style: GoogleFonts.notoNaskhArabic(
-                              fontSize: 12,
-                              color: AppColors.danger,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _loading
-                          ? null
-                          : (_tabs.index == 0 ? _signIn : _signUp),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: s.gold,
-                        foregroundColor: s.bg,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: _loading
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: s.bg,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              _tabs.index == 0 ? 'دخول' : 'إنشاء حساب',
-                              style: s.naskh(14, weight: FontWeight.w700),
-                            ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-                  
-                  // Social Auth Separator
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: s.border, thickness: 1)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'أو عبر',
-                          style: s.naskh(12, color: s.textSec),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: s.border, thickness: 1)),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 20),
-
-                  // Social Buttons
-                  Row(
+          // ── Submit Button ──
+          SizedBox(
+            width: double.infinity,
+            height: 58,
+            child: ElevatedButton(
+              onPressed: _loading
+                  ? null
+                  : (_tabs.index == 0 ? _signIn : _signUp),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: s.bg,
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                shadowColor: s.gold.withOpacity(0.3),
+              ),
+              child: Ink(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [s.goldDark, s.gold]),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _SocialBtn(
-                        onTap: _loading ? null : _signInGoogle,
-                        icon: 'assets/images/google_logo.png', // Assuming user has this or I'll provide a placeholder
-                        label: 'Google',
-                        style: s,
-                        isGoogle: true,
+                      Text(
+                        _tabs.index == 0 ? 'دخول آمن' : 'إنشاء حساب جديد',
+                        style: s.naskh(15, weight: FontWeight.w700),
                       ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 18),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
-                  GestureDetector(
-                    onTap: () => Navigator.pushReplacementNamed(context, '/'),
-                    child: Text(
-                      'متابعة بدون حساب',
-                      style: s.naskh(12, color: s.textSec, weight: FontWeight.w600),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildError(AdaptiveStyle s) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red.withOpacity(0.2)),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.redAccent,
+              size: 18,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(_error!, style: s.naskh(12, color: Colors.redAccent)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSeparator(AdaptiveStyle s) {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: s.border.withOpacity(0.4))),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text('أو استعمل', style: s.naskh(11, color: s.textDim)),
+        ),
+        Expanded(child: Divider(color: s.border.withOpacity(0.4))),
+      ],
+    );
+  }
+}
+
+class _AuthHeader extends StatelessWidget {
+  final AdaptiveStyle style;
+  const _AuthHeader({required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Background Gradient
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [style.gold.withOpacity(0.2), style.bg],
+            ),
+          ),
+        ),
+        // Decorative Elements
+        Positioned(
+          top: -20,
+          right: -30,
+          child: Opacity(
+            opacity: 0.1,
+            child: Icon(Icons.mosque_rounded, size: 200, color: style.gold),
+          ),
+        ),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 44),
+              // Logo with Glow
+              Hero(
+                tag: 'app_logo',
+                child: Container(
+                  width: 84,
+                  height: 84,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: style.card,
+                    boxShadow: [
+                      BoxShadow(
+                        color: style.gold.withOpacity(0.3),
+                        blurRadius: 25,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                    border: Border.all(
+                      color: style.gold.withOpacity(0.4),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '🌙',
+                      style: TextStyle(
+                        fontSize: 40,
+                        shadows: [
+                          Shadow(
+                            color: style.gold.withOpacity(0.5),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text('تقوى', style: style.amiri(36, weight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text(
+                'رفيقك في محاسبة النفس والطاعات',
+                style: style.naskh(14, color: style.textSec),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -342,12 +492,15 @@ class _AuthField extends StatefulWidget {
   final IconData icon;
   final AdaptiveStyle style;
   final bool isPassword;
+  final String? labelSuffix;
+
   const _AuthField({
     required this.ctrl,
     required this.hint,
     required this.icon,
     required this.style,
     this.isPassword = false,
+    this.labelSuffix,
   });
 
   @override
@@ -356,41 +509,79 @@ class _AuthField extends StatefulWidget {
 
 class _AuthFieldState extends State<_AuthField> {
   bool _obscure = true;
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
-    return Container(
-      decoration: BoxDecoration(
-        color: s.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: s.border),
-      ),
-      child: TextField(
-        controller: widget.ctrl,
-        obscureText: widget.isPassword && _obscure,
-        textDirection: TextDirection.ltr,
-        style: s.naskh(13),
-        decoration: InputDecoration(
-          hintText: widget.hint,
-          hintStyle: s.naskh(12, color: s.textSec),
-          prefixIcon: Icon(widget.icon, color: s.textSec, size: 20),
-          suffixIcon: widget.isPassword
-              ? GestureDetector(
-                  onTap: () => setState(() => _obscure = !_obscure),
-                  child: Icon(
-                    _obscure
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded,
-                    color: s.textSec,
-                    size: 18,
+    return Focus(
+      onFocusChange: (f) => setState(() => _isFocused = f),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        decoration: BoxDecoration(
+          color: s.bg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _isFocused ? s.gold : s.border,
+            width: _isFocused ? 1.5 : 1,
+          ),
+          boxShadow: _isFocused
+              ? [
+                  BoxShadow(
+                    color: s.gold.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                )
+                ]
               : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 14,
+        ),
+        child: TextField(
+          controller: widget.ctrl,
+          obscureText: widget.isPassword && _obscure,
+          textDirection: TextDirection.ltr,
+          style: s.naskh(14),
+          decoration: InputDecoration(
+            hintText: widget.hint,
+            hintStyle: s.naskh(13, color: s.textDim),
+            prefixIcon: Icon(
+              widget.icon,
+              color: _isFocused ? s.gold : s.textSec,
+              size: 20,
+            ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                    icon: Icon(
+                      _obscure
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
+                      color: s.textSec,
+                      size: 20,
+                    ),
+                  )
+                : (widget.labelSuffix != null
+                      ? Container(
+                          margin: const EdgeInsets.only(left: 14),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.labelSuffix!,
+                                style: s.naskh(
+                                  10,
+                                  color: s.gold,
+                                  weight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : null),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
         ),
       ),
@@ -418,56 +609,29 @@ class _SocialBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 140,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+        decoration: style.cardDeco.copyWith(
           color: style.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: style.border),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isGoogle)
-              Icon(Icons.g_mobiledata, color: style.gold, size: 24)
+              const Icon(
+                Icons.g_mobiledata_rounded,
+                color: Colors.blueAccent,
+                size: 32,
+              )
             else
-              const Icon(Icons.login_rounded, size: 18),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: style.naskh(13, weight: FontWeight.w600),
-            ),
+              const Icon(Icons.login_rounded, size: 20),
+            const SizedBox(width: 12),
+            Text(label, style: style.naskh(14, weight: FontWeight.w600)),
           ],
         ),
       ),
     );
   }
-}
-
-class _RamadanBg extends StatelessWidget {
-  const _RamadanBg();
-  @override
-  Widget build(BuildContext context) =>
-      CustomPaint(painter: RamadanBgPainter());
-}
-
-class _AuthBgPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _AuthBgPainter o) => false;
 }

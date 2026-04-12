@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  RAMADAN COLOR PALETTE  (تجاوز الألوان الأساسية)
@@ -665,29 +665,37 @@ class AdaptiveStyle {
   BoxDecoration get cardDeco => _decorations.card;
   BoxDecoration get heroDeco => _decorations.goldCard;
 
-  TextStyle amiri(double size, {Color? color, FontWeight? weight, double? height}) =>
-      GoogleFonts.amiri(
-        fontSize: size,
-        color: color ?? gold,
-        fontWeight: weight ?? FontWeight.w700,
-        height: height,
-        shadows: isRamadan
-            ? [
-                Shadow(
-                  color: gold.withOpacity(size > 20 ? 0.4 : 0.2),
-                  blurRadius: size > 20 ? 12 : 8,
-                ),
-              ]
-            : null,
-      );
+  TextStyle amiri(
+    double size, {
+    Color? color,
+    FontWeight? weight,
+    double? height,
+  }) => GoogleFonts.amiri(
+    fontSize: size,
+    color: color ?? gold,
+    fontWeight: weight ?? FontWeight.w700,
+    height: height,
+    shadows: isRamadan
+        ? [
+            Shadow(
+              color: gold.withOpacity(size > 20 ? 0.4 : 0.2),
+              blurRadius: size > 20 ? 12 : 8,
+            ),
+          ]
+        : null,
+  );
 
-  TextStyle naskh(double size, {Color? color, FontWeight? weight, double? height}) =>
-      GoogleFonts.notoNaskhArabic(
-        fontSize: size,
-        color: color ?? (size < 12 ? textSec : text),
-        fontWeight: weight ?? FontWeight.w400,
-        height: height,
-      );
+  TextStyle naskh(
+    double size, {
+    Color? color,
+    FontWeight? weight,
+    double? height,
+  }) => GoogleFonts.notoNaskhArabic(
+    fontSize: size,
+    color: color ?? (size < 12 ? textSec : text),
+    fontWeight: weight ?? FontWeight.w400,
+    height: height,
+  );
 }
 
 // ─────────────────────────────────────────

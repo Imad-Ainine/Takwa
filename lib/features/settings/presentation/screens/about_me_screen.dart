@@ -6,8 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutMeScreen extends StatelessWidget {
@@ -35,7 +35,11 @@ class AboutMeScreen extends StatelessWidget {
                     children: [
                       _buildProfileHeader(context),
                       const SizedBox(height: 24),
-                      _buildSectionTitle(context, 'عن المطور', 'About Developer'),
+                      _buildSectionTitle(
+                        context,
+                        'عن المطور',
+                        'About Developer',
+                      ),
                       const SizedBox(height: 12),
                       _buildBioCard(context),
                       const SizedBox(height: 24),
@@ -47,7 +51,11 @@ class AboutMeScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildSkillsGrid(context),
                       const SizedBox(height: 24),
-                      _buildSectionTitle(context, 'تواصل معي', 'Connect With Me'),
+                      _buildSectionTitle(
+                        context,
+                        'تواصل معي',
+                        'Connect With Me',
+                      ),
                       const SizedBox(height: 12),
                       _buildSocialLinks(context),
                       const SizedBox(height: 40),
@@ -79,7 +87,9 @@ class AboutMeScreen extends StatelessWidget {
       ),
       title: Text(
         'عن المطور',
-        style: context.typography.headingMedium.copyWith(color: context.colors.gold),
+        style: context.typography.headingMedium.copyWith(
+          color: context.colors.gold,
+        ),
       ),
       centerTitle: true,
     );
@@ -116,7 +126,7 @@ class AboutMeScreen extends StatelessWidget {
             style: GoogleFonts.amiri(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-            color: context.colors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           // English Name
@@ -137,13 +147,19 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String arabic, String english) {
+  Widget _buildSectionTitle(
+    BuildContext context,
+    String arabic,
+    String english,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           arabic,
-          style: context.typography.headingMedium.copyWith(color: context.colors.teal),
+          style: context.typography.headingMedium.copyWith(
+            color: context.colors.teal,
+          ),
         ),
         Text(
           english,
@@ -261,7 +277,12 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(BuildContext context, IconData icon, String tooltip, {String? url}) {
+  Widget _buildSocialIcon(
+    BuildContext context,
+    IconData icon,
+    String tooltip, {
+    String? url,
+  }) {
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
@@ -305,12 +326,16 @@ class AboutMeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             'ادعوا لي من خالص دعائكم',
-            style: context.typography.headingMedium.copyWith(color: context.colors.gold),
+            style: context.typography.headingMedium.copyWith(
+              color: context.colors.gold,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
             'صنع بكل حب للأمة الإسلامية',
-            style: context.typography.caption.copyWith(color: context.colors.textDim),
+            style: context.typography.caption.copyWith(
+              color: context.colors.textDim,
+            ),
           ),
           const SizedBox(height: 6),
           Row(

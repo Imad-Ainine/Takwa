@@ -1,6 +1,6 @@
-# Muhasabah × Supabase — Professional Integration Guide
+# Takwa × Supabase — Professional Integration Guide
 
-> **Stack**: Flutter · Drift (local SQLite) · Supabase (Postgres + Auth + Realtime + Storage)  
+> **Stack**: Flutter · Drift (local SQLite) · Supabase (Postgres + Auth + Realtime + Storage)
 > **Pattern**: **Offline-first** — every write hits Drift first, then syncs to Supabase in the background.
 
 ---
@@ -20,9 +20,9 @@
 └──────────────────────────────────────────────────┘
 ```
 
-- **Local first** → app works 100% offline with Drift  
-- **Background sync** → SyncService pushes dirty records to Supabase  
-- **Realtime** → Supabase Realtime pushes remote changes back  
+- **Local first** → app works 100% offline with Drift
+- **Background sync** → SyncService pushes dirty records to Supabase
+- **Realtime** → Supabase Realtime pushes remote changes back
 - **Auth** → Supabase Auth (email / Google / anonymous)
 
 ---
@@ -207,7 +207,7 @@ create policy "own profile"
 ```yaml
 dependencies:
   supabase_flutter: ^2.5.0
-  connectivity_plus: ^6.0.3   # detect online/offline
+  connectivity_plus: ^6.0.3 # detect online/offline
 ```
 
 ```bash
@@ -477,19 +477,19 @@ supabase functions new weekly-summary
 
 ```typescript
 // supabase/functions/weekly-summary/index.ts
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-serve(async (req) => {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-  )
-  // ... your logic
-  return new Response(JSON.stringify({ ok: true }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+serve(async req => {
+	const supabase = createClient(
+		Deno.env.get('SUPABASE_URL')!,
+		Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+	);
+	// ... your logic
+	return new Response(JSON.stringify({ ok: true }), {
+		headers: { 'Content-Type': 'application/json' },
+	});
+});
 ```
 
 ### 9.2 Call from Flutter
@@ -533,7 +533,7 @@ lib/
 ## 11. Security Checklist
 
 | ✅ | Item |
-|---|------|
+
 | ✅ | RLS enabled on every table |
 | ✅ | `service_role` key never in Flutter code |
 | ✅ | `anon` key only has SELECT on public data |

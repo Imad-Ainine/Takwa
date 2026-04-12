@@ -4,8 +4,8 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:muhasabah/core/database/app_database.dart';
-import 'package:muhasabah/core/database/daos.dart';
+import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/database/daos.dart';
 
 // ── Singleton database ──
 final appDatabaseProvider = Provider<AppDatabase>((ref) {

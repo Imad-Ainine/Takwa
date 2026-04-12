@@ -13,8 +13,8 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:permission_handler/permission_handler.dart';
 
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/routes/app_routes.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 
 // ─────────────────────────────────────────
 //  NOTIFICATION IDs  (ثابتة لا تتغير)
@@ -199,7 +199,22 @@ class NotificationsService {
   }) async {
     // إلغاء القديمة
     final idsToCancel = [
-      100, 101, 102, 103, 104, 105, 110, 111, 112, 113, 114, 120, 121, 122, 123, 124
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      110,
+      111,
+      112,
+      113,
+      114,
+      120,
+      121,
+      122,
+      123,
+      124,
     ];
     for (final id in idsToCancel) {
       await _plugin.cancel(id);

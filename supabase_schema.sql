@@ -1,5 +1,5 @@
 -- ──────────────────────────────────────────────────────────────────
---  MUHASABAH — Professional Supabase Schema
+--  TAKWA — Professional Supabase Schema
 --  Author: Antigravity AI
 --  Description: Full schema Migration for Professional Religious App
 -- ──────────────────────────────────────────────────────────────────

@@ -3,7 +3,6 @@
 //  محاسبة النفس — شاشة الأذان والصلاة القادمة
 // ═══════════════════════════════════════════════════════════════
 
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -11,10 +10,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/notifications/notifications_service.dart';
-import 'package:muhasabah/core/notifications/location_prayer_update.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/core/notifications/location_prayer_update.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -167,11 +166,7 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
       // حساب أوقات الصلاة باستخدام الـ provider لإبقاء البيانات متزامنة
       final prayers = await _ref.read(prayerTimesProvider.future);
 
-      state = state.copyWith(
-        prayers: prayers,
-        cityName: city,
-        loading: false,
-      );
+      state = state.copyWith(prayers: prayers, cityName: city, loading: false);
 
       _startTicker();
     } catch (e) {
@@ -213,7 +208,6 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
       isIqamaPhase: isIqamaPhase,
     );
   }
-
 
   @override
   void dispose() {
@@ -1135,11 +1129,7 @@ class _CountdownArcPainter extends CustomPainter {
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
           colors: isIqama
-              ? [
-                  successColor,
-                  tealColor,
-                  successColor,
-                ]
+              ? [successColor, tealColor, successColor]
               : [primaryColor, Colors.white.withOpacity(0.9), primaryColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
@@ -1159,11 +1149,7 @@ class _CountdownArcPainter extends CustomPainter {
           startAngle: -math.pi / 2,
           endAngle: 3 * math.pi / 2,
           colors: isIqama
-              ? [
-                  successColor,
-                  tealColor,
-                  successColor,
-                ]
+              ? [successColor, tealColor, successColor]
               : [primaryColor, Colors.white, primaryColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
@@ -1603,7 +1589,12 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
               child: SizedBox(
                 width: 60,
                 height: 60,
-                child: CustomPaint(painter: _LoadingRingPainter(_ctrl.value, context.colors.gold)),
+                child: CustomPaint(
+                  painter: _LoadingRingPainter(
+                    _ctrl.value,
+                    context.colors.gold,
+                  ),
+                ),
               ),
             ),
           ),

@@ -9,13 +9,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:muhasabah/core/notifications/notifications_service.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
-import 'package:muhasabah/core/providers/theme_provider.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/routes/app_routes.dart';
-import 'package:muhasabah/core/supabase/supabase_config.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/theme_provider.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/supabase/supabase_config.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
@@ -48,11 +48,11 @@ void main() async {
   // تهيئة الإشعارات
   await NotificationsService.initialize();
 
-  runApp(const ProviderScope(child: MuhasabahApp()));
+  runApp(const ProviderScope(child: TakwaApp()));
 }
 
-class MuhasabahApp extends ConsumerWidget {
-  const MuhasabahApp({super.key});
+class TakwaApp extends ConsumerWidget {
+  const TakwaApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:adhan/adhan.dart' as adhan;
 
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 
 // ─────────────────────────────────────────
 //  QIBLA CALCULATION PROVIDER

@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.muhasabah" "\0"
-            VALUE "FileDescription", "muhasabah" "\0"
+            VALUE "CompanyName", "com.takwa" "\0"
+            VALUE "FileDescription", "takwa" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "muhasabah" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.muhasabah. All rights reserved." "\0"
-            VALUE "OriginalFilename", "muhasabah.exe" "\0"
-            VALUE "ProductName", "muhasabah" "\0"
+            VALUE "InternalName", "takwa" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.takwa. All rights reserved." "\0"
+            VALUE "OriginalFilename", "takwa.exe" "\0"
+            VALUE "ProductName", "takwa" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

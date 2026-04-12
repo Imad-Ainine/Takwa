@@ -116,7 +116,7 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
 
   // --- Dark Colors ---
   static const dark = AppColorsExtension(
-    background: Color(0xFF0D1117),
+    background: Color(0xFF04011e),
     deep: Color(0xFF111827),
     card: Color(0xFF1A2332),
     card2: Color(0xFF1E2D40),

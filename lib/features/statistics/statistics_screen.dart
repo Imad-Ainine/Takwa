@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/statistics/presentation/screens/statistics_screen.dart
-//  محاسبة النفس — Statistics Screen (شاشة الإحصائيات)
+//  تقوى — Statistics Screen (شاشة الإحصائيات)
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
@@ -10,11 +10,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hijri/hijri_calendar.dart';
-import 'package:muhasabah/core/database/app_database.dart';
-import 'package:muhasabah/core/database/daos.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/database/daos.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/guest_mode_guard.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  LOCAL PROVIDERS
@@ -129,88 +130,83 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         body: Stack(
           children: [
             const CustomPatternBackground(pattern: BackgroundPattern.stats),
-            CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // ── AppBar ──
-                SliverAppBar(
-                  backgroundColor: Colors.transparent,
-                  expandedHeight: 120,
-                  pinned: true,
-                  elevation: 0,
-                  surfaceTintColor: Colors.transparent,
-                  flexibleSpace: FlexibleSpaceBar(
-                    collapseMode: CollapseMode.pin,
-                    background: _StatsTopBar(hijri: hijri),
+            GuestModeGuard(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  // ── AppBar ──
+                  SliverAppBar(
+                    backgroundColor: Colors.transparent,
+                    expandedHeight: 120,
+                    pinned: true,
+                    elevation: 0,
+                    surfaceTintColor: Colors.transparent,
+                    flexibleSpace: FlexibleSpaceBar(
+                      collapseMode: CollapseMode.pin,
+                      background: _StatsTopBar(hijri: hijri),
+                    ),
                   ),
-                ),
-
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const SizedBox(height: 8),
-
-                      // ① Period Selector
-                      _anim(0, _PeriodSelector()),
-                      const SizedBox(height: 16),
-
-                      // ② Taqwa Score Hero Card
-                      _anim(
-                        1,
-                        statsAsync.when(
-                          loading: () => const _StatSkeleton(height: 150),
-                          error: (_, __) => const SizedBox(),
-                          data: (s) => streakAsync.when(
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        const SizedBox(height: 8),
+                        // ① Period Selector
+                        _anim(0, _PeriodSelector()),
+                        const SizedBox(height: 16),
+                        // ② Taqwa Score Hero Card
+                        _anim(
+                          1,
+                          statsAsync.when(
                             loading: () => const _StatSkeleton(height: 150),
                             error: (_, __) => const SizedBox(),
-                            data: (streak) =>
-                                _TaqwaHeroCard(stats: s, streak: streak),
+                            data: (s) => streakAsync.when(
+                              loading: () => const _StatSkeleton(height: 150),
+                              error: (_, __) => const SizedBox(),
+                              data: (streak) =>
+                                  _TaqwaHeroCard(stats: s, streak: streak),
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ③ Weekly Bar Chart
-                      _anim(
-                        2,
-                        weekAsync.when(
-                          loading: () => const _StatSkeleton(height: 180),
-                          error: (_, __) => const SizedBox(),
-                          data: (pts) => _WeeklyChart(points: pts),
+                        const SizedBox(height: 16),
+                        // ③ Weekly Bar Chart
+                        _anim(
+                          2,
+                          weekAsync.when(
+                            loading: () => const _StatSkeleton(height: 180),
+                            error: (_, __) => const SizedBox(),
+                            data: (pts) => _WeeklyChart(points: pts),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ④ Stats Cards Grid
-                      _anim(
-                        3,
-                        statsAsync.when(
-                          loading: () => const _StatSkeleton(height: 120),
-                          error: (_, __) => const SizedBox(),
-                          data: (s) => _StatsCardsGrid(stats: s),
+                        const SizedBox(height: 16),
+                        // ④ Stats Cards Grid
+                        _anim(
+                          3,
+                          statsAsync.when(
+                            loading: () => const _StatSkeleton(height: 120),
+                            error: (_, __) => const SizedBox(),
+                            data: (s) => _StatsCardsGrid(stats: s),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ⑤ Prayer Attendance Radial
-                      _anim(
-                        4,
-                        statsAsync.when(
-                          loading: () => const _StatSkeleton(height: 150),
-                          error: (_, __) => const SizedBox(),
-                          data: (s) => _PrayerAttendanceCard(stats: s),
+                        const SizedBox(height: 16),
+                        // ⑤ Prayer Attendance Radial
+                        _anim(
+                          4,
+                          statsAsync.when(
+                            loading: () => const _StatSkeleton(height: 150),
+                            error: (_, __) => const SizedBox(),
+                            data: (s) => _PrayerAttendanceCard(stats: s),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ⑥ Achievements
-                      _anim(5, _AchievementsSection()),
-                      const SizedBox(height: 100),
-                    ]),
+                        const SizedBox(height: 16),
+                        // ⑥ Achievements
+                        _anim(5, _AchievementsSection()),
+                        const SizedBox(height: 100),
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
 
             // ── Unseen Achievement Overlay ──

@@ -4,8 +4,8 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/features/achievements/domain/models/achievement_definition.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/features/achievements/domain/models/achievement_definition.dart';
 
 class AchievementView {
   final AchievementDefinition definition;

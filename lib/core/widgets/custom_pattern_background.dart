@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:muhasabah/core/providers/database_providers.dart';
-import 'package:muhasabah/core/theme/app_theme.dart';
-import 'package:muhasabah/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'dart:ui';
 import 'background_painters.dart';
 
-enum BackgroundPattern { geometric, stats, duas, adhkar, checklist, qibla }
+enum BackgroundPattern { geometric, stats, duas, adhkar, checklist, qibla, asma }
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
   final BackgroundPattern pattern;
@@ -108,6 +108,9 @@ class _CustomPatternBackgroundState
         break;
       case BackgroundPattern.qibla:
         painter = QiblaBgPainter(goldColor: colors.gold, blur: 1.0);
+        break;
+      case BackgroundPattern.asma:
+        painter = AsmaBgPainter(goldColor: colors.gold, blur: 0.8);
         break;
     }
 
