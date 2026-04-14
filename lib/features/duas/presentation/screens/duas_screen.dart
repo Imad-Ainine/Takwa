@@ -323,7 +323,9 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
         backgroundColor: style.bg,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.duas),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.duas),
+            ),
 
             Column(
               children: [

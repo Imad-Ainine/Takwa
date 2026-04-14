@@ -14,7 +14,9 @@ class AuthChoiceScreen extends ConsumerWidget {
       backgroundColor: context.colors.night,
       body: Stack(
         children: [
-          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),

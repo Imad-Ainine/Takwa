@@ -18,6 +18,7 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
 import '../core/providers/auth_providers.dart';
 import '../features/auth/presentation/pages/auth_choice_screen.dart';
+import '../core/widgets/custom_pattern_background.dart';
 
 // ─────────────────────────────────────────
 //  CURRENT TAB PROVIDER
@@ -177,8 +178,8 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.colors.card,
-        border: Border(top: BorderSide(color: context.colors.border, width: 1)),
+        color: context.colors.card.withOpacity(0.95),
+        border: Border(top: BorderSide(color: context.colors.border, width: 0.5)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -187,86 +188,107 @@ class _BottomNav extends StatelessWidget {
           ),
         ],
       ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: List.generate(tabs.length, (i) {
-              final tab = tabs[i];
-              final isActive = currentIndex == i;
-              return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onTap(i),
-                  child: AnimatedBuilder(
-                    animation: tabAnims[i],
-                    builder: (_, __) {
-                      final t = tabAnims[i].value;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Active indicator
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 250),
-                            width: isActive ? 28 : 0,
-                            height: 2,
-                            margin: const EdgeInsets.only(bottom: 4),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  context.colors.gold,
-                                  context.colors.teal,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(1),
-                            ),
-                          ),
-
-                          // Icon with scale bounce
-                          Transform.scale(
-                            scale: isActive ? 1.0 + 0.1 * t : 1.0,
-                            child: Text(
-                              tab.emoji,
-                              style: TextStyle(
-                                fontSize: 22,
-                                shadows: isActive
-                                    ? [
-                                        Shadow(
-                                          color: context.colors.gold
-                                              .withOpacity(0.5 * t),
-                                          blurRadius: 10,
-                                        ),
-                                      ]
-                                    : null,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-
-                          // Label
-                          AnimatedDefaultTextStyle(
-                            duration: const Duration(milliseconds: 200),
-                            style: context.typography.caption.copyWith(
-                              fontSize: 10,
-                              color: isActive
-                                  ? context.colors.gold
-                                  : context.colors.textDim,
-                              fontWeight: isActive
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                            child: Text(tab.label),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              );
-            }),
+      child: Stack(
+        children: [
+          // Subtle pattern background for BottomNav
+          const Positioned.fill(
+            child: ClipRect(
+              child: CustomPatternBackground(
+                pattern: BackgroundPattern.geometric,
+                blurAmount: 0.1,
+              ),
+            ),
           ),
-        ),
+
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: List.generate(tabs.length, (i) {
+                  final tab = tabs[i];
+                  final isActive = currentIndex == i;
+                  return Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => onTap(i),
+                      child: AnimatedBuilder(
+                        animation: tabAnims[i],
+                        builder: (_, __) {
+                          final t = tabAnims[i].value;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Improved Active indicator with glow
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 250),
+                                width: isActive ? 24 : 0,
+                                height: 3,
+                                margin: const EdgeInsets.only(bottom: 4),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      context.colors.gold,
+                                      context.colors.teal,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(1.5),
+                                  boxShadow: isActive ? [
+                                    BoxShadow(
+                                      color: context.colors.gold.withOpacity(0.3),
+                                      blurRadius: 8,
+                                    ),
+                                  ] : null,
+                                ),
+                              ),
+
+                              // Icon with scale bounce
+                              Transform.scale(
+                                scale: isActive ? 1.0 + 0.15 * t : 1.0,
+                                child: Text(
+                                  tab.emoji,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    shadows: isActive
+                                        ? [
+                                            Shadow(
+                                              color: context.colors.gold
+                                                  .withOpacity(0.6 * t),
+                                              blurRadius: 10,
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+
+                              // Label
+                              AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 200),
+                                style: context.typography.caption.copyWith(
+                                  fontSize: 10,
+                                  color: isActive
+                                      ? context.colors.gold
+                                      : context.colors.textDim,
+                                  fontWeight: isActive
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
+                                  letterSpacing: isActive ? 0.2 : 0,
+                                ),
+                                child: Text(tab.label),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

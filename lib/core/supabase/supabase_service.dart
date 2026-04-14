@@ -174,6 +174,29 @@ class SupabaseService {
     }, onConflict: 'user_id');
   }
 
+  // ─────────────── ACHIEVEMENTS ───────────────
+  static Future<void> upsertAchievement(Map<String, dynamic> achievement) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+
+    await _db.from('achievements').upsert({
+      ...achievement,
+      'user_id': uid,
+      'earned_at': achievement['earned_at'] ?? DateTime.now().toIso8601String(),
+    }, onConflict: 'user_id,type');
+  }
+
+  static Future<List<Map<String, dynamic>>> getEarnedAchievements() async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+
+    final data = await _db.from('achievements')
+        .select()
+        .eq('user_id', uid);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+
   static String _dateStr(DateTime dt) =>
       '${dt.year}-${dt.month.toString().padLeft(2,'0')}-${dt.day.toString().padLeft(2,'0')}';
 }

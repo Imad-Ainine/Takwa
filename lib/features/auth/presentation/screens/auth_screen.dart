@@ -140,7 +140,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       backgroundColor: s.bg,
       body: Stack(
         children: [
-          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [

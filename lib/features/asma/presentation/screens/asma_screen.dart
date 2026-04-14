@@ -70,7 +70,9 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
         backgroundColor: s.bg,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.asma),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+            ),
             Column(
               children: [
                 _AsmaTopBar(

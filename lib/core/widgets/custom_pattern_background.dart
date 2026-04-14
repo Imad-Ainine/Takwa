@@ -6,7 +6,15 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'dart:ui';
 import 'background_painters.dart';
 
-enum BackgroundPattern { geometric, stats, duas, adhkar, checklist, qibla, asma }
+enum BackgroundPattern {
+  geometric,
+  stats,
+  duas,
+  adhkar,
+  checklist,
+  qibla,
+  asma,
+}
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
   final BackgroundPattern pattern;
@@ -49,32 +57,41 @@ class _CustomPatternBackgroundState
 
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
-      return Positioned.fill(
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: AnimatedBuilder(
-                animation: _ctrl,
-                builder: (_, __) => CustomPaint(
-                  painter: RamadanBgPainter(
-                    animT: _ctrl.value,
-                    brightness: brightness,
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final h = constraints.maxHeight.isInfinite ? null : double.infinity;
+          final w = constraints.maxWidth.isInfinite ? null : double.infinity;
+          
+          return SizedBox(
+            width: w,
+            height: h,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _ctrl,
+                    builder: (_, __) => CustomPaint(
+                      painter: RamadanBgPainter(
+                        animT: _ctrl.value,
+                        brightness: brightness,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                if (widget.blurAmount > 0)
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: widget.blurAmount,
+                        sigmaY: widget.blurAmount,
+                      ),
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
+              ],
             ),
-            if (widget.blurAmount > 0)
-              Positioned.fill(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: widget.blurAmount,
-                    sigmaY: widget.blurAmount,
-                  ),
-                  child: const SizedBox.expand(),
-                ),
-              ),
-          ],
-        ),
+          );
+        },
       );
     }
 
@@ -114,22 +131,31 @@ class _CustomPatternBackgroundState
         break;
     }
 
-    return Positioned.fill(
-      child: Stack(
-        children: [
-          Positioned.fill(child: CustomPaint(painter: painter)),
-          if (widget.blurAmount > 0)
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: widget.blurAmount,
-                  sigmaY: widget.blurAmount,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final h = constraints.maxHeight.isInfinite ? null : double.infinity;
+        final w = constraints.maxWidth.isInfinite ? null : double.infinity;
+
+        return SizedBox(
+          width: w,
+          height: h,
+          child: Stack(
+            children: [
+              Positioned.fill(child: CustomPaint(painter: painter)),
+              if (widget.blurAmount > 0)
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: widget.blurAmount,
+                      sigmaY: widget.blurAmount,
+                    ),
+                    child: const SizedBox.expand(),
+                  ),
                 ),
-                child: const SizedBox.expand(),
-              ),
-            ),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

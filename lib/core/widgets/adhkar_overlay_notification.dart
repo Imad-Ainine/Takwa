@@ -167,8 +167,10 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                     child: Stack(
                       children: [
                         // ── Geometric Pattern (from Home) ──
-                        const CustomPatternBackground(
-                          pattern: BackgroundPattern.geometric,
+                        const Positioned.fill(
+                          child: CustomPatternBackground(
+                            pattern: BackgroundPattern.geometric,
+                          ),
                         ),
 
                         // ── Content ──

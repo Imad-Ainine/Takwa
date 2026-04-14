@@ -17,18 +17,24 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
 
   Future<DailyRecord?> getTodayRecord() {
     final today = _dateOnly(DateTime.now());
-    return (select(dailyRecords)..where((r) => r.date.equals(today)))
-        .getSingleOrNull();
+    return (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(today))).getSingleOrNull();
   }
 
   Future<DailyRecord> getOrCreateToday() async {
-    final existing = await getTodayRecord();
-    if (existing != null) return existing;
+    final now = DateTime.now();
+    final today = _dateOnly(now);
 
-    final id = await into(dailyRecords).insert(
-      DailyRecordsCompanion(date: Value(_dateOnly(DateTime.now()))),
+    // Atomic insert Or Ignore to handle race conditions
+    await into(dailyRecords).insert(
+      DailyRecordsCompanion(date: Value(today)),
+      mode: InsertMode.insertOrIgnore,
     );
-    return (select(dailyRecords)..where((r) => r.id.equals(id))).getSingle();
+
+    // Fetch the record (either newly created or existed)
+    return (select(dailyRecords)..where((r) => r.date.equals(today)))
+        .getSingle();
   }
 
   Future<void> updatePrayerStatus({
@@ -37,8 +43,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     required PrayerStatus status,
   }) async {
     final companion = _prayerCompanion(prayerName, status);
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId)))
-        .write(companion);
+    await (update(
+      dailyRecords,
+    )..where((r) => r.id.equals(recordId))).write(companion);
     await _recalcPoints(recordId);
   }
 
@@ -70,8 +77,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       DailyRecordsCompanion(
         morningAdhkar: morning != null ? Value(morning) : const Value.absent(),
         eveningAdhkar: evening != null ? Value(evening) : const Value.absent(),
-        afterPrayerAdhkar:
-            afterPrayer != null ? Value(afterPrayer) : const Value.absent(),
+        afterPrayerAdhkar: afterPrayer != null
+            ? Value(afterPrayer)
+            : const Value.absent(),
         updatedAt: Value(DateTime.now()),
       ),
     );
@@ -88,29 +96,32 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> toggleSadaqah(int recordId, bool value) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId)))
-        .write(DailyRecordsCompanion(
-      sadaqah: Value(value),
-      updatedAt: Value(DateTime.now()),
-    ));
+    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+      DailyRecordsCompanion(
+        sadaqah: Value(value),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
     await _recalcPoints(recordId);
   }
 
   Future<void> toggleNightPrayer(int recordId, bool value) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId)))
-        .write(DailyRecordsCompanion(
-      nightPrayer: Value(value),
-      updatedAt: Value(DateTime.now()),
-    ));
+    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+      DailyRecordsCompanion(
+        nightPrayer: Value(value),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
     await _recalcPoints(recordId);
   }
 
   Future<void> updateFasting(int recordId, FastingType type) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId)))
-        .write(DailyRecordsCompanion(
-      fastingType: Value(type),
-      updatedAt: Value(DateTime.now()),
-    ));
+    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+      DailyRecordsCompanion(
+        fastingType: Value(type),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
     await _recalcPoints(recordId);
   }
 
@@ -122,39 +133,49 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     int timesCount = 1,
     int deductPoints = 10,
   }) async {
-    final existing = await (select(prohibitionsLog)
-          ..where((p) =>
-              p.recordId.equals(recordId) & p.category.equals(category.index)))
-        .getSingleOrNull();
+    final existing =
+        await (select(prohibitionsLog)..where(
+              (p) =>
+                  p.recordId.equals(recordId) &
+                  p.category.equals(category.index),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
-      await (update(prohibitionsLog)..where((p) => p.id.equals(existing.id)))
-          .write(ProhibitionsLogCompanion(
-        committed: Value(committed),
-        timesCount: Value(timesCount),
-      ));
+      await (update(
+        prohibitionsLog,
+      )..where((p) => p.id.equals(existing.id))).write(
+        ProhibitionsLogCompanion(
+          committed: Value(committed),
+          timesCount: Value(timesCount),
+        ),
+      );
     } else {
-      await into(prohibitionsLog).insert(ProhibitionsLogCompanion(
-        recordId: Value(recordId),
-        date: Value(DateTime.now()),
-        category: Value(category),
-        committed: Value(committed),
-        customName: Value(customName),
-        timesCount: Value(timesCount),
-        deductPoints: Value(deductPoints),
-      ));
+      await into(prohibitionsLog).insert(
+        ProhibitionsLogCompanion(
+          recordId: Value(recordId),
+          date: Value(DateTime.now()),
+          category: Value(category),
+          committed: Value(committed),
+          customName: Value(customName),
+          timesCount: Value(timesCount),
+          deductPoints: Value(deductPoints),
+        ),
+      );
     }
     await _recalcPoints(recordId);
   }
 
   Future<List<ProhibitionsLogData>> getTodayProhibitions(int recordId) {
-    return (select(prohibitionsLog)..where((p) => p.recordId.equals(recordId)))
-        .get();
+    return (select(
+      prohibitionsLog,
+    )..where((p) => p.recordId.equals(recordId))).get();
   }
 
   Future<DailyRecord?> getRecordByDate(DateTime date) {
-    return (select(dailyRecords)..where((r) => r.date.equals(_dateOnly(date))))
-        .getSingleOrNull();
+    return (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(_dateOnly(date)))).getSingleOrNull();
   }
 
   Future<List<DailyRecord>> getLastNDays(int n) {
@@ -167,8 +188,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
 
   Stream<DailyRecord?> watchTodayRecord() {
     final today = _dateOnly(DateTime.now());
-    return (select(dailyRecords)..where((r) => r.date.equals(today)))
-        .watchSingleOrNull();
+    return (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(today))).watchSingleOrNull();
   }
 
   int _prayerPoints(PrayerStatus status) {
@@ -180,9 +202,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> _recalcPoints(int recordId) async {
-    final record = await (select(dailyRecords)
-          ..where((r) => r.id.equals(recordId)))
-        .getSingle();
+    final record = await (select(
+      dailyRecords,
+    )..where((r) => r.id.equals(recordId))).getSingle();
 
     int points = 0;
 
@@ -273,16 +295,16 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   Future<int> getMonthlyPoints(int year, int month) async {
     final from = DateTime(year, month, 1);
     final to = DateTime(year, month + 1, 0);
-    final rows = await (select(dailyRecords)
-          ..where((r) => r.date.isBetweenValues(from, to)))
-        .get();
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(from, to))).get();
     return rows.fold<int>(0, (sum, r) => sum + r.netPoints);
   }
 
   Future<int> getLongestStreak() async {
-    final records = await (select(dailyRecords)
-          ..orderBy([(r) => OrderingTerm.asc(r.date)]))
-        .get();
+    final records = await (select(
+      dailyRecords,
+    )..orderBy([(r) => OrderingTerm.asc(r.date)])).get();
 
     int longest = 0;
     int current = 0;
@@ -306,10 +328,11 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Future<int> getCurrentStreak() async {
-    final records = await (select(dailyRecords)
-          ..orderBy([(r) => OrderingTerm.desc(r.date)])
-          ..limit(60))
-        .get();
+    final records =
+        await (select(dailyRecords)
+              ..orderBy([(r) => OrderingTerm.desc(r.date)])
+              ..limit(60))
+            .get();
 
     int streak = 0;
     DateTime? prev;
@@ -335,9 +358,9 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   Future<double> getPrayerAttendanceRate(int year, int month) async {
     final from = DateTime(year, month, 1);
     final to = DateTime(year, month + 1, 0);
-    final rows = await (select(dailyRecords)
-          ..where((r) => r.date.isBetweenValues(from, to)))
-        .get();
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(from, to))).get();
 
     if (rows.isEmpty) return 0;
 
@@ -361,9 +384,9 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   Future<int> getMonthlyQuranPages(int year, int month) async {
     final from = DateTime(year, month, 1);
     final to = DateTime(year, month + 1, 0);
-    final rows = await (select(dailyRecords)
-          ..where((r) => r.date.isBetweenValues(from, to)))
-        .get();
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(from, to))).get();
     return rows.fold<int>(0, (sum, r) => sum + r.quranPages);
   }
 
@@ -372,13 +395,10 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     for (int i = 6; i >= 0; i--) {
       final date = DateTime.now().subtract(Duration(days: i));
       final d = DateTime(date.year, date.month, date.day);
-      final record = await (select(dailyRecords)
-            ..where((r) => r.date.equals(d)))
-          .getSingleOrNull();
-      results.add(WeeklyPoint(
-        date: d,
-        points: record?.netPoints ?? 0,
-      ));
+      final record = await (select(
+        dailyRecords,
+      )..where((r) => r.date.equals(d))).getSingleOrNull();
+      results.add(WeeklyPoint(date: d, points: record?.netPoints ?? 0));
     }
     return results;
   }
@@ -407,19 +427,21 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     required String emoji,
     int pointsReward = 0,
   }) async {
-    final existing = await (select(achievements)
-          ..where((a) => a.type.equals(type)))
-        .getSingleOrNull();
+    final existing = await (select(
+      achievements,
+    )..where((a) => a.type.equals(type))).getSingleOrNull();
     if (existing != null) return;
 
-    await into(achievements).insert(AchievementsCompanion(
-      type: Value(type),
-      titleAr: Value(titleAr),
-      descAr: Value(descAr),
-      emoji: Value(emoji),
-      pointsReward: Value(pointsReward),
-      earnedAt: Value(DateTime.now()),
-    ));
+    await into(achievements).insert(
+      AchievementsCompanion(
+        type: Value(type),
+        titleAr: Value(titleAr),
+        descAr: Value(descAr),
+        emoji: Value(emoji),
+        pointsReward: Value(pointsReward),
+        earnedAt: Value(DateTime.now()),
+      ),
+    );
   }
 
   Future<List<Achievement>> checkAndGrantAchievements() async {
@@ -429,74 +451,148 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
 
     // 1. Streaks
     if (streak >= 3) {
-      await _tryGrant('streak_3', 'البداية الطيبة',
-          'حافظت على المحاسبة لثلاثة أيام متواصلة', '🌱', 20);
+      final a = await _tryGrant(
+        'streak_3',
+        'البداية الطيبة',
+        'حافظت على المحاسبة لثلاثة أيام متواصلة',
+        '🌱',
+        20,
+      );
+      if (a != null) newAchievements.add(a);
     }
     if (streak >= 7) {
-      await _tryGrant(
-          'streak_7', 'الأسبوع المثالي', 'سبعة أيام من الالتزام والمحاسبة', '🌿', 50);
+      final a = await _tryGrant(
+        'streak_7',
+        'الأسبوع المثالي',
+        'سبعة أيام من الالتزام والمحاسبة',
+        '🌿',
+        50,
+      );
+      if (a != null) newAchievements.add(a);
     }
     if (streak >= 30) {
-      await _tryGrant(
-          'streak_30', 'المجاهد المثابر', 'ثلاثون يوماً من مراقبة النفس والتقوى', '⚔️', 200);
+      final a = await _tryGrant(
+        'streak_30',
+        'المجاهد المثابر',
+        'ثلاثون يوماً من مراقبة النفس والتقوى',
+        '⚔️',
+        200,
+      );
+      if (a != null) newAchievements.add(a);
     }
 
     // 2. Quran
     final quranPages = await getMonthlyQuranPages(now.year, now.month);
     if (quranPages >= 30) {
-      await _tryGrant(
-          'quran_juz', 'أهل القرآن', 'ختمت جزءاً كاملاً من كتاب الله', '📖', 100);
+      final a = await _tryGrant(
+        'quran_juz',
+        'أهل القرآن',
+        'ختمت جزءاً كاملاً من كتاب الله',
+        '📖',
+        100,
+      );
+      if (a != null) newAchievements.add(a);
     }
 
     // 3. Today's tasks (Dynamic)
     final todayDate = DateTime(now.year, now.month, now.day);
-    final today = await (select(dailyRecords)..where((r) => r.date.equals(todayDate)))
-        .getSingleOrNull();
+    final today = await (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(todayDate))).getSingleOrNull();
 
     if (today != null) {
       if (today.netPoints > 0) {
-        await _tryGrant('daily_muhasaba', 'المحاسب المجتهد',
-            'أكملت محاسبة النفس لهذا اليوم', '📝', 10);
+        final a = await _tryGrant(
+          'daily_muhasaba',
+          'المحاسب المجتهد',
+          'أكملت محاسبة النفس لهذا اليوم',
+          '📝',
+          10,
+        );
+        if (a != null) newAchievements.add(a);
       }
       if (today.morningAdhkar) {
-        await _tryGrant('morning_adhkar', 'نور الصباح',
-            'أكملت أذكار الصباح بالكامل', '🌅', 5);
+        final a = await _tryGrant(
+          'morning_adhkar',
+          'نور الصباح',
+          'أكملت أذكار الصباح بالكامل',
+          '🌅',
+          5,
+        );
+        if (a != null) newAchievements.add(a);
       }
       if (today.eveningAdhkar) {
-        await _tryGrant('evening_adhkar', 'تحصين المساء',
-            'أكملت أذكار المساء بالكامل', '🌙', 5);
+        final a = await _tryGrant(
+          'evening_adhkar',
+          'تحصين المساء',
+          'أكملت أذكار المساء بالكامل',
+          '🌙',
+          5,
+        );
+        if (a != null) newAchievements.add(a);
       }
       if (today.sadaqah) {
-        await _tryGrant('first_sadaqah', 'اليد المعطية',
-            'أخرجت أول صدقة لك عبر التطبيق', '💰', 30);
+        final a = await _tryGrant(
+          'first_sadaqah',
+          'اليد المعطية',
+          'أخرجت أول صدقة لك عبر التطبيق',
+          '💰',
+          30,
+        );
+        if (a != null) newAchievements.add(a);
       }
     }
 
     // 4. Points Milestones
     final totalPoints = await getMonthlyPoints(now.year, now.month);
     if (totalPoints >= 100) {
-      await _tryGrant('points_100', 'مئة خطوة', 'جمعت أول 100 نقطة تقوى', '🎖️', 50);
+      final a = await _tryGrant(
+        'points_100',
+        'مئة خطوة',
+        'جمعت أول 100 نقطة تقوى',
+        '🎖️',
+        50,
+      );
+      if (a != null) newAchievements.add(a);
     }
     if (totalPoints >= 3000) {
-       await _tryGrant('points_1000', 'فارس التقوى', 'بلغت 1000 نقطة في مسيرتك', '🏆', 500);
+      final a = await _tryGrant(
+        'points_1000',
+        'فارس التقوى',
+        'بلغت 1000 نقطة في مسيرتك',
+        '🏆',
+        500,
+      );
+      if (a != null) newAchievements.add(a);
     }
 
     return newAchievements;
   }
 
-  Future<void> _tryGrant(
-      String type, String title, String desc, String emoji, int pts) async {
-    final exists = await (select(achievements)
-          ..where((a) => a.type.equals(type)))
-        .getSingleOrNull();
+  Future<Achievement?> _tryGrant(
+    String type,
+    String title,
+    String desc,
+    String emoji,
+    int pts,
+  ) async {
+    final exists = await (select(
+      achievements,
+    )..where((a) => a.type.equals(type))).getSingleOrNull();
     if (exists == null) {
-      await addAchievement(
-          type: type,
-          titleAr: title,
-          descAr: desc,
-          emoji: emoji,
-          pointsReward: pts);
+      final id = await into(achievements).insert(
+        AchievementsCompanion(
+          type: Value(type),
+          titleAr: Value(title),
+          descAr: Value(desc),
+          emoji: Value(emoji),
+          pointsReward: Value(pts),
+          earnedAt: Value(DateTime.now()),
+        ),
+      );
+      return (select(achievements)..where((a) => a.id.equals(id))).getSingle();
     }
+    return null;
   }
 }
 
@@ -509,8 +605,9 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
   SettingsDao(super.db);
 
   Future<String?> get(String key) async {
-    final row = await (select(userSettings)..where((s) => s.key.equals(key)))
-        .getSingleOrNull();
+    final row = await (select(
+      userSettings,
+    )..where((s) => s.key.equals(key))).getSingleOrNull();
     return row?.value;
   }
 
@@ -589,11 +686,11 @@ class MonthStats {
   }
 
   String get levelLabel => switch (level) {
-        TaqwaLevel.mubtadi => 'مبتدئ 🌱',
-        TaqwaLevel.salik => 'سالك 🌿',
-        TaqwaLevel.mujahid => 'مجاهد ⚔️',
-        TaqwaLevel.mutaqi => 'متقي ✨',
-      };
+    TaqwaLevel.mubtadi => 'مبتدئ 🌱',
+    TaqwaLevel.salik => 'سالك 🌿',
+    TaqwaLevel.mujahid => 'مجاهد ⚔️',
+    TaqwaLevel.mutaqi => 'متقي ✨',
+  };
 
   int get prayerPercent => (prayerRate * 100).round();
 }

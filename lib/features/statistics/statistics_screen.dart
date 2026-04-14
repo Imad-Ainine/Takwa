@@ -129,7 +129,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.stats),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.stats),
+            ),
             GuestModeGuard(
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),

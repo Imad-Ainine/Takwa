@@ -19,7 +19,9 @@ class AboutMeScreen extends StatelessWidget {
       backgroundColor: context.colors.background,
       body: Stack(
         children: [
-          const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.geometric),
+          ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [

@@ -22,6 +22,7 @@ class SyncManager {
     _syncing = true;
     try {
       await _syncDailyRecords(ref);
+      await _syncAchievements(ref);
       await _syncSettings(ref);
       await _syncStats(ref);
     } finally {
@@ -42,6 +43,21 @@ class SyncManager {
     }
   }
 
+  static Future<void> _syncAchievements(WidgetRef ref) async {
+    final remoteAchievements = await SupabaseService.getEarnedAchievements();
+    final statsDao = ref.read(statsDaoProvider);
+
+    for (final data in remoteAchievements) {
+      await statsDao.addAchievement(
+        type: data['type'],
+        titleAr: data['title_ar'] ?? '',
+        descAr: data['desc_ar'] ?? '',
+        emoji: data['emoji'] ?? '✨',
+        pointsReward: data['points_reward'] ?? 0,
+      );
+    }
+  }
+
   static Future<void> _syncSettings(WidgetRef ref) async {
     final remote = await SupabaseService.getSettings();
     if (remote == null) return;
@@ -51,10 +67,9 @@ class SyncManager {
   }
 
   static Future<void> _syncStats(WidgetRef ref) async {
-    final stats = await ref.read(statsDaoProvider).getMonthStats(
-      DateTime.now().year,
-      DateTime.now().month,
-    );
+    final stats = await ref
+        .read(statsDaoProvider)
+        .getMonthStats(DateTime.now().year, DateTime.now().month);
 
     await SupabaseService.updateUserStats(
       totalPoints: stats.totalPoints,
@@ -86,6 +101,25 @@ class SyncManager {
       'net_points': record.netPoints,
       'taqwa_points': record.taqwaPoints,
       'notes': record.notes,
+    });
+  }
+
+  /// Sync newly earned achievement
+  static Future<void> syncAchievement(
+    WidgetRef ref,
+    Achievement achievement,
+  ) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.upsertAchievement({
+      'type': achievement.type,
+      'title_ar': achievement.titleAr,
+      'desc_ar': achievement.descAr,
+      'emoji': achievement.emoji,
+      'points_reward': achievement.pointsReward,
+      'earned_at': achievement.earnedAt.toIso8601String(),
     });
   }
 }

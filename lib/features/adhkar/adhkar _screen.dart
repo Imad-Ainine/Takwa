@@ -75,7 +75,9 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
         backgroundColor: style.bg,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            ),
             Column(
               children: [
                 _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs),

@@ -88,7 +88,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
         body: Stack(
           children: [
             // Background
-            const CustomPatternBackground(pattern: BackgroundPattern.qibla),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.qibla),
+            ),
             SafeArea(
               child: Column(
                 children: [

@@ -107,7 +107,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            ),
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [

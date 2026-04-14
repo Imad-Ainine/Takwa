@@ -185,9 +185,11 @@ class _DrawerContent extends ConsumerWidget {
       child: Stack(
         children: [
           // نمط خلفية عصري
-          const CustomPatternBackground(
-            pattern: BackgroundPattern.geometric,
-            blurAmount: 0.5,
+          const Positioned.fill(
+            child: CustomPatternBackground(
+              pattern: BackgroundPattern.geometric,
+              blurAmount: 0.5,
+            ),
           ),
 
           SafeArea(

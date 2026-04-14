@@ -4,9 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:ui';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
@@ -29,7 +27,10 @@ class ProfileScreen extends ConsumerWidget {
       body: Stack(
         children: [
           // Background Pattern
-          const CustomPatternBackground(pattern: BackgroundPattern.geometric, blurAmount: 4),
+          const Positioned.fill(
+            child: CustomPatternBackground(
+                pattern: BackgroundPattern.geometric, blurAmount: 4),
+          ),
           
           CustomScrollView(
             physics: const BouncingScrollPhysics(),

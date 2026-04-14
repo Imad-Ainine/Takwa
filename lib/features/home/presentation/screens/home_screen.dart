@@ -130,7 +130,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         body: Stack(
           children: [
             // ── Dynamic Background ──
-            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            ),
 
             CustomScrollView(
               controller: _scrollCtrl,

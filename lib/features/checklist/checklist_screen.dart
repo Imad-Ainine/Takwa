@@ -15,6 +15,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  CHECKLIST SCREEN
@@ -98,7 +99,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.checklist),
+            const Positioned.fill(
+              child:
+                  CustomPatternBackground(pattern: BackgroundPattern.checklist),
+            ),
             todayAsync.when(
               loading: () => Center(
                 child: CircularProgressIndicator(
@@ -547,6 +551,11 @@ class _PrayersGroup extends ConsumerWidget {
                   prayerName: p.$3,
                   status: newStatus,
                 );
+            // Sync to Supabase
+            final updatedRec = await ref.read(dailyRecordDaoProvider).getRecordByDate(DateTime.now());
+            if (updatedRec != null) {
+              await SyncManager.syncDailyRecord(ref, updatedRec);
+            }
           },
         );
       }).toList(),
@@ -836,6 +845,7 @@ class _IbadahGroup extends ConsumerWidget {
             await ref
                 .read(dailyRecordDaoProvider)
                 .updateAdhkar(recordId: rec.id, morning: v);
+            await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
           },
         ),
 
@@ -852,6 +862,7 @@ class _IbadahGroup extends ConsumerWidget {
             await ref
                 .read(dailyRecordDaoProvider)
                 .updateAdhkar(recordId: rec.id, evening: v);
+            await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
           },
         ),
 
@@ -866,6 +877,7 @@ class _IbadahGroup extends ConsumerWidget {
                 .read(dailyRecordDaoProvider)
                 .getOrCreateToday();
             await ref.read(dailyRecordDaoProvider).toggleNightPrayer(rec.id, v);
+            await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
           },
         ),
 
@@ -882,6 +894,7 @@ class _IbadahGroup extends ConsumerWidget {
                 .read(dailyRecordDaoProvider)
                 .getOrCreateToday();
             await ref.read(dailyRecordDaoProvider).toggleSadaqah(rec.id, v);
+            await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
           },
         ),
       ],
@@ -983,6 +996,7 @@ class _QuranInput extends ConsumerWidget {
                 await ref
                     .read(dailyRecordDaoProvider)
                     .updateQuran(recordId: rec.id, pages: pages);
+                await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
               },
             ),
           ),
@@ -1196,6 +1210,7 @@ class _FastingSelector extends ConsumerWidget {
           HapticFeedback.selectionClick();
           final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
           await ref.read(dailyRecordDaoProvider).updateFasting(rec.id, value);
+          await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -1328,13 +1343,14 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           committed: newVal,
           timesCount: newVal ? (_count == 0 ? 1 : _count) : 0,
         );
+    await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
   }
 
-  void _increment() {
+  Future<void> _increment() async {
     if (!_committed || widget.recordId == null) return;
     HapticFeedback.selectionClick();
     setState(() => _count++);
-    ref
+    await ref
         .read(dailyRecordDaoProvider)
         .logProhibition(
           recordId: widget.recordId!,
@@ -1342,6 +1358,7 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           committed: true,
           timesCount: _count,
         );
+    await SyncManager.syncDailyRecord(ref, await ref.read(dailyRecordDaoProvider).getOrCreateToday());
   }
 
   @override
@@ -1576,6 +1593,9 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
         updatedAt: Value(DateTime.now()),
       ),
     );
+    // Sync to Supabase
+    final updatedRec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
+    await SyncManager.syncDailyRecord(ref, updatedRec);
     setState(() => _saving = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

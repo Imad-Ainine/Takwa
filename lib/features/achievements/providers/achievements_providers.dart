@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/supabase/supabase_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/features/achievements/domain/models/achievement_definition.dart';
 
@@ -24,7 +25,22 @@ final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
   final db = ref.watch(appDatabaseProvider);
 
   // 1. Check and grant new achievements automatically
-  await statsDao.checkAndGrantAchievements();
+  final newEarned = await statsDao.checkAndGrantAchievements();
+  for (final ach in newEarned) {
+    // Note: In providers, we can't pass 'ref' directly to SyncManager if it expects WidgetRef
+    // But SyncManager uses ConnectivityProvider which can be read from ProviderRef
+    // I will use a custom sync method for providers if needed, or check if ref works.
+    // SyncManager.syncAchievement(ref, ach) expects WidgetRef.
+    // Let's assume SyncManager can handle ProviderRef or we change its type.
+    await SupabaseService.upsertAchievement({
+      'type': ach.type,
+      'title_ar': ach.titleAr,
+      'desc_ar': ach.descAr,
+      'emoji': ach.emoji,
+      'points_reward': ach.pointsReward,
+      'earned_at': ach.earnedAt.toIso8601String(),
+    });
+  }
 
   // 2. Fetch earned achievements from DB
   final earnedList = await (db.select(db.achievements)).get();
