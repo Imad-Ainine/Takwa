@@ -55,33 +55,42 @@ class _CustomPatternBackgroundState
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
 
+    // Optimization: Stop animation if not in Ramadan mode to save resources
+    if (!isRamadan && _ctrl.isAnimating) {
+      _ctrl.stop();
+    } else if (isRamadan && !_ctrl.isAnimating) {
+      _ctrl.repeat();
+    }
+
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
       return LayoutBuilder(
         builder: (context, constraints) {
           final h = constraints.maxHeight.isInfinite ? null : double.infinity;
           final w = constraints.maxWidth.isInfinite ? null : double.infinity;
-          
+
           return SizedBox(
             width: w,
             height: h,
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: AnimatedBuilder(
-                    animation: _ctrl,
-                    builder: (_, __) => CustomPaint(
-                      painter: RamadanBgPainter(
-                        animT: _ctrl.value,
-                        brightness: brightness,
+                  child: RepaintBoundary(
+                    child: AnimatedBuilder(
+                      animation: _ctrl,
+                      builder: (_, __) => CustomPaint(
+                        painter: RamadanBgPainter(
+                          animT: _ctrl.value,
+                          brightness: brightness,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 if (widget.blurAmount > 0)
                   Positioned.fill(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
                         sigmaX: widget.blurAmount,
                         sigmaY: widget.blurAmount,
                       ),
@@ -141,11 +150,15 @@ class _CustomPatternBackgroundState
           height: h,
           child: Stack(
             children: [
-              Positioned.fill(child: CustomPaint(painter: painter)),
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: CustomPaint(painter: painter),
+                ),
+              ),
               if (widget.blurAmount > 0)
                 Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(
                       sigmaX: widget.blurAmount,
                       sigmaY: widget.blurAmount,
                     ),

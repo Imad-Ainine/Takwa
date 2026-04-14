@@ -16,6 +16,7 @@ import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
+import 'package:quran_library/quran_library.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
@@ -47,6 +48,9 @@ void main() async {
 
   // تهيئة الإشعارات
   await NotificationsService.initialize();
+
+  // تهيئة مكتبة القرآن
+  await QuranLibrary.init();
 
   runApp(const ProviderScope(child: TakwaApp()));
 }

@@ -12,6 +12,9 @@ import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
 import 'package:takwa/features/auth/presentation/screens/auth_screen.dart';
 import 'package:takwa/features/achievements/presentation/screens/achievements_screen.dart';
 import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/quran_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.dart';
+import 'package:takwa/features/quran/data/quran_data.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -31,6 +34,8 @@ class Routes {
   static const String achievements = '/achievements';
   static const String authChoice = '/auth-choice';
   static const String profile = '/profile';
+  static const String quran = '/quran';
+  static const String quranReader = '/quran-reader';
 }
 
 /// Centralized route generation and management.
@@ -80,6 +85,16 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const AuthChoiceScreen());
       case Routes.profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case Routes.quran:
+        return MaterialPageRoute(builder: (_) => const QuranScreen());
+      case Routes.quranReader:
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => QuranReaderScreen(
+            surah: args['surah'] as SurahMeta,
+            initialAyah: args['initialAyah'] as int,
+          ),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) =>

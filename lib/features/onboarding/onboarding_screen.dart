@@ -22,7 +22,6 @@ enum OnboardStep {
   location,
   notifications,
   gender,
-  auth,
   plan,
 }
 
@@ -152,14 +151,6 @@ class OnboardingScreen extends ConsumerWidget {
           onNext: notifier.next,
           onSkip: notifier.skip,
         );
-      case OnboardStep.auth:
-        return _AuthStep(
-          onAuth: (type) {
-            // Logic for Social Auth
-            notifier.next();
-          },
-          onSkip: notifier.skip,
-        );
       case OnboardStep.plan:
         return _PlanStep(
           onStart: () async {
@@ -182,7 +173,6 @@ class _StepIndicator extends StatelessWidget {
       OnboardStep.location,
       OnboardStep.notifications,
       OnboardStep.gender,
-      OnboardStep.auth,
       OnboardStep.plan,
     ];
     final idx = setupSteps.indexOf(current);
@@ -788,35 +778,6 @@ class _AuthStepState extends State<_AuthStep>
             ),
             const Spacer(),
             _anim(
-              3,
-              Column(
-                children: [
-                  _SocialAuthBtn(
-                    icon: '🔵',
-                    label: 'تسجيل الدخول بـ Facebook',
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF1877F2), Color(0xFF0D65E0)],
-                    ),
-                    onTap: () => widget.onAuth('facebook'),
-                  ),
-                  const SizedBox(height: 10),
-                  _SocialAuthBtn(
-                    icon: '🔴',
-                    label: 'تسجيل الدخول بـ Google',
-                    isOutline: true,
-                    onTap: () => widget.onAuth('google'),
-                  ),
-                  const SizedBox(height: 10),
-                  _SocialAuthBtn(
-                    icon: '📧',
-                    label: 'تسجيل بالبريد الإلكتروني',
-                    isOutline: true,
-                    onTap: () => widget.onAuth('email'),
-                  ),
-                ],
-              ),
-            ),
-            _anim(
               4,
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -862,67 +823,6 @@ class _BenefitRow extends StatelessWidget {
         color: AppColors.success,
       ),
     ],
-  );
-}
-
-class _SocialAuthBtn extends StatelessWidget {
-  final String icon, label;
-  final Gradient? gradient;
-  final bool isOutline;
-  final VoidCallback onTap;
-
-  const _SocialAuthBtn({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.gradient,
-    this.isOutline = false,
-  });
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: () {
-      HapticFeedback.selectionClick();
-      onTap();
-    },
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-      decoration: BoxDecoration(
-        gradient: isOutline ? null : gradient,
-        color: isOutline ? Colors.transparent : null,
-        borderRadius: BorderRadius.circular(14),
-        border: isOutline
-            ? Border.all(color: AppColors.border, width: 1.5)
-            : null,
-        boxShadow: !isOutline
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ]
-            : null,
-      ),
-      child: Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
-          Expanded(
-            child: Center(
-              child: Text(
-                label,
-                style: GoogleFonts.notoNaskhArabic(
-                  fontSize: 13,
-                  color: isOutline ? AppColors.textPrimary : Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
   );
 }
 

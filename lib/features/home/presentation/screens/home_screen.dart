@@ -1143,6 +1143,8 @@ class _IbadahChipMerged extends StatelessWidget {
       onTap: () {
         if (label == 'الأذكار') {
           Navigator.pushNamed(context, '/adhkar');
+        } else if (label == 'القرآن') {
+          Navigator.pushNamed(context, '/quran');
         } else {
           HapticFeedback.lightImpact();
         }
@@ -1217,6 +1219,7 @@ class _FeatureRow extends StatelessWidget {
 
   static const _features = [
     ('🕌', 'أوقات\nالصلاة', '/prayer'),
+    ('📖', 'القرآن', '/quran'),
     ('🧭', 'القبلة', '/qibla'),
     ('📿', 'الأذكار', '/adhkar'),
     ('🤲', 'الأدعية', '/duas'),

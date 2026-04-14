@@ -58,11 +58,16 @@ dependencies:
   google_sign_in: ^6.2.1
 
   # ── Connectivity ──
-  connectivity_plus: ^6.0.3 # detect online/offline
+  connectivity_plus: ^7.1.1 # detect online/offline
 
   # ── Environment Variables ──
   flutter_dotenv: ^5.1.0
   geocoding: ^4.0.0
+
+  # ── Quran & Audio ──
+  quran_library: ^3.2.2+3
+  just_audio: ^0.10.5
+  audio_service: ^0.18.18
 
 dev_dependencies:
   flutter_test:
