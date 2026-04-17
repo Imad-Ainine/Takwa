@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  lib/main.dart — محاسبة النفس
+//  lib/main.dart — تقوى
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -63,7 +63,7 @@ class TakwaApp extends ConsumerWidget {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
 
     return MaterialApp(
-      title: 'محاسبة النفس',
+      title: 'تقوى',
       debugShowCheckedModeBanner: false,
       navigatorKey: NotificationRouter.navigatorKey,
       themeMode: ref.watch(themeModeProvider),

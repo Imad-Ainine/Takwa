@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/database/daos.dart
-//  محاسبة النفس — Data Access Objects (DAOs)
+// تقوى — Data Access Objects (DAOs)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:drift/drift.dart';
@@ -33,8 +33,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     );
 
     // Fetch the record (either newly created or existed)
-    return (select(dailyRecords)..where((r) => r.date.equals(today)))
-        .getSingle();
+    return (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(today))).getSingle();
   }
 
   Future<void> updatePrayerStatus({

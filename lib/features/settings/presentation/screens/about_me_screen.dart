@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/settings/presentation/screens/about_me_screen.dart
-//  محاسبة النفس — About Me (عن المبرمج)
+//  تقوى — About Me (عن المبرمج)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';

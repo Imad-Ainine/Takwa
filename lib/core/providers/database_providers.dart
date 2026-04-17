@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/providers/database_providers.dart
-//  محاسبة النفس — Riverpod Providers
+//  تقوى — Riverpod Providers
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

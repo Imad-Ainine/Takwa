@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/database/app_database.dart
-//  محاسبة النفس — Complete Local Database (Drift / SQLite)
+//  تقوى — Complete Local Database (Drift / SQLite)
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:io';
@@ -205,23 +205,25 @@ class RamadanProgress extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {year, dayNumber},
-      ];
+    {year, dayNumber},
+  ];
 }
 
 // ─────────────────────────────────────────
 //  DATABASE CLASS
 // ─────────────────────────────────────────
-@DriftDatabase(tables: [
-  DailyRecords,
-  ProhibitionsLog,
-  PrayerTimesCache,
-  Achievements,
-  CustomIbadah,
-  CustomIbadahLog,
-  UserSettings,
-  RamadanProgress,
-])
+@DriftDatabase(
+  tables: [
+    DailyRecords,
+    ProhibitionsLog,
+    PrayerTimesCache,
+    Achievements,
+    CustomIbadah,
+    CustomIbadahLog,
+    UserSettings,
+    RamadanProgress,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -230,14 +232,14 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) async {
-          await m.createAll();
-          await _seedDefaultData();
-        },
-        onUpgrade: (Migrator m, int from, int to) async {
-          // Future migrations here
-        },
-      );
+    onCreate: (Migrator m) async {
+      await m.createAll();
+      await _seedDefaultData();
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      // Future migrations here
+    },
+  );
 
   Future<void> _seedDefaultData() async {
     await _insertSetting('madhab', 'shafi');
@@ -256,12 +258,14 @@ class AppDatabase extends _$AppDatabase {
       ('الغيبة', '🗣️', false, -10),
     ];
     for (final item in defaultIbadaat) {
-      await into(customIbadah).insert(CustomIbadahCompanion(
-        nameAr: Value(item.$1),
-        emoji: Value(item.$2),
-        isPositive: Value(item.$3),
-        points: Value(item.$4),
-      ));
+      await into(customIbadah).insert(
+        CustomIbadahCompanion(
+          nameAr: Value(item.$1),
+          emoji: Value(item.$2),
+          isPositive: Value(item.$3),
+          points: Value(item.$4),
+        ),
+      );
     }
   }
 
@@ -279,6 +283,12 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'takwa.db'));
-    return NativeDatabase.createInBackground(file);
+    return NativeDatabase.createInBackground(
+      file,
+      setup: (db) {
+        db.execute('PRAGMA journal_mode=WAL;');
+        db.execute('PRAGMA busy_timeout=5000;');
+      },
+    );
   });
 }

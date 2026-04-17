@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/notifications/notifications_service.dart
-//  محاسبة النفس — Local Notifications + Prayer Times
+// تقوى — Local Notifications + Prayer Times
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:io';

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
-import 'dart:ui';
 import 'background_painters.dart';
 
 enum BackgroundPattern {
@@ -18,12 +17,10 @@ enum BackgroundPattern {
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
   final BackgroundPattern pattern;
-  final double blurAmount;
 
   const CustomPatternBackground({
     super.key,
     this.pattern = BackgroundPattern.geometric,
-    this.blurAmount = 2.0,
   });
 
   @override
@@ -64,43 +61,24 @@ class _CustomPatternBackgroundState
 
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final h = constraints.maxHeight.isInfinite ? null : double.infinity;
-          final w = constraints.maxWidth.isInfinite ? null : double.infinity;
-
-          return SizedBox(
-            width: w,
-            height: h,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: RepaintBoundary(
-                    child: AnimatedBuilder(
-                      animation: _ctrl,
-                      builder: (_, __) => CustomPaint(
-                        painter: RamadanBgPainter(
-                          animT: _ctrl.value,
-                          brightness: brightness,
-                        ),
-                      ),
+      return SizedBox.expand(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: RepaintBoundary(
+                child: AnimatedBuilder(
+                  animation: _ctrl,
+                  builder: (context, _) => CustomPaint(
+                    painter: RamadanBgPainter(
+                      animT: _ctrl.value,
+                      brightness: brightness,
                     ),
                   ),
                 ),
-                if (widget.blurAmount > 0)
-                  Positioned.fill(
-                    child: ImageFiltered(
-                      imageFilter: ImageFilter.blur(
-                        sigmaX: widget.blurAmount,
-                        sigmaY: widget.blurAmount,
-                      ),
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
-              ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       );
     }
 
@@ -109,7 +87,7 @@ class _CustomPatternBackgroundState
 
     switch (widget.pattern) {
       case BackgroundPattern.geometric:
-        painter = GeometricPainter(color: colors.gold, blur: 0.5);
+        painter = GeometricPainter(color: colors.gold);
         break;
       case BackgroundPattern.stats:
         painter = StatsBgPainter(
@@ -118,7 +96,7 @@ class _CustomPatternBackgroundState
         );
         break;
       case BackgroundPattern.duas:
-        painter = DuasBgPainter(goldColor: colors.gold, blur: 0.8);
+        painter = DuasBgPainter(goldColor: colors.gold);
         break;
       case BackgroundPattern.adhkar:
         painter = AdhkarBgPainter(
@@ -133,42 +111,15 @@ class _CustomPatternBackgroundState
         );
         break;
       case BackgroundPattern.qibla:
-        painter = QiblaBgPainter(goldColor: colors.gold, blur: 1.0);
+        painter = QiblaBgPainter(goldColor: colors.gold);
         break;
       case BackgroundPattern.asma:
-        painter = AsmaBgPainter(goldColor: colors.gold, blur: 0.8);
+        painter = AsmaBgPainter(goldColor: colors.gold);
         break;
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final h = constraints.maxHeight.isInfinite ? null : double.infinity;
-        final w = constraints.maxWidth.isInfinite ? null : double.infinity;
-
-        return SizedBox(
-          width: w,
-          height: h,
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: RepaintBoundary(
-                  child: CustomPaint(painter: painter),
-                ),
-              ),
-              if (widget.blurAmount > 0)
-                Positioned.fill(
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(
-                      sigmaX: widget.blurAmount,
-                      sigmaY: widget.blurAmount,
-                    ),
-                    child: const SizedBox.expand(),
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
+    return SizedBox.expand(
+      child: RepaintBoundary(child: CustomPaint(painter: painter)),
     );
   }
 }

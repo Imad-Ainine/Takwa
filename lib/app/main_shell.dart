@@ -195,7 +195,6 @@ class _BottomNav extends StatelessWidget {
             child: ClipRect(
               child: CustomPatternBackground(
                 pattern: BackgroundPattern.geometric,
-                blurAmount: 0.1,
               ),
             ),
           ),

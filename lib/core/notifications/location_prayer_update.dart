@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/notifications/location_prayer_update.dart
-//  محاسبة النفس — Location + Timezone + Prayer Auto-Update
+//  تقوى — Location + Timezone + Prayer Auto-Update
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';

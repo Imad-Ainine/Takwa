@@ -1,14 +1,9 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/achievements/domain/models/achievement_definition.dart
-//  محاسبة النفس — Achievement Definitions (تعريفات الإنجازات)
+//  تقوى — Achievement Definitions (تعريفات الإنجازات)
 // ═══════════════════════════════════════════════════════════════
 
-enum AchievementCategory {
-  daily,
-  milestone,
-  ibadah,
-  special,
-}
+enum AchievementCategory { daily, milestone, ibadah, special }
 
 class AchievementDefinition {
   final String id;

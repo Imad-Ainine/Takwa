@@ -14,7 +14,7 @@ import 'package:takwa/features/achievements/presentation/screens/achievements_sc
 import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.dart';
-import 'package:takwa/features/quran/data/quran_data.dart';
+// Remove quran_data.dart import if unused
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -88,13 +88,7 @@ class AppRoutes {
       case Routes.quran:
         return MaterialPageRoute(builder: (_) => const QuranScreen());
       case Routes.quranReader:
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-          builder: (_) => QuranReaderScreen(
-            surah: args['surah'] as SurahMeta,
-            initialAyah: args['initialAyah'] as int,
-          ),
-        );
+        return MaterialPageRoute(builder: (_) => const QuranReaderScreen());
       default:
         return MaterialPageRoute(
           builder: (_) =>

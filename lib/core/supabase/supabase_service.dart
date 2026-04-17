@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/supabase/supabase_service.dart
-//  محاسبة النفس — Supabase Unified Service
+//  تقوى — Supabase Unified Service
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,8 +17,8 @@ class SupabaseService {
     required String username,
   }) async {
     final res = await _db.auth.signUp(
-      email: email, 
-      password: password, 
+      email: email,
+      password: password,
       data: {'username': username, 'avatar_emoji': '🌙'},
     );
     if (res.user != null) {
@@ -46,7 +46,7 @@ class SupabaseService {
         clientId: iosClientId,
         serverClientId: webClientId,
       );
-      
+
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) return null;
 

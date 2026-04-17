@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/supabase/supabase_providers.dart
-//  محاسبة النفس — Supabase Providers
+//  تقوى — Supabase Providers
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

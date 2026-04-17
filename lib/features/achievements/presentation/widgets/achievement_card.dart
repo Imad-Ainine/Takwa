@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/achievements/presentation/widgets/achievement_card.dart
-//  محاسبة النفس — Achievement Card (بطاقة الإنجاز)
+//  تقوى — Achievement Card (بطاقة الإنجاز)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -61,10 +61,7 @@ class AchievementCard extends StatelessWidget {
               ),
               child: Opacity(
                 opacity: isEarned ? 1.0 : 0.4,
-                child: Text(
-                  def.emoji,
-                  style: const TextStyle(fontSize: 34),
-                ),
+                child: Text(def.emoji, style: const TextStyle(fontSize: 34)),
               ),
             ),
             const SizedBox(height: 14),
@@ -87,7 +84,10 @@ class AchievementCard extends StatelessWidget {
             // Points Reward (only if earned or descriptive)
             if (isEarned) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: colors.gold.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),

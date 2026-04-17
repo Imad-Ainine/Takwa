@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/home/presentation/screens/home_screen.dart
-//  محاسبة النفس — Home Dashboard (الشاشة الرئيسية المدمجة)
+// تقوى — Home Dashboard (الشاشة الرئيسية المدمجة)
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
@@ -166,10 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       duration: const Duration(milliseconds: 180),
                       child: Text(
                         hijriStr,
-                        style: GoogleFonts.amiri(
-                          fontSize: 14,
-                          color: style.gold,
-                        ),
+                        style: style.amiri(14, color: style.gold),
                       ),
                     ),
                     centerTitle: true,

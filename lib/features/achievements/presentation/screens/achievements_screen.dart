@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/achievements/presentation/screens/achievements_screen.dart
-//  محاسبة النفس — Achievements Screen (شاشة الإنجازات)
+//  — Achievements Screen (شاشة الإنجازات)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -66,12 +66,12 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
   }
 
   Widget _anim(int i, Widget child) => FadeTransition(
-        opacity: _fadeAnims[i.clamp(0, _sectionCount - 1)],
-        child: SlideTransition(
-          position: _slideAnims[i.clamp(0, _sectionCount - 1)],
-          child: child,
-        ),
-      );
+    opacity: _fadeAnims[i.clamp(0, _sectionCount - 1)],
+    child: SlideTransition(
+      position: _slideAnims[i.clamp(0, _sectionCount - 1)],
+      child: child,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +83,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.geometric),
+            child: CustomPatternBackground(
+              pattern: BackgroundPattern.geometric,
+            ),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
@@ -157,7 +159,10 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               _anim(
                 0,
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: colors.cardGradient,
@@ -210,10 +215,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                               borderRadius: BorderRadius.circular(10),
                               child: Stack(
                                 children: [
-                                  Container(
-                                    height: 8,
-                                    color: colors.border,
-                                  ),
+                                  Container(height: 8, color: colors.border),
                                   FractionallySizedBox(
                                     widthFactor: progress,
                                     child: Container(
@@ -248,7 +250,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
         final cat = categories[index];
-        final catItems = list.where((a) => a.definition.category == cat).toList();
+        final catItems = list
+            .where((a) => a.definition.category == cat)
+            .toList();
         if (catItems.isEmpty) return const SizedBox.shrink();
 
         return _anim(
@@ -330,7 +334,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
         decoration: BoxDecoration(
           color: colors.background,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          border: Border(top: BorderSide(color: colors.gold.withOpacity(0.3), width: 1.5)),
+          border: Border(
+            top: BorderSide(color: colors.gold.withOpacity(0.3), width: 1.5),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

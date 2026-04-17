@@ -156,7 +156,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                         // Title
                         Text(
-                          'محاسبة النفس',
+                          'تقوى ',
                           style: GoogleFonts.amiri(
                             fontSize: 38,
                             fontWeight: FontWeight.bold,

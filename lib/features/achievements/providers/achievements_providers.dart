@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/achievements/providers/achievements_providers.dart
-//  محاسبة النفس — Achievements Providers (مزودو بيانات الإنجازات)
+// تقوى — Achievements Providers (مزودو بيانات الإنجازات)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

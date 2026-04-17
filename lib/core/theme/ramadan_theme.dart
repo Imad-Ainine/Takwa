@@ -1,9 +1,10 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/theme/ramadan_theme.dart
-//  محاسبة النفس — Ramadan Dynamic Theme System
+//  تقوى — Ramadan Dynamic Theme System
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -342,9 +343,13 @@ class RamadanBgPainter extends CustomPainter {
 
   static final _rng = math.Random(7);
   static List<Offset>? _stars;
+  static Picture? _cachedArabesque;
+  static Size? _cachedArabesqueSize;
+  static Brightness? _cachedBrightness;
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
     final isDark = brightness == Brightness.dark;
 
     // Background gradient
@@ -361,8 +366,18 @@ class RamadanBgPainter extends CustomPainter {
       _drawDayElements(canvas, size);
     }
 
-    // Pattern
-    _drawArabesque(canvas, size, isDark);
+    // Pattern - Caching expensive arabesque
+    if (_cachedArabesque == null ||
+        _cachedArabesqueSize != size ||
+        _cachedBrightness != brightness) {
+      _cachedArabesqueSize = size;
+      _cachedBrightness = brightness;
+      final recorder = PictureRecorder();
+      final c = Canvas(recorder);
+      _drawArabesque(c, size, isDark);
+      _cachedArabesque = recorder.endRecording();
+    }
+    canvas.drawPicture(_cachedArabesque!);
 
     // Lanterns (Fanoos)
     _drawLantern(canvas, Offset(size.width * 0.15, 60), 1.0, isDark);
@@ -483,40 +498,74 @@ class RamadanBgPainter extends CustomPainter {
 
   void _drawArabesque(Canvas canvas, Size size, bool isDark) {
     final p = Paint()
-      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.06 : 0.04)
-      ..strokeWidth = 0.8
+      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.07 : 0.05)
+      ..strokeWidth = 0.9
       ..style = PaintingStyle.stroke;
-    const s = 64.0;
+    const s = 100.0;
     for (double x = 0; x < size.width + s; x += s) {
       for (double y = 0; y < size.height + s; y += s) {
-        _drawGeomStar(canvas, Offset(x, y), s * 0.35, p);
+        final isOdd = (x / s).round().isOdd;
+        final py = isOdd ? y + s / 2 : y;
+        _drawTenFoldArabesque(canvas, Offset(x, py), s * 0.45, p);
       }
     }
   }
 
-  void _drawGeomStar(Canvas canvas, Offset c, double r, Paint p) {
-    final path = Path();
-    // 8-pointed star
-    for (int i = 0; i < 8; i++) {
-      final a = i * math.pi / 4;
-      final pt = Offset(c.dx + r * math.cos(a), c.dy + r * math.sin(a));
-      i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
+  void _drawTenFoldArabesque(Canvas canvas, Offset c, double r, Paint p) {
+    // 10-point star base
+    final Path star = Path();
+    for (int i = 0; i < 20; i++) {
+      final a = i * math.pi / 10;
+      final dist = i.isEven ? r : r * 0.7;
+      final px = c.dx + dist * math.cos(a);
+      final py = c.dy + dist * math.sin(a);
+      if (i == 0) {
+        star.moveTo(px, py);
+      } else {
+        star.lineTo(px, py);
+      }
     }
-    path.close();
-    canvas.drawPath(path, p);
+    star.close();
+    canvas.drawPath(star, p);
 
-    // Inner 8-pointed star (rotated)
-    final path2 = Path();
-    for (int i = 0; i < 8; i++) {
-      final a = i * math.pi / 4 + math.pi / 8;
-      final pt = Offset(
-        c.dx + r * 0.7 * math.cos(a),
-        c.dy + r * 0.7 * math.sin(a),
+    // Interlacing "vine" paths
+    final Path vines = Path();
+    for (int i = 0; i < 10; i++) {
+      final a1 = i * math.pi / 5;
+      final a2 = (i + 1) * math.pi / 5;
+
+      final p1 = Offset(c.dx + r * math.cos(a1), c.dy + r * math.sin(a1));
+      final p2 = Offset(c.dx + r * math.cos(a2), c.dy + r * math.sin(a2));
+      final cp = Offset(
+        c.dx + r * 1.4 * math.cos((a1 + a2) / 2),
+        c.dy + r * 1.4 * math.sin((a1 + a2) / 2),
       );
-      i == 0 ? path2.moveTo(pt.dx, pt.dy) : path2.lineTo(pt.dx, pt.dy);
+
+      vines.moveTo(p1.dx, p1.dy);
+      vines.quadraticBezierTo(cp.dx, cp.dy, p2.dx, p2.dy);
     }
-    path2.close();
-    canvas.drawPath(path2, p);
+    canvas.drawPath(vines, p);
+
+    // Core detail
+    canvas.drawCircle(c, r * 0.3, p);
+    _drawSmallStar(canvas, c, r * 0.15, p);
+  }
+
+  void _drawSmallStar(Canvas canvas, Offset c, double r, Paint p) {
+    final Path s = Path();
+    for (int i = 0; i < 16; i++) {
+      final a = i * math.pi / 8;
+      final dist = i.isEven ? r : r * 0.5;
+      final px = c.dx + dist * math.cos(a);
+      final py = c.dy + dist * math.sin(a);
+      if (i == 0) {
+        s.moveTo(px, py);
+      } else {
+        s.lineTo(px, py);
+      }
+    }
+    s.close();
+    canvas.drawPath(s, p);
   }
 
   @override

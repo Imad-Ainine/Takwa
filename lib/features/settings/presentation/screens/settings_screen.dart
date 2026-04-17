@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/settings/presentation/screens/settings_screen.dart
-//  محاسبة النفس — Settings Screen (شاشة الإعدادات)
+//  تقوى — Settings Screen (شاشة الإعدادات)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -347,7 +347,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'محاسبة النفس — v1.0.0',
+                              'تقوى — v1.0.0',
                               style: GoogleFonts.notoNaskhArabic(
                                 fontSize: 11,
                                 color: context.colors.textDim,

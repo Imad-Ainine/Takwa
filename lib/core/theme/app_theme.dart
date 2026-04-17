@@ -1,11 +1,10 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/theme/app_theme.dart
-//  محاسبة النفس — Complete Design System
+// تقوى — Complete Design System
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 // ─────────────────────────────────────────
 //  COLOR TOKENS & EXTENSION
@@ -278,69 +277,81 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
 
   static AppTypographyExtension fromColors(AppColorsExtension colors) {
     return AppTypographyExtension(
-      displayLarge: GoogleFonts.amiri(
+      displayLarge: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 36,
         fontWeight: FontWeight.w700,
         color: colors.gold,
         height: 1.3,
       ),
-      displayMedium: GoogleFonts.amiri(
+      displayMedium: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 28,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
         height: 1.4,
       ),
-      headingLarge: GoogleFonts.amiri(
+      headingLarge: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
         height: 1.4,
       ),
-      headingMedium: GoogleFonts.amiri(
+      headingMedium: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
-      bodyLarge: GoogleFonts.notoNaskhArabic(
+      bodyLarge: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: colors.textPrimary,
         height: 1.8,
       ),
-      bodyMedium: GoogleFonts.notoNaskhArabic(
+      bodyMedium: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: colors.textPrimary,
         height: 1.6,
       ),
-      bodySmall: GoogleFonts.notoNaskhArabic(
+      bodySmall: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 12,
         fontWeight: FontWeight.w400,
         color: colors.textSecondary,
         height: 1.5,
       ),
-      labelLarge: GoogleFonts.notoNaskhArabic(
+      labelLarge: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: colors.textPrimary,
       ),
-      labelMedium: GoogleFonts.notoNaskhArabic(
+      labelMedium: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 12,
         fontWeight: FontWeight.w500,
         color: colors.textSecondary,
       ),
-      caption: GoogleFonts.notoNaskhArabic(
+      caption: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 11,
         fontWeight: FontWeight.w400,
         color: colors.textDim,
       ),
-      quranicVerse: GoogleFonts.amiri(
+      quranicVerse: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 20,
         fontWeight: FontWeight.w400,
         color: colors.goldLight,
         height: 2.0,
       ),
-      taqwaScore: GoogleFonts.notoNaskhArabic(
+      taqwaScore: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 28,
         fontWeight: FontWeight.w700,
         color: colors.gold,

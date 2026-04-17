@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/app/animated_drawer.dart
-//  محاسبة النفس — Animated Drawer
+//   — Animated Drawer تقوى
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -188,7 +188,6 @@ class _DrawerContent extends ConsumerWidget {
           const Positioned.fill(
             child: CustomPatternBackground(
               pattern: BackgroundPattern.geometric,
-              blurAmount: 0.5,
             ),
           ),
 
@@ -290,7 +289,10 @@ class _DrawerHeader extends ConsumerWidget {
                         ],
                       ),
                       child: Center(
-                        child: Text(avatar, style: const TextStyle(fontSize: 24)),
+                        child: Text(
+                          avatar,
+                          style: const TextStyle(fontSize: 24),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -335,7 +337,7 @@ class _DrawerHeader extends ConsumerWidget {
             loading: () => const SizedBox(height: 52),
             error: (_, __) => const SizedBox(height: 52),
           ),
-          
+
           const SizedBox(height: 20),
 
           // التاريخ الهجري
@@ -743,7 +745,7 @@ class _DrawerFooter extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'محاسبة النفس v1.0',
+            ' v1.0',
             style: context.typography.caption.copyWith(
               fontSize: 10,
               color: context.colors.textDim,

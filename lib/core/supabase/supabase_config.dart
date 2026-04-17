@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/supabase/supabase_config.dart
-//  محاسبة النفس — Supabase Configuration
+//  تقوى — Supabase Configuration
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:supabase_flutter/supabase_flutter.dart';

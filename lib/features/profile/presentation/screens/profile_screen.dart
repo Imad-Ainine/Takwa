@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/profile/presentation/screens/profile_screen.dart
-//  محاسبة النفس — Profile Screen
+//  تقوى — Profile Screen
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -29,14 +29,15 @@ class ProfileScreen extends ConsumerWidget {
           // Background Pattern
           const Positioned.fill(
             child: CustomPatternBackground(
-                pattern: BackgroundPattern.geometric, blurAmount: 4),
+              pattern: BackgroundPattern.geometric,
+            ),
           ),
-          
+
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
               _buildAppBar(context),
-              
+
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -45,19 +46,19 @@ class ProfileScreen extends ConsumerWidget {
                       // Profile Header Card
                       _buildProfileHeader(context, profileAsync),
                       const SizedBox(height: 24),
-                      
+
                       // Stats Row
                       _buildStatsGrid(context, statsAsync, streakAsync),
                       const SizedBox(height: 24),
-                      
+
                       // Quick Actions / Menu
                       _buildProfileMenu(context),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       // Logout Button
                       _buildLogoutButton(context),
-                      
+
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -76,21 +77,34 @@ class ProfileScreen extends ConsumerWidget {
       elevation: 0,
       pinned: true,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new_rounded, color: context.colors.gold),
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: context.colors.gold,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
       title: Text(
         'الملف الشخصي',
-        style: context.typography.headingMedium.copyWith(color: context.colors.gold),
+        style: context.typography.headingMedium.copyWith(
+          color: context.colors.gold,
+        ),
       ),
       centerTitle: true,
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, AsyncValue<Map<String, dynamic>?> profileAsync) {
+  Widget _buildProfileHeader(
+    BuildContext context,
+    AsyncValue<Map<String, dynamic>?> profileAsync,
+  ) {
     return profileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('خطأ في تحميل البيانات', style: context.typography.bodySmall)),
+      error: (e, _) => Center(
+        child: Text(
+          'خطأ في تحميل البيانات',
+          style: context.typography.bodySmall,
+        ),
+      ),
       data: (profile) {
         final username = profile?['username'] ?? 'مستخدم تقوى';
         final avatar = profile?['avatar_emoji'] ?? '🌙';
@@ -110,7 +124,10 @@ class ProfileScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: context.colors.goldDim,
-                  border: Border.all(color: context.colors.gold.withOpacity(0.5), width: 2),
+                  border: Border.all(
+                    color: context.colors.gold.withOpacity(0.5),
+                    width: 2,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: context.colors.gold.withOpacity(0.2),
@@ -120,10 +137,7 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
                 child: Center(
-                  child: Text(
-                    avatar,
-                    style: const TextStyle(fontSize: 48),
-                  ),
+                  child: Text(avatar, style: const TextStyle(fontSize: 48)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -137,7 +151,9 @@ class ProfileScreen extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 profile?['email'] ?? '',
-                style: context.typography.caption.copyWith(color: context.colors.textSecondary),
+                style: context.typography.caption.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
               const SizedBox(height: 16),
               const TaqwaBadge(label: 'عضو مجتهد'),
@@ -148,7 +164,11 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsGrid(BuildContext context, AsyncValue<MonthStats> statsAsync, AsyncValue<int> streakAsync) {
+  Widget _buildStatsGrid(
+    BuildContext context,
+    AsyncValue<MonthStats> statsAsync,
+    AsyncValue<int> streakAsync,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -211,8 +231,14 @@ class ProfileScreen extends ConsumerWidget {
             title: const Text('تسجيل الخروج'),
             content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج؟'),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء')),
-              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('خروج')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('إلغاء'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('خروج'),
+              ),
             ],
           ),
         );
@@ -225,7 +251,10 @@ class ProfileScreen extends ConsumerWidget {
         }
       },
       icon: const Icon(Icons.logout_rounded, size: 20, color: Colors.redAccent),
-      label: const Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
+      label: const Text(
+        'تسجيل الخروج',
+        style: TextStyle(color: Colors.redAccent),
+      ),
       style: OutlinedButton.styleFrom(
         side: const BorderSide(color: Colors.redAccent, width: 1),
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -258,11 +287,16 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             value,
-            style: context.typography.taqwaScore.copyWith(color: color, fontSize: 22),
+            style: context.typography.taqwaScore.copyWith(
+              color: color,
+              fontSize: 22,
+            ),
           ),
           Text(
             label,
-            style: context.typography.caption.copyWith(color: context.colors.textSecondary),
+            style: context.typography.caption.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -293,7 +327,11 @@ class _MenuTile extends StatelessWidget {
         dense: true,
         leading: Icon(icon, color: context.colors.gold, size: 22),
         title: Text(title, style: context.typography.labelLarge),
-        trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: context.colors.textDim),
+        trailing: Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 14,
+          color: context.colors.textDim,
+        ),
       ),
     );
   }

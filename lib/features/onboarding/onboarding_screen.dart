@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/onboarding/onboarding_screen.dart
-//  محاسبة النفس — Combined Onboarding Flow
+//  تقوى — Combined Onboarding Flow
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
@@ -246,7 +246,7 @@ class _OnboardingPage {
 
 final _onboardPages = [
   const _OnboardingPage(
-    'أهلاً بك في محاسبة النفس',
+    'أهلاً بك في تقوى',
     'رفيقك في رحلة التزكية والقرب من الله عز وجل، من خلال أدوات ذكية ومميزة.',
     '🌙',
   ),
@@ -734,7 +734,7 @@ class _AuthStepState extends State<_AuthStep>
               Column(
                 children: [
                   Text(
-                    'محاسبة النفس',
+                    'تقوى',
                     style: GoogleFonts.amiri(
                       fontSize: 28,
                       color: AppColors.gold,
@@ -894,7 +894,7 @@ class _PlanStepState extends State<_PlanStep>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'انضم إلى عائلة محاسبة النفس',
+                    'انضم إلى عائلة تقوى',
                     style: GoogleFonts.notoNaskhArabic(
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -914,7 +914,7 @@ class _PlanStepState extends State<_PlanStep>
                   children: [
                     _PlanCard(
                       id: 'premium',
-                      title: 'محاسبة النفس ⭐ Premium',
+                      title: 'تقوى ⭐ Premium',
                       desc:
                           'بلا إعلانات + إحصائيات متقدمة + مزامنة سحابية + دعم أولوي',
                       badge: 'الأفضل',
@@ -933,7 +933,7 @@ class _PlanStepState extends State<_PlanStep>
                     const SizedBox(height: 10),
                     _PlanCard(
                       id: 'free',
-                      title: 'محاسبة النفس 🌙 مجاني',
+                      title: 'تقوى 🌙 مجاني',
                       desc:
                           'جميع الميزات الأساسية مع إعلانات بسيطة للإبقاء على الخدمة',
                       features: const [

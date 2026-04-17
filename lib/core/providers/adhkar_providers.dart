@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/adhkar/data/adhkar_data.dart
 //  lib/features/adhkar/providers/adhkar_providers.dart
-//  محاسبة النفس — Adhkar Data + Providers + Notification Service
+//  تقوى — Adhkar Data + Providers + Notification Service
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:convert';
@@ -921,7 +921,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: context.colors.gold.withOpacity(0.3)),
+                      side: BorderSide(
+                        color: context.colors.gold.withOpacity(0.3),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -942,9 +944,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
       context: context,
       initialTime: current,
       builder: (ctx, child) => Theme(
-        data: Theme.of(ctx).copyWith(
-          colorScheme: ColorScheme.dark(primary: context.colors.gold),
-        ),
+        data: Theme.of(
+          ctx,
+        ).copyWith(colorScheme: ColorScheme.dark(primary: context.colors.gold)),
         child: child!,
       ),
     );
@@ -989,7 +991,9 @@ class _NotifRow extends StatelessWidget {
               decoration: BoxDecoration(
                 color: context.colors.goldDim,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: context.colors.gold.withOpacity(0.25)),
+                border: Border.all(
+                  color: context.colors.gold.withOpacity(0.25),
+                ),
               ),
               child: Text(
                 '$h:$m',
