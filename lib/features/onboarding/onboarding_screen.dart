@@ -9,12 +9,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/notifications/notifications_service.dart';
+import '../../core/notifications/overlay_background_service.dart';
 
 // ── Enum for current step ──
 enum OnboardStep {
@@ -23,6 +24,8 @@ enum OnboardStep {
   intro3,
   location,
   notifications,
+  overlay,
+  background,
   gender,
   plan,
 }
@@ -85,20 +88,16 @@ class OnboardingScreen extends ConsumerWidget {
     final notifier = ref.read(onboardProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // Dynamic Background
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _OnboardBgPainter(
-                t: DateTime.now().millisecond / 1000.0,
-              ),
-            ),
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
 
           // Content
-          _buildStep(state, notifier, ref),
+          _buildStep(context, state, notifier, ref),
 
           // Header / Progress (Hidden for intro pages)
           if (!_isIntro(state.step))
@@ -119,6 +118,7 @@ class OnboardingScreen extends ConsumerWidget {
       step == OnboardStep.intro3;
 
   Widget _buildStep(
+    BuildContext context,
     OnboardState state,
     OnboardNotifier notifier,
     WidgetRef ref,
@@ -133,16 +133,57 @@ class OnboardingScreen extends ConsumerWidget {
       case OnboardStep.location:
         return _LocationStep(
           onAllow: () async {
-            final p = await Geolocator.requestPermission();
-            if (p != LocationPermission.denied) notifier.next();
+            try {
+              final p = await Geolocator.requestPermission().timeout(
+                const Duration(seconds: 15),
+              );
+              // We move forward even if denied or restricted, as long as it's not a permanent block that requires UI changes
+              notifier.next();
+            } catch (e) {
+              notifier.next();
+            }
           },
           onSkip: notifier.skip,
         );
       case OnboardStep.notifications:
         return _NotificationsStep(
           onAllow: () async {
-            final granted = await NotificationsService.requestPermissions();
-            if (granted) notifier.next();
+            try {
+              await NotificationsService.requestPermissions().timeout(
+                const Duration(seconds: 20),
+              );
+              notifier.next();
+            } catch (e) {
+              notifier.next();
+            }
+          },
+          onSkip: notifier.skip,
+        );
+      case OnboardStep.overlay:
+        return _OverlayStep(
+          onAllow: () async {
+            try {
+              await OverlayBackgroundService.requestPermissions().timeout(
+                const Duration(seconds: 45),
+              );
+              notifier.next();
+            } catch (e) {
+              notifier.next();
+            }
+          },
+          onSkip: notifier.skip,
+        );
+      case OnboardStep.background:
+        return _BackgroundStep(
+          onAllow: () async {
+            try {
+              await NotificationsService.requestBackgroundPermission().timeout(
+                const Duration(seconds: 15),
+              );
+              notifier.next();
+            } catch (e) {
+              notifier.next();
+            }
           },
           onSkip: notifier.skip,
         );
@@ -174,6 +215,8 @@ class _StepIndicator extends StatelessWidget {
     const setupSteps = [
       OnboardStep.location,
       OnboardStep.notifications,
+      OnboardStep.overlay,
+      OnboardStep.background,
       OnboardStep.gender,
       OnboardStep.plan,
     ];
@@ -1223,7 +1266,6 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-
 class _BottomActions extends StatelessWidget {
   final String primaryLabel;
   final VoidCallback? onPrimary;
@@ -1540,4 +1582,342 @@ class _PlanIllustration extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _PlanIllustration o) => false;
+}
+
+// ── STEP: Overlay ──
+class _OverlayStep extends StatefulWidget {
+  final Future<void> Function() onAllow;
+  final VoidCallback onSkip;
+  const _OverlayStep({required this.onAllow, required this.onSkip});
+
+  @override
+  State<_OverlayStep> createState() => _OverlayStepState();
+}
+
+class _OverlayStepState extends State<_OverlayStep>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _floatCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _floatCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 70),
+          Expanded(
+            child: Center(
+              child: AnimatedBuilder(
+                animation: _floatCtrl,
+                builder: (_, _) => SizedBox(
+                  width: 220,
+                  height: 200,
+                  child: CustomPaint(
+                    painter: _OverlayIllustration(progress: _floatCtrl.value),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          _InfoCard(
+            title: 'نافذة الأذكار 🪟',
+            titleColor: AppColors.teal,
+            subtitle:
+                'تسمح بعرض الأذكار والتنبيهات فوق التطبيقات الأخرى لتذكيرك الدائم',
+            hint: 'يتطلب إذن "الظهور فوق التطبيقات" على أندرويد',
+            primaryLabel: 'تفعيل النافذة',
+            primaryIcon: Icons.layers_outlined,
+            onPrimary: widget.onAllow,
+            skipLabel: 'تخطى',
+            onSkip: widget.onSkip,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OverlayIllustration extends CustomPainter {
+  final double progress;
+  _OverlayIllustration({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2, cy = size.height / 2;
+
+    // Background App
+    final appRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(cx, cy + 20), width: 140, height: 100),
+      const Radius.circular(12),
+    );
+    canvas.drawRRect(appRect, Paint()..color = const Color(0xFF1A2332));
+    canvas.drawRRect(
+      appRect,
+      Paint()
+        ..color = AppColors.border
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+
+    // Some dummy lines in the background app
+    for (int i = 0; i < 3; i++) {
+      canvas.drawLine(
+        Offset(cx - 50, cy - 10 + i * 15),
+        Offset(cx + 50, cy - 10 + i * 15),
+        Paint()..color = AppColors.border.withOpacity(0.3),
+      );
+    }
+
+    // Floating Overlay Window
+    final floatY = cy - 20 - (progress * 15);
+    final overlayRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(center: Offset(cx, floatY), width: 100, height: 60),
+      const Radius.circular(10),
+    );
+
+    // Glow for overlay
+    canvas.drawRRect(
+      overlayRect.inflate(8),
+      Paint()
+        ..shader = RadialGradient(
+          colors: [AppColors.gold.withOpacity(0.15), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: Offset(cx, floatY), radius: 60)),
+    );
+
+    canvas.drawRRect(overlayRect, Paint()..color = AppColors.card);
+    canvas.drawRRect(
+      overlayRect,
+      Paint()
+        ..color = AppColors.gold.withOpacity(0.6)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+
+    // Text in overlay
+    final tp = TextPainter(
+      text: const TextSpan(
+        text: 'سبحان الله',
+        style: TextStyle(
+          color: AppColors.gold,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.rtl,
+    )..layout();
+    tp.paint(
+      canvas,
+      Offset(cx - tp.width / 2, floatY - tp.height / 2),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _OverlayIllustration o) => o.progress != progress;
+}
+
+// ── STEP: Background ──
+class _BackgroundStep extends StatefulWidget {
+  final Future<void> Function() onAllow;
+  final VoidCallback onSkip;
+  const _BackgroundStep({required this.onAllow, required this.onSkip});
+
+  @override
+  State<_BackgroundStep> createState() => _BackgroundStepState();
+}
+
+class _BackgroundStepState extends State<_BackgroundStep>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 70),
+          Expanded(
+            child: Center(
+              child: AnimatedBuilder(
+                animation: _pulseCtrl,
+                builder: (_, _) => SizedBox(
+                  width: 220,
+                  height: 200,
+                  child: CustomPaint(
+                    painter: _BackgroundIllustration(
+                      progress: _pulseCtrl.value,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          _InfoCard(
+            title: 'التشغيل في الخلفية',
+            titleColor: AppColors.gold,
+            subtitle:
+                'لضمان وصول تنبيهات الأذان والأذكار في وقتها بدقة دون توقف التطبيق',
+            hint: 'يطلب النظام استثناء التطبيق من تحسين البطارية',
+            primaryLabel: 'السماح بالتشغيل 🔋',
+            primaryIcon: Icons.battery_saver_rounded,
+            onPrimary: widget.onAllow,
+            skipLabel: 'تخطى',
+            onSkip: widget.onSkip,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BackgroundIllustration extends CustomPainter {
+  final double progress;
+  _BackgroundIllustration({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2, cy = size.height / 2;
+
+    // Pulse rings
+    for (int i = 0; i < 3; i++) {
+      final r = 60.0 + (i * 30.0) + (progress * 20.0);
+      final opacity = (0.05 - (i * 0.015)).clamp(0.0, 1.0);
+      canvas.drawCircle(
+        Offset(cx, cy),
+        r,
+        Paint()..color = AppColors.teal.withOpacity(opacity),
+      );
+    }
+
+    // Phone shape
+    const phoneWidth = 80.0, phoneHeight = 140.0;
+    final phoneRect = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(cx, cy),
+        width: phoneWidth,
+        height: phoneHeight,
+      ),
+      const Radius.circular(16),
+    );
+
+    // Background glow
+    canvas.drawRRect(
+      phoneRect.inflate(10),
+      Paint()
+        ..shader = RadialGradient(
+          colors: [AppColors.teal.withOpacity(0.2), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 100)),
+    );
+
+    canvas.drawRRect(phoneRect, Paint()..color = const Color(0xFF1A2332));
+    canvas.drawRRect(
+      phoneRect,
+      Paint()
+        ..color = AppColors.teal.withOpacity(0.3)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+
+    // Battery icon inside
+    final batteryRect = Rect.fromCenter(
+      center: Offset(cx, cy),
+      width: 30,
+      height: 50,
+    );
+    final batteryPaint = Paint()..color = AppColors.teal.withOpacity(0.7);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(batteryRect, const Radius.circular(4)),
+      batteryPaint
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+
+    // Battery tip
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - 5, cy - 25 - 4, 10, 4),
+        const Radius.circular(2),
+      ),
+      batteryPaint..style = PaintingStyle.fill,
+    );
+
+    // Filling battery based on pulse
+    final fillHeight = 10.0 + (progress * 30.0);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTRB(
+          batteryRect.left + 4,
+          batteryRect.bottom - 4 - fillHeight,
+          batteryRect.right - 4,
+          batteryRect.bottom - 4,
+        ),
+        const Radius.circular(2),
+      ),
+      batteryPaint..color = AppColors.teal.withOpacity(0.5 + (0.5 * progress)),
+    );
+
+    // Gear icons around signifying background services
+    _drawSmallGear(canvas, Offset(cx - 60, cy - 40), 12, progress * math.pi);
+    _drawSmallGear(canvas, Offset(cx + 60, cy + 30), 10, -progress * math.pi);
+  }
+
+  void _drawSmallGear(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double rotation,
+  ) {
+    final paint = Paint()
+      ..color = AppColors.gold.withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(rotation);
+    canvas.drawCircle(Offset.zero, radius * 0.6, paint);
+    for (int i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+      canvas.drawLine(
+        Offset(
+          math.cos(angle) * (radius * 0.7),
+          math.sin(angle) * (radius * 0.7),
+        ),
+        Offset(math.cos(angle) * radius, math.sin(angle) * radius),
+        paint,
+      );
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _BackgroundIllustration o) =>
+      o.progress != progress;
 }

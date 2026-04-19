@@ -14,6 +14,7 @@ class PrimaryButton extends StatefulWidget {
   final Widget? customContent;
   final bool isOutline;
   final bool isLoading;
+  final bool isBg;
 
   const PrimaryButton({
     super.key,
@@ -24,6 +25,7 @@ class PrimaryButton extends StatefulWidget {
     this.customContent,
     this.isOutline = false,
     this.isLoading = false,
+    this.isBg = true,
   });
 
   @override
@@ -119,14 +121,14 @@ class _PrimaryButtonState extends State<PrimaryButton>
             alignment: Alignment.center,
             children: [
               if (!disabled && !widget.isOutline)
-                const Positioned.fill(
-                  child: CustomPatternBackground(
-                    pattern: BackgroundPattern.asma,
-                    opacity: 0.15,
+                if (widget.isBg)
+                  const Positioned.fill(
+                    child: CustomPatternBackground(
+                      pattern: BackgroundPattern.eightWithCrosses,
+                    ),
                   ),
-                ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: _loading
                     ? const Center(
                         child: SizedBox(

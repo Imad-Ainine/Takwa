@@ -728,6 +728,8 @@ class AppTheme {
         overlayColor: colors.goldDim,
       ),
       tabBarTheme: TabBarThemeData(
+        splashFactory: NoSplash.splashFactory,
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
         labelColor: colors.gold,
         unselectedLabelColor: colors.textDim,
         indicatorColor: colors.gold,

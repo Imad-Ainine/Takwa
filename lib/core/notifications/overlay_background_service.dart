@@ -84,34 +84,59 @@ class OverlayBackgroundService {
   }
 
   static Future<void> start() async {
-    final perm = await FlutterForegroundTask.checkNotificationPermission();
-    if (perm != NotificationPermission.granted) {
-      try {
-        await FlutterForegroundTask.requestNotificationPermission();
-      } catch (e) {
-        print('Notification permission request error: $e');
-      }
-    }
-
-    // Ensure overlay permission
-    final isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-    if (isOverlayGranted == false) {
-      try {
-        await FlutterOverlayWindow.requestPermission();
-      } catch (e) {
-        print('Overlay permission request error: $e');
-      }
-    }
-
     if (await FlutterForegroundTask.isRunningService) {
       return;
     }
+
+    // Only start if permissions are already granted (don't request here)
+    final perm = await FlutterForegroundTask.checkNotificationPermission();
+    if (perm != NotificationPermission.granted) return;
 
     await FlutterForegroundTask.startService(
       notificationTitle: 'تطبيق تقوى يعمل بالخلفية',
       notificationText: 'لعرض الأذكار والأذان بشكل تلقائي',
       callback: startCallback,
     );
+  }
+
+  static Future<bool> requestPermissions() async {
+    try {
+      // 1. Notification Permission
+      final perm = await FlutterForegroundTask.checkNotificationPermission().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => NotificationPermission.denied,
+      );
+      if (perm != NotificationPermission.granted) {
+        await FlutterForegroundTask.requestNotificationPermission().timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => NotificationPermission.denied,
+        );
+      }
+
+      // 2. Overlay Permission
+      final isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => false,
+      );
+      if (!isOverlayGranted) {
+        await FlutterOverlayWindow.requestPermission().timeout(
+          const Duration(seconds: 30), // Overlay often opens settings, give it more time
+          onTimeout: () => false,
+        );
+      }
+
+      final newPerm = await FlutterForegroundTask.checkNotificationPermission().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => NotificationPermission.denied,
+      );
+      final newOverlay = await FlutterOverlayWindow.isPermissionGranted().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => false,
+      );
+      return newPerm == NotificationPermission.granted && newOverlay;
+    } catch (e) {
+      return false;
+    }
   }
 }
 

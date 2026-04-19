@@ -66,10 +66,12 @@ class _MainShellState extends ConsumerState<MainShell>
     // تفعيل التبويب الأول
     _tabAnims[widget.initialIndex].forward();
 
-    // جدولة الإشعارات عند أول تشغيل
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationsManager.scheduleAll(ref);
-      OverlayBackgroundService.start();
+    // جدولة الإشعارات عند أول تشغيل (بعد استكمال التهيئة فقط)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final done = await ref.read(onboardingDoneProvider.future);
+      if (done) {
+        _initializePostOnboardingServices();
+      }
     });
   }
 
@@ -100,8 +102,20 @@ class _MainShellState extends ConsumerState<MainShell>
     );
   }
 
+  void _initializePostOnboardingServices() {
+    NotificationsManager.scheduleAll(ref);
+    OverlayBackgroundService.start();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // تشغيل الخدمات فور اكتمال التهيئة
+    ref.listen(onboardingDoneProvider, (prev, next) {
+      if (next.value == true && prev?.value != true) {
+        _initializePostOnboardingServices();
+      }
+    });
+
     // Avoid rebuilding unnecessarily on each new frame
     final onboardAsync = ref.watch(onboardingDoneProvider);
 
@@ -181,7 +195,9 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.colors.card.withOpacity(0.95),
-        border: Border(top: BorderSide(color: context.colors.border, width: 0.5)),
+        border: Border(
+          top: BorderSide(color: context.colors.border, width: 0.5),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.4),
@@ -234,12 +250,15 @@ class _BottomNav extends StatelessWidget {
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(1.5),
-                                  boxShadow: isActive ? [
-                                    BoxShadow(
-                                      color: context.colors.gold.withOpacity(0.3),
-                                      blurRadius: 8,
-                                    ),
-                                  ] : null,
+                                  boxShadow: isActive
+                                      ? [
+                                          BoxShadow(
+                                            color: context.colors.gold
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          ),
+                                        ]
+                                      : null,
                                 ),
                               ),
 

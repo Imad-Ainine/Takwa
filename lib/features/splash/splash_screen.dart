@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Stack(
         children: [
           // ── Geometric Background (Shared) ──
-          const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
 
           // ── Gradient Glows ──
           Positioned(

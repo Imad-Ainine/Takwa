@@ -16,6 +16,7 @@ import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/auth_field.dart';
 
 // ══════════════════════════════════════════════════════
 //  AUTH SCREEN
@@ -189,7 +190,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: s.bg,
         body: Stack(
           children: [
             const Positioned.fill(
@@ -296,7 +296,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         child: Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: s.card.withOpacity(0.72),
+            color: s.bg.withOpacity(0.72),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: s.gold.withOpacity(0.22), width: 1.2),
             boxShadow: [
@@ -314,11 +314,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 height: 50,
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: s.bg.withOpacity(0.6),
+                  color: s.bg,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: s.border.withOpacity(0.5)),
                 ),
                 child: TabBar(
+                  // 1. Removes the ink ripple on click
+                  splashFactory: NoSplash.splashFactory,
+                  // 2. Removes the grey circle highlight on long press
+                  overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  // 3. Optional: Remove indicator padding if it causes overflow
+                  indicatorPadding: EdgeInsets.zero,
                   controller: _tabs,
                   indicator: BoxDecoration(
                     gradient: LinearGradient(colors: [s.goldDark, s.gold]),
@@ -349,7 +355,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 firstChild: const SizedBox.shrink(),
                 secondChild: Column(
                   children: [
-                    _AuthField(
+                    AuthField(
                       ctrl: _userCtrl,
                       hint: 'اسم المستخدم',
                       icon: Icons.person_outline_rounded,
@@ -361,7 +367,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
 
               // ── Email ──
-              _AuthField(
+              AuthField(
                 ctrl: _emailCtrl,
                 hint: 'البريد الإلكتروني',
                 icon: Icons.alternate_email_rounded,
@@ -371,7 +377,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               const SizedBox(height: 14),
 
               // ── Password ──
-              _AuthField(
+              AuthField(
                 ctrl: _passCtrl,
                 hint: 'كلمة المرور',
                 icon: Icons.lock_outline_rounded,
@@ -388,10 +394,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 firstChild: const SizedBox.shrink(),
                 secondChild: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: _PasswordStrengthBar(
-                    strength: _passStrength,
-                    style: s,
-                  ),
+                  child: PasswordStrengthBar(strength: _passStrength, style: s),
                 ),
               ),
 
@@ -483,7 +486,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             decoration: BoxDecoration(
-              color: s.deep.withOpacity(0.65),
+              color: s.bg.withOpacity(0.65),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: s.border.withOpacity(0.5)),
             ),
@@ -661,149 +664,8 @@ class _AuthHeader extends StatelessWidget {
 }
 
 // ══════════════════════════════════════════════════════
-//  AUTH FIELD (animated focus)
-// ══════════════════════════════════════════════════════
-class _AuthField extends StatefulWidget {
-  final TextEditingController ctrl;
-  final String hint;
-  final IconData icon;
-  final AdaptiveStyle style;
-  final bool isPassword;
-  final TextInputType? keyboardType;
-
-  const _AuthField({
-    required this.ctrl,
-    required this.hint,
-    required this.icon,
-    required this.style,
-    this.isPassword = false,
-    this.keyboardType,
-  });
-
-  @override
-  State<_AuthField> createState() => _AuthFieldState();
-}
-
-class _AuthFieldState extends State<_AuthField> {
-  bool _obscure = true;
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = widget.style;
-    return Focus(
-      onFocusChange: (f) => setState(() => _focused = f),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        decoration: BoxDecoration(
-          color: s.bg.withOpacity(0.55),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: _focused ? s.gold : s.border.withOpacity(0.5),
-            width: _focused ? 1.5 : 1,
-          ),
-          boxShadow: _focused
-              ? [BoxShadow(color: s.gold.withOpacity(0.15), blurRadius: 10)]
-              : null,
-        ),
-        child: TextField(
-          controller: widget.ctrl,
-          obscureText: widget.isPassword && _obscure,
-          keyboardType: widget.keyboardType,
-          textDirection: TextDirection.ltr,
-          style: s.naskh(14).copyWith(color: s.text),
-          decoration: InputDecoration(
-            hintText: widget.hint,
-            hintStyle: s.naskh(13, color: s.textDim),
-            prefixIcon: Icon(
-              widget.icon,
-              color: _focused ? s.gold : s.textSec,
-              size: 20,
-            ),
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                    icon: Icon(
-                      _obscure
-                          ? Icons.visibility_rounded
-                          : Icons.visibility_off_rounded,
-                      color: s.textSec,
-                      size: 20,
-                    ),
-                  )
-                : null,
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ══════════════════════════════════════════════════════
-//  PASSWORD STRENGTH BAR
-// ══════════════════════════════════════════════════════
-class _PasswordStrengthBar extends StatelessWidget {
-  final double strength; // 0..1
-  final AdaptiveStyle style;
-  const _PasswordStrengthBar({required this.strength, required this.style});
-
-  @override
-  Widget build(BuildContext context) {
-    final label = strength < 0.26
-        ? 'ضعيفة'
-        : strength < 0.51
-        ? 'متوسطة'
-        : strength < 0.76
-        ? 'جيدة'
-        : 'قوية ✓';
-    final color = strength < 0.26
-        ? Colors.redAccent
-        : strength < 0.51
-        ? Colors.orange
-        : strength < 0.76
-        ? Colors.amber
-        : Colors.greenAccent;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: Stack(
-            children: [
-              Container(height: 4, color: style.border.withOpacity(0.3)),
-              AnimatedFractionallySizedBox(
-                duration: const Duration(milliseconds: 300),
-                widthFactor: strength.clamp(0.05, 1.0),
-                alignment: AlignmentDirectional.centerStart,
-                child: Container(
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(color: color.withOpacity(0.4), blurRadius: 6),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text('قوة كلمة المرور: $label', style: style.naskh(11, color: color)),
-      ],
-    );
-  }
-}
-
-// ══════════════════════════════════════════════════════
 //  GLOW PULSE WRAPPER
+
 // ══════════════════════════════════════════════════════
 class _GlowPulse extends StatefulWidget {
   final Widget child;

@@ -131,7 +131,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.stats),
+              child: CustomPatternBackground(
+                pattern: BackgroundPattern.pattern1,
+              ),
             ),
             GuestModeGuard(
               child: CustomScrollView(

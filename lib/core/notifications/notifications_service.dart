@@ -126,7 +126,7 @@ class PrayerTimeInfo {
 //  NOTIFICATIONS SERVICE
 // ─────────────────────────────────────────
 class NotificationsService {
-  static final _plugin = FlutterLocalNotificationsPlugin();
+  static final plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
   // ── تهيئة الخدمة ──
@@ -147,7 +147,7 @@ class NotificationsService {
 
     const settings = InitializationSettings(android: android, iOS: ios);
 
-    await _plugin.initialize(
+    await plugin.initialize(
       settings,
       onDidReceiveNotificationResponse: _onNotifTap,
       onDidReceiveBackgroundNotificationResponse: _onNotifTap,
@@ -155,7 +155,7 @@ class NotificationsService {
 
     // إنشاء القنوات (Android)
     if (Platform.isAndroid) {
-      final androidPlugin = _plugin
+      final androidPlugin = plugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
@@ -182,26 +182,40 @@ class NotificationsService {
     return true;
   }
 
+  // ── طلب إذن العمل في الخلفية (Battery Optimization) ──
+  static Future<bool> requestBackgroundPermission() async {
+    if (Platform.isAndroid) {
+      try {
+        final status = await Permission.ignoreBatteryOptimizations.request().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () => PermissionStatus.denied,
+        );
+        return status.isGranted;
+      } catch (e) {
+        return false;
+      }
+    }
+    return true; // iOS doesn't have a direct equivalent in the same way
+  }
+
   // ── طلب الإذن ──
   static Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.request();
-      if (!status.isGranted) return false;
-
-      // Android 12+ exact alarm
-      final exact = await Permission.scheduleExactAlarm.request();
-      return exact.isGranted;
+      if (status.isGranted) {
+        final exact = await Permission.scheduleExactAlarm.request();
+        return exact.isGranted;
+      }
+      return false;
     }
-
     if (Platform.isIOS) {
-      final result = await _plugin
+      final result = await plugin
           .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin
           >()
           ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     }
-
     return true;
   }
 
@@ -230,7 +244,7 @@ class NotificationsService {
       124,
     ];
     for (final id in idsToCancel) {
-      await _plugin.cancel(id);
+      await plugin.cancel(id);
     }
 
     final iqamaOffsets = {
@@ -291,7 +305,7 @@ class NotificationsService {
 
   // ── جدولة المحاسبة المسائية (يومياً) ──
   static Future<void> scheduleEveningMuhasaba({required TimeOfDay time}) async {
-    await _plugin.cancel(NotifIds.eveningMuhasaba);
+    await plugin.cancel(NotifIds.eveningMuhasaba);
 
     final now = DateTime.now();
     var scheduled = DateTime(
@@ -306,7 +320,7 @@ class NotificationsService {
     }
 
     // يومي بالتكرار
-    await _plugin.zonedSchedule(
+    await plugin.zonedSchedule(
       NotifIds.eveningMuhasaba,
       'وقت محاسبة النفس 📝',
       _eveningMessages[DateTime.now().weekday % _eveningMessages.length],
@@ -340,8 +354,8 @@ class NotificationsService {
     required TimeOfDay morningTime,
     required TimeOfDay eveningTime,
   }) async {
-    await _plugin.cancel(NotifIds.morningAdhkar);
-    await _plugin.cancel(NotifIds.eveningAdhkar);
+    await plugin.cancel(NotifIds.morningAdhkar);
+    await plugin.cancel(NotifIds.eveningAdhkar);
 
     await _scheduleDailyAt(
       id: NotifIds.morningAdhkar,
@@ -370,7 +384,7 @@ class NotificationsService {
     required String emoji,
     required int points,
   }) async {
-    await _plugin.show(
+    await plugin.show(
       NotifIds.achievement,
       '$emoji إنجاز جديد: $title',
       '$body — +$points نقطة 🌟',
@@ -395,14 +409,14 @@ class NotificationsService {
   }
 
   // ── إلغاء كل الإشعارات ──
-  static Future<void> cancelAll() => _plugin.cancelAll();
+  static Future<void> cancelAll() => plugin.cancelAll();
 
   // ── إلغاء إشعار محدد ──
-  static Future<void> cancel(int id) => _plugin.cancel(id);
+  static Future<void> cancel(int id) => plugin.cancel(id);
 
   // ── الإشعارات المجدولة ──
   static Future<List<PendingNotificationRequest>> getPending() =>
-      _plugin.pendingNotificationRequests();
+      plugin.pendingNotificationRequests();
 
   // ─────────────────── PRIVATE ───────────────────
 
@@ -416,7 +430,7 @@ class NotificationsService {
     String? payload,
   }) async {
     final tzTime = tz.TZDateTime.from(scheduledTime, tz.local);
-    await _plugin.zonedSchedule(
+    await plugin.zonedSchedule(
       id,
       title,
       body,
@@ -466,7 +480,7 @@ class NotificationsService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    await _plugin.zonedSchedule(
+    await plugin.zonedSchedule(
       id,
       title,
       body,
@@ -687,12 +701,18 @@ class NotificationRouter {
   /// Converts an English prayer key to Arabic name.
   static String _prayerNameAr(String key) {
     switch (key) {
-      case 'fajr':    return 'الفجر';
-      case 'dhuhr':   return 'الظهر';
-      case 'asr':     return 'العصر';
-      case 'maghrib': return 'المغرب';
-      case 'isha':    return 'العشاء';
-      default:       return key.isNotEmpty ? key : 'الصلاة';
+      case 'fajr':
+        return 'الفجر';
+      case 'dhuhr':
+        return 'الظهر';
+      case 'asr':
+        return 'العصر';
+      case 'maghrib':
+        return 'المغرب';
+      case 'isha':
+        return 'العشاء';
+      default:
+        return key.isNotEmpty ? key : 'الصلاة';
     }
   }
 }

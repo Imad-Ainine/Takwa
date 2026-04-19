@@ -487,6 +487,12 @@ class _DuasTopBar extends ConsumerWidget {
                 splashColor: Colors.transparent,
               ),
               child: TabBar(
+                // 1. Removes the ink ripple on click
+                splashFactory: NoSplash.splashFactory,
+                // 2. Removes the grey circle highlight on long press
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+                // 3. Optional: Remove indicator padding if it causes overflow
+                indicatorPadding: EdgeInsets.zero,
                 controller: tabCtrl,
                 indicatorColor: style.gold,
                 indicatorWeight: 3,
@@ -702,7 +708,9 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      ref.read(favoriteDuasProvider.notifier).toggle(widget.dua.id);
+                      ref
+                          .read(favoriteDuasProvider.notifier)
+                          .toggle(widget.dua.id);
                     },
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),

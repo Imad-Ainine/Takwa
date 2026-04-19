@@ -16,11 +16,13 @@ class AuthChoiceScreen extends ConsumerWidget {
     final style = AdaptiveStyle(context, isRamadan);
 
     return Scaffold(
-      backgroundColor: context.colors.night,
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            child: CustomPatternBackground(
+              pattern: BackgroundPattern.adhkar,
+              opacity: 0.1,
+            ),
           ),
           SafeArea(
             child: Padding(

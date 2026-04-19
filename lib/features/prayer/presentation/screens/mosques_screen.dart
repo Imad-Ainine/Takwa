@@ -298,13 +298,14 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                     color: Colors.white,
                   ),
                   Positioned(
-                    bottom: 12,
+                    bottom: 4,
                     left: 12,
                     child: SizedBox(
                       width: 180,
                       child: PrimaryButton(
                         onTap: () async => _openMap(0, 0),
                         label: 'عرض على الخريطة',
+                        isBg: true,
                       ),
                     ),
                   ),

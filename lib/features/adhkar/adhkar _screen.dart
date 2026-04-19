@@ -198,6 +198,11 @@ class _AdhkarTopBar extends StatelessWidget {
 
             // Tabs
             TabBar(
+              // 1. Removes the ink ripple on click
+              splashFactory: NoSplash.splashFactory,
+              // 2. Removes the grey circle highlight on long press
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+              // 3. Optional: Remove indicator padding if it causes overflow
               controller: tabCtrl,
               isScrollable: true,
               tabAlignment: TabAlignment.start,
