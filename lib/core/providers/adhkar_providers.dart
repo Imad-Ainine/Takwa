@@ -14,6 +14,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
 
 import '../../../core/theme/app_theme.dart';
+import '../widgets/primary_button.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  MODELS
@@ -49,7 +50,7 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
     DhikrItem(
       id: 101,
       arabic:
-          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ',
+          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا  هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ',
       count: 1,
       category: AdhkarCategory.morning,
       transliteration: 'آية الكرسي',
@@ -893,8 +894,10 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 // زر اختبار
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
+                  child: PrimaryButton(
+                    label: 'اختبار إشعار ذكر الآن',
+                    isOutline: true,
+                    onTap: () async {
                       final dhikr = (kAdhkarData[AdhkarCategory.morning]!)[0];
                       await AdhkarNotificationService.showDhikrNow(dhikr);
                       Navigator.pop(context);
@@ -912,22 +915,19 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                         ),
                       );
                     },
-                    icon: const Text('🔔', style: TextStyle(fontSize: 16)),
-                    label: Text(
-                      'اختبار إشعار ذكر الآن',
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 13,
-                        color: context.colors.gold,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: context.colors.gold.withOpacity(0.3),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                    customContent: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('🔔', style: TextStyle(fontSize: 16)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'اختبار إشعار ذكر الآن',
+                          style: GoogleFonts.notoNaskhArabic(
+                            fontSize: 13,
+                            color: context.colors.gold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

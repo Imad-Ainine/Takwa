@@ -11,6 +11,7 @@ import 'package:takwa/features/asma/data/asma_data.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/providers/database_providers.dart';
+import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -530,17 +531,9 @@ class _AsmaDetailSheet extends StatelessWidget {
               isDua: true,
             ),
             const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: s.gold,
-                foregroundColor: s.bg,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: Text('إغلاق', style: s.naskh(14, weight: FontWeight.w700)),
+            PrimaryButton(
+              onTap: () async => Navigator.pop(context),
+              label: 'إغلاق',
             ),
           ],
         ),

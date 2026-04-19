@@ -27,6 +27,6 @@ final authStatusProvider = Provider<AuthStatus>((ref) {
       return isGuest ? AuthStatus.guest : AuthStatus.unauthenticated;
     },
     loading: () => AuthStatus.unauthenticated, // Default to unauth during loading
-    error: (_, __) => AuthStatus.unauthenticated,
+    error: (_, _) => AuthStatus.unauthenticated,
   );
 });

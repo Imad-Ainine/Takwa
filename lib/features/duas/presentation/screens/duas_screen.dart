@@ -12,6 +12,11 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/providers/favorites_providers.dart';
+import 'package:takwa/core/providers/user_content_providers.dart';
+import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/features/duas/presentation/screens/favorite_duas_screen.dart';
 
 // ─────────────────────────────────────────
 //  MODELS
@@ -248,16 +253,7 @@ const _categoryMeta = {
 // ─────────────────────────────────────────
 final _duaSearchProvider = StateProvider<String>((ref) => '');
 final _selectedCatProvider = StateProvider<DuaCategory?>((ref) => null);
-final _favDuasProvider = StateNotifierProvider<_FavNotifier, Set<int>>(
-  (ref) => _FavNotifier(),
-);
-
-class _FavNotifier extends StateNotifier<Set<int>> {
-  _FavNotifier() : super({});
-  void toggle(int id) {
-    state = state.contains(id) ? ({...state}..remove(id)) : {...state, id};
-  }
-}
+// Persistent favorites are now managed by favoriteDuasProvider from favorites_providers.dart
 
 // ═══════════════════════════════════════════════════════════════
 //  DUAS SCREEN
@@ -269,8 +265,9 @@ class DuasScreen extends ConsumerStatefulWidget {
 }
 
 class _DuasScreenState extends ConsumerState<DuasScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final AnimationController _entryCtrl;
+  late final TabController _tabCtrl;
   final _searchCtrl = TextEditingController();
 
   @override
@@ -280,11 +277,13 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
       vsync: this,
       duration: const Duration(milliseconds: 700),
     )..forward();
+    _tabCtrl = TabController(length: 3, vsync: this);
   }
 
   @override
   void dispose() {
     _entryCtrl.dispose();
+    _tabCtrl.dispose();
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -292,13 +291,11 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
   List<DuaItem> get _filteredDuas {
     final query = ref.read(_duaSearchProvider).trim().toLowerCase();
     final cat = ref.read(_selectedCatProvider);
-    final favs = ref.read(_favDuasProvider);
 
     final all = kDuasData.values.expand((l) => l).toList();
 
     return all.where((d) {
       final matchCat = cat == null || d.category == cat;
-      final matchFav = cat == null || d.isFav == favs.contains(d.id);
       final matchQ =
           query.isEmpty ||
           d.arabic.contains(query) ||
@@ -329,13 +326,30 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
 
             Column(
               children: [
-                _DuasTopBar(style: style, searchCtrl: _searchCtrl),
-                _CategoryFilter(style: style),
+                _DuasTopBar(
+                  style: style,
+                  searchCtrl: _searchCtrl,
+                  tabCtrl: _tabCtrl,
+                ),
                 Expanded(
-                  child: _DuasList(
-                    duas: _filteredDuas,
-                    style: style,
-                    entryCtrl: _entryCtrl,
+                  child: TabBarView(
+                    controller: _tabCtrl,
+                    children: [
+                      Column(
+                        children: [
+                          _CategoryFilter(style: style),
+                          Expanded(
+                            child: _DuasList(
+                              duas: _filteredDuas,
+                              style: style,
+                              entryCtrl: _entryCtrl,
+                            ),
+                          ),
+                        ],
+                      ),
+                      _UserDuasTabView(style: style),
+                      _CommunityDuasTabView(style: style),
+                    ],
                   ),
                 ),
               ],
@@ -350,7 +364,12 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
 class _DuasTopBar extends ConsumerWidget {
   final AdaptiveStyle style;
   final TextEditingController searchCtrl;
-  const _DuasTopBar({required this.style, required this.searchCtrl});
+  final TabController tabCtrl;
+  const _DuasTopBar({
+    required this.style,
+    required this.searchCtrl,
+    required this.tabCtrl,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -377,27 +396,54 @@ class _DuasTopBar extends ConsumerWidget {
                     ],
                   ),
                 ),
-                // Favs filter
+                // Favs button → navigate to FavoriteDuasScreen
                 Consumer(
-                  builder: (_, ref, __) {
-                    final hasFav = ref.watch(_selectedCatProvider) == null;
+                  builder: (_, ref, _) {
+                    final favCount = ref.watch(favoriteDuasProvider).length;
                     return GestureDetector(
-                      onTap: () {
-                        /* show favs */
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: style.goldDim,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: style.gold.withOpacity(0.3),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const FavoriteDuasScreen(),
+                        ),
+                      ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: style.goldDim,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: style.gold.withOpacity(0.3),
+                              ),
+                            ),
+                            child: const Center(
+                              child: Text('❤️', style: TextStyle(fontSize: 18)),
+                            ),
                           ),
-                        ),
-                        child: const Center(
-                          child: Text('🤍', style: TextStyle(fontSize: 18)),
-                        ),
+                          if (favCount > 0)
+                            Positioned(
+                              top: -4,
+                              right: -4,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade400,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  '$favCount',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     );
                   },
@@ -432,6 +478,27 @@ class _DuasTopBar extends ConsumerWidget {
                     vertical: 12,
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Theme(
+              data: Theme.of(context).copyWith(
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
+              ),
+              child: TabBar(
+                controller: tabCtrl,
+                indicatorColor: style.gold,
+                indicatorWeight: 3,
+                labelColor: style.gold,
+                unselectedLabelColor: style.textSec,
+                labelStyle: style.naskh(14, weight: FontWeight.w600),
+                unselectedLabelStyle: style.naskh(13, weight: FontWeight.w400),
+                tabs: const [
+                  Tab(text: 'المأثورة'),
+                  Tab(text: 'أدعيتي'),
+                  Tab(text: 'من المجتمع'),
+                ],
               ),
             ),
           ],
@@ -589,7 +656,7 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
-    final favs = ref.watch(_favDuasProvider);
+    final favs = ref.watch(favoriteDuasProvider);
     final isFav = favs.contains(widget.dua.id);
 
     return GestureDetector(
@@ -635,7 +702,7 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.lightImpact();
-                      ref.read(_favDuasProvider.notifier).toggle(widget.dua.id);
+                      ref.read(favoriteDuasProvider.notifier).toggle(widget.dua.id);
                     },
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
@@ -749,6 +816,759 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB 2: MY DUAS
+// ═══════════════════════════════════════════════════════════════
+class _UserDuasTabView extends ConsumerWidget {
+  final AdaptiveStyle style;
+  const _UserDuasTabView({required this.style});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(userDuasProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (_) => const AddDuaSheet(),
+          );
+        },
+        backgroundColor: style.gold,
+        child: Icon(Icons.add, color: style.bg),
+      ),
+      body: state.when(
+        loading: () =>
+            Center(child: CircularProgressIndicator(color: style.gold)),
+        error: (err, _) => Center(
+          child: Text(
+            'حدث خطأ في جلب أدعيتك',
+            style: style.naskh(14, color: Colors.red),
+          ),
+        ),
+        data: (items) {
+          if (items.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('🤲', style: TextStyle(fontSize: 48)),
+                  const SizedBox(height: 16),
+                  Text(
+                    'لم تقم بإضافة أي أدعية بعد',
+                    style: style.amiri(18, color: style.textSec),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            itemCount: items.length,
+            itemBuilder: (_, i) {
+              final dua = items[i];
+              return _UserDuaCard(dua: dua, style: style);
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _UserDuaCard extends ConsumerWidget {
+  final UserDuaItem dua;
+  final AdaptiveStyle style;
+
+  const _UserDuaCard({required this.dua, required this.style});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: style.card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: style.border),
+        boxShadow: [
+          BoxShadow(
+            color: style.gold.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+            child: Row(
+              children: [
+                Text(
+                  dua.emoji.isNotEmpty ? dua.emoji : '🤲',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    dua.titleAr,
+                    style: style.naskh(
+                      14,
+                      weight: FontWeight.w700,
+                      color: style.gold,
+                    ),
+                  ),
+                ),
+                // Copy
+                IconButton(
+                  iconSize: 18,
+                  tooltip: 'نسخ',
+                  icon: Icon(
+                    Icons.copy_rounded,
+                    color: style.textSec,
+                    size: 18,
+                  ),
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: dua.textAr));
+                    HapticFeedback.lightImpact();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'تم النسخ ✓',
+                          style: GoogleFonts.notoNaskhArabic(fontSize: 12),
+                        ),
+                        backgroundColor: style.teal,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                // Share to community
+                IconButton(
+                  iconSize: 18,
+                  tooltip: 'مشاركة مع المجتمع',
+                  icon: Icon(Icons.public_rounded, color: style.teal, size: 20),
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) =>
+                        _ShareToDuaCommunitySheet(dua: dua, style: style),
+                  ),
+                ),
+                // Delete
+                IconButton(
+                  iconSize: 18,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                    size: 20,
+                  ),
+                  onPressed: () async {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text('حذف الدعاء', style: style.naskh(16)),
+                        content: Text(
+                          'هل تريد حذف هذا الدعاء؟',
+                          style: style.naskh(13, color: style.textSec),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(
+                              'إلغاء',
+                              style: style.naskh(13, color: style.textSec),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text(
+                              'حذف',
+                              style: style.naskh(13, color: Colors.redAccent),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (ok == true && context.mounted) {
+                      await ref.read(userDuasProvider.notifier).delete(dua.id);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  dua.textAr,
+                  textAlign: TextAlign.center,
+                  style: style
+                      .amiri(19, color: style.text)
+                      .copyWith(height: 1.9),
+                ),
+                if (dua.occasion.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(height: 1, color: style.border),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 12,
+                        color: style.textSec,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        dua.occasion,
+                        style: style.naskh(12, color: style.textSec),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Share to Community Sheet for Duas ───────────────────────────
+class _ShareToDuaCommunitySheet extends ConsumerStatefulWidget {
+  final UserDuaItem dua;
+  final AdaptiveStyle style;
+  const _ShareToDuaCommunitySheet({required this.dua, required this.style});
+  @override
+  ConsumerState<_ShareToDuaCommunitySheet> createState() =>
+      _ShareToDuaCommunitySheetState();
+}
+
+class _ShareToDuaCommunitySheetState
+    extends ConsumerState<_ShareToDuaCommunitySheet> {
+  bool _isSharing = false;
+  bool _shared = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.style;
+    return Container(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 28,
+      ),
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: s.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            _shared ? '✅ تمت المشاركة!' : '🌍 مشاركة مع المجتمع',
+            style: s.amiri(20, color: _shared ? Colors.green : s.gold),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: s.teal.withOpacity(0.07),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: s.teal.withOpacity(0.25)),
+            ),
+            child: Text(
+              widget.dua.textAr,
+              textAlign: TextAlign.center,
+              style: s.amiri(18, color: s.text).copyWith(height: 1.9),
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (!_shared)
+            PrimaryButton(
+              onTap: _isSharing
+                  ? null
+                  : () async {
+                      setState(() => _isSharing = true);
+                      try {
+                        await ref
+                            .read(userDuasProvider.notifier)
+                            .shareDua(widget.dua);
+                        if (mounted) setState(() => _shared = true);
+                        await Future.delayed(const Duration(seconds: 1));
+                        if (mounted) Navigator.pop(context);
+                      } catch (e) {
+                        if (mounted) {
+                          setState(() => _isSharing = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('خطأ: $e'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              icon: Icons.public_rounded,
+              label: 'مشاركة مع المجتمع',
+              baseColor: s.teal,
+              isLoading: _isSharing,
+            )
+          else
+            Text(
+              'شكراً لمشاركتك مع مجتمع تقوى 🤍',
+              textAlign: TextAlign.center,
+              style: s.naskh(13, color: s.textSec),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB 3: COMMUNITY DUAS
+// ═══════════════════════════════════════════════════════════════
+class _CommunityDuasTabView extends ConsumerWidget {
+  final AdaptiveStyle style;
+  const _CommunityDuasTabView({required this.style});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(communityDuasProvider);
+
+    return state.when(
+      loading: () =>
+          Center(child: CircularProgressIndicator(color: style.teal)),
+      error: (err, _) => Center(
+        child: Text(
+          'تعذر تحميل أدعية المجتمع',
+          style: style.naskh(14, color: Colors.red),
+        ),
+      ),
+      data: (items) {
+        if (items.isEmpty) {
+          return RefreshIndicator(
+            color: style.teal,
+            onRefresh: () => ref.read(communityDuasProvider.notifier).refresh(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: 300,
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🌍', style: TextStyle(fontSize: 48)),
+                        const SizedBox(height: 16),
+                        Text(
+                          'لا توجد أدعية مشتركة حالياً',
+                          style: style.amiri(18, color: style.textSec),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'اسحب للأسفل للتحديث',
+                          style: style.naskh(12, color: style.textSec),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          color: style.teal,
+          onRefresh: () => ref.read(communityDuasProvider.notifier).refresh(),
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+            itemCount: items.length,
+            itemBuilder: (_, i) {
+              final dua = items[i];
+              return _CommunityDuaCard(dua: dua, style: style);
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CommunityDuaCard extends ConsumerStatefulWidget {
+  final CommunityDuaItem dua;
+  final AdaptiveStyle style;
+
+  const _CommunityDuaCard({required this.dua, required this.style});
+
+  @override
+  ConsumerState<_CommunityDuaCard> createState() => _CommunityDuaCardState();
+}
+
+class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _heartCtrl;
+  late final Animation<double> _heartScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _heartCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _heartScale = TweenSequence([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.4), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.4, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(parent: _heartCtrl, curve: Curves.easeOut));
+  }
+
+  @override
+  void dispose() {
+    _heartCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.style;
+    final dua = widget.dua;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [s.teal.withOpacity(0.09), s.card],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: s.teal.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: s.teal.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+            child: Row(
+              children: [
+                Text(
+                  dua.emoji.isNotEmpty ? dua.emoji : '🌐',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    dua.titleAr,
+                    style: s.naskh(14, weight: FontWeight.w700, color: s.teal),
+                  ),
+                ),
+                // Copy
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: dua.textAr));
+                    HapticFeedback.lightImpact();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'تم النسخ ✓',
+                          style: GoogleFonts.notoNaskhArabic(fontSize: 12),
+                        ),
+                        backgroundColor: s.teal,
+                        behavior: SnackBarBehavior.floating,
+                        duration: const Duration(seconds: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.copy_rounded, size: 16, color: s.textSec),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Body
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: Text(
+              dua.textAr,
+              textAlign: TextAlign.center,
+              style: s.amiri(19, color: s.text).copyWith(height: 1.9),
+            ),
+          ),
+          if (dua.occasion.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+              child: Column(
+                children: [
+                  Container(height: 1, color: s.teal.withOpacity(0.2)),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.schedule_rounded, size: 12, color: s.textSec),
+                      const SizedBox(width: 4),
+                      Text(dua.occasion, style: s.naskh(12, color: s.textSec)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          // Footer — like button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Like counter
+                Text(
+                  '${dua.likes}',
+                  style: s.naskh(
+                    13,
+                    color: dua.likedByMe ? Colors.red.shade400 : s.textSec,
+                    weight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Animated heart button
+                GestureDetector(
+                  onTap: dua.likedByMe
+                      ? null
+                      : () {
+                          HapticFeedback.mediumImpact();
+                          _heartCtrl.forward(from: 0);
+                          ref
+                              .read(communityDuasProvider.notifier)
+                              .likeDua(dua.id);
+                        },
+                  child: ScaleTransition(
+                    scale: _heartScale,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      child: Icon(
+                        dua.likedByMe
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        key: ValueKey(dua.likedByMe),
+                        color: dua.likedByMe ? Colors.red.shade400 : s.textSec,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ADD DUA SHEET
+// ═══════════════════════════════════════════════════════════════
+class AddDuaSheet extends ConsumerStatefulWidget {
+  const AddDuaSheet({super.key});
+  @override
+  ConsumerState<AddDuaSheet> createState() => _AddDuaSheetState();
+}
+
+class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
+  final _titleCtrl = TextEditingController();
+  final _arabicCtrl = TextEditingController();
+  final _occasionCtrl = TextEditingController();
+  bool _shareToCommunity = false;
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _arabicCtrl.dispose();
+    _occasionCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final title = _titleCtrl.text.trim();
+    final arabic = _arabicCtrl.text.trim();
+    if (title.isEmpty || arabic.isEmpty) return;
+
+    setState(() => _isSaving = true);
+    try {
+      await ref
+          .read(userDuasProvider.notifier)
+          .add(
+            textAr: arabic,
+            titleAr: title,
+            occasion: _occasionCtrl.text.trim(),
+          );
+
+      if (_shareToCommunity && mounted) {
+        await SupabaseService.shareDuaToCommunity(
+          textAr: arabic,
+          titleAr: title,
+          occasion: _occasionCtrl.text.trim(),
+        );
+      }
+
+      if (mounted) Navigator.of(context).pop();
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final s = AdaptiveStyle(context, isRamadan);
+
+    return Container(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      decoration: BoxDecoration(
+        color: s.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('إضافة دعاء', style: s.amiri(22, color: s.gold)),
+              IconButton(
+                icon: Icon(Icons.close, color: s.textSec),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _titleCtrl,
+            textDirection: TextDirection.rtl,
+            style: s.naskh(14),
+            decoration: InputDecoration(
+              labelText: 'عنوان الدعاء',
+              labelStyle: s.naskh(12, color: s.textSec),
+              filled: true,
+              fillColor: s.border.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _arabicCtrl,
+            textDirection: TextDirection.rtl,
+            style: s.amiri(16),
+            maxLines: 4,
+            decoration: InputDecoration(
+              labelText: 'نص الدعاء (عربي)',
+              labelStyle: s.naskh(12, color: s.textSec),
+              filled: true,
+              fillColor: s.border.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _occasionCtrl,
+            textDirection: TextDirection.rtl,
+            style: s.naskh(14),
+            decoration: InputDecoration(
+              labelText: 'المناسبة (اختياري)',
+              labelStyle: s.naskh(12, color: s.textSec),
+              filled: true,
+              fillColor: s.border.withOpacity(0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'مشاركة مع مجتمع تقوى (ليستفيد منه الآخرون)',
+                  style: s.naskh(12, color: s.text),
+                ),
+              ),
+              Switch(
+                value: _shareToCommunity,
+                onChanged: (v) => setState(() => _shareToCommunity = v),
+                activeColor: s.teal,
+                activeTrackColor: s.teal.withOpacity(0.3),
+                inactiveTrackColor: s.border,
+                inactiveThumbColor: s.textDim,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          PrimaryButton(
+            label: 'حفظ',
+            onTap: _isSaving ? null : _save,
+            isLoading: _isSaving,
+          ),
+        ],
       ),
     );
   }

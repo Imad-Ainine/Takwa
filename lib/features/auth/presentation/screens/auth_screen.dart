@@ -1,18 +1,25 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/auth/presentation/screens/auth_screen.dart
-//  تقوى — تسجيل الدخول وإنشاء الحساب
+//  تقوى — شاشة المصادقة — Professional Islamic UI
 // ═══════════════════════════════════════════════════════════════
 
+import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/supabase/supabase_service.dart';
 import '../../../../core/providers/database_providers.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/primary_button.dart';
 
+// ══════════════════════════════════════════════════════
+//  AUTH SCREEN
+// ══════════════════════════════════════════════════════
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
   @override
@@ -23,34 +30,52 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     with TickerProviderStateMixin {
   late final TabController _tabs;
   late final AnimationController _entryCtrl;
+  late final AnimationController _bgCtrl; // rotating star field
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
   bool _loading = false;
   String? _error;
+  double _passStrength = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 2, vsync: this);
-    _tabs.addListener(() => setState(() {}));
-
+    _tabs = TabController(length: 2, vsync: this)
+      ..addListener(() => setState(() {}));
     _entryCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1200),
     )..forward();
+    _bgCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 30),
+    )..repeat();
+    _passCtrl.addListener(_updatePassStrength);
+  }
+
+  void _updatePassStrength() {
+    final p = _passCtrl.text;
+    double s = 0;
+    if (p.length >= 6) s += 0.25;
+    if (p.length >= 10) s += 0.25;
+    if (p.contains(RegExp(r'[A-Z]'))) s += 0.25;
+    if (p.contains(RegExp(r'[0-9!@#\$%^&*]'))) s += 0.25;
+    setState(() => _passStrength = s);
   }
 
   @override
   void dispose() {
     _tabs.dispose();
     _entryCtrl.dispose();
+    _bgCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _userCtrl.dispose();
     super.dispose();
   }
 
+  // ── Actions ──────────────────────────────────────────
   Future<void> _signIn() async {
     if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
       setState(() => _error = 'أدخل البريد وكلمة المرور');
@@ -68,7 +93,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
       if (mounted) setState(() => _error = _authError(e.message));
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -97,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
       if (mounted) setState(() => _error = _authError(e.message));
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -111,126 +136,150 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     });
     try {
       final res = await SupabaseService.signInWithGoogle();
-      if (res != null && mounted) {
-        Navigator.pushReplacementNamed(context, '/');
-      }
-    } catch (e) {
+      if (res != null && mounted) Navigator.pushReplacementNamed(context, '/');
+    } catch (_) {
       if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
+  Future<void> _forgotPassword() async {
+    if (_emailCtrl.text.trim().isEmpty) {
+      setState(() => _error = 'أدخل بريدك الإلكتروني أولاً');
+      return;
+    }
+    try {
+      await Supabase.instance.client.auth.resetPasswordForEmail(
+        _emailCtrl.text.trim(),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('تم إرسال رابط إعادة تعيين كلمة المرور ✓'),
+            backgroundColor: const Color(0xFF2DD4BF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) setState(() => _error = 'تعذّر إرسال الرابط');
+    }
+  }
+
   String _authError(String msg) {
     if (msg.contains('Invalid login')) return 'البريد أو كلمة المرور خاطئة';
     if (msg.contains('already registered')) return 'البريد مسجّل مسبقاً';
-    if (msg.contains('unique constraint')) return 'اسم المستخدم مأخوذ بالفعل';
-    if (msg.contains('Password should')) {
-      return 'كلمة المرور يجب أن تكون ٦ أحرف على الأقل';
-    }
+    if (msg.contains('unique constraint')) return 'اسم المستخدم مأخوذ';
+    if (msg.contains('Password should')) return 'كلمة المرور ٦ أحرف على الأقل';
     return 'خطأ في الاتصال، حاول لاحقاً';
   }
 
+  // ── Build ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
 
-    return Scaffold(
-      backgroundColor: s.bg,
-      body: Stack(
-        children: [
-          const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-          ),
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // ── AppBar / Header ──
-              SliverAppBar(
-                expandedHeight: 240,
-                pinned: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _AuthHeader(style: s),
-                  collapseMode: CollapseMode.pin,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: s.bg,
+        body: Stack(
+          children: [
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+            ),
+            // ② Scroll content
+            CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 280,
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: _AuthHeader(style: s, entryCtrl: _entryCtrl),
+                    collapseMode: CollapseMode.pin,
+                  ),
                 ),
-              ),
-
-              // ── Content ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
-                  child: Column(
-                    children: [
-                      // ① Form Card
-                      _anim(0, _buildFormCard(s)),
-                      const SizedBox(height: 24),
-
-                      // ② Social Separator
-                      _anim(1, _buildSeparator(s)),
-                      const SizedBox(height: 20),
-
-                      // ③ Social Button
-                      _anim(
-                        2,
-                        _SocialBtn(
-                          onTap: _loading ? null : _signInGoogle,
-                          icon: 'assets/images/google_logo.png',
-                          label: 'Google الدخول عبر',
-                          style: s,
-                          isGoogle: true,
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-                      _anim(
-                        3,
-                        GestureDetector(
-                          onTap: () =>
-                              Navigator.pushReplacementNamed(context, '/'),
-                          child: Text(
-                            'متابعة كضيف — استكشف التطبيق ➜',
-                            style: s.naskh(
-                              13,
-                              color: s.textSec,
-                              weight: FontWeight.w600,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                    child: Column(
+                      children: [
+                        _anim(0, _buildGlassCard(s)),
+                        const SizedBox(height: 20),
+                        _anim(1, _buildSeparator(s)),
+                        const SizedBox(height: 16),
+                        _anim(2, _buildGoogleBtn(s)),
+                        const SizedBox(height: 28),
+                        _anim(
+                          3,
+                          GestureDetector(
+                            onTap: () =>
+                                Navigator.pushReplacementNamed(context, '/'),
+                            child: Text(
+                              'متابعة كضيف — استكشف التطبيق ➜',
+                              style: s.naskh(
+                                13,
+                                color: s.textSec,
+                                weight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // ③ Loading overlay
+            if (_loading)
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+                child: Container(
+                  color: Colors.black38,
+                  child: Center(
+                    child: _GlowPulse(
+                      child: CircularProgressIndicator(
+                        color: s.gold,
+                        strokeWidth: 3,
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ],
-          ),
-          if (_loading)
-            Container(
-              color: Colors.black26,
-              child: Center(child: CircularProgressIndicator(color: s.gold)),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _anim(int i, Widget child) {
-    final delay = i * 0.1, duration = (delay + 0.5).clamp(0.0, 1.0);
+    final delay = i * 0.12;
+    final end = (delay + 0.5).clamp(0.0, 1.0);
     return FadeTransition(
       opacity: Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(
           parent: _entryCtrl,
-          curve: Interval(delay, duration, curve: Curves.easeOut),
+          curve: Interval(delay, end, curve: Curves.easeOut),
         ),
       ),
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+        position: Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero)
             .animate(
               CurvedAnimation(
                 parent: _entryCtrl,
-                curve: Interval(delay, duration, curve: Curves.easeOutCubic),
+                curve: Interval(delay, end, curve: Curves.easeOutCubic),
               ),
             ),
         child: child,
@@ -238,140 +287,160 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  Widget _buildFormCard(AdaptiveStyle s) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: s.cardDeco.copyWith(
-        border: Border.all(color: s.gold.withOpacity(0.2)),
-        boxShadow: context.shadows.card,
-      ),
-      child: Column(
-        children: [
-          // ── Tab Bar ──
-          Container(
-            height: 52,
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: s.bg,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: s.border),
-            ),
-            child: TabBar(
-              controller: _tabs,
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicator: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [s.gold, s.teal],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: s.gold.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+  // ── Glassmorphism Form Card ────────────────────────────
+  Widget _buildGlassCard(AdaptiveStyle s) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: s.card.withOpacity(0.72),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: s.gold.withOpacity(0.22), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: s.gold.withOpacity(0.07),
+                blurRadius: 30,
+                spreadRadius: 2,
               ),
-              labelColor: s.bg,
-              unselectedLabelColor: s.textSec,
-              dividerColor: Colors.transparent,
-              labelStyle: s.naskh(13, weight: FontWeight.bold),
-              tabs: const [
-                Tab(text: 'تسجيل الدخول'),
-                Tab(text: 'حساب جديد'),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: 28),
-
-          // ── Fields ──
-          _AuthField(
-            ctrl: _emailCtrl,
-            hint: 'عنوان البريد الإلكتروني',
-            icon: Icons.alternate_email_rounded,
-            style: s,
-          ),
-          const SizedBox(height: 16),
-          _AuthField(
-            ctrl: _passCtrl,
-            hint: 'كلمة المرور',
-            icon: Icons.lock_outline_rounded,
-            style: s,
-            isPassword: true,
-          ),
-          const SizedBox(height: 16),
-
-          // Username always visible as requested "without hide username"
-          _AuthField(
-            ctrl: _userCtrl,
-            hint: _tabs.index == 0
-                ? 'اسم المستخدم (اختياري للجدد)'
-                : 'اسم المستخدم للملف الشخصي',
-            icon: Icons.person_outline_rounded,
-            style: s,
-            labelSuffix: _tabs.index == 0 ? 'جديد؟' : '*',
-          ),
-
-          if (_error != null) _buildError(s),
-
-          const SizedBox(height: 32),
-
-          // ── Submit Button ──
-          SizedBox(
-            width: double.infinity,
-            height: 58,
-            child: ElevatedButton(
-              onPressed: _loading
-                  ? null
-                  : (_tabs.index == 0 ? _signIn : _signUp),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: s.bg,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 4,
-                shadowColor: s.gold.withOpacity(0.3),
-              ),
-              child: Ink(
+          child: Column(
+            children: [
+              // ── Tab bar ──
+              Container(
+                height: 50,
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [s.goldDark, s.gold]),
-                  borderRadius: BorderRadius.circular(16),
+                  color: s.bg.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: s.border.withOpacity(0.5)),
                 ),
-                child: Container(
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _tabs.index == 0 ? 'دخول آمن' : 'إنشاء حساب جديد',
-                        style: s.naskh(15, weight: FontWeight.w700),
-                      ),
-                      const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, size: 18),
+                child: TabBar(
+                  controller: _tabs,
+                  indicator: BoxDecoration(
+                    gradient: LinearGradient(colors: [s.goldDark, s.gold]),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(color: s.gold.withOpacity(0.3), blurRadius: 8),
                     ],
                   ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: s.textSec,
+                  dividerColor: Colors.transparent,
+                  labelStyle: s.naskh(13, weight: FontWeight.bold),
+                  tabs: const [
+                    Tab(text: 'تسجيل الدخول'),
+                    Tab(text: 'حساب جديد'),
+                  ],
                 ),
               ),
-            ),
+              const SizedBox(height: 24),
+
+              // ── Username field (sign-up only) ──
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 200),
+                crossFadeState: _tabs.index == 1
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: const SizedBox.shrink(),
+                secondChild: Column(
+                  children: [
+                    _AuthField(
+                      ctrl: _userCtrl,
+                      hint: 'اسم المستخدم',
+                      icon: Icons.person_outline_rounded,
+                      style: s,
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                ),
+              ),
+
+              // ── Email ──
+              _AuthField(
+                ctrl: _emailCtrl,
+                hint: 'البريد الإلكتروني',
+                icon: Icons.alternate_email_rounded,
+                style: s,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 14),
+
+              // ── Password ──
+              _AuthField(
+                ctrl: _passCtrl,
+                hint: 'كلمة المرور',
+                icon: Icons.lock_outline_rounded,
+                style: s,
+                isPassword: true,
+              ),
+
+              // ── Password strength (sign-up only) ──
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 200),
+                crossFadeState: _tabs.index == 1 && _passCtrl.text.isNotEmpty
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: const SizedBox.shrink(),
+                secondChild: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _PasswordStrengthBar(
+                    strength: _passStrength,
+                    style: s,
+                  ),
+                ),
+              ),
+
+              // ── Forgot password ──
+              if (_tabs.index == 0)
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TextButton(
+                    onPressed: _forgotPassword,
+                    child: Text(
+                      'نسيت كلمة المرور؟',
+                      style: s.naskh(12, color: s.gold),
+                    ),
+                  ),
+                ),
+
+              if (_error != null) _buildError(s),
+              const SizedBox(height: 20),
+
+              // ── Submit ──
+              PrimaryButton(
+                onTap: _loading
+                    ? null
+                    : () async {
+                        if (_tabs.index == 0) {
+                          await _signIn();
+                        } else {
+                          await _signUp();
+                        }
+                      },
+                label: _tabs.index == 0 ? 'دخول آمن' : 'إنشاء حساب',
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildError(AdaptiveStyle s) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Container(
-        padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(top: 14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.red.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.red.withOpacity(0.2)),
+          border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
         ),
         child: Row(
           children: [
@@ -380,7 +449,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               color: Colors.redAccent,
               size: 18,
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(_error!, style: s.naskh(12, color: Colors.redAccent)),
             ),
@@ -393,108 +462,214 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget _buildSeparator(AdaptiveStyle s) {
     return Row(
       children: [
-        Expanded(child: Divider(color: s.border.withOpacity(0.4))),
+        Expanded(child: Divider(color: s.border.withOpacity(0.5))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text('أو استعمل', style: s.naskh(11, color: s.textDim)),
+          child: Text('أو', style: s.naskh(12, color: s.textDim)),
         ),
-        Expanded(child: Divider(color: s.border.withOpacity(0.4))),
+        Expanded(child: Divider(color: s.border.withOpacity(0.5))),
       ],
+    );
+  }
+
+  Widget _buildGoogleBtn(AdaptiveStyle s) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: InkWell(
+          onTap: _loading ? null : _signInGoogle,
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            decoration: BoxDecoration(
+              color: s.deep.withOpacity(0.65),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: s.border.withOpacity(0.5)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'الدخول عبر Google',
+                  style: s.naskh(14, weight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class _AuthHeader extends StatelessWidget {
+// ══════════════════════════════════════════════════════
+//  ANIMATED STAR-FIELD BACKGROUND
+// ══════════════════════════════════════════════════════
+class _StarFieldBg extends StatelessWidget {
+  final AnimationController controller;
   final AdaptiveStyle style;
-  const _AuthHeader({required this.style});
+  const _StarFieldBg({required this.controller, required this.style});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Background Gradient
-        Container(
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (_, _) => CustomPaint(
+        painter: _StarsPainter(progress: controller.value, gold: style.gold),
+        child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [style.gold.withOpacity(0.2), style.bg],
+              colors: [const Color(0xFF050B2A), style.bg],
             ),
           ),
         ),
-        // Decorative Elements
-        Positioned(
-          top: -20,
-          right: -30,
-          child: Opacity(
-            opacity: 0.1,
-            child: Icon(Icons.mosque_rounded, size: 200, color: style.gold),
-          ),
-        ),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 44),
-              // Logo with Glow
-              Hero(
-                tag: 'app_logo',
-                child: Container(
-                  width: 84,
-                  height: 84,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: style.card,
-                    boxShadow: [
-                      BoxShadow(
-                        color: style.gold.withOpacity(0.3),
-                        blurRadius: 25,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                    border: Border.all(
-                      color: style.gold.withOpacity(0.4),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '🌙',
-                      style: TextStyle(
-                        fontSize: 40,
-                        shadows: [
-                          Shadow(
-                            color: style.gold.withOpacity(0.5),
-                            blurRadius: 10,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text('تقوى', style: style.amiri(36, weight: FontWeight.w800)),
-              const SizedBox(height: 4),
-              Text(
-                'رفيقك في محاسبة النفس والطاعات',
-                style: style.naskh(14, color: style.textSec),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
+class _StarsPainter extends CustomPainter {
+  final double progress;
+  final Color gold;
+  _StarsPainter({required this.progress, required this.gold});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = math.Random(42);
+    final paint = Paint();
+    const count = 60;
+
+    for (int i = 0; i < count; i++) {
+      final x = rng.nextDouble() * size.width;
+      final baseY = rng.nextDouble() * size.height * 0.6;
+      final twinkle = math.sin((progress * math.pi * 2) + i * 0.7);
+      final opacity = (0.2 + 0.5 * ((twinkle + 1) / 2)).clamp(0.0, 0.8);
+      final radius = 1.0 + rng.nextDouble() * 1.4;
+
+      paint.color = (i % 7 == 0 ? gold : Colors.white).withOpacity(opacity);
+      canvas.drawCircle(Offset(x, baseY), radius, paint);
+    }
+
+    // Mosque silhouette hint at bottom of header
+    final mPaint = Paint()
+      ..color = gold.withOpacity(0.05)
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    final w = size.width;
+    final h = size.height * 0.45;
+    // simple dome shape
+    path.moveTo(0, h);
+    path.lineTo(w * 0.3, h);
+    path.lineTo(w * 0.3, h * 0.7);
+    path.quadraticBezierTo(w * 0.5, h * 0.3, w * 0.7, h * 0.7);
+    path.lineTo(w * 0.7, h);
+    path.lineTo(w, h);
+    canvas.drawPath(path, mPaint);
+  }
+
+  @override
+  bool shouldRepaint(_StarsPainter old) => old.progress != progress;
+}
+
+// ══════════════════════════════════════════════════════
+//  AUTH HEADER
+// ══════════════════════════════════════════════════════
+class _AuthHeader extends StatelessWidget {
+  final AdaptiveStyle style;
+  final AnimationController entryCtrl;
+  const _AuthHeader({required this.style, required this.entryCtrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.transparent, style.bg.withOpacity(0.95)],
+        ),
+      ),
+      child: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              // Glowing logo
+              Hero(
+                tag: 'app_logo',
+                child: AnimatedBuilder(
+                  animation: entryCtrl,
+                  builder: (_, child) => Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [style.card, style.bg],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: style.gold.withOpacity(0.4 * entryCtrl.value),
+                          blurRadius: 28,
+                          spreadRadius: 4,
+                        ),
+                      ],
+                      border: Border.all(
+                        color: style.gold.withOpacity(0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: child,
+                  ),
+                  child: const Center(
+                    child: Text('🌙', style: TextStyle(fontSize: 42)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [style.gold, style.gold],
+                ).createShader(bounds),
+                child: Text(
+                  'تقوى',
+                  style: style
+                      .amiri(48, weight: FontWeight.w800)
+                      .copyWith(color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'رفيقك في محاسبة النفس والطاعات',
+                style: context.typography.bodyLarge.copyWith(
+                  color: context.colors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  AUTH FIELD (animated focus)
+// ══════════════════════════════════════════════════════
 class _AuthField extends StatefulWidget {
   final TextEditingController ctrl;
   final String hint;
   final IconData icon;
   final AdaptiveStyle style;
   final bool isPassword;
-  final String? labelSuffix;
+  final TextInputType? keyboardType;
 
   const _AuthField({
     required this.ctrl,
@@ -502,7 +677,7 @@ class _AuthField extends StatefulWidget {
     required this.icon,
     required this.style,
     this.isPassword = false,
-    this.labelSuffix,
+    this.keyboardType,
   });
 
   @override
@@ -511,43 +686,38 @@ class _AuthField extends StatefulWidget {
 
 class _AuthFieldState extends State<_AuthField> {
   bool _obscure = true;
-  bool _isFocused = false;
+  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
     return Focus(
-      onFocusChange: (f) => setState(() => _isFocused = f),
+      onFocusChange: (f) => setState(() => _focused = f),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
-          color: s.bg,
+          color: s.bg.withOpacity(0.55),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _isFocused ? s.gold : s.border,
-            width: _isFocused ? 1.5 : 1,
+            color: _focused ? s.gold : s.border.withOpacity(0.5),
+            width: _focused ? 1.5 : 1,
           ),
-          boxShadow: _isFocused
-              ? [
-                  BoxShadow(
-                    color: s.gold.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
+          boxShadow: _focused
+              ? [BoxShadow(color: s.gold.withOpacity(0.15), blurRadius: 10)]
               : null,
         ),
         child: TextField(
           controller: widget.ctrl,
           obscureText: widget.isPassword && _obscure,
+          keyboardType: widget.keyboardType,
           textDirection: TextDirection.ltr,
-          style: s.naskh(14),
+          style: s.naskh(14).copyWith(color: s.text),
           decoration: InputDecoration(
             hintText: widget.hint,
             hintStyle: s.naskh(13, color: s.textDim),
             prefixIcon: Icon(
               widget.icon,
-              color: _isFocused ? s.gold : s.textSec,
+              color: _focused ? s.gold : s.textSec,
               size: 20,
             ),
             suffixIcon: widget.isPassword
@@ -561,24 +731,7 @@ class _AuthFieldState extends State<_AuthField> {
                       size: 20,
                     ),
                   )
-                : (widget.labelSuffix != null
-                      ? Container(
-                          margin: const EdgeInsets.only(left: 14),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                widget.labelSuffix!,
-                                style: s.naskh(
-                                  10,
-                                  color: s.gold,
-                                  weight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : null),
+                : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -591,49 +744,111 @@ class _AuthFieldState extends State<_AuthField> {
   }
 }
 
-class _SocialBtn extends StatelessWidget {
-  final VoidCallback? onTap;
-  final String icon;
-  final String label;
+// ══════════════════════════════════════════════════════
+//  PASSWORD STRENGTH BAR
+// ══════════════════════════════════════════════════════
+class _PasswordStrengthBar extends StatelessWidget {
+  final double strength; // 0..1
   final AdaptiveStyle style;
-  final bool isGoogle;
-
-  const _SocialBtn({
-    required this.onTap,
-    required this.icon,
-    required this.label,
-    required this.style,
-    this.isGoogle = false,
-  });
+  const _PasswordStrengthBar({required this.strength, required this.style});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-        decoration: style.cardDeco.copyWith(
-          color: style.card,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: style.border),
+    final label = strength < 0.26
+        ? 'ضعيفة'
+        : strength < 0.51
+        ? 'متوسطة'
+        : strength < 0.76
+        ? 'جيدة'
+        : 'قوية ✓';
+    final color = strength < 0.26
+        ? Colors.redAccent
+        : strength < 0.51
+        ? Colors.orange
+        : strength < 0.76
+        ? Colors.amber
+        : Colors.greenAccent;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: Stack(
+            children: [
+              Container(height: 4, color: style.border.withOpacity(0.3)),
+              AnimatedFractionallySizedBox(
+                duration: const Duration(milliseconds: 300),
+                widthFactor: strength.clamp(0.05, 1.0),
+                alignment: AlignmentDirectional.centerStart,
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(4),
+                    boxShadow: [
+                      BoxShadow(color: color.withOpacity(0.4), blurRadius: 6),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isGoogle)
-              const Icon(
-                Icons.g_mobiledata_rounded,
-                color: Colors.blueAccent,
-                size: 32,
-              )
-            else
-              const Icon(Icons.login_rounded, size: 20),
-            const SizedBox(width: 12),
-            Text(label, style: style.naskh(14, weight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        Text('قوة كلمة المرور: $label', style: style.naskh(11, color: color)),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  GLOW PULSE WRAPPER
+// ══════════════════════════════════════════════════════
+class _GlowPulse extends StatefulWidget {
+  final Widget child;
+  const _GlowPulse({required this.child});
+  @override
+  State<_GlowPulse> createState() => _GlowPulseState();
+}
+
+class _GlowPulseState extends State<_GlowPulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, child) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFD4AF37).withOpacity(0.3 * _ctrl.value),
+              blurRadius: 30,
+              spreadRadius: 10,
+            ),
           ],
         ),
+        child: child,
       ),
+      child: widget.child,
     );
   }
 }

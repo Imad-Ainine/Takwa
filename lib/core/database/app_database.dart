@@ -180,6 +180,19 @@ class CustomIbadahLog extends Table {
 }
 
 // ─────────────────────────────────────────
+//  TABLE: reminders
+// ─────────────────────────────────────────
+class Reminders extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text().withLength(max: 200)();
+  TextColumn get iconName =>
+      text().withDefault(const Constant('favorite_rounded'))();
+  TextColumn get time => text()(); // stored as "HH:mm" 24h
+  BoolColumn get isEnabled => boolean().withDefault(const Constant(true))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
+// ─────────────────────────────────────────
 //  TABLE: user_settings
 // ─────────────────────────────────────────
 class UserSettings extends Table {
@@ -222,13 +235,14 @@ class RamadanProgress extends Table {
     CustomIbadahLog,
     UserSettings,
     RamadanProgress,
+    Reminders,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -237,7 +251,9 @@ class AppDatabase extends _$AppDatabase {
       await _seedDefaultData();
     },
     onUpgrade: (Migrator m, int from, int to) async {
-      // Future migrations here
+      if (from < 2) {
+        await m.createTable(reminders);
+      }
     },
   );
 

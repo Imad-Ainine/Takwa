@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:takwa/features/adhkar/favorite_adhkar_screen.dart';
+import 'package:takwa/features/prayer/presentation/screens/mosques_screen.dart';
+import 'package:takwa/features/adhkar/presentation/screens/misbaha_screen.dart';
+
 import 'package:takwa/features/asma/presentation/screens/asma_screen.dart';
+import 'package:takwa/features/duas/presentation/screens/favorite_duas_screen.dart';
 import 'package:takwa/features/splash/splash_screen.dart';
 import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/features/onboarding/onboarding_screen.dart';
@@ -14,7 +19,9 @@ import 'package:takwa/features/achievements/presentation/screens/achievements_sc
 import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.dart';
-// Remove quran_data.dart import if unused
+import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
+import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
+import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -36,6 +43,13 @@ class Routes {
   static const String profile = '/profile';
   static const String quran = '/quran';
   static const String quranReader = '/quran-reader';
+  static const String adhan = '/adhan';
+  static const String terms = '/terms';
+  static const String reminders = '/reminders';
+  static const String favoriteAdhkar = '/favorite-adhkar';
+  static const String favoriteDuas = '/favorite-duas';
+  static const String mosques = '/mosques';
+  static const String misbaha = '/misbaha';
 }
 
 /// Centralized route generation and management.
@@ -57,7 +71,7 @@ class AppRoutes {
         );
       case Routes.settings:
         return MaterialPageRoute(
-          builder: (_) => const MainShell(initialIndex: 3),
+          builder: (_) => const MainShell(initialIndex: 4),
         );
       case Routes.aboutMe:
         return MaterialPageRoute(builder: (_) => const AboutMeScreen());
@@ -89,6 +103,24 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const QuranScreen());
       case Routes.quranReader:
         return MaterialPageRoute(builder: (_) => const QuranReaderScreen());
+      case Routes.adhan:
+        final prayerName = (settings.arguments as String?) ?? 'الصلاة';
+        return MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => AdhanOverlayScreen(prayerName: prayerName),
+        );
+      case Routes.terms:
+        return MaterialPageRoute(builder: (_) => const TermsPrivacyScreen());
+      case Routes.reminders:
+        return MaterialPageRoute(builder: (_) => const RemindersListScreen());
+      case Routes.favoriteAdhkar:
+        return MaterialPageRoute(builder: (_) => const FavoriteAdhkarScreen());
+      case Routes.favoriteDuas:
+        return MaterialPageRoute(builder: (_) => const FavoriteDuasScreen());
+      case Routes.mosques:
+        return MaterialPageRoute(builder: (_) => const MosquesScreen());
+      case Routes.misbaha:
+        return MaterialPageRoute(builder: (_) => const MisbahaScreen());
       default:
         return MaterialPageRoute(
           builder: (_) =>

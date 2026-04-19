@@ -14,10 +14,9 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
-import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
-import 'package:takwa/core/widgets/adhkar_overlay_notification.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -47,20 +46,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dailyRecordDaoProvider).getOrCreateToday();
       _staggerCtrl.forward();
-
-      // Demo trigger for Adhkar Overlay Notification
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          final isRamadan = ref.read(ramadanModeProvider).value ?? false;
-          if (!isRamadan) {
-            AdhkarOverlayNotification.show(
-              context,
-              AdhkarCategory.evening,
-              kAdhkarData[AdhkarCategory.evening]![1],
-            );
-          }
-        }
-      });
+      // Auto-start the background overlay service (adhkar + adhan)
+      OverlayBackgroundService.start();
     });
   }
 
@@ -222,7 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         3,
                         todayAsync.when(
                           loading: () => _Skeleton(style: style, height: 110),
-                          error: (_, __) => const SizedBox(),
+                          error: (_, _) => const SizedBox(),
                           data: (r) => _TaqwaSectionMerged(
                             record: r,
                             streakAsync: streakAsync,
@@ -237,7 +224,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         4,
                         todayAsync.when(
                           loading: () => _Skeleton(style: style, height: 180),
-                          error: (_, __) => const SizedBox(),
+                          error: (_, _) => const SizedBox(),
                           data: (r) =>
                               _QuickIbadahGridMerged(record: r, style: style),
                         ),
@@ -404,7 +391,7 @@ class _RamadanBannerState extends State<_RamadanBanner>
     final s = widget.style;
     return AnimatedBuilder(
       animation: _ctrl,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -545,7 +532,7 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
 
     return AnimatedBuilder(
       animation: _pulse,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -673,7 +660,7 @@ class _PrayerTimesRowMerged extends StatelessWidget {
             reverse: true,
             physics: const BouncingScrollPhysics(),
             itemCount: prayers.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (_, i) {
               final prayer = prayers[i];
               final isActive = prayer.name == currentKey;
@@ -878,7 +865,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                 const SizedBox(height: 6),
                 streakAsync.when(
                   loading: () => const SizedBox(height: 22),
-                  error: (_, __) => const SizedBox(),
+                  error: (_, _) => const SizedBox(),
                   data: (n) => n > 0
                       ? Container(
                           padding: const EdgeInsets.symmetric(
@@ -967,7 +954,7 @@ class _RingWidgetState extends State<_RingWidget>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _anim,
-      builder: (_, __) => SizedBox(
+      builder: (_, _) => SizedBox(
         width: 88,
         height: 88,
         child: CustomPaint(
@@ -1220,8 +1207,11 @@ class _FeatureRow extends StatelessWidget {
     ('🧭', 'القبلة', '/qibla'),
     ('📿', 'الأذكار', '/adhkar'),
     ('🤲', 'الأدعية', '/duas'),
+    ('✨', 'المسبحة', '/misbaha'),
+    ('🕋', 'المساجد', '/mosques'),
     ('📊', 'إحصائيات', '/statistics'),
     ('🏆', 'الإنجازات', '/achievements'),
+    ('🔔', 'التذكيرات', '/reminders'),
   ];
 
   @override
@@ -1239,7 +1229,7 @@ class _FeatureRow extends StatelessWidget {
             reverse: true,
             physics: const BouncingScrollPhysics(),
             itemCount: _features.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (_, i) {
               final f = _features[i];
               return GestureDetector(

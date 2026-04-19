@@ -10,6 +10,7 @@ import 'package:takwa/features/achievements/domain/models/achievement_definition
 import 'package:takwa/features/achievements/presentation/widgets/achievement_card.dart';
 import 'package:takwa/features/achievements/providers/achievements_providers.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
@@ -424,12 +425,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               ),
             ],
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 56),
-              ),
-              child: const Text('فهمت'),
+            PrimaryButton(
+              label: 'فهمت',
+              onTap: () async => Navigator.pop(context),
             ),
           ],
         ),

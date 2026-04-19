@@ -31,8 +31,7 @@ class SupabaseService {
     required String email,
     required String password,
   }) async {
-    return await _db.auth.signInWithPassword(
-        email: email, password: password);
+    return await _db.auth.signInWithPassword(email: email, password: password);
   }
 
   static Future<AuthResponse?> signInWithGoogle() async {
@@ -67,7 +66,8 @@ class SupabaseService {
       // If it's a new user, internal profiles are handled by DB triggers
       // but we can ensure username is set if available
       if (res.user != null) {
-        final username = googleUser.displayName ?? 'user_${res.user!.id.substring(0, 5)}';
+        final username =
+            googleUser.displayName ?? 'user_${res.user!.id.substring(0, 5)}';
         await _db.from('profiles').upsert({
           'id': res.user!.id,
           'username': username,
@@ -122,11 +122,14 @@ class SupabaseService {
   }
 
   static Future<List<Map<String, dynamic>>> getRecordsRange({
-    required DateTime from, required DateTime to}) async {
+    required DateTime from,
+    required DateTime to,
+  }) async {
     final uid = SupabaseConfig.userId;
     if (uid == null) return [];
 
-    final data = await _db.from('daily_records')
+    final data = await _db
+        .from('daily_records')
         .select()
         .eq('user_id', uid)
         .gte('date', _dateStr(from))
@@ -139,7 +142,8 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return null;
 
-    return await _db.from('user_settings')
+    return await _db
+        .from('user_settings')
         .select()
         .eq('user_id', uid)
         .maybeSingle();
@@ -164,18 +168,19 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('user_stats').upsert({
-      'user_id': uid,
+    await _db.from('profiles').update({
       'total_points': totalPoints,
       'current_streak': currentStreak,
-      'longest_streak': longestStreak,
+      'highest_streak': longestStreak,
       'quran_pages': quranPages,
       'updated_at': DateTime.now().toIso8601String(),
-    }, onConflict: 'user_id');
+    }).eq('id', uid);
   }
 
   // ─────────────── ACHIEVEMENTS ───────────────
-  static Future<void> upsertAchievement(Map<String, dynamic> achievement) async {
+  static Future<void> upsertAchievement(
+    Map<String, dynamic> achievement,
+  ) async {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
@@ -190,13 +195,158 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return [];
 
-    final data = await _db.from('achievements')
-        .select()
-        .eq('user_id', uid);
+    final data = await _db.from('achievements').select().eq('user_id', uid);
     return List<Map<String, dynamic>>.from(data);
   }
 
-
   static String _dateStr(DateTime dt) =>
-      '${dt.year}-${dt.month.toString().padLeft(2,'0')}-${dt.day.toString().padLeft(2,'0')}';
+      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+
+  // ─────────────── USER PERSONAL ADHKAR ───────────────
+  static Future<List<Map<String, dynamic>>> getUserAdhkar() async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+    final data = await _db
+        .from('user_adhkar')
+        .select()
+        .eq('user_id', uid)
+        .order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> addUserAdhkar({
+    required String textAr,
+    int count = 1,
+    String categoryHint = 'general',
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+    await _db.from('user_adhkar').insert({
+      'user_id': uid,
+      'text_ar': textAr,
+      'count': count,
+      'category_hint': categoryHint,
+    });
+  }
+
+  static Future<void> deleteUserAdhkar(String id) async {
+    await _db.from('user_adhkar').delete().eq('id', id);
+  }
+
+  // ─────────────── USER PERSONAL DUAS ───────────────
+  static Future<List<Map<String, dynamic>>> getUserDuas() async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+    final data = await _db
+        .from('user_duas')
+        .select()
+        .eq('user_id', uid)
+        .order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> addUserDua({
+    required String titleAr,
+    required String textAr,
+    String occasion = '',
+    String source = '',
+    String emoji = '🤲',
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+    await _db.from('user_duas').insert({
+      'user_id': uid,
+      'title_ar': titleAr,
+      'text_ar': textAr,
+      'occasion': occasion,
+      'source': source,
+      'emoji': emoji,
+    });
+  }
+
+  static Future<void> deleteUserDua(String id) async {
+    await _db.from('user_duas').delete().eq('id', id);
+  }
+
+  // ─────────────── COMMUNITY ADHKAR ───────────────
+  static Future<List<Map<String, dynamic>>> getCommunityAdhkar() async {
+    final data = await _db
+        .from('community_adhkar')
+        .select()
+        .eq('approved', true)
+        .order('likes', ascending: false)
+        .limit(50);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> likeAdhkar(String id) async {
+    // Use an RPC or a direct update. We do a read-then-write for simplicity;
+    // on production you'd use a Postgres function to avoid race conditions.
+    final row = await _db
+        .from('community_adhkar')
+        .select('likes')
+        .eq('id', id)
+        .single();
+    final currentLikes = (row['likes'] as int?) ?? 0;
+    await _db
+        .from('community_adhkar')
+        .update({'likes': currentLikes + 1}).eq('id', id);
+  }
+
+  static Future<void> shareAdhkarToCommunity({
+    required String textAr,
+    int count = 1,
+    String categoryHint = 'general',
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+    await _db.from('community_adhkar').insert({
+      'shared_by': uid,
+      'text_ar': textAr,
+      'count': count,
+      'category_hint': categoryHint,
+    });
+  }
+
+  // ─────────────── COMMUNITY DUAS ───────────────
+  static Future<List<Map<String, dynamic>>> getCommunityDuas() async {
+    final data = await _db
+        .from('community_duas')
+        .select()
+        .eq('approved', true)
+        .order('likes', ascending: false)
+        .limit(50);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> likeDua(String id) async {
+    final row = await _db
+        .from('community_duas')
+        .select('likes')
+        .eq('id', id)
+        .single();
+    final currentLikes = (row['likes'] as int?) ?? 0;
+    await _db
+        .from('community_duas')
+        .update({'likes': currentLikes + 1}).eq('id', id);
+  }
+
+  static Future<void> shareDuaToCommunity({
+    required String titleAr,
+    required String textAr,
+    String occasion = '',
+    String source = '',
+    String emoji = '🤲',
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+    await _db.from('community_duas').insert({
+      'shared_by': uid,
+      'title_ar': titleAr,
+      'text_ar': textAr,
+      'occasion': occasion,
+      'source': source,
+      'emoji': emoji,
+    });
+  }
 }

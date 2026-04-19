@@ -17,3 +17,6 @@ mixin _$StatsDaoMixin on DatabaseAccessor<AppDatabase> {
 mixin _$SettingsDaoMixin on DatabaseAccessor<AppDatabase> {
   $UserSettingsTable get userSettings => attachedDatabase.userSettings;
 }
+mixin _$RemindersDaoMixin on DatabaseAccessor<AppDatabase> {
+  $RemindersTable get reminders => attachedDatabase.reminders;
+}

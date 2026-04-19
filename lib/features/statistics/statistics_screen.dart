@@ -16,6 +16,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  LOCAL PROVIDERS
@@ -161,10 +162,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           1,
                           statsAsync.when(
                             loading: () => const _StatSkeleton(height: 150),
-                            error: (_, __) => const SizedBox(),
+                            error: (_, _) => const SizedBox(),
                             data: (s) => streakAsync.when(
                               loading: () => const _StatSkeleton(height: 150),
-                              error: (_, __) => const SizedBox(),
+                              error: (_, _) => const SizedBox(),
                               data: (streak) =>
                                   _TaqwaHeroCard(stats: s, streak: streak),
                             ),
@@ -176,7 +177,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           2,
                           weekAsync.when(
                             loading: () => const _StatSkeleton(height: 180),
-                            error: (_, __) => const SizedBox(),
+                            error: (_, _) => const SizedBox(),
                             data: (pts) => _WeeklyChart(points: pts),
                           ),
                         ),
@@ -186,7 +187,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           3,
                           statsAsync.when(
                             loading: () => const _StatSkeleton(height: 120),
-                            error: (_, __) => const SizedBox(),
+                            error: (_, _) => const SizedBox(),
                             data: (s) => _StatsCardsGrid(stats: s),
                           ),
                         ),
@@ -196,7 +197,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           4,
                           statsAsync.when(
                             loading: () => const _StatSkeleton(height: 150),
-                            error: (_, __) => const SizedBox(),
+                            error: (_, _) => const SizedBox(),
                             data: (s) => _PrayerAttendanceCard(stats: s),
                           ),
                         ),
@@ -214,7 +215,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
             // ── Unseen Achievement Overlay ──
             unseenAsync.when(
               loading: () => const SizedBox(),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
               data: (list) => list.isNotEmpty
                   ? _AchievementToast(achievement: list.first)
                   : const SizedBox(),
@@ -527,7 +528,7 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _ctrl,
-    builder: (_, __) => SizedBox(
+    builder: (_, _) => SizedBox(
       width: 100,
       height: 100,
       child: CustomPaint(
@@ -816,7 +817,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
           // Chart area
           AnimatedBuilder(
             animation: _anim,
-            builder: (_, __) => SizedBox(
+            builder: (_, _) => SizedBox(
               height: 170,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -1214,7 +1215,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
           Expanded(
             child: AnimatedBuilder(
               animation: _anim,
-              builder: (_, __) => ClipRRect(
+              builder: (_, _) => ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: Stack(
                   children: [
@@ -1250,7 +1251,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
             width: 34,
             child: AnimatedBuilder(
               animation: _anim,
-              builder: (_, __) => Text(
+              builder: (_, _) => Text(
                 '${(_anim.value * 100).round()}%',
                 style: context.typography.bodySmall.copyWith(
                   color: _color(context),
@@ -1292,7 +1293,7 @@ class _AchievementsSection extends ConsumerWidget {
               const Spacer(),
               allAsync.when(
                 loading: () => const SizedBox(),
-                error: (_, __) => const SizedBox(),
+                error: (_, _) => const SizedBox(),
                 data: (list) => Text(
                   '${list.length} إنجاز',
                   style: context.typography.bodySmall.copyWith(
@@ -1311,7 +1312,7 @@ class _AchievementsSection extends ConsumerWidget {
                 strokeWidth: 2,
               ),
             ),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
             data: (list) => list.isEmpty
                 ? _EmptyAchievements()
                 : Wrap(
@@ -1447,23 +1448,9 @@ class _AchievementDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: context.colors.background,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'شكراً لله 🤲',
-                  style: context.typography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
+            PrimaryButton(
+              onTap: () async => Navigator.pop(context),
+              label: 'شكراً لله 🤲',
             ),
           ],
         ),

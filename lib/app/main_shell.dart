@@ -19,6 +19,7 @@ import '../app/animated_drawer.dart';
 import '../core/providers/auth_providers.dart';
 import '../features/auth/presentation/pages/auth_choice_screen.dart';
 import '../core/widgets/custom_pattern_background.dart';
+import '../core/notifications/overlay_background_service.dart';
 
 // ─────────────────────────────────────────
 //  CURRENT TAB PROVIDER
@@ -68,6 +69,7 @@ class _MainShellState extends ConsumerState<MainShell>
     // جدولة الإشعارات عند أول تشغيل
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationsManager.scheduleAll(ref);
+      OverlayBackgroundService.start();
     });
   }
 
@@ -105,7 +107,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
     return onboardAsync.when(
       loading: () => const _SplashScreen(),
-      error: (_, __) => const _SplashScreen(),
+      error: (_, _) => const _SplashScreen(),
       data: (done) {
         if (!done) {
           return const OnboardingScreen();
@@ -213,7 +215,7 @@ class _BottomNav extends StatelessWidget {
                       onTap: () => onTap(i),
                       child: AnimatedBuilder(
                         animation: tabAnims[i],
-                        builder: (_, __) {
+                        builder: (_, _) {
                           final t = tabAnims[i].value;
                           return Column(
                             mainAxisSize: MainAxisSize.min,

@@ -260,24 +260,75 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     };
   }
 
+  /// Safely coerce a dynamic JSON value to [int].
+  /// Supabase may return integer fields as [String] in some responses.
+  int _toInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0; 
+  }
+
+  /// Safely coerce a dynamic JSON value to [bool].
+  bool _toBool(dynamic v) {
+    if (v == null) return false;
+    if (v is bool) return v;
+    final s = v.toString().toLowerCase();
+    return s == 'true' || s == '1';
+  }
+
+  PrayerStatus _parsePrayerStatus(dynamic v) {
+    if (v == null) return PrayerStatus.notDue;
+    if (v is int) {
+      if (v >= 0 && v < PrayerStatus.values.length) return PrayerStatus.values[v];
+      return PrayerStatus.notDue;
+    }
+    final String s = v.toString().replaceFirst('PrayerStatus.', '');
+    return PrayerStatus.values.firstWhere(
+      (e) => e.name == s,
+      orElse: () {
+        final idx = int.tryParse(s) ?? 0;
+        if (idx >= 0 && idx < PrayerStatus.values.length) return PrayerStatus.values[idx];
+        return PrayerStatus.notDue;
+      },
+    );
+  }
+
+  FastingType _parseFastingType(dynamic v) {
+    if (v == null) return FastingType.none;
+    if (v is int) {
+      if (v >= 0 && v < FastingType.values.length) return FastingType.values[v];
+      return FastingType.none;
+    }
+    final String s = v.toString().replaceFirst('FastingType.', '');
+    return FastingType.values.firstWhere(
+      (e) => e.name == s,
+      orElse: () {
+        final idx = int.tryParse(s) ?? 0;
+        if (idx >= 0 && idx < FastingType.values.length) return FastingType.values[idx];
+        return FastingType.none;
+      },
+    );
+  }
+
   /// Sync from remote Supabase record
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
-    final date = DateTime.parse(data['date']);
+    final date = DateTime.parse(data['date'] as String);
     final companion = DailyRecordsCompanion(
       date: Value(date),
-      fajrStatus: Value(PrayerStatus.values[data['fajr_status'] as int]),
-      dhuhrStatus: Value(PrayerStatus.values[data['dhuhr_status'] as int]),
-      asrStatus: Value(PrayerStatus.values[data['asr_status'] as int]),
-      maghribStatus: Value(PrayerStatus.values[data['maghrib_status'] as int]),
-      ishaStatus: Value(PrayerStatus.values[data['isha_status'] as int]),
-      nightPrayer: Value(data['night_prayer'] as bool),
-      quranPages: Value(data['quran_pages'] as int),
-      morningAdhkar: Value(data['morning_adhkar'] as bool),
-      eveningAdhkar: Value(data['evening_adhkar'] as bool),
-      fastingType: Value(FastingType.values[data['fasting_type'] as int]),
-      sadaqah: Value(data['sadaqah'] as bool),
-      netPoints: Value(data['net_points'] as int),
-      taqwaPoints: Value(data['taqwa_points'] as int),
+      fajrStatus: Value(_parsePrayerStatus(data['fajr_status'])),
+      dhuhrStatus: Value(_parsePrayerStatus(data['dhuhr_status'])),
+      asrStatus: Value(_parsePrayerStatus(data['asr_status'])),
+      maghribStatus: Value(_parsePrayerStatus(data['maghrib_status'])),
+      ishaStatus: Value(_parsePrayerStatus(data['isha_status'])),
+      nightPrayer: Value(_toBool(data['night_prayer'])),
+      quranPages: Value(_toInt(data['quran_pages'])),
+      morningAdhkar: Value(_toBool(data['morning_adhkar'])),
+      eveningAdhkar: Value(_toBool(data['evening_adhkar'])),
+      fastingType: Value(_parseFastingType(data['fasting_type'])),
+      sadaqah: Value(_toBool(data['sadaqah'])),
+      netPoints: Value(_toInt(data['net_points'])),
+      taqwaPoints: Value(_toInt(data['taqwa_points'])),
       notes: Value(data['notes'] as String?),
       updatedAt: Value(DateTime.now()),
     );
@@ -419,6 +470,24 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       prayerRate: await getPrayerAttendanceRate(year, month),
       quranPages: await getMonthlyQuranPages(year, month),
     );
+  }
+
+  Stream<MonthStats> watchMonthStats(int year, int month) {
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getMonthStats(year, month));
+  }
+
+  Stream<int> watchCurrentStreak() {
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getCurrentStreak());
+  }
+
+  Stream<List<WeeklyPoint>> watchWeeklyPoints() {
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getWeeklyPoints());
   }
 
   Future<void> addAchievement({
@@ -694,4 +763,47 @@ class MonthStats {
   };
 
   int get prayerPercent => (prayerRate * 100).round();
+}
+
+// ─────────────────────────────────────────
+//  DAO 4: RemindersDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [Reminders])
+class RemindersDao extends DatabaseAccessor<AppDatabase>
+    with _$RemindersDaoMixin {
+  RemindersDao(super.db);
+
+  /// Watch all reminders ordered by creation date
+  Stream<List<Reminder>> watchAll() {
+    return (select(reminders)
+          ..orderBy([(r) => OrderingTerm.desc(r.createdAt)]))
+        .watch();
+  }
+
+  /// Insert a new reminder
+  Future<int> addReminder({
+    required String title,
+    required String iconName,
+    required String time,
+  }) {
+    return into(reminders).insert(
+      RemindersCompanion(
+        title: Value(title),
+        iconName: Value(iconName),
+        time: Value(time),
+      ),
+    );
+  }
+
+  /// Toggle enabled / disabled for a reminder
+  Future<void> toggleEnabled(int id, bool isEnabled) {
+    return (update(reminders)..where((r) => r.id.equals(id))).write(
+      RemindersCompanion(isEnabled: Value(isEnabled)),
+    );
+  }
+
+  /// Delete a reminder by id
+  Future<int> deleteReminder(int id) {
+    return (delete(reminders)..where((r) => r.id.equals(id))).go();
+  }
 }

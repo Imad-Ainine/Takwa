@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
-import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 
 class AuthChoiceScreen extends ConsumerWidget {
   const AuthChoiceScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     return Scaffold(
       backgroundColor: context.colors.night,
       body: Stack(
@@ -45,7 +50,17 @@ class AuthChoiceScreen extends ConsumerWidget {
                     child: const Text('🌙', style: TextStyle(fontSize: 60)),
                   ),
                   const SizedBox(height: 24),
-                  Text('تقوى', style: context.typography.displayLarge),
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [style.gold, style.gold],
+                    ).createShader(bounds),
+                    child: Text(
+                      'تقوى',
+                      style: style
+                          .amiri(48, weight: FontWeight.w800)
+                          .copyWith(color: Colors.white),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   Text(
                     'رفيقك نحو حياة مليئة بالإيمان',
@@ -60,19 +75,18 @@ class AuthChoiceScreen extends ConsumerWidget {
                   // Actions
                   Column(
                     children: [
-                      _ChoiceButton(
+                      PrimaryButton(
                         label: 'تسجيل الدخول',
                         icon: Icons.login_rounded,
-                        isPrimary: true,
-                        onTap: () => Navigator.pushNamed(context, Routes.auth),
+                        onTap: () async =>
+                            Navigator.pushNamed(context, Routes.auth),
                       ),
                       const SizedBox(height: 16),
-                      _ChoiceButton(
+                      PrimaryButton(
                         label: 'المتابعة كضيف',
                         icon: Icons.person_outline_rounded,
-                        isPrimary: false,
-                        onTap: () {
-                          ref.read(guestModeProvider.notifier).state = true;
+                        isOutline: true,
+                        onTap: () async {
                           // If guest mode is true, authStatusProvider will change to guest.
                           // Navigation is handled by the root redirect or shell.
                           Navigator.pushReplacementNamed(context, Routes.home);
@@ -97,64 +111,6 @@ class AuthChoiceScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ChoiceButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool isPrimary;
-  final VoidCallback onTap;
-
-  const _ChoiceButton({
-    required this.label,
-    required this.icon,
-    required this.isPrimary,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: isPrimary
-          ? ElevatedButton(
-              onPressed: onTap,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: _btnContent(context),
-            )
-          : OutlinedButton(
-              onPressed: onTap,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: context.colors.gold.withOpacity(0.5)),
-              ),
-              child: _btnContent(context),
-            ),
-    );
-  }
-
-  Widget _btnContent(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: isPrimary ? context.colors.background : context.colors.gold,
-        ),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: context.typography.labelLarge.copyWith(
-            color: isPrimary ? context.colors.background : context.colors.gold,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }

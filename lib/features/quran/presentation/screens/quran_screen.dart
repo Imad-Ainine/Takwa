@@ -51,7 +51,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         children: [
           AnimatedBuilder(
             animation: _anim,
-            builder: (_, __) => CustomPaint(
+            builder: (_, _) => CustomPaint(
               painter: QuranBgPainter(_anim.value),
               size: Size.infinite,
             ),

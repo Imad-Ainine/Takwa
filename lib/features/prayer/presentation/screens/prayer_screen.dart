@@ -14,6 +14,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -400,7 +401,7 @@ class _SkyBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: skyCtrl,
-      builder: (_, __) => CustomPaint(
+      builder: (_, _) => CustomPaint(
         painter: _SkyPainter(
           primary: visual.primaryColor,
           secondary: visual.secondaryColor,
@@ -663,7 +664,7 @@ class _FloatingParticlesState extends State<_FloatingParticles>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _ctrl,
-      builder: (_, __) => CustomPaint(
+      builder: (_, _) => CustomPaint(
         painter: _ParticlePainter(
           particles: _particles,
           t: _ctrl.value,
@@ -1584,7 +1585,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
         children: [
           AnimatedBuilder(
             animation: _ctrl,
-            builder: (_, __) => Transform.rotate(
+            builder: (_, _) => Transform.rotate(
               angle: _ctrl.value * 2 * math.pi,
               child: SizedBox(
                 width: 60,
@@ -1676,21 +1677,11 @@ class _ErrorView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onRetry,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.colors.gold,
-              foregroundColor: context.colors.night,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Text(
-              'إعادة المحاولة',
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+          SizedBox(
+            width: 200,
+            child: PrimaryButton(
+              onTap: () async => onRetry(),
+              label: 'إعادة المحاولة',
             ),
           ),
         ],

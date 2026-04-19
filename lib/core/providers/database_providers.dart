@@ -33,19 +33,19 @@ final todayRecordProvider = StreamProvider<DailyRecord?>((ref) {
 });
 
 // ── نقاط الأسبوع ──
-final weeklyPointsProvider = FutureProvider<List<WeeklyPoint>>((ref) {
-  return ref.watch(statsDaoProvider).getWeeklyPoints();
+final weeklyPointsProvider = StreamProvider<List<WeeklyPoint>>((ref) {
+  return ref.watch(statsDaoProvider).watchWeeklyPoints();
 });
 
 // ── إحصائيات الشهر الحالي ──
-final monthStatsProvider = FutureProvider<MonthStats>((ref) {
+final monthStatsProvider = StreamProvider<MonthStats>((ref) {
   final now = DateTime.now();
-  return ref.watch(statsDaoProvider).getMonthStats(now.year, now.month);
+  return ref.watch(statsDaoProvider).watchMonthStats(now.year, now.month);
 });
 
 // ── السلسلة الحالية ──
-final currentStreakProvider = FutureProvider<int>((ref) {
-  return ref.watch(statsDaoProvider).getCurrentStreak();
+final currentStreakProvider = StreamProvider<int>((ref) {
+  return ref.watch(statsDaoProvider).watchCurrentStreak();
 });
 
 // ── إعداد معين ──
@@ -65,4 +65,13 @@ final ramadanModeProvider = StreamProvider<bool>((ref) {
 final onboardingDoneProvider = FutureProvider<bool>((ref) async {
   final v = await ref.watch(settingsDaoProvider).get('onboardingDone');
   return v == 'true';
+});
+
+// ── التذكيرات ──
+final remindersDaoProvider = Provider<RemindersDao>((ref) {
+  return RemindersDao(ref.watch(appDatabaseProvider));
+});
+
+final remindersProvider = StreamProvider<List<Reminder>>((ref) {
+  return ref.watch(remindersDaoProvider).watchAll();
 });

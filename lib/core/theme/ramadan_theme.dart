@@ -137,7 +137,7 @@ class RamadanTheme {
         color: RamadanColors.lapisCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: RamadanColors.border, width: 1),
         ),
       ),
@@ -209,7 +209,7 @@ class RamadanTheme {
         color: Colors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: RamadanColors.border, width: 1),
         ),
       ),
@@ -626,7 +626,7 @@ class _RamadanToggleState extends ConsumerState<RamadanToggle>
       },
       child: AnimatedBuilder(
         animation: _ctrl,
-        builder: (_, __) => Transform.scale(
+        builder: (_, _) => Transform.scale(
           scale: isRamadan ? _scale.value : 1.0,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 500),

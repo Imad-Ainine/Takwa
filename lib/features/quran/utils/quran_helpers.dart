@@ -37,8 +37,8 @@ const arWords = [
 String arWord(int n) => n >= 1 && n <= 30 ? arWords[n - 1] : ar(n);
 
 Route slideRoute(Widget w) => PageRouteBuilder(
-  pageBuilder: (_, a, __) => w,
-  transitionsBuilder: (_, a, __, child) => SlideTransition(
+  pageBuilder: (_, a, _) => w,
+  transitionsBuilder: (_, a, _, child) => SlideTransition(
     position: Tween<Offset>(
       begin: const Offset(0, 0.04), end: Offset.zero,
     ).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)),

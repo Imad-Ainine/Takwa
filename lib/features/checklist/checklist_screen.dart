@@ -14,6 +14,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 
@@ -462,7 +463,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _anim,
-    builder: (_, __) => ClipRRect(
+    builder: (_, _) => ClipRRect(
       borderRadius: BorderRadius.circular(6),
       child: Stack(
         children: [
@@ -1548,35 +1549,10 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
           onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _saving ? null : _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.colors.gold,
-              foregroundColor: context.colors.night,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: _saving
-                ? SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      color: context.colors.night,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Text(
-                    'حفظ الملاحظة',
-                    style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-          ),
+        PrimaryButton(
+          onTap: _saving ? null : () async => _save(),
+          label: 'حفظ الملاحظة',
+          isLoading: _saving,
         ),
       ],
     );

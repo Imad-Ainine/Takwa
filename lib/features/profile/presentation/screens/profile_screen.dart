@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
+import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
 import '../../../../core/supabase/supabase_providers.dart';
@@ -180,7 +181,7 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.gold,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
         ),
         const SizedBox(width: 12),
@@ -193,7 +194,7 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.success,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
         ),
       ],
@@ -223,8 +224,8 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: () async {
+    return PrimaryButton(
+      onTap: () async {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
@@ -250,15 +251,10 @@ class ProfileScreen extends ConsumerWidget {
           }
         }
       },
-      icon: const Icon(Icons.logout_rounded, size: 20, color: Colors.redAccent),
-      label: const Text(
-        'تسجيل الخروج',
-        style: TextStyle(color: Colors.redAccent),
-      ),
-      style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: Colors.redAccent, width: 1),
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-      ),
+      icon: Icons.logout_rounded,
+      label: 'تسجيل الخروج',
+      isOutline: true,
+      baseColor: Colors.redAccent,
     );
   }
 }

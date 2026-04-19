@@ -27,19 +27,19 @@ final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
   // 1. Check and grant new achievements automatically
   final newEarned = await statsDao.checkAndGrantAchievements();
   for (final ach in newEarned) {
-    // Note: In providers, we can't pass 'ref' directly to SyncManager if it expects WidgetRef
-    // But SyncManager uses ConnectivityProvider which can be read from ProviderRef
-    // I will use a custom sync method for providers if needed, or check if ref works.
-    // SyncManager.syncAchievement(ref, ach) expects WidgetRef.
-    // Let's assume SyncManager can handle ProviderRef or we change its type.
-    await SupabaseService.upsertAchievement({
-      'type': ach.type,
-      'title_ar': ach.titleAr,
-      'desc_ar': ach.descAr,
-      'emoji': ach.emoji,
-      'points_reward': ach.pointsReward,
-      'earned_at': ach.earnedAt.toIso8601String(),
-    });
+    try {
+      await SupabaseService.upsertAchievement({
+        'type': ach.type,
+        'title_ar': ach.titleAr,
+        'desc_ar': ach.descAr,
+        'emoji': ach.emoji,
+        'points_reward': ach.pointsReward,
+        'earned_at': ach.earnedAt.toIso8601String(),
+      });
+    } catch (e) {
+      // Silently fail if not authenticated or network error
+      print('[Achievements] Cannot sync to Supabase: $e');
+    }
   }
 
   // 2. Fetch earned achievements from DB

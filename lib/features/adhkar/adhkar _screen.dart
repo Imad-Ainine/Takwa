@@ -10,7 +10,11 @@ import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/features/adhkar/_user_community_adhkar_views.dart';
+import 'package:takwa/core/providers/favorites_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR SCREEN
@@ -33,6 +37,8 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     ('🕌', 'بعد الصلاة'),
     ('🌙', 'النوم'),
     ('📿', 'متنوعة'),
+    ('✨', 'أذكاري'),
+    ('🌍', 'المجتمع'),
   ];
 
   @override
@@ -84,14 +90,16 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
                 Expanded(
                   child: TabBarView(
                     controller: _tabCtrl,
-                    children: AdhkarCategory.values
-                        .map(
-                          (cat) => _AdhkarCategoryView(
-                            category: cat,
-                            entryCtrl: _entryCtrl,
-                          ),
-                        )
-                        .toList(),
+                    children: [
+                      ...AdhkarCategory.values.map(
+                        (cat) => _AdhkarCategoryView(
+                          category: cat,
+                          entryCtrl: _entryCtrl,
+                        ),
+                      ),
+                      _UserAdhkarTabView(entryCtrl: _entryCtrl),
+                      _CommunityAdhkarTabView(entryCtrl: _entryCtrl),
+                    ],
                   ),
                 ),
               ],
@@ -157,7 +165,33 @@ class _AdhkarTopBar extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Consumer(builder: (_, ref, __) => _NotifSettingsButton()),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(
+                            context,
+                          ).pushNamed(Routes.favoriteAdhkar);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: context.colors.card,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: context.colors.border),
+                          ),
+                          child: const Center(
+                            child: Text('❤️', style: TextStyle(fontSize: 18)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Consumer(builder: (_, ref, _) => _NotifSettingsButton()),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -626,6 +660,35 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                         ],
                         const Spacer(),
 
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final favs = ref.watch(favoriteAdhkarProvider);
+                            final isFav = favs.contains(widget.dhikr.id);
+                            return GestureDetector(
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                ref
+                                    .read(favoriteAdhkarProvider.notifier)
+                                    .toggle(widget.dhikr.id);
+                              },
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: Icon(
+                                  isFav
+                                      ? Icons.favorite_rounded
+                                      : Icons.favorite_border_rounded,
+                                  key: ValueKey(isFav),
+                                  color: isFav
+                                      ? Colors.red.shade400
+                                      : context.colors.textSecondary,
+                                  size: 20,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 12),
+
                         // expand hint
                         Text(
                           _expanded ? 'إخفاء' : 'الفضل',
@@ -902,28 +965,16 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 const SizedBox(height: 14),
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
+                  child: PrimaryButton(
+                    onTap: () async {
                       final dhikr = (kAdhkarData[AdhkarCategory.morning]!)[0];
                       await AdhkarNotificationService.showDhikrNow(dhikr);
                       if (context.mounted) Navigator.pop(context);
                     },
-                    icon: const Text('🔔', style: TextStyle(fontSize: 16)),
-                    label: Text(
-                      'اختبار إشعار ذكر الآن',
-                      style: context.typography.bodySmall.copyWith(
-                        color: context.colors.gold,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        color: context.colors.gold.withOpacity(0.3),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    icon: Icons.notifications_active_outlined,
+                    label: 'اختبار إشعار ذكر الآن',
+                    isOutline: true,
+                    baseColor: context.colors.gold,
                   ),
                 ),
               ],
@@ -1041,4 +1092,25 @@ class _ToggleRow extends StatelessWidget {
       ],
     ),
   );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  USER & COMMUNITY ADHKAR (delegates to _user_community_adhkar_views.dart)
+// ═══════════════════════════════════════════════════════════════
+
+class _UserAdhkarTabView extends StatelessWidget {
+  final AnimationController entryCtrl;
+  const _UserAdhkarTabView({required this.entryCtrl});
+
+  @override
+  Widget build(BuildContext context) => UserAdhkarTabView(entryCtrl: entryCtrl);
+}
+
+class _CommunityAdhkarTabView extends StatelessWidget {
+  final AnimationController entryCtrl;
+  const _CommunityAdhkarTabView({required this.entryCtrl});
+
+  @override
+  Widget build(BuildContext context) =>
+      CommunityAdhkarTabView(entryCtrl: entryCtrl);
 }

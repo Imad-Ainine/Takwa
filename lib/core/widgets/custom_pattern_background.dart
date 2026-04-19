@@ -17,10 +17,14 @@ enum BackgroundPattern {
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
   final BackgroundPattern pattern;
+  final Color? color;
+  final double? opacity;
 
   const CustomPatternBackground({
     super.key,
     this.pattern = BackgroundPattern.geometric,
+    this.color,
+    this.opacity,
   });
 
   @override
@@ -87,7 +91,10 @@ class _CustomPatternBackgroundState
 
     switch (widget.pattern) {
       case BackgroundPattern.geometric:
-        painter = GeometricPainter(color: colors.gold);
+        painter = GeometricPainter(
+          color: widget.color ?? colors.gold,
+          opacity: widget.opacity ?? 0.08,
+        );
         break;
       case BackgroundPattern.stats:
         painter = StatsBgPainter(

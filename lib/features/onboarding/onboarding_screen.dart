@@ -9,10 +9,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/primary_button.dart';
 import '../../core/providers/database_providers.dart';
+import '../../core/notifications/notifications_service.dart';
 
 // ── Enum for current step ──
 enum OnboardStep {
@@ -139,8 +141,8 @@ class OnboardingScreen extends ConsumerWidget {
       case OnboardStep.notifications:
         return _NotificationsStep(
           onAllow: () async {
-            final s = await Permission.notification.request();
-            if (s.isGranted) notifier.next();
+            final granted = await NotificationsService.requestPermissions();
+            if (granted) notifier.next();
           },
           onSkip: notifier.skip,
         );
@@ -340,7 +342,7 @@ class _NotificationsStepState extends State<_NotificationsStep>
             child: Center(
               child: AnimatedBuilder(
                 animation: _bellCtrl,
-                builder: (_, __) => Transform.rotate(
+                builder: (_, _) => Transform.rotate(
                   angle: math.sin(_bellCtrl.value * math.pi * 2) * 0.15,
                   child: SizedBox(
                     width: 220,
@@ -954,7 +956,7 @@ class _PlanStepState extends State<_PlanStep>
                 parent: _ctrl,
                 curve: const Interval(0.6, 1.0),
               ),
-              child: _PrimaryButton(
+              child: PrimaryButton(
                 label: _selected == 'premium'
                     ? 'ابدأ Premium 🌟'
                     : 'ابدأ مجاناً 🤲',
@@ -1197,7 +1199,7 @@ class _InfoCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          _PrimaryButton(
+          PrimaryButton(
             label: primaryLabel,
             icon: primaryIcon,
             onTap: onPrimary,
@@ -1221,117 +1223,6 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-class _PrimaryButton extends StatefulWidget {
-  final String label;
-  final Future<void> Function()? onTap;
-  final IconData? icon;
-
-  const _PrimaryButton({required this.label, required this.onTap, this.icon});
-
-  @override
-  State<_PrimaryButton> createState() => _PrimaryButtonState();
-}
-
-class _PrimaryButtonState extends State<_PrimaryButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  bool _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final disabled = widget.onTap == null;
-
-    return GestureDetector(
-      onTapDown: disabled
-          ? null
-          : (_) {
-              _ctrl.forward();
-              HapticFeedback.mediumImpact();
-            },
-      onTapUp: disabled
-          ? null
-          : (_) async {
-              _ctrl.reverse();
-              setState(() => _loading = true);
-              await widget.onTap!();
-              if (mounted) setState(() => _loading = false);
-            },
-      onTapCancel: () => _ctrl.reverse(),
-      child: ScaleTransition(
-        scale: Tween<double>(
-          begin: 1,
-          end: 0.96,
-        ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-            gradient: disabled
-                ? null
-                : const LinearGradient(
-                    colors: [AppColors.gold, Color(0xFFB8920E)],
-                  ),
-            color: disabled ? AppColors.border : null,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: disabled
-                ? null
-                : [
-                    BoxShadow(
-                      color: AppColors.gold.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-          ),
-          child: _loading
-              ? const Center(
-                  child: SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      color: AppColors.night,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(widget.icon, size: 18, color: AppColors.night),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      widget.label,
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: disabled ? AppColors.textDim : AppColors.night,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
-}
 
 class _BottomActions extends StatelessWidget {
   final String primaryLabel;
@@ -1352,7 +1243,7 @@ class _BottomActions extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _PrimaryButton(
+        PrimaryButton(
           label: primaryLabel,
           onTap: onPrimary != null ? () async => onPrimary!() : null,
         ),

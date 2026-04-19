@@ -72,6 +72,10 @@
 		<string>نحتاج موقعك لحساب أوقات الصلاة بدقة</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>نحتاج موقعك لحساب أوقات الصلاة</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>نحتاج إلى الميكروفون لحساب الذكر صوتياً</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>نحتاج إلى التعرف على الصوت لحساب الذكر صوتياً</string>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
 	</dict>

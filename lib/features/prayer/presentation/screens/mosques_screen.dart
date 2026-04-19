@@ -1,0 +1,615 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/features/prayer/providers/mosque_provider.dart';
+import 'package:takwa/features/prayer/data/mosque_repository.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:intl/intl.dart';
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+
+class MosquesScreen extends ConsumerStatefulWidget {
+  const MosquesScreen({super.key});
+
+  @override
+  ConsumerState<MosquesScreen> createState() => _MosquesScreenState();
+}
+
+class _MosquesScreenState extends ConsumerState<MosquesScreen> {
+  String _cityName = 'الجزائر';
+  Position? _currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+
+  Future<void> _loadLocation() async {
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+      );
+      if (mounted) {
+        setState(() {
+          _currentPosition = pos;
+        });
+      }
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        pos.latitude,
+        pos.longitude,
+      );
+      if (placemarks.isNotEmpty && mounted) {
+        setState(() {
+          _cityName =
+              placemarks.first.locality ??
+              placemarks.first.subAdministrativeArea ??
+              _cityName;
+        });
+      }
+    } catch (e) {
+      final settings = ref.read(settingsDaoProvider);
+      final city = await settings.get('cityName');
+      if (city != null && mounted) {
+        setState(() {
+          _cityName = city;
+        });
+      }
+    }
+  }
+
+  void _openMap(double lat, double lon) async {
+    Uri url;
+    if (lat == 0 && lon == 0) {
+      if (_currentPosition != null) {
+        url = Uri.parse(
+          'https://www.google.com/maps/search/mosque/@${_currentPosition!.latitude},${_currentPosition!.longitude},15z',
+        );
+      } else {
+        url = Uri.parse('https://www.google.com/maps/search/mosque');
+      }
+    } else {
+      url = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon',
+      );
+    }
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('لا يمكن فتح الخرائط')));
+      }
+    }
+  }
+
+  void _callPhone(String phone) async {
+    final url = Uri.parse('tel:$phone');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('لا يمكن إجراء المكالمة')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+    final mosquesAsyncValue = ref.watch(nearbyMosquesProvider);
+    final prayersAsyncValue = ref.watch(prayerTimesProvider);
+
+    String nextPrayerTime = '--:--';
+    prayersAsyncValue.whenData((prayers) {
+      final next = PrayerTimesService.nextPrayer(prayers);
+      if (next != null) {
+        nextPrayerTime = DateFormat('hh:mm a').format(next.time);
+      }
+    });
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: style.bg,
+        body: Stack(
+          children: [
+            const Positioned.fill(
+              child: CustomPatternBackground(
+                pattern: BackgroundPattern.geometric,
+              ),
+            ),
+            Column(
+              children: [
+                _buildDynamicHeader(style, context),
+                Expanded(
+                  child: mosquesAsyncValue.when(
+                    data: (mosques) {
+                      if (mosques.isEmpty) {
+                        return _buildEmptyState(style);
+                      }
+                      return ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.only(
+                          top: 8,
+                          bottom: 24,
+                          left: 16,
+                          right: 16,
+                        ),
+                        itemCount:
+                            mosques.length + 1, // +1 for the Hadith footer
+                        itemBuilder: (context, index) {
+                          if (index == mosques.length) {
+                            return _buildHadithFooter(style);
+                          }
+                          final mosque = mosques[index];
+                          return _buildEnhancedMosqueCard(
+                            mosque,
+                            index + 1,
+                            nextPrayerTime,
+                            style,
+                          );
+                        },
+                      );
+                    },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(color: AppColors.gold),
+                    ),
+                    error: (err, stack) => _buildErrorState(err, style),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDynamicHeader(AdaptiveStyle style, BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/mosquesbg.png'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black45, // Darken background slightly to maintain contrast
+            BlendMode.darken,
+          ),
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // AppBar replacement
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'المساجد القريبة',
+                    style: style.amiri(
+                      22,
+                      color: Colors.white,
+                      weight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                ],
+              ),
+            ),
+            // Current Location Indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.location_on_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'الموقع الحالي: $_cityName',
+                    style: style.naskh(
+                      14,
+                      color: Colors.white,
+                      weight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Hero Map Section
+            Container(
+              margin: const EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 8,
+                bottom: 24,
+              ),
+              height: 120,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Icon(
+                    Icons.map_outlined,
+                    size: 80,
+                    color: Colors.white24,
+                  ),
+                  const Icon(
+                    Icons.location_on_rounded,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                  Positioned(
+                    bottom: 12,
+                    left: 12,
+                    child: SizedBox(
+                      width: 180,
+                      child: PrimaryButton(
+                        onTap: () async => _openMap(0, 0),
+                        label: 'عرض على الخريطة',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedMosqueCard(
+    Mosque mosque,
+    int index,
+    String nextPrayerTime,
+    AdaptiveStyle style,
+  ) {
+    String formattedDistance;
+    if (mosque.distance < 1000) {
+      formattedDistance = '${mosque.distance.toStringAsFixed(0)} متر';
+    } else {
+      formattedDistance = '${(mosque.distance / 1000).toStringAsFixed(1)} كم';
+    }
+
+    final hasPhone = mosque.phone.isNotEmpty;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: style.card,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: style.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                // Index Badge
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                    color: AppColors.gold,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$index',
+                      style: style.naskh(
+                        16,
+                        color: Colors.white,
+                        weight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    mosque.name,
+                    style: style.amiri(
+                      20,
+                      color: style.text,
+                      weight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Distance Text
+                Text(
+                  formattedDistance,
+                  style: style.naskh(
+                    14,
+                    color: AppColors.gold,
+                    weight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // Address Row
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: style.textSec,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    mosque.address,
+                    style: style.naskh(13, color: style.textSec),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Next Prayer Row
+            Row(
+              children: [
+                Icon(Icons.access_time_rounded, size: 16, color: style.textSec),
+                const SizedBox(width: 6),
+                Text(
+                  'الصلاة القادمة: $nextPrayerTime',
+                  style: style.naskh(13, color: style.textSec),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Action Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      _openMap(mosque.lat, mosque.lon);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.directions_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'توجيه',
+                            style: style.naskh(
+                              14,
+                              color: Colors.white,
+                              weight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                if (hasPhone) const SizedBox(width: 12),
+                if (hasPhone)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        _callPhone(mosque.phone);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: style.bg,
+                          border: Border.all(color: AppColors.gold),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.call_outlined,
+                              color: AppColors.gold,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'اتصال',
+                              style: style.naskh(
+                                14,
+                                color: AppColors.gold,
+                                weight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHadithFooter(AdaptiveStyle style) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF9E5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE8D595)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.star_rounded,
+                color: Color(0xFFD4AF37),
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'فضل الذهاب للمسجد',
+                style: style.naskh(
+                  14,
+                  color: const Color(0xFF8B7322),
+                  weight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.star_rounded,
+                color: Color(0xFFD4AF37),
+                size: 16,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: "من غدا إلى المسجد، أو راح، أعد الله له في الجنة نزلا، كلما غدا، أو راح"',
+            style: style.amiri(
+              18,
+              color: const Color(0xFF5E4E16),
+              weight: FontWeight.w600,
+              height: 1.6,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'متفق عليه',
+            style: style.naskh(
+              12,
+              color: const Color(0xFF8B7322).withOpacity(0.8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AdaptiveStyle style) {
+    return Center(
+      child: Text(
+        'لم يتم العثور على مساجد قريبة في محيط 5 كيلومتر',
+        style: style.naskh(16, color: style.textSec),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildErrorState(Object err, AdaptiveStyle style) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.location_off_rounded,
+              size: 48,
+              color: AppColors.gold.withOpacity(0.5),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              err.toString().replaceAll('Exception: ', ''),
+              style: style.naskh(16, color: style.textSec),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: 200,
+              child: PrimaryButton(
+                onTap: () async => ref.refresh(nearbyMosquesProvider),
+                label: 'إعادة المحاولة',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

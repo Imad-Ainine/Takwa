@@ -13,6 +13,9 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/adhkar_overlay_notification.dart';
+import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 
 import '../widgets/location_picker_sheet.dart';
 
@@ -310,9 +313,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         children: [
                           _ActionSetting(
                             icon: '🔔',
-                            label: 'اختبار الإشعارات',
-                            sublabel: 'تأكد من عمل الإشعارات',
-                            onTap: _testNotification,
+                            label: 'اختبار الإشعارات والنافذة',
+                            sublabel: 'تأكد من عمل الإشعارات والنوافذ العائمة',
+                            onTap: _showTestMenu,
                           ),
                           _Divider(),
                           _ActionSetting(
@@ -321,6 +324,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             sublabel: 'تعرف على مبرمج التطبيق',
                             onTap: () =>
                                 Navigator.pushNamed(context, '/about-me'),
+                          ),
+                          _Divider(),
+                          _ActionSetting(
+                            icon: '📜',
+                            label: 'الشروط والخصوصية',
+                            sublabel: 'شروط الدخول والخصوصية',
+                            onTap: () => Navigator.pushNamed(context, '/terms'),
                           ),
                           _Divider(),
                           _ActionSetting(
@@ -368,12 +378,99 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Future<void> _testNotification() async {
-    await NotificationsService.showAchievementNotif(
-      title: 'اختبار الإشعار',
-      body: 'الإشعارات تعمل بشكل صحيح',
-      emoji: '✅',
-      points: 0,
+  void _showTestMenu() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: context.colors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.colors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'اختبار الإشعارات',
+              style: GoogleFonts.amiri(
+                fontSize: 18,
+                color: context.colors.gold,
+              ),
+            ),
+            const SizedBox(height: 14),
+            _ActionSetting(
+              icon: '🔔',
+              label: 'إشعار عادي',
+              sublabel: 'إشعار النظام التقليدي',
+              onTap: () {
+                Navigator.pop(context);
+                NotificationsService.showAchievementNotif(
+                  title: 'اختبار الإشعار',
+                  body: 'الإشعارات تعمل بشكل صحيح',
+                  emoji: '✅',
+                  points: 0,
+                );
+              },
+            ),
+            _Divider(),
+            _ActionSetting(
+              icon: '🕌',
+              label: 'أذان الصلاة',
+              sublabel: 'شاشة الأذان الكاملة مع الصوت',
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const AdhanOverlayScreen(
+                    prayerName: 'العصر',
+                    autoPlay: true,
+                  ),
+                ));
+              },
+            ),
+            _Divider(),
+            _ActionSetting(
+              icon: '🌅',
+              label: 'ذكر',
+              sublabel: 'إشعار داخلي للأذكار',
+              onTap: () {
+                Navigator.pop(context);
+                final dhikr = kAdhkarData[AdhkarCategory.morning]![0];
+                AdhkarOverlayNotification.show(
+                  context,
+                  AdhkarCategory.morning,
+                  dhikr,
+                  duration: const Duration(seconds: 8),
+                );
+              },
+            ),
+            _Divider(),
+            _ActionSetting(
+              icon: '🤲',
+              label: 'دعاء',
+              sublabel: 'إشعار داخلي للدعاء',
+              onTap: () {
+                Navigator.pop(context);
+                final dhikr = kAdhkarData[AdhkarCategory.misc]![0];
+                AdhkarOverlayNotification.show(
+                  context,
+                  AdhkarCategory.misc,
+                  dhikr,
+                  duration: const Duration(seconds: 8),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 

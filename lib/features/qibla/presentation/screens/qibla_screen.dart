@@ -97,10 +97,12 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
                   // ── Top bar ──
                   _QiblaTopBar(style: style),
 
+
+
                   Expanded(
                     child: qiblaAsync.when(
                       loading: () => const _QiblaLoading(),
-                      error: (_, __) => _QiblaLocationError(style: style),
+                      error: (_, _) => _QiblaLocationError(style: style),
                       data: (qiblaDir) => compassAsync.when(
                         loading: () => const _QiblaLoading(),
                         error: (e, _) =>

@@ -8,6 +8,7 @@ import '../../core/database/app_database.dart';
 import '../../core/providers/database_providers.dart';
 import 'supabase_service.dart';
 import 'supabase_providers.dart';
+import '../providers/favorites_providers.dart';
 
 class SyncManager {
   static bool _syncing = false;
@@ -64,6 +65,15 @@ class SyncManager {
 
     final dao = ref.read(settingsDaoProvider);
     await dao.upsertFromRemote(remote);
+
+    if (remote['favorite_adhkar'] != null) {
+      final adhkar = remote['favorite_adhkar'] as List<dynamic>;
+      ref.read(favoriteAdhkarProvider.notifier).syncFromRemote(adhkar);
+    }
+    if (remote['favorite_duas'] != null) {
+      final duas = remote['favorite_duas'] as List<dynamic>;
+      ref.read(favoriteDuasProvider.notifier).syncFromRemote(duas);
+    }
   }
 
   static Future<void> _syncStats(WidgetRef ref) async {
@@ -87,19 +97,28 @@ class SyncManager {
 
     await SupabaseService.upsertDailyRecord({
       'date': record.date.toIso8601String().split('T')[0],
-      'fajr_status': record.fajrStatus.index,
-      'dhuhr_status': record.dhuhrStatus.index,
-      'asr_status': record.asrStatus.index,
-      'maghrib_status': record.maghribStatus.index,
-      'isha_status': record.ishaStatus.index,
+      'fajr_status': record.fajrStatus.name,
+      'dhuhr_status': record.dhuhrStatus.name,
+      'asr_status': record.asrStatus.name,
+      'maghrib_status': record.maghribStatus.name,
+      'isha_status': record.ishaStatus.name,
       'night_prayer': record.nightPrayer,
+      'witr': record.witr,
+      'rawatib': record.rawatib,
       'quran_pages': record.quranPages,
+      'quran_verses': record.quranVerses,
+      'quran_juzaa': record.quranJuzaa,
       'morning_adhkar': record.morningAdhkar,
       'evening_adhkar': record.eveningAdhkar,
-      'fasting_type': record.fastingType.index,
+      'after_prayer_adhkar': record.afterPrayerAdhkar,
+      'tasbeeh_count': record.tasbeehCount,
+      'fasting_type': record.fastingType.name,
       'sadaqah': record.sadaqah,
+      'sadaqah_amount': record.sadaqahAmount,
       'net_points': record.netPoints,
       'taqwa_points': record.taqwaPoints,
+      'deducted_points': record.deductedPoints,
+      'mood': record.mood,
       'notes': record.notes,
     });
   }

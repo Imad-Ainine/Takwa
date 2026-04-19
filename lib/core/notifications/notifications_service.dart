@@ -140,9 +140,9 @@ class NotificationsService {
 
     // iOS settings
     const ios = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
     );
 
     const settings = InitializationSettings(android: android, iOS: ios);
@@ -167,6 +167,19 @@ class NotificationsService {
     }
 
     _initialized = true;
+  }
+
+  // ── التحقق من الإذن (بدون طلب) ──
+  static Future<bool> checkPermissions() async {
+    if (Platform.isAndroid) {
+      if (!await Permission.notification.isGranted) return false;
+      if (!await Permission.scheduleExactAlarm.isGranted) return false;
+      return true;
+    }
+    if (Platform.isIOS) {
+      return await Permission.notification.isGranted;
+    }
+    return true;
   }
 
   // ── طلب الإذن ──
@@ -647,6 +660,7 @@ class NotificationRouter {
     if (payload.isEmpty) return;
     final parts = payload.split(':');
     final type = parts.isNotEmpty ? parts[0] : '';
+    final param = parts.length > 1 ? parts[1] : '';
 
     final ctx = _navigatorKey.currentContext;
     if (ctx == null) return;
@@ -654,19 +668,31 @@ class NotificationRouter {
     switch (type) {
       case 'prayer':
       case 'wakeup':
-        // انتقل لشاشة المحاسبة
-        Navigator.pushNamed(ctx, Routes.checklist);
+        // تنبيه الأذان → شاشة الأذان الكاملة
+        final nameAr = _prayerNameAr(param);
+        Navigator.pushNamed(ctx, Routes.adhan, arguments: nameAr);
         break;
       case 'muhasaba':
         Navigator.pushNamed(ctx, Routes.checklist);
         break;
       case 'adhkar':
-        // انتقل لشاشة الأذكار
         Navigator.pushNamed(ctx, Routes.adhkar);
         break;
       case 'achievement':
         Navigator.pushNamed(ctx, Routes.statistics);
         break;
+    }
+  }
+
+  /// Converts an English prayer key to Arabic name.
+  static String _prayerNameAr(String key) {
+    switch (key) {
+      case 'fajr':    return 'الفجر';
+      case 'dhuhr':   return 'الظهر';
+      case 'asr':     return 'العصر';
+      case 'maghrib': return 'المغرب';
+      case 'isha':    return 'العشاء';
+      default:       return key.isNotEmpty ? key : 'الصلاة';
     }
   }
 }
@@ -716,7 +742,7 @@ final nextPrayerProvider = Provider<AsyncValue<PrayerTimeInfo?>>((ref) {
 // ═══════════════════════════════════════════════════════════════
 class NotificationsManager {
   static Future<void> scheduleAll(WidgetRef ref) async {
-    final granted = await NotificationsService.requestPermissions();
+    final granted = await NotificationsService.checkPermissions();
     if (!granted) return;
 
     final settings = ref.read(settingsDaoProvider);

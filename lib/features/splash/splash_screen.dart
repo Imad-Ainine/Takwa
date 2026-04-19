@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -71,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Stack(
         children: [
           // ── Geometric Background (Shared) ──
-          // const CustomPatternBackground(pattern: BackgroundPattern.geometric),
+          const CustomPatternBackground(pattern: BackgroundPattern.geometric),
 
           // ── Gradient Glows ──
           Positioned(
@@ -153,25 +154,6 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                         const SizedBox(height: 40),
-
-                        // Title
-                        Text(
-                          'تقوى ',
-                          style: GoogleFonts.amiri(
-                            fontSize: 38,
-                            fontWeight: FontWeight.bold,
-                            color: context.colors.gold,
-                            letterSpacing: 1.2,
-                            height: 1.1,
-                            shadows: [
-                              Shadow(
-                                color: context.colors.gold.withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                        ),
 
                         const SizedBox(height: 24),
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
 
 class GuestModeGuard extends ConsumerWidget {
   final Widget child;
@@ -66,26 +67,20 @@ class GuestModeGuard extends ConsumerWidget {
                     style: context.typography.bodyMedium.copyWith(color: context.colors.textSecondary),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Reset guest mode if they want to sign in
-                        ref.read(guestModeProvider.notifier).state = false;
-                        Navigator.pushNamed(context, Routes.auth);
-                      },
-                      child: const Text('تسجيل دخول / إنشاء حساب'),
-                    ),
+                  PrimaryButton(
+                    label: 'تسجيل دخول / إنشاء حساب',
+                    onTap: () async {
+                      ref.read(guestModeProvider.notifier).state = false;
+                      Navigator.pushNamed(context, Routes.auth);
+                    },
                   ),
                   const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () {
+                  PrimaryButton(
+                    label: 'استكمال كضيف (محدود)',
+                    isOutline: true,
+                    onTap: () async {
                       // Maybe navigate back or do nothing
                     },
-                    child: Text(
-                      'استكمال كضيف (محدود)',
-                      style: TextStyle(color: context.colors.textDim),
-                    ),
                   ),
                 ],
               ),

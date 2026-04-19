@@ -139,7 +139,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
                 // overlay عند فتح الـ Drawer
                 AnimatedBuilder(
                   animation: _fade,
-                  builder: (_, __) => _fade.value > 0
+                  builder: (_, _) => _fade.value > 0
                       ? GestureDetector(
                           onTap: _close,
                           child: Container(
@@ -335,7 +335,7 @@ class _DrawerHeader extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(height: 52),
-            error: (_, __) => const SizedBox(height: 52),
+            error: (_, _) => const SizedBox(height: 52),
           ),
 
           const SizedBox(height: 20),
@@ -370,7 +370,7 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: statsAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, __) => const SizedBox(),
+                  error: (_, _) => const SizedBox(),
                   data: (s) => _MiniStatCard(
                     value: '${s.totalPoints}',
                     label: 'نقطة التقوى',
@@ -383,7 +383,7 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: streakAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, __) => const SizedBox(),
+                  error: (_, _) => const SizedBox(),
                   data: (s) => _MiniStatCard(
                     value: '$s',
                     label: 'يوم متواصل',
@@ -399,7 +399,7 @@ class _DrawerHeader extends ConsumerWidget {
           // Level & Progress
           statsAsync.when(
             loading: () => const SizedBox(),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
             data: (s) => Column(
               children: [
                 Row(
@@ -627,7 +627,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
       onTapCancel: () => _hover.reverse(),
       child: AnimatedBuilder(
         animation: _hover,
-        builder: (_, __) => Transform.scale(
+        builder: (_, _) => Transform.scale(
           scale: 1.0 - 0.02 * _hover.value,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
