@@ -17,6 +17,7 @@ import 'package:takwa/core/widgets/adhkar_overlay_notification.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 
+import 'package:takwa/core/supabase/sync_manager.dart';
 import '../widgets/location_picker_sheet.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -98,6 +99,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     // إعادة جدولة الإشعارات
     await NotificationsManager.reschedule(ref);
+    // مزامنة مع السحابة
+    await SyncManager.syncSettings(ref);
   }
 
   @override

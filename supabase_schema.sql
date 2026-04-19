@@ -54,6 +54,9 @@ create table if not exists public.user_settings (
   evening_reminder_time text default '21:00',
   ramadan_mode boolean default false,
   language text default 'ar',
+  wake_up_before_fajr boolean default false,
+  morning_adhkar_reminder boolean default true,
+  evening_adhkar_reminder boolean default true,
   favorite_adhkar int[] default '{}',
   favorite_duas int[] default '{}',
   updated_at timestamptz default now()

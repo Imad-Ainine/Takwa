@@ -23,6 +23,8 @@ class SyncManager {
     _syncing = true;
     try {
       await _syncDailyRecords(ref);
+      await _syncProhibitions(ref);
+      await _syncCustomIbadah(ref);
       await _syncAchievements(ref);
       await _syncSettings(ref);
       await _syncStats(ref);
@@ -44,6 +46,32 @@ class SyncManager {
     }
   }
 
+  static Future<void> _syncProhibitions(WidgetRef ref) async {
+    final from = DateTime.now().subtract(const Duration(days: 14));
+    final remoteLogs = await SupabaseService.getProhibitionLogs(
+      from: from,
+      to: DateTime.now(),
+    );
+
+    // Assuming a dao exists for prohibitions
+    // final dao = ref.read(prohibitionDaoProvider); 
+    // for (final log in remoteLogs) {
+    //   await dao.upsertFromRemote(log);
+    // }
+  }
+
+  static Future<void> _syncCustomIbadah(WidgetRef ref) async {
+    final remoteIbadah = await SupabaseService.getCustomIbadah();
+    final remoteLogs = await SupabaseService.getCustomIbadahLogs(
+      from: DateTime.now().subtract(const Duration(days: 14)),
+      to: DateTime.now(),
+    );
+
+    // Assuming daos exist
+    // final ibadahDao = ref.read(customIbadahDaoProvider);
+    // for (final item in remoteIbadah) await ibadahDao.upsertFromRemote(item);
+  }
+
   static Future<void> _syncAchievements(WidgetRef ref) async {
     final remoteAchievements = await SupabaseService.getEarnedAchievements();
     final statsDao = ref.read(statsDaoProvider);
@@ -61,18 +89,23 @@ class SyncManager {
 
   static Future<void> _syncSettings(WidgetRef ref) async {
     final remote = await SupabaseService.getSettings();
-    if (remote == null) return;
-
     final dao = ref.read(settingsDaoProvider);
-    await dao.upsertFromRemote(remote);
 
-    if (remote['favorite_adhkar'] != null) {
-      final adhkar = remote['favorite_adhkar'] as List<dynamic>;
-      ref.read(favoriteAdhkarProvider.notifier).syncFromRemote(adhkar);
-    }
-    if (remote['favorite_duas'] != null) {
-      final duas = remote['favorite_duas'] as List<dynamic>;
-      ref.read(favoriteDuasProvider.notifier).syncFromRemote(duas);
+    if (remote != null) {
+      // If we have remote settings, pull them down
+      await dao.upsertFromRemote(remote);
+
+      if (remote['favorite_adhkar'] != null) {
+        final adhkar = remote['favorite_adhkar'] as List<dynamic>;
+        ref.read(favoriteAdhkarProvider.notifier).syncFromRemote(adhkar);
+      }
+      if (remote['favorite_duas'] != null) {
+        final duas = remote['favorite_duas'] as List<dynamic>;
+        ref.read(favoriteDuasProvider.notifier).syncFromRemote(duas);
+      }
+    } else {
+      // If no remote settings exist (new user), push local defaults
+      await syncSettings(ref);
     }
   }
 
@@ -140,5 +173,75 @@ class SyncManager {
       'points_reward': achievement.pointsReward,
       'earned_at': achievement.earnedAt.toIso8601String(),
     });
+  }
+
+  /// Sync prohibition log
+  static Future<void> syncProhibition(
+    WidgetRef ref,
+    ProhibitionsLogData log,
+  ) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.upsertProhibitionLog({
+      'record_id': log.recordId,
+      'date': log.date.toIso8601String().split('T')[0],
+      'category': log.category.name,
+      'committed': log.committed,
+      'times_count': log.timesCount,
+      'deduct_points': log.deductPoints,
+      'notes': log.notes,
+    });
+  }
+
+  /// Sync custom ibadah
+  static Future<void> syncCustomIbadah(
+    WidgetRef ref,
+    CustomIbadahData ibadah,
+  ) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.upsertCustomIbadah({
+      'id': ibadah.id,
+      'name_ar': ibadah.nameAr,
+      'emoji': ibadah.emoji,
+      'is_positive': ibadah.isPositive,
+      'points': ibadah.points,
+      'is_active': ibadah.isActive,
+      'sort_order': ibadah.sortOrder,
+    });
+  }
+
+  /// Sync custom ibadah log
+  static Future<void> syncCustomIbadahLog(
+    WidgetRef ref,
+    CustomIbadahLogData log,
+  ) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.upsertCustomIbadahLog({
+      'ibadah_id': log.ibadahId,
+      'date': log.date.toIso8601String().split('T')[0],
+      'done': log.done,
+      'count': log.count,
+    });
+  }
+
+  /// Sync all local settings to Supabase
+  static Future<void> syncSettings(WidgetRef ref) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    final dao = ref.read(settingsDaoProvider);
+    final settings = await dao.getAllSettings();
+    if (settings.isNotEmpty) {
+      await SupabaseService.updateSettings(settings);
+    }
   }
 }

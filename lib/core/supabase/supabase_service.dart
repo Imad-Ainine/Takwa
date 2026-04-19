@@ -153,10 +153,34 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('user_settings').upsert({
-      ...settings,
+    // Ensure we only send valid columns and map them if necessary
+    final payload = <String, dynamic>{
       'user_id': uid,
-    }, onConflict: 'user_id');
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+
+    final mapping = {
+      'madhab': 'madhab',
+      'ramadanMode': 'ramadan_mode',
+      'calcMethod': 'calc_method',
+      'prayerReminder': 'prayer_reminder',
+      'eveningMuhasabaReminder': 'muhasaba_reminder',
+      'eveningReminderTime': 'evening_reminder_time',
+      'language': 'language',
+      'wakeUpBeforeFajr': 'wake_up_before_fajr',
+      'morningAdhkarReminder': 'morning_adhkar_reminder',
+      'eveningAdhkarReminder': 'evening_adhkar_reminder',
+    };
+
+    for (var entry in mapping.entries) {
+      if (settings.containsKey(entry.key)) {
+        payload[entry.value] = settings[entry.key];
+      } else if (settings.containsKey(entry.value)) {
+        payload[entry.value] = settings[entry.value];
+      }
+    }
+
+    await _db.from('user_settings').upsert(payload, onConflict: 'user_id');
   }
 
   static Future<void> updateUserStats({
@@ -168,13 +192,82 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('profiles').update({
-      'total_points': totalPoints,
-      'current_streak': currentStreak,
-      'highest_streak': longestStreak,
-      'quran_pages': quranPages,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('id', uid);
+    await _db
+        .from('profiles')
+        .update({
+          'total_points': totalPoints,
+          'current_streak': currentStreak,
+          'highest_streak': longestStreak,
+          'quran_pages': quranPages,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('id', uid);
+  }
+
+  // ─────────────── PROHIBITIONS ───────────────
+  static Future<void> upsertProhibitionLog(Map<String, dynamic> log) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+
+    await _db.from('prohibitions_log').upsert({
+      ...log,
+      'user_id': uid,
+    }, onConflict: 'record_id,category');
+  }
+
+  static Future<List<Map<String, dynamic>>> getProhibitionLogs({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+
+    final data = await _db
+        .from('prohibitions_log')
+        .select()
+        .eq('user_id', uid)
+        .gte('date', _dateStr(from))
+        .lte('date', _dateStr(to));
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  // ─────────────── CUSTOM IBADAH ───────────────
+  static Future<void> upsertCustomIbadah(Map<String, dynamic> ibadah) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+
+    await _db.from('custom_ibadah').upsert({...ibadah, 'user_id': uid});
+  }
+
+  static Future<List<Map<String, dynamic>>> getCustomIbadah() async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+
+    final data = await _db.from('custom_ibadah').select().eq('user_id', uid);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  static Future<void> upsertCustomIbadahLog(Map<String, dynamic> log) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return;
+
+    await _db.from('custom_ibadah_log').upsert({...log, 'user_id': uid});
+  }
+
+  static Future<List<Map<String, dynamic>>> getCustomIbadahLogs({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) return [];
+
+    final data = await _db
+        .from('custom_ibadah_log')
+        .select()
+        .eq('user_id', uid)
+        .gte('date', _dateStr(from))
+        .lte('date', _dateStr(to));
+    return List<Map<String, dynamic>>.from(data);
   }
 
   // ─────────────── ACHIEVEMENTS ───────────────
@@ -290,7 +383,8 @@ class SupabaseService {
     final currentLikes = (row['likes'] as int?) ?? 0;
     await _db
         .from('community_adhkar')
-        .update({'likes': currentLikes + 1}).eq('id', id);
+        .update({'likes': currentLikes + 1})
+        .eq('id', id);
   }
 
   static Future<void> shareAdhkarToCommunity({
@@ -328,7 +422,8 @@ class SupabaseService {
     final currentLikes = (row['likes'] as int?) ?? 0;
     await _db
         .from('community_duas')
-        .update({'likes': currentLikes + 1}).eq('id', id);
+        .update({'likes': currentLikes + 1})
+        .eq('id', id);
   }
 
   static Future<void> shareDuaToCommunity({

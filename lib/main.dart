@@ -21,31 +21,13 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:quran_library/quran_library.dart';
 
-import 'package:takwa/core/overlay/system_overlay_ui.dart';
-
 import 'package:takwa/core/notifications/overlay_background_service.dart';
+import 'package:takwa/core/notifications/location_prayer_update.dart';
 
 // تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse response) {
   NotificationRouter.route(response.payload ?? '');
-}
-
-// ─────────────────────────────────────────
-//  OVERLAY ENTRY POINT (Runs in separate isolate)
-// ─────────────────────────────────────────
-@pragma("vm:entry-point")
-void overlayMain() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.transparent,
-      ),
-      home: const SystemOverlayUI(),
-    ),
-  );
 }
 
 void main() async {
@@ -109,12 +91,17 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
   }
 
   void _onAdhanData(Object data) {
-    if (data is Map && data['action'] == 'show_adhan') {
-      final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
-      NotificationRouter.navigatorKey.currentState?.pushNamed(
-        '/adhan',
-        arguments: prayerName,
-      );
+    if (data is Map) {
+      final action = data['action'];
+      if (action == 'show_adhan') {
+        final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
+        NotificationRouter.navigatorKey.currentState?.pushNamed(
+          '/adhan',
+          arguments: prayerName,
+        );
+      } else if (action == 'refresh_location') {
+        LocationPrayerManager.refreshLocation(ref);
+      }
     }
   }
 

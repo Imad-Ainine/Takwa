@@ -12,6 +12,8 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:adhan/adhan.dart' as adhan;
+import 'package:hijri/hijri_calendar.dart';
+import 'package:intl/intl.dart';
 
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
@@ -42,6 +44,7 @@ const _kLatKey = 'latitude';
 const _kLngKey = 'longitude';
 const _kMadhabKey = 'madhab';
 const _kCalcMethodKey = 'calcMethod';
+const _kCityNameKey = 'cityName';
 
 // ─────────────────────────────────────────
 //  PRAYER INFO  (lightweight, no adhan pkg types exposed)
@@ -67,8 +70,8 @@ class OverlayBackgroundService {
         channelId: _channelId,
         channelName: _channelName,
         channelDescription: 'Keeps background overlay service alive',
-        channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW,
+        channelImportance: NotificationChannelImportance.HIGH,
+        priority: NotificationPriority.HIGH,
       ),
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: false,
@@ -93,8 +96,12 @@ class OverlayBackgroundService {
     if (perm != NotificationPermission.granted) return;
 
     await FlutterForegroundTask.startService(
-      notificationTitle: 'تطبيق تقوى يعمل بالخلفية',
-      notificationText: 'لعرض الأذكار والأذان بشكل تلقائي',
+      notificationTitle: ' الجزائر | ...',
+      notificationText: 'جاري تحميل أوقات الصلاة...',
+      notificationButtons: [
+        const NotificationButton(id: 'open_app', text: 'افتح صلاتك'),
+        const NotificationButton(id: 'update_location', text: 'تحديث الموقع'),
+      ],
       callback: startCallback,
     );
   }
@@ -102,10 +109,11 @@ class OverlayBackgroundService {
   static Future<bool> requestPermissions() async {
     try {
       // 1. Notification Permission
-      final perm = await FlutterForegroundTask.checkNotificationPermission().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => NotificationPermission.denied,
-      );
+      final perm = await FlutterForegroundTask.checkNotificationPermission()
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () => NotificationPermission.denied,
+          );
       if (perm != NotificationPermission.granted) {
         await FlutterForegroundTask.requestNotificationPermission().timeout(
           const Duration(seconds: 15),
@@ -114,25 +122,24 @@ class OverlayBackgroundService {
       }
 
       // 2. Overlay Permission
-      final isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => false,
-      );
+      final isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted()
+          .timeout(const Duration(seconds: 5), onTimeout: () => false);
       if (!isOverlayGranted) {
         await FlutterOverlayWindow.requestPermission().timeout(
-          const Duration(seconds: 30), // Overlay often opens settings, give it more time
+          const Duration(
+            seconds: 30,
+          ), // Overlay often opens settings, give it more time
           onTimeout: () => false,
         );
       }
 
-      final newPerm = await FlutterForegroundTask.checkNotificationPermission().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => NotificationPermission.denied,
-      );
-      final newOverlay = await FlutterOverlayWindow.isPermissionGranted().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () => false,
-      );
+      final newPerm = await FlutterForegroundTask.checkNotificationPermission()
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () => NotificationPermission.denied,
+          );
+      final newOverlay = await FlutterOverlayWindow.isPermissionGranted()
+          .timeout(const Duration(seconds: 5), onTimeout: () => false);
       return newPerm == NotificationPermission.granted && newOverlay;
     } catch (e) {
       return false;
@@ -166,7 +173,10 @@ class _OverlayTaskHandler extends TaskHandler {
     final shownAdhan = await _checkAndShowAdhan();
     if (shownAdhan) return;
 
-    // 2. Check daily adhkar/dua counter and random delay
+    // 2. Update service notification with real data (Real location, Hijri, Countdown)
+    await _updateNotificationWithPrayerInfo();
+
+    // 3. Check daily adhkar/dua counter and random delay
     final prefs = await SharedPreferences.getInstance();
     final today = _dateKey(DateTime.now());
 
@@ -194,14 +204,14 @@ class _OverlayTaskHandler extends TaskHandler {
       return; // Not enough time has passed yet
     }
 
-    // 3. Pick random adhkar or dua
+    // 4. Pick random adhkar or dua
     final payload = _pickRandomPayload();
     if (payload == null) return;
 
-    // 4. Show overlay
+    // 5. Show overlay
     await _showOverlay(payload, height: 200);
 
-    // 5. Increment counter and set next delay
+    // 6. Increment counter and set next delay
     await prefs.setInt(_kDailyCountKey, count + 1);
     await prefs.setInt(_kLastAdhkarTimeKey, nowMs);
     // Set next delay between 15 and 45 minutes
@@ -211,6 +221,77 @@ class _OverlayTaskHandler extends TaskHandler {
     );
   }
 
+  Future<void> _updateNotificationWithPrayerInfo() async {
+    final now = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+
+    // 1. Get Location/City Info
+    final cityName = prefs.getString(_kCityNameKey) ?? 'الجزائر';
+
+    // 2. Get Hijri Date
+    final hijri = HijriCalendar.now();
+    final hijriStr =
+        '${hijri.hYear} ${_getHijriMonthNameAr(hijri.hMonth)} ${hijri.hDay.toString().padLeft(2, '0')}';
+
+    // 3. Get Prayer Info
+    if (_todayPrayers.isEmpty) await _refreshPrayerTimes();
+    if (_todayPrayers.isEmpty) return;
+
+    final nextPrayer = _getNextPrayer(now);
+    final countdown = _getCountdown(now, nextPrayer.time);
+
+    final title = '$cityName | $hijriStr';
+    final text = '$countdown - ${nextPrayer.nameAr}، ${DateFormat('HH:mm').format(nextPrayer.time)}';
+
+    FlutterForegroundTask.updateService(
+      notificationTitle: title,
+      notificationText: text,
+      notificationButtons: [
+        const NotificationButton(id: 'open_app', text: 'افتح صلاتك'),
+        const NotificationButton(id: 'update_location', text: 'تحديث الموقع'),
+      ],
+    );
+  }
+
+  _PrayerInfo _getNextPrayer(DateTime now) {
+    for (final p in _todayPrayers) {
+      if (p.time.isAfter(now)) return p;
+    }
+    // If all prayers passed, return first prayer of tomorrow (Fajr)
+    return _todayPrayers.first; // Simplified: actually should be tomorrow's Fajr
+  }
+
+  String _getCountdown(DateTime now, DateTime prayerTime) {
+    Duration diff = prayerTime.difference(now);
+    if (diff.isNegative) {
+      // It's for tomorrow
+      diff = const Duration(hours: 24) + diff;
+    }
+    final h = diff.inHours;
+    final m = diff.inMinutes % 60;
+    final s = diff.inSeconds % 60;
+    return '${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  String _getHijriMonthNameAr(int month) {
+    const months = [
+      'محرم',
+      'صفر',
+      'ربيع الأول',
+      'ربيع الآخر',
+      'جمادى الأولى',
+      'جمادى الآخرة',
+      'رجب',
+      'شعبان',
+      'رمضان',
+      'شوال',
+      'ذو القعدة',
+      'ذو الحجة'
+    ];
+    if (month < 1 || month > 12) return '';
+    return months[month - 1];
+  }
+
   @override
   Future<void> onDestroy(DateTime timestamp) async {}
 
@@ -218,7 +299,13 @@ class _OverlayTaskHandler extends TaskHandler {
   void onReceiveData(Object data) {}
 
   @override
-  void onNotificationButtonPressed(String id) {}
+  void onNotificationButtonPressed(String id) {
+    if (id == 'open_app') {
+      FlutterForegroundTask.launchApp();
+    } else if (id == 'update_location') {
+      FlutterForegroundTask.sendDataToMain({'action': 'refresh_location'});
+    }
+  }
 
   @override
   void onNotificationPressed() {}

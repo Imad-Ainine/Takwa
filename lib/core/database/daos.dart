@@ -700,18 +700,27 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
         .map((r) => r?.value);
   }
 
+  Future<Map<String, String>> getAllSettings() async {
+    final rows = await select(userSettings).get();
+    return {for (var row in rows) row.key: row.value};
+  }
+
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
-    // Map remote database keys to local keys if necessary
     final mapping = {
       'madhab': 'madhab',
       'ramadan_mode': 'ramadanMode',
       'calc_method': 'calcMethod',
       'prayer_reminder': 'prayerReminder',
       'muhasaba_reminder': 'eveningMuhasabaReminder',
+      'evening_reminder_time': 'eveningReminderTime',
+      'language': 'language',
+      'wake_up_before_fajr': 'wakeUpBeforeFajr',
+      'morning_adhkar_reminder': 'morningAdhkarReminder',
+      'evening_adhkar_reminder': 'eveningAdhkarReminder',
     };
 
     for (final entry in mapping.entries) {
-      if (data.containsKey(entry.key)) {
+      if (data.containsKey(entry.key) && data[entry.key] != null) {
         await set(entry.value, data[entry.key].toString());
       }
     }
