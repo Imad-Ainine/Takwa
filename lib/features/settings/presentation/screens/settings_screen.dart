@@ -428,12 +428,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               sublabel: 'شاشة الأذان الكاملة مع الصوت',
               onTap: () {
                 Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => const AdhanOverlayScreen(
-                    prayerName: 'العصر',
-                    autoPlay: true,
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AdhanOverlayScreen(
+                      prayerName: 'العصر',
+                      autoPlay: true,
+                    ),
                   ),
-                ));
+                );
               },
             ),
             _Divider(),

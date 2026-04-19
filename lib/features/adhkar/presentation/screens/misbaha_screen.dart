@@ -219,37 +219,37 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             },
           ),
 
-          // Voice
-          _buildControlButton(
-            icon: state.isListening
-                ? Icons.mic_rounded
-                : Icons.mic_none_rounded,
-            color: Colors.white,
-            bgColor: state.isListening ? Colors.redAccent : style.teal,
-            size: 64,
-            iconSize: 32,
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              ref.read(misbahaProvider.notifier).listen();
-            },
-          ),
+          // // Voice
+          // _buildControlButton(
+          //   icon: state.isListening
+          //       ? Icons.mic_rounded
+          //       : Icons.mic_none_rounded,
+          //   color: Colors.white,
+          //   bgColor: state.isListening ? Colors.redAccent : style.teal,
+          //   size: 64,
+          //   iconSize: 32,
+          //   onTap: () {
+          //     HapticFeedback.mediumImpact();
+          //     ref.read(misbahaProvider.notifier).listen();
+          //   },
+          // ),
 
-          // TTS (Speak)
-          _buildControlButton(
-            icon: state.isSpeaking
-                ? Icons.stop_rounded
-                : Icons.volume_up_rounded,
-            color: state.selectedDhikr == null
-                ? style.textSec.withOpacity(0.3)
-                : style.textSec,
-            bgColor: style.card,
-            onTap: state.selectedDhikr == null
-                ? () {}
-                : () {
-                    HapticFeedback.mediumImpact();
-                    ref.read(misbahaProvider.notifier).speakDhikr();
-                  },
-          ),
+          // // TTS (Speak)
+          // _buildControlButton(
+          //   icon: state.isSpeaking
+          //       ? Icons.stop_rounded
+          //       : Icons.volume_up_rounded,
+          //   color: state.selectedDhikr == null
+          //       ? style.textSec.withOpacity(0.3)
+          //       : style.textSec,
+          //   bgColor: style.card,
+          //   onTap: state.selectedDhikr == null
+          //       ? () {}
+          //       : () {
+          //           HapticFeedback.mediumImpact();
+          //           ref.read(misbahaProvider.notifier).speakDhikr();
+          //         },
+          // ),
         ],
       ),
     );

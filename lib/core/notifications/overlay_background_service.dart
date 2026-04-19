@@ -33,7 +33,8 @@ const _kPrayerWindowSecs = 2 * 60;
 // ─────────────────────────────────────────
 const _kDailyCountKey = 'overlay_daily_count';
 const _kDailyDateKey = 'overlay_daily_date';
-const _kTriggeredPrayersKey = 'overlay_triggered_prayers'; // "fajr,dhuhr,..." for today
+const _kTriggeredPrayersKey =
+    'overlay_triggered_prayers'; // "fajr,dhuhr,..." for today
 const _kTriggeredPrayersDateKey = 'overlay_triggered_prayers_date';
 const _kLastAdhkarTimeKey = 'overlay_last_adhkar_time';
 const _kNextAdhkarDelayMsKey = 'overlay_next_adhkar_delay';
@@ -160,9 +161,10 @@ class _OverlayTaskHandler extends TaskHandler {
     final nowMs = DateTime.now().millisecondsSinceEpoch;
     final lastTime = prefs.getInt(_kLastAdhkarTimeKey) ?? 0;
     // Determine the next delay if not set (between 20 and 40 minutes)
-    final nextDelay = prefs.getInt(_kNextAdhkarDelayMsKey) ?? 
-                      ((20 + _random.nextInt(21)) * 60 * 1000);
-                      
+    final nextDelay =
+        prefs.getInt(_kNextAdhkarDelayMsKey) ??
+        ((20 + _random.nextInt(21)) * 60 * 1000);
+
     if (nowMs - lastTime < nextDelay) {
       return; // Not enough time has passed yet
     }
@@ -178,7 +180,10 @@ class _OverlayTaskHandler extends TaskHandler {
     await prefs.setInt(_kDailyCountKey, count + 1);
     await prefs.setInt(_kLastAdhkarTimeKey, nowMs);
     // Set next delay between 15 and 45 minutes
-    await prefs.setInt(_kNextAdhkarDelayMsKey, (15 + _random.nextInt(31)) * 60 * 1000);
+    await prefs.setInt(
+      _kNextAdhkarDelayMsKey,
+      (15 + _random.nextInt(31)) * 60 * 1000,
+    );
   }
 
   @override
@@ -314,30 +319,36 @@ class _OverlayTaskHandler extends TaskHandler {
   String? _pickRandomPayload() {
     // Build unified pool: all adhkar items + all dua items
     final allAdhkar = kAdhkarData.entries.expand((entry) {
-      return entry.value.map((dhikr) => (
-        arabic: dhikr.arabic,
-        label: _categoryName(entry.key),
-        emoji: _categoryIcon(entry.key),
-        source: dhikr.source ?? '',
-        type: 'adhkar',
-      ));
+      return entry.value.map(
+        (dhikr) => (
+          arabic: dhikr.arabic,
+          label: _categoryName(entry.key),
+          emoji: _categoryIcon(entry.key),
+          source: dhikr.source ?? '',
+          type: 'adhkar',
+        ),
+      );
     }).toList();
 
     final allDuas = kDuasData.entries.expand((entry) {
-      return entry.value.map((dua) => (
-        arabic: dua.arabic,
-        label: 'دعاء — ${dua.occasion}',
-        emoji: dua.emoji,
-        source: dua.source,
-        type: 'dua',
-      ));
+      return entry.value.map(
+        (dua) => (
+          arabic: dua.arabic,
+          label: 'دعاء — ${dua.occasion}',
+          emoji: dua.emoji,
+          source: dua.source,
+          type: 'dua',
+        ),
+      );
     }).toList();
 
     final pool = [...allAdhkar, ...allDuas];
     if (pool.isEmpty) return null;
 
     // Filter out items with empty arabic text
-    final validPool = pool.where((item) => item.arabic.trim().isNotEmpty).toList();
+    final validPool = pool
+        .where((item) => item.arabic.trim().isNotEmpty)
+        .toList();
     if (validPool.isEmpty) return null;
 
     final item = validPool[_random.nextInt(validPool.length)];
@@ -362,7 +373,7 @@ class _OverlayTaskHandler extends TaskHandler {
       }
 
       await FlutterOverlayWindow.showOverlay(
-        alignment: OverlayAlignment.topCenter,
+        alignment: OverlayAlignment.centerRight,
         height: height,
         width: WindowSize.matchParent,
         enableDrag: true,
@@ -406,79 +417,5 @@ class _OverlayTaskHandler extends TaskHandler {
       case AdhkarCategory.misc:
         return 'أذكار عامة';
     }
-  }
-}
-
-// ─────────────────────────────────────────
-//  TESTING OVERLAYS
-// ─────────────────────────────────────────
-
-extension OverlayBackgroundTesting on OverlayBackgroundService {
-  static Future<void> testAdhkar() async {
-    await _showTestOverlay(
-      arabic:
-          'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، عَدَدَ خَلْقِهِ ، وَرِضَا نَفْسِهِ ، وَزِنَةَ عَرْشِهِ ، وَمِدَادَ كَلِمَاتِهِ',
-      label: 'أذكار الصباح',
-      emoji: '🌅',
-      source: 'حصن المسلم',
-      type: 'adhkar',
-    );
-  }
-
-  static Future<void> testDouaa() async {
-    await _showTestOverlay(
-      arabic:
-          'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ',
-      label: 'دعاء - شامل',
-      emoji: '🤲',
-      source: 'سنن أبي داود',
-      type: 'dua',
-    );
-  }
-
-  static Future<void> testAdhan() async {
-    await _showTestOverlay(
-      arabic: 'حَيَّ عَلَى الصَّلَاةِ ، حَيَّ عَلَى الْفَلَاحِ',
-      label: 'أذان العصر',
-      emoji: '🕌',
-      source: '',
-      type: 'adhan',
-    );
-  }
-
-  static Future<void> _showTestOverlay({
-    required String arabic,
-    required String label,
-    required String emoji,
-    required String source,
-    required String type,
-  }) async {
-    final payload = jsonEncode({
-      'arabic': arabic,
-      'label': label,
-      'emoji': emoji,
-      'source': source,
-      'type': type,
-    });
-
-    final isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-    if (isOverlayGranted == false) {
-      await FlutterOverlayWindow.requestPermission();
-    }
-
-    final bool isActive = await FlutterOverlayWindow.isActive();
-    if (isActive) {
-      await FlutterOverlayWindow.closeOverlay();
-      await Future.delayed(const Duration(milliseconds: 300));
-    }
-
-    await FlutterOverlayWindow.showOverlay(
-      alignment: OverlayAlignment.topCenter,
-      height: type == 'adhan' ? 450 : 350,
-      width: WindowSize.matchParent,
-      enableDrag: true,
-      overlayContent: payload,
-      flag: OverlayFlag.defaultFlag,
-    );
   }
 }
