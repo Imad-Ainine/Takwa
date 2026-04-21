@@ -12,6 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  RAMADAN COLOR PALETTE  (تجاوز الألوان الأساسية)
@@ -605,6 +607,10 @@ class RamadanToggle extends ConsumerWidget {
               final dao = ref.read(settingsDaoProvider);
               await dao.setBool('ramadanMode', v);
               ref.invalidate(ramadanModeProvider);
+
+              // ── Sync with Cloud & Reschedule Notifications ──
+              await NotificationsManager.reschedule(ref);
+              await SyncManager.syncSettings(ref);
             },
             accentColor: style.gold,
           ),
