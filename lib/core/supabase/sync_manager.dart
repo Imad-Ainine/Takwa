@@ -53,11 +53,10 @@ class SyncManager {
       to: DateTime.now(),
     );
 
-    // Assuming a dao exists for prohibitions
-    // final dao = ref.read(prohibitionDaoProvider); 
-    // for (final log in remoteLogs) {
-    //   await dao.upsertFromRemote(log);
-    // }
+    final dao = ref.read(dailyRecordDaoProvider);
+    for (final log in remoteLogs) {
+      await dao.upsertProhibitionFromRemote(log);
+    }
   }
 
   static Future<void> _syncCustomIbadah(WidgetRef ref) async {
@@ -67,9 +66,13 @@ class SyncManager {
       to: DateTime.now(),
     );
 
-    // Assuming daos exist
-    // final ibadahDao = ref.read(customIbadahDaoProvider);
-    // for (final item in remoteIbadah) await ibadahDao.upsertFromRemote(item);
+    final ibadahDao = ref.read(customIbadahDaoProvider);
+    for (final item in remoteIbadah) {
+      await ibadahDao.upsertCustomIbadahFromRemote(item);
+    }
+    for (final log in remoteLogs) {
+      await ibadahDao.upsertCustomIbadahLogFromRemote(log);
+    }
   }
 
   static Future<void> _syncAchievements(WidgetRef ref) async {
@@ -215,6 +218,22 @@ class SyncManager {
     });
   }
 
+  /// Delete custom ibadah
+  static Future<void> deleteCustomIbadah(
+    WidgetRef ref,
+    int id,
+  ) async {
+    final isOnline = ref.read(connectivityProvider).value ?? false;
+    final isAuth = ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    try {
+      await SupabaseService.deleteCustomIbadah(id);
+    } catch (e) {
+      // Log or handle error
+    }
+  }
+
   /// Sync custom ibadah log
   static Future<void> syncCustomIbadahLog(
     WidgetRef ref,
@@ -224,12 +243,36 @@ class SyncManager {
     final isAuth = ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertCustomIbadahLog({
-      'ibadah_id': log.ibadahId,
-      'date': log.date.toIso8601String().split('T')[0],
-      'done': log.done,
-      'count': log.count,
-    });
+    try {
+      await SupabaseService.upsertCustomIbadahLog({
+        'ibadah_id': log.ibadahId,
+        'date': log.date.toIso8601String().split('T')[0],
+        'done': log.done,
+        'count': log.count,
+      });
+    } catch (e) {
+      if (e.toString().contains('23503')) {
+        // Foreign key violation: custom_ibadah might be missing on remote
+        try {
+          final dao = ref.read(customIbadahDaoProvider);
+          final ibadahItems = await dao.getAllIbadat();
+          final ibadah = ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
+          
+          if (ibadah != null) {
+            await syncCustomIbadah(ref, ibadah);
+            // Retry log sync
+            await SupabaseService.upsertCustomIbadahLog({
+              'ibadah_id': log.ibadahId,
+              'date': log.date.toIso8601String().split('T')[0],
+              'done': log.done,
+              'count': log.count,
+            });
+          }
+        } catch (retryError) {
+          // Fallback or ignore
+        }
+      }
+    }
   }
 
   /// Sync all local settings to Supabase

@@ -68,10 +68,11 @@ class FavoriteDuasScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 'أدعيتي المفضلة',
-                                style: context.typography.headingMedium.copyWith(
-                                  fontSize: 20,
-                                  color: context.colors.gold,
-                                ),
+                                style: context.typography.headingMedium
+                                    .copyWith(
+                                      fontSize: 20,
+                                      color: context.colors.gold,
+                                    ),
                               ),
                               Text(
                                 '${favDuas.length} دعاء محفوظ',
@@ -89,7 +90,10 @@ class FavoriteDuasScreen extends ConsumerWidget {
                 ),
 
                 // ── Divider ──
-                Container(height: 1, color: context.colors.border.withOpacity(0.5)),
+                Container(
+                  height: 1,
+                  color: context.colors.border.withOpacity(0.5),
+                ),
                 const SizedBox(height: 4),
 
                 // ── Content ──
@@ -132,7 +136,9 @@ class _EmptyFavs extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'اضغط على ❤️ داخل أي دعاء لحفظه هنا',
-            style: context.typography.caption.copyWith(color: colors.textSecondary),
+            style: context.typography.caption.copyWith(
+              color: colors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -205,7 +211,7 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                   BoxShadow(
                     color: context.colors.gold.withOpacity(0.1),
                     blurRadius: 12,
-                  )
+                  ),
                 ]
               : null,
         ),
@@ -241,7 +247,9 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                             ? Icons.favorite_rounded
                             : Icons.favorite_border_rounded,
                         key: ValueKey(isFav),
-                        color: isFav ? Colors.red.shade400 : context.colors.textSecondary,
+                        color: isFav
+                            ? Colors.red.shade400
+                            : context.colors.textSecondary,
                         size: 20,
                       ),
                     ),

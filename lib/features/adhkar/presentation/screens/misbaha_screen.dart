@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -14,7 +15,7 @@ class MisbahaScreen extends ConsumerStatefulWidget {
   ConsumerState<MisbahaScreen> createState() => _MisbahaScreenState();
 }
 
-class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
+class _MisbahaScreenState extends ConsumerState<MisbahaScreen> 
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
 
@@ -34,9 +35,17 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   }
 
   void _onTap() {
-    HapticFeedback.lightImpact();
     ref.read(misbahaProvider.notifier).increment();
     _pulseCtrl.forward(from: 0);
+  }
+
+  void _onLongPressStart(LongPressStartDetails _) {
+    HapticFeedback.heavyImpact();
+    ref.read(misbahaProvider.notifier).listen(true);
+  }
+
+  void _onLongPressEnd(LongPressEndDetails _) {
+    ref.read(misbahaProvider.notifier).listen(false);
   }
 
   @override
@@ -56,24 +65,54 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.duas),
             ),
+
+            // Decorative Glows
+            Positioned(
+              top: -100,
+              right: -100,
+              child: _buildGlow(style.gold.withOpacity(0.15), 300),
+            ),
+            Positioned(
+              bottom: -50,
+              left: -50,
+              child: _buildGlow(style.teal.withOpacity(0.1), 250),
+            ),
+
             SafeArea(
               child: Column(
                 children: [
                   _buildHeader(style, context),
-                  const Spacer(flex: 1),
+                  const Spacer(),
                   _buildDhikrSelector(state, style, context),
-                  const Spacer(flex: 1),
-                  _buildCounter(state, style),
-                  const Spacer(flex: 2),
-                  _buildTapArea(style),
-                  const Spacer(flex: 1),
-                  _buildControls(state, style),
-                  const SizedBox(height: 32),
+                  const Spacer(),
+                  _buildCounterDisplay(state, style),
+                  const Spacer(),
+                  _buildMainBead(state, style),
+                  const Spacer(),
+                  _buildBottomControls(state, style),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildGlow(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: color,
+            blurRadius: size,
+            spreadRadius: size / 2,
+          ),
+        ],
       ),
     );
   }
@@ -115,171 +154,6 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           ),
           const SizedBox(width: 40),
         ],
-      ),
-    );
-  }
-
-  Widget _buildCounter(MisbahaState state, AdaptiveStyle style) {
-    return Column(
-      children: [
-        Text(
-          '${state.count}',
-          style: TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 80,
-            fontWeight: FontWeight.bold,
-            color: style.text,
-            height: 1.0,
-          ),
-        ),
-        if (state.selectedDhikr != null)
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: style.gold.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: style.gold.withOpacity(0.3)),
-            ),
-            child: Text(
-              'الهدف: ${state.selectedDhikr!.count}',
-              style: style.naskh(14, color: style.gold),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildTapArea(AdaptiveStyle style) {
-    return ScaleTransition(
-      scale: Tween<double>(
-        begin: 1.0,
-        end: 0.95,
-      ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOutBack)),
-      child: GestureDetector(
-        onTap: _onTap,
-        child: Container(
-          width: 240,
-          height: 240,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [style.gold, style.teal],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: style.gold.withOpacity(0.3),
-                blurRadius: 40,
-                spreadRadius: 10,
-              ),
-            ],
-          ),
-          child: Center(
-            child: Container(
-              width: 210,
-              height: 210,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: style.bg.withOpacity(0.1),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 2,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.touch_app_rounded,
-                  size: 64,
-                  color: Colors.white.withOpacity(0.8),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildControls(MisbahaState state, AdaptiveStyle style) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Reset
-          _buildControlButton(
-            icon: Icons.refresh_rounded,
-            color: style.textSec,
-            bgColor: style.card,
-            onTap: () {
-              HapticFeedback.mediumImpact();
-              ref.read(misbahaProvider.notifier).reset();
-            },
-          ),
-
-          // // Voice
-          // _buildControlButton(
-          //   icon: state.isListening
-          //       ? Icons.mic_rounded
-          //       : Icons.mic_none_rounded,
-          //   color: Colors.white,
-          //   bgColor: state.isListening ? Colors.redAccent : style.teal,
-          //   size: 64,
-          //   iconSize: 32,
-          //   onTap: () {
-          //     HapticFeedback.mediumImpact();
-          //     ref.read(misbahaProvider.notifier).listen();
-          //   },
-          // ),
-
-          // // TTS (Speak)
-          // _buildControlButton(
-          //   icon: state.isSpeaking
-          //       ? Icons.stop_rounded
-          //       : Icons.volume_up_rounded,
-          //   color: state.selectedDhikr == null
-          //       ? style.textSec.withOpacity(0.3)
-          //       : style.textSec,
-          //   bgColor: style.card,
-          //   onTap: state.selectedDhikr == null
-          //       ? () {}
-          //       : () {
-          //           HapticFeedback.mediumImpact();
-          //           ref.read(misbahaProvider.notifier).speakDhikr();
-          //         },
-          // ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-    required VoidCallback onTap,
-    double size = 48,
-    double iconSize = 24,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: bgColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Icon(icon, color: color, size: iconSize),
       ),
     );
   }
@@ -352,90 +226,336 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
+  Widget _buildCounterDisplay(MisbahaState state, AdaptiveStyle style) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Circular progress indicator around the number
+            if (state.selectedDhikr != null)
+              SizedBox(
+                width: 180,
+                height: 180,
+                child: CircularProgressIndicator(
+                  value: state.count / state.selectedDhikr!.count,
+                  strokeWidth: 4,
+                  color: style.gold.withOpacity(0.6),
+                  backgroundColor: style.gold.withOpacity(0.05),
+                ),
+              ),
+            Column(
+              children: [
+                Text(
+                  '${state.count}',
+                  style: GoogleFonts.amiri(
+                    fontSize: 90,
+                    fontWeight: FontWeight.bold,
+                    color: style.text,
+                    height: 1.0,
+                  ),
+                ),
+                if (state.selectedDhikr != null)
+                  Text(
+                    '/ ${state.selectedDhikr!.count}',
+                    style: style.naskh(16, color: style.gold.withOpacity(0.7)),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMainBead(MisbahaState state, AdaptiveStyle style) {
+    return Column(
+      children: [
+        ScaleTransition(
+          scale: Tween<double>(
+            begin: 1.0,
+            end: 0.92,
+          ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOutBack)),
+          child: GestureDetector(
+            onTap: _onTap,
+            onLongPressStart: _onLongPressStart,
+            onLongPressEnd: _onLongPressEnd,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Pulse Animation Background
+                if (state.isListening)
+                  _ListeningRipple(color: style.teal),
+
+                // The Main Bead
+                Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: state.isListening
+                        ? [style.teal, style.teal.withOpacity(0.7)]
+                        : [style.gold, style.goldDark],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (state.isListening ? style.teal : style.gold).withOpacity(0.4),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 190,
+                      height: 190,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.1),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            state.isListening ? Icons.mic_rounded : Icons.fingerprint_rounded,
+                            size: 64,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            state.isListening ? 'جاري الاستماع...' : 'انقر أو اضغط مطولاً',
+                            style: style.naskh(12, color: Colors.white.withOpacity(0.9)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomControls(MisbahaState state, AdaptiveStyle style) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Reset Button
+          _buildActionButton(
+            icon: Icons.refresh_rounded,
+            label: 'إعادة',
+            color: style.textSec,
+            onTap: () => ref.read(misbahaProvider.notifier).reset(),
+          ),
+
+          // Sound Toggle? (Optional extra)
+          _buildActionButton(
+            icon: state.isSpeaking ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+            label: 'الصوت',
+            color: state.selectedDhikr == null ? style.textDim : style.gold,
+            onTap: state.selectedDhikr == null ? null : () => ref.read(misbahaProvider.notifier).speakDhikr(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: GoogleFonts.notoNaskhArabic(fontSize: 10, color: color)),
+        ],
+      ),
+    );
+  }
+
   void _showDhikrListModal(AdaptiveStyle style, BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: style.bg,
+      backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (ctx) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          maxChildSize: 0.9,
-          minChildSize: 0.4,
-          builder: (_, controller) {
-            final allItems = kAdhkarData.values.expand((list) => list).toList();
-            return Column(
-              children: [
-                Center(
-                  child: Container(
+        return Container(
+          decoration: BoxDecoration(
+            color: style.bg,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 20,
+              ),
+            ],
+          ),
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.7,
+            maxChildSize: 0.9,
+            minChildSize: 0.5,
+            builder: (_, controller) {
+              final allItems = kAdhkarData.values.expand((list) => list).toList();
+              return Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
                     width: 40,
                     height: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                       color: style.border,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-                Text('اختر ذكراً', style: style.amiri(20, color: style.gold)),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.separated(
-                    controller: controller,
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                    itemCount: allItems.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (ctx, i) {
-                      final dhikr = allItems[i];
-                      return GestureDetector(
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          ref.read(misbahaProvider.notifier).selectDhikr(dhikr);
-                          Navigator.pop(ctx);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: style.card,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: style.border),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                dhikr.arabic,
-                                textAlign: TextAlign.center,
-                                style: style.amiri(16, color: style.text),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: style.gold.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  'الهدف: ${dhikr.count}',
-                                  style: style.naskh(12, color: style.gold),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                  const SizedBox(height: 20),
+                  Text('اختر ذكراً', style: style.amiri(24, color: style.gold)),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: ListView.separated(
+                      controller: controller,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      itemCount: allItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (ctx, i) {
+                        final dhikr = allItems[i];
+                        return _buildDhikrItem(dhikr, style, ctx);
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDhikrItem(DhikrItem dhikr, AdaptiveStyle style, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        ref.read(misbahaProvider.notifier).selectDhikr(dhikr);
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: style.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: style.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                dhikr.arabic,
+                style: style.amiri(18, color: style.text, height: 1.4),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: style.gold.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${dhikr.count}',
+                style: style.naskh(14, color: style.gold, weight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ListeningRipple extends StatefulWidget {
+  final Color color;
+  const _ListeningRipple({required this.color});
+
+  @override
+  State<_ListeningRipple> createState() => _ListeningRippleState();
+}
+
+class _ListeningRippleState extends State<_ListeningRipple>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, child) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            for (int i = 0; i < 3; i++)
+              Transform.scale(
+                scale: 1.0 + (_ctrl.value + i / 3) % 1.0 * 1.5,
+                child: Opacity(
+                  opacity: (1.0 - (_ctrl.value + i / 3) % 1.0).clamp(0.0, 1.0),
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: widget.color.withOpacity(0.5), width: 2),
+                    ),
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+          ],
         );
       },
     );

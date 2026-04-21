@@ -20,3 +20,8 @@ mixin _$SettingsDaoMixin on DatabaseAccessor<AppDatabase> {
 mixin _$RemindersDaoMixin on DatabaseAccessor<AppDatabase> {
   $RemindersTable get reminders => attachedDatabase.reminders;
 }
+mixin _$CustomIbadahDaoMixin on DatabaseAccessor<AppDatabase> {
+  $CustomIbadahTable get customIbadah => attachedDatabase.customIbadah;
+  $DailyRecordsTable get dailyRecords => attachedDatabase.dailyRecords;
+  $CustomIbadahLogTable get customIbadahLog => attachedDatabase.customIbadahLog;
+}

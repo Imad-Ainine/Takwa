@@ -52,7 +52,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                         Row(
                           children: [
                             const Icon(
-                              Icons.format_size_rounded, 
+                              Icons.format_size_rounded,
                               color: kGoldChip,
                               size: 20,
                             ),

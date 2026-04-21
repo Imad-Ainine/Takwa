@@ -13,11 +13,10 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
-import 'package:takwa/core/widgets/adhkar_overlay_notification.dart';
-import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
-
 import 'package:takwa/core/supabase/sync_manager.dart';
+
 import '../widgets/location_picker_sheet.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -441,38 +440,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               },
             ),
-            _Divider(),
-            _ActionSetting(
-              icon: '🌅',
-              label: 'ذكر',
-              sublabel: 'إشعار داخلي للأذكار',
-              onTap: () {
-                Navigator.pop(context);
-                final dhikr = kAdhkarData[AdhkarCategory.morning]![0];
-                AdhkarOverlayNotification.show(
-                  context,
-                  AdhkarCategory.morning,
-                  dhikr,
-                  duration: const Duration(seconds: 8),
-                );
-              },
-            ),
-            _Divider(),
-            _ActionSetting(
-              icon: '🤲',
-              label: 'دعاء',
-              sublabel: 'إشعار داخلي للدعاء',
-              onTap: () {
-                Navigator.pop(context);
-                final dhikr = kAdhkarData[AdhkarCategory.misc]![0];
-                AdhkarOverlayNotification.show(
-                  context,
-                  AdhkarCategory.misc,
-                  dhikr,
-                  duration: const Duration(seconds: 8),
-                );
-              },
-            ),
           ],
         ),
       ),
@@ -629,18 +596,10 @@ class _ToggleSetting extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
+          PrimarySwitch(
             value: value,
-            onChanged: (v) {
-              HapticFeedback.selectionClick();
-              onChanged(v);
-            },
-            activeColor: accentColor ?? context.colors.teal,
-            activeTrackColor: (accentColor ?? context.colors.teal).withOpacity(
-              0.3,
-            ),
-            inactiveTrackColor: context.colors.border,
-            inactiveThumbColor: context.colors.textDim,
+            onChanged: onChanged,
+            accentColor: accentColor,
           ),
         ],
       ),

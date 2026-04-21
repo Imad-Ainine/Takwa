@@ -275,18 +275,18 @@ class NotificationsService {
         );
       }
 
-        // 2. الأذان الفعلي
-        if (prayer.time.isAfter(now)) {
-          await _scheduleExact(
-            id: prayer.notifId,
-            title: 'حان وقت ${prayer.nameAr} ${prayer.emoji}',
-            body: 'الله أكبر، الله أكبر، حي على الصلاة',
-            scheduledTime: prayer.time,
-            channelId: NotifChannels.prayer.id,
-            sound: 'adhan',
-            payload: 'prayer:${prayer.name}',
-          );
-        }
+      // 2. الأذان الفعلي
+      if (prayer.time.isAfter(now)) {
+        await _scheduleExact(
+          id: prayer.notifId,
+          title: 'حان وقت ${prayer.nameAr} ${prayer.emoji}',
+          body: 'الله أكبر، الله أكبر، حي على الصلاة',
+          scheduledTime: prayer.time,
+          channelId: NotifChannels.prayer.id,
+          sound: 'adhan',
+          payload: 'prayer:${prayer.name}',
+        );
+      }
 
       // 3. تنبيه الإقامة
       final offset = iqamaOffsets[prayer.name] ?? 15;

@@ -10,7 +10,7 @@ part 'daos.g.dart';
 // ─────────────────────────────────────────
 //  DAO 1: DailyRecordDao
 // ─────────────────────────────────────────
-@DriftAccessor(tables: [DailyRecords, ProhibitionsLog, CustomIbadahLog])
+@DriftAccessor(tables: [DailyRecords, ProhibitionsLog, CustomIbadahLog, CustomIbadah])
 class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     with _$DailyRecordDaoMixin {
   DailyRecordDao(super.db);
@@ -47,7 +47,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     await (update(
       dailyRecords,
     )..where((r) => r.id.equals(recordId))).write(companion);
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> updateQuran({
@@ -62,7 +62,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> updateQuranPages(int recordId, int pages) =>
@@ -84,7 +84,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> toggleAdhkar(int recordId, String key, bool value) {
@@ -103,7 +103,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> toggleNightPrayer(int recordId, bool value) async {
@@ -113,7 +113,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> updateFasting(int recordId, FastingType type) async {
@@ -123,48 +123,47 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(DateTime.now()),
       ),
     );
-    await _recalcPoints(recordId);
+    await recalcPoints(recordId);
   }
 
   Future<void> logProhibition({
     required int recordId,
     required ProhibitionCategory category,
     required bool committed,
-    String? customName,
-    int timesCount = 1,
+    int timesCount = 0,
     int deductPoints = 10,
+    String? notes,
   }) async {
-    final existing =
-        await (select(prohibitionsLog)..where(
-              (p) =>
-                  p.recordId.equals(recordId) &
-                  p.category.equals(category.index),
-            ))
-            .getSingleOrNull();
+    await transaction(() async {
+      final existing = await (select(prohibitionsLog)..where(
+        (p) => p.recordId.equals(recordId) & p.category.equals(category.index),
+      )).getSingleOrNull();
 
-    if (existing != null) {
-      await (update(
-        prohibitionsLog,
-      )..where((p) => p.id.equals(existing.id))).write(
-        ProhibitionsLogCompanion(
-          committed: Value(committed),
-          timesCount: Value(timesCount),
-        ),
-      );
-    } else {
-      await into(prohibitionsLog).insert(
-        ProhibitionsLogCompanion(
-          recordId: Value(recordId),
-          date: Value(DateTime.now()),
-          category: Value(category),
-          committed: Value(committed),
-          customName: Value(customName),
-          timesCount: Value(timesCount),
-          deductPoints: Value(deductPoints),
-        ),
-      );
-    }
-    await _recalcPoints(recordId);
+      if (existing != null) {
+        await (update(
+          prohibitionsLog,
+        )..where((p) => p.id.equals(existing.id))).write(
+          ProhibitionsLogCompanion(
+            committed: Value(committed),
+            timesCount: Value(timesCount),
+            notes: Value(notes),
+          ),
+        );
+      } else {
+        await into(prohibitionsLog).insert(
+          ProhibitionsLogCompanion(
+            recordId: Value(recordId),
+            date: Value(DateTime.now()),
+            category: Value(category),
+            committed: Value(committed),
+            timesCount: Value(timesCount),
+            deductPoints: Value(deductPoints),
+            notes: Value(notes),
+          ),
+        );
+      }
+      await recalcPoints(recordId);
+    });
   }
 
   Future<List<ProhibitionsLogData>> getTodayProhibitions(int recordId) {
@@ -202,7 +201,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     };
   }
 
-  Future<void> _recalcPoints(int recordId) async {
+  Future<void> recalcPoints(int recordId) async {
     final record = await (select(
       dailyRecords,
     )..where((r) => r.id.equals(recordId))).getSingle();
@@ -236,6 +235,24 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       if (p.committed) deducted += p.deductPoints * p.timesCount;
     }
 
+    // ── Custom Ibadaat (Positive/Negative) ──
+    final customLogs = await (select(customIbadahLog).join([
+      innerJoin(customIbadah, customIbadah.id.equalsExp(customIbadahLog.ibadahId)),
+    ])..where(customIbadahLog.recordId.equals(recordId))).get();
+
+    for (final row in customLogs) {
+      final log = row.readTable(customIbadahLog);
+      final meta = row.readTable(customIbadah);
+      if (log.done) {
+        final pts = meta.points * log.count;
+        if (meta.isPositive) {
+          points += pts;
+        } else {
+          deducted += pts.abs();
+        }
+      }
+    }
+
     await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
       DailyRecordsCompanion(
         taqwaPoints: Value(points),
@@ -266,7 +283,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     if (v == null) return 0;
     if (v is int) return v;
     if (v is num) return v.toInt();
-    return int.tryParse(v.toString()) ?? 0; 
+    return int.tryParse(v.toString()) ?? 0;
   }
 
   /// Safely coerce a dynamic JSON value to [bool].
@@ -280,7 +297,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
   PrayerStatus _parsePrayerStatus(dynamic v) {
     if (v == null) return PrayerStatus.notDue;
     if (v is int) {
-      if (v >= 0 && v < PrayerStatus.values.length) return PrayerStatus.values[v];
+      if (v >= 0 && v < PrayerStatus.values.length) {
+        return PrayerStatus.values[v];
+      }
       return PrayerStatus.notDue;
     }
     final String s = v.toString().replaceFirst('PrayerStatus.', '');
@@ -288,7 +307,9 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       (e) => e.name == s,
       orElse: () {
         final idx = int.tryParse(s) ?? 0;
-        if (idx >= 0 && idx < PrayerStatus.values.length) return PrayerStatus.values[idx];
+        if (idx >= 0 && idx < PrayerStatus.values.length) {
+          return PrayerStatus.values[idx];
+        }
         return PrayerStatus.notDue;
       },
     );
@@ -305,10 +326,54 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       (e) => e.name == s,
       orElse: () {
         final idx = int.tryParse(s) ?? 0;
-        if (idx >= 0 && idx < FastingType.values.length) return FastingType.values[idx];
+        if (idx >= 0 && idx < FastingType.values.length) {
+          return FastingType.values[idx];
+        }
         return FastingType.none;
       },
     );
+  }
+
+  /// Syncs a remote prohibition log (uses date for matching local daily records)
+  Future<void> upsertProhibitionFromRemote(Map<String, dynamic> data) async {
+    final dateStr = data['date'] as String;
+    final date = DateTime.parse(dateStr);
+
+    var dr = await getRecordByDate(date);
+    if (dr == null) {
+      await into(dailyRecords).insert(
+        DailyRecordsCompanion(date: Value(date)),
+        mode: InsertMode.insertOrIgnore,
+      );
+      dr = await getRecordByDate(date);
+    }
+    if (dr == null) return;
+
+    final categoryName = data['category'] as String;
+    final category = ProhibitionCategory.values.firstWhere(
+      (e) => e.name == categoryName,
+      orElse: () => ProhibitionCategory.custom,
+    );
+
+    final companion = ProhibitionsLogCompanion(
+      recordId: Value(dr.id),
+      date: Value(date),
+      category: Value(category),
+      committed: Value((data['committed'] is bool) ? data['committed'] : data['committed'] == 1),
+      timesCount: Value(data['times_count'] as int? ?? 0),
+      deductPoints: Value(data['deduct_points'] as int? ?? 10),
+      notes: Value(data['notes'] as String?),
+    );
+
+    final existing = await (select(prohibitionsLog)
+          ..where((p) => p.recordId.equals(dr!.id) & p.category.equals(category.index)))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(prohibitionsLog)..where((p) => p.id.equals(existing.id))).write(companion);
+    } else {
+      await into(prohibitionsLog).insert(companion);
+    }
   }
 
   /// Sync from remote Supabase record
@@ -473,21 +538,24 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Stream<MonthStats> watchMonthStats(int year, int month) {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getMonthStats(year, month));
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getMonthStats(year, month));
   }
 
   Stream<int> watchCurrentStreak() {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getCurrentStreak());
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getCurrentStreak());
   }
 
   Stream<List<WeeklyPoint>> watchWeeklyPoints() {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getWeeklyPoints());
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getWeeklyPoints());
   }
 
   Future<void> addAchievement({
@@ -784,9 +852,9 @@ class RemindersDao extends DatabaseAccessor<AppDatabase>
 
   /// Watch all reminders ordered by creation date
   Stream<List<Reminder>> watchAll() {
-    return (select(reminders)
-          ..orderBy([(r) => OrderingTerm.desc(r.createdAt)]))
-        .watch();
+    return (select(
+      reminders,
+    )..orderBy([(r) => OrderingTerm.desc(r.createdAt)])).watch();
   }
 
   /// Insert a new reminder
@@ -814,5 +882,133 @@ class RemindersDao extends DatabaseAccessor<AppDatabase>
   /// Delete a reminder by id
   Future<int> deleteReminder(int id) {
     return (delete(reminders)..where((r) => r.id.equals(id))).go();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CUSTOM IBADAH DAO
+// ═══════════════════════════════════════════════════════════════
+@DriftAccessor(tables: [CustomIbadah, CustomIbadahLog, DailyRecords])
+class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
+    with _$CustomIbadahDaoMixin {
+  CustomIbadahDao(super.db);
+
+  // --- Ibadah Defs ---
+  Stream<List<CustomIbadahData>> watchActiveIbadat(bool isPositive) {
+    return (select(customIbadah)
+          ..where((i) => i.isActive.equals(true) & i.isPositive.equals(isPositive))
+          ..orderBy([(i) => OrderingTerm.asc(i.sortOrder)]))
+        .watch();
+  }
+
+  Stream<List<CustomIbadahData>> watchAllIbadat(bool isPositive) {
+    return (select(customIbadah)
+          ..where((i) => i.isPositive.equals(isPositive))
+          ..orderBy([(i) => OrderingTerm.desc(i.isActive), (i) => OrderingTerm.asc(i.sortOrder)]))
+        .watch();
+  }
+
+  Future<List<CustomIbadahData>> getAllIbadat() {
+    return select(customIbadah).get();
+  }
+
+  Future<int> addIbadah(CustomIbadahCompanion comp) {
+    return into(customIbadah).insert(comp);
+  }
+
+  Future<void> updateIbadah(CustomIbadahCompanion comp) {
+    return (update(customIbadah)..where((t) => t.id.equals(comp.id.value))).write(comp);
+  }
+
+  Future<void> deleteIbadah(int id) {
+    return (delete(customIbadah)..where((t) => t.id.equals(id))).go();
+  }
+
+  // --- Syncing (Remote -> Local) ---
+  Future<void> upsertCustomIbadahFromRemote(Map<String, dynamic> data) async {
+    final id = data['id'] as int;
+    final companion = CustomIbadahCompanion(
+      id: Value(id),
+      nameAr: Value(data['name_ar'] as String),
+      emoji: Value(data['emoji'] as String? ?? '⭐'),
+      isPositive: Value(data['is_positive'] as bool? ?? true),
+      points: Value(data['points'] as int? ?? 5),
+      isActive: Value(data['is_active'] as bool? ?? true),
+      sortOrder: Value(data['sort_order'] as int? ?? 0),
+    );
+    await into(customIbadah).insertOnConflictUpdate(companion);
+  }
+
+  Future<void> upsertCustomIbadahLogFromRemote(Map<String, dynamic> data) async {
+    final dateStr = data['date'] as String;
+    final date = DateTime.parse(dateStr);
+
+    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date))).getSingleOrNull();
+    int drId;
+    if (dr == null) {
+      drId = await into(dailyRecords).insert(DailyRecordsCompanion(date: Value(date)));
+    } else {
+      drId = dr.id;
+    }
+
+    final ibadahId = data['ibadah_id'] as int;
+    final companion = CustomIbadahLogCompanion(
+      ibadahId: Value(ibadahId),
+      recordId: Value(drId),
+      date: Value(date),
+      done: Value(data['done'] as bool? ?? false),
+      count: Value(data['count'] as int? ?? 1),
+    );
+
+    final existing = await (select(customIbadahLog)
+          ..where((l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId)))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id))).write(companion);
+    } else {
+      await into(customIbadahLog).insert(companion);
+    }
+    await DailyRecordDao(db).recalcPoints(drId);
+  }
+
+  // --- Logging (Local -> Remote later) ---
+  Stream<List<CustomIbadahLogData>> watchLogsForDate(DateTime date) {
+    return (select(customIbadahLog)..where((t) => t.date.equals(date))).watch();
+  }
+
+  Future<List<CustomIbadahLogData>> getLogsForDate(DateTime date) {
+    return (select(customIbadahLog)..where((t) => t.date.equals(date))).get();
+  }
+
+  Future<void> logIbadah(int ibadahId, DateTime date, bool done, int count) async {
+    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date))).getSingleOrNull();
+    int drId;
+    if (dr == null) {
+      drId = await into(dailyRecords).insert(DailyRecordsCompanion(date: Value(date)));
+    } else {
+      drId = dr.id;
+    }
+
+    final existing = await (select(customIbadahLog)
+          ..where((l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId)))
+        .getSingleOrNull();
+
+    if (existing != null) {
+      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id))).write(
+        CustomIbadahLogCompanion(done: Value(done), count: Value(count)),
+      );
+    } else {
+      await into(customIbadahLog).insert(
+        CustomIbadahLogCompanion(
+          ibadahId: Value(ibadahId),
+          recordId: Value(drId),
+          date: Value(date),
+          done: Value(done),
+          count: Value(count),
+        ),
+      );
+    }
+    await DailyRecordDao(db).recalcPoints(drId);
   }
 }

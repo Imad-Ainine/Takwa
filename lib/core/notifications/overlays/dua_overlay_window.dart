@@ -1,0 +1,33 @@
+// ═══════════════════════════════════════════════════════════════
+//  lib/core/notifications/overlays/dua_overlay_window.dart
+//  تقوى — DuaOverlayNotification helper (لا entry point هنا)
+//  ملاحظة: overlayMain موجود في adhkar_overlay_window.dart فقط
+// ═══════════════════════════════════════════════════════════════
+
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+
+/// Helper لإظهار/إخفاء overlay الأدعية
+/// (يستخدم نفس UnifiedOverlayWindow كـ entry point)
+class DuaOverlayNotification {
+  static Future<bool?> isShowing() => FlutterOverlayWindow.isActive();
+
+  /// يُظهر الـ Overlay من يمين الشاشة في المنتصف العمودي.
+  static Future<void> show() async {
+    final isActive = await FlutterOverlayWindow.isActive();
+    if (isActive) await FlutterOverlayWindow.closeOverlay();
+
+    await FlutterOverlayWindow.showOverlay(
+      enableDrag: true,
+      overlayTitle: 'أدعية تقوى',
+      overlayContent: 'دعاء اليوم',
+      flag: OverlayFlag.defaultFlag,
+      alignment: OverlayAlignment.center,
+      visibility: NotificationVisibility.visibilityPublic,
+      positionGravity: PositionGravity.none,
+      height: 420,
+      width: 320,
+    );
+  }
+
+  static Future<void> dismiss() => FlutterOverlayWindow.closeOverlay();
+}

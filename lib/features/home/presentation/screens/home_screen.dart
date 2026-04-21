@@ -191,11 +191,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                       if (prayerState.next != null) const SizedBox(height: 14),
 
-                      // ③ Prayer Times Row
+                      // ③ Prayer Times Mosque Section
                       if (prayerState.prayers.isNotEmpty)
                         _anim(
                           2,
-                          _PrayerTimesRowMerged(
+                          _MosquePrayerSection(
                             style: style,
                             prayers: prayerState.prayers,
                             currentKey: prayerState.next?.name ?? '',
@@ -626,13 +626,13 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
 }
 
 // ─────────────────────────────────────────
-//  PRAYER TIMES ROW
+//  MOSQUE PRAYER SECTION (REDESIGNED)
 // ─────────────────────────────────────────
-class _PrayerTimesRowMerged extends StatelessWidget {
-  final dynamic prayers;
+class _MosquePrayerSection extends StatelessWidget {
+  final List<dynamic> prayers;
   final String currentKey;
   final AdaptiveStyle style;
-  const _PrayerTimesRowMerged({
+  const _MosquePrayerSection({
     required this.prayers,
     required this.currentKey,
     required this.style,
@@ -643,33 +643,96 @@ class _PrayerTimesRowMerged extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text('أوقات الصلاة', style: style.amiri(15)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(height: 1, color: style.border.withOpacity(0.3)),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(right: 8, bottom: 8),
+          child: Row(
+            children: [
+              Text(
+                'أوقات الصلاة مدمجة',
+                style: style.amiri(15, color: style.gold),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(height: 1, color: style.gold.withOpacity(0.2)),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 84,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            physics: const BouncingScrollPhysics(),
-            itemCount: prayers.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (_, i) {
-              final prayer = prayers[i];
-              final isActive = prayer.name == currentKey;
-              return _PrayerChipMerged(
-                prayer: prayer,
-                isActive: isActive,
-                style: style,
-              );
-            },
+        ClipPath(
+          clipper: MosqueClipper(),
+          child: Container(
+            height: 180,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: style.gold.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                // Background Image
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/SL-020520-27660-18.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // Overlay Gradient
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          style.bg.withOpacity(0.4),
+                          style.bg.withOpacity(0.85),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Pattern Overlay
+                const Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.1,
+                    child: CustomPatternBackground(
+                      pattern: BackgroundPattern.duas,
+                    ),
+                  ),
+                ),
+                // Content
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      height: 110,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        reverse: true,
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: prayers.length,
+                        separatorBuilder: (_, i) => const SizedBox(width: 10),
+                        itemBuilder: (_, i) {
+                          final prayer = prayers[i];
+                          final isActive = prayer.name == currentKey;
+                          return _MihrabPrayerChip(
+                            prayer: prayer,
+                            isActive: isActive,
+                            style: style,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -677,11 +740,11 @@ class _PrayerTimesRowMerged extends StatelessWidget {
   }
 }
 
-class _PrayerChipMerged extends StatelessWidget {
+class _MihrabPrayerChip extends StatelessWidget {
   final dynamic prayer;
   final bool isActive;
   final AdaptiveStyle style;
-  const _PrayerChipMerged({
+  const _MihrabPrayerChip({
     required this.prayer,
     required this.isActive,
     required this.style,
@@ -734,57 +797,107 @@ class _PrayerChipMerged extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/prayer'),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        width: 66,
+        duration: const Duration(milliseconds: 350),
+        width: 70,
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          gradient: isActive
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    style.gold.withOpacity(0.15),
-                    style.teal.withOpacity(0.08),
-                  ],
-                )
-              : null,
-          color: isActive ? null : style.card,
-          borderRadius: BorderRadius.circular(14),
+          color: isActive
+              ? style.gold.withOpacity(0.15)
+              : style.card.withOpacity(0.4),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(35),
+            topRight: Radius.circular(35),
+            bottomLeft: Radius.circular(12),
+            bottomRight: Radius.circular(12),
+          ),
           border: Border.all(
-            color: isActive ? style.gold.withOpacity(0.4) : style.border,
+            color: isActive
+                ? style.gold.withOpacity(0.6)
+                : style.border.withOpacity(0.3),
             width: isActive ? 1.5 : 1,
           ),
           boxShadow: isActive
-              ? [BoxShadow(color: style.gold.withOpacity(0.1), blurRadius: 8)]
+              ? [
+                  BoxShadow(
+                    color: style.gold.withOpacity(0.2),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ]
               : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
+            AnimatedScale(
+              scale: isActive ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: Text(emoji, style: const TextStyle(fontSize: 22)),
+            ),
+            const Spacer(),
             Text(
               name,
               style: style.naskh(
-                10,
+                11,
                 color: isActive ? style.gold : style.textSec,
-                weight: isActive ? FontWeight.w600 : FontWeight.w400,
+                weight: isActive ? FontWeight.bold : FontWeight.w500,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               timeStr,
-              style: style.naskh(
-                10,
+              style: style.amiri(
+                13,
                 color: isActive
                     ? style.goldLight
-                    : style.textSec.withOpacity(0.7),
+                    : style.textSec.withOpacity(0.8),
               ),
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
     );
   }
+}
+
+class MosqueClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
+
+    path.moveTo(0, h); // Start bottom left
+    path.lineTo(0, h * 0.4); // Left wall
+
+    // Left shoulder
+    path.quadraticBezierTo(w * 0.05, h * 0.35, w * 0.15, h * 0.35);
+
+    // Left Minaret/Curve
+    path.lineTo(w * 0.25, h * 0.35);
+    path.quadraticBezierTo(w * 0.3, h * 0.15, w * 0.35, h * 0.15);
+
+    // Main Dome
+    path.lineTo(w * 0.4, h * 0.15);
+    path.quadraticBezierTo(w * 0.5, 0, w * 0.6, h * 0.15);
+    path.lineTo(w * 0.65, h * 0.15);
+
+    // Right Minaret/Curve
+    path.quadraticBezierTo(w * 0.7, h * 0.15, w * 0.75, h * 0.35);
+    path.lineTo(w * 0.85, h * 0.35);
+
+    // Right shoulder
+    path.quadraticBezierTo(w * 0.95, h * 0.35, w, h * 0.4);
+
+    path.lineTo(w, h); // Right wall
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
 // ─────────────────────────────────────────

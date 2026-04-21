@@ -22,6 +22,7 @@ import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.da
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
 import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
+import 'package:takwa/features/checklist/screens/manage_custom_ibadah_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -50,6 +51,7 @@ class Routes {
   static const String favoriteDuas = '/favorite-duas';
   static const String mosques = '/mosques';
   static const String misbaha = '/misbaha';
+  static const String manageCustomIbadah = '/manage-custom-ibadah';
 }
 
 /// Centralized route generation and management.
@@ -121,6 +123,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MosquesScreen());
       case Routes.misbaha:
         return MaterialPageRoute(builder: (_) => const MisbahaScreen());
+      case Routes.manageCustomIbadah:
+        return MaterialPageRoute(builder: (_) => const ManageCustomIbadahScreen());
       default:
         return MaterialPageRoute(
           builder: (_) =>

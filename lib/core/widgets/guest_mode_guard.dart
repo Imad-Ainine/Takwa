@@ -21,10 +21,7 @@ class GuestModeGuard extends ConsumerWidget {
     return Stack(
       children: [
         // The actual screen content blur/darkened
-        Opacity(
-          opacity: 0.3,
-          child: AbsorbPointer(child: child),
-        ),
+        Opacity(opacity: 0.3, child: AbsorbPointer(child: child)),
 
         // Restricted access overlay
         Center(
@@ -41,7 +38,7 @@ class GuestModeGuard extends ConsumerWidget {
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 20,
                     spreadRadius: 5,
-                  )
+                  ),
                 ],
               ),
               child: Column(
@@ -53,7 +50,11 @@ class GuestModeGuard extends ConsumerWidget {
                       shape: BoxShape.circle,
                       color: context.colors.gold.withOpacity(0.1),
                     ),
-                    child: Icon(Icons.lock_person_rounded, color: context.colors.gold, size: 40),
+                    child: Icon(
+                      Icons.lock_person_rounded,
+                      color: context.colors.gold,
+                      size: 40,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -64,7 +65,9 @@ class GuestModeGuard extends ConsumerWidget {
                   Text(
                     'هذه الميزة (المحاسبة والإحصائيات) تتطلب إنشاء حساب لحفظ بياناتك ومزامنتها سحابياً.',
                     textAlign: TextAlign.center,
-                    style: context.typography.bodyMedium.copyWith(color: context.colors.textSecondary),
+                    style: context.typography.bodyMedium.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   PrimaryButton(

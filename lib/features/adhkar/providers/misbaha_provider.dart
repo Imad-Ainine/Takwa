@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
@@ -120,30 +121,41 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
 
   void increment() {
     int newCount = state.count + 1;
+    
+    // Check if target is reached
     if (state.selectedDhikr != null && newCount >= state.selectedDhikr!.count) {
-      state = state.copyWith(count: 0);
+      state = state.copyWith(count: state.selectedDhikr!.count);
+      // Heavy vibration on completion
+      HapticFeedback.heavyImpact();
+      Future.delayed(const Duration(milliseconds: 300), () => HapticFeedback.heavyImpact());
     } else {
       state = state.copyWith(count: newCount);
+      // Light feedback on increment
+      HapticFeedback.lightImpact();
     }
   }
 
   void reset() {
+    HapticFeedback.mediumImpact();
     state = state.copyWith(count: 0);
   }
 
-  Future<void> listen() async {
-    if (!state.isAvailable) {
-      await _initSpeech();
-      if (!state.isAvailable) return;
-    }
-
-    if (state.isListening) {
-      state = state.copyWith(isListening: false);
-      await _speech.stop();
+  Future<void> listen(bool start) async {
+    if (start) {
+      if (!state.isAvailable) {
+        await _initSpeech();
+        if (!state.isAvailable) return;
+      }
+      if (!state.isListening) {
+        state = state.copyWith(isListening: true);
+        _lastRecognizedWords = '';
+        await _startListening();
+      }
     } else {
-      state = state.copyWith(isListening: true);
-      _lastRecognizedWords = '';
-      await _startListening();
+      if (state.isListening) {
+        state = state.copyWith(isListening: false);
+        await _speech.stop();
+      }
     }
   }
 
@@ -152,22 +164,29 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
       _lastRecognizedWords = '';
       try {
         await _speech.listen(
-        onResult: (val) {
-          final currentWords = val.recognizedWords.trim();
-          if (currentWords.isNotEmpty && currentWords != _lastRecognizedWords) {
-            _lastRecognizedWords = currentWords;
-            
-            final now = DateTime.now();
-            if (now.difference(_lastIncrementTime).inMilliseconds > 600) {
-              _lastIncrementTime = now;
-              increment();
+          onResult: (val) {
+            final currentWords = val.recognizedWords.trim();
+            if (currentWords.isNotEmpty &&
+                currentWords.length > _lastRecognizedWords.length) {
+              
+              // Count words or increments? 
+              // Usually in Misbaha, every word or phrase like "Subhan Allah" counts as 1.
+              // We compare the length to see if new words were added.
+              final newChars = currentWords.substring(_lastRecognizedWords.length).trim();
+              if (newChars.isNotEmpty) {
+                _lastRecognizedWords = currentWords;
+                final now = DateTime.now();
+                if (now.difference(_lastIncrementTime).inMilliseconds > 400) {
+                  _lastIncrementTime = now;
+                  increment();
+                }
+              }
             }
-          }
-        },
-        localeId: 'ar',
-        cancelOnError: false,
-        partialResults: true,
-      );
+          },
+          localeId: 'ar',
+          cancelOnError: false,
+          partialResults: true,
+        );
       } catch (e) {
         state = state.copyWith(isListening: false);
       }

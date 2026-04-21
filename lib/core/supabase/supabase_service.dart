@@ -3,12 +3,39 @@
 //  تقوى — Supabase Unified Service
 // ═══════════════════════════════════════════════════════════════
 
+import 'dart:async';
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'supabase_config.dart';
 
 class SupabaseService {
   static SupabaseClient get _db => SupabaseConfig.client;
+
+  /// Helper لإجراء الطلبات مع إعادة المحاولة في حال فشل الشبكة
+  static Future<T> _safeRequest<T>(Future<T> Function() request) async {
+    int attempts = 0;
+    const maxAttempts = 3;
+
+    while (true) {
+      attempts++;
+      try {
+        return await request();
+      } on SocketException catch (e) {
+        if (attempts >= maxAttempts) rethrow;
+        print('Supabase Request failed (SocketException), retrying $attempts/$maxAttempts: $e');
+        await Future.delayed(const Duration(seconds: 1));
+      } on http.ClientException catch (e) {
+        if (attempts >= maxAttempts) rethrow;
+        print('Supabase Request failed (ClientException), retrying $attempts/$maxAttempts: $e');
+        await Future.delayed(const Duration(seconds: 1));
+      } catch (e) {
+        // الأخطاء الأخرى نمررها مباشرة (مثل أخطاء الـ SQL أو الصلاحيات)
+        rethrow;
+      }
+    }
+  }
 
   // ─────────────── AUTH ───────────────
   static Future<AuthResponse> signUp({
@@ -114,11 +141,11 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('daily_records').upsert({
-      ...record,
-      'user_id': uid,
-      'updated_at': DateTime.now().toIso8601String(),
-    }, onConflict: 'user_id,date');
+    await _safeRequest(() => _db.from('daily_records').upsert({
+          ...record,
+          'user_id': uid,
+          'updated_at': DateTime.now().toIso8601String(),
+        }, onConflict: 'user_id,date'));
   }
 
   static Future<List<Map<String, dynamic>>> getRecordsRange({
@@ -142,11 +169,11 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return null;
 
-    return await _db
+    return await _safeRequest(() => _db
         .from('user_settings')
         .select()
         .eq('user_id', uid)
-        .maybeSingle();
+        .maybeSingle());
   }
 
   static Future<void> updateSettings(Map<String, dynamic> settings) async {
@@ -180,7 +207,9 @@ class SupabaseService {
       }
     }
 
-    await _db.from('user_settings').upsert(payload, onConflict: 'user_id');
+    await _safeRequest(
+      () => _db.from('user_settings').upsert(payload, onConflict: 'user_id'),
+    );
   }
 
   static Future<void> updateUserStats({
@@ -209,10 +238,10 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('prohibitions_log').upsert({
-      ...log,
-      'user_id': uid,
-    }, onConflict: 'record_id,category');
+    await _safeRequest(() => _db.from('prohibitions_log').upsert({
+          ...log,
+          'user_id': uid,
+        }, onConflict: 'record_id,category'));
   }
 
   static Future<List<Map<String, dynamic>>> getProhibitionLogs({
@@ -236,7 +265,9 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('custom_ibadah').upsert({...ibadah, 'user_id': uid});
+    await _safeRequest(
+      () => _db.from('custom_ibadah').upsert({...ibadah, 'user_id': uid}),
+    );
   }
 
   static Future<List<Map<String, dynamic>>> getCustomIbadah() async {
@@ -248,10 +279,21 @@ class SupabaseService {
   }
 
   static Future<void> upsertCustomIbadahLog(Map<String, dynamic> log) async {
+    final uid = SupabaseConfig.userId; 
+    if (uid == null) return;
+
+    await _safeRequest(
+      () => _db.from('custom_ibadah_log').upsert({...log, 'user_id': uid}),
+    );
+  }
+
+  static Future<void> deleteCustomIbadah(int id) async {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _db.from('custom_ibadah_log').upsert({...log, 'user_id': uid});
+    await _safeRequest(
+      () => _db.from('custom_ibadah').delete().eq('id', id).eq('user_id', uid),
+    );
   }
 
   static Future<List<Map<String, dynamic>>> getCustomIbadahLogs({

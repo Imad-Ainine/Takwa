@@ -898,7 +898,6 @@ class IslamicPattern18 extends IslamicBasePainter {
 
 // Shared Helpers
 
-
 // P01 · 12-fold Star — Moroccan/Andalusian hex grid
 class IslamicP01Painter extends IslamicBasePainter {
   IslamicP01Painter({

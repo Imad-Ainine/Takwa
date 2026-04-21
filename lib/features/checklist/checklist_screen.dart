@@ -17,6 +17,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  CHECKLIST SCREEN
@@ -35,7 +36,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
   late final List<Animation<Offset>> _slideAnims;
 
   final _quranCtrl = TextEditingController();
-  static const _groupCount = 4;
+  static const _groupCount = 5;
 
   @override
   void initState() {
@@ -179,7 +180,11 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
               _anim(3, _ProhibitionsGroup(record: record)),
               const SizedBox(height: 12),
 
-              // ⑤ ملاحظة اليوم
+              // ⑤ عاداتي وإضافاتي (Custom Ibadaat)
+              _anim(4, CustomIbadahGroup(record: record)),
+              const SizedBox(height: 12),
+
+              // ⑥ ملاحظة اليوم
               _DayNoteField(record: record),
               const SizedBox(height: 100),
             ]),

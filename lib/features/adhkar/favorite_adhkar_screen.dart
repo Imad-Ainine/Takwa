@@ -30,8 +30,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
         body: Stack(
           children: [
             const Positioned.fill(
-              child:
-                  CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Column(
               children: [
@@ -50,8 +49,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                             decoration: BoxDecoration(
                               color: context.colors.card,
                               borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: context.colors.border),
+                              border: Border.all(color: context.colors.border),
                             ),
                             child: Center(
                               child: Icon(
@@ -71,9 +69,9 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                                 'أذكاري المفضلة',
                                 style: context.typography.headingMedium
                                     .copyWith(
-                                  fontSize: 20,
-                                  color: context.colors.gold,
-                                ),
+                                      fontSize: 20,
+                                      color: context.colors.gold,
+                                    ),
                               ),
                               Text(
                                 '${favDhikr.length} ذكر محفوظ',
@@ -84,10 +82,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const Text(
-                          '❤️',
-                          style: TextStyle(fontSize: 22),
-                        ),
+                        const Text('❤️', style: TextStyle(fontSize: 22)),
                       ],
                     ),
                   ),
@@ -139,8 +134,9 @@ class _EmptyFavs extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'اضغط على ❤️ في أي ذكر لحفظه هنا',
-            style: context.typography.caption
-                .copyWith(color: colors.textSecondary),
+            style: context.typography.caption.copyWith(
+              color: colors.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -236,7 +232,9 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                   // count badge
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -280,7 +278,8 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(
-                          ClipboardData(text: widget.item.arabic));
+                        ClipboardData(text: widget.item.arabic),
+                      );
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -330,8 +329,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       Container(
                         height: 1,
                         color: context.colors.border,
-                        margin:
-                            const EdgeInsets.symmetric(horizontal: 8),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -354,23 +352,19 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                           color: context.colors.gold.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color:
-                                context.colors.gold.withOpacity(0.15),
+                            color: context.colors.gold.withOpacity(0.15),
                           ),
                         ),
                         child: Row(
                           children: [
-                            const Text(
-                              '✨',
-                              style: TextStyle(fontSize: 12),
-                            ),
+                            const Text('✨', style: TextStyle(fontSize: 12)),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 widget.item.fadl!,
-                                style: context.typography.caption
-                                    .copyWith(
-                                        color: context.colors.gold),
+                                style: context.typography.caption.copyWith(
+                                  color: context.colors.gold,
+                                ),
                               ),
                             ),
                           ],

@@ -138,9 +138,10 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
     final d = widget.item;
 
     return ScaleTransition(
-      scale: Tween<double>(begin: 1, end: 0.97).animate(
-        CurvedAnimation(parent: _tapCtrl, curve: Curves.easeOut),
-      ),
+      scale: Tween<double>(
+        begin: 1,
+        end: 0.97,
+      ).animate(CurvedAnimation(parent: _tapCtrl, curve: Curves.easeOut)),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
@@ -197,9 +198,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(18),
                 ),
-                border: Border(
-                  top: BorderSide(color: context.colors.border),
-                ),
+                border: Border(top: BorderSide(color: context.colors.border)),
               ),
               child: Row(
                 children: [
@@ -266,8 +265,10 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          title:
-                              const Text('حذف الذكر؟', textAlign: TextAlign.right),
+                          title: const Text(
+                            'حذف الذكر؟',
+                            textAlign: TextAlign.right,
+                          ),
                           content: const Text(
                             'هل تريد حذف هذا الذكر نهائياً؟',
                             textAlign: TextAlign.right,
@@ -323,18 +324,16 @@ class _ShareToCommunitySheetState
   Future<void> _share() async {
     setState(() => _loading = true);
     try {
-      await ref
-          .read(userAdhkarProvider.notifier)
-          .shareAdhkar(widget.item);
+      await ref.read(userAdhkarProvider.notifier).shareAdhkar(widget.item);
       if (mounted) setState(() => _done = true);
       await Future.delayed(const Duration(milliseconds: 1200));
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
       }
     }
   }
@@ -411,9 +410,7 @@ class _ShareToCommunitySheetState
             decoration: BoxDecoration(
               color: context.colors.gold.withOpacity(0.06),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: context.colors.gold.withOpacity(0.2),
-              ),
+              border: Border.all(color: context.colors.gold.withOpacity(0.2)),
             ),
             child: Column(
               children: [
@@ -551,8 +548,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
         }
 
         return RefreshIndicator(
-          onRefresh: () =>
-              ref.read(communityAdhkarProvider.notifier).refresh(),
+          onRefresh: () => ref.read(communityAdhkarProvider.notifier).refresh(),
           color: context.colors.gold,
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
@@ -565,8 +561,11 @@ class CommunityAdhkarTabView extends ConsumerWidget {
                 opacity: Tween<double>(begin: 0, end: 1).animate(
                   CurvedAnimation(
                     parent: entryCtrl,
-                    curve: Interval(delay, (delay + 0.4).clamp(0, 1),
-                        curve: Curves.easeOut),
+                    curve: Interval(
+                      delay,
+                      (delay + 0.4).clamp(0, 1),
+                      curve: Curves.easeOut,
+                    ),
                   ),
                 ),
                 child: _CommunityAdhkarCard(item: c),
@@ -591,7 +590,8 @@ class CommunityAdhkarTabView extends ConsumerWidget {
             SizedBox(
               width: 200,
               child: PrimaryButton(
-                onTap: () async => ref.read(communityAdhkarProvider.notifier).refresh(),
+                onTap: () async =>
+                    ref.read(communityAdhkarProvider.notifier).refresh(),
                 label: 'إعادة المحاولة',
               ),
             ),
@@ -661,8 +661,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
 
           // ── Footer ──
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: context.colors.teal.withOpacity(0.04),
               borderRadius: const BorderRadius.vertical(
@@ -938,8 +937,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                 setState(() => _shareWithCommunity = !_shareWithCommunity),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: _shareWithCommunity
                     ? context.colors.teal.withOpacity(0.08)
@@ -979,8 +977,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                   ),
                   Switch(
                     value: _shareWithCommunity,
-                    onChanged: (v) =>
-                        setState(() => _shareWithCommunity = v),
+                    onChanged: (v) => setState(() => _shareWithCommunity = v),
                     activeColor: context.colors.teal,
                     activeTrackColor: context.colors.teal.withOpacity(0.3),
                     inactiveTrackColor: context.colors.border,
@@ -994,7 +991,9 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
 
           PrimaryButton(
             onTap: _isLoading ? null : () async => _save(),
-            label: _shareWithCommunity ? 'إضافة ومشاركة مع المجتمع' : 'إضافة الذكر',
+            label: _shareWithCommunity
+                ? 'إضافة ومشاركة مع المجتمع'
+                : 'إضافة الذكر',
             isLoading: _isLoading,
           ),
         ],

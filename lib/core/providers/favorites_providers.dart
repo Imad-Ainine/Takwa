@@ -49,7 +49,9 @@ class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
   }
 
   Future<void> syncFromRemote(List<dynamic> remoteList) async {
-    final mapped = remoteList.map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0).toSet();
+    final mapped = remoteList
+        .map((e) => e is int ? e : int.tryParse(e.toString()) ?? 0)
+        .toSet();
     if (mapped.isNotEmpty) {
       state = {...state, ...mapped};
       await _save(syncToRemote: false);
@@ -57,10 +59,12 @@ class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
   }
 }
 
-final favoriteDuasProvider = StateNotifierProvider<FavoriteItemsNotifier, Set<int>>((ref) {
-  return FavoriteItemsNotifier('favorite_duas', ref);
-});
+final favoriteDuasProvider =
+    StateNotifierProvider<FavoriteItemsNotifier, Set<int>>((ref) {
+      return FavoriteItemsNotifier('favorite_duas', ref);
+    });
 
-final favoriteAdhkarProvider = StateNotifierProvider<FavoriteItemsNotifier, Set<int>>((ref) {
-  return FavoriteItemsNotifier('favorite_adhkar', ref);
-});
+final favoriteAdhkarProvider =
+    StateNotifierProvider<FavoriteItemsNotifier, Set<int>>((ref) {
+      return FavoriteItemsNotifier('favorite_adhkar', ref);
+    });

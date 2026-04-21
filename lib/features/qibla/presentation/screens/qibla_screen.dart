@@ -97,8 +97,6 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
                   // ── Top bar ──
                   _QiblaTopBar(style: style),
 
-
-
                   Expanded(
                     child: qiblaAsync.when(
                       loading: () => const _QiblaLoading(),

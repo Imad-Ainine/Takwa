@@ -46,11 +46,11 @@ class _AddReminderBottomSheetState
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: context.colors.gold,
-                  onPrimary: context.colors.background,
-                  surface: context.colors.card,
-                  onSurface: context.colors.textPrimary,
-                ),
+              primary: context.colors.gold,
+              onPrimary: context.colors.background,
+              surface: context.colors.card,
+              onSurface: context.colors.textPrimary,
+            ),
           ),
           child: child!,
         );
@@ -63,7 +63,7 @@ class _AddReminderBottomSheetState
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     final title = _titleController.text.trim();
     // Store time as padded 24h "HH:mm"
     final hour = _selectedTime.hour.toString().padLeft(2, '0');
@@ -71,17 +71,15 @@ class _AddReminderBottomSheetState
     final timeStr = '$hour:$minute';
 
     try {
-      await ref.read(remindersDaoProvider).addReminder(
-            title: title,
-            iconName: _selectedIconKey,
-            time: timeStr,
-          );
+      await ref
+          .read(remindersDaoProvider)
+          .addReminder(title: title, iconName: _selectedIconKey, time: timeStr);
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ أثناء الحفظ: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء الحفظ: $e')));
       }
     }
   }
@@ -95,9 +93,7 @@ class _AddReminderBottomSheetState
       decoration: BoxDecoration(
         color: context.colors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-          top: BorderSide(color: context.colors.border),
-        ),
+        border: Border(top: BorderSide(color: context.colors.border)),
       ),
       child: SingleChildScrollView(
         child: Form(
@@ -223,8 +219,7 @@ class _AddReminderBottomSheetState
                   children: kReminderIcons.entries.map((entry) {
                     final isSelected = _selectedIconKey == entry.key;
                     return GestureDetector(
-                      onTap: () =>
-                          setState(() => _selectedIconKey = entry.key),
+                      onTap: () => setState(() => _selectedIconKey = entry.key),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: 52,
@@ -275,10 +270,7 @@ class _AddReminderBottomSheetState
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: PrimaryButton(
-                        label: 'إضافة',
-                        onTap: _save,
-                      ),
+                      child: PrimaryButton(label: 'إضافة', onTap: _save),
                     ),
                   ],
                 ),

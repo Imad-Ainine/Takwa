@@ -1719,14 +1719,12 @@ class _OverlayIllustration extends CustomPainter {
       ),
       textDirection: TextDirection.rtl,
     )..layout();
-    tp.paint(
-      canvas,
-      Offset(cx - tp.width / 2, floatY - tp.height / 2),
-    );
+    tp.paint(canvas, Offset(cx - tp.width / 2, floatY - tp.height / 2));
   }
 
   @override
-  bool shouldRepaint(covariant _OverlayIllustration o) => o.progress != progress;
+  bool shouldRepaint(covariant _OverlayIllustration o) =>
+      o.progress != progress;
 }
 
 // ── STEP: Background ──

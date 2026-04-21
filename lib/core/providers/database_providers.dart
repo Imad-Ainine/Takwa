@@ -27,6 +27,10 @@ final settingsDaoProvider = Provider<SettingsDao>((ref) {
   return SettingsDao(ref.watch(appDatabaseProvider));
 });
 
+final customIbadahDaoProvider = Provider<CustomIbadahDao>((ref) {
+  return CustomIbadahDao(ref.watch(appDatabaseProvider));
+});
+
 // ── سجل اليوم (Stream) ──
 final todayRecordProvider = StreamProvider<DailyRecord?>((ref) {
   return ref.watch(dailyRecordDaoProvider).watchTodayRecord();

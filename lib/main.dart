@@ -101,7 +101,22 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
         );
       } else if (action == 'refresh_location') {
         LocationPrayerManager.refreshLocation(ref);
+      } else if (action == 'location_updated') {
+        _syncLocationFromBackground(data);
       }
+    }
+  }
+
+  Future<void> _syncLocationFromBackground(Map data) async {
+    final lat = data['latitude']?.toString();
+    final lng = data['longitude']?.toString();
+    final cityName = data['cityName']?.toString();
+
+    if (lat != null && lng != null) {
+      final settings = ref.read(settingsDaoProvider);
+      await settings.set('latitude', lat);
+      await settings.set('longitude', lng);
+      if (cityName != null) await settings.set('cityName', cityName);
     }
   }
 

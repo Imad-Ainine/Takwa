@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:takwa/core/utils/timezone_resolver.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/database_providers.dart';
@@ -149,7 +150,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
           message,
           style: GoogleFonts.notoNaskhArabic(fontSize: 13),
         ),
-        backgroundColor: isSuccess ? context.colors.success : context.colors.danger,
+        backgroundColor: isSuccess
+            ? context.colors.success
+            : context.colors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),

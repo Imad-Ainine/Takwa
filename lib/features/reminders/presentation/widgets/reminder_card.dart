@@ -43,9 +43,7 @@ class ReminderCard extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                gradient: isEnabled
-                    ? context.colors.tealGoldGradient
-                    : null,
+                gradient: isEnabled ? context.colors.tealGoldGradient : null,
                 color: isEnabled ? null : context.colors.card2,
                 borderRadius: BorderRadius.circular(16),
               ),
