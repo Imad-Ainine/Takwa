@@ -11,6 +11,7 @@ import 'package:takwa/features/asma/data/asma_data.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/providers/database_providers.dart';
+import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 
@@ -129,6 +130,8 @@ class _AsmaTopBar extends StatelessWidget {
           children: [
             Row(
               children: [
+                const CustomLeadingButton(),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,25 +145,6 @@ class _AsmaTopBar extends StatelessWidget {
                         style: s.naskh(11, color: s.textSec),
                       ),
                     ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: s.goldDim,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: s.gold.withOpacity(0.3)),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: s.gold,
-                        size: 18,
-                      ),
-                    ),
                   ),
                 ),
               ],

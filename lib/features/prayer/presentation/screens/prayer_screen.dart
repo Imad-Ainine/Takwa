@@ -12,9 +12,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -236,11 +239,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     with TickerProviderStateMixin {
   late final AnimationController _skyCtrl; // تغيير لون السماء
   late final AnimationController _pulseCtrl; // نبض الدائرة
-  late final AnimationController _starsCtrl; // النجوم ليلاً
   late final AnimationController _entryCtrl; // دخول العناصر
 
   late Animation<double> _pulse;
-  late Animation<double> _stars;
 
   String _lastPrayerKey = '';
 
@@ -262,12 +263,6 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
-    _starsCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-    _stars = CurvedAnimation(parent: _starsCtrl, curve: Curves.easeInOut);
-
     _entryCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -278,7 +273,6 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
   void dispose() {
     _skyCtrl.dispose();
     _pulseCtrl.dispose();
-    _starsCtrl.dispose();
     _entryCtrl.dispose();
     super.dispose();
   }
@@ -295,6 +289,10 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
   Widget build(BuildContext context) {
     final state = ref.watch(prayerScreenProvider);
 
+    final style = AdaptiveStyle(
+      context,
+      ref.watch(ramadanModeProvider).value ?? false,
+    );
     final prayerKey = state.next?.name ?? 'isha';
     final visual = _kPrayerVisuals[prayerKey]!;
     _animateSkyIfNeeded(prayerKey);
@@ -304,22 +302,43 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
         statusBarColor: Colors.transparent,
       ),
       child: Scaffold(
-        backgroundColor: context.colors.night,
+        backgroundColor: style.bg,
         body: Stack(
           children: [
-            // ── خلفية السماء الديناميكية ──
+            // ── Premium Background System ──
             Positioned.fill(
-              child: _SkyBackground(
-                visual: visual,
-                skyCtrl: _skyCtrl,
-                starsAnim: _stars,
+              child: Image.asset(
+                'assets/images/SL-020520-27660-18.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      style.bg.withOpacity(0.3),
+                      style.bg.withOpacity(0.95),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const Positioned.fill(
+              child: Opacity(
+                opacity: 0.08,
+                child: CustomPatternBackground(
+                  pattern: BackgroundPattern.adhkar,
+                ),
               ),
             ),
 
-            // ── جسيمات عائمة ──
+            // ── Floating Particles ──
             Positioned.fill(child: _FloatingParticles(visual: visual)),
 
-            // ── المحتوى ──
+            // ── Content ──
             state.loading
                 ? const _LoadingOverlay()
                 : state.error != null
@@ -327,7 +346,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                     onRetry: () =>
                         ref.read(prayerScreenProvider.notifier).refresh(),
                   )
-                : _buildContent(context, state, visual),
+                : _buildContent(context, state, visual, style),
           ],
         ),
       ),
@@ -338,15 +357,17 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     BuildContext context,
     PrayerScreenState state,
     _PrayerVisual visual,
+    AdaptiveStyle style,
   ) {
     return SafeArea(
       child: Column(
         children: [
-          // ── شريط علوي ──
-          _TopBar(
+          // ── Prayer Header (Combined Mosque & Top Bar) ──
+          _PrayerHeader(
             cityName: state.cityName,
             onRefresh: () => ref.read(prayerScreenProvider.notifier).refresh(),
             entryCtrl: _entryCtrl,
+            style: style,
           ),
 
           Expanded(
@@ -362,15 +383,17 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                     visual: visual,
                     pulseAnim: _pulse,
                     entryCtrl: _entryCtrl,
+                    style: style,
                   ),
                   const SizedBox(height: 20),
 
-                  // ── جدول الصلوات اليومي ──
+                  // ── جدول الصلوات اليومي (Mihrab Chips) ──
                   _DailyPrayersTable(
                     prayers: state.prayers,
                     currentKey: state.next?.name ?? '',
                     iqamaOffsets: _kIqamaOffsets,
                     entryCtrl: _entryCtrl,
+                    style: style,
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -386,237 +409,36 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
 // ═══════════════════════════════════════════════════════════════
 //  SKY BACKGROUND
 // ═══════════════════════════════════════════════════════════════
-class _SkyBackground extends StatelessWidget {
-  final _PrayerVisual visual;
-  final AnimationController skyCtrl;
-  final Animation<double> starsAnim;
-
-  const _SkyBackground({
-    required this.visual,
-    required this.skyCtrl,
-    required this.starsAnim,
-  });
-
+class MosqueClipper extends CustomClipper<Path> {
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: skyCtrl,
-      builder: (_, _) => CustomPaint(
-        painter: _SkyPainter(
-          primary: visual.primaryColor,
-          secondary: visual.secondaryColor,
-          phase: visual.skyPhase,
-          t: skyCtrl.value,
-          starsT: starsAnim.value,
-        ),
-      ),
-    );
-  }
-}
+  Path getClip(Size size) {
+    final path = Path();
+    final w = size.width;
+    final h = size.height;
 
-class _SkyPainter extends CustomPainter {
-  final Color primary, secondary;
-  final String phase;
-  final double t, starsT;
+    path.moveTo(0, h);
+    path.lineTo(0, h * 0.4);
 
-  _SkyPainter({
-    required this.primary,
-    required this.secondary,
-    required this.phase,
-    required this.t,
-    required this.starsT,
-  });
+    path.quadraticBezierTo(w * 0.05, h * 0.35, w * 0.15, h * 0.35);
+    path.lineTo(w * 0.25, h * 0.35);
+    path.quadraticBezierTo(w * 0.3, h * 0.15, w * 0.35, h * 0.15);
 
-  static final _rng = math.Random(42);
-  static List<Offset>? _starPositions;
+    path.lineTo(w * 0.4, h * 0.15);
+    path.quadraticBezierTo(w * 0.5, 0, w * 0.6, h * 0.15);
+    path.lineTo(w * 0.65, h * 0.15);
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    // ── Gradient sky ──
-    final bgPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: _skyColors(),
-        stops: const [0.0, 0.4, 0.7, 1.0],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
+    path.quadraticBezierTo(w * 0.7, h * 0.15, w * 0.75, h * 0.35);
+    path.lineTo(w * 0.85, h * 0.35);
 
-    // ── نجوم (ليل/فجر) ──
-    if (phase == 'night' || phase == 'dawn') {
-      _drawStars(canvas, size);
-    }
+    path.quadraticBezierTo(w * 0.95, h * 0.35, w, h * 0.4);
 
-    // ── هلال (ليل) ──
-    if (phase == 'night') {
-      _drawCrescent(canvas, size);
-    }
-
-    // ── شمس (ظهر) ──
-    if (phase == 'noon') {
-      _drawSun(canvas, size);
-    }
-
-    // ── طبقة الغلاف الجوي السفلية ──
-    _drawHorizonGlow(canvas, size);
-
-    // ── نمط هندسي إسلامي شفاف ──
-    _drawGeometricPattern(canvas, size);
-  }
-
-  List<Color> _skyColors() {
-    switch (phase) {
-      case 'dawn':
-        return [
-          const Color(0xFF1A1A2E),
-          const Color(0xFF2D3561),
-          const Color(0xFF6B3FA0).withOpacity(0.7),
-          const Color(0xFFE8945A).withOpacity(0.5),
-        ];
-      case 'noon':
-        return [
-          const Color(0xFF0A3D62),
-          const Color(0xFF1565C0),
-          const Color(0xFF1E88E5),
-          const Color(0xFF42A5F5),
-        ];
-      case 'afternoon':
-        return [
-          const Color(0xFF0D3349),
-          const Color(0xFF1A5276),
-          const Color(0xFFE8945A).withOpacity(0.6),
-          const Color(0xFFFFB74D).withOpacity(0.4),
-        ];
-      case 'sunset':
-        return [
-          const Color(0xFF1A0033),
-          const Color(0xFF7B1FA2),
-          const Color(0xFFE64A19),
-          const Color(0xFFFF8F00),
-        ];
-      case 'night':
-        return [
-          const Color(0xFF020408),
-          const Color(0xFF0A0F1A),
-          const Color(0xFF0D1117),
-          const Color(0xFF111827),
-        ];
-      default:
-        return [
-          const Color(0xFF0D1117),
-          const Color(0xFF111827),
-          const Color(0xFF1A2332),
-          const Color(0xFF1E2D40),
-        ];
-    }
-  }
-
-  void _drawStars(Canvas canvas, Size size) {
-    _starPositions ??= List.generate(
-      80,
-      (_) => Offset(
-        _rng.nextDouble() * size.width,
-        _rng.nextDouble() * size.height * 0.65,
-      ),
-    );
-
-    final starPaint = Paint()..color = Colors.white;
-    for (int i = 0; i < _starPositions!.length; i++) {
-      final opacity =
-          0.3 + 0.7 * ((math.sin(starsT * math.pi * 2 + i * 0.3) + 1) / 2);
-      final radius = 0.5 + _rng.nextDouble() * 1.5;
-      starPaint.color = Colors.white.withOpacity(
-        opacity * (phase == 'dawn' ? 0.5 : 1.0),
-      );
-      canvas.drawCircle(_starPositions![i], radius, starPaint);
-    }
-  }
-
-  void _drawCrescent(Canvas canvas, Size size) {
-    final cx = size.width * 0.78, cy = size.height * 0.12;
-    const r = 22.0;
-    final moonPaint = Paint()
-      ..color = const Color(0xFFFFF9C4)
-      ..style = PaintingStyle.fill;
-
-    // Outer circle
-    canvas.drawCircle(Offset(cx, cy), r, moonPaint);
-    // Cut with darker circle to make crescent
-    final cutPaint = Paint()
-      ..color = _skyColors()[0]
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(Offset(cx + r * 0.5, cy - r * 0.1), r * 0.88, cutPaint);
-
-    // Glow
-    canvas.drawCircle(
-      Offset(cx, cy),
-      r + 6,
-      Paint()
-        ..color = const Color(0x22FFF9C4)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
-    );
-  }
-
-  void _drawSun(Canvas canvas, Size size) {
-    final cx = size.width * 0.5, cy = size.height * 0.08;
-    // Glow rings
-    for (int i = 3; i >= 0; i--) {
-      canvas.drawCircle(
-        Offset(cx, cy),
-        20.0 + i * 14,
-        Paint()
-          ..color = const Color(0xFFFFD700).withOpacity(0.04 + i * 0.02)
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
-      );
-    }
-    canvas.drawCircle(
-      Offset(cx, cy),
-      22,
-      Paint()..color = const Color(0xFFFFF176),
-    );
-    canvas.drawCircle(
-      Offset(cx, cy),
-      18,
-      Paint()..color = const Color(0xFFFFFFFF),
-    );
-  }
-
-  void _drawHorizonGlow(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..shader =
-          LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.transparent,
-              primary.withOpacity(0.3),
-              secondary.withOpacity(0.15),
-            ],
-          ).createShader(
-            Rect.fromLTWH(0, size.height * 0.5, size.width, size.height * 0.5),
-          );
-    canvas.drawRect(
-      Rect.fromLTWH(0, size.height * 0.5, size.width, size.height * 0.5),
-      paint,
-    );
-  }
-
-  void _drawGeometricPattern(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = Colors.white.withOpacity(0.03)
-      ..strokeWidth = 0.7
-      ..style = PaintingStyle.stroke;
-
-    const spacing = 44.0;
-    for (double x = -size.height; x < size.width + size.height; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), p);
-      canvas.drawLine(Offset(x, 0), Offset(x - size.height, size.height), p);
-    }
+    path.lineTo(w, h);
+    path.close();
+    return path;
   }
 
   @override
-  bool shouldRepaint(_SkyPainter old) =>
-      old.phase != phase || old.t != t || old.starsT != starsT;
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -725,106 +547,177 @@ class _ParticlePainter extends CustomPainter {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  TOP BAR
+//  PRAYER HEADER (Combined Mosque & Top Bar)
 // ═══════════════════════════════════════════════════════════════
-class _TopBar extends StatelessWidget {
+class _PrayerHeader extends StatelessWidget {
   final String cityName;
   final VoidCallback onRefresh;
   final AnimationController entryCtrl;
+  final AdaptiveStyle style;
 
-  const _TopBar({
+  const _PrayerHeader({
     required this.cityName,
     required this.onRefresh,
     required this.entryCtrl,
+    required this.style,
   });
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: CurvedAnimation(
-        parent: entryCtrl,
-        curve: const Interval(0, 0.5),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'أوقات الصلاة',
-                    style: GoogleFonts.amiri(
-                      fontSize: 22,
-                      color: context.colors.gold,
-                      fontWeight: FontWeight.w700,
-                      shadows: [
-                        Shadow(
-                          color: context.colors.gold.withOpacity(0.4),
-                          blurRadius: 12,
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(0, -0.2),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: entryCtrl, curve: Curves.easeOutCubic)),
+      child: FadeTransition(
+        opacity: entryCtrl,
+        child: ClipPath(
+          clipper: HeaderCurveClipper(),
+          child: Container(
+            height: 90, // Increased slightly from 60 to accommodate the curve
+            width: double.infinity,
+            color: style.bg,
+            child: Stack(
+              children: [
+                // ── Mosque Silhouette Background ──
+                Positioned.fill(
+                  child: ClipPath(
+                    clipper: MosqueClipper(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            style.gold.withOpacity(0.3),
+                            style.gold.withOpacity(0.05),
+                          ],
+                        ),
+                      ),
+                      child: const Opacity(
+                        opacity: 0.1,
+                        child: CustomPatternBackground(
+                          pattern: BackgroundPattern.duas,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // ── Top Bar Content (Positioned) ──
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Row(
+                      children: [
+                        const CustomLeadingButton(),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'أوقات الصلاة',
+                                style: style.amiri(26, color: style.gold),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on_rounded,
+                                    size: 12,
+                                    color: style.textDim,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    cityName,
+                                    style: style.naskh(
+                                      12,
+                                      color: style.textDim,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: onRefresh,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: style.card.withOpacity(0.8),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: style.border),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.refresh_rounded,
+                              size: 20,
+                              color: style.gold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_rounded,
-                        size: 12,
-                        color: context.colors.textSecondary,
-                      ),
-                      const SizedBox(width: 3),
-                      Text(
-                        cityName,
-                        style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 12,
-                          color: context.colors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: onRefresh,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
-                child: Icon(
-                  Icons.my_location_rounded,
-                  size: 18,
-                  color: context.colors.gold,
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  MAIN PRAYER CARD
-// ═══════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────
+//  HEADER CURVE CLIPPER
+// ─────────────────────────────────────────
+class HeaderCurveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 15);
+    final controlPoint = Offset(size.width / 2, size.height);
+    final endPoint = Offset(size.width, size.height - 15);
+    path.quadraticBezierTo(
+      controlPoint.dx,
+      controlPoint.dy,
+      endPoint.dx,
+      endPoint.dy,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
 class _MainPrayerCard extends StatelessWidget {
   final PrayerScreenState state;
   final _PrayerVisual visual;
   final Animation<double> pulseAnim;
   final AnimationController entryCtrl;
+  final AdaptiveStyle style;
 
   const _MainPrayerCard({
     required this.state,
     required this.visual,
     required this.pulseAnim,
     required this.entryCtrl,
+    required this.style,
   });
 
   @override
@@ -846,34 +739,55 @@ class _MainPrayerCard extends StatelessWidget {
             .animate(
               CurvedAnimation(
                 parent: entryCtrl,
-                curve: const Interval(0.1, 0.7, curve: Curves.easeOutCubic),
+                curve: const Interval(0.6, 1, curve: Curves.decelerate),
               ),
             ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              // ── اسم الصلاة + الأيقونة ──
-              _PrayerNameBadge(visual: visual, isIqama: isIqama),
-              const SizedBox(height: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: style.bg,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: style.border),
+              boxShadow: [
+                BoxShadow(
+                  color: style.bg.withOpacity(0.4),
+                  blurRadius: 40,
+                  offset: const Offset(0, 20),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // ── Prayer Name Badge ──
+                _PrayerNameBadge(
+                  visual: visual,
+                  isIqama: isIqama,
+                  style: style,
+                ),
+                const SizedBox(height: 32),
 
-              // ── الساعة الرئيسية (العداد) ──
-              _CountdownRing(
-                remaining: remaining,
-                visual: visual,
-                isIqama: isIqama,
-                pulseAnim: pulseAnim,
-              ),
-              const SizedBox(height: 24),
+                // ── Countdown Ring ──
+                _CountdownRing(
+                  remaining: remaining,
+                  visual: visual,
+                  isIqama: isIqama,
+                  pulseAnim: pulseAnim,
+                  style: style,
+                ),
+                const SizedBox(height: 32),
 
-              // ── صف وقت الأذان و الإقامة ──
-              _AdhanIqamaRow(
-                adhanTime: next.time,
-                iqamaTime: iqamaTime,
-                iqamaOffset: _kIqamaOffsets[next.name] ?? 15,
-                isIqamaPhase: isIqama,
-              ),
-            ],
+                // ── Adhan & Iqama Info ──
+                _AdhanIqamaRow(
+                  adhanTime: next.time,
+                  iqamaTime: iqamaTime,
+                  iqamaOffset: _kIqamaOffsets[next.name] ?? 15,
+                  isIqamaPhase: isIqama,
+                  style: style,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -885,64 +799,49 @@ class _MainPrayerCard extends StatelessWidget {
 class _PrayerNameBadge extends StatelessWidget {
   final _PrayerVisual visual;
   final bool isIqama;
+  final AdaptiveStyle style;
 
-  const _PrayerNameBadge({required this.visual, required this.isIqama});
+  const _PrayerNameBadge({
+    required this.visual,
+    required this.isIqama,
+    required this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // الأيقونة
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                visual.secondaryColor.withOpacity(0.3),
-                Colors.transparent,
+        ScaleTransition(
+          scale: const AlwaysStoppedAnimation(1.1),
+          child: Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: style.gold.withOpacity(0.1),
+              border: Border.all(color: style.gold.withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: style.gold.withOpacity(0.1),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
               ],
             ),
-            border: Border.all(
-              color: visual.secondaryColor.withOpacity(0.4),
-              width: 1.5,
+            child: Center(
+              child: Text(visual.emoji, style: const TextStyle(fontSize: 28)),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: visual.secondaryColor.withOpacity(0.2),
-                blurRadius: 20,
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(visual.emoji, style: const TextStyle(fontSize: 26)),
           ),
         ),
-        const SizedBox(height: 10),
-
-        // الاسم
+        const SizedBox(height: 16),
         Text(
           isIqama ? 'وقت الإقامة — ${visual.nameAr}' : 'صلاة ${visual.nameAr}',
-          style: GoogleFonts.amiri(
-            fontSize: 22,
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            shadows: [
-              Shadow(
-                color: visual.secondaryColor.withOpacity(0.6),
-                blurRadius: 16,
-              ),
-            ],
-          ),
+          style: style.amiri(28, color: Colors.white, weight: FontWeight.w700),
         ),
         const SizedBox(height: 4),
         Text(
           isIqama ? 'أقم الصلاة' : 'الصلاة القادمة',
-          style: GoogleFonts.notoNaskhArabic(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.55),
-          ),
+          style: style.naskh(13, color: Colors.white.withOpacity(0.6)),
         ),
       ],
     );
@@ -955,12 +854,14 @@ class _CountdownRing extends StatelessWidget {
   final _PrayerVisual visual;
   final bool isIqama;
   final Animation<double> pulseAnim;
+  final AdaptiveStyle style;
 
   const _CountdownRing({
     required this.remaining,
     required this.visual,
     required this.isIqama,
     required this.pulseAnim,
+    required this.style,
   });
 
   String get _timeStr {
@@ -1187,12 +1088,14 @@ class _AdhanIqamaRow extends StatelessWidget {
   final DateTime? iqamaTime;
   final int iqamaOffset;
   final bool isIqamaPhase;
+  final AdaptiveStyle style;
 
   const _AdhanIqamaRow({
     required this.adhanTime,
     required this.iqamaTime,
     required this.iqamaOffset,
     required this.isIqamaPhase,
+    required this.style,
   });
 
   String _fmt(DateTime dt) {
@@ -1211,8 +1114,9 @@ class _AdhanIqamaRow extends StatelessWidget {
             label: 'وقت الأذان',
             time: _fmt(adhanTime),
             icon: '📢',
-            color: context.colors.gold,
+            color: style.gold,
             isActive: !isIqamaPhase,
+            subtitle: 'صلانك نجاتك',
           ),
         ),
         const SizedBox(width: 12),
@@ -1310,12 +1214,14 @@ class _DailyPrayersTable extends StatelessWidget {
   final String currentKey;
   final Map<String, int> iqamaOffsets;
   final AnimationController entryCtrl;
+  final AdaptiveStyle style;
 
   const _DailyPrayersTable({
     required this.prayers,
     required this.currentKey,
     required this.iqamaOffsets,
     required this.entryCtrl,
+    required this.style,
   });
 
   String _fmt(DateTime dt) {
@@ -1378,7 +1284,7 @@ class _DailyPrayersTable extends StatelessWidget {
                 final isNext = p.name == currentKey;
                 final isPast = DateTime.now().isAfter(p.time);
                 final iqama = p.time.add(
-                  Duration(minutes: iqamaOffsets[p.name] ?? 15),
+                  Duration(minutes: _kIqamaOffsets[p.name] ?? 15),
                 );
 
                 return _PrayerTableRow(
@@ -1485,12 +1391,12 @@ class _PrayerTableRow extends StatelessWidget {
                         fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
                       ),
                     ),
-                    Text(
-                      'أذان',
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 8,
-                        color: Colors.white.withOpacity(0.3),
-                      ),
+                    _MihrabPrayerChip(
+                      label: 'أذان',
+                      color: isNext
+                          ? visual.secondaryColor
+                          : Colors.white.withOpacity(0.3),
+                      isActive: isNext,
                     ),
                   ],
                 ),
@@ -1518,12 +1424,12 @@ class _PrayerTableRow extends StatelessWidget {
                         fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
                       ),
                     ),
-                    Text(
-                      'إقامة',
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 8,
-                        color: Colors.white.withOpacity(0.3),
-                      ),
+                    _MihrabPrayerChip(
+                      label: 'إقامة',
+                      color: isNext
+                          ? context.colors.success
+                          : Colors.white.withOpacity(0.2),
+                      isActive: isNext,
                     ),
                   ],
                 ),
@@ -1543,6 +1449,39 @@ class _PrayerTableRow extends StatelessWidget {
           if (!isLast)
             Container(height: 1, color: Colors.white.withOpacity(0.04)),
         ],
+      ),
+    );
+  }
+}
+
+// ── شريحة على شكل محراب ──
+class _MihrabPrayerChip extends StatelessWidget {
+  final String label;
+  final Color color;
+  final bool isActive;
+
+  const _MihrabPrayerChip({
+    required this.label,
+    required this.color,
+    required this.isActive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(isActive ? 0.15 : 0.05),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+        border: Border.all(color: color.withOpacity(isActive ? 0.3 : 0.1)),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.notoNaskhArabic(
+          fontSize: 9,
+          color: color.withOpacity(isActive ? 1.0 : 0.6),
+          fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+        ),
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../widgets/quran_widgets.dart';
 import 'quran_reader_screen.dart';
 import 'khatma_history_screen.dart';
@@ -385,17 +386,7 @@ class _SurahPickerState extends ConsumerState<_SurahPickerScreen>
     padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
     child: Row(
       children: [
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: kCard,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.close, color: Colors.white70, size: 20),
-          ),
-        ),
+        const CustomLeadingButton(),
         const SizedBox(width: 14),
         Text(
           'قراءة حرة',

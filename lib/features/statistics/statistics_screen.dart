@@ -17,6 +17,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  LOCAL PROVIDERS
@@ -143,9 +144,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                   SliverAppBar(
                     backgroundColor: Colors.transparent,
                     expandedHeight: 120,
-                    pinned: true,
-                    elevation: 0,
-                    surfaceTintColor: Colors.transparent,
+                    leading: const CustomLeadingButton(),
                     flexibleSpace: FlexibleSpaceBar(
                       collapseMode: CollapseMode.pin,
                       background: _StatsTopBar(hijri: hijri),

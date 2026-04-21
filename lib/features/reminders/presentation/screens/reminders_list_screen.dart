@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/reminders/presentation/widgets/advice_card.dart';
 import 'package:takwa/features/reminders/presentation/widgets/reminder_card.dart';
@@ -82,14 +83,7 @@ class RemindersListScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: context.colors.gold,
-          size: 20,
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: const CustomLeadingButton(),
       title: Text(
         'التذكيرات',
         style: context.typography.headingMedium.copyWith(

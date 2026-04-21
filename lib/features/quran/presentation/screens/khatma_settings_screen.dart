@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 
 class KhatmaSettingsScreen extends ConsumerWidget {
@@ -24,6 +25,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
             backgroundColor: const Color.fromARGB(46, 4, 1, 35),
             foregroundColor: Colors.white,
             pinned: true,
+            leading: const CustomLeadingButton(),
             title: Text(
               'الإعدادات',
               style: GoogleFonts.amiri(

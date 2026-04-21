@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 
 class AiMemorizeScreen extends ConsumerStatefulWidget {
@@ -101,21 +102,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white10,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white70,
-                        size: 18,
-                      ),
-                    ),
-                  ),
+                  const CustomLeadingButton(),
                   const Spacer(),
                   Column(
                     children: [

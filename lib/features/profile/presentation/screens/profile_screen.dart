@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/providers/database_providers.dart';
@@ -77,13 +78,7 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: context.colors.gold,
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: const CustomLeadingButton(),
       title: Text(
         'الملف الشخصي',
         style: context.typography.headingMedium.copyWith(

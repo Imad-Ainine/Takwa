@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
@@ -457,17 +458,7 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              GestureDetector(
-                onTap: onBack,
-                child: const Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white70,
-                    size: 20,
-                  ),
-                ),
-              ),
+              const CustomLeadingButton(),
             ],
           ),
         ),

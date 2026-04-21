@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
 class TermsPrivacyScreen extends StatelessWidget {
@@ -71,14 +72,7 @@ class TermsPrivacyScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: context.colors.gold,
-          size: 20,
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: const CustomLeadingButton(),
       title: Text(
         'الشروط والخصوصية',
         style: context.typography.headingMedium.copyWith(

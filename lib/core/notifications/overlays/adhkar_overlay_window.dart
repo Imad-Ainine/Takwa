@@ -45,10 +45,14 @@ class AdhkarOverlayNotification {
       alignment: OverlayAlignment.center,
       visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.none,
-      // الارتفاع يتكيّف مع المحتوى — نحدد max مريح
       height: 420,
       width: 320,
     );
+
+    // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر
+    Future.delayed(const Duration(milliseconds: 500), () {
+      FlutterOverlayWindow.shareData({'type': 'adhkar'});
+    });
   }
 
   /// يُغلق الـ Overlay.

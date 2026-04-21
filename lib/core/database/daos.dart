@@ -10,7 +10,9 @@ part 'daos.g.dart';
 // ─────────────────────────────────────────
 //  DAO 1: DailyRecordDao
 // ─────────────────────────────────────────
-@DriftAccessor(tables: [DailyRecords, ProhibitionsLog, CustomIbadahLog, CustomIbadah])
+@DriftAccessor(
+  tables: [DailyRecords, ProhibitionsLog, CustomIbadahLog, CustomIbadah],
+)
 class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     with _$DailyRecordDaoMixin {
   DailyRecordDao(super.db);
@@ -135,9 +137,13 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     String? notes,
   }) async {
     await transaction(() async {
-      final existing = await (select(prohibitionsLog)..where(
-        (p) => p.recordId.equals(recordId) & p.category.equals(category.index),
-      )).getSingleOrNull();
+      final existing =
+          await (select(prohibitionsLog)..where(
+                (p) =>
+                    p.recordId.equals(recordId) &
+                    p.category.equals(category.index),
+              ))
+              .getSingleOrNull();
 
       if (existing != null) {
         await (update(
@@ -237,7 +243,10 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
 
     // ── Custom Ibadaat (Positive/Negative) ──
     final customLogs = await (select(customIbadahLog).join([
-      innerJoin(customIbadah, customIbadah.id.equalsExp(customIbadahLog.ibadahId)),
+      innerJoin(
+        customIbadah,
+        customIbadah.id.equalsExp(customIbadahLog.ibadahId),
+      ),
     ])..where(customIbadahLog.recordId.equals(recordId))).get();
 
     for (final row in customLogs) {
@@ -359,18 +368,27 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       recordId: Value(dr.id),
       date: Value(date),
       category: Value(category),
-      committed: Value((data['committed'] is bool) ? data['committed'] : data['committed'] == 1),
+      committed: Value(
+        (data['committed'] is bool)
+            ? data['committed']
+            : data['committed'] == 1,
+      ),
       timesCount: Value(data['times_count'] as int? ?? 0),
       deductPoints: Value(data['deduct_points'] as int? ?? 10),
       notes: Value(data['notes'] as String?),
     );
 
-    final existing = await (select(prohibitionsLog)
-          ..where((p) => p.recordId.equals(dr!.id) & p.category.equals(category.index)))
-        .getSingleOrNull();
+    final existing =
+        await (select(prohibitionsLog)..where(
+              (p) =>
+                  p.recordId.equals(dr!.id) & p.category.equals(category.index),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
-      await (update(prohibitionsLog)..where((p) => p.id.equals(existing.id))).write(companion);
+      await (update(
+        prohibitionsLog,
+      )..where((p) => p.id.equals(existing.id))).write(companion);
     } else {
       await into(prohibitionsLog).insert(companion);
     }
@@ -398,7 +416,10 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       updatedAt: Value(DateTime.now()),
     );
 
-    await into(dailyRecords).insertOnConflictUpdate(companion);
+    await into(dailyRecords).insert(
+      companion,
+      onConflict: DoUpdate((old) => companion, target: [dailyRecords.date]),
+    );
   }
 }
 
@@ -896,7 +917,9 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
   // --- Ibadah Defs ---
   Stream<List<CustomIbadahData>> watchActiveIbadat(bool isPositive) {
     return (select(customIbadah)
-          ..where((i) => i.isActive.equals(true) & i.isPositive.equals(isPositive))
+          ..where(
+            (i) => i.isActive.equals(true) & i.isPositive.equals(isPositive),
+          )
           ..orderBy([(i) => OrderingTerm.asc(i.sortOrder)]))
         .watch();
   }
@@ -904,7 +927,10 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
   Stream<List<CustomIbadahData>> watchAllIbadat(bool isPositive) {
     return (select(customIbadah)
           ..where((i) => i.isPositive.equals(isPositive))
-          ..orderBy([(i) => OrderingTerm.desc(i.isActive), (i) => OrderingTerm.asc(i.sortOrder)]))
+          ..orderBy([
+            (i) => OrderingTerm.desc(i.isActive),
+            (i) => OrderingTerm.asc(i.sortOrder),
+          ]))
         .watch();
   }
 
@@ -917,7 +943,9 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> updateIbadah(CustomIbadahCompanion comp) {
-    return (update(customIbadah)..where((t) => t.id.equals(comp.id.value))).write(comp);
+    return (update(
+      customIbadah,
+    )..where((t) => t.id.equals(comp.id.value))).write(comp);
   }
 
   Future<void> deleteIbadah(int id) {
@@ -939,14 +967,27 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
     await into(customIbadah).insertOnConflictUpdate(companion);
   }
 
-  Future<void> upsertCustomIbadahLogFromRemote(Map<String, dynamic> data) async {
+  Future<void> upsertCustomIbadahLogFromRemote(
+    Map<String, dynamic> data,
+  ) async {
     final dateStr = data['date'] as String;
     final date = DateTime.parse(dateStr);
 
-    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date))).getSingleOrNull();
+    final dr = await (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(date))).getSingleOrNull();
     int drId;
     if (dr == null) {
-      drId = await into(dailyRecords).insert(DailyRecordsCompanion(date: Value(date)));
+      drId = await into(dailyRecords).insert(
+        DailyRecordsCompanion(date: Value(date)),
+        mode: InsertMode.insertOrIgnore,
+      );
+      if (drId == 0 || drId == -1) {
+        final existingDr = await (select(
+          dailyRecords,
+        )..where((r) => r.date.equals(date))).getSingle();
+        drId = existingDr.id;
+      }
     } else {
       drId = dr.id;
     }
@@ -960,12 +1001,16 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
       count: Value(data['count'] as int? ?? 1),
     );
 
-    final existing = await (select(customIbadahLog)
-          ..where((l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId)))
-        .getSingleOrNull();
+    final existing =
+        await (select(customIbadahLog)..where(
+              (l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
-      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id))).write(companion);
+      await (update(
+        customIbadahLog,
+      )..where((l) => l.id.equals(existing.id))).write(companion);
     } else {
       await into(customIbadahLog).insert(companion);
     }
@@ -981,11 +1026,26 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
     return (select(customIbadahLog)..where((t) => t.date.equals(date))).get();
   }
 
-  Future<void> logIbadah(int ibadahId, DateTime date, bool done, int count) async {
-    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date))).getSingleOrNull();
+  Future<void> logIbadah(
+    int ibadahId,
+    DateTime date,
+    bool done,
+    int count,
+  ) async {
+    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date)))
+        .getSingleOrNull();
     int drId;
     if (dr == null) {
-      drId = await into(dailyRecords).insert(DailyRecordsCompanion(date: Value(date)));
+      drId = await into(dailyRecords).insert(
+        DailyRecordsCompanion(date: Value(date)),
+        mode: InsertMode.insertOrIgnore,
+      );
+      if (drId == 0 || drId == -1) {
+        final existingDr = await (select(dailyRecords)
+              ..where((r) => r.date.equals(date)))
+            .getSingle();
+        drId = existingDr.id;
+      }
     } else {
       drId = dr.id;
     }
@@ -995,7 +1055,8 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
         .getSingleOrNull();
 
     if (existing != null) {
-      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id))).write(
+      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id)))
+          .write(
         CustomIbadahLogCompanion(done: Value(done), count: Value(count)),
       );
     } else {

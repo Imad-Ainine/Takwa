@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/prayer/providers/mosque_provider.dart';
@@ -128,9 +129,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.geometric,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.asma),
             ),
             Column(
               children: [
@@ -213,22 +212,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  const CustomLeadingButton(),
                   Text(
                     'المساجد القريبة',
                     style: style.amiri(

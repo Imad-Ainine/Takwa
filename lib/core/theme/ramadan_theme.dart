@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/widgets/primary_switch.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  RAMADAN COLOR PALETTE  (تجاوز الألوان الأساسية)
@@ -576,108 +577,38 @@ class RamadanBgPainter extends CustomPainter {
 // ═══════════════════════════════════════════════════════════════
 //  RAMADAN TOGGLE WIDGET  (الزر المميز)
 // ═══════════════════════════════════════════════════════════════
-class RamadanToggle extends ConsumerStatefulWidget {
+
+class RamadanToggle extends ConsumerWidget {
   const RamadanToggle({super.key});
 
   @override
-  ConsumerState<RamadanToggle> createState() => _RamadanToggleState();
-}
-
-class _RamadanToggleState extends ConsumerState<RamadanToggle>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late final Animation<double> _glow;
-  late final Animation<double> _scale;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-    _glow = Tween<double>(
-      begin: 0.4,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-    _scale = Tween<double>(
-      begin: 0.97,
-      end: 1.03,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
-    return GestureDetector(
-      onTap: () async {
-        HapticFeedback.mediumImpact();
-        final dao = ref.read(settingsDaoProvider);
-        await dao.setBool('ramadanMode', !isRamadan);
-        ref.invalidate(ramadanModeProvider);
-      },
-      child: AnimatedBuilder(
-        animation: _ctrl,
-        builder: (_, _) => Transform.scale(
-          scale: isRamadan ? _scale.value : 1.0,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-            decoration: BoxDecoration(
-              gradient: isRamadan
-                  ? LinearGradient(colors: [style.goldDark, style.gold])
-                  : null,
-              color: isRamadan ? null : style.card,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isRamadan
-                    ? style.goldLight.withOpacity(_glow.value)
-                    : style.border,
-                width: isRamadan ? 1.5 : 1,
-              ),
-              boxShadow: isRamadan
-                  ? [
-                      BoxShadow(
-                        color: style.gold.withOpacity(0.3 * _glow.value),
-                        blurRadius: 16,
-                        spreadRadius: 2,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    isRamadan ? '🌙' : '☽',
-                    key: ValueKey(isRamadan),
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  isRamadan ? 'رمضان كريم' : 'وضع رمضان',
-                  style: GoogleFonts.amiri(
-                    fontSize: 13,
-                    color: isRamadan ? RamadanColors.deepLapis : style.textSec,
-                    fontWeight: isRamadan ? FontWeight.w700 : FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+      decoration: BoxDecoration(
+        color: isRamadan ? style.gold.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(isRamadan ? '🌙' : '☽', style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 4),
+          PrimarySwitch(
+            value: isRamadan,
+            onChanged: (v) async {
+              HapticFeedback.mediumImpact();
+              final dao = ref.read(settingsDaoProvider);
+              await dao.setBool('ramadanMode', v);
+              ref.invalidate(ramadanModeProvider);
+            },
+            accentColor: style.gold,
           ),
-        ),
+        ],
       ),
     );
   }

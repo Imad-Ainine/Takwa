@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
@@ -47,6 +48,7 @@ class _ManageCustomIbadahScreenState
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        leading: const CustomLeadingButton(),
         title: const Text('إدارة العادات'),
         backgroundColor: Colors.transparent,
         elevation: 0,

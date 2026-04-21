@@ -162,10 +162,12 @@ class OnboardingScreen extends ConsumerWidget {
       case OnboardStep.overlay:
         return _OverlayStep(
           onAllow: () async {
+            // No longer wait for the full timeout. Trigger request and move on.
+            // This prevents the "hanging" feeling if the system call is slow.
             try {
-              await OverlayBackgroundService.requestPermissions().timeout(
-                const Duration(seconds: 45),
-              );
+              OverlayBackgroundService.requestPermissions();
+              // Give a tiny moment for the platform intent to fire, then go next.
+              await Future.delayed(const Duration(milliseconds: 500));
               notifier.next();
             } catch (e) {
               notifier.next();

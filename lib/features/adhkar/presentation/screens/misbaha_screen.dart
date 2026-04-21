@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/adhkar/providers/misbaha_provider.dart';
 
@@ -15,7 +16,7 @@ class MisbahaScreen extends ConsumerStatefulWidget {
   ConsumerState<MisbahaScreen> createState() => _MisbahaScreenState();
 }
 
-class _MisbahaScreenState extends ConsumerState<MisbahaScreen> 
+class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
 
@@ -107,11 +108,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
-          BoxShadow(
-            color: color,
-            blurRadius: size,
-            spreadRadius: size / 2,
-          ),
+          BoxShadow(color: color, blurRadius: size, spreadRadius: size / 2),
         ],
       ),
     );
@@ -123,23 +120,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: style.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: style.border),
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: 18,
-                color: style.text,
-              ),
-            ),
-          ),
+          const CustomLeadingButton(),
           Column(
             children: [
               Text(
@@ -272,10 +253,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     return Column(
       children: [
         ScaleTransition(
-          scale: Tween<double>(
-            begin: 1.0,
-            end: 0.92,
-          ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOutBack)),
+          scale: Tween<double>(begin: 1.0, end: 0.92).animate(
+            CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeOutBack),
+          ),
           child: GestureDetector(
             onTap: _onTap,
             onLongPressStart: _onLongPressStart,
@@ -284,8 +264,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               alignment: Alignment.center,
               children: [
                 // Pulse Animation Background
-                if (state.isListening)
-                  _ListeningRipple(color: style.teal),
+                if (state.isListening) _ListeningRipple(color: style.teal),
 
                 // The Main Bead
                 Container(
@@ -295,14 +274,15 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: state.isListening
-                        ? [style.teal, style.teal.withOpacity(0.7)]
-                        : [style.gold, style.goldDark],
+                          ? [style.teal, style.teal.withOpacity(0.7)]
+                          : [style.gold, style.goldDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (state.isListening ? style.teal : style.gold).withOpacity(0.4),
+                        color: (state.isListening ? style.teal : style.gold)
+                            .withOpacity(0.4),
                         blurRadius: 30,
                         spreadRadius: 5,
                         offset: const Offset(0, 10),
@@ -325,14 +305,21 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            state.isListening ? Icons.mic_rounded : Icons.fingerprint_rounded,
+                            state.isListening
+                                ? Icons.mic_rounded
+                                : Icons.fingerprint_rounded,
                             size: 64,
                             color: Colors.white,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            state.isListening ? 'جاري الاستماع...' : 'انقر أو اضغط مطولاً',
-                            style: style.naskh(12, color: Colors.white.withOpacity(0.9)),
+                            state.isListening
+                                ? 'جاري الاستماع...'
+                                : 'انقر أو اضغط مطولاً',
+                            style: style.naskh(
+                              12,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
                           ),
                         ],
                       ),
@@ -363,10 +350,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
 
           // Sound Toggle? (Optional extra)
           _buildActionButton(
-            icon: state.isSpeaking ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+            icon: state.isSpeaking
+                ? Icons.volume_up_rounded
+                : Icons.volume_off_rounded,
             label: 'الصوت',
             color: state.selectedDhikr == null ? style.textDim : style.gold,
-            onTap: state.selectedDhikr == null ? null : () => ref.read(misbahaProvider.notifier).speakDhikr(),
+            onTap: state.selectedDhikr == null
+                ? null
+                : () => ref.read(misbahaProvider.notifier).speakDhikr(),
           ),
         ],
       ),
@@ -392,7 +383,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 4),
-          Text(label, style: GoogleFonts.notoNaskhArabic(fontSize: 10, color: color)),
+          Text(
+            label,
+            style: GoogleFonts.notoNaskhArabic(fontSize: 10, color: color),
+          ),
         ],
       ),
     );
@@ -409,10 +403,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             color: style.bg,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 20,
-              ),
+              BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20),
             ],
           ),
           child: DraggableScrollableSheet(
@@ -421,7 +412,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             maxChildSize: 0.9,
             minChildSize: 0.5,
             builder: (_, controller) {
-              final allItems = kAdhkarData.values.expand((list) => list).toList();
+              final allItems = kAdhkarData.values
+                  .expand((list) => list)
+                  .toList();
               return Column(
                 children: [
                   const SizedBox(height: 12),
@@ -439,7 +432,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                   Expanded(
                     child: ListView.separated(
                       controller: controller,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       itemCount: allItems.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (ctx, i) {
@@ -457,7 +453,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-  Widget _buildDhikrItem(DhikrItem dhikr, AdaptiveStyle style, BuildContext context) {
+  Widget _buildDhikrItem(
+    DhikrItem dhikr,
+    AdaptiveStyle style,
+    BuildContext context,
+  ) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
@@ -495,7 +495,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               ),
               child: Text(
                 '${dhikr.count}',
-                style: style.naskh(14, color: style.gold, weight: FontWeight.bold),
+                style: style.naskh(
+                  14,
+                  color: style.gold,
+                  weight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -550,7 +554,10 @@ class _ListeningRippleState extends State<_ListeningRipple>
                     height: 200,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: widget.color.withOpacity(0.5), width: 2),
+                      border: Border.all(
+                        color: widget.color.withOpacity(0.5),
+                        width: 2,
+                      ),
                     ),
                   ),
                 ),

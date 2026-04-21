@@ -27,6 +27,11 @@ class DuaOverlayNotification {
       height: 420,
       width: 320,
     );
+
+    // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر
+    Future.delayed(const Duration(milliseconds: 500), () {
+      FlutterOverlayWindow.shareData({'type': 'dua'});
+    });
   }
 
   static Future<void> dismiss() => FlutterOverlayWindow.closeOverlay();

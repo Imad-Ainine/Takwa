@@ -106,12 +106,10 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
       }
     }
   }
-
   Future<void> _syncLocationFromBackground(Map data) async {
     final lat = data['latitude']?.toString();
     final lng = data['longitude']?.toString();
     final cityName = data['cityName']?.toString();
-
     if (lat != null && lng != null) {
       final settings = ref.read(settingsDaoProvider);
       await settings.set('latitude', lat);

@@ -13,6 +13,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
@@ -112,15 +113,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         backgroundColor: context.colors.background,
         body: Stack(
           children: [
+            // Background Pattern
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
+
             CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
                   pinned: true,
+                  leading: const CustomLeadingButton(),
                   title: Text(
                     'الإعدادات',
                     style: context.typography.headingMedium.copyWith(

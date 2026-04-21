@@ -211,6 +211,11 @@ class _OverlayTaskHandler extends TaskHandler {
         height: 420,
         width: 320,
       );
+
+      // نرسل نوع البيانات للمصفي (هنا نتركها عامة لتشمل الإثنين أو نحدد أذكار)
+      Future.delayed(const Duration(milliseconds: 500), () {
+        ow.FlutterOverlayWindow.shareData({'type': 'all'});
+      });
     } catch (e) {
       print('OverlayService: popup error: $e');
     }

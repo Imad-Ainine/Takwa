@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
 
@@ -42,25 +43,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                     child: Row(
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: context.colors.card,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: context.colors.border),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 16,
-                                color: context.colors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
+                        const CustomLeadingButton(),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(

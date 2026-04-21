@@ -9,6 +9,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/achievements/domain/models/achievement_definition.dart';
 import 'package:takwa/features/achievements/presentation/widgets/achievement_card.dart';
 import 'package:takwa/features/achievements/providers/achievements_providers.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 
@@ -124,17 +125,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       backgroundColor: Colors.transparent,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
-      leading: IconButton(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colors.card.withOpacity(0.5),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.arrow_back_ios_new, color: colors.gold, size: 18),
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
+      leading: const CustomLeadingButton(),
       title: Text(
         'إنجازاتي',
         style: context.typography.headingLarge.copyWith(

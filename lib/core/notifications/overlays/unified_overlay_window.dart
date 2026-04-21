@@ -119,6 +119,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
   final _random = math.Random();
   _PopupItem? _current;
   Timer? _autoRefreshTimer;
+  String? _filter; // 'adhkar' or 'dua'
 
   // Animation
   late final AnimationController _slideCtrl;
@@ -150,9 +151,16 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
       _pickRandom(animate: true);
     });
 
-    // استقبال بيانات من التطبيق الرئيسي (اختياري)
+    // استقبال بيانات من التطبيق الرئيسي
     FlutterOverlayWindow.overlayListener.listen((data) {
-      if (data is int && data >= 0 && data < _allItems.length) {
+      if (data is Map) {
+        if (data.containsKey('type')) {
+          setState(() {
+            _filter = data['type'];
+            _pickRandom(animate: true);
+          });
+        }
+      } else if (data is int && data >= 0 && data < _allItems.length) {
         setState(() => _current = _allItems[data]);
       } else {
         _pickRandom(animate: true);
@@ -162,7 +170,17 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
 
   void _pickRandom({bool animate = false}) {
     if (_allItems.isEmpty) return;
-    final next = _allItems[_random.nextInt(_allItems.length)];
+
+    List<_PopupItem> pool = _allItems;
+    if (_filter == 'adhkar') {
+      pool = _allItems.where((i) => !i.isDua).toList();
+    } else if (_filter == 'dua') {
+      pool = _allItems.where((i) => i.isDua).toList();
+    }
+
+    if (pool.isEmpty) pool = _allItems;
+
+    final next = pool[_random.nextInt(pool.length)];
     if (animate) {
       _slideCtrl.reverse().then((_) {
         if (mounted) {
@@ -185,7 +203,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
   // ─── الألوان الثابتة (لا يمكن استخدام Theme في isolate) ───
   static const _gold = Color(0xFFC9A66B);
   static const _goldDark = Color(0xFFA07838);
-  static const _cardBg = Color(0xFF1A2420);
+  static const _cardBg = Color(0xEE1A2420); // شفافية بسيطة (EE = 93%)
   static const _textMain = Color(0xFFF5F0E8);
   static const _textSec = Color(0xFF8CA090);
 
@@ -198,11 +216,16 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Align(
-          // ← منتصف الشاشة تماماً
           alignment: Alignment.center,
           child: SlideTransition(
             position: _slideAnim,
-            child: FadeTransition(opacity: _fadeAnim, child: _buildCard()),
+            child: FadeTransition(
+              opacity: _fadeAnim,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: _buildCard(),
+              ),
+            ),
           ),
         ),
       ),
@@ -220,22 +243,15 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: item.isDua
-              ? const Color(0xFF2D6A4F).withOpacity(0.6)
-              : _gold.withOpacity(0.5),
-          width: 1.2,
+              ? const Color(0xFF2D6A4F).withOpacity(0.5)
+              : _gold.withOpacity(0.4),
+          width: 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 24,
-            offset: const Offset(-4, 0),
-          ),
-          BoxShadow(
-            color: (item.isDua ? const Color(0xFF2D6A4F) : _gold).withOpacity(
-              0.15,
-            ),
-            blurRadius: 16,
-            spreadRadius: -2,
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),

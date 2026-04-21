@@ -159,38 +159,111 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
     }
   }
 
+  String _normalizeArabic(String text) {
+    if (text.isEmpty) return '';
+
+    // Remove diacritics (Tashkeel)
+    final diacritics = RegExp(r'[\u064B-\u065F\u0670]');
+    String result = text.replaceAll(diacritics, '');
+
+    // Normalize Alif
+    result = result.replaceAll(RegExp(r'[أإآ]'), 'ا');
+    // Normalize Teh Marbuta to Heh (common in speech recognition)
+    result = result.replaceAll('ة', 'ه');
+    // Normalize Yeh/Alef Maksura
+    result = result.replaceAll('ى', 'ي');
+    
+    // Normalize Hamzas
+    result = result.replaceAll('ؤ', 'و');
+    result = result.replaceAll('ئ', 'ي');
+    result = result.replaceAll('ء', ''); 
+
+    // Remove extra spaces and punctuation
+    // Keep only Arabic letters and spaces
+    result = result.replaceAll(RegExp(r'[^\u0621-\u064A\s]'), '');
+    
+    // Normalize multiple spaces into one
+    result = result.replaceAll(RegExp(r'\s+'), ' ');
+    
+    return result.trim().toLowerCase();
+  }
+
   Future<void> _startListening() async {
-    if (state.isListening) {
-      _lastRecognizedWords = '';
-      try {
-        await _speech.listen(
-          onResult: (val) {
-            final currentWords = val.recognizedWords.trim();
-            if (currentWords.isNotEmpty &&
-                currentWords.length > _lastRecognizedWords.length) {
-              
-              // Count words or increments? 
-              // Usually in Misbaha, every word or phrase like "Subhan Allah" counts as 1.
-              // We compare the length to see if new words were added.
-              final newChars = currentWords.substring(_lastRecognizedWords.length).trim();
-              if (newChars.isNotEmpty) {
-                _lastRecognizedWords = currentWords;
-                final now = DateTime.now();
-                if (now.difference(_lastIncrementTime).inMilliseconds > 400) {
-                  _lastIncrementTime = now;
+    if (!state.isListening) return;
+
+    _lastRecognizedWords = '';
+    int lastWordCount = 0;
+    int lastTargetMatches = 0;
+
+    try {
+      await _speech.listen(
+        onResult: (val) {
+          final words = val.recognizedWords.trim();
+          if (words.isEmpty) return;
+
+          // Detect engine reset (if the recognized text significantly shrinks)
+          if (words.length < _lastRecognizedWords.length * 0.5 && _lastRecognizedWords.isNotEmpty) {
+            lastWordCount = 0;
+            lastTargetMatches = 0;
+            _lastRecognizedWords = '';
+          }
+
+          if (state.selectedDhikr != null) {
+            // Specific Dhikr mode: Compare normalized strings WITHOUT spaces for max robustness
+            final normalizedTarget = _normalizeArabic(state.selectedDhikr!.arabic).replaceAll(' ', '');
+            final normalizedWords = _normalizeArabic(words).replaceAll(' ', '');
+            
+            final currentMatches = _countOccurrences(normalizedWords, normalizedTarget);
+            
+            if (currentMatches > lastTargetMatches) {
+              final now = DateTime.now();
+              if (now.difference(_lastIncrementTime).inMilliseconds > 350) {
+                // Increment for each NEW match found in the current string
+                for (int i = 0; i < (currentMatches - lastTargetMatches); i++) {
                   increment();
                 }
+                lastTargetMatches = currentMatches;
+                _lastIncrementTime = now;
               }
             }
-          },
-          localeId: 'ar',
-          cancelOnError: false,
-          partialResults: true,
-        );
-      } catch (e) {
-        state = state.copyWith(isListening: false);
-      }
+          } else {
+            // Any Word mode: Simple word counting
+            final currentWordsList = words.split(RegExp(r'\s+')).where((w) => w.length > 1).toList();
+            final currentWordCount = currentWordsList.length;
+
+            if (currentWordCount > lastWordCount) {
+              final now = DateTime.now();
+              if (now.difference(_lastIncrementTime).inMilliseconds > 350) {
+                for (int i = 0; i < (currentWordCount - lastWordCount); i++) {
+                  increment();
+                }
+                lastWordCount = currentWordCount;
+                _lastIncrementTime = now;
+              }
+            }
+          }
+          
+          _lastRecognizedWords = words;
+        },
+        localeId: 'ar-SA', // Ensure Arabic Saudi Arabia locale
+        cancelOnError: false,
+        partialResults: true,
+        listenMode: stt.ListenMode.dictation,
+      );
+    } catch (e) {
+      state = state.copyWith(isListening: false);
     }
+  }
+
+  int _countOccurrences(String text, String target) {
+    if (target.isEmpty) return 0;
+    int count = 0;
+    int index = 0;
+    while ((index = text.indexOf(target, index)) != -1) {
+      count++;
+      index += target.length;
+    }
+    return count;
   }
 }
 

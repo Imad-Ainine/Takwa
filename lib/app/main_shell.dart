@@ -211,9 +211,7 @@ class _BottomNav extends StatelessWidget {
           // Subtle pattern background for BottomNav
           const Positioned.fill(
             child: ClipRect(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.geometric,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.asma),
             ),
           ),
 

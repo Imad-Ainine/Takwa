@@ -300,7 +300,7 @@ class _HomeHeader extends StatelessWidget {
         : 'مساء النور 🌙';
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 52, 16, 10),
+      padding: const EdgeInsets.fromLTRB(16, 47, 16, 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -1333,54 +1333,83 @@ class _FeatureRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('الميزات', style: s.amiri(15)),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 88,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            reverse: true,
-            physics: const BouncingScrollPhysics(),
-            itemCount: _features.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (_, i) {
-              final f = _features[i];
-              return GestureDetector(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  Navigator.pushNamed(context, f.$3);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  width: 72,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        s.gold.withOpacity(0.1),
-                        s.teal.withOpacity(0.06),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: s.border),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(f.$1, style: const TextStyle(fontSize: 26)),
-                      const SizedBox(height: 5),
-                      Text(
-                        f.$2,
-                        textAlign: TextAlign.center,
-                        style: s.naskh(9, color: s.textSec),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+        Row(
+          children: [
+            Text('الميزات', style: s.amiri(15, color: s.gold)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Container(height: 1, color: s.gold.withOpacity(0.2)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 5,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.85,
+          children: _features.map((f) => _FeatureItem(f: f, style: s)).toList(),
         ),
       ],
+    );
+  }
+}
+
+class _FeatureItem extends StatelessWidget {
+  final (String, String, String) f;
+  final AdaptiveStyle style;
+  const _FeatureItem({required this.f, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = style;
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        Navigator.pushNamed(context, f.$3);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [s.gold.withOpacity(0.12), s.teal.withOpacity(0.05)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: s.gold.withOpacity(0.25), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: s.gold.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: s.gold.withOpacity(0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Text(f.$1, style: const TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              f.$2,
+              textAlign: TextAlign.center,
+              style: s
+                  .naskh(9, color: s.text, weight: FontWeight.w600)
+                  .copyWith(height: 1.2),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
