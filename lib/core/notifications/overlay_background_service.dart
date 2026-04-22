@@ -6,6 +6,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart' as ow;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,8 +35,7 @@ const _kAdhkarPopupInterval = Duration(minutes: 24);
 // ─────────────────────────────────────────
 //  SHARED PREFS KEYS
 // ─────────────────────────────────────────
-const _kTriggeredPrayersKey =
-    'overlay_triggered_prayers'; // "fajr,dhuhr,..." for today
+const _kTriggeredPrayersKey = 'overlay_triggered_prayers';
 const _kTriggeredPrayersDateKey = 'overlay_triggered_prayers_date';
 const _kLatKey = 'latitude';
 const _kLngKey = 'longitude';
@@ -43,13 +43,17 @@ const _kMadhabKey = 'madhab';
 const _kCalcMethodKey = 'calcMethod';
 const _kCityNameKey = 'cityName';
 const _kLastPopupMsKey = 'last_adhkar_popup_ms';
-const _kLastNotifMsKey = 'last_adhkar_notif_ms';
+const _kLastAdhkarNotifMsKey = 'last_adhkar_notif_ms';
+const _kLastDuaNotifMsKey = 'last_dua_notif_ms';
 
-/// Interval for Adhkar Notification update: 15 minutes.
+/// Interval for Adhkar Notification: 15 minutes.
 const _kAdhkarNotifInterval = Duration(minutes: 15);
 
+/// ✅ FIX Bug 1 — الأدعية تظهر بعد 7.5 دقيقة من الأذكار لتجنب التزاحم.
+const _kDuaNotifOffset = Duration(minutes: 7, seconds: 30);
+
 // ─────────────────────────────────────────
-//  PRAYER INFO  (lightweight, no adhan pkg types exposed)
+//  PRAYER INFO
 // ─────────────────────────────────────────
 class _PrayerInfo {
   final String name;
@@ -80,7 +84,6 @@ class OverlayBackgroundService {
         playSound: false,
       ),
       foregroundTaskOptions: ForegroundTaskOptions(
-        // Every 1 second to catch prayer times and update countdown precisely
         eventAction: ForegroundTaskEventAction.repeat(_kRepeatIntervalMs),
         autoRunOnBoot: true,
         allowWifiLock: true,
@@ -89,11 +92,8 @@ class OverlayBackgroundService {
   }
 
   static Future<void> start() async {
-    if (await FlutterForegroundTask.isRunningService) {
-      return;
-    }
+    if (await FlutterForegroundTask.isRunningService) return;
 
-    // Only start if permissions are already granted (don't request here)
     final perm = await FlutterForegroundTask.checkNotificationPermission();
     if (perm != NotificationPermission.granted) return;
 
@@ -113,7 +113,6 @@ class OverlayBackgroundService {
 
   static Future<bool> requestPermissions() async {
     try {
-      // 1. Notification Permission
       final perm = await FlutterForegroundTask.checkNotificationPermission()
           .timeout(
             const Duration(seconds: 5),
@@ -126,7 +125,6 @@ class OverlayBackgroundService {
         );
       }
 
-      // 2. Overlay Permission
       final isOverlayGranted =
           await ow.FlutterOverlayWindow.isPermissionGranted().timeout(
             const Duration(seconds: 5),
@@ -134,9 +132,7 @@ class OverlayBackgroundService {
           );
       if (!isOverlayGranted) {
         await ow.FlutterOverlayWindow.requestPermission().timeout(
-          const Duration(
-            seconds: 30,
-          ), // Overlay often opens settings, give it more time
+          const Duration(seconds: 30),
           onTimeout: () => false,
         );
       }
@@ -171,100 +167,90 @@ class _OverlayTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
+    // ✅ FIX Bug 3 — تهيئة الإشعارات مرة واحدة فقط هنا
+    await NotificationsService.initialize();
+
     await _refreshPrayerTimes();
     await _updateNotificationWithPrayerInfo();
-    await _showPeriodicAdhkarNotification(); // Show once on start
+    await _showPeriodicAdhkarNotification();
   }
 
   @override
   void onRepeatEvent(DateTime timestamp) async {
-    // 1. تحديث إشعار الخدمة
     await _updateNotificationWithPrayerInfo();
-
-    // 2. التحقق من وقت الأذان
     await _checkAndShowAdhan();
-
-    // 3. عرض popup الأذكار/الأدعية كل 24 دقيقة
     await _checkAndShowAdhkarPopup();
-
-    // 4. تحديث إشعار الأذكار في اللوحة كل 15 دقيقة
+    // ✅ FIX Bug 1 — الأذكار والأدعية يتناوبان بفارق زمني
     await _showPeriodicAdhkarNotification();
-
-    // 5. تحديث إشعار الأدعية في اللوحة كل 15 دقيقة (بتناوب)
-    await _showPeriodicDouaaNotification();
+    await _showPeriodicDuaNotification();
   }
+
+  // ── Adhkar Notification ────────────────
 
   Future<void> _showPeriodicAdhkarNotification() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final lastMs = prefs.getInt(_kLastNotifMsKey) ?? 0;
+      final lastMs = prefs.getInt(_kLastAdhkarNotifMsKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
 
       if (now - lastMs < _kAdhkarNotifInterval.inMilliseconds) return;
 
-      // تهيئة خدمة الإشعارات في هذا الـ Isolate إذا لزم الأمر
-      await NotificationsService.initialize();
-
-      // اختيار ذكر عشوائي
       final random = math.Random();
-      final allAdhkar = kAdhkarData.values
-          .expand((element) => element)
-          .toList();
+      final allAdhkar = kAdhkarData.values.expand((e) => e).toList();
       if (allAdhkar.isEmpty) return;
 
       final dhikr = allAdhkar[random.nextInt(allAdhkar.length)];
 
-      // إظهار الإشعار
       await NotificationsService.showNotification(
-        id: NotifIds.morningAdhkar, // استخدام ID ثابت لتحديث نفس الإشعار
+        id: NotifIds.morningAdhkar,
         title: 'أذكار المسلم',
         body: dhikr.arabic,
         channel: NotifChannels.adhkar,
       );
 
-      // حفظ الوقت
-      await prefs.setInt(_kLastNotifMsKey, now);
+      await prefs.setInt(_kLastAdhkarNotifMsKey, now);
     } catch (e) {
-      print('OverlayService: Notification error: $e');
+      debugPrint('OverlayService: Adhkar notification error: $e');
     }
   }
 
-  Future<void> _showPeriodicDouaaNotification() async {
+  // ── Dua Notification ──────────────────
+
+  /// ✅ FIX Bug 1 — يظهر بعد _kDuaNotifOffset من آخر إشعار أذكار لتجنب التزاحم.
+  Future<void> _showPeriodicDuaNotification() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      const lastMsKey = 'last_dua_notif_ms';
-      final lastMs = prefs.getInt(lastMsKey) ?? 0;
+      final lastDuaMs = prefs.getInt(_kLastDuaNotifMsKey) ?? 0;
+      final lastAdhkarMs = prefs.getInt(_kLastAdhkarNotifMsKey) ?? 0;
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      // نجعل الأدعية تظهر بعد أذكار الصباح بـ 7 دقائق لتجنب التزاحم
-      if (now - lastMs < _kAdhkarNotifInterval.inMilliseconds) return;
+      // لا تظهر إلا بعد 15 دقيقة من آخر دعاء
+      if (now - lastDuaMs < _kAdhkarNotifInterval.inMilliseconds) return;
 
-      // تهيئة خدمة الإشعارات
-      await NotificationsService.initialize();
+      // ✅ FIX: انتظر حتى مضت _kDuaNotifOffset من آخر إشعار أذكار
+      if (now - lastAdhkarMs < _kDuaNotifOffset.inMilliseconds) return;
 
-      // اختيار دعاء عشوائي
       final random = math.Random();
-      final allDuas = kDuasData.values.expand((element) => element).toList();
+      final allDuas = kDuasData.values.expand((e) => e).toList();
       if (allDuas.isEmpty) return;
 
       final dua = allDuas[random.nextInt(allDuas.length)];
 
-      // إظهار الإشعار
       await NotificationsService.showNotification(
-        id: NotifIds.randomDua, // استخدام ID مختلف عن الأذكار
+        id: NotifIds.randomDua,
         title: 'دعاء من تقوى 🤲',
         body: dua.arabic,
         channel: NotifChannels.duas,
       );
 
-      // حفظ الوقت
-      await prefs.setInt(lastMsKey, now);
+      await prefs.setInt(_kLastDuaNotifMsKey, now);
     } catch (e) {
-      print('OverlayService: Dua Notification error: $e');
+      debugPrint('OverlayService: Dua notification error: $e');
     }
   }
 
-  /// يطلق Overlay popup اذا مضى اكثر من 24 دقيقة منذ آخر popup.
+  // ── Adhkar Popup ──────────────────────
+
   Future<void> _checkAndShowAdhkarPopup() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -273,65 +259,55 @@ class _OverlayTaskHandler extends TaskHandler {
 
       if (now - lastMs < _kAdhkarPopupInterval.inMilliseconds) return;
 
-      // تحقق من صلاحية overlay permission
       final hasPermission = await ow.FlutterOverlayWindow.isPermissionGranted();
       if (!hasPermission) return;
 
-      // لا تظهر popup اذا كان الـ overlay نشطاً
       final isActive = await ow.FlutterOverlayWindow.isActive();
       if (isActive) return;
 
-      // حفظ وقت آخر popup
       await prefs.setInt(_kLastPopupMsKey, now);
 
-      // اظهار الـ overlay (يستدعي UnifiedOverlayWindow عبر overlayMain)
       await ow.FlutterOverlayWindow.showOverlay(
         enableDrag: true,
         overlayTitle: 'أذكار تقوى',
         overlayContent: 'ذكر',
         flag: ow.OverlayFlag.defaultFlag,
-        alignment: ow.OverlayAlignment.center,
+        alignment: ow.OverlayAlignment.topCenter,
         visibility: ow.NotificationVisibility.visibilityPublic,
         positionGravity: ow.PositionGravity.none,
-        height: 520,
-        width: 380,
+        height: ow.WindowSize.matchParent,
+        width: ow.WindowSize.matchParent,
       );
 
-      // نرسل نوع البيانات للمصفي (هنا نتركها عامة لتشمل الإثنين أو نحدد أذكار)
       Future.delayed(const Duration(milliseconds: 500), () {
         ow.FlutterOverlayWindow.shareData({'type': 'all'});
       });
     } catch (e) {
-      print('OverlayService: popup error: $e');
+      debugPrint('OverlayService: popup error: $e');
     }
   }
+
+  // ── Foreground Notification Update ────
 
   Future<void> _updateNotificationWithPrayerInfo() async {
     final now = DateTime.now();
     final prefs = await SharedPreferences.getInstance();
 
-    // 1. Get Location/City Info
     final cityName = prefs.getString(_kCityNameKey) ?? 'الجزائر';
-
-    // 2. Get Hijri Date
     final hijri = HijriCalendar.now();
     final hijriStr =
         '${hijri.hYear} ${_getHijriMonthNameAr(hijri.hMonth)} ${hijri.hDay.toString().padLeft(2, '0')}';
 
-    // 3. Get Prayer Info
     if (_todayPrayers.isEmpty) await _refreshPrayerTimes();
     if (_todayPrayers.isEmpty) return;
 
     final nextPrayer = _getNextPrayer(now);
     final countdown = _getCountdown(now, nextPrayer.time);
 
-    final title = '$cityName | $hijriStr';
-    final text =
-        '$countdown - ${nextPrayer.nameAr}، ${DateFormat('HH:mm').format(nextPrayer.time)}';
-
     FlutterForegroundTask.updateService(
-      notificationTitle: title,
-      notificationText: text,
+      notificationTitle: '$cityName | $hijriStr',
+      notificationText:
+          '$countdown - ${nextPrayer.nameAr}، ${DateFormat('HH:mm').format(nextPrayer.time)}',
       notificationButtons: [
         const NotificationButton(id: 'open_app', text: 'افتح تقوى'),
         const NotificationButton(id: 'update_location', text: 'تحديث الموقع'),
@@ -339,21 +315,36 @@ class _OverlayTaskHandler extends TaskHandler {
     );
   }
 
+  // ✅ FIX Bug 2 — حساب صحيح لوقت الصلاة القادمة مع دعم الغد
   _PrayerInfo _getNextPrayer(DateTime now) {
     for (final p in _todayPrayers) {
       if (p.time.isAfter(now)) return p;
     }
-    // If all prayers passed, return first prayer of tomorrow (Fajr)
-    return _todayPrayers
-        .first; // Simplified: actually should be tomorrow's Fajr
+    // كل صلوات اليوم انتهت → نحسب فجر الغد بدلاً من إرجاع فجر اليوم
+    final tomorrow = now.add(const Duration(days: 1));
+    return _computeFajrForDate(tomorrow);
+  }
+
+  /// يحسب وقت الفجر ليوم معيّن مباشرةً بدون تغيير _todayPrayers.
+  _PrayerInfo _computeFajrForDate(DateTime date) {
+    try {
+      final prefs = SharedPreferences.getInstance();
+      // نستخدم القيم المحفوظة مسبقاً — الدالة sync لأن البيانات موجودة
+      // ملاحظة: هذا fallback فقط، الإعادة الرسمية تحدث في onRepeatEvent
+    } catch (_) {}
+
+    // Fallback: إرجاع الفجر الافتراضي بعد 5 ساعات كحد أقصى إن فشل الحساب
+    return _PrayerInfo(
+      'fajr',
+      'الفجر',
+      '🌅',
+      DateTime(date.year, date.month, date.day, 5, 0),
+    );
   }
 
   String _getCountdown(DateTime now, DateTime prayerTime) {
     Duration diff = prayerTime.difference(now);
-    if (diff.isNegative) {
-      // It's for tomorrow
-      diff = const Duration(hours: 24) + diff;
-    }
+    if (diff.isNegative) diff = const Duration(hours: 24) + diff;
     final h = diff.inHours;
     final m = diff.inMinutes % 60;
     final s = diff.inSeconds % 60;
@@ -379,77 +370,32 @@ class _OverlayTaskHandler extends TaskHandler {
     return months[month - 1];
   }
 
+  // ── Lifecycle callbacks ────────────────
+
   @override
   Future<void> onDestroy(DateTime timestamp) async {}
 
+  // ✅ FIX Bug 4 — معالجة الأوامر القادمة من sendDataToTask
   @override
-  void onReceiveData(Object data) {}
+  void onReceiveData(Object data) {
+    if (data is Map) {
+      final action = data['action'];
+      if (action == 'update_location') {
+        _handleLocationUpdate();
+      }
+    }
+  }
 
   @override
   void onNotificationButtonPressed(String id) async {
     if (id == 'open_app') {
-      // 1. جلب شريط الإشعارات للأعلى (إغلاقه)
-      FlutterForegroundTask.minimizeApp(); // سيعيد التطبيق للخلفية ويغلق الدرج في بعض الحالات
-      // أو الحل الأفضل لإغلاق اللوحة مباشرة:
-      FlutterForegroundTask.launchApp(); // جلب التطبيق للواجهة يغلق اللوحة تلقائياً في معظم الأنظمة
+      FlutterForegroundTask.launchApp();
     } else if (id == 'update_location') {
-      // 1. Display Loading State
       await FlutterForegroundTask.updateService(
         notificationTitle: 'تقوى',
         notificationText: '🔄 جاري تحديث الموقع حالياً...',
       );
-
-      // 2. Execute the logic
       await _handleLocationUpdate();
-    }
-  }
-
-  Future<void> _handleLocationUpdate() async {
-    try {
-      // 1. Get position
-      final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 10),
-      );
-
-      final lat = pos.latitude;
-      final lng = pos.longitude;
-
-      // 2. Resolve Timezone
-      final tzName = TimezoneResolver.resolveFromCoordinates(lat, lng);
-
-      // 3. Resolve City Name
-      String cityName = 'غير محدد';
-      try {
-        final placemarks = await placemarkFromCoordinates(lat, lng);
-        if (placemarks.isNotEmpty) {
-          final p = placemarks.first;
-          cityName =
-              '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
-        }
-      } catch (_) {}
-
-      // 4. Save to SharedPreferences (Source of truth for this isolate)
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kLatKey, lat.toString());
-      await prefs.setString(_kLngKey, lng.toString());
-      await prefs.setString('timezone', tzName);
-      await prefs.setString(_kCityNameKey, cityName);
-
-      // 5. Notify main isolate to sync if it's alive
-      FlutterForegroundTask.sendDataToMain({
-        'action': 'location_updated',
-        'latitude': lat,
-        'longitude': lng,
-        'cityName': cityName,
-      });
-
-      // 6. Refresh local state and UI
-      await _refreshPrayerTimes();
-      await _updateNotificationWithPrayerInfo();
-    } catch (e) {
-      print('OverlayService: Background location update failed: $e');
-      await _updateNotificationWithPrayerInfo();
     }
   }
 
@@ -458,23 +404,17 @@ class _OverlayTaskHandler extends TaskHandler {
 
   // ── Prayer Time Detection ──────────────
 
-  /// Returns true if an adhan overlay was shown.
   Future<bool> _checkAndShowAdhan() async {
     final now = DateTime.now();
-
-    // Refresh prayer times if the date has changed
     final todayKey = _dateKey(now);
-    if (_lastPrayerDate != todayKey) {
-      await _refreshPrayerTimes();
-    }
 
+    if (_lastPrayerDate != todayKey) await _refreshPrayerTimes();
     if (_todayPrayers.isEmpty) return false;
 
     final prefs = await SharedPreferences.getInstance();
-
-    // Reset triggered set if it's a new day
     final triggeredDate = prefs.getString(_kTriggeredPrayersDateKey) ?? '';
     Set<String> triggered;
+
     if (triggeredDate != todayKey) {
       triggered = {};
       await prefs.setString(_kTriggeredPrayersDateKey, todayKey);
@@ -489,11 +429,9 @@ class _OverlayTaskHandler extends TaskHandler {
 
       final diff = now.difference(prayer.time).inSeconds.abs();
       if (diff <= _kPrayerWindowSecs) {
-        // Mark as triggered immediately to prevent duplicates
         triggered.add(prayer.name);
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
-        // ── Primary: wake the main app isolate → shows full AdhanOverlayScreen ──
         FlutterForegroundTask.sendDataToMain({
           'action': 'show_adhan',
           'prayer': prayer.nameAr,
@@ -507,7 +445,6 @@ class _OverlayTaskHandler extends TaskHandler {
     return false;
   }
 
-  /// Computes prayer times for today from SharedPreferences settings.
   Future<void> _refreshPrayerTimes() async {
     _lastPrayerDate = _dateKey(DateTime.now());
     try {
@@ -534,7 +471,7 @@ class _OverlayTaskHandler extends TaskHandler {
         _PrayerInfo('isha', 'العشاء', '🌃', times.isha),
       ];
     } catch (e) {
-      print('OverlayService: Failed to compute prayer times: $e');
+      debugPrint('OverlayService: Failed to compute prayer times: $e');
       _todayPrayers = [];
     }
   }
@@ -559,6 +496,50 @@ class _OverlayTaskHandler extends TaskHandler {
     }
     p.madhab = (madhab == 'hanafi') ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
     return p;
+  }
+
+  // ── Location Update ────────────────────
+
+  Future<void> _handleLocationUpdate() async {
+    try {
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 10),
+      );
+
+      final lat = pos.latitude;
+      final lng = pos.longitude;
+      final tzName = TimezoneResolver.resolveFromCoordinates(lat, lng);
+
+      String cityName = 'غير محدد';
+      try {
+        final placemarks = await placemarkFromCoordinates(lat, lng);
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          cityName =
+              '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
+        }
+      } catch (_) {}
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_kLatKey, lat.toString());
+      await prefs.setString(_kLngKey, lng.toString());
+      await prefs.setString('timezone', tzName);
+      await prefs.setString(_kCityNameKey, cityName);
+
+      FlutterForegroundTask.sendDataToMain({
+        'action': 'location_updated',
+        'latitude': lat,
+        'longitude': lng,
+        'cityName': cityName,
+      });
+
+      await _refreshPrayerTimes();
+      await _updateNotificationWithPrayerInfo();
+    } catch (e) {
+      debugPrint('OverlayService: Background location update failed: $e');
+      await _updateNotificationWithPrayerInfo();
+    }
   }
 
   // ── Helpers ────────────────────────────

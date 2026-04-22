@@ -22,8 +22,8 @@ class AdhkarOverlayNotification {
       alignment: OverlayAlignment.topCenter,
       visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.none,
-      height: 440, // Optimized height
-      width: 340,  // Optimized width to avoid edge clipping
+      height: WindowSize.matchParent,
+      width: WindowSize.matchParent,
     );
 
     // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر

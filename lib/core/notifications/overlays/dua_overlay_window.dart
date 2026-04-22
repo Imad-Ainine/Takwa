@@ -24,8 +24,8 @@ class DuaOverlayNotification {
       alignment: OverlayAlignment.topCenter,
       visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.none,
-      height: 440,
-      width: 340,
+      height: WindowSize.matchParent,
+      width: WindowSize.matchParent,
     );
 
     // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر

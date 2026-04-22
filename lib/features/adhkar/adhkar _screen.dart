@@ -10,8 +10,8 @@ import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/utils/overlay_helper.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart' as ow;
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/adhkar/_user_community_adhkar_views.dart';
@@ -991,31 +991,10 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   width: double.infinity,
                   child: PrimaryButton(
                     onTap: () async {
-                      final hasPermission =
-                          await ow.FlutterOverlayWindow.isPermissionGranted();
-                      if (!hasPermission) {
-                        await ow.FlutterOverlayWindow.requestPermission();
-                        return;
-                      }
-                      await ow.FlutterOverlayWindow.showOverlay(
-                        enableDrag: true,
-                        overlayTitle: 'تجربة تقوى',
-                        overlayContent: 'اختبار الواجهة البريميوم',
-                        flag: ow.OverlayFlag.defaultFlag,
-                        alignment: ow.OverlayAlignment.center,
-                        visibility: ow.NotificationVisibility.visibilityPublic,
-                        positionGravity: ow.PositionGravity.none,
-                        height: 520,
-                        width: 380,
-                      );
-                      // Send sample data
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        ow.FlutterOverlayWindow.shareData({'type': 'all'});
-                      });
-                      if (context.mounted) Navigator.pop(context);
+                      OverlayHelper.show(type: 'adhkar');
                     },
                     icon: Icons.star_rounded,
-                    label: 'اختبار الـ Overlay البريميوم (TrueCaller Style)',
+                    label: 'اختبار الـ Overlay',
                     isOutline: false,
                     baseColor: context.colors.teal,
                   ),
