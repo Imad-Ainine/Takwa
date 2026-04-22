@@ -88,9 +88,12 @@ class _MainShellState extends ConsumerState<MainShell>
 
   void _switchTab(int idx, {bool updateProvider = true}) {
     final current = ref.read(currentTabProvider);
-    // Use closer comparison for double values check from PageController if needed, 
+    // Use closer comparison for double values check from PageController if needed,
     // but round() is usually fine for discrete tab indexes.
-    if (current == idx && _pageCtrl.hasClients && _pageCtrl.page?.round() == idx) return;
+    if (current == idx &&
+        _pageCtrl.hasClients &&
+        _pageCtrl.page?.round() == idx)
+      return;
 
     HapticFeedback.selectionClick();
 
@@ -181,7 +184,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
     return DrawerScaffold(
       child: Scaffold(
-        backgroundColor: context.colors.night,
+        backgroundColor: context.colors.background,
         body: PageView(
           controller: _pageCtrl,
           physics: const NeverScrollableScrollPhysics(), // manual nav only
@@ -391,7 +394,7 @@ class _SplashScreenState extends State<_SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colors.night,
+      backgroundColor: context.colors.background,
       body: Center(
         child: FadeTransition(
           opacity: _fade,

@@ -8,7 +8,7 @@ class QiyamStoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           const Positioned.fill(

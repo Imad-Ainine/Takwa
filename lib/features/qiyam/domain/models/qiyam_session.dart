@@ -18,6 +18,24 @@ class QiyamStage {
     required this.defaultDuration,
     required this.color,
   });
+
+  QiyamStage copyWith({
+    String? id,
+    String? title,
+    String? subtitle,
+    String? emoji,
+    Duration? defaultDuration,
+    Color? color,
+  }) {
+    return QiyamStage(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      emoji: emoji ?? this.emoji,
+      defaultDuration: defaultDuration ?? this.defaultDuration,
+      color: color ?? this.color,
+    );
+  }
 }
 
 class QiyamSessionState {

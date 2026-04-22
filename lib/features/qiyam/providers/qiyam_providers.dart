@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import '../domain/models/qiyam_session.dart';
 
 class QiyamNotifier extends StateNotifier<QiyamSessionState> {
@@ -43,6 +44,17 @@ class QiyamNotifier extends StateNotifier<QiyamSessionState> {
     }
   }
 
+  void updatePlanDuration(Duration duration) {
+    _timer?.cancel();
+    final updatedStages = state.stages.map((s) => s.copyWith(defaultDuration: duration)).toList();
+    state = state.copyWith(
+      stages: updatedStages,
+      elapsed: Duration.zero,
+      status: QiyamStageStatus.idle,
+      currentStageIndex: 0,
+    );
+  }
+
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -68,3 +80,16 @@ final qiyamSessionProvider =
     StateNotifierProvider<QiyamNotifier, QiyamSessionState>((ref) {
       return QiyamNotifier();
     });
+
+// ── Qiyam Onboarding Provider ──
+final qiyamOnboardingDoneProvider = FutureProvider<bool>((ref) async {
+  final v = await ref.watch(settingsDaoProvider).get('qiyamOnboardingDone');
+  return v == 'true';
+});
+
+final completeQiyamOnboardingProvider = Provider((ref) {
+  return () async {
+    await ref.read(settingsDaoProvider).set('qiyamOnboardingDone', 'true');
+    ref.invalidate(qiyamOnboardingDoneProvider);
+  };
+});

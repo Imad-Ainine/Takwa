@@ -8,6 +8,7 @@ import 'package:takwa/app/main_shell.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import '../widgets/qiyam_onboarding_overlay.dart';
 
 class QiyamDashboardScreen extends ConsumerStatefulWidget {
   const QiyamDashboardScreen({super.key});
@@ -23,6 +24,8 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   late final Animation<double> _pulse;
   late final AudioPlayer _audioPlayer;
 
+  bool _showBanner = false;
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +39,13 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
     _audioPlayer = AudioPlayer();
-    _playWelcomeSound();
+    
+    // Trigger banner when screen is first loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() => _showBanner = true);
+      }
+    });
   }
 
   Future<void> _playWelcomeSound() async {
@@ -57,17 +66,22 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Listen to tab changes to trigger welcome sound when active
+    // Listen to tab changes
     ref.listen(currentTabProvider, (prev, next) {
       if (next == 1) {
-        _playWelcomeSound();
+        // Trigger banner when switching to this tab
+        if (mounted) {
+          setState(() => _showBanner = true);
+        }
       }
     });
 
     final session = ref.watch(qiyamSessionProvider);
+    final onboardingDone =
+        ref.watch(qiyamOnboardingDoneProvider).valueOrNull ?? true;
 
     return Scaffold(
-      backgroundColor: context.colors.night,
+      backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // Background System
@@ -82,24 +96,38 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             child: Column(
               children: [
                 _buildHeader(context, session),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildTimerRing(context, session),
-                      const SizedBox(height: 40),
-                      _buildStageInfo(context, session),
-                      const SizedBox(height: 20),
-                      _buildStoriesButton(context),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildPlanSelector(context, session),
+                        const SizedBox(height: 20),
+                        _buildTimerRing(context, session),
+                        const SizedBox(height: 40),
+                        _buildStageInfo(context, session),
+                        const SizedBox(height: 20),
+                        _buildStoriesButton(context),
+                        const SizedBox(height: 20),
+                        _buildControls(context, session),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
-                _buildControls(context, session),
-                const SizedBox(height: 20),
               ],
             ),
           ),
+
+          // Banner Notification Overlay
+          if (_showBanner && onboardingDone)
+            _IntroBannerNotification(
+              onDismiss: () => setState(() => _showBanner = false),
+            ),
+
+          // Onboarding Overlay
+          if (!onboardingDone)
+            const Positioned.fill(child: QiyamOnboardingOverlay()),
         ],
       ),
     );
@@ -107,7 +135,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   Widget _buildHeader(BuildContext context, QiyamSessionState session) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -137,6 +165,88 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           ),
         ],
       ),
+    );
+  }
+
+
+  Widget _buildPlanSelector(BuildContext context, QiyamSessionState session) {
+    final durations = [5, 10, 15, 20, 30];
+    final currentDuration = session.stages.first.defaultDuration.inMinutes;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: Text(
+            'اختر مدة المرحلة',
+            style: context.typography.caption.copyWith(
+              color: context.colors.textDim,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: durations.map((mins) {
+              final isSelected = currentDuration == mins;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: InkWell(
+                  onTap: () {
+                    ref
+                        .read(qiyamSessionProvider.notifier)
+                        .updatePlanDuration(Duration(minutes: mins));
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.colors.gold.withOpacity(0.1)
+                          : context.colors.card,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected
+                            ? context.colors.gold
+                            : context.colors.border,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          '$mins د',
+                          style: context.typography.bodyLarge.copyWith(
+                            color: isSelected
+                                ? context.colors.gold
+                                : context.colors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'مرحلة',
+                          style: context.typography.caption.copyWith(
+                            color: isSelected
+                                ? context.colors.gold.withOpacity(0.7)
+                                : context.colors.textDim,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -195,7 +305,11 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 Text(stage.emoji, style: const TextStyle(fontSize: 40)),
                 const SizedBox(height: 8),
                 Text(
-                  _formatDuration(session.elapsed),
+                  _formatDuration(
+                    (stage.defaultDuration - session.elapsed).isNegative
+                        ? Duration.zero
+                        : stage.defaultDuration - session.elapsed,
+                  ),
                   style: context.typography.displayLarge.copyWith(
                     fontSize: 36,
                     color: context.colors.textPrimary,
@@ -203,7 +317,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   ),
                 ),
                 Text(
-                  'الوقت المنقضي',
+                  'الوقت المتبقي',
                   style: context.typography.caption.copyWith(
                     color: context.colors.textDim,
                     fontSize: 10,
@@ -341,6 +455,145 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
           side: BorderSide(color: context.colors.gold.withOpacity(0.3)),
+        ),
+      ),
+    );
+  }
+}
+
+class _IntroBannerNotification extends StatefulWidget {
+  final VoidCallback onDismiss;
+  const _IntroBannerNotification({required this.onDismiss});
+
+  @override
+  State<_IntroBannerNotification> createState() =>
+      _IntroBannerNotificationState();
+}
+
+class _IntroBannerNotificationState extends State<_IntroBannerNotification>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, -1.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
+
+    _ctrl.forward();
+
+    // Auto dismiss after 6 seconds
+    Future.delayed(const Duration(seconds: 6), () {
+      if (mounted) {
+        _handleDismiss();
+      }
+    });
+  }
+
+  void _handleDismiss() {
+    _ctrl.reverse().then((_) => widget.onDismiss());
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 10,
+      left: 16,
+      right: 16,
+      child: SlideTransition(
+        position: _slide,
+        child: FadeTransition(
+          opacity: _fade,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    context.colors.gold,
+                    context.colors.goldDark,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: context.colors.gold.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text('🌙', style: TextStyle(fontSize: 24)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'قيام الليل',
+                          style: context.typography.headingMedium.copyWith(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'برنامج متكامل لصلاة الليل... خطوة للقرب من الله.',
+                          style: context.typography.caption.copyWith(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _handleDismiss,
+                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

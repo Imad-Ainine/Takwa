@@ -79,19 +79,35 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             ),
 
             SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(style, context),
-                  const Spacer(),
-                  _buildDhikrSelector(state, style, context),
-                  const Spacer(),
-                  _buildCounterDisplay(state, style),
-                  const Spacer(),
-                  _buildMainBead(state, style),
-                  const Spacer(),
-                  _buildBottomControls(state, style),
-                  const SizedBox(height: 40),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final availableHeight = constraints.maxHeight;
+                  // Adjusted scale factor to maintain aesthetics on smaller screens
+                  final scale = (availableHeight / 780).clamp(0.7, 1.0);
+                  
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: availableHeight),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          children: [
+                            _buildHeader(style, context),
+                            const Spacer(),
+                            _buildDhikrSelector(state, style, context),
+                            const Spacer(),
+                            _buildCounterDisplay(state, style, scale),
+                            const Spacer(),
+                            _buildMainBead(state, style, scale),
+                            const Spacer(),
+                            _buildBottomControls(state, style),
+                            SizedBox(height: 32 * scale),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -146,67 +162,147 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     final hasDhikr = state.selectedDhikr != null;
     return GestureDetector(
       onTap: () => _showDhikrListModal(style, context),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 24),
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: style.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: hasDhikr ? style.gold.withOpacity(0.5) : style.border,
+            color: hasDhikr ? style.gold.withOpacity(0.6) : style.border,
+            width: hasDhikr ? 1.5 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: style.gold.withOpacity(hasDhikr ? 0.1 : 0),
-              blurRadius: 15,
+              color: hasDhikr
+                  ? style.gold.withOpacity(0.12)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: 20,
               spreadRadius: 2,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Column(
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.menu_book_rounded, color: style.gold, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  hasDhikr ? 'الذكر المحدد' : 'اختر ذكراً (اختياري)',
-                  style: style.naskh(12, color: style.gold),
-                ),
-                if (hasDhikr) ...[
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref.read(misbahaProvider.notifier).clearDhikr();
-                    },
-                    child: Icon(
-                      Icons.close_rounded,
-                      color: style.textSec,
-                      size: 20,
-                    ),
+            // Subtle Pattern Overlay
+            if (hasDhikr)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.05,
+                  child: CustomPatternBackground(
+                    pattern: BackgroundPattern.twelveFoldStar,
+                    color: style.gold,
                   ),
-                ],
-              ],
-            ),
-            if (hasDhikr) ...[
-              const SizedBox(height: 12),
-              Text(
-                state.selectedDhikr!.arabic,
-                textAlign: TextAlign.center,
-                style: style.amiri(18, color: style.text),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ],
+
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: style.gold.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          hasDhikr
+                              ? Icons.auto_awesome_rounded
+                              : Icons.menu_book_rounded,
+                          color: style.gold,
+                          size: 16,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        hasDhikr ? 'الذكر المختار' : 'اختر ذكراً للتسبيح',
+                        style: style.naskh(13,
+                            color: style.gold, weight: FontWeight.w600),
+                      ),
+                      const Spacer(),
+                      if (hasDhikr)
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            ref.read(misbahaProvider.notifier).clearDhikr();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: style.textDim.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: style.textSec,
+                              size: 18,
+                            ),
+                          ),
+                        )
+                      else
+                        Icon(Icons.chevron_left_rounded,
+                            color: style.gold, size: 20),
+                    ],
+                  ),
+                  if (hasDhikr) ...[
+                    const SizedBox(height: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 140),
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            Opacity(
+                              opacity: 0.15,
+                              child: Icon(
+                                Icons.format_quote_rounded,
+                                color: style.gold,
+                                size: 32,
+                              ),
+                            ),
+                            Text(
+                              state.selectedDhikr!.arabic,
+                              textAlign: TextAlign.center,
+                              style: style.amiri(20, color: style.text, height: 1.5),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (state.selectedDhikr!.arabic.length > 50)
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: style.gold.withOpacity(0.3),
+                        size: 20,
+                      ),
+                  ] else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك',
+                        style: style.naskh(12, color: style.textDim),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCounterDisplay(MisbahaState state, AdaptiveStyle style) {
+
+  Widget _buildCounterDisplay(MisbahaState state, AdaptiveStyle style, double scale) {
+    final size = 180.0 * scale;
     return Column(
       children: [
         Stack(
@@ -215,11 +311,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             // Circular progress indicator around the number
             if (state.selectedDhikr != null)
               SizedBox(
-                width: 180,
-                height: 180,
+                width: size,
+                height: size,
                 child: CircularProgressIndicator(
                   value: state.count / state.selectedDhikr!.count,
-                  strokeWidth: 4,
+                  strokeWidth: 4 * scale,
                   color: style.gold.withOpacity(0.6),
                   backgroundColor: style.gold.withOpacity(0.05),
                 ),
@@ -230,7 +326,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                   '${state.count}',
                   style: TextStyle(
                     fontFamily: 'Amiri',
-                    fontSize: 90,
+                    fontSize: 90 * scale,
                     fontWeight: FontWeight.bold,
                     color: style.text,
                     height: 1.0,
@@ -239,7 +335,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 if (state.selectedDhikr != null)
                   Text(
                     '/ ${state.selectedDhikr!.count}',
-                    style: style.naskh(16, color: style.gold.withOpacity(0.7)),
+                    style: style.naskh(16 * scale, color: style.gold.withOpacity(0.7)),
                   ),
               ],
             ),
@@ -249,7 +345,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-  Widget _buildMainBead(MisbahaState state, AdaptiveStyle style) {
+  Widget _buildMainBead(MisbahaState state, AdaptiveStyle style, double scale) {
+    final size = 220.0 * scale;
+    final innerSize = 190.0 * scale;
+    
     return Column(
       children: [
         ScaleTransition(
@@ -264,12 +363,12 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               alignment: Alignment.center,
               children: [
                 // Pulse Animation Background
-                if (state.isListening) _ListeningRipple(color: style.teal),
-
+                if (state.isListening) _ListeningRipple(color: style.teal, size: size),
+ 
                 // The Main Bead
                 Container(
-                  width: 220,
-                  height: 220,
+                  width: size,
+                  height: size,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -283,16 +382,16 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       BoxShadow(
                         color: (state.isListening ? style.teal : style.gold)
                             .withOpacity(0.4),
-                        blurRadius: 30,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 10),
+                        blurRadius: 30 * scale,
+                        spreadRadius: 5 * scale,
+                        offset: Offset(0, 10 * scale),
                       ),
                     ],
                   ),
                   child: Center(
                     child: Container(
-                      width: 190,
-                      height: 190,
+                      width: innerSize,
+                      height: innerSize,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withOpacity(0.1),
@@ -308,16 +407,16 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                             state.isListening
                                 ? Icons.mic_rounded
                                 : Icons.fingerprint_rounded,
-                            size: 64,
+                            size: 64 * scale,
                             color: Colors.white,
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8 * scale),
                           Text(
                             state.isListening
                                 ? 'جاري الاستماع...'
                                 : 'انقر أو اضغط مطولاً',
                             style: style.naskh(
-                              12,
+                              12 * scale,
                               color: Colors.white.withOpacity(0.9),
                             ),
                           ),
@@ -515,7 +614,8 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
 
 class _ListeningRipple extends StatefulWidget {
   final Color color;
-  const _ListeningRipple({required this.color});
+  final double size;
+  const _ListeningRipple({required this.color, required this.size});
 
   @override
   State<_ListeningRipple> createState() => _ListeningRippleState();
@@ -554,8 +654,8 @@ class _ListeningRippleState extends State<_ListeningRipple>
                 child: Opacity(
                   opacity: (1.0 - (_ctrl.value + i / 3) % 1.0).clamp(0.0, 1.0),
                   child: Container(
-                    width: 200,
-                    height: 200,
+                    width: widget.size * 0.9,
+                    height: widget.size * 0.9,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
