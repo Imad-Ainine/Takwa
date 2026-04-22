@@ -199,7 +199,6 @@ import 'package:takwa/core/notifications/overlays/unified_overlay_window.dart';
 // ────────────────────────────────────────────
 @pragma('vm:entry-point')
 void overlayMain() {
-  // ✅ FIX: معالجة الأخطاء في الـ overlay isolate لمنع الـ crash الصامت
   WidgetsFlutterBinding.ensureInitialized();
   FlutterError.onError = (details) {
     debugPrint('Overlay isolate error: ${details.exceptionAsString()}');

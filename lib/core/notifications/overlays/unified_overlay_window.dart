@@ -982,15 +982,15 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
           // ── Multi-layer glow ──
           boxShadow: [
             BoxShadow(
-              color: _IGold.gold2.withOpacity(_glowAnim.value * 0.35),
-              blurRadius: 28,
-              spreadRadius: 1,
+              color: _IGold.gold2.withOpacity(_glowAnim.value * 0.2),
+              blurRadius: 15,
+              spreadRadius: 0.5,
               offset: const Offset(-3, 0),
             ),
             BoxShadow(
-              color: _IGold.gold1.withOpacity(_glowAnim.value * 0.12),
-              blurRadius: 50,
-              spreadRadius: 4,
+              color: _IGold.gold1.withOpacity(_glowAnim.value * 0.05),
+              blurRadius: 25,
+              spreadRadius: 1,
               offset: const Offset(-6, 0),
             ),
             BoxShadow(
@@ -1146,9 +1146,9 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
             ),
             boxShadow: [
               BoxShadow(
-                color: _IGold.gold2.withOpacity(0.3),
-                blurRadius: 10,
-                spreadRadius: 1,
+                color: _IGold.gold2.withOpacity(0.15),
+                blurRadius: 6,
+                spreadRadius: 0.5,
               ),
             ],
           ),
