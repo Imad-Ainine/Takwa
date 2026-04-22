@@ -23,6 +23,11 @@ import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.
 import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
 import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
 import 'package:takwa/features/checklist/screens/manage_custom_ibadah_screen.dart';
+import 'package:takwa/features/settings/presentation/screens/subscription_screen.dart';
+import 'package:takwa/features/settings/presentation/screens/payment_methods_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_dashboard_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_calculator_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_stories_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -52,6 +57,11 @@ class Routes {
   static const String mosques = '/mosques';
   static const String misbaha = '/misbaha';
   static const String manageCustomIbadah = '/manage-custom-ibadah';
+  static const String subscription = '/subscription';
+  static const String paymentMethods = '/payment-methods';
+  static const String qiyam = '/qiyam';
+  static const String qiyamCalculator = '/qiyam-calculator';
+  static const String qiyamStories = '/qiyam-stories';
 }
 
 /// Centralized route generation and management.
@@ -125,6 +135,16 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MisbahaScreen());
       case Routes.manageCustomIbadah:
         return MaterialPageRoute(builder: (_) => const ManageCustomIbadahScreen());
+      case Routes.subscription:
+        return MaterialPageRoute(builder: (_) => const SubscriptionScreen());
+      case Routes.paymentMethods:
+        return MaterialPageRoute(builder: (_) => const PaymentMethodsScreen());
+      case Routes.qiyam:
+        return MaterialPageRoute(builder: (_) => const QiyamDashboardScreen());
+      case Routes.qiyamCalculator:
+        return MaterialPageRoute(builder: (_) => const QiyamCalculatorScreen());
+      case Routes.qiyamStories:
+        return MaterialPageRoute(builder: (_) => const QiyamStoriesScreen());
       default:
         return MaterialPageRoute(
           builder: (_) =>

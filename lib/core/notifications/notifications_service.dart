@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,8 @@ import 'package:adhan/adhan.dart' as adhan;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:hijri/hijri_calendar.dart';
+import 'package:takwa/features/duas/data/duas_data.dart';
 
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -54,6 +57,18 @@ class NotifIds {
 
   // إنجاز جديد
   static const achievement = 500;
+
+  // أدعية
+  static const randomDua = 600;
+  static const dailyDuaMorning = 601;
+  static const dailyDuaEvening = 602;
+
+  // تنبيهات خاصة
+  static const fridayKahf = 700;
+  static const fridaySalawat = 701;
+  static const fastingMonday = 702;
+  static const fastingThursday = 703;
+  static const fastingWhiteDays = 704;
 }
 
 // ─────────────────────────────────────────
@@ -101,6 +116,21 @@ class NotifChannels {
         description: 'إشعارات الإنجازات الجديدة',
         importance: Importance.high,
       );
+
+  static const AndroidNotificationChannel duas = AndroidNotificationChannel(
+    'duas',
+    'الأدعية والرقية',
+    description: 'تذكيرات ونفحات من الأدعية النبوية والقرآنية',
+    importance: Importance.defaultImportance,
+  );
+
+  static const AndroidNotificationChannel reminders =
+      AndroidNotificationChannel(
+        'special_reminders',
+        'تذكيرات إيمانية',
+        description: 'تذكيرات بسنن الجمعة واليام البيض والصيام',
+        importance: Importance.defaultImportance,
+      );
 }
 
 // ─────────────────────────────────────────
@@ -128,6 +158,7 @@ class PrayerTimeInfo {
 class NotificationsService {
   static final plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
+  static final _random = Random();
 
   // ── تهيئة الخدمة ──
   static Future<void> initialize() async {
@@ -164,6 +195,8 @@ class NotificationsService {
       await androidPlugin?.createNotificationChannel(NotifChannels.muhasaba);
       await androidPlugin?.createNotificationChannel(NotifChannels.adhkar);
       await androidPlugin?.createNotificationChannel(NotifChannels.achievement);
+      await androidPlugin?.createNotificationChannel(NotifChannels.duas);
+      await androidPlugin?.createNotificationChannel(NotifChannels.reminders);
     }
 
     _initialized = true;
@@ -407,6 +440,231 @@ class NotificationsService {
         ),
       ),
       payload: 'achievement:new',
+    );
+  }
+
+  // ── جدولة التنبيهات الخاصة (الجمعة، الصيام) ──
+  static Future<void> scheduleSpecialReminders({
+    required bool fridayReminders,
+    required bool fastingReminders,
+  }) async {
+    // إلغاء التنبيهات القديمة
+    final specialIds = [
+      NotifIds.fridayKahf,
+      NotifIds.fridaySalawat,
+      NotifIds.fastingMonday,
+      NotifIds.fastingThursday,
+      NotifIds.fastingWhiteDays,
+    ];
+    for (final id in specialIds) {
+      await plugin.cancel(id);
+    }
+
+    if (fridayReminders) {
+      await _scheduleWeekly(
+        id: NotifIds.fridayKahf,
+        title: 'سورة الكهف 📖',
+        body: 'لا تنس قراءة سورة الكهف، نور ما بين الجمعتين',
+        day: DateTime.friday,
+        hour: 10,
+        minute: 0,
+        payload: 'reminder:kahf',
+      );
+      await _scheduleWeekly(
+        id: NotifIds.fridaySalawat,
+        title: 'يوم الجمعة 📿',
+        body: 'أكثروا من الصلاة على النبي ﷺ في هذا اليوم المبارك',
+        day: DateTime.friday,
+        hour: 14,
+        minute: 0,
+        payload: 'reminder:salawat',
+      );
+    }
+
+    if (fastingReminders) {
+      // صيام الاثنين والخميس
+      await _scheduleWeekly(
+        id: NotifIds.fastingMonday,
+        title: 'تذكير بالصيام 🥘',
+        body: 'غداً الاثنين، هنيئاً لمن صام وعمّر وقته بالطاعات',
+        day: DateTime.sunday, // الأحد بالليل
+        hour: 21,
+        minute: 0,
+        payload: 'reminder:fasting_monday',
+      );
+      await _scheduleWeekly(
+        id: NotifIds.fastingThursday,
+        title: 'تذكير بالصيام 🥘',
+        body: 'غداً الخميس، تُرفع فيه الأعمال، فليكن عملك صائماً',
+        day: DateTime.wednesday, // الأربعاء بالليل
+        hour: 21,
+        minute: 0,
+        payload: 'reminder:fasting_thursday',
+      );
+
+      // الأيام البيض (١٣، ١٤، ١٥ من الشهر الهجري)
+      await _scheduleWhiteDays();
+    }
+  }
+
+  static Future<void> _scheduleWeekly({
+    required int id,
+    required String title,
+    required String body,
+    required int day,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    // جدولة ليوم معين من الأسبوع
+    while (scheduledDate.weekday != day || scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    await plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      scheduledDate,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          NotifChannels.reminders.id,
+          NotifChannels.reminders.name,
+          importance: Importance.defaultImportance,
+          styleInformation: BigTextStyleInformation(body),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      payload: payload,
+    );
+  }
+
+  static Future<void> _scheduleWhiteDays() async {
+    final today = HijriCalendar.now();
+    // نحن نجدول للشهر الحالي والشهر القادم لضمان الاستمرارية
+    for (int monthOffset = 0; monthOffset <= 1; monthOffset++) {
+      final h = HijriCalendar.now();
+      if (monthOffset > 0) {
+        h.hMonth++;
+        if (h.hMonth > 12) {
+          h.hMonth = 1;
+          h.hYear++;
+        }
+      }
+
+      for (int day in [13, 14, 15]) {
+        h.hDay = day;
+        final solar = h.hijriToGregorian(h.hYear, h.hMonth, h.hDay);
+        final scheduled = DateTime(solar.year, solar.month, solar.day, 20, 0);
+
+        if (scheduled.isAfter(DateTime.now())) {
+          await _scheduleExact(
+            id: NotifIds.fastingWhiteDays + (monthOffset * 3) + (day - 13),
+            title: 'الأيام البيض ⚪',
+            body: 'غداً هو $day ${h.getLongMonthName()}، صيام الأيام البيض سنّة مؤكدة',
+            scheduledTime: scheduled.subtract(const Duration(days: 1)),
+            channelId: NotifChannels.reminders.id,
+            payload: 'reminder:fasting_white_days',
+          );
+        }
+      }
+    }
+  }
+
+  // ── جدولة الأدعية اليومية ──
+  static Future<void> scheduleDailyDuas() async {
+    final allDuas = kDuasData.values.expand((l) => l).toList();
+    if (allDuas.isEmpty) return;
+
+    // تحسين: اختيار أدعية مناسبة للوقت
+    final morningCats = [DuaCategory.morning, DuaCategory.health, DuaCategory.general];
+    final eveningCats = [DuaCategory.forgiveness, DuaCategory.guidance, DuaCategory.general, DuaCategory.parents];
+
+    final morningDuas = allDuas.where((d) => morningCats.contains(d.category)).toList();
+    final eveningDuas = allDuas.where((d) => eveningCats.contains(d.category)).toList();
+
+    // إشعار الصباح (9:00 ص)
+    final morningDua = morningDuas.isNotEmpty 
+        ? morningDuas[_random.nextInt(morningDuas.length)]
+        : allDuas[_random.nextInt(allDuas.length)];
+    
+    await _scheduleDailyAt(
+      id: NotifIds.dailyDuaMorning,
+      title: 'نفحة صباحية ✨',
+      body: '${morningDua.emoji} ${morningDua.arabic}',
+      time: const TimeOfDay(hour: 9, minute: 0),
+      channelId: NotifChannels.duas.id,
+      payload: 'dua:${morningDua.id}',
+    );
+
+    // إشعار المساء (9:00 م)
+    final eveningDua = eveningDuas.isNotEmpty
+        ? eveningDuas[_random.nextInt(eveningDuas.length)]
+        : allDuas[_random.nextInt(allDuas.length)];
+
+    await _scheduleDailyAt(
+      id: NotifIds.dailyDuaEvening,
+      title: 'دعاء المساء 🌙',
+      body: '${eveningDua.emoji} ${eveningDua.arabic}',
+      time: const TimeOfDay(hour: 21, minute: 0),
+      channelId: NotifChannels.duas.id,
+      payload: 'dua:${eveningDua.id}',
+    );
+  }
+
+  // ── جدولة دعاء عشوائي (عند الطلب) ──
+  static Future<void> scheduleRandomDua() async {
+    final allDuas = kDuasData.values.expand((l) => l).toList();
+    if (allDuas.isEmpty) return;
+
+    final dua = allDuas[_random.nextInt(allDuas.length)];
+
+    await showNotification(
+      id: NotifIds.randomDua,
+      title: 'دعاء اليوم 🤲',
+      body: '${dua.emoji} ${dua.arabic}',
+      payload: 'dua:${dua.id}',
+      channel: NotifChannels.duas,
+    );
+  }
+
+  // ── عرض إشعار بسيط ──
+  static Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+    required AndroidNotificationChannel channel,
+  }) async {
+    await plugin.show(
+      id,
+      title,
+      body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: channel.description,
+          importance: channel.importance,
+          styleInformation: BigTextStyleInformation(body),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      payload: payload,
     );
   }
 
@@ -789,6 +1047,19 @@ class NotificationsManager {
       defaultVal: false,
     );
 
+    final specialReminders = await settings.getBool(
+      'specialRemindersOn',
+      defaultVal: true,
+    );
+    final fastingReminders = await settings.getBool(
+      'fastingRemindersOn',
+      defaultVal: true,
+    );
+    final dailyDuasOn = await settings.getBool(
+      'dailyDuasOn',
+      defaultVal: true,
+    );
+
     // ── أوقات الصلاة ──
     if (prayerReminder) {
       final prayers = await ref.read(prayerTimesProvider.future);
@@ -816,6 +1087,17 @@ class NotificationsManager {
         eveningTime: const TimeOfDay(hour: 17, minute: 0),
       );
     }
+
+    // ── الأدعية اليومية ──
+    if (dailyDuasOn) {
+      await NotificationsService.scheduleDailyDuas();
+    }
+
+    // ── التنبيهات الخاصة (جمعة، صيام) ──
+    await NotificationsService.scheduleSpecialReminders(
+      fridayReminders: specialReminders,
+      fastingReminders: fastingReminders,
+    );
   }
 
   // إعادة الجدولة عند تغيير الإعدادات

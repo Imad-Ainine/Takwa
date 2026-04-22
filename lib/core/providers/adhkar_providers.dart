@@ -8,7 +8,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
@@ -786,7 +785,8 @@ class _AdhkarNotifSheet extends ConsumerWidget {
               children: [
                 Text(
                   'إشعارات الأذكار',
-                  style: GoogleFonts.amiri(
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
                     fontSize: 18,
                     color: context.colors.gold,
                     fontWeight: FontWeight.w700,
@@ -823,7 +823,8 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   const SizedBox(width: 10),
                   Text(
                     'الإشعارات متوقفة',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: context.colors.textDim,
                     ),
@@ -903,9 +904,12 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            'تم إرسال إشعار تجريبي ✓',
-                            style: GoogleFonts.notoNaskhArabic(fontSize: 13),
+                          content: const Text(
+                            'تم إرسconst ال إشعار تجريبي ✓',
+                            style: TextStyle(
+                              fontFamily: 'NotoNaskhArabic',
+                              fontSize: 13,
+                            ),
                           ),
                           backgroundColor: context.colors.success,
                           behavior: SnackBarBehavior.floating,
@@ -922,7 +926,8 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Text(
                           'اختبار إشعار ذكر الآن',
-                          style: GoogleFonts.notoNaskhArabic(
+                          style: TextStyle(
+                            fontFamily: 'NotoNaskhArabic',
                             fontSize: 13,
                             color: context.colors.gold,
                           ),
@@ -978,7 +983,8 @@ class _NotifRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.notoNaskhArabic(
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
                 color: context.colors.textPrimary,
               ),
@@ -997,7 +1003,8 @@ class _NotifRow extends StatelessWidget {
               ),
               child: Text(
                 '$h:$m',
-                style: GoogleFonts.notoNaskhArabic(
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 15,
                   color: context.colors.gold,
                   fontWeight: FontWeight.w700,
@@ -1033,7 +1040,8 @@ class _ToggleRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 13,
               color: context.colors.textPrimary,
             ),

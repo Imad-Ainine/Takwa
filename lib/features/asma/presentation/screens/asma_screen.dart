@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/features/asma/data/asma_data.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
@@ -310,9 +309,12 @@ class _AsmaCard extends StatelessWidget {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
+                          content: const Text(
                             'تم النسخ ✓',
-                            style: GoogleFonts.notoNaskhArabic(fontSize: 12),
+                            style: TextStyle(
+                              fontFamily: 'NotoNaskhArabic',
+                              fontSize: 12,
+                            ),
                           ),
                           backgroundColor: s.teal,
                           behavior: SnackBarBehavior.floating,
@@ -343,7 +345,8 @@ class _AsmaCard extends StatelessWidget {
               Text(
                 item.transliteration,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 10,
                   color: s.textSec.withOpacity(0.7),
                   letterSpacing: 1.2,
@@ -449,7 +452,8 @@ class _NumberBadge extends StatelessWidget {
       child: Center(
         child: Text(
           num.toString(),
-          style: GoogleFonts.inter(
+          style: TextStyle(
+            fontFamily: 'Amiri',
             color: style.bg,
             fontWeight: FontWeight.w700,
             fontSize: mini ? 10 : 13,

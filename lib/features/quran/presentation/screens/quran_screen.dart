@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
@@ -185,9 +184,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           // Title
           Column(
             children: [
-              Text(
+              const Text(
                 'ختمة',
-                style: GoogleFonts.amiri(
+                style: TextStyle(
+                  fontFamily: 'Amiri',
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -203,9 +203,13 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: kGoldChip.withOpacity(0.5)),
                 ),
-                child: Text(
+                child: const Text(
                   'القرآن الكريم',
-                  style: GoogleFonts.amiri(fontSize: 12, color: kGoldChip),
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 12,
+                    color: kGoldChip,
+                  ),
                 ),
               ),
             ],
@@ -252,7 +256,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(width: 8),
             Text(
               hijriDateString(),
-              style: GoogleFonts.outfit(fontSize: 13, color: Colors.white70),
+              style: const TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 13,
+                color: Colors.white70,
+              ),
             ),
           ],
         ),
@@ -316,9 +324,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     // Simple share action placeholder
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
+        content: const Text(
           'جاري المشاركة...',
-          style: GoogleFonts.amiri(color: Colors.white),
+          style: TextStyle(fontFamily: 'Amiri', color: Colors.white),
         ),
         backgroundColor: kGreenCard,
         behavior: SnackBarBehavior.floating,
@@ -382,15 +390,16 @@ class _SurahPickerState extends ConsumerState<_SurahPickerScreen>
     );
   }
 
-  Widget _buildHeader() => Padding(
-    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+  Widget _buildHeader() => const Padding(
+    padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
     child: Row(
       children: [
-        const CustomLeadingButton(),
-        const SizedBox(width: 14),
+        CustomLeadingButton(),
+        SizedBox(width: 14),
         Text(
           'قراءة حرة',
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Amiri',
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: kGold,
@@ -436,17 +445,25 @@ class _SurahPickerState extends ConsumerState<_SurahPickerScreen>
       labelColor: kGold,
       unselectedLabelColor: Colors.white38,
       dividerColor: Colors.transparent,
-      tabs: [
+      tabs: const [
         Tab(
           child: Text(
             'السور',
-            style: GoogleFonts.amiri(fontSize: 17, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         Tab(
           child: Text(
             'الأجزاء',
-            style: GoogleFonts.amiri(fontSize: 17, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontFamily: 'Amiri',
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],

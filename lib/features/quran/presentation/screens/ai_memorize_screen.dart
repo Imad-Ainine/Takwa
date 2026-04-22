@@ -5,7 +5,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
@@ -104,11 +103,12 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                 children: [
                   const CustomLeadingButton(),
                   const Spacer(),
-                  Column(
+                  const Column(
                     children: [
                       Text(
                         'تحفيظ ذكي',
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                    fontFamily: 'Amiri',
                           fontSize: 22,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -116,7 +116,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                       ),
                       Text(
                         'حفظ القرآن بالذكاء الاصطناعي',
-                        style: GoogleFonts.outfit(
+                        style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                           fontSize: 11,
                           color: Colors.white38,
                         ),
@@ -161,7 +162,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                       ),
                       child: Text(
                         surahs[i].arabicName,
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                    fontFamily: 'Amiri',
                           fontSize: 14,
                           color: sel ? kGreenDark : Colors.white60,
                           fontWeight: sel ? FontWeight.bold : FontWeight.normal,
@@ -206,7 +208,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                               ),
                               child: Text(
                                 surah.arabicName,
-                                style: GoogleFonts.amiri(
+                                style: const TextStyle(
+                    fontFamily: 'Amiri',
                                   fontSize: 13,
                                   color: kGoldChip,
                                 ),
@@ -214,7 +217,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                             ),
                             Text(
                               'آية ${ar(ayah.ayahNumber)}',
-                              style: GoogleFonts.outfit(
+                              style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                                 fontSize: 12,
                                 color: Colors.white38,
                               ),
@@ -237,7 +241,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                                 child: Text(
                                   revealed ? e.value : '___',
                                   key: ValueKey('$revealed${e.key}'),
-                                  style: GoogleFonts.amiriQuran(
+                                  style: TextStyle(
+                    fontFamily: 'Amiri',
                                     fontSize: 22,
                                     color: revealed
                                         ? Colors.white
@@ -335,7 +340,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
     ),
     child: Text(
       '${ar(pct)}٪',
-      style: GoogleFonts.outfit(
+      style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
         fontSize: 14,
         color: kGoldChip,
         fontWeight: FontWeight.bold,
@@ -362,7 +368,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
         children: [
           Icon(icon, color: color, size: 16),
           const SizedBox(width: 6),
-          Text(label, style: GoogleFonts.amiri(fontSize: 14, color: color)),
+          Text(label, style: TextStyle(
+                    fontFamily: 'Amiri',fontSize: 14, color: color)),
         ],
       ),
     ),
@@ -381,7 +388,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
           child: Center(
             child: Text(
               label,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                    fontFamily: 'Amiri',
                 fontSize: 17,
                 color: fg,
                 fontWeight: FontWeight.bold,

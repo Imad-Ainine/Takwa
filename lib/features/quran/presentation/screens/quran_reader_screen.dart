@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../data/quran_data.dart';
@@ -314,7 +313,8 @@ class _SurahHeader extends StatelessWidget {
     child: Center(
       child: Text(
         'سورة $name',
-        style: GoogleFonts.amiri(
+        style: const TextStyle(
+          fontFamily: 'Amiri',
           fontSize: 20,
           color: kGoldChip,
           fontWeight: FontWeight.bold,
@@ -328,12 +328,13 @@ class _Basmala extends StatelessWidget {
   const _Basmala();
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+  Widget build(BuildContext context) => const Padding(
+    padding: EdgeInsets.symmetric(vertical: 6),
     child: Text(
       'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
       textAlign: TextAlign.center,
-      style: GoogleFonts.amiriQuran(
+      style: TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 22,
         color: Colors.white,
         height: 2,
@@ -372,7 +373,8 @@ class _AyahBlock extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '${a.text} ',
-                  style: GoogleFonts.amiriQuran(
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
                     fontSize: fontSize,
                     color: isPlaying ? kGoldChip : Colors.white,
                     height: 1.9,
@@ -395,7 +397,8 @@ class _AyahBlock extends StatelessWidget {
                       ),
                       child: Text(
                         ar(a.ayahNumber as int),
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
                           fontSize: 11,
                           color: isPlaying ? kGoldChip : Colors.white54,
                         ),
@@ -451,7 +454,8 @@ class _TopBar extends StatelessWidget {
               const Spacer(),
               Text(
                 'سورة $surahName',
-                style: GoogleFonts.amiri(
+                style: const TextStyle(
+                  fontFamily: 'Amiri',
                   fontSize: 17,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -570,7 +574,8 @@ class _BottomBar extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '$surahName: ${ar(state.currentAyah)}',
-                        style: GoogleFonts.amiri(
+                        style: const TextStyle(
+                          fontFamily: 'Amiri',
                           fontSize: 14,
                           color: Colors.white70,
                         ),
@@ -627,7 +632,11 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
-    style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54),
+    style: const TextStyle(
+      fontFamily: 'NotoNaskhArabic',
+      fontSize: 11,
+      color: Colors.white54,
+    ),
   );
 }
 
@@ -667,18 +676,23 @@ class _SettingsSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'إعدادات القراءة',
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Amiri',
               fontSize: 22,
               color: kGoldChip,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             'حجم الخط',
-            style: GoogleFonts.outfit(color: Colors.white60, fontSize: 13),
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
+              color: Colors.white60,
+              fontSize: 13,
+            ),
           ),
           StatefulBuilder(
             builder: (_, set) => Slider(
@@ -694,9 +708,13 @@ class _SettingsSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'نمط الخلفية',
-            style: GoogleFonts.outfit(color: Colors.white60, fontSize: 13),
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
+              color: Colors.white60,
+              fontSize: 13,
+            ),
           ),
           const SizedBox(height: 12),
           Row(

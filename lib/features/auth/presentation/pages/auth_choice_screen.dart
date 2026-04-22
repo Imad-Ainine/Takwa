@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
@@ -89,8 +90,8 @@ class AuthChoiceScreen extends ConsumerWidget {
                         icon: Icons.person_outline_rounded,
                         isOutline: true,
                         onTap: () async {
-                          // If guest mode is true, authStatusProvider will change to guest.
-                          // Navigation is handled by the root redirect or shell.
+                          // تفعيل وضع الضيف
+                          ref.read(guestModeProvider.notifier).state = true;
                           Navigator.pushReplacementNamed(context, Routes.home);
                         },
                       ),

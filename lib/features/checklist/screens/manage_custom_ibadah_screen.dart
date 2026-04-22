@@ -208,7 +208,7 @@ class _IbadahTile extends ConsumerWidget {
                       isActive: drift.Value(val),
                     ),
                   );
-              await SyncManager.syncCustomIbadah(ref, updatedItem);
+              await ref.read(syncManagerProvider).syncCustomIbadah(updatedItem);
             },
           ),
           IconButton(
@@ -250,7 +250,9 @@ class _IbadahTile extends ConsumerWidget {
               if (confirm == true && context.mounted) {
                 try {
                   await ref.read(customIbadahDaoProvider).deleteIbadah(item.id);
-                  await SyncManager.deleteCustomIbadah(ref, item.id);
+                  await ref
+                      .read(syncManagerProvider)
+                      .deleteCustomIbadah(item.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('تم الحذف بنجاح')),
@@ -368,7 +370,7 @@ class _UpsertCustomIbadahDialogState
                   points: drift.Value(_points),
                 ),
               );
-          await SyncManager.syncCustomIbadah(ref, updated);
+          await ref.read(syncManagerProvider).syncCustomIbadah(updated);
         } else {
           final id = await ref
               .read(customIbadahDaoProvider)
@@ -390,7 +392,7 @@ class _UpsertCustomIbadahDialogState
             sortOrder: 0,
             emoji: '⭐',
           );
-          await SyncManager.syncCustomIbadah(ref, newData);
+          await ref.read(syncManagerProvider).syncCustomIbadah(newData);
         }
 
         if (mounted) {

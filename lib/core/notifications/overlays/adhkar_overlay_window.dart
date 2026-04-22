@@ -1,35 +1,12 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/notifications/overlays/adhkar_overlay_window.dart
-//  تقوى — Overlay Entry Point (يستدعي UnifiedOverlayWindow)
-//  ملاحظة: يجب أن يكون overlayMain هنا فقط (نقطة دخول واحدة)
+//  تقوى — Overlay Helper Methods
 // ═══════════════════════════════════════════════════════════════
 
-import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'unified_overlay_window.dart';
-
-// ────────────────────────────────────────────
-//  OVERLAY ENTRY POINT  (vm:entry-point إجباري)
-// ────────────────────────────────────────────
-
-@pragma('vm:entry-point')
-void overlayMain() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    const ProviderScope(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: UnifiedOverlayWindow(),
-      ),
-    ),
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  HELPER: إظهار/إخفاء الـ Overlay
-// ═══════════════════════════════════════════════════════════════
+// Note: overlayMain entry point has been moved to main.dart
+// to ensure the plugin can correctly discover it in all environments.
 
 class AdhkarOverlayNotification {
   /// يُظهر الـ Overlay من يمين الشاشة في المنتصف العمودي.
@@ -40,13 +17,13 @@ class AdhkarOverlayNotification {
     await FlutterOverlayWindow.showOverlay(
       enableDrag: true,
       overlayTitle: 'أذكار تقوى',
-      overlayContent: 'ذكر/دعاء متجدد',
+      overlayContent: 'ذكر اليوم',
       flag: OverlayFlag.defaultFlag,
-      alignment: OverlayAlignment.center,
+      alignment: OverlayAlignment.topCenter,
       visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.none,
-      height: 420,
-      width: 320,
+      height: 440, // Optimized height
+      width: 340,  // Optimized width to avoid edge clipping
     );
 
     // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر

@@ -5,7 +5,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -121,7 +120,8 @@ class AboutMeScreen extends StatelessWidget {
           // Arabic Name
           Text(
             'عماد الدين عينين',
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+                    fontFamily: 'Amiri',
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: context.colors.textPrimary,
@@ -130,7 +130,8 @@ class AboutMeScreen extends StatelessWidget {
           // English Name
           Text(
             'Imadeddine Ainine',
-            style: GoogleFonts.poppins(
+            style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
               fontSize: 18,
               color: context.colors.goldLight,
               letterSpacing: 0.5,
@@ -161,7 +162,8 @@ class AboutMeScreen extends StatelessWidget {
         ),
         Text(
           english,
-          style: GoogleFonts.poppins(
+          style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
             fontSize: 12,
             color: context.colors.textDim,
             fontWeight: FontWeight.w500,
@@ -343,7 +345,8 @@ class AboutMeScreen extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 '© 2026 - Imadeddine Ainine',
-                style: GoogleFonts.poppins(
+                style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                   fontSize: 11,
                   color: context.colors.textDim,
                 ),

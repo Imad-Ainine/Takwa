@@ -10,63 +10,68 @@ import 'supabase_service.dart';
 import 'supabase_providers.dart';
 import '../providers/favorites_providers.dart';
 
+final syncManagerProvider = Provider((ref) => SyncManager(ref));
+
 class SyncManager {
+  final Ref _ref;
+  SyncManager(this._ref);
+
   static bool _syncing = false;
 
   /// Full synchronization on App Start
-  static Future<void> fullSync(WidgetRef ref) async {
+  Future<void> fullSync() async {
     if (_syncing) return;
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     _syncing = true;
     try {
-      await _syncDailyRecords(ref);
-      await _syncProhibitions(ref);
-      await _syncCustomIbadah(ref);
-      await _syncAchievements(ref);
-      await _syncSettings(ref);
-      await _syncStats(ref);
+      await _syncDailyRecords();
+      await _syncProhibitions();
+      await _syncCustomIbadah();
+      await _syncAchievements();
+      await _syncSettings();
+      await _syncStats();
     } finally {
       _syncing = false;
     }
   }
 
-  static Future<void> _syncDailyRecords(WidgetRef ref) async {
+  Future<void> _syncDailyRecords() async {
     final from = DateTime.now().subtract(const Duration(days: 30));
     final remoteRecords = await SupabaseService.getRecordsRange(
       from: from,
       to: DateTime.now(),
     );
 
-    final dao = ref.read(dailyRecordDaoProvider);
+    final dao = _ref.read(dailyRecordDaoProvider);
     for (final record in remoteRecords) {
       await dao.upsertFromRemote(record);
     }
   }
 
-  static Future<void> _syncProhibitions(WidgetRef ref) async {
+  Future<void> _syncProhibitions() async {
     final from = DateTime.now().subtract(const Duration(days: 14));
     final remoteLogs = await SupabaseService.getProhibitionLogs(
       from: from,
       to: DateTime.now(),
     );
 
-    final dao = ref.read(dailyRecordDaoProvider);
+    final dao = _ref.read(dailyRecordDaoProvider);
     for (final log in remoteLogs) {
       await dao.upsertProhibitionFromRemote(log);
     }
   }
 
-  static Future<void> _syncCustomIbadah(WidgetRef ref) async {
+  Future<void> _syncCustomIbadah() async {
     final remoteIbadah = await SupabaseService.getCustomIbadah();
     final remoteLogs = await SupabaseService.getCustomIbadahLogs(
       from: DateTime.now().subtract(const Duration(days: 14)),
       to: DateTime.now(),
     );
 
-    final ibadahDao = ref.read(customIbadahDaoProvider);
+    final ibadahDao = _ref.read(customIbadahDaoProvider);
     for (final item in remoteIbadah) {
       await ibadahDao.upsertCustomIbadahFromRemote(item);
     }
@@ -75,9 +80,9 @@ class SyncManager {
     }
   }
 
-  static Future<void> _syncAchievements(WidgetRef ref) async {
+  Future<void> _syncAchievements() async {
     final remoteAchievements = await SupabaseService.getEarnedAchievements();
-    final statsDao = ref.read(statsDaoProvider);
+    final statsDao = _ref.read(statsDaoProvider);
 
     for (final data in remoteAchievements) {
       await statsDao.addAchievement(
@@ -90,9 +95,9 @@ class SyncManager {
     }
   }
 
-  static Future<void> _syncSettings(WidgetRef ref) async {
+  Future<void> _syncSettings() async {
     final remote = await SupabaseService.getSettings();
-    final dao = ref.read(settingsDaoProvider);
+    final dao = _ref.read(settingsDaoProvider);
 
     if (remote != null) {
       // If we have remote settings, pull them down
@@ -100,20 +105,20 @@ class SyncManager {
 
       if (remote['favorite_adhkar'] != null) {
         final adhkar = remote['favorite_adhkar'] as List<dynamic>;
-        ref.read(favoriteAdhkarProvider.notifier).syncFromRemote(adhkar);
+        _ref.read(favoriteAdhkarProvider.notifier).syncFromRemote(adhkar);
       }
       if (remote['favorite_duas'] != null) {
         final duas = remote['favorite_duas'] as List<dynamic>;
-        ref.read(favoriteDuasProvider.notifier).syncFromRemote(duas);
+        _ref.read(favoriteDuasProvider.notifier).syncFromRemote(duas);
       }
     } else {
       // If no remote settings exist (new user), push local defaults
-      await syncSettings(ref);
+      await syncSettings();
     }
   }
 
-  static Future<void> _syncStats(WidgetRef ref) async {
-    final stats = await ref
+  Future<void> _syncStats() async {
+    final stats = await _ref
         .read(statsDaoProvider)
         .getMonthStats(DateTime.now().year, DateTime.now().month);
 
@@ -126,9 +131,9 @@ class SyncManager {
   }
 
   /// Single record sync (call after local update)
-  static Future<void> syncDailyRecord(WidgetRef ref, DailyRecord record) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncDailyRecord(DailyRecord record) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     await SupabaseService.upsertDailyRecord({
@@ -160,12 +165,9 @@ class SyncManager {
   }
 
   /// Sync newly earned achievement
-  static Future<void> syncAchievement(
-    WidgetRef ref,
-    Achievement achievement,
-  ) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncAchievement(Achievement achievement) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     await SupabaseService.upsertAchievement({
@@ -179,12 +181,9 @@ class SyncManager {
   }
 
   /// Sync prohibition log
-  static Future<void> syncProhibition(
-    WidgetRef ref,
-    ProhibitionsLogData log,
-  ) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncProhibition(ProhibitionsLogData log) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     await SupabaseService.upsertProhibitionLog({
@@ -199,12 +198,9 @@ class SyncManager {
   }
 
   /// Sync custom ibadah
-  static Future<void> syncCustomIbadah(
-    WidgetRef ref,
-    CustomIbadahData ibadah,
-  ) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncCustomIbadah(CustomIbadahData ibadah) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     await SupabaseService.upsertCustomIbadah({
@@ -219,12 +215,9 @@ class SyncManager {
   }
 
   /// Delete custom ibadah
-  static Future<void> deleteCustomIbadah(
-    WidgetRef ref,
-    int id,
-  ) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> deleteCustomIbadah(int id) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     try {
@@ -235,12 +228,9 @@ class SyncManager {
   }
 
   /// Sync custom ibadah log
-  static Future<void> syncCustomIbadahLog(
-    WidgetRef ref,
-    CustomIbadahLogData log,
-  ) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncCustomIbadahLog(CustomIbadahLogData log) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
     try {
@@ -254,12 +244,12 @@ class SyncManager {
       if (e.toString().contains('23503')) {
         // Foreign key violation: custom_ibadah might be missing on remote
         try {
-          final dao = ref.read(customIbadahDaoProvider);
+          final dao = _ref.read(customIbadahDaoProvider);
           final ibadahItems = await dao.getAllIbadat();
           final ibadah = ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
           
           if (ibadah != null) {
-            await syncCustomIbadah(ref, ibadah);
+            await syncCustomIbadah(ibadah);
             // Retry log sync
             await SupabaseService.upsertCustomIbadahLog({
               'ibadah_id': log.ibadahId,
@@ -276,12 +266,12 @@ class SyncManager {
   }
 
   /// Sync all local settings to Supabase
-  static Future<void> syncSettings(WidgetRef ref) async {
-    final isOnline = ref.read(connectivityProvider).value ?? false;
-    final isAuth = ref.read(currentUserProvider) != null;
+  Future<void> syncSettings() async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    final dao = ref.read(settingsDaoProvider);
+    final dao = _ref.read(settingsDaoProvider);
     final settings = await dao.getAllSettings();
     if (settings.isNotEmpty) {
       await SupabaseService.updateSettings(settings);

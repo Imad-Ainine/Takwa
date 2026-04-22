@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -21,14 +20,15 @@ class KhatmaSettingsScreen extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: const Color.fromARGB(46, 4, 1, 35),
+          const SliverAppBar(
+            backgroundColor: Color.fromARGB(46, 4, 1, 35),
             foregroundColor: Colors.white,
             pinned: true,
-            leading: const CustomLeadingButton(),
+            leading: CustomLeadingButton(),
             title: Text(
               'الإعدادات',
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Amiri',
                 fontSize: 22,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -59,9 +59,10 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                               size: 20,
                             ),
                             const SizedBox(width: 10),
-                            Text(
+                            const Text(
                               'حجم الخط',
-                              style: GoogleFonts.amiri(
+                              style: TextStyle(
+                                fontFamily: 'Amiri',
                                 fontSize: 17,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -70,7 +71,8 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                             const Spacer(),
                             Text(
                               '${state.fontSize.toInt()}',
-                              style: GoogleFonts.outfit(
+                              style: const TextStyle(
+                                fontFamily: 'NotoNaskhArabic',
                                 fontSize: 15,
                                 color: kGoldChip,
                                 fontWeight: FontWeight.bold,
@@ -98,7 +100,8 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           child: Center(
                             child: Text(
                               'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-                              style: GoogleFonts.amiriQuran(
+                              style: TextStyle(
+                                fontFamily: 'Amiri',
                                 fontSize: state.fontSize,
                                 color: Colors.white,
                               ),
@@ -116,17 +119,18 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.palette_rounded,
                               color: kGoldChip,
                               size: 20,
                             ),
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             Text(
                               'مظهر القراءة',
-                              style: GoogleFonts.amiri(
+                              style: TextStyle(
+                                fontFamily: 'Amiri',
                                 fontSize: 17,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -265,7 +269,8 @@ class KhatmaSettingsScreen extends ConsumerWidget {
     padding: const EdgeInsets.only(right: 4),
     child: Text(
       title,
-      style: GoogleFonts.amiri(
+      style: const TextStyle(
+        fontFamily: 'Amiri',
         fontSize: 16,
         color: Colors.white54,
         fontWeight: FontWeight.bold,
@@ -294,7 +299,11 @@ class KhatmaSettingsScreen extends ConsumerWidget {
       const SizedBox(width: 12),
       Text(
         label,
-        style: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+        style: const TextStyle(
+          fontFamily: 'NotoNaskhArabic',
+          fontSize: 14,
+          color: Colors.white70,
+        ),
       ),
       const Spacer(),
       if (trailing != null)
@@ -302,7 +311,11 @@ class KhatmaSettingsScreen extends ConsumerWidget {
       else
         Text(
           value,
-          style: GoogleFonts.outfit(fontSize: 13, color: Colors.white38),
+          style: const TextStyle(
+            fontFamily: 'NotoNaskhArabic',
+            fontSize: 13,
+            color: Colors.white38,
+          ),
         ),
     ],
   );

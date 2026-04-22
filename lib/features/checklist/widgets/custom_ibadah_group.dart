@@ -231,17 +231,18 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
     await ref
         .read(customIbadahDaoProvider)
         .logIbadah(widget.ibadah.id, widget.recordDate, _committed, _count);
-    await SyncManager.syncCustomIbadahLog(
-      ref,
-      CustomIbadahLogData(
-        id: widget.log?.id ?? 0,
-        ibadahId: widget.ibadah.id,
-        recordId: widget.recordId,
-        date: widget.recordDate,
-        done: _committed,
-        count: _count,
-      ),
-    );
+    await ref
+        .read(syncManagerProvider)
+        .syncCustomIbadahLog(
+          CustomIbadahLogData(
+            id: widget.log?.id ?? 0,
+            ibadahId: widget.ibadah.id,
+            recordId: widget.recordId,
+            date: widget.recordDate,
+            done: _committed,
+            count: _count,
+          ),
+        );
     // update record points?
     // Wait, CustomIbadah needs a recalc points too
   }
@@ -253,17 +254,18 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
     await ref
         .read(customIbadahDaoProvider)
         .logIbadah(widget.ibadah.id, widget.recordDate, _committed, _count);
-    await SyncManager.syncCustomIbadahLog(
-      ref,
-      CustomIbadahLogData(
-        id: widget.log?.id ?? 0,
-        ibadahId: widget.ibadah.id,
-        recordId: widget.recordId,
-        date: widget.recordDate,
-        done: _committed,
-        count: _count,
-      ),
-    );
+    await ref
+        .read(syncManagerProvider)
+        .syncCustomIbadahLog(
+          CustomIbadahLogData(
+            id: widget.log?.id ?? 0,
+            ibadahId: widget.ibadah.id,
+            recordId: widget.recordId,
+            date: widget.recordDate,
+            done: _committed,
+            count: _count,
+          ),
+        );
   }
 
   @override

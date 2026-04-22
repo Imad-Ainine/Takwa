@@ -7,7 +7,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 
@@ -647,10 +646,7 @@ class _MosquePrayerSection extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8, bottom: 8),
           child: Row(
             children: [
-              Text(
-                'أوقات الصلاة مدمجة',
-                style: style.amiri(15, color: style.gold),
-              ),
+              Text('أوقات الصلاة', style: style.amiri(15, color: style.gold)),
               const SizedBox(width: 8),
               Expanded(
                 child: Container(height: 1, color: style.gold.withOpacity(0.2)),
@@ -1082,7 +1078,8 @@ class _RingWidgetState extends State<_RingWidget>
               children: [
                 Text(
                   '${(_anim.value * 100).round()}%',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: widget.style.gold,
@@ -1091,7 +1088,8 @@ class _RingWidgetState extends State<_RingWidget>
                 ),
                 Text(
                   'اليوم',
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 9,
                     color: widget.style.textSec,
                   ),

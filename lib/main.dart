@@ -23,6 +23,24 @@ import 'package:quran_library/quran_library.dart';
 
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
+import 'package:takwa/core/notifications/overlays/unified_overlay_window.dart'; // Add this
+
+// ────────────────────────────────────────────
+//  OVERLAY ENTRY POINT (Required by flutter_overlay_window)
+// ────────────────────────────────────────────
+@pragma('vm:entry-point')
+void overlayMain() {
+  debugPrint('Starting Premium Overlay Isolate...');
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: UnifiedOverlayWindow(),
+      ),
+    ),
+  );
+}
 
 // تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
@@ -106,6 +124,7 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
       }
     }
   }
+
   Future<void> _syncLocationFromBackground(Map data) async {
     final lat = data['latitude']?.toString();
     final lng = data['longitude']?.toString();

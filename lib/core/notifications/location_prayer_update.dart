@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:adhan/adhan.dart' as adhan;
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -374,7 +373,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
       SnackBar(
         content: Text(
           result.messageAr,
-          style: GoogleFonts.notoNaskhArabic(fontSize: 13),
+          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
         ),
         backgroundColor: result.isSuccess
             ? context.colors.success
@@ -423,7 +422,8 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                 children: [
                   Text(
                     'تحديث الموقع وأوقات الصلاة',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: context.colors.textPrimary,
                     ),
@@ -431,7 +431,8 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                   if (_lastCity != null)
                     Text(
                       '$_lastCity${_lastTimezone != null ? " · $_lastTimezone" : ""}',
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 10,
                         color: context.colors.textSecondary,
                       ),

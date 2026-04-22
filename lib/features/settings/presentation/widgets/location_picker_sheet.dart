@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/utils/timezone_resolver.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -148,7 +147,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
       SnackBar(
         content: Text(
           message,
-          style: GoogleFonts.notoNaskhArabic(fontSize: 13),
+          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
         ),
         backgroundColor: isSuccess
             ? context.colors.success
@@ -244,7 +243,8 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         children: [
                           Text(
                             'تحديث الموقع الجغرافي',
-                            style: GoogleFonts.amiri(
+                            style: TextStyle(
+                              fontFamily: 'Amiri',
                               fontSize: 18,
                               color: context.colors.gold,
                               fontWeight: FontWeight.bold,
@@ -252,7 +252,8 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                           ),
                           Text(
                             'اختر موقعك بدقة لحساب أوقات الصلاة',
-                            style: GoogleFonts.notoNaskhArabic(
+                            style: TextStyle(
+                              fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
                               color: context.colors.textSecondary,
                             ),
@@ -301,7 +302,8 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'أو اختر مدينة رئيسية',
-                            style: GoogleFonts.notoNaskhArabic(
+                            style: TextStyle(
+                              fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
                               color: context.colors.textSecondary,
                             ),
@@ -457,9 +459,10 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'تحديد الموقع تلقائياً',
-                        style: GoogleFonts.notoNaskhArabic(
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
                           fontSize: 15,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -468,7 +471,8 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                       const SizedBox(height: 2),
                       Text(
                         'باستخدام GPS',
-                        style: GoogleFonts.notoNaskhArabic(
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
                           fontSize: 12,
                           color: Colors.white.withOpacity(0.7),
                         ),
@@ -518,7 +522,8 @@ class _CityCard extends StatelessWidget {
                 children: [
                   Text(
                     cityData['name'],
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 14,
                       color: context.colors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -526,7 +531,8 @@ class _CityCard extends StatelessWidget {
                   ),
                   Text(
                     cityData['country'],
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
                       color: context.colors.textSecondary,
                     ),
@@ -542,7 +548,8 @@ class _CityCard extends StatelessWidget {
               ),
               child: Text(
                 'اختر',
-                style: GoogleFonts.notoNaskhArabic(
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 11,
                   color: context.colors.gold,
                 ),

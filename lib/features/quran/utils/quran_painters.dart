@@ -4,7 +4,6 @@
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'quran_helpers.dart';
 
 class QuranBgPainter extends CustomPainter {
@@ -90,7 +89,8 @@ class SurahBadgePainter extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: ar(n),
-        style: GoogleFonts.amiri(
+        style: TextStyle(
+                    fontFamily: 'Amiri',
           fontSize: n > 99 ? 8 : 11,
           color: c,
           fontWeight: FontWeight.w700,
@@ -164,7 +164,8 @@ class VerseMarkerPaint extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: ar(n),
-        style: GoogleFonts.amiri(
+        style: TextStyle(
+                    fontFamily: 'Amiri',
           fontSize: n > 9 ? 7 : 9,
           color: c,
           fontWeight: FontWeight.w700,

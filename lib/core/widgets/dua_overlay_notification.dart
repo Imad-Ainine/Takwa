@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../widgets/custom_pattern_background.dart';
 import '../theme/app_theme.dart';
-import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
+import 'package:takwa/features/duas/data/duas_data.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  CUSTOM IN-APP DUA OVERLAY NOTIFICATION
@@ -190,7 +189,8 @@ class _NotifCardOverlayState extends State<_NotifCardOverlay>
                                       children: [
                                         Text(
                                           'دعاء - ${widget.dua.occasion}',
-                                          style: GoogleFonts.amiri(
+                                          style: TextStyle(
+                    fontFamily: 'Amiri',
                                             fontSize: 18,
                                             color: context.colors.gold,
                                             fontWeight: FontWeight.w700,

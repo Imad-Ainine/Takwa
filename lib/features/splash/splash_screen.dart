@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
@@ -223,7 +222,8 @@ class _VerseCard extends StatelessWidget {
           Text(
             verse,
             textAlign: TextAlign.center,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Amiri',
               fontSize: 18,
               color: context.colors.gold,
               height: 2.0,

@@ -565,9 +565,7 @@ class _PrayersGroup extends ConsumerWidget {
             final updatedRec = await ref
                 .read(dailyRecordDaoProvider)
                 .getRecordByDate(DateTime.now());
-            if (updatedRec != null) {
-              await SyncManager.syncDailyRecord(ref, updatedRec);
-            }
+            await ref.read(syncManagerProvider).syncDailyRecord(updatedRec!);
           },
         );
       }).toList(),
@@ -857,10 +855,11 @@ class _IbadahGroup extends ConsumerWidget {
             await ref
                 .read(dailyRecordDaoProvider)
                 .updateAdhkar(recordId: rec.id, morning: v);
-            await SyncManager.syncDailyRecord(
-              ref,
-              await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-            );
+            await ref
+                .read(syncManagerProvider)
+                .syncDailyRecord(
+                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                );
           },
         ),
 
@@ -877,10 +876,11 @@ class _IbadahGroup extends ConsumerWidget {
             await ref
                 .read(dailyRecordDaoProvider)
                 .updateAdhkar(recordId: rec.id, evening: v);
-            await SyncManager.syncDailyRecord(
-              ref,
-              await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-            );
+            await ref
+                .read(syncManagerProvider)
+                .syncDailyRecord(
+                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                );
           },
         ),
 
@@ -895,10 +895,11 @@ class _IbadahGroup extends ConsumerWidget {
                 .read(dailyRecordDaoProvider)
                 .getOrCreateToday();
             await ref.read(dailyRecordDaoProvider).toggleNightPrayer(rec.id, v);
-            await SyncManager.syncDailyRecord(
-              ref,
-              await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-            );
+            await ref
+                .read(syncManagerProvider)
+                .syncDailyRecord(
+                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                );
           },
         ),
 
@@ -915,10 +916,11 @@ class _IbadahGroup extends ConsumerWidget {
                 .read(dailyRecordDaoProvider)
                 .getOrCreateToday();
             await ref.read(dailyRecordDaoProvider).toggleSadaqah(rec.id, v);
-            await SyncManager.syncDailyRecord(
-              ref,
-              await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-            );
+            await ref
+                .read(syncManagerProvider)
+                .syncDailyRecord(
+                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                );
           },
         ),
       ],
@@ -1020,10 +1022,11 @@ class _QuranInput extends ConsumerWidget {
                 await ref
                     .read(dailyRecordDaoProvider)
                     .updateQuran(recordId: rec.id, pages: pages);
-                await SyncManager.syncDailyRecord(
-                  ref,
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+                await ref
+                    .read(syncManagerProvider)
+                    .syncDailyRecord(
+                      await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                    );
               },
             ),
           ),
@@ -1237,10 +1240,11 @@ class _FastingSelector extends ConsumerWidget {
           HapticFeedback.selectionClick();
           final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
           await ref.read(dailyRecordDaoProvider).updateFasting(rec.id, value);
-          await SyncManager.syncDailyRecord(
-            ref,
-            await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-          );
+          await ref
+              .read(syncManagerProvider)
+              .syncDailyRecord(
+                await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+              );
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -1373,10 +1377,11 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           committed: newVal,
           timesCount: newVal ? (_count == 0 ? 1 : _count) : 0,
         );
-    await SyncManager.syncDailyRecord(
-      ref,
-      await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-    );
+    await ref
+        .read(syncManagerProvider)
+        .syncDailyRecord(
+          await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+        );
   }
 
   Future<void> _increment() async {
@@ -1391,10 +1396,11 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           committed: true,
           timesCount: _count,
         );
-    await SyncManager.syncDailyRecord(
-      ref,
-      await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-    );
+    await ref
+        .read(syncManagerProvider)
+        .syncDailyRecord(
+          await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+        );
   }
 
   @override
@@ -1608,7 +1614,7 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
     final updatedRec = await ref
         .read(dailyRecordDaoProvider)
         .getOrCreateToday();
-    await SyncManager.syncDailyRecord(ref, updatedRec);
+    await ref.read(syncManagerProvider).syncDailyRecord(updatedRec);
     setState(() => _saving = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -7,7 +7,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
@@ -440,9 +439,10 @@ class _GenderStep extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'حدد الجنس',
-                  style: GoogleFonts.amiri(
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
                     fontSize: 26,
                     color: AppColors.gold,
                     fontWeight: FontWeight.w700,
@@ -484,14 +484,15 @@ class _GenderStep extends StatelessWidget {
                         color: AppColors.gold.withOpacity(0.2),
                       ),
                     ),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        const Text('ℹ️', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 8),
+                        Text('ℹ️', style: TextStyle(fontSize: 14)),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'تجربة استخدام مناسبة، وختمات عامة للرجال وأخرى للنساء',
-                            style: GoogleFonts.notoNaskhArabic(
+                            style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                               fontSize: 11,
                               color: AppColors.textSecondary,
                               height: 1.6,
@@ -638,7 +639,8 @@ class _GenderCardState extends State<_GenderCard>
               const SizedBox(height: 12),
               Text(
                 widget.label,
-                style: GoogleFonts.amiri(
+                style: TextStyle(
+                    fontFamily: 'Amiri',
                   fontSize: 18,
                   color: widget.selected
                       ? AppColors.gold
@@ -778,21 +780,23 @@ class _AuthStepState extends State<_AuthStep>
             const SizedBox(height: 20),
             _anim(
               1,
-              Column(
+              const Column(
                 children: [
                   Text(
                     'تقوى',
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                    fontFamily: 'Amiri',
                       fontSize: 28,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     'سجّل دخولك لحفظ بياناتك ومزامنتها',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -830,9 +834,10 @@ class _AuthStepState extends State<_AuthStep>
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: GestureDetector(
                   onTap: widget.onSkip,
-                  child: Text(
+                  child: const Text(
                     'متابعة بدون حساب',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textDim,
                     ),
@@ -858,7 +863,8 @@ class _BenefitRow extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         label,
-        style: GoogleFonts.notoNaskhArabic(
+        style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
           fontSize: 13,
           color: AppColors.textPrimary,
         ),
@@ -929,20 +935,22 @@ class _PlanStepState extends State<_PlanStep>
                 parent: _ctrl,
                 curve: const Interval(0.2, 0.7),
               ),
-              child: Column(
+              child: const Column(
                 children: [
                   Text(
                     'اختر خطتك',
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                    fontFamily: 'Amiri',
                       fontSize: 26,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     'انضم إلى عائلة تقوى',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -1104,7 +1112,8 @@ class _PlanCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -1126,7 +1135,8 @@ class _PlanCard extends StatelessWidget {
                     ),
                     child: Text(
                       badge!,
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                         fontSize: 10,
                         color: badgeColor ?? AppColors.gold,
                         fontWeight: FontWeight.w600,
@@ -1137,7 +1147,8 @@ class _PlanCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     price!,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
@@ -1149,7 +1160,8 @@ class _PlanCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               desc,
-              style: GoogleFonts.notoNaskhArabic(
+              style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                 fontSize: 11,
                 color: AppColors.textSecondary,
                 height: 1.6,
@@ -1217,7 +1229,8 @@ class _InfoCard extends StatelessWidget {
           ),
           Text(
             title,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+                    fontFamily: 'Amiri',
               fontSize: 22,
               color: titleColor,
               fontWeight: FontWeight.w700,
@@ -1227,7 +1240,8 @@ class _InfoCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoNaskhArabic(
+            style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
               fontSize: 14,
               color: AppColors.textPrimary,
               height: 1.7,
@@ -1238,7 +1252,8 @@ class _InfoCard extends StatelessWidget {
           Text(
             hint,
             textAlign: TextAlign.center,
-            style: GoogleFonts.notoNaskhArabic(
+            style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
               fontSize: 11,
               color: AppColors.textDim,
             ),
@@ -1255,7 +1270,8 @@ class _InfoCard extends StatelessWidget {
               onTap: onSkip,
               child: Text(
                 skipLabel!,
-                style: GoogleFonts.notoNaskhArabic(
+                style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                   fontSize: 13,
                   color: AppColors.textDim,
                 ),
@@ -1297,7 +1313,8 @@ class _BottomActions extends StatelessWidget {
             onTap: onSkip,
             child: Text(
               skipLabel!,
-              style: GoogleFonts.notoNaskhArabic(
+              style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
                 color: AppColors.textDim,
               ),

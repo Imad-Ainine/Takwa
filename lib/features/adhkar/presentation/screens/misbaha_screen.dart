@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -229,7 +228,8 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               children: [
                 Text(
                   '${state.count}',
-                  style: GoogleFonts.amiri(
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
                     fontSize: 90,
                     fontWeight: FontWeight.bold,
                     color: style.text,
@@ -385,7 +385,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           const SizedBox(height: 4),
           Text(
             label,
-            style: GoogleFonts.notoNaskhArabic(fontSize: 10, color: color),
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
+              fontSize: 10,
+              color: color,
+            ),
           ),
         ],
       ),

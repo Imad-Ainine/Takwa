@@ -8,7 +8,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
@@ -938,7 +937,8 @@ class _CountdownRing extends StatelessWidget {
                 children: [
                   Text(
                     isIqama ? 'الإقامة بعد' : 'الأذان بعد',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
                       color: Colors.white.withOpacity(0.55),
                     ),
@@ -946,7 +946,8 @@ class _CountdownRing extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     _timeStr,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: remaining.inHours > 0 ? 26 : 32,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -971,7 +972,8 @@ class _CountdownRing extends StatelessWidget {
                     ),
                     child: Text(
                       isIqama ? '🕌 أقم الصلاة' : '🔔 استعد',
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 11,
                         color: Colors.white.withOpacity(0.8),
                       ),
@@ -1176,7 +1178,8 @@ class _TimeCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             label,
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 10,
               color: Colors.white.withOpacity(0.55),
             ),
@@ -1184,7 +1187,8 @@ class _TimeCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             time,
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: isActive ? color : Colors.white,
@@ -1194,7 +1198,8 @@ class _TimeCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle!,
-              style: GoogleFonts.notoNaskhArabic(
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 9,
                 color: color.withOpacity(0.7),
               ),
@@ -1261,14 +1266,16 @@ class _DailyPrayersTable extends StatelessWidget {
                   children: [
                     Text(
                       'جدول الصلوات اليوم',
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
                         fontSize: 15,
                         color: context.colors.gold,
                       ),
                     ),
                     Text(
                       DateFormat('EEEE d MMMM', 'ar').format(DateTime.now()),
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 11,
                         color: Colors.white.withOpacity(0.4),
                       ),
@@ -1351,7 +1358,8 @@ class _PrayerTableRow extends StatelessWidget {
                     children: [
                       Text(
                         prayer.nameAr,
-                        style: GoogleFonts.notoNaskhArabic(
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
                           fontSize: 13,
                           color: isNext
                               ? Colors.white
@@ -1366,7 +1374,8 @@ class _PrayerTableRow extends StatelessWidget {
                       if (isNext)
                         Text(
                           'الأذان الآن',
-                          style: GoogleFonts.notoNaskhArabic(
+                          style: TextStyle(
+                            fontFamily: 'NotoNaskhArabic',
                             fontSize: 9,
                             color: visual.secondaryColor,
                           ),
@@ -1381,7 +1390,8 @@ class _PrayerTableRow extends StatelessWidget {
                   children: [
                     Text(
                       formatTime(prayer.time),
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 14,
                         color: isNext
                             ? Colors.white
@@ -1414,7 +1424,8 @@ class _PrayerTableRow extends StatelessWidget {
                   children: [
                     Text(
                       formatTime(iqamaTime),
-                      style: GoogleFonts.notoNaskhArabic(
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 14,
                         color: isNext
                             ? context.colors.success
@@ -1477,7 +1488,8 @@ class _MihrabPrayerChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.notoNaskhArabic(
+        style: TextStyle(
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 9,
           color: color.withOpacity(isActive ? 1.0 : 0.6),
           fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
@@ -1541,7 +1553,8 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
           const SizedBox(height: 16),
           Text(
             'جارٍ تحديد موقعك...',
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 13,
               color: context.colors.textSecondary,
             ),
@@ -1549,7 +1562,8 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
           const SizedBox(height: 4),
           Text(
             'لحساب أوقات الصلاة',
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 11,
               color: context.colors.textDim,
             ),
@@ -1602,7 +1616,8 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'تعذّر تحديد الموقع',
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Amiri',
               fontSize: 18,
               color: context.colors.textPrimary,
             ),
@@ -1610,7 +1625,8 @@ class _ErrorView extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'تأكد من تفعيل GPS',
-            style: GoogleFonts.notoNaskhArabic(
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 12,
               color: context.colors.textSecondary,
             ),

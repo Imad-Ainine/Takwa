@@ -28,6 +28,8 @@ class MosqueRepository {
     'https://lz4.overpass-api.de/api/interpreter',
     'https://z.overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass.osm.ch/api/interpreter',
+    'https://overpass.openstreetmap.fr/api/interpreter',
   ];
 
   Future<List<Mosque>> fetchNearbyMosques(
@@ -36,8 +38,11 @@ class MosqueRepository {
   }) async {
     final query =
         '''
-      [out:json];
-      nwr["amenity"="place_of_worship"]["religion"="muslim"](around:$radius,${position.latitude},${position.longitude});
+      [out:json][timeout:25];
+      (
+        nwr["amenity"="place_of_worship"]["religion"="muslim"](around:$radius,${position.latitude},${position.longitude});
+        nwr["amenity"="mosque"](around:$radius,${position.latitude},${position.longitude});
+      );
       out center;
     ''';
 
@@ -45,7 +50,7 @@ class MosqueRepository {
       try {
         final response = await http
             .post(Uri.parse(url), body: {'data': query})
-            .timeout(const Duration(seconds: 10));
+            .timeout(const Duration(seconds: 25));
 
         if (response.statusCode == 200) {
           final decoded = json.decode(utf8.decode(response.bodyBytes));

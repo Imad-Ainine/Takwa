@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'custom_pattern_background.dart';
 
@@ -150,20 +149,25 @@ class _PrimaryButtonState extends State<PrimaryButton>
                                   size: 18,
                                   color: widget.isOutline
                                       ? primaryColor
-                                      : AppColors.night,
+                                      : (widget.isBg
+                                            ? Colors.white
+                                            : AppColors.night),
                                 ),
                                 const SizedBox(width: 8),
                               ],
                               Text(
                                 widget.label,
-                                style: GoogleFonts.notoNaskhArabic(
+                                style: TextStyle(
+                                  fontFamily: 'NotoNaskhArabic',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                   color: disabled
                                       ? AppColors.textDim
                                       : widget.isOutline
                                       ? primaryColor
-                                      : AppColors.night,
+                                      : (widget.isBg
+                                            ? Colors.white
+                                            : AppColors.night),
                                 ),
                               ),
                             ],

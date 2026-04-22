@@ -6,13 +6,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
-import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
+import 'package:takwa/features/duas/data/duas_data.dart';
 
 class FavoriteDuasScreen extends ConsumerWidget {
   const FavoriteDuasScreen({super.key});
@@ -244,9 +243,12 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
+                          content: const Text(
                             'تم النسخ ✓',
-                            style: GoogleFonts.notoNaskhArabic(fontSize: 12),
+                            style: TextStyle(
+                              fontFamily: 'NotoNaskhArabic',
+                              fontSize: 12,
+                            ),
                           ),
                           backgroundColor: context.colors.teal,
                           behavior: SnackBarBehavior.floating,

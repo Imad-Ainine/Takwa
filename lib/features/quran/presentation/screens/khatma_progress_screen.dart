@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -26,14 +25,15 @@ class KhatmaProgressScreen extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: const Color.fromARGB(46, 4, 1, 35),
+          const SliverAppBar(
+            backgroundColor: Color.fromARGB(46, 4, 1, 35),
             foregroundColor: Colors.white,
             pinned: true,
-            leading: const CustomLeadingButton(),
+            leading: CustomLeadingButton(),
             title: Text(
               'تقدم الختمة',
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Amiri',
                 fontSize: 22,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -54,7 +54,8 @@ class KhatmaProgressScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   '${(progress * 100).toStringAsFixed(1)}٪ مكتملة',
-                  style: GoogleFonts.outfit(
+                  style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 16,
                     color: kGoldChip,
                     fontWeight: FontWeight.bold,
@@ -136,9 +137,10 @@ class KhatmaProgressScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'القراءة الأسبوعية',
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Amiri',
               fontSize: 18,
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -161,7 +163,8 @@ class KhatmaProgressScreen extends ConsumerWidget {
                     children: [
                       Text(
                         ar(values[i].toInt()),
-                        style: GoogleFonts.outfit(
+                        style: const TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
                           fontSize: 10,
                           color: Colors.white38,
                         ),
@@ -179,7 +182,8 @@ class KhatmaProgressScreen extends ConsumerWidget {
                       const SizedBox(height: 6),
                       Text(
                         days[i].substring(0, 2),
-                        style: GoogleFonts.outfit(
+                        style: const TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
                           fontSize: 10,
                           color: Colors.white38,
                         ),
@@ -223,7 +227,8 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: GoogleFonts.amiri(
+              style: const TextStyle(
+                fontFamily: 'Amiri',
                 fontSize: 20,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -232,7 +237,11 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: GoogleFonts.outfit(fontSize: 10, color: Colors.white54),
+              style: const TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 10,
+                color: Colors.white54,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

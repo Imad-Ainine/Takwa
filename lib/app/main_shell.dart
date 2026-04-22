@@ -14,6 +14,7 @@ import '../features/checklist/checklist_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
 import '../features/asma/presentation/screens/asma_screen.dart';
+import '../features/qiyam/presentation/screens/qiyam_dashboard_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
 import '../core/providers/auth_providers.dart';
@@ -40,14 +41,15 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell>
     with TickerProviderStateMixin {
   late final PageController _pageCtrl;
-  late final List<AnimationController> _tabAnims;
+  late List<AnimationController> _tabAnims;
 
   static const _tabs = [
     _TabInfo('🏠', 'الرئيسية', 0),
-    _TabInfo('✅', 'المحاسبة', 1),
-    _TabInfo('📊', 'إحصائيات', 2),
-    _TabInfo('✨', 'أسماء الله', 3),
-    _TabInfo('⚙️', 'الإعدادات', 4),
+    _TabInfo('🌙', 'قيام الليل', 1),
+    _TabInfo('✅', 'المحاسبة', 2),
+    _TabInfo('📊', 'إحصائيات', 3),
+    _TabInfo('✨', 'أسماء الله', 4),
+    _TabInfo('⚙️', 'الإعدادات', 5),
   ];
 
   @override
@@ -139,6 +141,26 @@ class _MainShellState extends ConsumerState<MainShell>
   }
 
   Widget _buildShell() {
+    // Robustness check: If tabs were added/removed during hot reload, re-initialize controllers
+    if (_tabAnims.length != _tabs.length) {
+      for (final a in _tabAnims) {
+        a.dispose();
+      }
+      _tabAnims = List.generate(
+        _tabs.length,
+        (i) => AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 300),
+        ),
+      );
+      // Ensure current index is still valid
+      final currentIdx = ref.read(_currentTabProvider);
+      if (currentIdx >= _tabs.length) {
+        ref.read(_currentTabProvider.notifier).state = 0;
+      }
+      _tabAnims[ref.read(_currentTabProvider)].forward();
+    }
+
     final currentIdx = ref.watch(_currentTabProvider);
 
     return DrawerScaffold(
@@ -149,6 +171,7 @@ class _MainShellState extends ConsumerState<MainShell>
           physics: const NeverScrollableScrollPhysics(), // manual nav only
           children: const [
             HomeScreen(),
+            QiyamDashboardScreen(),
             ChecklistScreen(),
             StatisticsScreen(),
             AsmaScreen(),

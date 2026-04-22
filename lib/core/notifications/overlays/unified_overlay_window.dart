@@ -12,10 +12,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../providers/adhkar_providers.dart';
-import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
+import 'package:takwa/features/duas/data/duas_data.dart';
 
 // ─────────────────────────────────────────
 //  نموذج بيانات موحّد للعرض
@@ -103,9 +102,13 @@ List<_PopupItem> _buildAllItems() {
   return items;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  UNIFIED OVERLAY WINDOW WIDGET
-// ═══════════════════════════════════════════════════════════════
+// ─── Colors (Static because of isolate) ───
+const _gold = Color(0xFFD4AF37);
+const _goldDark = Color(0xFFA07838);
+const _cardBg = Color(0xFFFFFFFF); // Premium Light Theme
+const _textMain = Color(0xFF1A1A1A); // Dark text for readability
+const _textSec = Color(0xFF666666);
+
 class UnifiedOverlayWindow extends StatefulWidget {
   const UnifiedOverlayWindow({super.key});
 
@@ -114,7 +117,7 @@ class UnifiedOverlayWindow extends StatefulWidget {
 }
 
 class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final _allItems = _buildAllItems();
   final _random = math.Random();
   _PopupItem? _current;
@@ -123,6 +126,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
 
   // Animation
   late final AnimationController _slideCtrl;
+  late final AnimationController _starsCtrl;
   late final Animation<Offset> _slideAnim;
   late final Animation<double> _fadeAnim;
 
@@ -130,28 +134,39 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
   void initState() {
     super.initState();
 
-    // ── Slide-in من اليمين ──
+    // ── Slide-in Animation ──
     _slideCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 800),
     );
     _slideAnim = Tween<Offset>(
       begin: const Offset(0.0, 0.4),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _slideCtrl, curve: Curves.easeOutBack));
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _slideCtrl, curve: const Interval(0.0, 0.4)),
+      CurvedAnimation(parent: _slideCtrl, curve: const Interval(0.0, 0.6)),
     );
+
+    // ── Background Stars Animation ──
+    _starsCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 30),
+    )..repeat();
 
     _pickRandom();
     _slideCtrl.forward();
 
-    // تحديث كل 15 دقيقة إذا ظل الـ overlay مفتوحاً
+    // Refresh every 15 minutes if overlay stays open
     _autoRefreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
       _pickRandom(animate: true);
     });
 
-    // استقبال بيانات من التطبيق الرئيسي
+    // Auto-close after 15 seconds
+    Timer(const Duration(seconds: 15), () {
+      if (mounted) FlutterOverlayWindow.closeOverlay();
+    });
+
+    // Listen to data from main isolate
     FlutterOverlayWindow.overlayListener.listen((data) {
       if (data is Map) {
         if (data.containsKey('type')) {
@@ -161,7 +176,10 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
           });
         }
       } else if (data is int && data >= 0 && data < _allItems.length) {
-        setState(() => _current = _allItems[data]);
+        setState(() {
+          _current = _allItems[data];
+          _slideCtrl.forward(from: 0);
+        });
       } else {
         _pickRandom(animate: true);
       }
@@ -197,15 +215,9 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
   void dispose() {
     _autoRefreshTimer?.cancel();
     _slideCtrl.dispose();
+    _starsCtrl.dispose();
     super.dispose();
   }
-
-  // ─── الألوان الثابتة (لا يمكن استخدام Theme في isolate) ───
-  static const _gold = Color(0xFFC9A66B);
-  static const _goldDark = Color(0xFFA07838);
-  static const _cardBg = Color(0xEE1A2420); // شفافية بسيطة (EE = 93%)
-  static const _textMain = Color(0xFFF5F0E8);
-  static const _textSec = Color(0xFF8CA090);
 
   @override
   Widget build(BuildContext context) {
@@ -213,19 +225,48 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
 
     return Material(
       color: Colors.transparent,
-      child: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Align(
-          alignment: Alignment.center,
-          child: SlideTransition(
-            position: _slideAnim,
-            child: FadeTransition(
-              opacity: _fadeAnim,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: _buildCard(),
+      child: GestureDetector(
+        onTap: () => FlutterOverlayWindow.closeOverlay(),
+        child: Directionality(
+          textDirection: TextDirection.rtl,
+          child: Stack(
+            children: [
+              // ── Background Stars ──
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: _starsCtrl,
+                  builder: (_, _) => CustomPaint(
+                    painter: _OverlayStarsPainter(progress: _starsCtrl.value),
+                  ),
+                ),
               ),
-            ),
+
+              // ── Card Alignment ──
+              Align(
+                alignment: Alignment.topCenter,
+                child: SlideTransition(
+                  position: _slideAnim,
+                  child: FadeTransition(
+                    opacity: _fadeAnim,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 50, // Padding for status bar
+                      ),
+                      child: GestureDetector(
+                        onTap:
+                            () {}, // Prevent closing when tapping the card itself
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(32),
+                          child: _buildCard(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -234,291 +275,370 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
 
   Widget _buildCard() {
     final item = _current!;
+    final accentColor = item.isDua ? const Color(0xFF2DD4BF) : _gold;
 
     return Container(
-      width: 320,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: _cardBg,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(
-          color: item.isDua
-              ? const Color(0xFF2D6A4F).withOpacity(0.5)
-              : _gold.withOpacity(0.4),
-          width: 1.0,
-        ),
+          color: _gold.withOpacity(0.5),
+          width: 2,
+        ), // Slightly thicker gold border
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 20,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 30,
+            spreadRadius: 2,
             offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          // ── شريط علوي ملوّن ──
-          Container(
-            height: 3,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: item.isDua
-                    ? [const Color(0xFF2D6A4F), const Color(0xFF52B788)]
-                    : [_goldDark, _gold, const Color(0xFFE8D5A3)],
+          // ── Background Geometric Pattern ──
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.03,
+              child: CustomPaint(painter: _OverlayPatternPainter(color: _gold)),
+            ),
+          ),
+          // ── Mosque Silhouette ──
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: CustomPaint(
+              painter: _OverlayMosquePainter(
+                color: accentColor.withOpacity(0.08),
               ),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              size: const Size(double.infinity, 80),
             ),
           ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Header: Icon + تصنيف + إغلاق ──
-                Row(
-                  children: [
-                    // أيقونة التصنيف
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: (item.isDua ? const Color(0xFF2D6A4F) : _gold)
-                            .withOpacity(0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: (item.isDua ? const Color(0xFF52B788) : _gold)
-                              .withOpacity(0.3),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        item.emoji,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.categoryName,
-                            style: GoogleFonts.amiri(
-                              fontSize: 14,
-                              color: item.isDua
-                                  ? const Color(0xFF52B788)
-                                  : _gold,
-                              fontWeight: FontWeight.w700,
-                              height: 1.2,
-                            ),
-                          ),
-                          Text(
-                            'تقوى · ${item.isDua ? 'أدعية' : 'أذكار'} 📿',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: _textSec,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // زر الإغلاق
-                    GestureDetector(
-                      onTap: () => FlutterOverlayWindow.closeOverlay(),
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.06),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close_rounded,
-                          color: _textSec,
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ],
+          // ── Main Content ──
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ── Top Gradient Bar ──
+              Container(
+                height: 4,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: item.isDua
+                        ? [const Color(0xFF2DD4BF), const Color(0xFF14B8A6)]
+                        : [_goldDark, _gold, const Color(0xFFFDE68A)],
+                  ),
                 ),
+              ),
 
-                const SizedBox(height: 12),
-
-                // ── فاصل رفيع ──
-                Container(
-                  height: 1,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        _gold.withOpacity(0.3),
-                        Colors.transparent,
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ── Header ──
+                    Row(
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: accentColor.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            item.emoji,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.categoryName,
+                                style: TextStyle(
+                                  fontFamily: 'Amiri',
+                                  fontSize: 18,
+                                  color: accentColor,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.1,
+                                ),
+                              ),
+                              const Text(
+                                'تطبيق تقوى ✨',
+                                style: TextStyle(fontSize: 11, color: _textSec),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Close
+                        GestureDetector(
+                          onTap: () => FlutterOverlayWindow.closeOverlay(),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.04),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              color: _textSec,
+                              size: 18,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                ),
 
-                const SizedBox(height: 12),
+                    const SizedBox(height: 20),
 
-                // ── النص العربي ──
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 200),
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Text(
-                      item.arabic,
-                      style: GoogleFonts.amiri(
-                        fontSize: 18,
-                        color: _textMain,
-                        height: 1.9,
-                        fontWeight: FontWeight.w600,
+                    // ── Arabic Text ──
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height * 0.45,
                       ),
-                      textAlign: TextAlign.center,
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ),
-                ),
-
-                // ── معنى الدعاء (إن وُجد) ──
-                if (item.isDua && item.meaning != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    item.meaning!,
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 11,
-                      color: _textSec,
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-
-                // ── الفضل (أذكار) ──
-                if (!item.isDua && item.fadl != null) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Text('✨', style: TextStyle(fontSize: 11)),
-                      const SizedBox(width: 4),
-                      Expanded(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
                         child: Text(
-                          item.fadl!,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: _gold.withOpacity(0.8),
-                            height: 1.4,
+                          item.arabic,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: 'Amiri',
+                            fontSize: 22,
+                            color: _textMain,
+                            height: 1.6,
+                            fontWeight: FontWeight.bold,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+
+                    // ── Fadl / Meaning ──
+                    if (item.fadl != null || item.meaning != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: _gold.withOpacity(0.04),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: _gold.withOpacity(0.1)),
+                        ),
+                        child: Text(
+                          item.fadl ?? item.meaning ?? '',
+                          style: TextStyle(
+                            fontFamily: 'Amiri',
+                            fontSize: 14,
+                            color: accentColor.withOpacity(0.85),
+                            fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ],
-                  ),
-                ],
 
-                const SizedBox(height: 10),
+                    const SizedBox(height: 24),
 
-                // ── شريط المصدر + أزرار ──
-                Row(
-                  children: [
-                    // نسخ
-                    GestureDetector(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: item.arabic));
-                        HapticFeedback.lightImpact();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
+                    // ── Actions ──
+                    Row(
+                      children: [
+                        _ActionIcon(
+                          icon: Icons.copy_rounded,
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(text: item.arabic));
+                            HapticFeedback.mediumImpact();
+                          },
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.08),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.copy_rounded,
-                          size: 13,
-                          color: _textSec,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-
-                    // المصدر
-                    if (item.source != null)
-                      Expanded(
-                        child: Text(
-                          item.source!,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: _textSec,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    else
-                      const Spacer(),
-
-                    // ذكر آخر
-                    GestureDetector(
-                      onTap: () => _pickRandom(animate: true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: item.isDua
-                                ? [
-                                    const Color(0xFF2D6A4F),
-                                    const Color(0xFF52B788),
-                                  ]
-                                : [_goldDark, _gold],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.auto_awesome_rounded,
-                              size: 12,
-                              color: Colors.white,
+                        const SizedBox(width: 8),
+                        const Spacer(),
+                        // Next Button
+                        GestureDetector(
+                          onTap: () => _pickRandom(animate: true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              item.isDua ? 'دعاء آخر' : 'ذكر آخر',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: item.isDua
+                                    ? [
+                                        const Color(0xFF2DD4BF),
+                                        const Color(0xFF14B8A6),
+                                      ]
+                                    : [_gold, _goldDark],
                               ),
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: accentColor.withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
                             ),
-                          ],
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.auto_awesome_rounded,
+                                  size: 16,
+                                  color: Color(0xFF02061A),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  item.isDua ? 'دعاء آخر' : 'ذكر آخر',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF02061A),
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
+}
+
+class _ActionIcon extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _ActionIcon({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.04),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.black.withOpacity(0.06)),
+        ),
+        child: Icon(icon, size: 20, color: _textMain),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  PAINTERS
+// ─────────────────────────────────────────
+
+class _OverlayStarsPainter extends CustomPainter {
+  final double progress;
+  _OverlayStarsPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rng = math.Random(42);
+    final paint = Paint();
+
+    for (int i = 0; i < 70; i++) {
+      final x = rng.nextDouble() * size.width;
+      final y = rng.nextDouble() * size.height;
+      final twinkle = math.sin((progress * math.pi * 2) + i * 0.7);
+      final opacity = (0.1 + 0.5 * ((twinkle + 1) / 2)).clamp(0.0, 1.0);
+      final radius = 0.5 + rng.nextDouble() * 1.5;
+
+      paint.color = Colors.white.withOpacity(opacity * 0.4);
+      canvas.drawCircle(Offset(x, y), radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_OverlayStarsPainter old) => old.progress != progress;
+}
+
+class _OverlayMosquePainter extends CustomPainter {
+  final Color color;
+  _OverlayMosquePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final w = size.width;
+    final h = size.height;
+    final path = Path();
+
+    path.moveTo(0, h);
+    path.lineTo(w, h);
+
+    // Right minaret
+    path.lineTo(w * 0.92, h);
+    path.lineTo(w * 0.92, h * 0.4);
+    path.lineTo(w * 0.89, h * 0.2);
+    path.lineTo(w * 0.86, h * 0.4);
+    path.lineTo(w * 0.86, h);
+
+    // Left minaret
+    path.lineTo(w * 0.14, h);
+    path.lineTo(w * 0.14, h * 0.4);
+    path.lineTo(w * 0.11, h * 0.2);
+    path.lineTo(w * 0.08, h * 0.4);
+    path.lineTo(w * 0.08, h);
+
+    // Dome
+    path.moveTo(w * 0.7, h);
+    path.quadraticBezierTo(w * 0.5, h * -0.1, w * 0.3, h);
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_OverlayMosquePainter old) => false;
+}
+
+class _OverlayPatternPainter extends CustomPainter {
+  final Color color;
+  _OverlayPatternPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color.withOpacity(0.05)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5;
+
+    const spacing = 30.0;
+    for (double i = -size.width; i < size.width * 2; i += spacing) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        paint,
+      );
+      canvas.drawLine(
+        Offset(i, size.height),
+        Offset(i + size.height, 0),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_OverlayPatternPainter old) => false;
 }

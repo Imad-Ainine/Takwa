@@ -6,7 +6,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -17,6 +16,9 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/providers/auth_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 
 import '../widgets/location_picker_sheet.dart';
 
@@ -37,6 +39,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _madhab = 'shafi';
   String _method = 'MWL';
   TimeOfDay _muhasabaTime = const TimeOfDay(hour: 21, minute: 0);
+  bool _dailyDuas = true;
+  bool _specialReminders = true;
+  bool _fastingReminders = true;
 
   @override
   void initState() {
@@ -57,6 +62,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       s.get('madhab'),
       s.get('calcMethod'),
       s.get('eveningReminderTime'),
+      s.getBool('dailyDuasOn', defaultVal: true),
+      s.getBool('specialRemindersOn', defaultVal: true),
+      s.getBool('fastingRemindersOn', defaultVal: true),
     ]);
 
     final prayerReminder = results[0] as bool;
@@ -86,6 +94,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _madhab = madhab;
         _method = method;
         _muhasabaTime = muhasabaTime;
+        _dailyDuas = results[9] as bool;
+        _specialReminders = results[10] as bool;
+        _fastingReminders = results[11] as bool;
       });
     }
   }
@@ -99,8 +110,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
     // إعادة جدولة الإشعارات
     await NotificationsManager.reschedule(ref);
-    // مزامنة مع السحابة
-    await SyncManager.syncSettings(ref);
+    await ref.read(syncManagerProvider).syncSettings();
   }
 
   @override
@@ -200,6 +210,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             onChanged: (v) {
                               setState(() => _muhasabaReminder = v);
                               _save('eveningMuhasabaReminder', v);
+                            },
+                          ),
+                          _Divider(),
+                          _ToggleSetting(
+                            icon: '🤲',
+                            label: 'الأدعية اليومية',
+                            sublabel: 'نفحات من الأدعية النبوية',
+                            value: _dailyDuas,
+                            onChanged: (v) {
+                              setState(() => _dailyDuas = v);
+                              _save('dailyDuasOn', v);
+                            },
+                          ),
+                          _Divider(),
+                          _ToggleSetting(
+                            icon: '🕌',
+                            label: 'سنن الجمعة',
+                            sublabel: 'تذكير بسورة الكهف والجمعة',
+                            value: _specialReminders,
+                            onChanged: (v) {
+                              setState(() => _specialReminders = v);
+                              _save('specialRemindersOn', v);
+                            },
+                          ),
+                          _Divider(),
+                          _ToggleSetting(
+                            icon: '🥘',
+                            label: 'تنبيهات الصيام',
+                            sublabel: 'الاثنين والخميس والأيام البيض',
+                            value: _fastingReminders,
+                            onChanged: (v) {
+                              setState(() => _fastingReminders = v);
+                              _save('fastingRemindersOn', v);
                             },
                           ),
                           if (_muhasabaReminder) ...[
@@ -325,6 +368,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           _Divider(),
                           _ActionSetting(
+                            icon: '💎',
+                            label: 'الاشتراك',
+                            sublabel: 'دعم المشروع والاستمرار',
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              Routes.subscription,
+                            ),
+                          ),
+                          _Divider(),
+                          _ActionSetting(
                             icon: '👨‍💻',
                             label: 'عن المطور',
                             sublabel: 'تعرف على مبرمج التطبيق',
@@ -338,14 +391,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             sublabel: 'شروط الدخول والخصوصية',
                             onTap: () => Navigator.pushNamed(context, '/terms'),
                           ),
-                          _Divider(),
-                          _ActionSetting(
-                            icon: '🗑️',
-                            label: 'إعادة ضبط الإعدادات',
-                            sublabel: 'حذف جميع الإعدادات',
-                            onTap: _resetSettings,
-                            isDestructive: true,
-                          ),
+                          if (ref.watch(authStatusProvider) ==
+                              AuthStatus.authenticated)
+                            _ActionSetting(
+                              icon: '🚪',
+                              label: 'تسجيل الخروج',
+                              sublabel: 'الخروج من الحساب أو وضع الزائر',
+                              onTap: _handleLogout,
+                              isDestructive: true,
+                            ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -356,7 +410,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             Text(
                               'بسم الله الرحمن الرحيم',
-                              style: GoogleFonts.amiri(
+                              style: TextStyle(
+                                fontFamily: 'Amiri',
                                 fontSize: 14,
                                 color: context.colors.gold,
                               ),
@@ -364,7 +419,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const SizedBox(height: 4),
                             Text(
                               'تقوى — v1.0.0',
-                              style: GoogleFonts.notoNaskhArabic(
+                              style: TextStyle(
+                                fontFamily: 'NotoNaskhArabic',
                                 fontSize: 11,
                                 color: context.colors.textDim,
                               ),
@@ -407,7 +463,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 14),
             Text(
               'اختبار الإشعارات',
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Amiri',
                 fontSize: 18,
                 color: context.colors.gold,
               ),
@@ -461,11 +518,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         title: Text(
           'إعادة الضبط',
-          style: GoogleFonts.amiri(fontSize: 18, color: context.colors.danger),
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 18,
+            color: context.colors.danger,
+          ),
         ),
         content: Text(
           'هل تريد حذف جميع الإعدادات؟',
-          style: GoogleFonts.notoNaskhArabic(
+          style: TextStyle(
+            fontFamily: 'NotoNaskhArabic',
             fontSize: 13,
             color: context.colors.textSecondary,
           ),
@@ -475,7 +537,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'إلغاء',
-              style: GoogleFonts.notoNaskhArabic(
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
                 color: context.colors.textSecondary,
               ),
@@ -485,7 +548,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               'حذف',
-              style: GoogleFonts.notoNaskhArabic(
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
                 color: context.colors.danger,
               ),
@@ -495,6 +559,72 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
     );
     if (confirm == true) await NotificationsService.cancelAll();
+  }
+
+  Future<void> _handleLogout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: context.colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.colors.border),
+        ),
+        title: Text(
+          'تسجيل الخروج',
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 18,
+            color: context.colors.danger,
+          ),
+        ),
+        content: Text(
+          'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+          style: TextStyle(
+            fontFamily: 'NotoNaskhArabic',
+            fontSize: 13,
+            color: context.colors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'إلغاء',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 13,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'خروج',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 13,
+                color: context.colors.danger,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      // 1. Reset guest mode state
+      ref.read(guestModeProvider.notifier).state = false;
+
+      // 2. Sign out from Supabase (Google/Email)
+      await SupabaseService.signOut();
+
+      // 3. Navigate to splash/login
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    }
   }
 }
 
@@ -512,7 +642,8 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           title,
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Amiri',
             fontSize: 15,
             color: context.colors.textSecondary,
           ),
@@ -585,14 +716,16 @@ class _ToggleSetting extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 13,
                     color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
                   sublabel,
-                  style: GoogleFonts.notoNaskhArabic(
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 10,
                     color: context.colors.textSecondary,
                   ),
@@ -661,7 +794,8 @@ class _TimeSetting extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: GoogleFonts.notoNaskhArabic(
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 13,
                   color: context.colors.textPrimary,
                 ),
@@ -678,7 +812,8 @@ class _TimeSetting extends StatelessWidget {
               ),
               child: Text(
                 '$h:$m',
-                style: GoogleFonts.notoNaskhArabic(
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 14,
                   color: context.colors.gold,
                   fontWeight: FontWeight.w600,
@@ -731,14 +866,16 @@ class _SelectSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: context.colors.textPrimary,
                     ),
                   ),
                   Text(
                     options[value] ?? value,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 10,
                       color: context.colors.textSecondary,
                     ),
@@ -780,7 +917,8 @@ class _SelectSetting extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               label,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Amiri',
                 fontSize: 18,
                 color: context.colors.gold,
               ),
@@ -815,7 +953,8 @@ class _SelectSetting extends StatelessWidget {
                       Expanded(
                         child: Text(
                           e.value,
-                          style: GoogleFonts.notoNaskhArabic(
+                          style: TextStyle(
+                            fontFamily: 'NotoNaskhArabic',
                             fontSize: 13,
                             color: value == e.key
                                 ? context.colors.teal
@@ -890,14 +1029,16 @@ class _ActionSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: color,
                     ),
                   ),
                   Text(
                     sublabel,
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 10,
                       color: context.colors.textSecondary,
                     ),

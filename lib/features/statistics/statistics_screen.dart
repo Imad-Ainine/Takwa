@@ -8,7 +8,6 @@ import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/database/daos.dart';
@@ -1694,7 +1693,8 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                   ),
                   child: Text(
                     '+${widget.achievement.pointsReward}',
-                    style: GoogleFonts.notoNaskhArabic(
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 12,
                       color: context.colors.gold,
                       fontWeight: FontWeight.w700,

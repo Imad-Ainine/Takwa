@@ -4,7 +4,6 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../utils/quran_helpers.dart';
 import '../../utils/quran_painters.dart';
@@ -67,7 +66,8 @@ class DailyVerseCard extends StatelessWidget {
                 verse['text'] as String,
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
-                style: GoogleFonts.amiriQuran(
+                style: const TextStyle(
+                    fontFamily: 'Amiri',
                   fontSize: 19,
                   color: Colors.white,
                   height: 2.0,
@@ -112,7 +112,8 @@ class DailyVerseCard extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           name,
-          style: GoogleFonts.amiri(
+          style: const TextStyle(
+                    fontFamily: 'Amiri',
             fontSize: 14,
             color: kGoldChip,
             fontWeight: FontWeight.bold,
@@ -145,7 +146,8 @@ class DailyVerseCard extends StatelessWidget {
       children: [
         Text(
           'آية ${ar(ayah)}',
-          style: GoogleFonts.amiri(fontSize: 13, color: Colors.white70),
+          style: const TextStyle(
+                    fontFamily: 'Amiri',fontSize: 13, color: Colors.white70),
         ),
         const SizedBox(width: 4),
         const Text('»»', style: TextStyle(color: Colors.white38, fontSize: 11)),
@@ -211,7 +213,8 @@ class KhatmaActionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.amiri(
+                    style: const TextStyle(
+                    fontFamily: 'Amiri',
                       fontSize: 19,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -220,7 +223,8 @@ class KhatmaActionCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: GoogleFonts.outfit(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 12,
                       color: Colors.white70,
                     ),
@@ -296,10 +300,11 @@ class FeatureGridItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: useAiLabel
-                  ? Center(
+                  ? const Center(
                       child: Text(
                         'AI',
-                        style: GoogleFonts.outfit(
+                        style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -311,7 +316,8 @@ class FeatureGridItem extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              style: GoogleFonts.amiri(
+              style: const TextStyle(
+                    fontFamily: 'Amiri',
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -320,7 +326,8 @@ class FeatureGridItem extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54),
+              style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',fontSize: 11, color: Colors.white54),
               textAlign: TextAlign.center,
             ),
           ],
@@ -362,7 +369,8 @@ class KhatmaProgressRing extends StatelessWidget {
             children: [
               Text(
                 ar(pagesRead),
-                style: GoogleFonts.amiri(
+                style: const TextStyle(
+                    fontFamily: 'Amiri',
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -370,7 +378,8 @@ class KhatmaProgressRing extends StatelessWidget {
               ),
               Text(
                 'من ${ar(totalPages)} صفحة',
-                style: GoogleFonts.outfit(fontSize: 12, color: Colors.white60),
+                style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',fontSize: 12, color: Colors.white60),
               ),
             ],
           ),
@@ -449,7 +458,8 @@ class QuranSurahRow extends StatelessWidget {
                 children: [
                   Text(
                     s.englishName,
-                    style: GoogleFonts.outfit(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -458,7 +468,8 @@ class QuranSurahRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${s.revelationType == 'Meccan' ? 'مكية' : 'مدنية'} • ${s.ayahsNumber} آية',
-                    style: GoogleFonts.outfit(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 12,
                       color: Colors.white70,
                       letterSpacing: 0.5,
@@ -469,7 +480,8 @@ class QuranSurahRow extends StatelessWidget {
             ),
             Text(
               s.name,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                    fontFamily: 'Amiri',
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: c,
@@ -522,7 +534,8 @@ class QuranJuzCard extends StatelessWidget {
                 ),
                 Text(
                   ar(n),
-                  style: GoogleFonts.amiri(
+                  style: const TextStyle(
+                    fontFamily: 'Amiri',
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -537,7 +550,8 @@ class QuranJuzCard extends StatelessWidget {
                 children: [
                   Text(
                     'الجزء $name',
-                    style: GoogleFonts.amiri(
+                    style: const TextStyle(
+                    fontFamily: 'Amiri',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -545,7 +559,8 @@ class QuranJuzCard extends StatelessWidget {
                   ),
                   Text(
                     '${(progress * 100).toInt()}% مكتمل',
-                    style: GoogleFonts.outfit(
+                    style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                       fontSize: 12,
                       color: Colors.white70,
                     ),
@@ -596,7 +611,8 @@ class AyahBlock extends StatelessWidget {
             Text(
               a.text,
               textAlign: TextAlign.center,
-              style: GoogleFonts.amiriQuran(
+              style: TextStyle(
+                    fontFamily: 'Amiri',
                 fontSize: fontSize,
                 color: c,
                 height: 1.8,

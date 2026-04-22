@@ -15,6 +15,8 @@ import '../core/database/daos.dart';
 import '../core/supabase/sync_manager.dart';
 import '../core/supabase/supabase_providers.dart';
 import '../core/widgets/custom_pattern_background.dart';
+import '../core/supabase/supabase_service.dart';
+import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
 
 // ─────────────────────────────────────────
@@ -89,7 +91,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
     HapticFeedback.mediumImpact();
     ref.read(drawerOpenProvider.notifier).state = true;
     _ctrl.forward();
-    SyncManager.fullSync(ref); // Trigger sync when opening
+    ref.read(syncManagerProvider).fullSync(); // Trigger sync when opening
   }
 
   void _close() {
@@ -207,6 +209,10 @@ class _DrawerContent extends ConsumerWidget {
                 // ── قائمة التنقل ──
                 Expanded(child: _DrawerNav(onClose: onClose)),
 
+                // ── تسجيل الخروج ──
+                if (ref.watch(authStatusProvider) == AuthStatus.authenticated)
+                  _LogoutButton(onClose: onClose),
+
                 // ── تذييل ──
                 _DrawerFooter(),
               ],
@@ -307,24 +313,26 @@ class _DrawerHeader extends ConsumerWidget {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                'عرض البروفايل',
-                                style: context.typography.caption.copyWith(
-                                  fontSize: 11,
-                                  color: context.colors.gold,
-                                  fontWeight: FontWeight.w500,
+                          if (ref.watch(authStatusProvider) ==
+                              AuthStatus.authenticated)
+                            Row(
+                              children: [
+                                Text(
+                                  'عرض البروفايل',
+                                  style: context.typography.caption.copyWith(
+                                    fontSize: 11,
+                                    color: context.colors.gold,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 8,
-                                color: context.colors.gold,
-                              ),
-                            ],
-                          ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 8,
+                                  color: context.colors.gold,
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
@@ -499,7 +507,6 @@ class _DrawerNav extends ConsumerStatefulWidget {
 class _DrawerNavState extends ConsumerState<_DrawerNav>
     with SingleTickerProviderStateMixin {
   late final AnimationController _staggerCtrl;
-  late final List<Animation<double>> _itemAnims;
 
   static const _items = [
     _NavItem('🏠', 'الرئيسية', '/home', 0),
@@ -519,15 +526,7 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
       duration: const Duration(milliseconds: 600),
     )..forward();
 
-    _itemAnims = List.generate(_items.length, (i) {
-      final s = i * 0.1, e = (s + 0.4).clamp(0.0, 1.0);
-      return Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(
-          parent: _staggerCtrl,
-          curve: Interval(s, e, curve: Curves.easeOut),
-        ),
-      );
-    });
+    // Animations are now computed dynamically in build to handle filtered items
   }
 
   @override
@@ -540,13 +539,32 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
   Widget build(BuildContext context) {
     final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
 
+    final authStatus = ref.watch(authStatusProvider);
+    final visibleItems = _items.where((item) {
+      if (item.route == '/profile') {
+        return authStatus == AuthStatus.authenticated;
+      }
+      return true;
+    }).toList();
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      itemCount: _items.length,
+      itemCount: visibleItems.length,
       itemBuilder: (_, i) {
-        final item = _items[i];
+        final item = visibleItems[i];
+
+        // Dynamic animation for the current index
+        final stagger = CurvedAnimation(
+          parent: _staggerCtrl,
+          curve: Interval(
+            (i * 0.1).clamp(0.0, 1.0),
+            (i * 0.1 + 0.4).clamp(0.0, 1.0),
+            curve: Curves.easeOut,
+          ),
+        );
+
         return FadeTransition(
-          opacity: _itemAnims[i],
+          opacity: Tween<double>(begin: 0, end: 1).animate(stagger),
           child: SlideTransition(
             position:
                 Tween<Offset>(
@@ -556,8 +574,8 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
                   CurvedAnimation(
                     parent: _staggerCtrl,
                     curve: Interval(
-                      i * 0.1,
-                      (i * 0.1 + 0.4).clamp(0, 1.0),
+                      (i * 0.1).clamp(0.0, 1.0),
+                      (i * 0.1 + 0.4).clamp(0.0, 1.0),
                       curve: Curves.easeOutCubic,
                     ),
                   ),
@@ -882,4 +900,111 @@ class _NavItem {
   final String emoji, label, route;
   final int index;
   const _NavItem(this.emoji, this.label, this.route, this.index);
+}
+
+class _LogoutButton extends ConsumerWidget {
+  final VoidCallback onClose;
+  const _LogoutButton({required this.onClose});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: InkWell(
+        onTap: () => _handleLogout(context, ref, onClose),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: context.colors.danger.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
+          ),
+          child: Row(
+            children: [
+              Text(
+                '🚪',
+                style: TextStyle(fontSize: 18, color: context.colors.danger),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'تسجيل الخروج',
+                style: context.typography.bodyMedium.copyWith(
+                  fontSize: 13,
+                  color: context.colors.danger,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleLogout(
+    BuildContext context,
+    WidgetRef ref,
+    VoidCallback onClose,
+  ) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: context.colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: context.colors.border),
+        ),
+        title: Text(
+          'تسجيل الخروج',
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 18,
+            color: context.colors.danger,
+          ),
+        ),
+        content: Text(
+          'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+          style: TextStyle(
+            fontFamily: 'NotoNaskhArabic',
+            fontSize: 13,
+            color: context.colors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'إلغاء',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 13,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              'خروج',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 13,
+                color: context.colors.danger,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      onClose(); // Close drawer
+      ref.read(guestModeProvider.notifier).state = false;
+      await SupabaseService.signOut();
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      }
+    }
+  }
 }

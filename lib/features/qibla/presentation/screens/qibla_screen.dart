@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:adhan/adhan.dart' as adhan;
 
 import 'package:takwa/core/theme/ramadan_theme.dart';
@@ -333,7 +332,8 @@ class _QiblaCompassPainter extends CustomPainter {
       final y = c.dy - textR * math.cos(a);
       tp.text = TextSpan(
         text: d.$1,
-        style: GoogleFonts.amiri(
+        style: TextStyle(
+                    fontFamily: 'Amiri',
           fontSize: 13,
           color: d.$1 == 'ش' ? primaryColor : primaryColor.withOpacity(0.4),
         ),

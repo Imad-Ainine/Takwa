@@ -21,11 +21,11 @@ class DuaOverlayNotification {
       overlayTitle: 'أدعية تقوى',
       overlayContent: 'دعاء اليوم',
       flag: OverlayFlag.defaultFlag,
-      alignment: OverlayAlignment.center,
+      alignment: OverlayAlignment.topCenter,
       visibility: NotificationVisibility.visibilityPublic,
       positionGravity: PositionGravity.none,
-      height: 420,
-      width: 320,
+      height: 440,
+      width: 340,
     );
 
     // نرسل البيانات بعد برهة لضمان عمل الـ Listener في الـ Isolate الآخر

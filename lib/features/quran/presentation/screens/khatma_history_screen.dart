@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
@@ -22,14 +21,15 @@ class KhatmaHistoryScreen extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: const Color.fromARGB(46, 4, 1, 35),
+          const SliverAppBar(
+            backgroundColor: Color.fromARGB(46, 4, 1, 35),
             foregroundColor: Colors.white,
             pinned: true,
-            leading: const CustomLeadingButton(),
+            leading: CustomLeadingButton(),
             title: Text(
               'تاريخ الختمات',
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                    fontFamily: 'Amiri',
                 fontSize: 22,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -67,20 +67,22 @@ class KhatmaHistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.menu_book_outlined, size: 72, color: Colors.white24),
-          const SizedBox(height: 20),
+          Icon(Icons.menu_book_outlined, size: 72, color: Colors.white24),
+          SizedBox(height: 20),
           Text(
             'لا توجد ختمات مكتملة بعد',
-            style: GoogleFonts.amiri(fontSize: 20, color: Colors.white54),
+            style: TextStyle(
+                    fontFamily: 'Amiri',fontSize: 20, color: Colors.white54),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'ابدأ ختمتك الأولى من الشاشة الرئيسية',
-            style: GoogleFonts.outfit(fontSize: 13, color: Colors.white38),
+            style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',fontSize: 13, color: Colors.white38),
           ),
         ],
       ),
@@ -129,7 +131,8 @@ class _KhatmaHistoryCard extends StatelessWidget {
                 ),
                 child: Text(
                   session.isCompleted ? 'مكتملة' : 'جارية',
-                  style: GoogleFonts.outfit(
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
                     fontSize: 12,
                     color: session.isCompleted ? kGoldChip : Colors.greenAccent,
                     fontWeight: FontWeight.w600,
@@ -139,7 +142,8 @@ class _KhatmaHistoryCard extends StatelessWidget {
               const Spacer(),
               Text(
                 session.label,
-                style: GoogleFonts.amiri(
+                style: const TextStyle(
+                    fontFamily: 'Amiri',
                   fontSize: 16,
                   color: Colors.white70,
                   fontWeight: FontWeight.bold,
@@ -191,7 +195,8 @@ class _KhatmaHistoryCard extends StatelessWidget {
       const SizedBox(width: 5),
       Text(
         text,
-        style: GoogleFonts.outfit(fontSize: 11, color: Colors.white54),
+        style: const TextStyle(
+                    fontFamily: 'NotoNaskhArabic',fontSize: 11, color: Colors.white54),
       ),
     ],
   );

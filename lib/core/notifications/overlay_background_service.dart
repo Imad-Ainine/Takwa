@@ -15,6 +15,10 @@ import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../utils/timezone_resolver.dart';
+import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/features/duas/data/duas_data.dart';
+import 'notifications_service.dart';
+import 'dart:math' as math;
 
 // ─────────────────────────────────────────
 //  CONSTANTS
@@ -39,6 +43,10 @@ const _kMadhabKey = 'madhab';
 const _kCalcMethodKey = 'calcMethod';
 const _kCityNameKey = 'cityName';
 const _kLastPopupMsKey = 'last_adhkar_popup_ms';
+const _kLastNotifMsKey = 'last_adhkar_notif_ms';
+
+/// Interval for Adhkar Notification update: 15 minutes.
+const _kAdhkarNotifInterval = Duration(minutes: 15);
 
 // ─────────────────────────────────────────
 //  PRAYER INFO  (lightweight, no adhan pkg types exposed)
@@ -165,6 +173,7 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     await _refreshPrayerTimes();
     await _updateNotificationWithPrayerInfo();
+    await _showPeriodicAdhkarNotification(); // Show once on start
   }
 
   @override
@@ -177,6 +186,82 @@ class _OverlayTaskHandler extends TaskHandler {
 
     // 3. عرض popup الأذكار/الأدعية كل 24 دقيقة
     await _checkAndShowAdhkarPopup();
+
+    // 4. تحديث إشعار الأذكار في اللوحة كل 15 دقيقة
+    await _showPeriodicAdhkarNotification();
+
+    // 5. تحديث إشعار الأدعية في اللوحة كل 15 دقيقة (بتناوب)
+    await _showPeriodicDouaaNotification();
+  }
+
+  Future<void> _showPeriodicAdhkarNotification() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastMs = prefs.getInt(_kLastNotifMsKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      if (now - lastMs < _kAdhkarNotifInterval.inMilliseconds) return;
+
+      // تهيئة خدمة الإشعارات في هذا الـ Isolate إذا لزم الأمر
+      await NotificationsService.initialize();
+
+      // اختيار ذكر عشوائي
+      final random = math.Random();
+      final allAdhkar = kAdhkarData.values
+          .expand((element) => element)
+          .toList();
+      if (allAdhkar.isEmpty) return;
+
+      final dhikr = allAdhkar[random.nextInt(allAdhkar.length)];
+
+      // إظهار الإشعار
+      await NotificationsService.showNotification(
+        id: NotifIds.morningAdhkar, // استخدام ID ثابت لتحديث نفس الإشعار
+        title: 'أذكار المسلم',
+        body: dhikr.arabic,
+        channel: NotifChannels.adhkar,
+      );
+
+      // حفظ الوقت
+      await prefs.setInt(_kLastNotifMsKey, now);
+    } catch (e) {
+      print('OverlayService: Notification error: $e');
+    }
+  }
+
+  Future<void> _showPeriodicDouaaNotification() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      const lastMsKey = 'last_dua_notif_ms';
+      final lastMs = prefs.getInt(lastMsKey) ?? 0;
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      // نجعل الأدعية تظهر بعد أذكار الصباح بـ 7 دقائق لتجنب التزاحم
+      if (now - lastMs < _kAdhkarNotifInterval.inMilliseconds) return;
+
+      // تهيئة خدمة الإشعارات
+      await NotificationsService.initialize();
+
+      // اختيار دعاء عشوائي
+      final random = math.Random();
+      final allDuas = kDuasData.values.expand((element) => element).toList();
+      if (allDuas.isEmpty) return;
+
+      final dua = allDuas[random.nextInt(allDuas.length)];
+
+      // إظهار الإشعار
+      await NotificationsService.showNotification(
+        id: NotifIds.randomDua, // استخدام ID مختلف عن الأذكار
+        title: 'دعاء من تقوى 🤲',
+        body: dua.arabic,
+        channel: NotifChannels.duas,
+      );
+
+      // حفظ الوقت
+      await prefs.setInt(lastMsKey, now);
+    } catch (e) {
+      print('OverlayService: Dua Notification error: $e');
+    }
   }
 
   /// يطلق Overlay popup اذا مضى اكثر من 24 دقيقة منذ آخر popup.
@@ -203,13 +288,13 @@ class _OverlayTaskHandler extends TaskHandler {
       await ow.FlutterOverlayWindow.showOverlay(
         enableDrag: true,
         overlayTitle: 'أذكار تقوى',
-        overlayContent: 'ذكر/دعاء متجدد',
+        overlayContent: 'ذكر',
         flag: ow.OverlayFlag.defaultFlag,
         alignment: ow.OverlayAlignment.center,
         visibility: ow.NotificationVisibility.visibilityPublic,
         positionGravity: ow.PositionGravity.none,
-        height: 420,
-        width: 320,
+        height: 520,
+        width: 380,
       );
 
       // نرسل نوع البيانات للمصفي (هنا نتركها عامة لتشمل الإثنين أو نحدد أذكار)

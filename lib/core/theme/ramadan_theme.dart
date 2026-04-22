@@ -8,7 +8,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
@@ -235,37 +234,48 @@ class RamadanTheme {
   }
 
   static TextTheme _buildTextTheme(Color main, Color accent) => TextTheme(
-    displayLarge: GoogleFonts.amiri(
+    displayLarge: TextStyle(
+      fontFamily: 'Amiri',
       fontSize: 36,
       fontWeight: FontWeight.w700,
       color: accent,
     ),
-    displayMedium: GoogleFonts.amiri(
+    displayMedium: TextStyle(
+      fontFamily: 'Amiri',
       fontSize: 28,
       fontWeight: FontWeight.w700,
       color: main,
     ),
-    headlineLarge: GoogleFonts.amiri(
+    headlineLarge: TextStyle(
+      fontFamily: 'Amiri',
       fontSize: 22,
       fontWeight: FontWeight.w700,
       color: main,
     ),
-    headlineMedium: GoogleFonts.amiri(
+    headlineMedium: TextStyle(
+      fontFamily: 'Amiri',
       fontSize: 18,
       fontWeight: FontWeight.w700,
       color: main,
     ),
-    bodyLarge: GoogleFonts.notoNaskhArabic(
+    bodyLarge: TextStyle(
+      fontFamily: 'NotoNaskhArabic',
       fontSize: 16,
       color: main,
       height: 1.9,
     ),
-    bodyMedium: GoogleFonts.notoNaskhArabic(fontSize: 14, color: main),
-    bodySmall: GoogleFonts.notoNaskhArabic(
+    bodyMedium: TextStyle(
+      fontFamily: 'NotoNaskhArabic',
+      fontSize: 14,
+      color: main,
+    ),
+    bodySmall: TextStyle(
+      fontFamily: 'NotoNaskhArabic',
       fontSize: 12,
       color: main.withOpacity(0.7),
     ),
-    labelLarge: GoogleFonts.notoNaskhArabic(
+    labelLarge: TextStyle(
+      fontFamily: 'NotoNaskhArabic',
       fontSize: 14,
       fontWeight: FontWeight.w600,
       color: main,
@@ -287,7 +297,8 @@ class RamadanTheme {
   static AppBarTheme _buildAppBarTheme(Color accent) => AppBarTheme(
     backgroundColor: Colors.transparent,
     elevation: 0,
-    titleTextStyle: GoogleFonts.amiri(
+    titleTextStyle: TextStyle(
+      fontFamily: 'Amiri',
       fontSize: 20,
       color: accent,
       fontWeight: FontWeight.w700,
@@ -610,7 +621,7 @@ class RamadanToggle extends ConsumerWidget {
 
               // ── Sync with Cloud & Reschedule Notifications ──
               await NotificationsManager.reschedule(ref);
-              await SyncManager.syncSettings(ref);
+              await ref.read(syncManagerProvider).syncSettings();
             },
             accentColor: style.gold,
           ),
@@ -656,7 +667,8 @@ class AdaptiveStyle {
     Color? color,
     FontWeight? weight,
     double? height,
-  }) => GoogleFonts.amiri(
+  }) => TextStyle(
+    fontFamily: 'Amiri',
     fontSize: size,
     color: color ?? gold,
     fontWeight: weight ?? FontWeight.w700,
@@ -676,7 +688,8 @@ class AdaptiveStyle {
     Color? color,
     FontWeight? weight,
     double? height,
-  }) => GoogleFonts.notoNaskhArabic(
+  }) => TextStyle(
+    fontFamily: 'NotoNaskhArabic',
     fontSize: size,
     color: color ?? (size < 12 ? textSec : text),
     fontWeight: weight ?? FontWeight.w400,
