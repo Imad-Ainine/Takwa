@@ -500,7 +500,10 @@ List<_PopupItem> _buildAllItems() {
     AdhkarCategory.afterPrayer: ('🕌', 'أذكار بعد الصلاة'),
     AdhkarCategory.sleep: ('🌙', 'أذكار النوم'),
     AdhkarCategory.misc: ('📿', 'أذكار متنوعة'),
+    AdhkarCategory.wakingUp: ('📿', 'الاستيقاظ من النوم'),
+    AdhkarCategory.food: ('📿', 'أذكار الطعام'),
   };
+
   for (final entry in kAdhkarData.entries) {
     final meta = catNames[entry.key]!;
     for (final d in entry.value) {

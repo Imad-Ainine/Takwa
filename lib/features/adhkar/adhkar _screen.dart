@@ -51,6 +51,7 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     _tabCtrl = TabController(
       initialIndex: widget.initialCategoryIndex,
       length: _tabs.length,
+
       vsync: this,
     );
     _entryCtrl = AnimationController(

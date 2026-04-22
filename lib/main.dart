@@ -228,7 +228,12 @@ void main() async {
 
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();
-  await FlutterWindowManagerPlus.addFlags(FlutterWindowManagerPlus.FLAG_SECURE);
+  try {
+    await FlutterWindowManagerPlus.addFlags(FlutterWindowManagerPlus.FLAG_SECURE);
+  } catch (e) {
+    debugPrint('WindowManager Error: $e');
+  }
+
   OverlayBackgroundService.init();
 
   SystemChrome.setPreferredOrientations([
