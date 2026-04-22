@@ -1,6 +1,13 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/notifications/notifications_service.dart
-// تقوى — Local Notifications + Prayer Times
+//  تقوى — Complete Notifications Service (IMPROVED)
+//  • إشعارات الصلاة مع صوت الأذان
+//  • تنبيهات قبل الأذان بـ 15 دقيقة
+//  • إشعارات الإقامة بعد الأذان
+//  • أذكار الصباح والمساء يومياً
+//  • دعاء الصباح ودعاء المساء
+//  • إشعارات الجمعة والأيام البيض
+//  • إشعارات الإنجازات
 // ═══════════════════════════════════════════════════════════════
 
 import 'dart:io';
@@ -14,31 +21,31 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hijri/hijri_calendar.dart';
-import 'package:takwa/features/duas/data/duas_data.dart';
 
+import 'package:takwa/features/duas/data/duas_data.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/providers/adhkar_providers.dart';
 
 // ─────────────────────────────────────────
-//  NOTIFICATION IDs  (ثابتة لا تتغير)
+//  NOTIFICATION IDs
 // ─────────────────────────────────────────
 class NotifIds {
-  // صلوات
+  // الصلوات الخمس
   static const fajr = 100;
   static const dhuhr = 101;
   static const asr = 102;
   static const maghrib = 103;
   static const isha = 104;
-  static const fajrWakeUp = 105; // تنبيه قبل الفجر بـ 15 دقيقة (قديم)
 
-  // تنبيهات جديدة قبل الأذان بـ 15 دقيقة
+  // تنبيهات قبل الأذان بـ 15 دقيقة
   static const preFajr = 110;
   static const preDhuhr = 111;
   static const preAsr = 112;
   static const preMaghrib = 113;
   static const preIsha = 114;
 
-  // تنبيهات الإقامة (بعد الأذان)
+  // تنبيهات الإقامة
   static const iqamaFajr = 120;
   static const iqamaDhuhr = 121;
   static const iqamaAsr = 122;
@@ -51,90 +58,133 @@ class NotifIds {
   // أذكار
   static const morningAdhkar = 300;
   static const eveningAdhkar = 301;
-
-  // تحدي رمضان يومي
-  static const ramadanDaily = 400;
-
-  // إنجاز جديد
-  static const achievement = 500;
+  static const afterPrayerAdhkar = 302;
+  static const sleepAdhkar = 303;
+  static const randomAdhkar = 304;
 
   // أدعية
-  static const randomDua = 600;
-  static const dailyDuaMorning = 601;
-  static const dailyDuaEvening = 602;
+  static const randomDua = 400;
+  static const dailyDuaMorning = 401;
+  static const dailyDuaEvening = 402;
+  static const distressDua = 403;
 
-  // تنبيهات خاصة
-  static const fridayKahf = 700;
-  static const fridaySalawat = 701;
-  static const fastingMonday = 702;
-  static const fastingThursday = 703;
-  static const fastingWhiteDays = 704;
+  // تذكيرات خاصة
+  static const fridayKahf = 500;
+  static const fridaySalawat = 501;
+  static const fastingMonday = 502;
+  static const fastingThursday = 503;
+  static const fastingWhiteDays = 504;
+
+  // إنجازات
+  static const achievement = 600;
+
+  // رمضان
+  static const ramadanSuhoor = 700;
+  static const ramadanIftar = 701;
 }
 
 // ─────────────────────────────────────────
 //  NOTIFICATION CHANNELS (Android)
 // ─────────────────────────────────────────
 class NotifChannels {
+  /// قناة الأذان — أعلى أولوية مع صوت الأذان
   static const AndroidNotificationChannel prayer = AndroidNotificationChannel(
-    'prayer_times',
-    'أوقات الصلاة',
-    description: 'تذكيرات أوقات الصلوات الخمس',
-    importance: Importance.high,
+    'prayer_adhan',
+    'أذان الصلاة',
+    description: 'إشعار وقت الأذان مع صوت الأذان',
+    importance: Importance.max,
     sound: RawResourceAndroidNotificationSound('adhan'),
     playSound: true,
     enableVibration: true,
+    enableLights: true,
+    ledColor: Color(0xFFC8A96E),
   );
 
+  /// تنبيهات قبل الأذان والإقامة
   static const AndroidNotificationChannel alert = AndroidNotificationChannel(
     'prayer_alerts',
     'تنبيهات الصلاة',
-    description: 'تنبيهات قبل الأذان وبوقت الإقامة',
+    description: 'تنبيهات قبل الأذان وبعد الإقامة',
     importance: Importance.high,
     sound: RawResourceAndroidNotificationSound('notification'),
     playSound: true,
     enableVibration: true,
   );
 
+  /// قناة المحاسبة
   static const AndroidNotificationChannel muhasaba = AndroidNotificationChannel(
     'muhasaba',
     'محاسبة النفس',
-    description: 'تذكيرات المحاسبة المسائية',
+    description: 'تذكير محاسبة النفس المسائية',
     importance: Importance.defaultImportance,
+    enableVibration: false,
   );
 
+  /// قناة الأذكار
   static const AndroidNotificationChannel adhkar = AndroidNotificationChannel(
-    'adhkar',
-    'الأذكار',
-    description: 'تذكيرات أذكار الصباح والمساء',
+    'adhkar_channel',
+    'الأذكار اليومية',
+    description: 'أذكار الصباح والمساء وبعد الصلاة',
     importance: Importance.defaultImportance,
+    playSound: false,
+    enableVibration: false,
   );
 
+  /// قناة الأدعية
+  static const AndroidNotificationChannel duas = AndroidNotificationChannel(
+    'duas_channel',
+    'الأدعية',
+    description: 'نفحات من الأدعية النبوية والقرآنية',
+    importance: Importance.defaultImportance,
+    playSound: false,
+    enableVibration: false,
+  );
+
+  /// قناة الإنجازات
   static const AndroidNotificationChannel achievement =
       AndroidNotificationChannel(
-        'achievement',
+        'achievement_channel',
         'الإنجازات',
         description: 'إشعارات الإنجازات الجديدة',
         importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
       );
 
-  static const AndroidNotificationChannel duas = AndroidNotificationChannel(
-    'duas',
-    'الأدعية والرقية',
-    description: 'تذكيرات ونفحات من الأدعية النبوية والقرآنية',
-    importance: Importance.defaultImportance,
-  );
-
+  /// قناة التذكيرات الخاصة
   static const AndroidNotificationChannel reminders =
       AndroidNotificationChannel(
         'special_reminders',
         'تذكيرات إيمانية',
-        description: 'تذكيرات بسنن الجمعة واليام البيض والصيام',
+        description: 'تذكيرات بسنن الجمعة والصيام والأيام البيض',
         importance: Importance.defaultImportance,
+        enableVibration: false,
       );
+
+  /// قناة رمضان
+  static const AndroidNotificationChannel ramadan = AndroidNotificationChannel(
+    'ramadan_channel',
+    'رمضان المبارك',
+    description: 'تنبيهات السحور والإفطار',
+    importance: Importance.high,
+    playSound: true,
+    enableVibration: true,
+  );
+
+  static List<AndroidNotificationChannel> get all => [
+    prayer,
+    alert,
+    muhasaba,
+    adhkar,
+    duas,
+    achievement,
+    reminders,
+    ramadan,
+  ];
 }
 
 // ─────────────────────────────────────────
-//  PRAYER INFO MODEL
+//  PRAYER TIME INFO MODEL
 // ─────────────────────────────────────────
 class PrayerTimeInfo {
   final String name;
@@ -142,7 +192,6 @@ class PrayerTimeInfo {
   final String emoji;
   final DateTime time;
   final int notifId;
-
   const PrayerTimeInfo({
     required this.name,
     required this.nameAr,
@@ -152,99 +201,56 @@ class PrayerTimeInfo {
   });
 }
 
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 //  NOTIFICATIONS SERVICE
-// ─────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 class NotificationsService {
-  static final plugin = FlutterLocalNotificationsPlugin();
+  static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
-  static final _random = Random();
 
   // ── تهيئة الخدمة ──
   static Future<void> initialize() async {
     if (_initialized) return;
-
     tz_data.initializeTimeZones();
 
-    // Android settings
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    // iOS settings
     const ios = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
 
-    const settings = InitializationSettings(android: android, iOS: ios);
-
-    await plugin.initialize(
-      settings,
+    await _plugin.initialize(
+      const InitializationSettings(android: android, iOS: ios),
       onDidReceiveNotificationResponse: _onNotifTap,
       onDidReceiveBackgroundNotificationResponse: _onNotifTap,
     );
 
-    // إنشاء القنوات (Android)
+    // إنشاء القنوات على Android
     if (Platform.isAndroid) {
-      final androidPlugin = plugin
+      final androidPlugin = _plugin
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      await androidPlugin?.createNotificationChannel(NotifChannels.prayer);
-      await androidPlugin?.createNotificationChannel(NotifChannels.alert);
-      await androidPlugin?.createNotificationChannel(NotifChannels.muhasaba);
-      await androidPlugin?.createNotificationChannel(NotifChannels.adhkar);
-      await androidPlugin?.createNotificationChannel(NotifChannels.achievement);
-      await androidPlugin?.createNotificationChannel(NotifChannels.duas);
-      await androidPlugin?.createNotificationChannel(NotifChannels.reminders);
+      for (final channel in NotifChannels.all) {
+        await androidPlugin?.createNotificationChannel(channel);
+      }
     }
 
     _initialized = true;
   }
 
-  // ── التحقق من الإذن (بدون طلب) ──
-  static Future<bool> checkPermissions() async {
-    if (Platform.isAndroid) {
-      if (!await Permission.notification.isGranted) return false;
-      if (!await Permission.scheduleExactAlarm.isGranted) return false;
-      return true;
-    }
-    if (Platform.isIOS) {
-      return await Permission.notification.isGranted;
-    }
-    return true;
-  }
-
-  // ── طلب إذن العمل في الخلفية (Battery Optimization) ──
-  static Future<bool> requestBackgroundPermission() async {
-    if (Platform.isAndroid) {
-      try {
-        final status = await Permission.ignoreBatteryOptimizations
-            .request()
-            .timeout(
-              const Duration(seconds: 10),
-              onTimeout: () => PermissionStatus.denied,
-            );
-        return status.isGranted;
-      } catch (e) {
-        return false;
-      }
-    }
-    return true; // iOS doesn't have a direct equivalent in the same way
-  }
-
-  // ── طلب الإذن ──
+  // ── طلب الأذون ──
   static Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.request();
-      if (status.isGranted) {
-        final exact = await Permission.scheduleExactAlarm.request();
-        return exact.isGranted;
-      }
-      return false;
+      if (!status.isGranted) return false;
+      // Android 12+ يحتاج إذن التنبيه الدقيق
+      final exact = await Permission.scheduleExactAlarm.request();
+      return exact.isGranted;
     }
     if (Platform.isIOS) {
-      final result = await plugin
+      final result = await _plugin
           .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin
           >()
@@ -254,32 +260,42 @@ class NotificationsService {
     return true;
   }
 
-  // ── جدولة إشعارات الصلاة (ليوم واحد) ──
+  static Future<bool> checkPermissions() async {
+    if (Platform.isAndroid) {
+      return await Permission.notification.isGranted &&
+          await Permission.scheduleExactAlarm.isGranted;
+    }
+    return await Permission.notification.isGranted;
+  }
+
+  static Future<bool> requestBackgroundPermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.ignoreBatteryOptimizations
+          .request()
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () => PermissionStatus.denied,
+          );
+      return status.isGranted;
+    }
+    return true;
+  }
+
+  // ── جدولة إشعارات الصلاة الكاملة ──
   static Future<void> schedulePrayerNotifications({
     required List<PrayerTimeInfo> prayers,
     required bool wakeUpBeforeFajr,
+    bool preAdhanEnabled = true,
+    bool iqamaEnabled = true,
   }) async {
     // إلغاء القديمة
-    final idsToCancel = [
-      100,
-      101,
-      102,
-      103,
-      104,
-      105,
-      110,
-      111,
-      112,
-      113,
-      114,
-      120,
-      121,
-      122,
-      123,
-      124,
+    final ids = [
+      ...List.generate(5, (i) => 100 + i), // أذان
+      ...List.generate(5, (i) => 110 + i), // قبل الأذان
+      ...List.generate(5, (i) => 120 + i), // إقامة
     ];
-    for (final id in idsToCancel) {
-      await plugin.cancel(id);
+    for (final id in ids) {
+      await _plugin.cancel(id);
     }
 
     final iqamaOffsets = {
@@ -290,57 +306,76 @@ class NotificationsService {
       'isha': 15,
     };
 
+    final now = DateTime.now();
+
     for (int i = 0; i < prayers.length; i++) {
       final prayer = prayers[i];
-      final now = DateTime.now();
 
-      // 1. التنبيه قبل الأذان بـ 15 دقيقة
-      final preTime = prayer.time.subtract(const Duration(minutes: 15));
-      if (preTime.isAfter(now)) {
-        await _scheduleExact(
-          id: 110 + i,
-          title: 'اقترب وقت ${prayer.nameAr} ⏳',
-          body: '١٥ دقيقة ويؤذن لـ ${prayer.nameAr}، استعد للصلاة',
-          scheduledTime: preTime,
-          channelId: NotifChannels.alert.id,
-          sound: 'notification',
-          payload: 'pre_prayer:${prayer.name}',
-        );
+      // 1. تنبيه قبل الأذان بـ 15 دقيقة
+      if (preAdhanEnabled) {
+        final preTime = prayer.time.subtract(const Duration(minutes: 15));
+        if (preTime.isAfter(now)) {
+          await _scheduleExact(
+            id: 110 + i,
+            title: '⏳ اقترب وقت ${prayer.nameAr}',
+            body: '15 دقيقة على أذان ${prayer.nameAr}، استعدَّ للصلاة',
+            scheduledTime: preTime,
+            channelId: NotifChannels.alert.id,
+            payload: 'pre_prayer:${prayer.name}',
+          );
+        }
       }
 
-      // 2. الأذان الفعلي
+      // 2. إشعار الأذان مع الصوت
       if (prayer.time.isAfter(now)) {
         await _scheduleExact(
           id: prayer.notifId,
-          title: 'حان وقت ${prayer.nameAr} ${prayer.emoji}',
-          body: 'الله أكبر، الله أكبر، حي على الصلاة',
+          title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
+          body: 'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح',
           scheduledTime: prayer.time,
           channelId: NotifChannels.prayer.id,
           sound: 'adhan',
           payload: 'prayer:${prayer.name}',
+          fullScreenIntent: true,
         );
       }
 
       // 3. تنبيه الإقامة
-      final offset = iqamaOffsets[prayer.name] ?? 15;
-      final iqamaTime = prayer.time.add(Duration(minutes: offset));
-      if (iqamaTime.isAfter(now)) {
-        await _scheduleExact(
-          id: 120 + i,
-          title: 'وقت الإقامة — ${prayer.nameAr} 🤲',
-          body: 'حان الآن وقت إقامة صلاة ${prayer.nameAr}',
-          scheduledTime: iqamaTime,
-          channelId: NotifChannels.alert.id,
-          sound: 'notification',
-          payload: 'iqama:${prayer.name}',
-        );
+      if (iqamaEnabled) {
+        final offset = iqamaOffsets[prayer.name] ?? 15;
+        final iqamaTime = prayer.time.add(Duration(minutes: offset));
+        if (iqamaTime.isAfter(now)) {
+          await _scheduleExact(
+            id: 120 + i,
+            title: '🤲 وقت الإقامة — ${prayer.nameAr}',
+            body: 'حان وقت إقامة صلاة ${prayer.nameAr}، الله أكبر الله أكبر',
+            scheduledTime: iqamaTime,
+            channelId: NotifChannels.alert.id,
+            payload: 'iqama:${prayer.name}',
+          );
+        }
+      }
+
+      // 4. تنبيه اليقظة قبل الفجر
+      if (prayer.name == 'fajr' && wakeUpBeforeFajr) {
+        final wakeTime = prayer.time.subtract(const Duration(minutes: 20));
+        if (wakeTime.isAfter(now)) {
+          await _scheduleExact(
+            id: 105,
+            title: '🌙 استيقظ لصلاة الفجر',
+            body: 'بقي 20 دقيقة على أذان الفجر — ${_formatTime(prayer.time)}',
+            scheduledTime: wakeTime,
+            channelId: NotifChannels.alert.id,
+            payload: 'wakeup:fajr',
+          );
+        }
       }
     }
   }
 
-  // ── جدولة المحاسبة المسائية (يومياً) ──
+  // ── جدولة محاسبة مسائية يومية ──
   static Future<void> scheduleEveningMuhasaba({required TimeOfDay time}) async {
-    await plugin.cancel(NotifIds.eveningMuhasaba);
+    await _plugin.cancel(NotifIds.eveningMuhasaba);
 
     final now = DateTime.now();
     var scheduled = DateTime(
@@ -354,11 +389,12 @@ class NotificationsService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    // يومي بالتكرار
-    await plugin.zonedSchedule(
+    final msg = _eveningMessages[now.weekday % _eveningMessages.length];
+
+    await _plugin.zonedSchedule(
       NotifIds.eveningMuhasaba,
-      'وقت محاسبة النفس 📝',
-      _eveningMessages[DateTime.now().weekday % _eveningMessages.length],
+      '📝 وقت محاسبة النفس',
+      msg,
       tz.TZDateTime.from(scheduled, tz.local),
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -366,14 +402,11 @@ class NotificationsService {
           NotifChannels.muhasaba.name,
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
-          styleInformation: BigTextStyleInformation(
-            _eveningMessages[DateTime.now().weekday % _eveningMessages.length],
-          ),
+          styleInformation: BigTextStyleInformation(msg),
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
+          presentSound: false,
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -384,32 +417,189 @@ class NotificationsService {
     );
   }
 
-  // ── جدولة أذكار الصباح والمساء ──
+  // ── جدولة أذكار الصباح والمساء يومياً ──
   static Future<void> scheduleAdhkarReminders({
     required TimeOfDay morningTime,
     required TimeOfDay eveningTime,
   }) async {
-    await plugin.cancel(NotifIds.morningAdhkar);
-    await plugin.cancel(NotifIds.eveningAdhkar);
+    await _plugin.cancel(NotifIds.morningAdhkar);
+    await _plugin.cancel(NotifIds.eveningAdhkar);
 
+    // أذكار الصباح
+    final morningDhikr = _randomFromCategory(AdhkarCategory.morning);
     await _scheduleDailyAt(
       id: NotifIds.morningAdhkar,
-      title: 'أذكار الصباح ☀️',
-      body:
-          'لا تنس أذكار الصباح — "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا"',
+      title: '🌅 أذكار الصباح',
+      body: morningDhikr != null
+          ? _truncate(morningDhikr.arabic, 120)
+          : 'لا تنس أذكار الصباح — حصنك اليومي',
       time: morningTime,
       channelId: NotifChannels.adhkar.id,
       payload: 'adhkar:morning',
     );
 
+    // أذكار المساء
+    final eveningDhikr = _randomFromCategory(AdhkarCategory.evening);
     await _scheduleDailyAt(
       id: NotifIds.eveningAdhkar,
-      title: 'أذكار المساء 🌆',
-      body: 'اللهم بك أمسينا وبك أصبحنا وبك نحيا وبك نموت',
+      title: '🌆 أذكار المساء',
+      body: eveningDhikr != null
+          ? _truncate(eveningDhikr.arabic, 120)
+          : 'اللهم بك أمسينا وبك أصبحنا وبك نحيا وبك نموت',
       time: eveningTime,
       channelId: NotifChannels.adhkar.id,
       payload: 'adhkar:evening',
     );
+
+    // أذكار النوم
+    await _scheduleDailyAt(
+      id: NotifIds.sleepAdhkar,
+      title: '🌙 أذكار النوم',
+      body: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا — حان وقت أذكار النوم',
+      time: const TimeOfDay(hour: 22, minute: 0),
+      channelId: NotifChannels.adhkar.id,
+      payload: 'adhkar:sleep',
+    );
+  }
+
+  // ── جدولة أدعية يومية ──
+  static Future<void> scheduleDailyDuas() async {
+    // دعاء الصباح (9:00)
+    final morningDua = _getTimedDua(DuaCategory.morning);
+    if (morningDua != null) {
+      await _scheduleDailyAt(
+        id: NotifIds.dailyDuaMorning,
+        title: '${morningDua.emoji} دعاء الصباح',
+        body: _truncate(morningDua.arabic, 150),
+        time: const TimeOfDay(hour: 9, minute: 0),
+        channelId: NotifChannels.duas.id,
+        payload: 'dua:${morningDua.id}',
+      );
+    }
+
+    // دعاء المساء (9:00 م)
+    final eveningDua = _getRandomDua([
+      DuaCategory.forgiveness,
+      DuaCategory.guidance,
+      DuaCategory.general,
+    ]);
+    if (eveningDua != null) {
+      await _scheduleDailyAt(
+        id: NotifIds.dailyDuaEvening,
+        title: '${eveningDua.emoji} دعاء المساء',
+        body: _truncate(eveningDua.arabic, 150),
+        time: const TimeOfDay(hour: 21, minute: 0),
+        channelId: NotifChannels.duas.id,
+        payload: 'dua:${eveningDua.id}',
+      );
+    }
+
+    // دعاء الكرب (12:00) — وسط النهار
+    final distressDua = _getTimedDua(DuaCategory.distress);
+    if (distressDua != null) {
+      await _scheduleDailyAt(
+        id: NotifIds.distressDua,
+        title: '${distressDua.emoji} دعاء اليوم',
+        body: _truncate(distressDua.arabic, 150),
+        time: const TimeOfDay(hour: 12, minute: 0),
+        channelId: NotifChannels.duas.id,
+        payload: 'dua:${distressDua.id}',
+      );
+    }
+  }
+
+  // ── جدولة تذكيرات الجمعة والصيام ──
+  static Future<void> scheduleSpecialReminders({
+    required bool fridayReminders,
+    required bool fastingReminders,
+  }) async {
+    final ids = [
+      NotifIds.fridayKahf,
+      NotifIds.fridaySalawat,
+      NotifIds.fastingMonday,
+      NotifIds.fastingThursday,
+    ];
+    for (final id in ids) {
+      await _plugin.cancel(id);
+    }
+
+    if (fridayReminders) {
+      await _scheduleWeekly(
+        id: NotifIds.fridayKahf,
+        title: '📖 سورة الكهف',
+        body: 'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين',
+        day: DateTime.friday,
+        hour: 9,
+        minute: 0,
+        payload: 'reminder:kahf',
+      );
+      await _scheduleWeekly(
+        id: NotifIds.fridaySalawat,
+        title: '💛 الصلاة على النبي ﷺ',
+        body: 'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة',
+        day: DateTime.friday,
+        hour: 13,
+        minute: 0,
+        payload: 'reminder:salawat',
+      );
+    }
+
+    if (fastingReminders) {
+      await _scheduleWeekly(
+        id: NotifIds.fastingMonday,
+        title: '🥘 تذكير بصيام الاثنين',
+        body: 'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم',
+        day: DateTime.sunday,
+        hour: 21,
+        minute: 0,
+        payload: 'reminder:fasting_monday',
+      );
+      await _scheduleWeekly(
+        id: NotifIds.fastingThursday,
+        title: '🥘 تذكير بصيام الخميس',
+        body: 'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام',
+        day: DateTime.wednesday,
+        hour: 21,
+        minute: 0,
+        payload: 'reminder:fasting_thursday',
+      );
+
+      // الأيام البيض
+      await _scheduleWhiteDays();
+    }
+  }
+
+  // ── جدولة رمضان (السحور والإفطار) ──
+  static Future<void> scheduleRamadanNotifications({
+    required DateTime suhoorTime,
+    required DateTime iftarTime,
+  }) async {
+    await _plugin.cancel(NotifIds.ramadanSuhoor);
+    await _plugin.cancel(NotifIds.ramadanIftar);
+
+    final now = DateTime.now();
+    final suhoorAlert = suhoorTime.subtract(const Duration(minutes: 30));
+    if (suhoorAlert.isAfter(now)) {
+      await _scheduleExact(
+        id: NotifIds.ramadanSuhoor,
+        title: '🌙 تنبيه السحور',
+        body: 'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك',
+        scheduledTime: suhoorAlert,
+        channelId: NotifChannels.ramadan.id,
+        payload: 'ramadan:suhoor',
+      );
+    }
+    if (iftarTime.isAfter(now)) {
+      await _scheduleExact(
+        id: NotifIds.ramadanIftar,
+        title: '🌅 حان وقت الإفطار',
+        body: 'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك',
+        scheduledTime: iftarTime,
+        channelId: NotifChannels.ramadan.id,
+        sound: 'adhan',
+        payload: 'ramadan:iftar',
+      );
+    }
   }
 
   // ── إشعار إنجاز فوري ──
@@ -419,238 +609,40 @@ class NotificationsService {
     required String emoji,
     required int points,
   }) async {
-    await plugin.show(
+    await _plugin.show(
       NotifIds.achievement,
       '$emoji إنجاز جديد: $title',
-      '$body — +$points نقطة 🌟',
+      '$body — +$points نقطة تقوى 🌟',
       NotificationDetails(
         android: AndroidNotificationDetails(
           NotifChannels.achievement.id,
           NotifChannels.achievement.name,
           importance: Importance.high,
           priority: Priority.high,
-          styleInformation: BigTextStyleInformation('$body — +$points نقطة 🌟'),
+          styleInformation: BigTextStyleInformation(
+            '$body\n✨ +$points نقطة تقوى',
+          ),
           color: const Color(0xFFC8A96E),
-          // largeIcon: const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
-          presentSound: true,
         ),
       ),
       payload: 'achievement:new',
     );
   }
 
-  // ── جدولة التنبيهات الخاصة (الجمعة، الصيام) ──
-  static Future<void> scheduleSpecialReminders({
-    required bool fridayReminders,
-    required bool fastingReminders,
-  }) async {
-    // إلغاء التنبيهات القديمة
-    final specialIds = [
-      NotifIds.fridayKahf,
-      NotifIds.fridaySalawat,
-      NotifIds.fastingMonday,
-      NotifIds.fastingThursday,
-      NotifIds.fastingWhiteDays,
-    ];
-    for (final id in specialIds) {
-      await plugin.cancel(id);
-    }
-
-    if (fridayReminders) {
-      await _scheduleWeekly(
-        id: NotifIds.fridayKahf,
-        title: 'سورة الكهف 📖',
-        body: 'لا تنس قراءة سورة الكهف، نور ما بين الجمعتين',
-        day: DateTime.friday,
-        hour: 10,
-        minute: 0,
-        payload: 'reminder:kahf',
-      );
-      await _scheduleWeekly(
-        id: NotifIds.fridaySalawat,
-        title: 'يوم الجمعة 📿',
-        body: 'أكثروا من الصلاة على النبي ﷺ في هذا اليوم المبارك',
-        day: DateTime.friday,
-        hour: 14,
-        minute: 0,
-        payload: 'reminder:salawat',
-      );
-    }
-
-    if (fastingReminders) {
-      // صيام الاثنين والخميس
-      await _scheduleWeekly(
-        id: NotifIds.fastingMonday,
-        title: 'تذكير بالصيام 🥘',
-        body: 'غداً الاثنين، هنيئاً لمن صام وعمّر وقته بالطاعات',
-        day: DateTime.sunday, // الأحد بالليل
-        hour: 21,
-        minute: 0,
-        payload: 'reminder:fasting_monday',
-      );
-      await _scheduleWeekly(
-        id: NotifIds.fastingThursday,
-        title: 'تذكير بالصيام 🥘',
-        body: 'غداً الخميس، تُرفع فيه الأعمال، فليكن عملك صائماً',
-        day: DateTime.wednesday, // الأربعاء بالليل
-        hour: 21,
-        minute: 0,
-        payload: 'reminder:fasting_thursday',
-      );
-
-      // الأيام البيض (١٣، ١٤، ١٥ من الشهر الهجري)
-      await _scheduleWhiteDays();
-    }
-  }
-
-  static Future<void> _scheduleWeekly({
-    required int id,
-    required String title,
-    required String body,
-    required int day,
-    required int hour,
-    required int minute,
-    String? payload,
-  }) async {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-
-    // جدولة ليوم معين من الأسبوع
-    while (scheduledDate.weekday != day || scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-
-    await plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          NotifChannels.reminders.id,
-          NotifChannels.reminders.name,
-          importance: Importance.defaultImportance,
-          styleInformation: BigTextStyleInformation(body),
-        ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-      payload: payload,
-    );
-  }
-
-  static Future<void> _scheduleWhiteDays() async {
-    final today = HijriCalendar.now();
-    // نحن نجدول للشهر الحالي والشهر القادم لضمان الاستمرارية
-    for (int monthOffset = 0; monthOffset <= 1; monthOffset++) {
-      final h = HijriCalendar.now();
-      if (monthOffset > 0) {
-        h.hMonth++;
-        if (h.hMonth > 12) {
-          h.hMonth = 1;
-          h.hYear++;
-        }
-      }
-
-      for (int day in [13, 14, 15]) {
-        h.hDay = day;
-        final solar = h.hijriToGregorian(h.hYear, h.hMonth, h.hDay);
-        final scheduled = DateTime(solar.year, solar.month, solar.day, 20, 0);
-
-        if (scheduled.isAfter(DateTime.now())) {
-          await _scheduleExact(
-            id: NotifIds.fastingWhiteDays + (monthOffset * 3) + (day - 13),
-            title: 'الأيام البيض ⚪',
-            body: 'غداً هو $day ${h.getLongMonthName()}، صيام الأيام البيض سنّة مؤكدة',
-            scheduledTime: scheduled.subtract(const Duration(days: 1)),
-            channelId: NotifChannels.reminders.id,
-            payload: 'reminder:fasting_white_days',
-          );
-        }
-      }
-    }
-  }
-
-  // ── جدولة الأدعية اليومية ──
-  static Future<void> scheduleDailyDuas() async {
-    final allDuas = kDuasData.values.expand((l) => l).toList();
-    if (allDuas.isEmpty) return;
-
-    // تحسين: اختيار أدعية مناسبة للوقت
-    final morningCats = [DuaCategory.morning, DuaCategory.health, DuaCategory.general];
-    final eveningCats = [DuaCategory.forgiveness, DuaCategory.guidance, DuaCategory.general, DuaCategory.parents];
-
-    final morningDuas = allDuas.where((d) => morningCats.contains(d.category)).toList();
-    final eveningDuas = allDuas.where((d) => eveningCats.contains(d.category)).toList();
-
-    // إشعار الصباح (9:00 ص)
-    final morningDua = morningDuas.isNotEmpty 
-        ? morningDuas[_random.nextInt(morningDuas.length)]
-        : allDuas[_random.nextInt(allDuas.length)];
-    
-    await _scheduleDailyAt(
-      id: NotifIds.dailyDuaMorning,
-      title: 'نفحة صباحية ✨',
-      body: '${morningDua.emoji} ${morningDua.arabic}',
-      time: const TimeOfDay(hour: 9, minute: 0),
-      channelId: NotifChannels.duas.id,
-      payload: 'dua:${morningDua.id}',
-    );
-
-    // إشعار المساء (9:00 م)
-    final eveningDua = eveningDuas.isNotEmpty
-        ? eveningDuas[_random.nextInt(eveningDuas.length)]
-        : allDuas[_random.nextInt(allDuas.length)];
-
-    await _scheduleDailyAt(
-      id: NotifIds.dailyDuaEvening,
-      title: 'دعاء المساء 🌙',
-      body: '${eveningDua.emoji} ${eveningDua.arabic}',
-      time: const TimeOfDay(hour: 21, minute: 0),
-      channelId: NotifChannels.duas.id,
-      payload: 'dua:${eveningDua.id}',
-    );
-  }
-
-  // ── جدولة دعاء عشوائي (عند الطلب) ──
-  static Future<void> scheduleRandomDua() async {
-    final allDuas = kDuasData.values.expand((l) => l).toList();
-    if (allDuas.isEmpty) return;
-
-    final dua = allDuas[_random.nextInt(allDuas.length)];
-
-    await showNotification(
-      id: NotifIds.randomDua,
-      title: 'دعاء اليوم 🤲',
-      body: '${dua.emoji} ${dua.arabic}',
-      payload: 'dua:${dua.id}',
-      channel: NotifChannels.duas,
-    );
-  }
-
-  // ── عرض إشعار بسيط ──
+  // ── عرض إشعار فوري ──
   static Future<void> showNotification({
     required int id,
     required String title,
     required String body,
     String? payload,
     required AndroidNotificationChannel channel,
+    String? bigText,
   }) async {
-    await plugin.show(
+    await _plugin.show(
       id,
       title,
       body,
@@ -660,23 +652,21 @@ class NotificationsService {
           channel.name,
           channelDescription: channel.description,
           importance: channel.importance,
-          styleInformation: BigTextStyleInformation(body),
+          priority: Priority.defaultPriority,
+          styleInformation: BigTextStyleInformation(bigText ?? body),
+          color: const Color(0xFFC8A96E),
         ),
-        iOS: const DarwinNotificationDetails(),
+        iOS: const DarwinNotificationDetails(presentAlert: true),
       ),
       payload: payload,
     );
   }
 
-  // ── إلغاء كل الإشعارات ──
-  static Future<void> cancelAll() => plugin.cancelAll();
-
-  // ── إلغاء إشعار محدد ──
-  static Future<void> cancel(int id) => plugin.cancel(id);
-
-  // ── الإشعارات المجدولة ──
+  // ── إلغاء الإشعارات ──
+  static Future<void> cancel(int id) => _plugin.cancel(id);
+  static Future<void> cancelAll() => _plugin.cancelAll();
   static Future<List<PendingNotificationRequest>> getPending() =>
-      plugin.pendingNotificationRequests();
+      _plugin.pendingNotificationRequests();
 
   // ─────────────────── PRIVATE ───────────────────
 
@@ -688,9 +678,12 @@ class NotificationsService {
     required String channelId,
     String? sound,
     String? payload,
+    bool fullScreenIntent = false,
   }) async {
     final tzTime = tz.TZDateTime.from(scheduledTime, tz.local);
-    await plugin.zonedSchedule(
+    if (tzTime.isBefore(tz.TZDateTime.now(tz.local))) return;
+
+    await _plugin.zonedSchedule(
       id,
       title,
       body,
@@ -699,18 +692,23 @@ class NotificationsService {
         android: AndroidNotificationDetails(
           channelId,
           channelId,
-          importance: Importance.high,
+          importance: Importance.max,
           priority: Priority.high,
           sound: sound != null
               ? RawResourceAndroidNotificationSound(sound)
               : null,
           playSound: sound != null,
           enableVibration: true,
+          fullScreenIntent: fullScreenIntent,
+          styleInformation: BigTextStyleInformation(body),
+          color: const Color(0xFFC8A96E),
         ),
-        iOS: const DarwinNotificationDetails(
+        iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
-          presentSound: true,
+          presentSound: sound != null,
+          sound: sound != null ? 'adhan.aiff' : null,
+          interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -740,7 +738,7 @@ class NotificationsService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    await plugin.zonedSchedule(
+    await _plugin.zonedSchedule(
       id,
       title,
       body,
@@ -750,10 +748,12 @@ class NotificationsService {
           channelId,
           channelId,
           importance: Importance.defaultImportance,
+          styleInformation: BigTextStyleInformation(body),
+          color: const Color(0xFFC8A96E),
         ),
         iOS: const DarwinNotificationDetails(
           presentAlert: true,
-          presentBadge: true,
+          presentBadge: false,
           presentSound: false,
         ),
       ),
@@ -765,20 +765,122 @@ class NotificationsService {
     );
   }
 
+  static Future<void> _scheduleWeekly({
+    required int id,
+    required String title,
+    required String body,
+    required int day,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    final now = tz.TZDateTime.now(tz.local);
+    var date = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    while (date.weekday != day || date.isBefore(now)) {
+      date = date.add(const Duration(days: 1));
+    }
+
+    await _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      date,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          NotifChannels.reminders.id,
+          NotifChannels.reminders.name,
+          importance: Importance.defaultImportance,
+          styleInformation: BigTextStyleInformation(body),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      payload: payload,
+    );
+  }
+
+  static Future<void> _scheduleWhiteDays() async {
+    for (int monthOffset = 0; monthOffset <= 1; monthOffset++) {
+      final h = HijriCalendar.now();
+      if (monthOffset > 0) {
+        h.hMonth++;
+        if (h.hMonth > 12) {
+          h.hMonth = 1;
+          h.hYear++;
+        }
+      }
+      for (int day in [12, 13, 14]) {
+        h.hDay = day;
+        final solar = h.hijriToGregorian(h.hYear, h.hMonth, h.hDay);
+        final notify = DateTime(solar.year, solar.month, solar.day, 20, 30);
+        if (notify.isAfter(DateTime.now())) {
+          await _scheduleExact(
+            id: NotifIds.fastingWhiteDays + (monthOffset * 3) + (day - 12),
+            title: '⚪ غداً من الأيام البيض',
+            body:
+                'غداً يوم ${day + 1} من ${h.getLongMonthName()} الهجري — صيام الأيام البيض سنّة مؤكدة',
+            scheduledTime: notify,
+            channelId: NotifChannels.reminders.id,
+            payload: 'reminder:white_days',
+          );
+        }
+      }
+    }
+  }
+
+  // ── helpers ──
+  static DhikrItem? _randomFromCategory(AdhkarCategory cat) {
+    final list = kAdhkarData[cat];
+    if (list == null || list.isEmpty) return null;
+    return list[Random(DateTime.now().dayOfYear).nextInt(list.length)];
+  }
+
+  static DuaItem? _getTimedDua(DuaCategory cat) {
+    final list = kDuasData[cat];
+    if (list == null || list.isEmpty) return null;
+    return list[Random(DateTime.now().dayOfYear).nextInt(list.length)];
+  }
+
+  static DuaItem? _getRandomDua(List<DuaCategory> cats) {
+    final pool = cats.expand((c) => kDuasData[c] ?? []).toList();
+    if (pool.isEmpty) return null;
+    return pool[Random(DateTime.now().dayOfYear).nextInt(pool.length)];
+  }
+
+  static String _truncate(String text, int maxLen) {
+    final clean = text.replaceAll('\n', ' ');
+    return clean.length > maxLen ? '${clean.substring(0, maxLen)}...' : clean;
+  }
+
+  static String _formatTime(DateTime dt) {
+    final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    final m = dt.minute.toString().padLeft(2, '0');
+    final ap = dt.hour < 12 ? 'ص' : 'م';
+    return '$h:$m $ap';
+  }
+
   static void _onNotifTap(NotificationResponse response) {
-    // يُعالج في main.dart عبر navigatorKey
     NotificationRouter.route(response.payload ?? '');
   }
 
-  // رسائل المحاسبة المسائية المتنوعة
   static const _eveningMessages = [
     'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙',
     '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا" — عمر بن الخطاب',
-    'ماذا قدّمت اليوم؟ سجّل عباداتك الآن 📝',
-    'الليل ينادي: أيها المؤمن، ماذا فعلت اليوم؟ 🌟',
+    'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝',
+    'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟',
     'لا تنم قبل أن تحاسب نفسك على يومك 💫',
     'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲',
-    'أنجزت شيئاً جيداً اليوم؟ دوّنه واشكر الله 🙏',
+    'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏',
   ];
 }
 
@@ -786,19 +888,18 @@ class NotificationsService {
 //  PRAYER TIMES SERVICE
 // ═══════════════════════════════════════════════════════════════
 class PrayerTimesService {
-  // ── حساب أوقات الصلاة ──
   static Future<List<PrayerTimeInfo>> calculate({
     required double latitude,
     required double longitude,
-    required String madhab, // 'hanafi' | 'shafi'
-    required String method, // 'MWL' | 'Egypt' | 'Karachi' | 'UmmAlQura'
+    required String madhab,
+    required String method,
     DateTime? date,
   }) async {
     final d = date ?? DateTime.now();
     final coords = adhan.Coordinates(latitude, longitude);
     final params = _calcParams(method, madhab);
-    final dateComponents = adhan.DateComponents(d.year, d.month, d.day);
-    final times = adhan.PrayerTimes(coords, dateComponents, params);
+    final dc = adhan.DateComponents(d.year, d.month, d.day);
+    final times = adhan.PrayerTimes(coords, dc, params);
 
     return [
       PrayerTimeInfo(
@@ -839,32 +940,17 @@ class PrayerTimesService {
     ];
   }
 
-  // ── جلب الموقع الجغرافي ──
   static Future<Position?> getLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return null;
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return null;
+    if (!await Geolocator.isLocationServiceEnabled()) return null;
+    var perm = await Geolocator.checkPermission();
+    if (perm == LocationPermission.denied) {
+      perm = await Geolocator.requestPermission();
+      if (perm == LocationPermission.denied) return null;
     }
-    if (permission == LocationPermission.deniedForever) return null;
-
-    return await Geolocator.getCurrentPosition(
+    if (perm == LocationPermission.deniedForever) return null;
+    return Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.medium,
     );
-  }
-
-  // ── الصلاة الحالية / القادمة ──
-  static adhan.Prayer currentPrayer(List<PrayerTimeInfo> prayers) {
-    final now = DateTime.now();
-    for (int i = prayers.length - 1; i >= 0; i--) {
-      if (now.isAfter(prayers[i].time)) {
-        return adhan.Prayer.values[i];
-      }
-    }
-    return adhan.Prayer.none;
   }
 
   static PrayerTimeInfo? nextPrayer(List<PrayerTimeInfo> prayers) {
@@ -872,22 +958,17 @@ class PrayerTimesService {
     for (final p in prayers) {
       if (p.time.isAfter(now)) return p;
     }
-    // الفجر الغد
     return null;
   }
 
-  static Duration? timeUntilNext(List<PrayerTimeInfo> prayers) {
-    final next = nextPrayer(prayers);
-    if (next == null) return null;
-    return next.time.difference(DateTime.now());
-  }
+  static Duration? timeUntilNext(List<PrayerTimeInfo> prayers) =>
+      nextPrayer(prayers)?.time.difference(DateTime.now());
 
-  // ── تنسيق الوقت ──
   static String formatTime(DateTime dt) {
     final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final m = dt.minute.toString().padLeft(2, '0');
-    final ampm = dt.hour < 12 ? 'ص' : 'م';
-    return '$h:$m $ampm';
+    final ap = dt.hour < 12 ? 'ص' : 'م';
+    return '$h:$m $ap';
   }
 
   static String formatDuration(Duration d) {
@@ -895,7 +976,6 @@ class PrayerTimesService {
     return '${d.inMinutes} دقيقة';
   }
 
-  // ── معامل الحساب ──
   static adhan.CalculationParameters _calcParams(String method, String madhab) {
     adhan.CalculationParameters p;
     switch (method) {
@@ -914,17 +994,13 @@ class PrayerTimesService {
       default:
         p = adhan.CalculationMethod.muslim_world_league.getParameters();
     }
-    if (madhab == 'hanafi') {
-      p.madhab = adhan.Madhab.hanafi;
-    } else {
-      p.madhab = adhan.Madhab.shafi;
-    }
+    p.madhab = madhab == 'hanafi' ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
     return p;
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  NOTIFICATION ROUTER  (معالجة النقر على الإشعار)
+//  NOTIFICATION ROUTER
 // ═══════════════════════════════════════════════════════════════
 class NotificationRouter {
   static final _navigatorKey = GlobalKey<NavigatorState>();
@@ -935,16 +1011,17 @@ class NotificationRouter {
     final parts = payload.split(':');
     final type = parts.isNotEmpty ? parts[0] : '';
     final param = parts.length > 1 ? parts[1] : '';
-
     final ctx = _navigatorKey.currentContext;
     if (ctx == null) return;
 
     switch (type) {
       case 'prayer':
       case 'wakeup':
-        // تنبيه الأذان → شاشة الأذان الكاملة
-        final nameAr = _prayerNameAr(param);
-        Navigator.pushNamed(ctx, Routes.adhan, arguments: nameAr);
+        Navigator.pushNamed(ctx, Routes.adhan, arguments: _prayerNameAr(param));
+        break;
+      case 'pre_prayer':
+      case 'iqama':
+        Navigator.pushNamed(ctx, Routes.prayer);
         break;
       case 'muhasaba':
         Navigator.pushNamed(ctx, Routes.checklist);
@@ -952,40 +1029,38 @@ class NotificationRouter {
       case 'adhkar':
         Navigator.pushNamed(ctx, Routes.adhkar);
         break;
+      case 'dua':
+        Navigator.pushNamed(ctx, Routes.duas);
+        break;
       case 'achievement':
         Navigator.pushNamed(ctx, Routes.statistics);
+        break;
+      case 'reminder':
+        Navigator.pushNamed(ctx, Routes.home);
+        break;
+      case 'ramadan':
+        Navigator.pushNamed(ctx, Routes.prayer);
         break;
     }
   }
 
-  /// Converts an English prayer key to Arabic name.
-  static String _prayerNameAr(String key) {
-    switch (key) {
-      case 'fajr':
-        return 'الفجر';
-      case 'dhuhr':
-        return 'الظهر';
-      case 'asr':
-        return 'العصر';
-      case 'maghrib':
-        return 'المغرب';
-      case 'isha':
-        return 'العشاء';
-      default:
-        return key.isNotEmpty ? key : 'الصلاة';
-    }
-  }
+  static String _prayerNameAr(String key) => switch (key) {
+    'fajr' => 'الفجر',
+    'dhuhr' => 'الظهر',
+    'asr' => 'العصر',
+    'maghrib' => 'المغرب',
+    'isha' => 'العشاء',
+    _ => key.isNotEmpty ? key : 'الصلاة',
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  PRAYER TIMES PROVIDER (Riverpod)
+//  PRAYER TIMES PROVIDER
 // ═══════════════════════════════════════════════════════════════
 final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
   final settings = ref.watch(settingsDaoProvider);
   final madhab = await settings.get('madhab') ?? 'shafi';
   final method = await settings.get('calcMethod') ?? 'MWL';
-
-  // جرّب الموقع المحفوظ أولاً
   final savedLat = await settings.get('latitude');
   final savedLng = await settings.get('longitude');
 
@@ -995,7 +1070,7 @@ final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
     lng = double.tryParse(savedLng) ?? 3.0;
   } else {
     final pos = await PrayerTimesService.getLocation();
-    lat = pos?.latitude ?? 36.7; // الجزائر العاصمة default
+    lat = pos?.latitude ?? 36.7;
     lng = pos?.longitude ?? 3.0;
     if (pos != null) {
       await settings.set('latitude', lat.toString());
@@ -1011,19 +1086,18 @@ final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
   );
 });
 
-final nextPrayerProvider = Provider<AsyncValue<PrayerTimeInfo?>>((ref) {
-  return ref
+final nextPrayerProvider = Provider<AsyncValue<PrayerTimeInfo?>>(
+  (ref) => ref
       .watch(prayerTimesProvider)
-      .whenData((prayers) => PrayerTimesService.nextPrayer(prayers));
-});
+      .whenData((p) => PrayerTimesService.nextPrayer(p)),
+);
 
 // ═══════════════════════════════════════════════════════════════
-//  NOTIFICATIONS MANAGER  (جدولة شاملة)
+//  NOTIFICATIONS MANAGER
 // ═══════════════════════════════════════════════════════════════
 class NotificationsManager {
   static Future<void> scheduleAll(WidgetRef ref) async {
-    final granted = await NotificationsService.checkPermissions();
-    if (!granted) return;
+    if (!await NotificationsService.checkPermissions()) return;
 
     final settings = ref.read(settingsDaoProvider);
     final prayerReminder = await settings.getBool(
@@ -1046,7 +1120,6 @@ class NotificationsManager {
       'wakeUpBeforeFajr',
       defaultVal: false,
     );
-
     final specialReminders = await settings.getBool(
       'specialRemindersOn',
       defaultVal: true,
@@ -1055,32 +1128,34 @@ class NotificationsManager {
       'fastingRemindersOn',
       defaultVal: true,
     );
-    final dailyDuasOn = await settings.getBool(
-      'dailyDuasOn',
+    final dailyDuasOn = await settings.getBool('dailyDuasOn', defaultVal: true);
+    final preAdhanOn = await settings.getBool(
+      'preAdhanNotif',
       defaultVal: true,
     );
+    final iqamaOn = await settings.getBool('iqamaNotif', defaultVal: true);
 
-    // ── أوقات الصلاة ──
+    // أوقات الصلاة
     if (prayerReminder) {
       final prayers = await ref.read(prayerTimesProvider.future);
       await NotificationsService.schedulePrayerNotifications(
         prayers: prayers,
         wakeUpBeforeFajr: wakeUpFajr,
+        preAdhanEnabled: preAdhanOn,
+        iqamaEnabled: iqamaOn,
       );
     }
 
-    // ── المحاسبة المسائية ──
+    // المحاسبة
     if (muhasabaReminder) {
       final timeStr = await settings.get('eveningReminderTime') ?? '21:00';
       final parts = timeStr.split(':');
-      final time = TimeOfDay(
-        hour: int.parse(parts[0]),
-        minute: int.parse(parts[1]),
+      await NotificationsService.scheduleEveningMuhasaba(
+        time: TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1])),
       );
-      await NotificationsService.scheduleEveningMuhasaba(time: time);
     }
 
-    // ── الأذكار ──
+    // الأذكار
     if (morningAdhkarOn || eveningAdhkarOn) {
       await NotificationsService.scheduleAdhkarReminders(
         morningTime: const TimeOfDay(hour: 6, minute: 30),
@@ -1088,21 +1163,26 @@ class NotificationsManager {
       );
     }
 
-    // ── الأدعية اليومية ──
-    if (dailyDuasOn) {
-      await NotificationsService.scheduleDailyDuas();
-    }
+    // الأدعية
+    if (dailyDuasOn) await NotificationsService.scheduleDailyDuas();
 
-    // ── التنبيهات الخاصة (جمعة، صيام) ──
+    // التذكيرات الخاصة
     await NotificationsService.scheduleSpecialReminders(
       fridayReminders: specialReminders,
       fastingReminders: fastingReminders,
     );
   }
 
-  // إعادة الجدولة عند تغيير الإعدادات
   static Future<void> reschedule(WidgetRef ref) async {
     await NotificationsService.cancelAll();
     await scheduleAll(ref);
+  }
+}
+
+// Helper extension
+extension on DateTime {
+  int get dayOfYear {
+    final start = DateTime(year, 1, 1);
+    return difference(start).inDays + 1;
   }
 }

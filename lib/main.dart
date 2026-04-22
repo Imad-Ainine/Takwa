@@ -166,9 +166,8 @@
 //     );
 //   }
 // }
-
 // ═══════════════════════════════════════════════════════════════
-//  lib/main.dart — تقوى
+//  lib/main.dart — تقوى (UPDATED)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -180,8 +179,10 @@ import 'package:flutter_windowmanager_plus/flutter_windowmanager_plus.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/adhan_foreground_service.dart';
+import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
@@ -195,7 +196,7 @@ import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/notifications/overlays/unified_overlay_window.dart';
 
 // ────────────────────────────────────────────
-//  OVERLAY ENTRY POINT (Required by flutter_overlay_window)
+//  OVERLAY ENTRY POINT
 // ────────────────────────────────────────────
 @pragma('vm:entry-point')
 void overlayMain() {
@@ -214,12 +215,12 @@ void overlayMain() {
   );
 }
 
-// تلقي الإشعارات والتطبيق في الخلفية
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse response) {
   NotificationRouter.route(response.payload ?? '');
 }
 
+// ─────────────────────────────────────────
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -227,7 +228,6 @@ void main() async {
 
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();
-  // حماية الخصوصية — منع التقاط الشاشة في قائمة التطبيقات الأخيرة
   await FlutterWindowManagerPlus.addFlags(FlutterWindowManagerPlus.FLAG_SECURE);
   OverlayBackgroundService.init();
 
@@ -235,7 +235,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -251,6 +250,7 @@ void main() async {
   runApp(const ProviderScope(child: TakwaApp()));
 }
 
+// ─────────────────────────────────────────
 class TakwaApp extends ConsumerStatefulWidget {
   const TakwaApp({super.key});
   @override
@@ -261,29 +261,38 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
   @override
   void initState() {
     super.initState();
-    FlutterForegroundTask.addTaskDataCallback(_onAdhanData);
+    FlutterForegroundTask.addTaskDataCallback(_onForegroundData);
+    // بدء مراقبة أوقات الصلاة لتشغيل الأذان تلقائياً
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AdhanAutoTrigger.start(ref, NotificationRouter.navigatorKey);
+    });
   }
 
   @override
   void dispose() {
-    FlutterForegroundTask.removeTaskDataCallback(_onAdhanData);
+    FlutterForegroundTask.removeTaskDataCallback(_onForegroundData);
+    AdhanAutoTrigger.stop();
     super.dispose();
   }
 
-  void _onAdhanData(Object data) {
-    if (data is Map) {
-      final action = data['action'];
-      if (action == 'show_adhan') {
-        final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
-        NotificationRouter.navigatorKey.currentState?.pushNamed(
-          '/adhan',
-          arguments: prayerName,
+  void _onForegroundData(Object data) {
+    if (data is! Map) return;
+    final action = data['action'];
+
+    switch (action) {
+      case 'show_adhan':
+        AdhanAutoTrigger.handleForegroundData(
+          data,
+          NotificationRouter.navigatorKey,
+          ref,
         );
-      } else if (action == 'refresh_location') {
+        break;
+      case 'refresh_location':
         LocationPrayerManager.refreshLocation(ref);
-      } else if (action == 'location_updated') {
+        break;
+      case 'location_updated':
         _syncLocationFromBackground(data);
-      }
+        break;
     }
   }
 
@@ -318,12 +327,8 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [Locale('ar', 'SA'), Locale('ar')],
-        builder: (context, child) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: child!,
-          );
-        },
+        builder: (context, child) =>
+            Directionality(textDirection: TextDirection.rtl, child: child!),
         initialRoute: Routes.splash,
         onGenerateRoute: AppRoutes.onGenerateRoute,
       ),

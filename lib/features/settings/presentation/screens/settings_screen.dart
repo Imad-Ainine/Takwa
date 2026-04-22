@@ -19,6 +19,7 @@ import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
 import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/notifications/overlay_settings_tile.dart';
 
 import '../widgets/location_picker_sheet.dart';
 
@@ -261,6 +262,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ],
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      const OverlayNotificationSettings(),
                       const SizedBox(height: 16),
 
                       // ── المظهر ──
