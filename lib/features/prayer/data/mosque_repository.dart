@@ -7,7 +7,7 @@ class Mosque {
   final String name;
   final double lat;
   final double lon;
-  final double distance; // in meters
+  final double distance;
   final String address;
   final String phone;
 
@@ -28,20 +28,25 @@ class MosqueRepository {
     'https://lz4.overpass-api.de/api/interpreter',
     'https://z.overpass-api.de/api/interpreter',
     'https://overpass.kumi.systems/api/interpreter',
-    'https://overpass.osm.ch/api/interpreter',
-    'https://overpass.openstreetmap.fr/api/interpreter',
   ];
 
   Future<List<Mosque>> fetchNearbyMosques(
     Position position, {
     double radius = 5000,
   }) async {
+    // Failsafe: Prevent querying the ocean if GPS defaults to 0.0
+    if (position.latitude == 0 && position.longitude == 0) {
+      return [];
+    }
+
+    // Broadened query to catch all variations of mosque tags in OpenStreetMap
     final query =
         '''
       [out:json][timeout:25];
       (
         nwr["amenity"="place_of_worship"]["religion"="muslim"](around:$radius,${position.latitude},${position.longitude});
         nwr["amenity"="mosque"](around:$radius,${position.latitude},${position.longitude});
+        nwr["building"="mosque"](around:$radius,${position.latitude},${position.longitude});
       );
       out center;
     ''';
@@ -49,7 +54,15 @@ class MosqueRepository {
     for (final url in _overpassUrls) {
       try {
         final response = await http
-            .post(Uri.parse(url), body: {'data': query})
+            .post(
+              Uri.parse(url),
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                // Overpass often drops anonymous requests. Always provide a User-Agent.
+                'User-Agent': 'Takwa_App_Flutter/1.0',
+              },
+              body: 'data=${Uri.encodeQueryComponent(query)}',
+            )
             .timeout(const Duration(seconds: 25));
 
         if (response.statusCode == 200) {
@@ -58,40 +71,35 @@ class MosqueRepository {
 
           List<Mosque> mosques = elements
               .map<Mosque?>((e) {
-                if (e['type'] == 'node' ||
-                    e['type'] == 'way' ||
-                    e['type'] == 'relation') {
-                  final tags = e['tags'] ?? {};
-                  final lat = e['lat'] ?? e['center']?['lat'];
-                  final lon = e['lon'] ?? e['center']?['lon'];
+                final lat = e['lat'] ?? e['center']?['lat'];
+                final lon = e['lon'] ?? e['center']?['lon'];
 
-                  if (lat == null || lon == null) return null;
-                  final name = tags['name'] ?? tags['name:ar'] ?? 'مسجد قريب';
+                if (lat == null || lon == null) return null;
 
-                  final address =
-                      tags['addr:full'] ??
-                      tags['addr:street'] ??
-                      'بدون عنوان محدد';
-                  final phone = tags['contact:phone'] ?? tags['phone'] ?? '';
+                final tags = e['tags'] ?? {};
+                final name = tags['name'] ?? tags['name:ar'] ?? 'مسجد قريب';
+                final address =
+                    tags['addr:full'] ??
+                    tags['addr:street'] ??
+                    'بدون عنوان محدد';
+                final phone = tags['contact:phone'] ?? tags['phone'] ?? '';
 
-                  final distance = Geolocator.distanceBetween(
-                    position.latitude,
-                    position.longitude,
-                    lat,
-                    lon,
-                  );
+                final distance = Geolocator.distanceBetween(
+                  position.latitude,
+                  position.longitude,
+                  lat,
+                  lon,
+                );
 
-                  return Mosque(
-                    id: e['id'],
-                    name: name,
-                    lat: lat,
-                    lon: lon,
-                    distance: distance,
-                    address: address,
-                    phone: phone,
-                  );
-                }
-                return null;
+                return Mosque(
+                  id: e['id'],
+                  name: name,
+                  lat: lat,
+                  lon: lon,
+                  distance: distance,
+                  address: address,
+                  phone: phone,
+                );
               })
               .whereType<Mosque>()
               .toList();
@@ -100,7 +108,7 @@ class MosqueRepository {
           return mosques;
         }
       } catch (e) {
-        // Skip to the next URL if there is an error (timeout, socket exception, 429, etc)
+        // Silently skip to the next mirror if one fails
         continue;
       }
     }

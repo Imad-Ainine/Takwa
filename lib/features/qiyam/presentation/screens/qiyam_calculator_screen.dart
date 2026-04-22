@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
+import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/notifications/notifications_service.dart';
 
 class QiyamCalculatorScreen extends ConsumerWidget {
@@ -89,10 +90,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios_new, color: context.colors.gold),
-          ),
+          const CustomLeadingButton(),
           const SizedBox(width: 12),
           Text(
             'حاسبة الليل',

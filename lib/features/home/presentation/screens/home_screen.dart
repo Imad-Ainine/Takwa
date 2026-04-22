@@ -13,6 +13,7 @@ import 'package:intl/intl.dart' hide TextDirection;
 import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -1220,7 +1221,7 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
   }
 }
 
-class _IbadahChipMerged extends StatelessWidget {
+class _IbadahChipMerged extends ConsumerWidget {
   final String emoji, label;
   final bool done;
   final AdaptiveStyle style;
@@ -1232,7 +1233,7 @@ class _IbadahChipMerged extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = style;
     return GestureDetector(
       onTap: () {
@@ -1240,6 +1241,9 @@ class _IbadahChipMerged extends StatelessWidget {
           Navigator.pushNamed(context, '/adhkar');
         } else if (label == 'القرآن') {
           Navigator.pushNamed(context, '/quran');
+        } else if (label == 'قيام الليل') {
+          HapticFeedback.mediumImpact();
+          ref.read(currentTabProvider.notifier).state = 1;
         } else {
           HapticFeedback.lightImpact();
         }
@@ -1658,7 +1662,7 @@ class _DailyDhikrCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_left_rounded, size: 18, color: s.textSec),
+            Icon(Icons.chevron_right_rounded, size: 18, color: s.textSec),
           ],
         ),
       ),

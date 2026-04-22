@@ -685,7 +685,7 @@ class _PrayerRow extends StatelessWidget {
               _MiniPts('-٥', context.colors.danger),
             const SizedBox(width: 4),
             Icon(
-              Icons.chevron_left_rounded,
+              Icons.chevron_right_rounded,
               size: 18,
               color: context.colors.textDim,
             ),

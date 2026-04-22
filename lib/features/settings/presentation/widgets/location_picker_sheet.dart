@@ -481,7 +481,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   ),
                 ),
                 Icon(
-                  Icons.chevron_left_rounded,
+                  Icons.chevron_right_rounded,
                   color: Colors.white.withOpacity(0.8),
                 ),
               ],

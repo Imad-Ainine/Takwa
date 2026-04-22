@@ -887,7 +887,7 @@ class _SelectSetting extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.chevron_left_rounded,
+              Icons.chevron_right_rounded,
               size: 18,
               color: context.colors.textDim,
             ),
@@ -1050,7 +1050,7 @@ class _ActionSetting extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.chevron_left_rounded,
+              Icons.chevron_right_rounded,
               size: 18,
               color: context.colors.textDim,
             ),

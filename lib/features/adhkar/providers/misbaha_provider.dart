@@ -57,7 +57,7 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
   Future<void> _initTts() async {
     await _tts.setLanguage("ar-SA");
     await _tts.setSpeechRate(0.4);
-    await _tts.setPitch(1.0);
+    await _tts.setPitch(0.8);
     await _tts.setVolume(1.0);
     await _tts.awaitSpeakCompletion(true);
 
@@ -121,13 +121,16 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
 
   void increment() {
     int newCount = state.count + 1;
-    
+
     // Check if target is reached
     if (state.selectedDhikr != null && newCount >= state.selectedDhikr!.count) {
       state = state.copyWith(count: state.selectedDhikr!.count);
       // Heavy vibration on completion
       HapticFeedback.heavyImpact();
-      Future.delayed(const Duration(milliseconds: 300), () => HapticFeedback.heavyImpact());
+      Future.delayed(
+        const Duration(milliseconds: 300),
+        () => HapticFeedback.heavyImpact(),
+      );
     } else {
       state = state.copyWith(count: newCount);
       // Light feedback on increment
@@ -172,19 +175,19 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
     result = result.replaceAll('ة', 'ه');
     // Normalize Yeh/Alef Maksura
     result = result.replaceAll('ى', 'ي');
-    
+
     // Normalize Hamzas
     result = result.replaceAll('ؤ', 'و');
     result = result.replaceAll('ئ', 'ي');
-    result = result.replaceAll('ء', ''); 
+    result = result.replaceAll('ء', '');
 
     // Remove extra spaces and punctuation
     // Keep only Arabic letters and spaces
     result = result.replaceAll(RegExp(r'[^\u0621-\u064A\s]'), '');
-    
+
     // Normalize multiple spaces into one
     result = result.replaceAll(RegExp(r'\s+'), ' ');
-    
+
     return result.trim().toLowerCase();
   }
 
@@ -202,7 +205,8 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
           if (words.isEmpty) return;
 
           // Detect engine reset (if the recognized text significantly shrinks)
-          if (words.length < _lastRecognizedWords.length * 0.5 && _lastRecognizedWords.isNotEmpty) {
+          if (words.length < _lastRecognizedWords.length * 0.5 &&
+              _lastRecognizedWords.isNotEmpty) {
             lastWordCount = 0;
             lastTargetMatches = 0;
             _lastRecognizedWords = '';
@@ -210,11 +214,16 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
 
           if (state.selectedDhikr != null) {
             // Specific Dhikr mode: Compare normalized strings WITHOUT spaces for max robustness
-            final normalizedTarget = _normalizeArabic(state.selectedDhikr!.arabic).replaceAll(' ', '');
+            final normalizedTarget = _normalizeArabic(
+              state.selectedDhikr!.arabic,
+            ).replaceAll(' ', '');
             final normalizedWords = _normalizeArabic(words).replaceAll(' ', '');
-            
-            final currentMatches = _countOccurrences(normalizedWords, normalizedTarget);
-            
+
+            final currentMatches = _countOccurrences(
+              normalizedWords,
+              normalizedTarget,
+            );
+
             if (currentMatches > lastTargetMatches) {
               final now = DateTime.now();
               if (now.difference(_lastIncrementTime).inMilliseconds > 350) {
@@ -228,7 +237,10 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
             }
           } else {
             // Any Word mode: Simple word counting
-            final currentWordsList = words.split(RegExp(r'\s+')).where((w) => w.length > 1).toList();
+            final currentWordsList = words
+                .split(RegExp(r'\s+'))
+                .where((w) => w.length > 1)
+                .toList();
             final currentWordCount = currentWordsList.length;
 
             if (currentWordCount > lastWordCount) {
@@ -242,7 +254,7 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
               }
             }
           }
-          
+
           _lastRecognizedWords = words;
         },
         localeId: 'ar-SA', // Ensure Arabic Saudi Arabia locale

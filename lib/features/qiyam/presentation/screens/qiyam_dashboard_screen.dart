@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/features/qiyam/domain/models/qiyam_session.dart';
 import 'package:takwa/features/qiyam/providers/qiyam_providers.dart';
+import 'package:takwa/app/main_shell.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
+import '../../../../core/widgets/custom_leading_button.dart';
 
 class QiyamDashboardScreen extends ConsumerStatefulWidget {
   const QiyamDashboardScreen({super.key});
@@ -18,6 +21,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     with TickerProviderStateMixin {
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulse;
+  late final AudioPlayer _audioPlayer;
 
   @override
   void initState() {
@@ -30,16 +34,36 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       begin: 0.95,
       end: 1.05,
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+
+    _audioPlayer = AudioPlayer();
+    _playWelcomeSound();
+  }
+
+  Future<void> _playWelcomeSound() async {
+    try {
+      await _audioPlayer.setAsset('assets/sounds/ayah.mp3');
+      await _audioPlayer.play();
+    } catch (e) {
+      debugPrint('Error playing welcome sound: $e');
+    }
   }
 
   @override
   void dispose() {
     _pulseCtrl.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Listen to tab changes to trigger welcome sound when active
+    ref.listen(currentTabProvider, (prev, next) {
+      if (next == 1) {
+        _playWelcomeSound();
+      }
+    });
+
     final session = ref.watch(qiyamSessionProvider);
 
     return Scaffold(
@@ -87,10 +111,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios_new, color: context.colors.gold),
-          ),
+          const CustomLeadingButton(),
           Column(
             children: [
               Text(
@@ -227,11 +248,11 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Previous
+          // Next
           _buildCircleButton(
-            icon: Icons.skip_previous,
+            icon: Icons.skip_next,
             onPressed: () =>
-                ref.read(qiyamSessionProvider.notifier).previousStage(),
+                ref.read(qiyamSessionProvider.notifier).nextStage(),
           ),
 
           // Play/Pause
@@ -268,11 +289,11 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             ),
           ),
 
-          // Next
+          // Previous
           _buildCircleButton(
-            icon: Icons.skip_next,
+            icon: Icons.skip_previous,
             onPressed: () =>
-                ref.read(qiyamSessionProvider.notifier).nextStage(),
+                ref.read(qiyamSessionProvider.notifier).previousStage(),
           ),
         ],
       ),

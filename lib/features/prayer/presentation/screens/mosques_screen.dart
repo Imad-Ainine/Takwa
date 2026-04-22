@@ -109,8 +109,20 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
-    final mosquesAsyncValue = ref.watch(nearbyMosquesProvider);
     final prayersAsyncValue = ref.watch(prayerTimesProvider);
+
+    // If you haven't secured a location yet, show a loader instead of querying the API
+    if (_currentPosition == null) {
+      return Scaffold(
+        backgroundColor: style.bg,
+        body: const Center(
+          child: CircularProgressIndicator(color: AppColors.gold),
+        ),
+      );
+    }
+
+    // Once position is secured, watch the provider.
+    final mosquesAsyncValue = ref.watch(nearbyMosquesProvider);
 
     String nextPrayerTime = '--:--';
     prayersAsyncValue.whenData((prayers) {

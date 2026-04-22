@@ -25,7 +25,7 @@ import '../core/notifications/overlay_background_service.dart';
 // ─────────────────────────────────────────
 //  CURRENT TAB PROVIDER
 // ─────────────────────────────────────────
-final _currentTabProvider = StateProvider<int>((ref) => 0);
+final currentTabProvider = StateProvider<int>((ref) => 0);
 
 // ─────────────────────────────────────────
 //  APP SHELL
@@ -86,22 +86,31 @@ class _MainShellState extends ConsumerState<MainShell>
     super.dispose();
   }
 
-  void _switchTab(int idx) {
-    final current = ref.read(_currentTabProvider);
-    if (current == idx) return;
+  void _switchTab(int idx, {bool updateProvider = true}) {
+    final current = ref.read(currentTabProvider);
+    // Use closer comparison for double values check from PageController if needed, 
+    // but round() is usually fine for discrete tab indexes.
+    if (current == idx && _pageCtrl.hasClients && _pageCtrl.page?.round() == idx) return;
 
     HapticFeedback.selectionClick();
 
     // Animate out current, animate in new
-    _tabAnims[current].reverse();
-    _tabAnims[idx].forward();
+    if (current != idx) {
+      _tabAnims[current].reverse();
+      _tabAnims[idx].forward();
+    }
 
-    ref.read(_currentTabProvider.notifier).state = idx;
-    _pageCtrl.animateToPage(
-      idx,
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeInOutCubic,
-    );
+    if (updateProvider) {
+      ref.read(currentTabProvider.notifier).state = idx;
+    }
+
+    if (_pageCtrl.hasClients && _pageCtrl.page?.round() != idx) {
+      _pageCtrl.animateToPage(
+        idx,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOutCubic,
+      );
+    }
   }
 
   void _initializePostOnboardingServices() {
@@ -115,6 +124,13 @@ class _MainShellState extends ConsumerState<MainShell>
     ref.listen(onboardingDoneProvider, (prev, next) {
       if (next.value == true && prev?.value != true) {
         _initializePostOnboardingServices();
+      }
+    });
+
+    // Listen for external tab changes (e.g. from Home screen)
+    ref.listen(currentTabProvider, (prev, next) {
+      if (_pageCtrl.hasClients && _pageCtrl.page?.round() != next) {
+        _switchTab(next, updateProvider: false);
       }
     });
 
@@ -154,14 +170,14 @@ class _MainShellState extends ConsumerState<MainShell>
         ),
       );
       // Ensure current index is still valid
-      final currentIdx = ref.read(_currentTabProvider);
+      final currentIdx = ref.read(currentTabProvider);
       if (currentIdx >= _tabs.length) {
-        ref.read(_currentTabProvider.notifier).state = 0;
+        ref.read(currentTabProvider.notifier).state = 0;
       }
-      _tabAnims[ref.read(_currentTabProvider)].forward();
+      _tabAnims[ref.read(currentTabProvider)].forward();
     }
 
-    final currentIdx = ref.watch(_currentTabProvider);
+    final currentIdx = ref.watch(currentTabProvider);
 
     return DrawerScaffold(
       child: Scaffold(
@@ -179,10 +195,10 @@ class _MainShellState extends ConsumerState<MainShell>
           ],
           onPageChanged: (idx) {
             // If swiped
-            if (ref.read(_currentTabProvider) != idx) {
-              _tabAnims[ref.read(_currentTabProvider)].reverse();
+            if (ref.read(currentTabProvider) != idx) {
+              _tabAnims[ref.read(currentTabProvider)].reverse();
               _tabAnims[idx].forward();
-              ref.read(_currentTabProvider.notifier).state = idx;
+              ref.read(currentTabProvider.notifier).state = idx;
             }
           },
         ),

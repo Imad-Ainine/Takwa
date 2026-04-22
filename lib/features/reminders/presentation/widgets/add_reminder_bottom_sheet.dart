@@ -200,7 +200,7 @@ class _AddReminderBottomSheetState
                         ),
                         const Spacer(),
                         Icon(
-                          Icons.chevron_left_rounded,
+                          Icons.chevron_right_rounded,
                           color: context.colors.textDim,
                           size: 20,
                         ),
