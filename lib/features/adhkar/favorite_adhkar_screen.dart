@@ -397,6 +397,8 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
       AdhkarCategory.afterPrayer => '🕌 بعد الصلاة',
       AdhkarCategory.sleep => '🌙 أذكار النوم',
       AdhkarCategory.misc => '📿 متنوعة',
+      AdhkarCategory.wakingUp => '📿 الاستيقاظ من النوم',
+      AdhkarCategory.food => '📿 الطعام',
     };
   }
 }

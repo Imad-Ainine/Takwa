@@ -948,7 +948,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
 
             // ── Card: center right ──
             Positioned(
-              top: 200,
+              top: 220,
               left: 12,
               right: 12,
               child: Padding(

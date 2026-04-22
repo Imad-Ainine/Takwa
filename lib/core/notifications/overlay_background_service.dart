@@ -481,11 +481,13 @@ class _OverlayTaskHandler extends TaskHandler {
   }
 
   String _adhkarCategoryTitle(AdhkarCategory cat) => switch (cat) {
-    AdhkarCategory.morning => 'أذكار الصباح',
-    AdhkarCategory.evening => 'أذكار المساء',
-    AdhkarCategory.afterPrayer => 'أذكار بعد الصلاة',
-    AdhkarCategory.sleep => 'أذكار النوم',
-    AdhkarCategory.misc => 'ذكر اليوم',
+    AdhkarCategory.morning => '🌅 أذكار الصباح',
+    AdhkarCategory.evening => '🌆 أذكار المساء',
+    AdhkarCategory.afterPrayer => '🕌 بعد الصلاة',
+    AdhkarCategory.sleep => '🌙 أذكار النوم',
+    AdhkarCategory.misc => '📿 متنوعة',
+    AdhkarCategory.wakingUp => '📿 الاستيقاظ من النوم',
+    AdhkarCategory.food => '📿 الطعام',
   };
 
   // ──────────────────────────────────────

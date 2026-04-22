@@ -12,13 +12,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
 
-import '../../../core/theme/app_theme.dart';
-import '../widgets/primary_button.dart';
+
 
 // ═══════════════════════════════════════════════════════════════
 //  MODELS
 // ═══════════════════════════════════════════════════════════════
-enum AdhkarCategory { morning, evening, afterPrayer, sleep, misc }
+enum AdhkarCategory {
+  wakingUp,
+  morning,
+  evening,
+  afterPrayer,
+  sleep,
+  food,
+  misc,
+}
 
 class DhikrItem {
   final int id;
@@ -44,12 +51,33 @@ class DhikrItem {
 //  ADHKAR DATA  (بيانات حقيقية من حصن المسلم)
 // ═══════════════════════════════════════════════════════════════
 const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
+  // ────────────── الاستيقاظ من النوم ──────────────
+  AdhkarCategory.wakingUp: [
+    DhikrItem(
+      id: 1,
+      arabic:
+          'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
+      count: 1,
+      category: AdhkarCategory.wakingUp,
+      source: 'صحيح البخاري',
+    ),
+    DhikrItem(
+      id: 2,
+      arabic:
+          'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ الْعَلِيِّ الْعَظِيمِ، رَبِّ اغْفِرْ لِي',
+      count: 1,
+      category: AdhkarCategory.wakingUp,
+      fadl: 'من قالها غُفر له، وإن دعا استُجيب له، وإن توضأ وصلى قُبلت صلاته',
+      source: 'صحيح البخاري',
+    ),
+  ],
+
   // ────────────── الصباح ──────────────
   AdhkarCategory.morning: [
     DhikrItem(
       id: 101,
       arabic:
-          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا  هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ',
+          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ',
       count: 1,
       category: AdhkarCategory.morning,
       transliteration: 'آية الكرسي',
@@ -59,14 +87,23 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
     DhikrItem(
       id: 102,
       arabic:
-          'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
-      count: 1,
+          'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\nقُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\n\nبِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ * وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\n\nبِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ',
+      count: 3,
       category: AdhkarCategory.morning,
-      fadl: 'كانَ مِن حِرزٍ له مِن الشيطان يومه ذلك',
-      source: 'صحيح مسلم',
+      transliteration: 'المعوذات',
+      fadl: 'تكفيك من كل شيء',
+      source: 'سنن أبي داود',
     ),
     DhikrItem(
       id: 103,
+      arabic:
+          'أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ',
+      count: 1,
+      category: AdhkarCategory.morning,
+      source: 'صحيح مسلم',
+    ),
+    DhikrItem(
+      id: 104,
       arabic:
           'اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ',
       count: 1,
@@ -74,9 +111,9 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
       source: 'سنن أبي داود',
     ),
     DhikrItem(
-      id: 104,
+      id: 105,
       arabic:
-          'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ',
+          'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',
       count: 1,
       category: AdhkarCategory.morning,
       transliteration: 'سيد الاستغفار',
@@ -84,29 +121,54 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
       source: 'صحيح البخاري',
     ),
     DhikrItem(
-      id: 105,
+      id: 106,
+      arabic:
+          'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي',
+      count: 1,
+      category: AdhkarCategory.morning,
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 107,
+      arabic:
+          'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَٰهَ إِلَّا أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَٰهَ إِلَّا أَنْتَ',
+      count: 3,
+      category: AdhkarCategory.morning,
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 108,
+      arabic:
+          'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
+      count: 3,
+      category: AdhkarCategory.morning,
+      fadl: 'لم يضره شيء',
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 109,
+      arabic:
+          'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالْإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيًّا',
+      count: 3,
+      category: AdhkarCategory.morning,
+      fadl: 'كان حقاً على الله أن يرضيه يوم القيامة',
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 110,
+      arabic:
+          'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ',
+      count: 1,
+      category: AdhkarCategory.morning,
+      source: 'النسائي في الكبرى',
+    ),
+    DhikrItem(
+      id: 111,
       arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ',
       count: 100,
       category: AdhkarCategory.morning,
       fadl: 'من قالها مئة مرة حُطَّت خطاياه وإن كانت مثل زبد البحر',
       source: 'متفق عليه',
-    ),
-    DhikrItem(
-      id: 106,
-      arabic:
-          'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
-      count: 10,
-      category: AdhkarCategory.morning,
-      fadl: 'كانت له عِدل عشر رقاب، وكُتبت له مئة حسنة',
-      source: 'صحيح البخاري',
-    ),
-    DhikrItem(
-      id: 107,
-      arabic:
-          'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَٰهَ إِلَّا أَنْتَ',
-      count: 3,
-      category: AdhkarCategory.morning,
-      source: 'سنن أبي داود',
     ),
   ],
 
@@ -115,7 +177,7 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
     DhikrItem(
       id: 201,
       arabic:
-          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
+          'أَعُوذُ بِاللَّهِ مِنَ الشَّيطانِ الرَّجِيمِ\nاللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...',
       count: 1,
       category: AdhkarCategory.evening,
       transliteration: 'آية الكرسي',
@@ -125,45 +187,61 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
     DhikrItem(
       id: 202,
       arabic:
-          'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
+          'المعوذات (الإخلاص، الفلق، الناس)', // اختصاراً هنا، يُفضل وضع النص كاملاً كما في الصباح
+      count: 3,
+      category: AdhkarCategory.evening,
+      fadl: 'تكفيك من كل شيء',
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 203,
+      arabic:
+          'أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا...',
       count: 1,
       category: AdhkarCategory.evening,
       source: 'صحيح مسلم',
     ),
     DhikrItem(
-      id: 203,
-      arabic:
-          'اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَٰهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ',
-      count: 4,
-      category: AdhkarCategory.evening,
-      fadl: 'أعتقه الله ربع النار',
-      source: 'سنن أبي داود',
-    ),
-    DhikrItem(
       id: 204,
       arabic:
-          'اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ، أَوْ بِأَحَدٍ مِنْ خَلْقِكَ، فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ',
+          'اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ',
       count: 1,
       category: AdhkarCategory.evening,
-      fadl: 'أدّى شكر يومه',
-      source: 'صحيح ابن حبان',
+      source: 'الترمذي',
     ),
     DhikrItem(
       id: 205,
       arabic:
-          'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ، وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ، وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ',
+          'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',
       count: 1,
       category: AdhkarCategory.evening,
+      transliteration: 'سيد الاستغفار',
       source: 'صحيح البخاري',
     ),
     DhikrItem(
       id: 206,
       arabic:
+          'اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلَائِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لَا إِلَٰهَ إِلَّا أَنْتَ وَحْدَكَ لَا شَرِيكَ لَكَ، وَأَنَّ مُحَمَّدًا عَبْدُكَ وَرَسُولُكَ',
+      count: 4,
+      category: AdhkarCategory.evening,
+      fadl: 'أعتقه الله من النار',
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 207,
+      arabic:
           'بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ',
       count: 3,
       category: AdhkarCategory.evening,
-      fadl: 'لم يضره شيء',
       source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 208,
+      arabic: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ',
+      count: 3,
+      category: AdhkarCategory.evening,
+      fadl: 'لم يضره شيء في تلك الليلة',
+      source: 'صحيح مسلم',
     ),
   ],
 
@@ -186,43 +264,43 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
     ),
     DhikrItem(
       id: 303,
-      arabic: 'سُبْحَانَ اللَّهِ',
-      count: 33,
+      arabic:
+          'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ',
+      count: 1,
       category: AdhkarCategory.afterPrayer,
       source: 'متفق عليه',
     ),
     DhikrItem(
       id: 304,
-      arabic: 'الْحَمْدُ لِلَّهِ',
-      count: 33,
+      arabic:
+          'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ، وَشُكْرِكَ، وَحُسْنِ عِبَادَتِكَ',
+      count: 1,
       category: AdhkarCategory.afterPrayer,
-      source: 'متفق عليه',
+      source: 'سنن أبي داود',
     ),
     DhikrItem(
       id: 305,
-      arabic: 'اللَّهُ أَكْبَرُ',
-      count: 33,
-      category: AdhkarCategory.afterPrayer,
-      fadl: 'من سبّح وحمد وكبّر دبر كل صلاة غُفرت ذنوبه',
-      source: 'متفق عليه',
-    ),
-    DhikrItem(
-      id: 306,
       arabic:
-          'لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ',
+          'سُبْحَانَ اللَّهِ (33) ، الْحَمْدُ لِلَّهِ (33) ، اللَّهُ أَكْبَرُ (33)\nلَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ (1)',
       count: 1,
       category: AdhkarCategory.afterPrayer,
-      fadl: 'من قالها بعد كل صلاة غُفرت ذنوبه وإن كانت مثل زبد البحر',
+      fadl: 'غُفرت ذنوبه وإن كانت مثل زبد البحر',
       source: 'صحيح مسلم',
     ),
     DhikrItem(
-      id: 307,
-      arabic:
-          'آية الكرسي\nاللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ',
+      id: 306,
+      arabic: 'قراءة آية الكرسي',
       count: 1,
       category: AdhkarCategory.afterPrayer,
-      fadl: 'من قرأها دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا الموت',
-      source: 'النسائي — صحيح',
+      fadl: 'لم يمنعه من دخول الجنة إلا الموت',
+      source: 'صحيح الجامع',
+    ),
+    DhikrItem(
+      id: 307,
+      arabic: 'قراءة المعوذات (الإخلاص، الفلق، الناس)',
+      count: 1, // مرة واحدة دبر كل صلاة، و 3 مرات بعد الفجر والمغرب
+      category: AdhkarCategory.afterPrayer,
+      source: 'سنن أبي داود',
     ),
   ],
 
@@ -230,47 +308,63 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
   AdhkarCategory.sleep: [
     DhikrItem(
       id: 401,
+      arabic:
+          'بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ',
+      count: 1,
+      category: AdhkarCategory.sleep,
+      source: 'متفق عليه',
+    ),
+    DhikrItem(
+      id: 402,
       arabic: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',
       count: 1,
       category: AdhkarCategory.sleep,
       source: 'صحيح البخاري',
     ),
     DhikrItem(
-      id: 402,
+      id: 403,
+      arabic:
+          'آمَنَ الرَّسُولُ بِمَا أُنزِلَ إِلَيْهِ مِن رَّبِّهِ وَالْمُؤْمِنُونَ ۚ ... (الآيتان من آخر سورة البقرة)',
+      count: 1,
+      category: AdhkarCategory.sleep,
+      fadl: 'من قرأهما في ليلة كفتاه',
+      source: 'متفق عليه',
+    ),
+    DhikrItem(
+      id: 404,
       arabic: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ',
       count: 3,
       category: AdhkarCategory.sleep,
       source: 'سنن أبي داود',
     ),
     DhikrItem(
-      id: 403,
-      arabic: 'سُبْحَانَ اللَّهِ',
-      count: 33,
-      category: AdhkarCategory.sleep,
-      fadl: 'خير لك من خادم',
-      source: 'متفق عليه',
-    ),
-    DhikrItem(
-      id: 404,
-      arabic: 'الْحَمْدُ لِلَّهِ',
-      count: 33,
-      category: AdhkarCategory.sleep,
-      source: 'متفق عليه',
-    ),
-    DhikrItem(
       id: 405,
-      arabic: 'اللَّهُ أَكْبَرُ',
-      count: 34,
+      arabic:
+          'سُبْحَانَ اللَّهِ (33) ، الْحَمْدُ لِلَّهِ (33) ، اللَّهُ أَكْبَرُ (34)',
+      count: 1,
       category: AdhkarCategory.sleep,
+      fadl: 'خير لكما من خادم',
       source: 'متفق عليه',
     ),
+  ],
+
+  // ────────────── الطعام ──────────────
+  AdhkarCategory.food: [
     DhikrItem(
-      id: 406,
+      id: 501,
       arabic:
-          'قُلْ هُوَ اللَّهُ أَحَدٌ\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ',
-      count: 3,
-      category: AdhkarCategory.sleep,
-      fadl: 'كفتاه من كل شيء',
+          'بِسْمِ اللَّهِ (في أوله) .. فإن نسي: بِسْمِ اللَّهِ فِي أَوَّلِهِ وَآخِرِهِ',
+      count: 1,
+      category: AdhkarCategory.food,
+      source: 'سنن أبي داود',
+    ),
+    DhikrItem(
+      id: 502,
+      arabic:
+          'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا، وَرَزَقَنِيهِ، مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ',
+      count: 1,
+      category: AdhkarCategory.food,
+      fadl: 'غُفر له ما تقدم من ذنبه',
       source: 'سنن أبي داود',
     ),
   ],
@@ -278,23 +372,22 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
   // ────────────── متنوعة ──────────────
   AdhkarCategory.misc: [
     DhikrItem(
-      id: 501,
+      id: 601,
       arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
       count: 100,
       category: AdhkarCategory.misc,
-      fadl: 'من قالها مئة مرة كانت له عِدل عشر رقاب',
       source: 'متفق عليه',
     ),
     DhikrItem(
-      id: 502,
+      id: 602,
       arabic: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',
       count: 1,
       category: AdhkarCategory.misc,
-      fadl: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان',
+      fadl: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن',
       source: 'متفق عليه',
     ),
     DhikrItem(
-      id: 503,
+      id: 603,
       arabic: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ',
       count: 10,
       category: AdhkarCategory.misc,
@@ -302,16 +395,16 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
       source: 'صحيح مسلم',
     ),
     DhikrItem(
-      id: 504,
+      id: 604,
       arabic:
           'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ',
       count: 7,
       category: AdhkarCategory.misc,
-      fadl: 'كفاه الله ما أهمه',
-      source: 'سنن أبي داود',
+      fadl: 'كفاه الله ما أهمه من أمر الدنيا والآخرة',
+      source: 'ابن السني',
     ),
     DhikrItem(
-      id: 505,
+      id: 605,
       arabic: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',
       count: 100,
       category: AdhkarCategory.misc,
@@ -458,20 +551,17 @@ class _TimeNotifier extends StateNotifier<TimeOfDay> {
 
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR NOTIFICATION SERVICE
-//  إشعارات الأذكار مع زر "قرأت الذكر"
 // ═══════════════════════════════════════════════════════════════
 class AdhkarNotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
-  // IDs مخصصة للأذكار (200-range)
   static const _morningId = 310;
   static const _eveningId = 311;
   static const _afterFajrId = 312;
   static const _afterAsrId = 313;
   static const _sleepId = 314;
-  static const _dhikrId = 315; // ذكر عشوائي
+  static const _dhikrId = 315;
 
-  // ─── إشعار أذكار الصباح ───
   static Future<void> scheduleMorning(TimeOfDay time) async {
     await _cancelId(_morningId);
 
@@ -522,7 +612,6 @@ class AdhkarNotificationService {
     );
   }
 
-  // ─── إشعار أذكار المساء ───
   static Future<void> scheduleEvening(TimeOfDay time) async {
     await _cancelId(_eveningId);
 
@@ -573,7 +662,6 @@ class AdhkarNotificationService {
     );
   }
 
-  // ─── إشعار ذكر يومي عشوائي ───
   static Future<void> scheduleDailyDhikr({
     required TimeOfDay time,
     AdhkarCategory category = AdhkarCategory.misc,
@@ -612,7 +700,7 @@ class AdhkarNotificationService {
             'read_dhikr_${dhikr.id}',
             'قرأت الذكر ✓',
             showsUserInterface: false,
-            cancelNotification: true, // ← يُغلق الإشعار فوراً
+            cancelNotification: true,
           ),
           const AndroidNotificationAction(
             'share_dhikr',
@@ -630,7 +718,6 @@ class AdhkarNotificationService {
     );
   }
 
-  // ─── إشعار فوري لذكر مخصص ───
   static Future<void> showDhikrNow(DhikrItem dhikr) async {
     final arabic = dhikr.arabic.replaceAll('\n', ' ');
 
@@ -650,7 +737,7 @@ class AdhkarNotificationService {
             'read_done_${dhikr.id}',
             'قرأت الذكر ✓',
             showsUserInterface: false,
-            cancelNotification: true, // ← يُخفي الإشعار
+            cancelNotification: true,
           ),
           AndroidNotificationAction(
             'repeat_${dhikr.id}',
@@ -664,7 +751,6 @@ class AdhkarNotificationService {
     );
   }
 
-  // ─── إلغاء الجدولة ───
   static Future<void> cancelAll() async {
     for (final id in [
       _morningId,
@@ -680,7 +766,6 @@ class AdhkarNotificationService {
 
   static Future<void> _cancelId(int id) => _plugin.cancel(id);
 
-  // ─── بناء تفاصيل الإشعار ───
   static NotificationDetails _buildDetails({
     required String channelId,
     required String channelName,
@@ -704,7 +789,6 @@ class AdhkarNotificationService {
             : null,
         actions: actions,
         groupKey: 'adhkar_group',
-        // لا صوت مزعج للأذكار
         playSound: false,
         enableVibration: false,
       ),
@@ -718,344 +802,27 @@ class AdhkarNotificationService {
     );
   }
 
-  // ─── ذكر عشوائي ───
   static DhikrItem _randomDhikr(AdhkarCategory cat) {
     final list = kAdhkarData[cat] ?? kAdhkarData[AdhkarCategory.misc]!;
     final rng = math.Random(DateTime.now().dayOfYear);
     return list[rng.nextInt(list.length)];
   }
 
+  // تم تحديث الدالة لتدعم التصنيفات الجديدة ✅
   static String _categoryName(AdhkarCategory cat) => switch (cat) {
+    AdhkarCategory.wakingUp => 'أذكار الاستيقاظ',
     AdhkarCategory.morning => 'أذكار الصباح',
     AdhkarCategory.evening => 'أذكار المساء',
     AdhkarCategory.afterPrayer => 'أذكار بعد الصلاة',
     AdhkarCategory.sleep => 'أذكار النوم',
+    AdhkarCategory.food => 'أذكار الطعام',
     AdhkarCategory.misc => 'أذكار متنوعة',
   };
 }
 
-// Helper extension
 extension on DateTime {
   int get dayOfYear {
     final start = DateTime(year, 1, 1);
     return difference(start).inDays + 1;
   }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  ADHKAR NOTIF SETTINGS SHEET
-//  (تُستدعى من زر 🔔 في الشاشة)
-// ═══════════════════════════════════════════════════════════════
-class _AdhkarNotifSheet extends ConsumerWidget {
-  const _AdhkarNotifSheet();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final enabled = ref.watch(adhkarNotifEnabledProvider);
-    final morningTime = ref.watch(adhkarMorningTimeProvider);
-    final eveningTime = ref.watch(adhkarEveningTimeProvider);
-    final afterFajr = ref.watch(adhkarAfterFajrProvider);
-    final afterAsr = ref.watch(adhkarAfterAsrProvider);
-    final sleepTime = ref.watch(adhkarSleepTimeProvider);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colors.card,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(
-                color: context.colors.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              children: [
-                Text(
-                  'إشعارات الأذكار',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 18,
-                    color: context.colors.gold,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const Spacer(),
-                Switch(
-                  value: enabled,
-                  onChanged: (v) {
-                    ref.read(adhkarNotifEnabledProvider.notifier).set(v);
-                    if (!v) AdhkarNotificationService.cancelAll();
-                  },
-                  activeColor: context.colors.gold,
-                  activeTrackColor: context.colors.gold.withOpacity(0.3),
-                  inactiveTrackColor: context.colors.border,
-                  inactiveThumbColor: context.colors.textDim,
-                ),
-              ],
-            ),
-          ),
-
-          Divider(color: context.colors.border, height: 20),
-
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 250),
-            crossFadeState: enabled
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              child: Row(
-                children: [
-                  const Text('🔕', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: 10),
-                  Text(
-                    'الإشعارات متوقفة',
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 13,
-                      color: context.colors.textDim,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            secondChild: ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-              children: [
-                // أذكار الصباح
-                _NotifRow(
-                  icon: '🌅',
-                  label: 'أذكار الصباح',
-                  time: morningTime,
-                  onTimeTap: () async {
-                    final t = await _pickTime(context, morningTime);
-                    if (t != null) {
-                      ref.read(adhkarMorningTimeProvider.notifier).set(t);
-                      await AdhkarNotificationService.scheduleMorning(t);
-                    }
-                  },
-                ),
-                _NotifRow(
-                  icon: '🌆',
-                  label: 'أذكار المساء',
-                  time: eveningTime,
-                  onTimeTap: () async {
-                    final t = await _pickTime(context, eveningTime);
-                    if (t != null) {
-                      ref.read(adhkarEveningTimeProvider.notifier).set(t);
-                      await AdhkarNotificationService.scheduleEvening(t);
-                    }
-                  },
-                ),
-                _NotifRow(
-                  icon: '🌙',
-                  label: 'أذكار النوم',
-                  time: sleepTime,
-                  onTimeTap: () async {
-                    final t = await _pickTime(context, sleepTime);
-                    if (t != null) {
-                      ref.read(adhkarSleepTimeProvider.notifier).set(t);
-                    }
-                  },
-                ),
-                const SizedBox(height: 12),
-                Container(height: 1, color: context.colors.border),
-                const SizedBox(height: 12),
-                _ToggleRow(
-                  icon: '🌅',
-                  label: 'بعد صلاة الفجر',
-                  value: afterFajr,
-                  onChanged: (v) =>
-                      ref.read(adhkarAfterFajrProvider.notifier).set(v),
-                ),
-                _ToggleRow(
-                  icon: '🌇',
-                  label: 'بعد صلاة العصر',
-                  value: afterAsr,
-                  onChanged: (v) =>
-                      ref.read(adhkarAfterAsrProvider.notifier).set(v),
-                ),
-
-                const SizedBox(height: 14),
-                // زر اختبار
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    label: 'اختبار إشعار ذكر الآن',
-                    isOutline: true,
-                    onTap: () async {
-                      final dhikr = (kAdhkarData[AdhkarCategory.morning]!)[0];
-                      await AdhkarNotificationService.showDhikrNow(dhikr);
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'تم إرسconst ال إشعار تجريبي ✓',
-                            style: TextStyle(
-                              fontFamily: 'NotoNaskhArabic',
-                              fontSize: 13,
-                            ),
-                          ),
-                          backgroundColor: context.colors.success,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      );
-                    },
-                    customContent: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('🔔', style: TextStyle(fontSize: 16)),
-                        const SizedBox(width: 8),
-                        Text(
-                          'اختبار إشعار ذكر الآن',
-                          style: TextStyle(
-                            fontFamily: 'NotoNaskhArabic',
-                            fontSize: 13,
-                            color: context.colors.gold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay current) async {
-    return showTimePicker(
-      context: context,
-      initialTime: current,
-      builder: (ctx, child) => Theme(
-        data: Theme.of(
-          ctx,
-        ).copyWith(colorScheme: ColorScheme.dark(primary: context.colors.gold)),
-        child: child!,
-      ),
-    );
-  }
-}
-
-class _NotifRow extends StatelessWidget {
-  final String icon, label;
-  final TimeOfDay time;
-  final VoidCallback onTimeTap;
-
-  const _NotifRow({
-    required this.icon,
-    required this.label,
-    required this.time,
-    required this.onTimeTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final h = time.hour.toString().padLeft(2, '0');
-    final m = time.minute.toString().padLeft(2, '0');
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
-                fontSize: 13,
-                color: context.colors.textPrimary,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: onTimeTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: context.colors.goldDim,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: context.colors.gold.withOpacity(0.25),
-                ),
-              ),
-              child: Text(
-                '$h:$m',
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  fontSize: 15,
-                  color: context.colors.gold,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToggleRow extends StatelessWidget {
-  final String icon, label;
-  final bool value;
-  final void Function(bool) onChanged;
-
-  const _ToggleRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 18)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 13,
-              color: context.colors.textPrimary,
-            ),
-          ),
-        ),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          activeColor: context.colors.teal,
-          activeTrackColor: context.colors.teal.withOpacity(0.3),
-          inactiveTrackColor: context.colors.border,
-          inactiveThumbColor: context.colors.textDim,
-        ),
-      ],
-    ),
-  );
 }
