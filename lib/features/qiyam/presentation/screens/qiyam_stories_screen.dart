@@ -12,10 +12,7 @@ class QiyamStoriesScreen extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
             child: Column(
@@ -40,7 +37,7 @@ class QiyamStoriesScreen extends StatelessWidget {
 
   Widget _buildAppTopBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: Row(
         children: [
           IconButton(
@@ -63,52 +60,64 @@ class QiyamStoriesScreen extends StatelessWidget {
 
   Widget _buildStoryCard(BuildContext context, _Story story) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.colors.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: context.colors.border),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(story.icon, style: const TextStyle(fontSize: 24)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  story.title,
-                  style: context.typography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.gold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            story.content,
-            style: context.typography.bodyMedium.copyWith(
-              color: context.colors.textSecondary,
-              height: 1.6,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            const Positioned.fill(
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
-          ),
-          if (story.reference.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '— ${story.reference}',
-                style: context.typography.caption.copyWith(
-                  color: context.colors.textDim,
-                  fontStyle: FontStyle.italic,
-                ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(story.icon, style: const TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          story.title,
+                          style: context.typography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.colors.gold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    story.content,
+                    style: context.typography.bodyMedium.copyWith(
+                      color: context.colors.textSecondary,
+                      height: 1.6,
+                    ),
+                  ),
+                  if (story.reference.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '— ${story.reference}',
+                        style: context.typography.caption.copyWith(
+                          color: context.colors.textDim,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }

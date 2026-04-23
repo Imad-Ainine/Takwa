@@ -92,8 +92,9 @@ class _MainShellState extends ConsumerState<MainShell>
     // but round() is usually fine for discrete tab indexes.
     if (current == idx &&
         _pageCtrl.hasClients &&
-        _pageCtrl.page?.round() == idx)
+        _pageCtrl.page?.round() == idx) {
       return;
+    }
 
     HapticFeedback.selectionClick();
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -39,7 +40,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
 
     _audioPlayer = AudioPlayer();
-    
+
     // Trigger banner when screen is first loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -86,10 +87,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         children: [
           // Background System
           const Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
 
           SafeArea(
@@ -108,9 +106,11 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                         _buildStageInfo(context, session),
                         const SizedBox(height: 20),
                         _buildStoriesButton(context),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
+                        _buildToolsSection(context),
+                        const SizedBox(height: 24),
                         _buildControls(context, session),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -135,7 +135,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   Widget _buildHeader(BuildContext context, QiyamSessionState session) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -154,6 +154,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 'المرحلة ${session.currentStageIndex + 1} من ${session.stages.length}',
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
+                  fontSize: 16,
                 ),
               ),
             ],
@@ -168,7 +169,6 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     );
   }
 
-
   Widget _buildPlanSelector(BuildContext context, QiyamSessionState session) {
     final durations = [5, 10, 15, 20, 30];
     final currentDuration = session.stages.first.defaultDuration.inMinutes;
@@ -181,64 +181,70 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           child: Text(
             'اختر مدة المرحلة',
             style: context.typography.caption.copyWith(
-              color: context.colors.textDim,
+              fontSize: 20,
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: durations.map((mins) {
               final isSelected = currentDuration == mins;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: InkWell(
+                child: GestureDetector(
                   onTap: () {
+                    HapticFeedback.lightImpact();
                     ref
                         .read(qiyamSessionProvider.notifier)
                         .updatePlanDuration(Duration(minutes: mins));
                   },
-                  borderRadius: BorderRadius.circular(16),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                      horizontal: 24,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colors.gold.withOpacity(0.1)
-                          : context.colors.card,
-                      borderRadius: BorderRadius.circular(16),
+                      gradient: isSelected
+                          ? LinearGradient(
+                              colors: [
+                                context.colors.gold,
+                                context.colors.teal,
+                              ],
+                            )
+                          : null,
+                      color: isSelected ? null : context.colors.card,
+                      borderRadius: BorderRadius.circular(25),
                       border: Border.all(
                         color: isSelected
-                            ? context.colors.gold
+                            ? Colors.transparent
                             : context.colors.border,
+                        width: 1,
                       ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: context.colors.gold.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          '$mins د',
-                          style: context.typography.bodyLarge.copyWith(
-                            color: isSelected
-                                ? context.colors.gold
-                                : context.colors.textPrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'مرحلة',
-                          style: context.typography.caption.copyWith(
-                            color: isSelected
-                                ? context.colors.gold.withOpacity(0.7)
-                                : context.colors.textDim,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      '$mins دقيقة',
+                      style: context.typography.bodyMedium.copyWith(
+                        color: isSelected
+                            ? context.colors.night
+                            : context.colors.textPrimary,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
@@ -439,22 +445,197 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildStoriesButton(BuildContext context) {
-    return TextButton.icon(
-      onPressed: () => Navigator.pushNamed(context, Routes.qiyamStories),
-      icon: Icon(Icons.auto_stories, color: context.colors.gold, size: 20),
-      label: Text(
-        'عجائب وقصص القيام',
-        style: context.typography.bodyMedium.copyWith(
-          color: context.colors.gold,
-          fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(context, Routes.qiyamStories),
+        borderRadius: BorderRadius.circular(20),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  context.colors.gold.withOpacity(0.15),
+                  context.colors.teal.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: context.colors.gold.withOpacity(0.3)),
+            ),
+            child: Stack(
+              children: [
+                const Positioned.fill(
+                  child: CustomPatternBackground(
+                    pattern: BackgroundPattern.curvedPetals,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: context.colors.gold.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.auto_stories,
+                          color: context.colors.gold,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'عجائب وقصص القيام',
+                              style: context.typography.bodyLarge.copyWith(
+                                color: context.colors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'قصص واقعية ملهمة عن أثر قيام الليل',
+                              style: context.typography.caption.copyWith(
+                                color: context.colors.textDim,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.chevron_right, color: context.colors.gold),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        backgroundColor: context.colors.gold.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-          side: BorderSide(color: context.colors.gold.withOpacity(0.3)),
+    );
+  }
+
+  Widget _buildToolsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: Text(
+            'الأدوات والدليل الإيماني',
+            style: context.typography.caption.copyWith(
+              color: context.colors.textDim,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.5,
+          children: [
+            _buildToolCard(
+              context,
+              title: 'ورد القيام',
+              icon: Icons.auto_awesome,
+              color: context.colors.gold,
+              onTap: () => Navigator.pushNamed(context, Routes.qiyamWird),
+            ),
+            _buildToolCard(
+              context,
+              title: 'فضائل القيام',
+              icon: Icons.star_rounded,
+              color: context.colors.teal,
+              onTap: () => Navigator.pushNamed(context, Routes.qiyamVirtues),
+            ),
+            _buildToolCard(
+              context,
+              title: 'حاسبة النوم',
+              icon: Icons.bedtime_outlined,
+              color: Colors.indigoAccent,
+              onTap: () =>
+                  Navigator.pushNamed(context, Routes.qiyamSleepCalculator),
+            ),
+            _buildToolCard(
+              context,
+              title: 'السنة النبوية',
+              icon: Icons.history_edu,
+              color: Colors.brown[400]!,
+              onTap: () =>
+                  Navigator.pushNamed(context, Routes.qiyamSunnahGuide),
+            ),
+            _buildToolCard(
+              context,
+              title: 'دليل المبتدئين',
+              icon: Icons.lightbulb_outline,
+              color: context.colors.success,
+              onTap: () =>
+                  Navigator.pushNamed(context, Routes.qiyamBeginnerGuide),
+            ),
+            _buildToolCard(
+              context,
+              title: 'حاسبة الساعة',
+              icon: Icons.timer_outlined,
+              color: context.colors.goldDark,
+              onTap: () => Navigator.pushNamed(context, Routes.qiyamCalculator),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withOpacity(0.2)),
+          ),
+          child: Stack(
+            children: [
+              const Positioned.fill(
+                child: CustomPatternBackground(
+                  pattern: BackgroundPattern.curvedPetals,
+                ),
+              ),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, color: color, size: 28),
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      style: context.typography.labelMedium.copyWith(
+                        color: context.colors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -527,10 +708,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                 gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
-                  colors: [
-                    context.colors.gold,
-                    context.colors.goldDark,
-                  ],
+                  colors: [context.colors.gold, context.colors.goldDark],
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -586,7 +764,11 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                   ),
                   IconButton(
                     onPressed: _handleDismiss,
-                    icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),

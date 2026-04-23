@@ -1,21 +1,28 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/quran/presentation/screens/quran_screen.dart
-//  Khatma Hub — matches the reference Khatma app UI
+//  Khatma Hub — matches reference screenshots
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quran_library/quran_library.dart' as ql;
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
-import '../widgets/quran_widgets.dart';
-import 'quran_reader_screen.dart';
+import 'create_khatma_screen.dart';
 import 'khatma_history_screen.dart';
 import 'khatma_progress_screen.dart';
 import 'khatma_settings_screen.dart';
 import 'ai_memorize_screen.dart';
+import 'quran_reader_screen.dart';
+import 'free_reading_screen.dart';
+
+const _kBg = Color(0xFF08121E);
+const _kCard = Color(0xFF0F1E2D);
+const _kGreenDark = Color(0xFF1A5234);
+const _kGreenMid = Color(0xFF236644);
+const _kGold = Color(0xFFC8A96E);
+const _kGoldLight = Color(0xFFD4B483);
+const _kBorder = Color(0xFF1E3040);
 
 class QuranScreen extends ConsumerStatefulWidget {
   const QuranScreen({super.key});
@@ -24,233 +31,154 @@ class QuranScreen extends ConsumerStatefulWidget {
 }
 
 class _QuranScreenState extends ConsumerState<QuranScreen>
-    with TickerProviderStateMixin {
-  late final AnimationController _bgAnim;
-  late final AnimationController _enterAnim;
-  late final Animation<double> _fade;
-  late final Animation<Offset> _slide;
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    _bgAnim = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat(reverse: true);
-    _enterAnim = AnimationController(
+    _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
-    );
-    _fade = CurvedAnimation(parent: _enterAnim, curve: Curves.easeOut);
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _enterAnim, curve: Curves.easeOutCubic));
-    _enterAnim.forward();
+    )..forward();
   }
 
   @override
   void dispose() {
-    _bgAnim.dispose();
-    _enterAnim.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final khatma = ref.watch(khatmaProvider);
+    final khatma = ref.watch(khatmaExProvider);
     final dailyVerse = ref.watch(dailyVerseProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        body: AnimatedBuilder(
-          animation: _bgAnim,
-          builder: (_, child) => Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color.lerp(
-                    const Color(0xFF0A3020),
-                    const Color(0xFF0F4530),
-                    _bgAnim.value,
-                  )!,
-                  Color.lerp(
-                    const Color.fromARGB(255, 5, 13, 59),
-                    const Color.fromARGB(255, 3, 10, 30),
-                    _bgAnim.value,
-                  )!,
-                  const Color(0xFF071810),
-                ],
-                stops: const [0, 0.55, 1],
-              ),
-            ),
-            child: child,
-          ),
-          child: SafeArea(
-            child: FadeTransition(
-              opacity: _fade,
-              child: SlideTransition(
-                position: _slide,
-                child: _buildBody(khatma, dailyVerse),
-              ),
-            ),
+        backgroundColor: _kBg,
+        body: FadeTransition(
+          opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(child: _buildTopBar()),
+              SliverToBoxAdapter(child: _buildDatePill()),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              SliverToBoxAdapter(child: _buildVerseCard(dailyVerse)),
+              const SliverToBoxAdapter(child: SizedBox(height: 10)),
+              SliverToBoxAdapter(child: _buildKhatmaButton(khatma)),
+              const SliverToBoxAdapter(child: SizedBox(height: 10)),
+              SliverToBoxAdapter(child: _buildFreeReadingButton()),
+              const SliverToBoxAdapter(child: SizedBox(height: 18)),
+              SliverToBoxAdapter(child: _buildGrid()),
+              const SliverToBoxAdapter(child: SizedBox(height: 32)),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(dynamic khatma, Map<String, dynamic> dailyVerse) {
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(child: _buildAppBar()),
-        SliverToBoxAdapter(child: _buildDatePill()),
-        const SliverToBoxAdapter(child: SizedBox(height: 10)),
-        SliverToBoxAdapter(
-          child: DailyVerseCard(
-            verse: dailyVerse,
-            onRefresh: () => setState(() {}),
-            onShare: () => _shareVerse(dailyVerse),
-            onNavigate: () =>
-                Navigator.push(context, slideRoute(const QuranReaderScreen())),
-          ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 8)),
-        SliverToBoxAdapter(
-          child: KhatmaActionCard(
-            title: 'متابعة الختمة',
-            subtitle: khatma != null
-                ? 'أكمل القراءة من الصفحة ${ar(khatma.currentPage)}'
-                : 'ابدأ ختمتك الأولى',
-            color: kGreenCard,
-            actionIcon: Icons.play_arrow_rounded,
-            onTap: () {
-              if (khatma == null) {
-                ref.read(khatmaProvider.notifier).startNew();
-              }
-              Navigator.push(
-                context,
-                slideRoute(const QuranReaderScreen(startFromKhatma: true)),
-              );
-            },
-            onBack: () =>
-                Navigator.push(context, fadeRoute(const QuranReaderScreen())),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: KhatmaActionCard(
-            title: 'قراءة حرة',
-            subtitle: 'اقرأ القرآن الكريم بحرية',
-            color: kGreenMid,
-            actionIcon: Icons.menu_book_rounded,
-            onTap: () => _showSurahPicker(),
-            onBack: () => _showSurahPicker(),
-          ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        SliverToBoxAdapter(child: _buildGrid()),
-        const SliverToBoxAdapter(child: SizedBox(height: 30)),
-      ],
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 6),
-      child: Row(
-        children: [
-          // History icon
-          GestureDetector(
-            onTap: () =>
-                Navigator.push(context, fadeRoute(const KhatmaHistoryScreen())),
-            child: Container(
-              padding: const EdgeInsets.all(10),
+  Widget _buildTopBar() {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
+        child: Row(
+          children: [
+            // History icon
+            _iconBtn(
+              Icons.history_rounded,
+              () => _push(const KhatmaHistoryScreen()),
+            ),
+            const Spacer(),
+            // Center: title
+            Column(
+              children: [
+                const Text(
+                  'ختمة',
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _kGold.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: _kGold.withOpacity(0.45)),
+                  ),
+                  child: const Text(
+                    'القرآن الكريم',
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 13,
+                      color: _kGold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            // Quran icon button
+            Container(
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: _kGold.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _kGold.withOpacity(0.35)),
               ),
               child: const Icon(
-                Icons.history_rounded,
-                color: Colors.white70,
+                Icons.menu_book_rounded,
+                color: _kGold,
                 size: 22,
               ),
             ),
-          ),
-          const Spacer(),
-          // Title
-          Column(
-            children: [
-              const Text(
-                'ختمة',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: kGoldChip.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: kGoldChip.withOpacity(0.5)),
-                ),
-                child: const Text(
-                  'القرآن الكريم',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 12,
-                    color: kGoldChip,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Quran icon
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: kGoldChip.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: kGoldChip.withOpacity(0.4)),
-            ),
-            child: const Icon(
-              Icons.menu_book_rounded,
-              color: kGoldChip,
-              size: 22,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  Widget _iconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _kBorder),
+      ),
+      child: Icon(icon, color: Colors.white60, size: 22),
+    ),
+  );
 
   Widget _buildDatePill() {
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.12)),
+          color: Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: _kBorder),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
               Icons.calendar_today_rounded,
-              color: Colors.white54,
+              color: Colors.white38,
               size: 14,
             ),
             const SizedBox(width: 8),
@@ -268,7 +196,323 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
+  Widget _buildVerseCard(Map<String, dynamic> verse) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 18),
+      decoration: BoxDecoration(
+        color: _kCard,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _kBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+            child: Row(
+              children: [
+                _surahChip(verse['surahName'] as String),
+                const Spacer(),
+                _tinyBtn(Icons.share_rounded, () {}),
+                const SizedBox(width: 6),
+                _tinyBtn(Icons.refresh_rounded, () => setState(() {})),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            child: Text(
+              verse['text'] as String,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: const TextStyle(
+                fontFamily: 'Amiri',
+                fontSize: 20,
+                color: Colors.white,
+                height: 2.0,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => _push(
+                    QuranReaderScreen(
+                      initialSurah: verse['surahNumber'] as int,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.chevron_left,
+                    color: Colors.white38,
+                    size: 22,
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'آية ${ar(verse['ayahNumber'] as int)}',
+                        style: const TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 13,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        '»»',
+                        style: TextStyle(color: Colors.white30, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _surahChip(String name) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    decoration: BoxDecoration(
+      color: _kGold.withOpacity(0.2),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: _kGold.withOpacity(0.4)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.auto_awesome, color: _kGold, size: 12),
+        const SizedBox(width: 5),
+        Text(
+          name,
+          style: const TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 14,
+            color: _kGold,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _tinyBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.all(7),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Icon(icon, color: Colors.white60, size: 16),
+    ),
+  );
+
+  Widget _buildKhatmaButton(KhatmaSessionEx? khatma) {
+    final hasActive = khatma != null && khatma.isActive;
+    return GestureDetector(
+      onTap: () {
+        if (hasActive) {
+          _push(
+            QuranReaderScreen(
+              startFromKhatma: true,
+              initialPage: khatma.currentPage,
+            ),
+          );
+        } else {
+          _push(const CreateKhatmaScreen());
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: _kGreenDark,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: _kGreenDark.withOpacity(0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _circleBtn(
+              Icons.chevron_left,
+              Colors.white.withOpacity(0.15),
+              Colors.white70,
+              () => _push(const KhatmaHistoryScreen()),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    hasActive ? 'متابعة الختمة' : 'ابدأ ختمة جديدة',
+                    style: const TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 19,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    hasActive
+                        ? 'أكمل القراءة من صفحة ${ar(khatma.currentPage)}'
+                        : 'حدد خيارات الختمة التي تناسبك',
+                    style: const TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 14),
+            _circleBtn(
+              hasActive ? Icons.play_arrow_rounded : Icons.add,
+              Colors.white.withOpacity(0.2),
+              Colors.white,
+              () => hasActive
+                  ? _push(
+                      QuranReaderScreen(
+                        startFromKhatma: true,
+                        initialPage: khatma.currentPage,
+                      ),
+                    )
+                  : _push(const CreateKhatmaScreen()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFreeReadingButton() {
+    return GestureDetector(
+      onTap: () => _push(const FreeReadingScreen()),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 18),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        decoration: BoxDecoration(
+          color: _kGreenMid,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: _kGreenMid.withOpacity(0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _circleBtn(
+              Icons.chevron_left,
+              Colors.white.withOpacity(0.15),
+              Colors.white70,
+              () => _push(const FreeReadingScreen()),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    'قراءة حرة',
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 19,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'اقرأ القرآن الكريم بحرية',
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 14),
+            _circleBtn(
+              Icons.menu_book_rounded,
+              Colors.white.withOpacity(0.2),
+              Colors.white,
+              () => _push(const FreeReadingScreen()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
+      GestureDetector(
+        onTap: f,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+          child: Icon(icon, color: fg, size: 22),
+        ),
+      );
+
   Widget _buildGrid() {
+    final items = [
+      _GridItem(
+        icon: Icons.history_rounded,
+        title: 'تاريخ الختمات',
+        subtitle: 'الختمات المكتملة',
+        color: const Color(0xFF7A6833),
+        onTap: () => _push(const KhatmaHistoryScreen()),
+      ),
+      _GridItem(
+        icon: Icons.bar_chart_rounded,
+        title: 'تقدم الختمة',
+        subtitle: 'إحصائيات القراءة',
+        color: const Color(0xFF1A5C3A),
+        onTap: () => _push(const KhatmaProgressScreen()),
+      ),
+      _GridItem(
+        icon: Icons.settings_rounded,
+        title: 'الإعدادات',
+        subtitle: 'تخصيص التطبيق',
+        color: const Color(0xFF7A6833),
+        onTap: () => _push(const KhatmaSettingsScreen()),
+      ),
+      _GridItem(
+        isAi: true,
+        title: 'تحفيظ ذكي',
+        subtitle: 'حفظ القرآن بالذكاء الاصطناعي',
+        color: const Color(0xFF1A4060),
+        onTap: () => _push(const AiMemorizeScreen()),
+      ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: GridView.count(
@@ -277,112 +521,64 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         crossAxisCount: 2,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        children: [
-          FeatureGridItem(
-            icon: Icons.history_rounded,
-            title: 'تاريخ الختمات',
-            subtitle: 'الختمات المكتملة',
-            iconBg: kOlive,
-            onTap: () =>
-                Navigator.push(context, fadeRoute(const KhatmaHistoryScreen())),
-          ),
-          FeatureGridItem(
-            icon: Icons.bar_chart_rounded,
-            title: 'تقدم الختمة',
-            subtitle: 'إحصائيات القراءة',
-            iconBg: kGreenDark,
-            onTap: () => Navigator.push(
-              context,
-              fadeRoute(const KhatmaProgressScreen()),
-            ),
-          ),
-          FeatureGridItem(
-            icon: Icons.settings_rounded,
-            title: 'الإعدادات',
-            subtitle: 'تخصيص التطبيق',
-            iconBg: kOlive,
-            onTap: () => Navigator.push(
-              context,
-              fadeRoute(const KhatmaSettingsScreen()),
-            ),
-          ),
-          FeatureGridItem(
-            icon: Icons.auto_awesome,
-            title: 'تحفيظ ذكي',
-            subtitle: 'حفظ القرآن بالذكاء الاصطناعي',
-            iconBg: const Color(0xFF1A4060),
-            onTap: () =>
-                Navigator.push(context, fadeRoute(const AiMemorizeScreen())),
-            useAiLabel: true,
-          ),
-        ],
+        childAspectRatio: 1.1,
+        children: items.map(_buildGridItem).toList(),
       ),
     );
   }
 
-  void _shareVerse(Map<String, dynamic> verse) {
-    // Simple share action placeholder
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'جاري المشاركة...',
-          style: TextStyle(fontFamily: 'Amiri', color: Colors.white),
+  Widget _buildGridItem(_GridItem item) {
+    return GestureDetector(
+      onTap: item.onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: _kCard,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _kBorder),
         ),
-        backgroundColor: kGreenCard,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
-  void _showSurahPicker() {
-    Navigator.push(context, fadeRoute(const _SurahPickerScreen()));
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Surah List Picker (free reading)
-// ─────────────────────────────────────────────────────────────
-class _SurahPickerScreen extends ConsumerStatefulWidget {
-  const _SurahPickerScreen();
-  @override
-  ConsumerState<_SurahPickerScreen> createState() => _SurahPickerState();
-}
-
-class _SurahPickerState extends ConsumerState<_SurahPickerScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tab;
-  final _search = TextEditingController();
-  String _query = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _tab = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tab.dispose();
-    _search.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kNight,
-      body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildHeader(),
-            _buildSearch(),
-            _buildTabs(),
-            Expanded(
-              child: TabBarView(
-                controller: _tab,
-                children: [_buildSurahList(), _buildJuzList()],
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: item.color,
+                borderRadius: BorderRadius.circular(14),
               ),
+              child: item.isAi
+                  ? const Center(
+                      child: Text(
+                        'AI',
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  : Icon(item.icon, color: Colors.white, size: 26),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              item.title,
+              style: const TextStyle(
+                fontFamily: 'Amiri',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              item.subtitle,
+              style: const TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                fontSize: 10,
+                color: Colors.white54,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -390,127 +586,23 @@ class _SurahPickerState extends ConsumerState<_SurahPickerScreen>
     );
   }
 
-  Widget _buildHeader() => const Padding(
-    padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
-    child: Row(
-      children: [
-        CustomLeadingButton(),
-        SizedBox(width: 14),
-        Text(
-          'قراءة حرة',
-          style: TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: kGold,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildSearch() => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-    child: Container(
-      decoration: BoxDecoration(
-        color: kCard,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: TextField(
-        controller: _search,
-        onChanged: (v) => setState(() => _query = v),
-        style: const TextStyle(color: Colors.white),
-        decoration: const InputDecoration(
-          hintText: 'ابحث عن سورة...',
-          hintStyle: TextStyle(color: Colors.white38),
-          prefixIcon: Icon(Icons.search, color: kGold, size: 20),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.all(14),
-        ),
-      ),
-    ),
-  );
-
-  Widget _buildTabs() => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: TabBar(
-      // 1. Removes the ink ripple on click
-      splashFactory: NoSplash.splashFactory,
-      // 2. Removes the grey circle highlight on long press
-      overlayColor: WidgetStateProperty.all(Colors.transparent),
-      // 3. Optional: Remove indicator padding if it causes overflow
-      indicatorPadding: EdgeInsets.zero,
-      controller: _tab,
-      indicatorColor: kGold,
-      labelColor: kGold,
-      unselectedLabelColor: Colors.white38,
-      dividerColor: Colors.transparent,
-      tabs: const [
-        Tab(
-          child: Text(
-            'السور',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Tab(
-          child: Text(
-            'الأجزاء',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-
-  Widget _buildSurahList() {
-    final surahs = ql.QuranLibrary.quranCtrl.surahsList
-        .where(
-          (s) =>
-              s.name.contains(_query) ||
-              s.englishName.toLowerCase().contains(_query.toLowerCase()),
-        )
-        .toList();
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 30),
-      itemCount: surahs.length,
-      itemBuilder: (_, i) => QuranSurahRow(
-        s: surahs[i],
-        onTap: () {
-          // Navigate to the reader and jump to this surah's start page
-          Navigator.push(
-            context,
-            slideRoute(QuranReaderScreen(initialSurah: surahs[i].number)),
-          );
-        },
-      ),
-    );
+  void _push(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
   }
+}
 
-  Widget _buildJuzList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: 30,
-      itemBuilder: (_, i) => QuranJuzCard(
-        n: i + 1,
-        name: arWord(i + 1),
-        progress: 0.0,
-        onTap: () {
-          // juzStarts holds (surahNum, ayahNum); navigate to that surah
-          final start = juzStarts[i];
-          Navigator.push(
-            context,
-            slideRoute(QuranReaderScreen(initialSurah: start.$1)),
-          );
-        },
-      ),
-    );
-  }
+class _GridItem {
+  final IconData? icon;
+  final String title, subtitle;
+  final Color color;
+  final VoidCallback onTap;
+  final bool isAi;
+  const _GridItem({
+    this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+    this.isAi = false,
+  });
 }

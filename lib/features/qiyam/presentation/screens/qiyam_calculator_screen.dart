@@ -17,10 +17,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: Opacity(
-              opacity: 0.05,
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
             child: prayersAsync.when(
@@ -115,7 +112,6 @@ class QiyamCalculatorScreen extends ConsumerWidget {
     bool isHighlight = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.colors.card,
         borderRadius: BorderRadius.circular(20),
@@ -133,46 +129,61 @@ class QiyamCalculatorScreen extends ConsumerWidget {
               ]
             : null,
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            const Positioned.fill(
+              child: CustomPatternBackground(
+                pattern: BackgroundPattern.crystalFacets,
+              ),
             ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: context.typography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.textPrimary,
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: color, size: 28),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: context.typography.caption.copyWith(
-                    color: context.colors.textDim,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: context.typography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.colors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          subtitle,
+                          style: context.typography.caption.copyWith(
+                            color: context.colors.textDim,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Text(
+                    _formatTime(time),
+                    style: context.typography.displayMedium.copyWith(
+                      fontSize: 20,
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            _formatTime(time),
-            style: context.typography.displayMedium.copyWith(
-              fontSize: 20,
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

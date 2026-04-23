@@ -84,7 +84,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                   final availableHeight = constraints.maxHeight;
                   // Adjusted scale factor to maintain aesthetics on smaller screens
                   final scale = (availableHeight / 780).clamp(0.7, 1.0);
-                  
+
                   return SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: ConstrainedBox(
@@ -95,7 +95,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                             _buildHeader(style, context),
                             const Spacer(),
                             _buildDhikrSelector(state, style, context),
-                            const Spacer(),
+                            SizedBox(height: 32 * scale),
                             _buildCounterDisplay(state, style, scale),
                             const Spacer(),
                             _buildMainBead(state, style, scale),
@@ -166,7 +166,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
-          color: style.card,
+          color: style.bg,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
             color: hasDhikr ? style.gold.withOpacity(0.6) : style.border,
@@ -222,8 +222,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       const SizedBox(width: 12),
                       Text(
                         hasDhikr ? 'الذكر المختار' : 'اختر ذكراً للتسبيح',
-                        style: style.naskh(13,
-                            color: style.gold, weight: FontWeight.w600),
+                        style: style.naskh(
+                          13,
+                          color: style.gold,
+                          weight: FontWeight.w600,
+                        ),
                       ),
                       const Spacer(),
                       if (hasDhikr)
@@ -246,8 +249,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           ),
                         )
                       else
-                        Icon(Icons.chevron_left_rounded,
-                            color: style.gold, size: 20),
+                        Icon(
+                          Icons.chevron_left_rounded,
+                          color: style.gold,
+                          size: 20,
+                        ),
                     ],
                   ),
                   if (hasDhikr) ...[
@@ -269,7 +275,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                             Text(
                               state.selectedDhikr!.arabic,
                               textAlign: TextAlign.center,
-                              style: style.amiri(20, color: style.text, height: 1.5),
+                              style: style.amiri(
+                                20,
+                                color: style.text,
+                                height: 1.5,
+                              ),
                             ),
                           ],
                         ),
@@ -300,8 +310,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-
-  Widget _buildCounterDisplay(MisbahaState state, AdaptiveStyle style, double scale) {
+  Widget _buildCounterDisplay(
+    MisbahaState state,
+    AdaptiveStyle style,
+    double scale,
+  ) {
     final size = 180.0 * scale;
     return Column(
       children: [
@@ -335,7 +348,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 if (state.selectedDhikr != null)
                   Text(
                     '/ ${state.selectedDhikr!.count}',
-                    style: style.naskh(16 * scale, color: style.gold.withOpacity(0.7)),
+                    style: style.naskh(
+                      16 * scale,
+                      color: style.gold.withOpacity(0.7),
+                    ),
                   ),
               ],
             ),
@@ -348,7 +364,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   Widget _buildMainBead(MisbahaState state, AdaptiveStyle style, double scale) {
     final size = 220.0 * scale;
     final innerSize = 190.0 * scale;
-    
+
     return Column(
       children: [
         ScaleTransition(
@@ -363,8 +379,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               alignment: Alignment.center,
               children: [
                 // Pulse Animation Background
-                if (state.isListening) _ListeningRipple(color: style.teal, size: size),
- 
+                if (state.isListening)
+                  _ListeningRipple(color: style.teal, size: size),
+
                 // The Main Bead
                 Container(
                   width: size,

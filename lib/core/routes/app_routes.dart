@@ -19,6 +19,13 @@ import 'package:takwa/features/achievements/presentation/screens/achievements_sc
 import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/ai_memorize_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/create_khatma_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/free_reading_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/khatma_history_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/khatma_progress_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/khatma_progress_settings_screen.dart';
+import 'package:takwa/features/quran/presentation/screens/khatma_settings_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
 import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
@@ -28,6 +35,11 @@ import 'package:takwa/features/settings/presentation/screens/payment_methods_scr
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_dashboard_screen.dart';
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_calculator_screen.dart';
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_stories_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_wird_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_virtues_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_sleep_calculator_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_beginner_guide_screen.dart';
+import 'package:takwa/features/qiyam/presentation/screens/qiyam_sunnah_guide_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -49,6 +61,16 @@ class Routes {
   static const String profile = '/profile';
   static const String quran = '/quran';
   static const String quranReader = '/quran-reader';
+  static const String aiMemorize = '/quran/ai-memorize';
+  static const String createKhatma = '/quran/create-khatma';
+  static const String freeReading = '/quran/free-reading';
+  static const String khatmaHistory = '/quran/khatma-history';
+  static const String khatmaProgress = '/quran/khatma-progress';
+  static const String khatmaProgressSettings =
+      '/quran/khatma-progress-settings';
+  static const String khatmaExtendedSettings =
+      '/quran/khatma-extended-settings';
+  static const String khatmaSettings = '/quran/khatma-settings';
   static const String adhan = '/adhan';
   static const String terms = '/terms';
   static const String reminders = '/reminders';
@@ -62,6 +84,11 @@ class Routes {
   static const String qiyam = '/qiyam';
   static const String qiyamCalculator = '/qiyam-calculator';
   static const String qiyamStories = '/qiyam-stories';
+  static const String qiyamWird = '/qiyam-wird';
+  static const String qiyamVirtues = '/qiyam-virtues';
+  static const String qiyamSleepCalculator = '/qiyam-sleep-calculator';
+  static const String qiyamBeginnerGuide = '/qiyam-beginner-guide';
+  static const String qiyamSunnahGuide = '/qiyam-sunnah-guide';
 }
 
 /// Centralized route generation and management.
@@ -114,7 +141,34 @@ class AppRoutes {
       case Routes.quran:
         return MaterialPageRoute(builder: (_) => const QuranScreen());
       case Routes.quranReader:
-        return MaterialPageRoute(builder: (_) => const QuranReaderScreen());
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => QuranReaderScreen(
+            startFromKhatma: args?['startFromKhatma'] ?? false,
+            initialSurah: args?['initialSurah'],
+            initialPage: args?['initialPage'],
+          ),
+        );
+      case Routes.aiMemorize:
+        return MaterialPageRoute(builder: (_) => const AiMemorizeScreen());
+      case Routes.createKhatma:
+        return MaterialPageRoute(builder: (_) => const CreateKhatmaScreen());
+      case Routes.freeReading:
+        return MaterialPageRoute(builder: (_) => const FreeReadingScreen());
+      case Routes.khatmaHistory:
+        return MaterialPageRoute(builder: (_) => const KhatmaHistoryScreen());
+      case Routes.khatmaProgress:
+        return MaterialPageRoute(builder: (_) => const KhatmaProgressScreen());
+      case Routes.khatmaProgressSettings:
+        return MaterialPageRoute(
+          builder: (_) => const KhatmaProgressSettingsScreen(),
+        );
+      case Routes.khatmaExtendedSettings:
+        return MaterialPageRoute(
+          builder: (_) => const KhatmaExtendedSettingsScreen(),
+        );
+      case Routes.khatmaSettings:
+        return MaterialPageRoute(builder: (_) => const KhatmaSettingsScreen());
       case Routes.adhan:
         final prayerName = (settings.arguments as String?) ?? 'الصلاة';
         return MaterialPageRoute(
@@ -134,7 +188,9 @@ class AppRoutes {
       case Routes.misbaha:
         return MaterialPageRoute(builder: (_) => const MisbahaScreen());
       case Routes.manageCustomIbadah:
-        return MaterialPageRoute(builder: (_) => const ManageCustomIbadahScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ManageCustomIbadahScreen(),
+        );
       case Routes.subscription:
         return MaterialPageRoute(builder: (_) => const SubscriptionScreen());
       case Routes.paymentMethods:
@@ -145,6 +201,22 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const QiyamCalculatorScreen());
       case Routes.qiyamStories:
         return MaterialPageRoute(builder: (_) => const QiyamStoriesScreen());
+      case Routes.qiyamWird:
+        return MaterialPageRoute(builder: (_) => const QiyamWirdScreen());
+      case Routes.qiyamVirtues:
+        return MaterialPageRoute(builder: (_) => const QiyamVirtuesScreen());
+      case Routes.qiyamSleepCalculator:
+        return MaterialPageRoute(
+          builder: (_) => const QiyamSleepCalculatorScreen(),
+        );
+      case Routes.qiyamBeginnerGuide:
+        return MaterialPageRoute(
+          builder: (_) => const QiyamBeginnerGuideScreen(),
+        );
+      case Routes.qiyamSunnahGuide:
+        return MaterialPageRoute(
+          builder: (_) => const QiyamSunnahGuideScreen(),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) =>

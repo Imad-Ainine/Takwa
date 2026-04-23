@@ -1,30 +1,33 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/quran/presentation/screens/quran_reader_screen.dart
-//  Page-based Quran Reader — dark green theme
+//  Page-based Quran Reader — matches reference screenshots 14-15
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_library/quran_library.dart' as ql;
-import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 
-// ─────────────────────────────────────────────────────────────
-class QuranReaderScreen extends ConsumerStatefulWidget {
-  /// When true the reader advances the active Khatma session as pages turn.
-  final bool startFromKhatma;
+const _kBgDark = Color(0xFF0D1E2D);
+const _kBgGreen = Color(0xFF0A2818);
+const _kGold = Color(0xFFC8A96E);
+const _kGreenHeader = Color(0xFF1A5234);
+const _kBorder = Color(0xFF1E3040);
 
-  /// Jump directly to this surah's start page (free-reading mode).
+class QuranReaderScreen extends ConsumerStatefulWidget {
+  final bool startFromKhatma;
   final int? initialSurah;
+  final int? initialPage;
 
   const QuranReaderScreen({
     super.key,
     this.startFromKhatma = false,
     this.initialSurah,
+    this.initialPage,
   });
 
   @override
@@ -35,47 +38,46 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     with TickerProviderStateMixin {
   late PageController _pageCtrl;
   late AnimationController _toolbarAnim;
-  late Animation<double> _toolbarFade;
-  late Animation<Offset> _topSlide;
-  late Animation<Offset> _bottomSlide;
+  late Animation<double> _topFade;
+  late Animation<Offset> _topSlide, _bottomSlide;
 
   int _currentPage = 1;
   bool _toolbarVisible = true;
   static const int _totalPages = 604;
 
-  // ── Lifecycle ─────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
-
-    // Determine start page
-    int startPage = ref
-        .read(quranStateProvider)
-        .currentPage
-        .clamp(1, _totalPages);
-    if (widget.initialSurah != null) {
-      final si = (widget.initialSurah! - 1).clamp(0, kSurahData.length - 1);
-      startPage = kSurahData[si].startPage;
+    // Determine initial page
+    int startPage = 1;
+    if (widget.initialPage != null) {
+      startPage = widget.initialPage!.clamp(1, _totalPages);
+    } else if (widget.initialSurah != null) {
+      final idx = (widget.initialSurah! - 1).clamp(0, kSurahData.length - 1);
+      startPage = kSurahData[idx].startPage;
+    } else {
+      startPage = ref
+          .read(quranStateProvider)
+          .currentPage
+          .clamp(1, _totalPages);
     }
     _currentPage = startPage;
 
-    // Toolbar animation
     _toolbarAnim = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 270),
+      duration: const Duration(milliseconds: 280),
       value: 1.0,
     );
-    _toolbarFade = _toolbarAnim;
-    _topSlide = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _toolbarAnim, curve: Curves.easeOut));
-    _bottomSlide = Tween<Offset>(
-      begin: const Offset(0, 1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _toolbarAnim, curve: Curves.easeOut));
+    _topFade = _toolbarAnim;
+    _topSlide = Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _toolbarAnim, curve: Curves.easeOutCubic),
+        );
+    _bottomSlide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _toolbarAnim, curve: Curves.easeOutCubic),
+        );
 
-    // Page controller — start at correct page (0-indexed)
     _pageCtrl = PageController(initialPage: _currentPage - 1);
     _pageCtrl.addListener(_onPageChange);
   }
@@ -89,8 +91,6 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     super.dispose();
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
-  /// Returns 1-based surah number for a given Mushaf page.
   int _surahForPage(int page) {
     for (int i = kSurahData.length - 1; i >= 0; i--) {
       if (page >= kSurahData[i].startPage) return i + 1;
@@ -103,11 +103,14 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     if (p == _currentPage || p < 1 || p > _totalPages) return;
     setState(() => _currentPage = p);
     ref.read(quranStateProvider.notifier).setPage(p);
+
     if (widget.startFromKhatma) {
-      ref.read(khatmaProvider.notifier).advancePage(p);
+      ref.read(khatmaExProvider.notifier).advancePage(p);
     }
-    // Persist last-read bookmark
+
+    // Save last read
     final surahNum = _surahForPage(p);
+    final surahName = ql.QuranLibrary.quranCtrl.surahs[surahNum - 1].arabicName;
     ref
         .read(quranLastReadProvider.notifier)
         .save(
@@ -115,8 +118,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
             surahNum: surahNum,
             ayahNum: 1,
             page: p,
-            surahName:
-                ql.QuranLibrary.quranCtrl.surahs[surahNum - 1].arabicName,
+            surahName: surahName,
             savedAt: DateTime.now(),
           ),
         );
@@ -127,53 +129,56 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     _toolbarVisible ? _toolbarAnim.forward() : _toolbarAnim.reverse();
   }
 
-  // ── Build ─────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(quranStateProvider);
     final audio = ref.watch(quranAudioProvider);
     final juz = pageToJuz(_currentPage);
-    final surahIdx = _surahForPage(_currentPage) - 1;
-    final surahName = ql.QuranLibrary.quranCtrl.surahs[surahIdx].arabicName;
+    final surahNum = _surahForPage(_currentPage);
+    final surahName = ql.QuranLibrary.quranCtrl.surahs[surahNum - 1].arabicName;
+
+    // Determine background color based on theme
+    final bgColor = state.theme == ReaderTheme.white
+        ? Colors.white
+        : state.theme == ReaderTheme.sepia
+        ? const Color(0xFFF4ECD8)
+        : _kBgDark;
+
+    final textColor = state.theme == ReaderTheme.white
+        ? Colors.black87
+        : state.theme == ReaderTheme.sepia
+        ? const Color(0xFF3A2810)
+        : Colors.white;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: state.theme == ReaderTheme.white
+          ? SystemUiOverlayStyle.dark
+          : SystemUiOverlayStyle.light,
       child: Scaffold(
+        backgroundColor: bgColor,
         body: Stack(
           children: [
-            // ── 1. Page viewer  ──────────────────────────────────
-            // FIX: Listener wraps PageView so taps toggle toolbar
-            //      without blocking horizontal swipe gestures.
-            Listener(
-              onPointerUp: (_) {
-                // Only count very short taps (no drag), toggle toolbar
-                // We use a simple flag approach via the page scroll callback.
-              },
-              child: GestureDetector(
-                // onTap only fires when user taps in place (no swipe)
-                onTap: _toggleToolbar,
-                // Pass horizontal drags through to PageView
-                behavior: HitTestBehavior.translucent,
-                child: PageView.builder(
-                  controller: _pageCtrl,
-                  // Arabic Mushaf: swipe LEFT reveals the NEXT page
-                  // (higher page number is "to the left" in RTL)
-                  reverse: false,
-                  itemCount: _totalPages,
-                  itemBuilder: (_, i) => _PageContent(
-                    page: i + 1,
-                    state: state,
-                    surahForPage: _surahForPage,
-                    onAyahTap: (surah, ayah) => ref
-                        .read(quranAudioProvider.notifier)
-                        .togglePlay(surah, ayah),
-                    audio: audio,
-                  ),
+            // ── Page Viewer ──────────────────────────
+            GestureDetector(
+              onTap: _toggleToolbar,
+              behavior: HitTestBehavior.opaque,
+              child: PageView.builder(
+                controller: _pageCtrl,
+                itemCount: _totalPages,
+                itemBuilder: (_, i) => _QuranPageView(
+                  page: i + 1,
+                  surahForPage: _surahForPage,
+                  fontSize: state.fontSize,
+                  textColor: textColor,
+                  bgColor: bgColor,
+                  audio: audio,
+                  onAyahTap: (s, a) =>
+                      ref.read(quranAudioProvider.notifier).togglePlay(s, a),
                 ),
               ),
             ),
 
-            // ── 2. Top toolbar (FIX: Positioned is direct Stack child) ──
+            // ── Top Bar ──────────────────────────────
             Positioned(
               top: 0,
               left: 0,
@@ -181,17 +186,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
               child: SlideTransition(
                 position: _topSlide,
                 child: FadeTransition(
-                  opacity: _toolbarFade,
+                  opacity: _topFade,
                   child: _TopBar(
                     surahName: surahName,
                     onBack: () => Navigator.pop(context),
                     onSettings: _showSettings,
+                    theme: state.theme,
                   ),
                 ),
               ),
             ),
 
-            // ── 3. Bottom bar (FIX: Positioned is direct Stack child) ──
+            // ── Bottom Bar ───────────────────────────
             Positioned(
               bottom: 0,
               left: 0,
@@ -199,17 +205,15 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
               child: SlideTransition(
                 position: _bottomSlide,
                 child: FadeTransition(
-                  opacity: _toolbarFade,
+                  opacity: _topFade,
                   child: _BottomBar(
                     juz: juz,
                     currentPage: _currentPage,
                     surahName: surahName,
-                    surahNum: surahIdx + 1,
                     audio: audio,
-                    state: state,
                     onTogglePlay: () => ref
                         .read(quranAudioProvider.notifier)
-                        .togglePlay(surahIdx + 1, state.currentAyah),
+                        .togglePlay(surahNum, 1),
                     onStop: () => ref.read(quranAudioProvider.notifier).stop(),
                     onSpeedTap: () {
                       const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
@@ -228,7 +232,6 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     );
   }
 
-  // ── Settings sheet ─────────────────────────────────────────────
   void _showSettings() {
     final state = ref.read(quranStateProvider);
     showModalBottomSheet(
@@ -247,128 +250,154 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   }
 }
 
-// ═════════════════════════════════════════════════════════════════
-// Page content — extracted widget so PageView can re-use efficiently
-// ═════════════════════════════════════════════════════════════════
-class _PageContent extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────
+// QURAN PAGE VIEW
+// ─────────────────────────────────────────────────────────────
+class _QuranPageView extends StatelessWidget {
   final int page;
-  final QuranReadingState state;
-  final QuranAudioState audio;
   final int Function(int) surahForPage;
-  final void Function(int surah, int ayah) onAyahTap;
+  final double fontSize;
+  final Color textColor, bgColor;
+  final QuranAudioState audio;
+  final void Function(int, int) onAyahTap;
 
-  const _PageContent({
+  const _QuranPageView({
     required this.page,
-    required this.state,
-    required this.audio,
     required this.surahForPage,
+    required this.fontSize,
+    required this.textColor,
+    required this.bgColor,
+    required this.audio,
     required this.onAyahTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final surahIdx = surahForPage(page) - 1;
-    final surah = ql.QuranLibrary.quranCtrl.surahs[surahIdx];
+    final surahNum = surahForPage(page);
+    final surahIdx = surahNum - 1;
+    final surahs = ql.QuranLibrary.quranCtrl.surahs;
+    if (surahIdx >= surahs.length) return const SizedBox();
+    final surah = surahs[surahIdx];
     final isSurahStart = kSurahData[surahIdx].startPage == page;
+    final noBasmala = surahIdx == 8; // At-Tawbah
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 76, bottom: 108),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            if (isSurahStart) _SurahHeader(name: surah.arabicName),
-            if (isSurahStart && surahIdx != 8) // no basmala for At-Tawbah
-              const _Basmala(),
-            _AyahBlock(
-              surahNum: surahIdx + 1,
-              surah: surah,
-              fontSize: state.fontSize,
-              audio: audio,
-              onAyahTap: onAyahTap,
-            ),
-          ],
+    // For single-surah pages (like Fatiha), show all ayahs
+    // For multi-surah pages, show content proportionally
+    return Container(
+      color: bgColor,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 80, bottom: 90),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              if (isSurahStart) _SurahHeaderWidget(surahName: surah.arabicName),
+              if (isSurahStart && !noBasmala)
+                _BasmalaWidget(textColor: textColor),
+              const SizedBox(height: 12),
+              _AyahTextWidget(
+                surahNum: surahNum,
+                surah: surah,
+                fontSize: fontSize,
+                textColor: textColor,
+                audio: audio,
+                onAyahTap: onAyahTap,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _SurahHeader extends StatelessWidget {
-  final String name;
-  const _SurahHeader({required this.name});
+class _SurahHeaderWidget extends StatelessWidget {
+  final String surahName;
+  const _SurahHeaderWidget({required this.surahName});
 
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-    padding: const EdgeInsets.symmetric(vertical: 10),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF1A6040), Color(0xFF0D3A26)],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1A6040), Color(0xFF0D3A26)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _kGold.withOpacity(0.5), width: 1.4),
       ),
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: kGoldChip.withOpacity(0.5), width: 1.4),
-    ),
-    child: Center(
-      child: Text(
-        'سورة $name',
-        style: const TextStyle(
-          fontFamily: 'Amiri',
-          fontSize: 20,
-          color: kGoldChip,
-          fontWeight: FontWeight.bold,
+      child: Center(
+        child: Text(
+          'سورة $surahName',
+          style: const TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 22,
+            color: _kGold,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
-class _Basmala extends StatelessWidget {
-  const _Basmala();
+class _BasmalaWidget extends StatelessWidget {
+  final Color textColor;
+  const _BasmalaWidget({required this.textColor});
 
   @override
-  Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(vertical: 6),
-    child: Text(
-      'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontFamily: 'Amiri',
-        fontSize: 22,
-        color: Colors.white,
-        height: 2,
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+      child: Text(
+        'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Amiri',
+          fontSize: 22,
+          color: textColor,
+          height: 2.0,
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
-class _AyahBlock extends StatelessWidget {
+class _AyahTextWidget extends StatelessWidget {
   final int surahNum;
-  final dynamic surah; // ql.Surah
+  final dynamic surah;
   final double fontSize;
+  final Color textColor;
   final QuranAudioState audio;
   final void Function(int, int) onAyahTap;
 
-  const _AyahBlock({
+  const _AyahTextWidget({
     required this.surahNum,
     required this.surah,
     required this.fontSize,
+    required this.textColor,
     required this.audio,
     required this.onAyahTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final ayahs = surah.ayahs as List;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text.rich(
         TextSpan(
-          children: (surah.ayahs as List).map<InlineSpan>((a) {
+          children: ayahs.map<InlineSpan>((a) {
+            final ayahNum = a.ayahNumber as int;
             final isPlaying =
                 audio.isPlaying &&
                 audio.surah == surahNum &&
-                audio.ayah == (a.ayahNumber as int);
+                audio.ayah == ayahNum;
+
             return TextSpan(
               children: [
                 TextSpan(
@@ -376,36 +405,17 @@ class _AyahBlock extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: fontSize,
-                    color: isPlaying ? kGoldChip : Colors.white,
-                    height: 1.9,
+                    color: isPlaying ? _kGold : textColor,
+                    height: 2.0,
                   ),
                 ),
                 WidgetSpan(
                   child: GestureDetector(
-                    onTap: () => onAyahTap(surahNum, a.ayahNumber as int),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isPlaying ? kGoldChip : Colors.white30,
-                        ),
-                        color: isPlaying
-                            ? kGoldChip.withOpacity(0.2)
-                            : Colors.transparent,
-                      ),
-                      child: Text(
-                        ar(a.ayahNumber as int),
-                        style: TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 11,
-                          color: isPlaying ? kGoldChip : Colors.white54,
-                        ),
-                      ),
-                    ),
+                    onTap: () => onAyahTap(surahNum, ayahNum),
+                    child: _AyahMarker(num: ayahNum, isPlaying: isPlaying),
                   ),
                 ),
+                const TextSpan(text: ' '),
               ],
             );
           }).toList(),
@@ -417,28 +427,65 @@ class _AyahBlock extends StatelessWidget {
   }
 }
 
-// ═════════════════════════════════════════════════════════════════
-// Top bar widget
-// ═════════════════════════════════════════════════════════════════
+class _AyahMarker extends StatelessWidget {
+  final int num;
+  final bool isPlaying;
+  const _AyahMarker({required this.num, required this.isPlaying});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      height: 28,
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isPlaying ? _kGold.withOpacity(0.2) : Colors.transparent,
+        border: Border.all(
+          color: isPlaying ? _kGold : Colors.white24,
+          width: 0.8,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          ar(num),
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 10,
+            color: isPlaying ? _kGold : Colors.white38,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// TOP BAR
+// ─────────────────────────────────────────────────────────────
 class _TopBar extends StatelessWidget {
   final String surahName;
-  final VoidCallback onBack;
-  final VoidCallback onSettings;
+  final VoidCallback onBack, onSettings;
+  final ReaderTheme theme;
 
   const _TopBar({
     required this.surahName,
     required this.onBack,
     required this.onSettings,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = theme != ReaderTheme.white;
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xDD0A3020), Colors.transparent],
+          colors: isDark
+              ? [const Color(0xDF0A2818), Colors.transparent]
+              : [Colors.white.withOpacity(0.95), Colors.transparent],
         ),
       ),
       child: SafeArea(
@@ -447,66 +494,74 @@ class _TopBar extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 18),
           child: Row(
             children: [
-              _BarIcon(Icons.wb_sunny_outlined, onSettings),
-              _BarIcon(Icons.headphones_rounded, () {}),
-              _BarIcon(Icons.menu_book_outlined, () {}),
-              _BarIcon(Icons.history_rounded, () {}),
+              _barIcon(Icons.wb_sunny_outlined, onSettings, isDark),
+              _barIcon(Icons.headphones_rounded, () {}, isDark),
+              _barIcon(Icons.bookmark_border_rounded, () {}, isDark),
+              _barIcon(Icons.screen_rotation_rounded, () {}, isDark),
               const Spacer(),
               Text(
                 'سورة $surahName',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 17,
-                  color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
               const Spacer(),
-              const CustomLeadingButton(),
+              GestureDetector(
+                onTap: onBack,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                    size: 22,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _barIcon(IconData icon, VoidCallback onTap, bool isDark) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Icon(
+            icon,
+            color: isDark ? Colors.white60 : Colors.black38,
+            size: 22,
+          ),
+        ),
+      );
 }
 
-class _BarIcon extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _BarIcon(this.icon, this.onTap);
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.all(8),
-      child: Icon(icon, color: Colors.white70, size: 22),
-    ),
-  );
-}
-
-// ═════════════════════════════════════════════════════════════════
-// Bottom bar widget
-// ═════════════════════════════════════════════════════════════════
+// ─────────────────────────────────────────────────────────────
+// BOTTOM BAR
+// ─────────────────────────────────────────────────────────────
 class _BottomBar extends StatelessWidget {
-  final int juz;
-  final int currentPage;
+  final int juz, currentPage;
   final String surahName;
-  final int surahNum;
   final QuranAudioState audio;
-  final QuranReadingState state;
-  final VoidCallback onTogglePlay;
-  final VoidCallback onStop;
-  final VoidCallback onSpeedTap;
+  final VoidCallback onTogglePlay, onStop, onSpeedTap;
 
   const _BottomBar({
     required this.juz,
     required this.currentPage,
     required this.surahName,
-    required this.surahNum,
     required this.audio,
-    required this.state,
     required this.onTogglePlay,
     required this.onStop,
     required this.onSpeedTap,
@@ -519,7 +574,7 @@ class _BottomBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-          colors: [Color(0xEF082018), Colors.transparent],
+          colors: [Color(0xF00A2818), Colors.transparent],
         ),
       ),
       child: SafeArea(
@@ -529,29 +584,29 @@ class _BottomBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Stats row
+              // Status row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _Chip('جزء: ${ar(juz)}'),
-                  _Chip('صفحة: ${ar(currentPage)} / ${ar(604)}'),
-                  _Chip('سورة: $surahName'),
+                  _chip('جزء: ${ar(juz)}'),
+                  _chip('صفحة: ${ar(currentPage)} من ${ar(604)}'),
+                  _chip('سورة: $surahName'),
                 ],
               ),
               const SizedBox(height: 10),
-              // Audio row
+              // Audio control
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.35),
+                  color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Row(
                   children: [
-                    // Play/pause button
+                    // Play button
                     GestureDetector(
                       onTap: onTogglePlay,
                       child: Container(
@@ -559,7 +614,7 @@ class _BottomBar extends StatelessWidget {
                         height: 34,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: kGoldChip,
+                          color: _kGold,
                         ),
                         child: Icon(
                           audio.isPlaying
@@ -570,20 +625,20 @@ class _BottomBar extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        '$surahName: ${ar(state.currentAyah)}',
+                        audio.isLoading ? 'جاري التحميل...' : 'الشيخ المنشاوي',
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontFamily: 'Amiri',
                           fontSize: 14,
-                          color: Colors.white70,
+                          color: Colors.white60,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // Speed chip
+                    const SizedBox(width: 10),
+                    // Speed
                     GestureDetector(
                       onTap: onSpeedTap,
                       child: Container(
@@ -591,21 +646,20 @@ class _BottomBar extends StatelessWidget {
                           horizontal: 6,
                           vertical: 3,
                         ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white24),
-                          borderRadius: BorderRadius.circular(8),
+                        decoration: const BoxDecoration(
+                          border: Border.fromBorderSide(BorderSide(color: Colors.white24)),
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
                         ),
                         child: Text(
                           '${audio.speed}x',
                           style: const TextStyle(
-                            color: Colors.white54,
+                            color: Colors.white38,
                             fontSize: 11,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    // Stop
+                    const SizedBox(width: 8),
                     GestureDetector(
                       onTap: onStop,
                       child: const Icon(
@@ -623,14 +677,8 @@ class _BottomBar extends StatelessWidget {
       ),
     );
   }
-}
 
-class _Chip extends StatelessWidget {
-  final String text;
-  const _Chip(this.text);
-
-  @override
-  Widget build(BuildContext context) => Text(
+  Widget _chip(String text) => Text(
     text,
     style: const TextStyle(
       fontFamily: 'NotoNaskhArabic',
@@ -640,10 +688,10 @@ class _Chip extends StatelessWidget {
   );
 }
 
-// ═════════════════════════════════════════════════════════════════
-// Settings Sheet
-// ═════════════════════════════════════════════════════════════════
-class _SettingsSheet extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────
+// SETTINGS SHEET
+// ─────────────────────────────────────────────────────────────
+class _SettingsSheet extends StatefulWidget {
   final double fontSize;
   final ReaderTheme theme;
   final ValueChanged<double> onFontSizeChanged;
@@ -655,6 +703,19 @@ class _SettingsSheet extends StatelessWidget {
     required this.onFontSizeChanged,
     required this.onThemeChanged,
   });
+
+  @override
+  State<_SettingsSheet> createState() => _SettingsSheetState();
+}
+
+class _SettingsSheetState extends State<_SettingsSheet> {
+  late double _fontSize;
+
+  @override
+  void initState() {
+    super.initState();
+    _fontSize = widget.fontSize;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -681,39 +742,43 @@ class _SettingsSheet extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 22,
-              color: kGoldChip,
+              color: _kGold,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'حجم الخط',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              color: Colors.white60,
-              fontSize: 13,
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'حجم الخط',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                color: Colors.white60,
+                fontSize: 13,
+              ),
             ),
           ),
-          StatefulBuilder(
-            builder: (_, set) => Slider(
-              value: fontSize,
-              min: 14,
-              max: 34,
-              activeColor: kGoldChip,
-              inactiveColor: Colors.white12,
-              onChanged: (v) {
-                onFontSizeChanged(v);
-                set(() {});
-              },
-            ),
+          Slider(
+            value: _fontSize,
+            min: 14,
+            max: 34,
+            activeColor: _kGold,
+            inactiveColor: Colors.white12,
+            onChanged: (v) {
+              setState(() => _fontSize = v);
+              widget.onFontSizeChanged(v);
+            },
           ),
           const SizedBox(height: 8),
-          const Text(
-            'نمط الخلفية',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              color: Colors.white60,
-              fontSize: 13,
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'نمط الخلفية',
+              style: TextStyle(
+                fontFamily: 'NotoNaskhArabic',
+                color: Colors.white60,
+                fontSize: 13,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -724,16 +789,16 @@ class _SettingsSheet extends StatelessWidget {
                 'sepia': 'عاجي',
                 'white': 'فاتح',
               };
-              final selected = theme == t;
+              final selected = widget.theme == t;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () => onThemeChanged(t),
+                  onTap: () => widget.onThemeChanged(t),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: selected ? kGoldChip : Colors.white10,
+                      color: selected ? _kGold : Colors.white10,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
