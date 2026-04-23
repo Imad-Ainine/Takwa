@@ -21,6 +21,9 @@ import 'package:takwa/features/duas/presentation/screens/favorite_duas_screen.da
 
 const _categoryMeta = {
   DuaCategory.morning: ('🌅', 'الصباح'),
+  DuaCategory.evening: ('🌑', 'المساء'),
+  DuaCategory.sleep: ('🛌', 'النوم'),
+  DuaCategory.wakingUp: ('☀️', 'الاستيقاظ'),
   DuaCategory.distress: ('🌊', 'الكرب'),
   DuaCategory.guidance: ('🌟', 'الهداية'),
   DuaCategory.forgiveness: ('🌿', 'المغفرة'),
@@ -29,6 +32,10 @@ const _categoryMeta = {
   DuaCategory.parents: ('❤️', 'الوالدين'),
   DuaCategory.travel: ('✈️', 'السفر'),
   DuaCategory.rain: ('🌧️', 'الاستسقاء'),
+  DuaCategory.istikhara: ('⚖️', 'الاستخارة'),
+  DuaCategory.mosque: ('🕌', 'المسجد'),
+  DuaCategory.knowledge: ('📖', 'طلب العلم'),
+  DuaCategory.afterPrayer: ('📿', 'بعد الصلاة'),
   DuaCategory.general: ('🤲', 'عامة'),
 };
 
@@ -327,7 +334,7 @@ class _CategoryFilter extends ConsumerWidget {
             );
           }
           final cat = cats[i - 1];
-          final meta = _categoryMeta[cat]!;
+          final meta = _categoryMeta[cat] ?? ('🤲', 'أخرى');
           return _FilterChip(
             label: '${meta.$1} ${meta.$2}',
             isActive: selected == cat,
