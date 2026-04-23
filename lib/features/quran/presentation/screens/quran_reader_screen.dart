@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
@@ -349,7 +350,7 @@ class _QuranBgPainter extends CustomPainter {
 
     // Subtle gold geometric pattern
     final p = Paint()
-      ..color = const Color(0x07C8A96E)
+      ..color = const Color.fromARGB(6, 255, 166, 0)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 
@@ -775,24 +776,7 @@ class _TopBar extends StatelessWidget {
               ),
               const Spacer(),
               // Right: back button
-              GestureDetector(
-                onTap: onBack,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.1)
-                        : Colors.black.withOpacity(0.06),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.chevron_right,
-                    color: isDark ? Colors.white70 : Colors.black54,
-                    size: 22,
-                  ),
-                ),
-              ),
+              const CustomLeadingButton(),
             ],
           ),
         ),

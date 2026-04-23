@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 
@@ -89,16 +90,13 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.chevron_right, color: _kGold, size: 28),
-          ),
-          const Spacer(),
-          const Text(
+          CustomLeadingButton(),
+          Spacer(),
+          Text(
             'إنشاء ختمة جديدة',
             style: TextStyle(
               fontFamily: 'Amiri',
@@ -107,8 +105,8 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               color: Colors.white,
             ),
           ),
-          const Spacer(),
-          const SizedBox(width: 28),
+          Spacer(),
+          SizedBox(width: 28),
         ],
       ),
     );

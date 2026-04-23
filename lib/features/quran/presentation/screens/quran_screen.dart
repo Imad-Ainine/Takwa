@@ -6,6 +6,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 import 'create_khatma_screen.dart';
@@ -51,31 +55,38 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
     final khatma = ref.watch(khatmaExProvider);
     final dailyVerse = ref.watch(dailyVerseProvider);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: _kBg,
-        body: FadeTransition(
-          opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(child: _buildTopBar()),
-              SliverToBoxAdapter(child: _buildDatePill()),
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-              SliverToBoxAdapter(child: _buildVerseCard(dailyVerse)),
-              const SliverToBoxAdapter(child: SizedBox(height: 10)),
-              SliverToBoxAdapter(child: _buildKhatmaButton(khatma)),
-              const SliverToBoxAdapter(child: SizedBox(height: 10)),
-              SliverToBoxAdapter(child: _buildFreeReadingButton()),
-              const SliverToBoxAdapter(child: SizedBox(height: 18)),
-              SliverToBoxAdapter(child: _buildGrid()),
-              const SliverToBoxAdapter(child: SizedBox(height: 32)),
-            ],
-          ),
+        backgroundColor: style.bg,
+        body: Stack(
+          children: [
+            const CustomPatternBackground(pattern: BackgroundPattern.duas),
+            FadeTransition(
+              opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(child: _buildTopBar()),
+                  SliverToBoxAdapter(child: _buildDatePill()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  SliverToBoxAdapter(child: _buildVerseCard(dailyVerse)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                  SliverToBoxAdapter(child: _buildKhatmaButton(khatma)),
+                  const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                  SliverToBoxAdapter(child: _buildFreeReadingButton()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 18)),
+                  SliverToBoxAdapter(child: _buildGrid()),
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -89,10 +100,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Row(
           children: [
             // History icon
-            _iconBtn(
-              Icons.history_rounded,
-              () => _push(const KhatmaHistoryScreen()),
-            ),
+            const CustomLeadingButton(),
             const Spacer(),
             // Center: title
             Column(

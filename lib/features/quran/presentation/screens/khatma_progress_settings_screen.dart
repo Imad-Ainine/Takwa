@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/features/quran/data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 
 const _kBg = Color(0xFF08121E);
 const _kCard = Color(0xFF0F1E2D);
@@ -333,15 +334,12 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
+          const SliverAppBar(
             backgroundColor: _kBg,
             foregroundColor: _kGold,
             pinned: true,
-            leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const Icon(Icons.chevron_right, color: _kGold, size: 28),
-            ),
-            title: const Text(
+            leading: CustomLeadingButton(),
+            title: Text(
               'الإعدادات',
               style: TextStyle(
                 fontFamily: 'Amiri',

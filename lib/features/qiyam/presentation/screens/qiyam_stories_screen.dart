@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 
 class QiyamStoriesScreen extends StatelessWidget {
   const QiyamStoriesScreen({super.key});
@@ -40,10 +41,7 @@ class QiyamStoriesScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.arrow_back_ios_new, color: context.colors.gold),
-          ),
+          const CustomLeadingButton(),
           const SizedBox(width: 12),
           Text(
             'قصص وعجائب القيام',

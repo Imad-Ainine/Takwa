@@ -287,6 +287,7 @@ class _DuasTopBar extends ConsumerWidget {
                 // 3. Optional: Remove indicator padding if it causes overflow
                 indicatorPadding: EdgeInsets.zero,
                 controller: tabCtrl,
+                dividerHeight: 0,
                 indicatorColor: style.gold,
                 indicatorWeight: 3,
                 labelColor: style.gold,
