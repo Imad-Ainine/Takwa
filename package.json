@@ -1,0 +1,15 @@
+{
+  "name": "takwa-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "web:dev": "npm run dev --workspace=@takwa/web",
+    "web:build": "npm run build --workspace=@takwa/web",
+    "mobile:bootstrap": "melos bootstrap",
+    "mobile:clean": "melos clean",
+    "test": "melos run test"
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "HomePage": {
+    "title": "Elevate Your Spiritual Journey",
+    "description": "Takwa is your comprehensive companion for an enlightened Islamic life, crafted with elegance and precision to keep you deeply connected with your faith.",
+    "download": "Download Now",
+    "learnMore": "Discover More",
+    "featuresTitle": "All Essentials For Your Spiritual Life",
+    "featuresSubtitle": "A premium interface that seamlessly blends Islamic artistry with modern technology.",
+    "features": {
+      "prayerTimes": {
+        "title": "Precise Prayer Times",
+        "description": "Accurate prayer calculations based on your location with beautifully crafted, customizable Adhan alerts."
+      },
+      "quran": {
+        "title": "The Holy Quran",
+        "description": "Immerse yourself in the Word of God with elegant reading modes, translations, and high-quality recitations."
+      },
+      "qibla": {
+        "title": "Qibla Direction",
+        "description": "Find the Qibla with absolute precision anywhere in the world, ensuring you are always oriented towards the Kabah."
+      },
+      "azkar": {
+        "title": "Azkar & Adhkar",
+        "description": "A curated collection of daily remembrances and authentic supplications to bring peace to your heart."
+      },
+      "ramadan": {
+        "title": "Ramadan Companion",
+        "description": "Specialized features for the holy month, including accurate Imsak, Iftar, and Taraweeh scheduling."
+      },
+      "notifications": {
+        "title": "Premium Spiritual Alerts",
+        "description": "Thoughtfully designed notifications that honor the sanctity and serenity of your daily rituals."
+      }
+    },
+    "showcase": {
+      "title": "Contemporary Artistry, Timeless Faith",
+      "description": "We believe spiritual tools should be as beautiful as they are functional. Takwa features a curated dark-mode aesthetic, refined gold gradients, and fluid transitions.",
+      "list": [
+        "Premium Dark Mode Experience",
+        "Authentic Islamic Geometric Patterns",
+        "Fluid & Responsive Interactions",
+        "Adaptive Design for All Devices"
+      ]
+    }
+  },
+  "Metadata": {
+    "title": "Takwa - Your Ultimate Islamic Companion for a Mindful Life",
+    "description": "Experience the beauty of Islam with Takwa. Featuring precise prayer times, Holy Quran, Qibla compass, and daily Azkar in a premium environment."
+  },
+  "Navigation": {
+    "home": "Home",
+    "features": "Features",
+    "download": "Download",
+    "support": "Support",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "Privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: April 24, 2026",
+    "sections": {
+      "intro": {
+        "title": "1. Introduction",
+        "content": "Welcome to Takwa. We are deeply committed to safeguarding your privacy and ensuring a secure experience. This policy outlines how we protect and manage your information with the utmost care."
+      },
+      "collect": {
+        "title": "2. Information We Collect",
+        "content": "We only collect information essential to providing our services, such as your authentication details and geographical location for spiritual accuracy.",
+        "items": [
+          "Personal Data: Secure registration via Supabase or Google authentication.",
+          "Location Data: Necessary for calculating precise prayer times and Qibla direction.",
+          "Usage Data: Anonymized technical insights to enhance the application's performance."
+        ]
+      },
+      "use": {
+        "title": "3. How We Use Your Information",
+        "content": "Your data is used exclusively to facilitate your spiritual practices and improve our offerings.",
+        "items": [
+          "Providing and refining our core services.",
+          "Ensuring the highest precision in prayer times.",
+          "Delivering timely spiritual notifications.",
+          "Enhancing the overall user experience."
+        ]
+      },
+      "thirdParty": {
+        "title": "4. Third-Party Services",
+        "content": "We partner with industry-leading services like Supabase and Google to ensure robust security and reliability. These partners maintain their own rigorous privacy standards."
+      },
+      "security": {
+        "title": "5. Data Security",
+        "content": "We implement state-of-the-art security measures, honoring the trust you place in us to keep your spiritual journey private."
+      },
+      "contact": {
+        "title": "6. Contact Us",
+        "content": "For any privacy-related inquiries, please contact our dedicated support team at:"
+      }
+    }
+  },
+  "Terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last Updated: April 24, 2026",
+    "sections": {
+      "agree": {
+        "title": "1. Agreement to Terms",
+        "content": "By entering the Takwa ecosystem, you agree to be bound by these Terms of Service. Please review them to ensure a harmonious experience."
+      },
+      "use": {
+        "title": "2. Use of Services",
+        "content": "You agree to use Takwa for lawful and spiritual purposes, respecting the community and the sanctity of the services provided."
+      },
+      "ip": {
+        "title": "3. Intellectual Property",
+        "content": "All designs, content, and features are the exclusive property of Takwa and are protected by global intellectual property standards."
+      },
+      "disclaimer": {
+        "title": "4. Disclaimer",
+        "content": "While we strive for absolute perfection in prayer calculations and Quranic texts, we encourage users to remain mindful of local variations."
+      },
+      "liability": {
+        "title": "5. Limitation of Liability",
+        "content": "Takwa shall not be held liable for any indirect experiences resulting from the use of our digital platforms."
+      },
+      "changes": {
+        "title": "6. Modifications",
+        "content": "We reserve the right to evolve these terms as our services grow. Continued use signifies your acceptance of these enhancements."
+      },
+      "contact": {
+        "title": "7. Contact Information",
+        "content": "For legal or formal inquiries, please reach us at:"
+      }
+    }
+  },
+  "Support": {
+    "title": "How Can We Assist You?",
+    "subtitle": "The Takwa team is here to support you at every step of your spiritual path.",
+    "cards": {
+      "email": {
+        "title": "Inquiry Suport",
+        "content": "Reach out to us via email for personalized assistance."
+      },
+      "social": {
+        "title": "Community",
+        "content": "Connect with us across our social platforms for tips and updates."
+      },
+      "faq": {
+        "title": "Knowledge Base",
+        "content": "Explore our detailed FAQ for immediate answers to common questions.",
+        "button": "View FAQ"
+      }
+    },
+    "form": {
+      "title": "Message Our Team",
+      "name": "Full Name",
+      "email": "Email Address",
+      "message": "Your Message",
+      "placeholderName": "How should we address you?",
+      "placeholderEmail": "Where can we reach you?",
+      "placeholderMessage": "Tell us how we can help...",
+      "submit": "Send Message"
+    }
+  }
+}

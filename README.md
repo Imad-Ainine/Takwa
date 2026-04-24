@@ -1,241 +1,78 @@
 <div align="center">
 
-# 🌙 تقوى — Takwa
+# 🌙 Takwa Monorepo
 
-**A premium Islamic self-accountability app built with Flutter**
+**A Premium Islamic Ecosystem — Mobile & Web**
 
-*Track your daily prayers, Quran recitation, adhkar, fasting, and guard against prohibitions — all in a beautiful offline-first experience.*
+_Hold yourselves accountable before you are held accountable._
 
-[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart)](https://dart.dev)
-[![Riverpod](https://img.shields.io/badge/Riverpod-2.x-00C853)](https://riverpod.dev)
-[![Drift](https://img.shields.io/badge/Drift-SQLite-FF6F00)](https://drift.simonbinder.eu)
+[![Melos](https://img.shields.io/badge/Managed%20by-Melos-0175C2.svg)](https://melos.invertase.dev)
+[![Flutter](https://img.shields.io/badge/Mobile-Flutter-02569B?logo=flutter)](https://flutter.dev)
+[![Next.js](https://img.shields.io/badge/Web-Next.js-black?logo=next.js)](https://nextjs.org)
 [![License](https://img.shields.io/badge/License-MIT-gold)](LICENSE)
 
 </div>
 
 ---
 
-## ✨ Features
+## 📂 Project Structure
 
-| Category | What it does |
-|---|---|
-| 🕌 **Prayers** | Track all 5 daily prayers — performed, qadaa, or missed — with a beautiful status picker |
-| 📖 **Quran** | Log pages read each day with per-page point rewards |
-| 📿 **Adhkar** | Morning & evening adhkar toggles with streak awareness |
-| 🌙 **Fasting** | Mark obligatory (فريضة) or voluntary (نافلة) fasts |
-| 🌌 **Qiyam** | Night prayer logging with bonus points |
-| 💧 **Sadaqah** | Daily charity checkbox — "ولو بكلمة طيبة" |
-| ⚠️ **Prohibitions** | Honest self-audit for 6 major sins with repeat-count tracking |
-| 📊 **Statistics** | Weekly bar chart, monthly streaks, Taqwa level progression |
-| 📝 **Day Notes** | Personal journal entry saved per day |
-| 🏆 **Achievements** | Unlockable badges for streaks and Quran milestones |
-| 🗓️ **Hijri Calendar** | Dates displayed in the Islamic calendar |
+This monorepo manages all Takwa-related applications and shared libraries:
+
+- **[`apps/mobile`](apps/mobile)**: The flagship Flutter mobile application.
+- **[`apps/web`](apps/web)**: The Next.js web application companion.
+- **[`packages/`](packages)**: (Planned) Shared domain logic and UI components.
 
 ---
 
-## 📱 الشاشات الرئيسية · Key Screens
+## 🚀 Quick Start
 
-The application's interface was meticulously crafted as seen in the [`muhasaba_ui_preview.html`](muhasaba_ui_preview.html) design system. It consists of four primary screens:
+### 1. Prerequisites
 
-### 1. Onboarding (مرحباً بك)
+- **Flutter SDK**: [Install](https://docs.flutter.dev/get-started/install)
+- **Node.js**: [Install](https://nodejs.org/)
+- **Melos**: Install globally via `dart pub global activate melos`.
 
-- **Welcome Message:** Greets users with the profound quote of Umar ibn Al-Khattab: *"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"*
-- **Feature Highlights:** Introduces tracking for daily worship, statistics, and reminders.
+### 2. Setup Entire Environment
 
-### 2. Home Dashboard (الرئيسية)
-
-- **Header:** Displays current Hijri/Gregorian date and a dynamic greeting.
-- **Next Prayer Card:** Highlights the upcoming prayer with an active countdown timer.
-- **Taqwa Ring:** A circular progress indicator summarizing the day's total completion percentage and current streak.
-- **Quick Ibadah:** A fast-access grid marking completed daily tasks like Fajr, Dhuhr, and Quran reading.
-- **Daily Inspiration:** A dedicated card for a Quranic verse or quote of the day.
-
-### 3. Daily Checklist (محاسبة اليوم)
-
-- **Detailed Accountability:** Grouped lists for Prayers (الصلوات), Quran & Adhkar (القرآن والأذكار), and Prohibitions (المحظورات).
-- **Gamification:** Displays the points gained (`+10`) for good deeds or lost (`-10`) for prohibitions, directly on the checklist items.
-
-### 4. Statistics (تقرير الأداء)
-
-- **Taqwa Score Card:** Shows the user's current spiritual level (e.g., مجاهد ⚔️) and total monthly points.
-- **Weekly Chart:** A visual bar chart indicating performance over the last 7 days.
-- **Continuous Streak:** Badges indicating how many consecutive days the user has maintained their habits.
-
----
-
-## 🏗️ Architecture
-
-```
-lib/
-├── app/
-│   └── main_shell.dart          # Navigation shell
-├── core/
-│   ├── database/
-│   │   ├── app_database.dart    # Drift schema & enums
-│   │   ├── daos.dart            # Data Access Objects
-│   │   └── *.g.dart             # Generated Drift files
-│   ├── providers/
-│   │   └── database_providers.dart  # Riverpod providers
-│   └── theme/
-│       └── app_theme.dart       # Design system (colors, typography, tokens)
-└── features/
-    ├── checklist/               # Daily checklist screen
-    ├── home/                    # Home & points summary
-    ├── onboarding/              # First-launch onboarding
-    └── statistics/              # Charts and history
-```
-
-**Pattern:** Feature-first, layered architecture  
-**State:** Riverpod `StreamProvider` → Drift `watchSingleOrNull()` → reactive UI  
-**Storage:** Drift (SQLite) — fully offline, no internet required
-
----
-
-## 🎨 Design System
-
-The app uses a cohesive dark-mode-only design system defined in `app_theme.dart`:
-
-| Token | Value |
-|---|---|
-| Background | `#0D1117` (night) |
-| Card | `#1A2332` |
-| Gold (primary) | `#C8A96E` |
-| Teal (secondary) | `#3AAFA9` |
-| Success | `#4CAF7D` |
-| Danger | `#E07070` |
-| Arabic heading font | **Amiri** |
-| Arabic body font | **Noto Naskh Arabic** |
-
----
-
-## 🛢️ Database Schema
-
-Powered by **Drift** (type-safe SQLite wrapper):
-
-| Table | Purpose |
-|---|---|
-| `daily_records` | One row per day — prayers, quran, adhkar, fasting, points |
-| `prohibitions_log` | Per-prohibition commit log with repeat count |
-| `custom_ibadah` | User-defined ibadah items |
-| `custom_ibadah_log` | Log entries for custom ibadah |
-| `achievements` | Unlocked badges |
-| `user_settings` | Key-value settings store |
-| `ramadan_progress` | Ramadan-specific nightly progress |
-| `prayer_times_cache` | Cached prayer times per location |
-
-**Enums:** `PrayerStatus` · `FastingType` · `ProhibitionCategory` · `TaqwaLevel`
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) **≥ 3.x**
-- Dart **≥ 3.x**
-- Android Studio / VS Code with Flutter plugin
-
-### Installation
+From the root directory, run:
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/muhasabah.git
-cd muhasabah
-
-# 2. Install dependencies
-flutter pub get
-
-# 3. Generate Drift database files
-dart run build_runner build --delete-conflicting-outputs
-
-# 4. Run the app
-flutter run
+# Bootstrap Flutter packages and fetch dependencies
+npm run mobile:bootstrap
 ```
 
-### Generate code after schema changes
+### 3. Run Applications
 
-```bash
-dart run build_runner watch --delete-conflicting-outputs
-```
-
----
-
-## 📦 Dependencies
-
-| Package | Purpose |
-|---|---|
-| `flutter_riverpod` | State management |
-| `drift` + `sqlite3_flutter_libs` | Local SQLite database |
-| `google_fonts` | Amiri & Noto Naskh Arabic typography |
-| `hijri` | Hijri calendar conversion |
-| `fl_chart` | Statistics charts |
-| `flutter_local_notifications` | Prayer time reminders |
-| `intl` | Date/number formatting |
-| `shared_preferences` | Lightweight settings persistence |
-| `path_provider` + `path` | Database file location |
+| App        | Development Command             |
+| ---------- | ------------------------------- |
+| **Mobile** | `cd apps/mobile && flutter run` |
+| **Web**    | `npm run web:dev`               |
 
 ---
 
-## 🧮 Points System
+## 🛠️ Monorepo Commands
 
-| Action | Points |
-|---|---|
-| Prayer performed in time | +10 |
-| Prayer qadaa | +5 |
-| Quran recitation | +1 per page |
-| Morning adhkar | +5 |
-| Evening adhkar | +5 |
-| Night prayer (Qiyam) | +15 |
-| Fasting (obligatory) | +20 |
-| Fasting (voluntary) | +10 |
-| Sadaqah | +10 |
-| Prohibition committed | -10 per occurrence |
-
-### Taqwa Levels
-
-| Level | Points | Label |
-|---|---|---|
-| 🌱 | 0 – 99 | مبتدئ (Beginner) |
-| 🌿 | 100 – 299 | سالك (Seeker) |
-| ⚔️ | 300 – 599 | مجاهد (Striver) |
-| ✨ | 600+ | متقي (The Pious) |
+| Command                    | Description                                          |
+| -------------------------- | ---------------------------------------------------- |
+| `npm run mobile:bootstrap` | Uses Melos to bootstrap all Flutter packages.        |
+| `npm run mobile:clean`     | Cleans all Flutter build artifacts.                  |
+| `npm run web:dev`          | Starts the Next.js dev server for the web workspace. |
+| `npm run web:build`        | Build the web app for production.                    |
 
 ---
 
-## 🌐 Planned: Supabase Cloud Sync
+## 🏗️ Technical Stack
 
-> See [`docs/supabase_integration_guide.md`](docs/supabase_integration_guide.md) for the full plan.
-
-- **Offline-first** — all writes go to Drift, synced in the background
-- **Auth** — Supabase Auth (email / Google / anonymous)
-- **Realtime** — live sync across devices via Postgres Realtime
-- **Row Level Security** — users only access their own data
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'feat: add your feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
+- **Mobile**: Flutter, Riverpod, Drift (SQLite), Adhan API.
+- **Web**: Next.js 16, React 19, TypeScript, Tailwind CSS.
+- **Management**: Melos, NPM Workspaces.
 
 ---
 
 <div align="center">
 
-*"حاسبوا أنفسكم قبل أن تُحاسبوا"*  
-*"Hold yourselves accountable before you are held accountable"*  
-— عمر بن الخطاب رضي الله عنه
-
+_"حاسبوا أنفسكم قبل أن تُحاسبوا"_
 Made with ❤️ for the Muslim community
 
 </div>
