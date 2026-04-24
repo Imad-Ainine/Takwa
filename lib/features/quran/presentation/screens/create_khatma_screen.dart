@@ -1,20 +1,13 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/presentation/screens/create_khatma_screen.dart
-//  3-step Khatma creation wizard
-// ═══════════════════════════════════════════════════════════════
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 
-const _kBg = Color(0xFF08121E);
-const _kCard = Color(0xFF0F1E2D);
-const _kGreen = Color(0xFF1A5234);
-const _kGold = Color(0xFFC8A96E);
-const _kBorder = Color(0xFF1E3040);
+// Styles are managed via AdaptiveStyle for consistent theming (including Ramadan mode).
 
 class CreateKhatmaScreen extends ConsumerStatefulWidget {
   const CreateKhatmaScreen({super.key});
@@ -52,13 +45,17 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+    final khatma = ref.watch(khatmaExProvider);
+
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: style.bg,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildStepIndicator(),
+            _buildHeader(style),
+            _buildStepIndicator(style),
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 280),
@@ -75,59 +72,54 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 child: KeyedSubtree(
                   key: ValueKey(_step),
                   child: _step == 0
-                      ? _buildStep0()
+                      ? _buildStep0(style)
                       : _step == 1
-                      ? _buildStep1()
-                      : _buildStep2(),
+                      ? _buildStep1(style)
+                      : _buildStep2(style),
                 ),
               ),
             ),
-            _buildBottomBar(),
+            _buildBottomBar(style),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(18, 14, 18, 0),
+  Widget _buildHeader(AdaptiveStyle style) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
-          CustomLeadingButton(),
-          Spacer(),
+          const CustomLeadingButton(),
+          const Spacer(),
           Text(
             'إنشاء ختمة جديدة',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
-          Spacer(),
-          SizedBox(width: 28),
+          const Spacer(),
+          const SizedBox(width: 28),
         ],
       ),
     );
   }
 
-  Widget _buildStepIndicator() {
+  Widget _buildStepIndicator(AdaptiveStyle style) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
       child: Row(
         children: [
-          _stepDot(0),
-          Expanded(child: _stepLine(0)),
-          _stepDot(1),
-          Expanded(child: _stepLine(1)),
-          _stepDot(2),
+          _stepDot(0, style),
+          Expanded(child: _stepLine(0, style)),
+          _stepDot(1, style),
+          Expanded(child: _stepLine(1, style)),
+          _stepDot(2, style),
         ],
       ),
     );
   }
 
-  Widget _stepDot(int s) {
+  Widget _stepDot(int s, AdaptiveStyle style) {
     final active = s == _step;
     final done = s < _step;
     return Container(
@@ -136,12 +128,14 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: active
-            ? _kGreen
+            ? (style.isRamadan ? style.gold : style.teal)
             : done
-            ? _kGreen.withOpacity(0.7)
-            : _kCard,
+            ? (style.isRamadan ? style.gold : style.teal).withOpacity(0.7)
+            : style.card,
         border: Border.all(
-          color: active || done ? _kGreen : _kBorder,
+          color: active || done
+              ? (style.isRamadan ? style.gold : style.teal)
+              : style.border,
           width: active ? 2 : 1,
         ),
       ),
@@ -150,29 +144,31 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             ? const Icon(Icons.check, color: Colors.white, size: 16)
             : Text(
                 '${s + 1}',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 13,
-                  color: active || done ? Colors.white : Colors.white38,
-                  fontWeight: FontWeight.bold,
+                style: style.amiri(
+                  13,
+                  color: active || done ? Colors.white : style.textDim,
+                  weight: FontWeight.bold,
                 ),
               ),
       ),
     );
   }
 
-  Widget _stepLine(int s) => Container(
+  Widget _stepLine(int s, AdaptiveStyle style) => Container(
     height: 2,
-    color: s < _step ? _kGreen.withOpacity(0.6) : _kBorder,
+    color: s < _step
+        ? (style.isRamadan ? style.gold : style.teal).withOpacity(0.6)
+        : style.border,
   );
 
   // ──────────────────── STEP 0: Name & Type ────────────────────
-  Widget _buildStep0() {
+  Widget _buildStep0(AdaptiveStyle style) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           _card(
+            style,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -183,19 +179,18 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       onTap: () {
                         // edit name
                       },
-                      child: const Icon(
+                      child: Icon(
                         Icons.edit_rounded,
-                        color: _kGold,
+                        color: style.gold,
                         size: 18,
                       ),
                     ),
-                    const Text(
+                    Text(
                       'اسم الختمة',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: style.amiri(
+                        18,
+                        color: style.text,
+                        weight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -205,25 +200,23 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   controller: _nameCtrl,
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
-                  style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
+                  style: style.naskh(15, color: style.text),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: _kBg,
+                    fillColor: style.bg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: _kBorder),
+                      borderSide: BorderSide(color: style.border),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: _kBorder),
+                      borderSide: BorderSide(color: style.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: _kGreen),
+                      borderSide: BorderSide(
+                        color: style.isRamadan ? style.gold : style.teal,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -236,35 +229,35 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           ),
           const SizedBox(height: 14),
           _card(
+            style,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       'نوع الختمة',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: style.amiri(
+                        18,
+                        color: style.text,
+                        weight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.account_tree_rounded, color: _kGold, size: 18),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.account_tree_rounded,
+                      color: style.gold,
+                      size: 18,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
                   child: Text(
                     'اختر نوع الختمة التي تريد إنشاءها',
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white38,
-                    ),
+                    style: style.naskh(12, color: style.textDim),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -272,12 +265,14 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   KhatmaType.muyassara,
                   'ختمة ميسرة',
                   'قراءة القرآن كاملاً بالترتيب بدون ورد يومي محدد أو وقت ختم محدد',
+                  style,
                 ),
                 const SizedBox(height: 10),
                 _typeOption(
                   KhatmaType.multazima,
                   'ختمة ملتزمة',
                   'ختمة مع ورد يومي محدد ووقت ختم محدد',
+                  style,
                 ),
               ],
             ),
@@ -287,7 +282,12 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
     );
   }
 
-  Widget _typeOption(KhatmaType type, String title, String desc) {
+  Widget _typeOption(
+    KhatmaType type,
+    String title,
+    String desc,
+    AdaptiveStyle style,
+  ) {
     final selected = _type == type;
     return GestureDetector(
       onTap: () {
@@ -300,7 +300,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           Radio<KhatmaType>(
             value: type,
             groupValue: _type,
-            activeColor: _kGreen,
+            activeColor: style.isRamadan ? style.gold : style.teal,
             onChanged: (v) {
               if (v != null) setState(() => _type = v);
             },
@@ -312,21 +312,16 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 const SizedBox(height: 12),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: selected ? Colors.white : Colors.white60,
+                  style: style.amiri(
+                    16,
+                    color: selected ? style.text : style.textSec,
+                    weight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   desc,
-                  style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 12,
-                    color: Colors.white38,
-                  ),
+                  style: style.naskh(12, color: style.textDim),
                   textAlign: TextAlign.right,
                 ),
               ],
@@ -338,57 +333,57 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   // ──────────────────── STEP 1: Settings ────────────────────
-  Widget _buildStep1() {
+  Widget _buildStep1(AdaptiveStyle style) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           // Start Date
           _card(
+            style,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       'تاريخ البداية',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: style.amiri(
+                        18,
+                        color: style.text,
+                        weight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.calendar_month_rounded, color: _kGold, size: 18),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.calendar_month_rounded,
+                      color: style.gold,
+                      size: 18,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 GestureDetector(
-                  onTap: _pickDate,
+                  onTap: () => _pickDate(style),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: _kBg,
+                      color: style.bg,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _kBorder),
+                      border: Border.all(color: style.border),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.calendar_today_rounded,
-                          color: _kGold,
+                          color: style.gold,
                           size: 18,
                         ),
                         const SizedBox(width: 10),
                         Text(
                           '${_startDate.year}-${_startDate.month.toString().padLeft(2, '0')}-${_startDate.day.toString().padLeft(2, '0')}',
-                          style: const TextStyle(
-                            fontFamily: 'NotoNaskhArabic',
-                            fontSize: 15,
-                            color: Colors.white,
-                          ),
+                          style: style.naskh(15, color: style.text),
                         ),
                       ],
                     ),
@@ -400,23 +395,27 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           const SizedBox(height: 12),
           // Start Page
           _card(
+            style,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       'صفحة البداية',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      style: style.amiri(
+                        18,
+                        color: style.text,
+                        weight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.auto_stories_rounded, color: _kGold, size: 18),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.auto_stories_rounded,
+                      color: style.gold,
+                      size: 18,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -426,23 +425,19 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _kBg,
+                    color: style.bg,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _kBorder),
+                    border: Border.all(color: style.border),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<int>(
                       value: _startPage,
                       isExpanded: true,
-                      dropdownColor: _kCard,
-                      style: const TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 15,
-                        color: Colors.white,
-                      ),
-                      icon: const Icon(
+                      dropdownColor: style.card,
+                      style: style.naskh(15, color: style.text),
+                      icon: Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white38,
+                        color: style.textDim,
                       ),
                       items: List.generate(
                         604,
@@ -463,6 +458,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           const SizedBox(height: 12),
           // Notifications
           _card(
+            style,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -470,29 +466,30 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   children: [
                     Switch(
                       value: _notificationsEnabled,
-                      activeColor: _kGreen,
-                      activeTrackColor: _kGreen.withOpacity(0.3),
-                      inactiveTrackColor: _kBorder,
-                      inactiveThumbColor: Colors.white38,
+                      activeColor: style.isRamadan ? style.gold : style.teal,
+                      activeTrackColor:
+                          (style.isRamadan ? style.gold : style.teal)
+                              .withOpacity(0.3),
+                      inactiveTrackColor: style.border,
+                      inactiveThumbColor: style.textDim,
                       onChanged: (v) =>
                           setState(() => _notificationsEnabled = v),
                     ),
                     const Spacer(),
-                    const Row(
+                    Row(
                       children: [
                         Text(
                           'تفعيل الإشعارات',
-                          style: TextStyle(
-                            fontFamily: 'Amiri',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          style: style.amiri(
+                            18,
+                            color: style.text,
+                            weight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Icon(
                           Icons.notifications_rounded,
-                          color: _kGold,
+                          color: style.gold,
                           size: 18,
                         ),
                       ],
@@ -507,28 +504,24 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A3500),
+                      color: style.danger.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF7A5800)),
+                      border: Border.all(color: style.danger.withOpacity(0.3)),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Expanded(
                           child: Text(
                             'الإشعارات معطلة - لن يتم إرسال أي تذكرات',
                             textAlign: TextAlign.right,
-                            style: TextStyle(
-                              fontFamily: 'NotoNaskhArabic',
-                              fontSize: 12,
-                              color: Color(0xFFE8A030),
-                            ),
+                            style: style.naskh(12, color: style.danger),
                           ),
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Icon(
                           Icons.info_outline_rounded,
-                          color: Color(0xFFE8A030),
+                          color: style.danger,
                           size: 16,
                         ),
                       ],
@@ -543,7 +536,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
     );
   }
 
-  Future<void> _pickDate() async {
+  Future<void> _pickDate(AdaptiveStyle style) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: _startDate,
@@ -551,9 +544,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (ctx, child) => Theme(
         data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: _kGreen,
-            surface: _kCard,
+          colorScheme: ColorScheme.dark(
+            primary: style.isRamadan ? style.gold : style.teal,
+            surface: style.card,
           ),
         ),
         child: child!,
@@ -563,10 +556,11 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   // ──────────────────── STEP 2: Summary ────────────────────
-  Widget _buildStep2() {
+  Widget _buildStep2(AdaptiveStyle style) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: _card(
+        style,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -578,21 +572,16 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   height: 28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _kGold.withOpacity(0.2),
+                    color: style.gold.withOpacity(0.2),
                   ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: _kGold,
-                    size: 16,
-                  ),
+                  child: Icon(Icons.check_rounded, color: style.gold, size: 16),
                 ),
-                const Text(
+                Text(
                   'ملخص الختمة الميسرة',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  style: style.amiri(
+                    18,
+                    color: style.text,
+                    weight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -602,9 +591,14 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A0D3A),
+                color: style.isRamadan
+                    ? style.gold.withOpacity(0.1)
+                    : style.teal.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF4A1A7A)),
+                border: Border.all(
+                  color: (style.isRamadan ? style.gold : style.teal)
+                      .withOpacity(0.3),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -616,26 +610,24 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         _type == KhatmaType.muyassara
                             ? 'ختمة ميسرة'
                             : 'ختمة ملتزمة',
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 15,
-                          color: Color(0xFFB060E8),
-                          fontWeight: FontWeight.bold,
+                        style: style.amiri(
+                          15,
+                          color: style.isRamadan ? style.gold : style.teal,
+                          weight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Icon(
+                      Icon(
                         Icons.account_tree_rounded,
-                        color: Color(0xFFB060E8),
+                        color: style.isRamadan ? style.gold : style.teal,
                         size: 16,
                       ),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         'نوع الختمة:',
-                        style: TextStyle(
-                          fontFamily: 'NotoNaskhArabic',
-                          fontSize: 12,
-                          color: Color(0xFFB060E8),
+                        style: style.naskh(
+                          12,
+                          color: style.isRamadan ? style.gold : style.teal,
                         ),
                       ),
                     ],
@@ -646,52 +638,58 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         ? 'قراءة القرآن كاملاً بالترتيب بدون ورد يومي محدد أو وقت ختم محدد'
                         : 'ختمة مع ورد يومي محدد ووقت ختم محدد',
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 11,
-                      color: Color(0xFF9040C0),
+                    style: style.naskh(
+                      11,
+                      color: (style.isRamadan ? style.gold : style.teal)
+                          .withOpacity(0.7),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            _summaryRow('اسم الختمة:', _nameCtrl.text),
+            _summaryRow('اسم الختمة:', _nameCtrl.text, style),
             _summaryRow(
               'تاريخ البداية:',
               '${_startDate.day}/${_startDate.month}/${_startDate.year}',
+              style,
             ),
-            _summaryRow('الصفحة الأولى:', 'صفحة ${ar(_startPage)}'),
+            _summaryRow('الصفحة الأولى:', 'صفحة ${ar(_startPage)}', style),
             _summaryRow(
               'الإشعارات:',
               _notificationsEnabled ? 'مفعّلة' : 'معطلة',
+              style,
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _kGreen.withOpacity(0.15),
+                color: (style.isRamadan ? style.gold : style.teal).withOpacity(
+                  0.15,
+                ),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: _kGreen.withOpacity(0.4)),
+                border: Border.all(
+                  color: (style.isRamadan ? style.gold : style.teal)
+                      .withOpacity(0.4),
+                ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Text(
                       'يمكنك البدء في القراءة فوراً بعد إنشاء الختمة',
                       textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 12,
-                        color: Color(0xFF6ECC9A),
+                      style: style.naskh(
+                        12,
+                        color: style.isRamadan ? style.gold : style.teal,
                       ),
                     ),
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Icon(
                     Icons.info_outline_rounded,
-                    color: Color(0xFF6ECC9A),
+                    color: style.isRamadan ? style.gold : style.teal,
                     size: 16,
                   ),
                 ],
@@ -703,40 +701,26 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
     );
   }
 
-  Widget _summaryRow(String label, String value) {
+  Widget _summaryRow(String label, String value, AdaptiveStyle style) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 13,
-              color: Colors.white60,
-            ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 13,
-              color: Colors.white38,
-            ),
-          ),
+          Text(value, style: style.naskh(13, color: style.textSec)),
+          Text(label, style: style.naskh(13, color: style.textDim)),
         ],
       ),
     );
   }
 
   // ──────────────────── Bottom Bar ────────────────────
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(AdaptiveStyle style) {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
-      decoration: const BoxDecoration(
-        color: _kBg,
-        border: Border(top: BorderSide(color: _kBorder)),
+      decoration: BoxDecoration(
+        color: style.bg,
+        border: Border(top: BorderSide(color: style.border)),
       ),
       child: Row(
         children: [
@@ -747,17 +731,13 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    border: Border.all(color: _kBorder),
+                    border: Border.all(color: style.border),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'السابق',
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 16,
-                        color: Colors.white60,
-                      ),
+                      style: style.amiri(16, color: style.textSec),
                     ),
                   ),
                 ),
@@ -771,11 +751,12 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  color: _kGreen,
+                  color: style.isRamadan ? style.gold : style.teal,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: _kGreen.withOpacity(0.35),
+                      color: (style.isRamadan ? style.gold : style.teal)
+                          .withOpacity(0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -809,6 +790,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   Future<void> _createKhatma() async {
+    final isRamadan = ref.read(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     await ref
         .read(khatmaExProvider.notifier)
         .createNew(
@@ -827,7 +811,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             'تم إنشاء الختمة بنجاح',
             style: TextStyle(fontFamily: 'NotoNaskhArabic'),
           ),
-          backgroundColor: _kGreen,
+          backgroundColor: style.isRamadan ? style.gold : style.teal,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -837,13 +821,13 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
     }
   }
 
-  Widget _card({required Widget child}) => Container(
+  Widget _card(AdaptiveStyle style, {required Widget child}) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: _kCard,
+      color: style.card,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: _kBorder),
+      border: Border.all(color: style.border),
     ),
     child: child,
   );

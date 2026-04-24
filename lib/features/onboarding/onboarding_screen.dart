@@ -26,7 +26,7 @@ enum OnboardStep {
   overlay,
   background,
   gender,
-  plan,
+  // plan,
 }
 
 // ── State handling ──
@@ -192,16 +192,22 @@ class OnboardingScreen extends ConsumerWidget {
         return _GenderStep(
           selected: state.gender,
           onSelect: notifier.selectGender,
-          onNext: notifier.next,
-          onSkip: notifier.skip,
-        );
-      case OnboardStep.plan:
-        return _PlanStep(
-          onStart: () async {
+          onNext: () async {
+            await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
+            ref.invalidate(onboardingDoneProvider);
+          },
+          onSkip: () async {
             await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
             ref.invalidate(onboardingDoneProvider);
           },
         );
+      // case OnboardStep.plan:
+      //   return _PlanStep(
+      //     onStart: () async {
+      //       await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
+      //       ref.invalidate(onboardingDoneProvider);
+      //     },
+      //   );
     }
   }
 }
@@ -219,7 +225,7 @@ class _StepIndicator extends StatelessWidget {
       OnboardStep.overlay,
       OnboardStep.background,
       OnboardStep.gender,
-      OnboardStep.plan,
+      // OnboardStep.plan,
     ];
     final idx = setupSteps.indexOf(current);
     if (idx == -1) return const SizedBox();

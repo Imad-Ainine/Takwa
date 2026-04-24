@@ -229,7 +229,9 @@ void main() async {
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();
   try {
-    await FlutterWindowManagerPlus.addFlags(FlutterWindowManagerPlus.FLAG_SECURE);
+    await FlutterWindowManagerPlus.addFlags(
+      FlutterWindowManagerPlus.FLAG_SECURE,
+    );
   } catch (e) {
     debugPrint('WindowManager Error: $e');
   }

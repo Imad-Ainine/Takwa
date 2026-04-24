@@ -5,8 +5,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import 'package:takwa/core/theme/ramadan_theme.dart';
 import '../../utils/quran_helpers.dart';
 import '../../utils/quran_painters.dart';
+
+// Styles are managed via AdaptiveStyle for consistent theming.
 
 // ─────────────────────────────────────────────────────────────
 // Daily Verse Card  (home hub)
@@ -16,6 +19,7 @@ class DailyVerseCard extends StatelessWidget {
   final VoidCallback onRefresh;
   final VoidCallback onShare;
   final VoidCallback onNavigate;
+  final AdaptiveStyle style;
 
   const DailyVerseCard({
     super.key,
@@ -23,6 +27,7 @@ class DailyVerseCard extends StatelessWidget {
     required this.onRefresh,
     required this.onShare,
     required this.onNavigate,
+    required this.style,
   });
 
   @override
@@ -30,14 +35,14 @@ class DailyVerseCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: style.card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.15), width: 1),
+        border: Border.all(color: style.border, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -51,11 +56,11 @@ class DailyVerseCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
               child: Row(
                 children: [
-                  _surahChip(verse['surahName'] as String),
+                  _surahChip(verse['surahName'] as String, style),
                   const Spacer(),
-                  _iconBtn(Icons.share_rounded, onShare),
+                  _iconBtn(Icons.share_rounded, onShare, style),
                   const SizedBox(width: 4),
-                  _iconBtn(Icons.refresh_rounded, onRefresh),
+                  _iconBtn(Icons.refresh_rounded, onRefresh, style),
                 ],
               ),
             ),
@@ -66,10 +71,9 @@ class DailyVerseCard extends StatelessWidget {
                 verse['text'] as String,
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
-                style: const TextStyle(
-                    fontFamily: 'Amiri',
-                  fontSize: 19,
-                  color: Colors.white,
+                style: style.amiri(
+                  19,
+                  color: style.text,
                   height: 2.0,
                 ),
               ),
@@ -81,14 +85,14 @@ class DailyVerseCard extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: onNavigate,
-                    child: const Icon(
+                    child: Icon(
                       Icons.chevron_left,
-                      color: Colors.white54,
+                      color: style.textDim,
                       size: 22,
                     ),
                   ),
                   const Spacer(),
-                  _ayahBadge(verse['ayahNumber'] as int),
+                  _ayahBadge(verse['ayahNumber'] as int, style),
                 ],
               ),
             ),
@@ -98,47 +102,46 @@ class DailyVerseCard extends StatelessWidget {
     );
   }
 
-  Widget _surahChip(String name) => Container(
+  Widget _surahChip(String name, AdaptiveStyle style) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
     decoration: BoxDecoration(
-      color: kGoldChip.withOpacity(0.25),
+      color: style.gold.withOpacity(0.15),
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: kGoldChip.withOpacity(0.5)),
+      border: Border.all(color: style.gold.withOpacity(0.4)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.auto_awesome, color: kGoldChip, size: 13),
+        Icon(Icons.auto_awesome, color: style.gold, size: 13),
         const SizedBox(width: 5),
         Text(
           name,
-          style: const TextStyle(
-                    fontFamily: 'Amiri',
-            fontSize: 14,
-            color: kGoldChip,
-            fontWeight: FontWeight.bold,
+          style: style.amiri(
+            14,
+            color: style.gold,
+            weight: FontWeight.bold,
           ),
         ),
       ],
     ),
   );
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
+  Widget _iconBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) => GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: style.text.withOpacity(0.06),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(icon, color: Colors.white70, size: 17),
+      child: Icon(icon, color: style.textSec, size: 17),
     ),
   );
 
-  Widget _ayahBadge(int ayah) => Container(
+  Widget _ayahBadge(int ayah, AdaptiveStyle style) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
     decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.1),
+      color: style.text.withOpacity(0.06),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(
@@ -146,11 +149,10 @@ class DailyVerseCard extends StatelessWidget {
       children: [
         Text(
           'آية ${ar(ayah)}',
-          style: const TextStyle(
-                    fontFamily: 'Amiri',fontSize: 13, color: Colors.white70),
+          style: style.amiri(13, color: style.textSec),
         ),
         const SizedBox(width: 4),
-        const Text('»»', style: TextStyle(color: Colors.white38, fontSize: 11)),
+        Text('»»', style: TextStyle(color: style.textDim, fontSize: 11)),
       ],
     ),
   );
@@ -165,6 +167,7 @@ class KhatmaActionCard extends StatelessWidget {
   final Color color;
   final IconData actionIcon;
   final VoidCallback onTap;
+  final AdaptiveStyle style;
   final VoidCallback? onBack;
 
   const KhatmaActionCard({
@@ -174,6 +177,7 @@ class KhatmaActionCard extends StatelessWidget {
     required this.color,
     required this.actionIcon,
     required this.onTap,
+    required this.style,
     this.onBack,
   });
 
@@ -189,9 +193,9 @@ class KhatmaActionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
+              color: color.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -213,21 +217,16 @@ class KhatmaActionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                    fontFamily: 'Amiri',
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
+                    style: style.amiri(
+                      19,
+                      weight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white70,
-                    ),
+                    style: style.naskh(12, color: Colors.white.withOpacity(0.85)),
                   ),
                 ],
               ),
@@ -267,6 +266,7 @@ class FeatureGridItem extends StatelessWidget {
   final String subtitle;
   final Color iconBg;
   final VoidCallback onTap;
+  final AdaptiveStyle style;
   final bool useAiLabel;
 
   const FeatureGridItem({
@@ -276,6 +276,7 @@ class FeatureGridItem extends StatelessWidget {
     required this.subtitle,
     required this.iconBg,
     required this.onTap,
+    required this.style,
     this.useAiLabel = false,
   });
 
@@ -285,9 +286,9 @@ class FeatureGridItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.07),
+          color: style.card,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: style.border),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -300,13 +301,12 @@ class FeatureGridItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: useAiLabel
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'AI',
-                        style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        style: style.naskh(
+                          18,
+                          weight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -316,18 +316,16 @@ class FeatureGridItem extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               title,
-              style: const TextStyle(
-                    fontFamily: 'Amiri',
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              style: style.amiri(
+                15,
+                weight: FontWeight.bold,
+                color: style.text,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',fontSize: 11, color: Colors.white54),
+              style: style.naskh(11, color: style.textDim),
               textAlign: TextAlign.center,
             ),
           ],
@@ -344,12 +342,16 @@ class KhatmaProgressRing extends StatelessWidget {
   final double progress; // 0.0 → 1.0
   final int pagesRead;
   final int totalPages;
+  final AdaptiveStyle style;
+  final Color? color;
 
   const KhatmaProgressRing({
     super.key,
     required this.progress,
     required this.pagesRead,
     required this.totalPages,
+    required this.style,
+    this.color,
   });
 
   @override
@@ -362,24 +364,22 @@ class KhatmaProgressRing extends StatelessWidget {
         children: [
           CustomPaint(
             size: const Size(160, 160),
-            painter: _RingPainter(progress),
+            painter: _RingPainter(progress, color: color),
           ),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 ar(pagesRead),
-                style: const TextStyle(
-                    fontFamily: 'Amiri',
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                style: style.amiri(
+                  32,
+                  weight: FontWeight.bold,
+                  color: style.text,
                 ),
               ),
               Text(
                 'من ${ar(totalPages)} صفحة',
-                style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',fontSize: 12, color: Colors.white60),
+                style: style.naskh(12, color: style.textDim),
               ),
             ],
           ),
@@ -391,7 +391,8 @@ class KhatmaProgressRing extends StatelessWidget {
 
 class _RingPainter extends CustomPainter {
   final double progress;
-  _RingPainter(this.progress);
+  final Color? color;
+  _RingPainter(this.progress, {this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -399,12 +400,12 @@ class _RingPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = (size.width - 16) / 2;
     final track = Paint()
-      ..color = Colors.white.withOpacity(0.1)
+      ..color = Colors.white.withOpacity(0.04)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10;
     final fill = Paint()
-      ..shader = const LinearGradient(
-        colors: [kGoldChip, kGoldL],
+      ..shader = LinearGradient(
+        colors: [color ?? kGoldChip, color?.withOpacity(0.5) ?? kGoldL],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
@@ -431,7 +432,13 @@ class _RingPainter extends CustomPainter {
 class QuranSurahRow extends StatelessWidget {
   final ql.SurahNamesModel s;
   final VoidCallback onTap;
-  const QuranSurahRow({super.key, required this.s, required this.onTap});
+  final AdaptiveStyle style;
+  const QuranSurahRow({
+    super.key,
+    required this.s,
+    required this.onTap,
+    required this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -442,7 +449,7 @@ class QuranSurahRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: kBorder.withOpacity(0.5), width: 0.5),
+            bottom: BorderSide(color: style.border, width: 0.5),
           ),
         ),
         child: Row(
@@ -458,21 +465,18 @@ class QuranSurahRow extends StatelessWidget {
                 children: [
                   Text(
                     s.englishName,
-                    style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                    style: style.naskh(
+                      17,
+                      weight: FontWeight.w600,
+                      color: style.text,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '${s.revelationType == 'Meccan' ? 'مكية' : 'مدنية'} • ${s.ayahsNumber} آية',
-                    style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white70,
-                      letterSpacing: 0.5,
+                    style: style.naskh(
+                      12,
+                      color: style.textDim,
                     ),
                   ),
                 ],
@@ -480,10 +484,9 @@ class QuranSurahRow extends StatelessWidget {
             ),
             Text(
               s.name,
-              style: TextStyle(
-                    fontFamily: 'Amiri',
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+              style: style.amiri(
+                22,
+                weight: FontWeight.bold,
                 color: c,
               ),
             ),
@@ -502,12 +505,14 @@ class QuranJuzCard extends StatelessWidget {
   final String name;
   final double progress;
   final VoidCallback onTap;
+  final AdaptiveStyle style;
   const QuranJuzCard({
     super.key,
     required this.n,
     required this.name,
     required this.progress,
     required this.onTap,
+    required this.style,
   });
 
   @override
@@ -519,8 +524,8 @@ class QuranJuzCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: kBorder.withOpacity(0.3),
-          border: Border.all(color: kBorder),
+          color: style.card,
+          border: Border.all(color: style.border),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -534,11 +539,10 @@ class QuranJuzCard extends StatelessWidget {
                 ),
                 Text(
                   ar(n),
-                  style: const TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  style: style.amiri(
+                    14,
+                    weight: FontWeight.bold,
+                    color: style.text,
                   ),
                 ),
               ],
@@ -550,25 +554,23 @@ class QuranJuzCard extends StatelessWidget {
                 children: [
                   Text(
                     'الجزء $name',
-                    style: const TextStyle(
-                    fontFamily: 'Amiri',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    style: style.amiri(
+                      18,
+                      weight: FontWeight.bold,
+                      color: style.text,
                     ),
                   ),
                   Text(
                     '${(progress * 100).toInt()}% مكتمل',
-                    style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white70,
+                    style: style.naskh(
+                      12,
+                      color: style.textSec,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.white38),
+            Icon(Icons.chevron_right, color: style.textDim),
           ],
         ),
       ),
@@ -584,22 +586,24 @@ class AyahBlock extends StatelessWidget {
   final double fontSize;
   final bool isPlaying;
   final VoidCallback onPlay;
+  final AdaptiveStyle style;
   const AyahBlock({
     super.key,
     required this.a,
     required this.fontSize,
     required this.isPlaying,
     required this.onPlay,
+    required this.style,
   });
 
   @override
   Widget build(BuildContext context) {
-    final c = isPlaying ? kGold : Colors.white.withOpacity(0.92);
+    final c = isPlaying ? style.gold : style.text;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       decoration: BoxDecoration(
-        color: isPlaying ? kGold.withOpacity(0.08) : Colors.transparent,
+        color: isPlaying ? style.gold.withOpacity(0.08) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
@@ -611,9 +615,8 @@ class AyahBlock extends StatelessWidget {
             Text(
               a.text,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                    fontFamily: 'Amiri',
-                fontSize: fontSize,
+              style: style.amiri(
+                fontSize,
                 color: c,
                 height: 1.8,
               ),
@@ -625,7 +628,7 @@ class AyahBlock extends StatelessWidget {
                 size: const Size(28, 28),
                 painter: VerseMarkerPaint(
                   a.ayahNumber,
-                  isPlaying ? kGold : kBorder.withOpacity(0.8),
+                  isPlaying ? style.gold : style.border,
                 ),
               ),
             ),
@@ -633,5 +636,6 @@ class AyahBlock extends StatelessWidget {
         ),
       ),
     );
+
   }
 }

@@ -7,16 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import '../../utils/quran_helpers.dart';
 import '../../data/quran_data.dart';
 import 'quran_reader_screen.dart';
-
-const _kBg = Color(0xFF08121E);
-const _kCard = Color(0xFF0F1E2D);
-const _kGreen = Color(0xFF1A5234);
-const _kGold = Color(0xFFC8A96E);
-const _kBorder = Color(0xFF1E3040);
-const _kTeal = Color(0xFF3AAFA9);
 
 class AiMemorizeScreen extends ConsumerStatefulWidget {
   const AiMemorizeScreen({super.key});
@@ -46,22 +41,25 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: style.bg,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildTabBar(),
-            _buildSearch(),
+            _buildHeader(style),
+            _buildTabBar(style),
+            _buildSearch(style),
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: KeyedSubtree(
                   key: ValueKey(_tab.index),
                   child: _tab.index == 0
-                      ? _buildPagesGrid()
-                      : _buildSurahList(),
+                      ? _buildPagesGrid(style)
+                      : _buildSurahList(style),
                 ),
               ),
             ),
@@ -71,43 +69,38 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
     );
   }
 
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(18, 14, 18, 0),
+  Widget _buildHeader(AdaptiveStyle style) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
-          CustomLeadingButton(),
-          Spacer(),
+          const CustomLeadingButton(),
+          const Spacer(),
           Text(
             'التحفيظ الذكي',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
-          Spacer(),
-          SizedBox(width: 28),
+          const Spacer(),
+          const SizedBox(width: 28),
         ],
       ),
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: _kBorder)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: style.border)),
       ),
       child: TabBar(
         controller: _tab,
         splashFactory: NoSplash.splashFactory,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
-        indicatorColor: Colors.white,
+        indicatorColor: style.gold,
         indicatorWeight: 2.5,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white38,
+        labelColor: style.gold,
+        unselectedLabelColor: style.textSec.withOpacity(0.5),
         dividerColor: Colors.transparent,
         tabs: const [
           Tab(
@@ -141,13 +134,13 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
     );
   }
 
-  Widget _buildSearch() {
+  Widget _buildSearch(AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       decoration: BoxDecoration(
-        color: _kCard,
+        color: style.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: style.border),
       ),
       child: TextField(
         controller: _searchCtrl,
@@ -156,17 +149,13 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
         keyboardType: _tab.index == 0
             ? TextInputType.number
             : TextInputType.text,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: style.text),
         decoration: InputDecoration(
           hintText: _tab.index == 0
               ? 'أدخل رقم الصفحة (1-604)'
               : 'ابحث في السور',
-          hintStyle: const TextStyle(
-            color: Colors.white30,
-            fontFamily: 'NotoNaskhArabic',
-            fontSize: 13,
-          ),
-          suffixIcon: const Icon(Icons.search, color: Colors.white30, size: 20),
+          hintStyle: style.naskh(13, color: style.textSec.withOpacity(0.5)),
+          suffixIcon: Icon(Icons.search, color: style.textSec.withOpacity(0.5), size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -177,7 +166,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
     );
   }
 
-  Widget _buildPagesGrid() {
+  Widget _buildPagesGrid(AdaptiveStyle style) {
     final filteredPages = <int>[];
     for (int i = 1; i <= 604; i++) {
       if (_query.isEmpty || ar(i).contains(_query) || '$i'.contains(_query)) {
@@ -197,12 +186,12 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
       itemCount: filteredPages.length,
       itemBuilder: (_, i) {
         final page = filteredPages[i];
-        return _PageItem(page: page, onTap: () => _goToPage(page));
+        return _PageItem(page: page, style: style, onTap: () => _goToPage(page));
       },
     );
   }
 
-  Widget _buildSurahList() {
+  Widget _buildSurahList(AdaptiveStyle style) {
     final surahs = ql.QuranLibrary.quranCtrl.surahsList;
     final filtered = _query.isEmpty
         ? surahs
@@ -221,8 +210,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
       itemBuilder: (_, i) {
         final s = filtered[i];
         final colors = [
-          _kGold,
-          _kTeal,
+          style.gold,
+          style.teal,
           const Color(0xFF4CAF7D),
           const Color(0xFF9B59B6),
           const Color(0xFFE07070),
@@ -247,12 +236,12 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: _kBorder.withOpacity(0.4)),
+                bottom: BorderSide(color: style.border.withOpacity(0.4)),
               ),
             ),
             child: Row(
               children: [
-                const Icon(Icons.chevron_left, color: Colors.white30, size: 20),
+                Icon(Icons.chevron_left, color: style.textSec.withOpacity(0.3), size: 20),
                 const SizedBox(width: 10),
                 // Badge number on left
                 Container(
@@ -266,12 +255,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                   child: Center(
                     child: Text(
                       ar(s.number),
-                      style: TextStyle(
-                        fontFamily: 'Amiri',
-                        fontSize: 12,
-                        color: c,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: style.amiri(12, color: c, weight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -282,20 +266,11 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                     children: [
                       Text(
                         meta.nameAr.isNotEmpty ? meta.nameAr : s.englishName,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: style.amiri(18, color: style.text, weight: FontWeight.bold),
                       ),
                       Text(
                         '${ar(s.ayahsNumber)} آية',
-                        style: const TextStyle(
-                          fontFamily: 'NotoNaskhArabic',
-                          fontSize: 12,
-                          color: Colors.white38,
-                        ),
+                        style: style.naskh(12, color: style.textSec.withOpacity(0.6)),
                       ),
                     ],
                   ),
@@ -327,8 +302,9 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
 
 class _PageItem extends StatelessWidget {
   final int page;
+  final AdaptiveStyle style;
   final VoidCallback onTap;
-  const _PageItem({required this.page, required this.onTap});
+  const _PageItem({required this.page, required this.style, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -336,19 +312,14 @@ class _PageItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: _kCard,
+          color: style.card,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _kBorder),
+          border: Border.all(color: style.border),
         ),
         child: Center(
           child: Text(
             ar(page),
-            style: const TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 22,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
+            style: style.amiri(22, color: style.text, weight: FontWeight.w500),
           ),
         ),
       ),

@@ -11,13 +11,11 @@ import 'package:takwa/features/quran/data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 import '../../data/quran_data.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import 'quran_reader_screen.dart';
 
-const _kBg = Color(0xFF08121E);
-const _kCard = Color(0xFF0F1E2D);
-const _kGreen = Color(0xFF1A5234);
-const _kGold = Color(0xFFC8A96E);
-const _kBorder = Color(0xFF1E3040);
+// Styles are managed via AdaptiveStyle
 
 class FreeReadingScreen extends ConsumerStatefulWidget {
   const FreeReadingScreen({super.key});
@@ -50,27 +48,31 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: style.bg,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildTabBar(),
-            if (_tab.index == 0 || _tab.index == 2) _buildSearchBar(),
+            _buildHeader(style),
+            _buildTabBar(style),
+            if (_tab.index == 0 || _tab.index == 2) _buildSearchBar(style),
             Expanded(
               child: TabBarView(
                 controller: _tab,
                 children: [
-                  _SurahTab(query: _query, onTap: _goToSurah),
-                  _ReviewTab(onTap: _goToSurah),
+                  _SurahTab(query: _query, onTap: _goToSurah, style: style),
+                  _ReviewTab(onTap: _goToSurah, style: style),
                   _IndexTab(
                     query: _query,
                     lastRead: ref.watch(quranLastReadProvider),
                     onTap: _goToPage,
+                    style: style,
                   ),
-                  _JuzTab(onTap: _goToJuz),
-                  _RubTab(onTap: _goToPage),
+                  _JuzTab(onTap: _goToJuz, style: style),
+                  _RubTab(onTap: _goToPage, style: style),
                 ],
               ),
             ),
@@ -80,44 +82,39 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
     );
   }
 
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(18, 14, 18, 0),
+  Widget _buildHeader(AdaptiveStyle style) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
-          CustomLeadingButton(),
-          Spacer(),
+          const CustomLeadingButton(),
+          const Spacer(),
           Text(
             'القراءة الحرة',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
-          Spacer(),
-          SizedBox(width: 28),
+          const Spacer(),
+          const SizedBox(width: 28),
         ],
       ),
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: _kBorder)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: style.border)),
       ),
       child: TabBar(
         controller: _tab,
         isScrollable: false,
         splashFactory: NoSplash.splashFactory,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
-        indicatorColor: Colors.white,
+        indicatorColor: style.gold,
         indicatorWeight: 2,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white38,
+        labelColor: style.gold,
+        unselectedLabelColor: style.textDim,
         dividerColor: Colors.transparent,
         labelStyle: const TextStyle(
           fontFamily: 'Amiri',
@@ -133,29 +130,25 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       decoration: BoxDecoration(
-        color: _kCard,
+        color: style.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: style.border),
       ),
       child: TextField(
         controller: _search,
         onChanged: (v) => setState(() => _query = v),
         textDirection: TextDirection.rtl,
-        style: const TextStyle(color: Colors.white),
+        style: style.naskh(15, color: style.text),
         decoration: InputDecoration(
           hintText: _tab.index == 0
               ? 'ابحث عن سورة أو آية أو صفحة'
               : 'ابحث في السور',
-          hintStyle: const TextStyle(
-            color: Colors.white30,
-            fontFamily: 'NotoNaskhArabic',
-            fontSize: 13,
-          ),
-          prefixIcon: const Icon(Icons.search, color: Colors.white38, size: 20),
+          hintStyle: style.naskh(13, color: style.textDim),
+          prefixIcon: Icon(Icons.search, color: style.textDim, size: 20),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(14),
         ),
@@ -196,7 +189,12 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
 class _SurahTab extends StatelessWidget {
   final String query;
   final void Function(int) onTap;
-  const _SurahTab({required this.query, required this.onTap});
+  final AdaptiveStyle style;
+  const _SurahTab({
+    required this.query,
+    required this.onTap,
+    required this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,7 +215,7 @@ class _SurahTab extends StatelessWidget {
       itemCount: filtered.length,
       itemBuilder: (_, i) {
         final s = filtered[i];
-        return _SurahRow(s: s, onTap: () => onTap(s.number));
+        return _SurahRow(s: s, onTap: () => onTap(s.number), style: style);
       },
     );
   }
@@ -226,13 +224,14 @@ class _SurahTab extends StatelessWidget {
 class _SurahRow extends StatelessWidget {
   final dynamic s;
   final VoidCallback onTap;
-  const _SurahRow({required this.s, required this.onTap});
+  final AdaptiveStyle style;
+  const _SurahRow({required this.s, required this.onTap, required this.style});
 
   @override
   Widget build(BuildContext context) {
     final surahNum = s.number as int;
     final colors = [
-      _kGold,
+      style.gold,
       const Color(0xFF3AAFA9),
       const Color(0xFF4CAF7D),
       const Color(0xFF9B59B6),
@@ -244,12 +243,14 @@ class _SurahRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: _kBorder.withOpacity(0.4))),
+          border: Border(
+            bottom: BorderSide(color: style.border.withOpacity(0.4)),
+          ),
         ),
         child: Row(
           children: [
             // Arrow
-            const Icon(Icons.chevron_left, color: Colors.white30, size: 20),
+            Icon(Icons.chevron_left, color: style.textDim, size: 20),
             const SizedBox(width: 8),
             // Arabic calligraphic name (left side)
             Expanded(
@@ -271,20 +272,15 @@ class _SurahRow extends StatelessWidget {
               children: [
                 Text(
                   s.englishName as String,
-                  style: const TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  style: style.amiri(
+                    17,
+                    color: style.text,
+                    weight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   '${s.ayahsNumber as int} آية',
-                  style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 12,
-                    color: Colors.white38,
-                  ),
+                  style: style.naskh(12, color: style.textSec),
                 ),
               ],
             ),
@@ -322,7 +318,8 @@ class _SurahRow extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 class _ReviewTab extends StatelessWidget {
   final void Function(int) onTap;
-  const _ReviewTab({required this.onTap});
+  final AdaptiveStyle style;
+  const _ReviewTab({required this.onTap, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -350,14 +347,14 @@ class _ReviewTab extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: _kCard,
+              color: style.card,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _kBorder),
+              border: Border.all(color: style.border),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.chevron_left, color: Colors.white30, size: 20),
+                Icon(Icons.chevron_left, color: style.textDim, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -365,23 +362,17 @@ class _ReviewTab extends StatelessWidget {
                     children: [
                       Text(
                         surah.arabicName,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        style: style.amiri(
+                          18,
+                          color: style.text,
+                          weight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         previewText,
                         textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 14,
-                          color: Colors.white54,
-                          height: 1.6,
-                        ),
+                        style: style.amiri(14, color: style.textSec),
                       ),
                     ],
                   ),
@@ -390,17 +381,17 @@ class _ReviewTab extends StatelessWidget {
                 Container(
                   width: 30,
                   height: 30,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color(0xFF1A3A28),
+                    color: style.gold.withOpacity(0.15),
                   ),
                   child: Center(
                     child: Text(
                       ar(i + 1),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 11,
-                        color: Color(0xFF4CAF7D),
+                        color: style.gold,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -422,10 +413,12 @@ class _IndexTab extends StatelessWidget {
   final String query;
   final QuranBookmark? lastRead;
   final void Function(int) onTap;
+  final AdaptiveStyle style;
   const _IndexTab({
     required this.query,
     required this.lastRead,
     required this.onTap,
+    required this.style,
   });
 
   @override
@@ -439,7 +432,7 @@ class _IndexTab extends StatelessWidget {
             margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFFD07010),
+              color: style.isRamadan ? style.gold : const Color(0xFFD07010),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -447,11 +440,10 @@ class _IndexTab extends StatelessWidget {
                 lastRead != null
                     ? 'آخر قراءة: ${lastRead!.surahName} - صفحة ${ar(lastRead!.page)}'
                     : 'آخر قراءة: لا يوجد',
-                style: const TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
+                style: style.naskh(
+                  15,
                   color: Colors.white,
+                  weight: FontWeight.bold,
                 ),
               ),
             ),
@@ -479,30 +471,25 @@ class _IndexTab extends StatelessWidget {
                 onTap: () => onTap(page),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: _kCard,
+                    color: style.card,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: _kBorder),
+                    border: Border.all(color: style.border),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         ar(page),
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 20,
-                          color: Color(0xFF3AAFA9),
-                          fontWeight: FontWeight.w500,
+                        style: style.amiri(
+                          20,
+                          color: style.gold,
+                          weight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
+                      Text(
                         'صفحة',
-                        style: TextStyle(
-                          fontFamily: 'NotoNaskhArabic',
-                          fontSize: 10,
-                          color: Colors.white38,
-                        ),
+                        style: style.naskh(10, color: style.textDim),
                       ),
                     ],
                   ),
@@ -521,7 +508,8 @@ class _IndexTab extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 class _JuzTab extends StatelessWidget {
   final void Function(int) onTap;
-  const _JuzTab({required this.onTap});
+  final AdaptiveStyle style;
+  const _JuzTab({required this.onTap, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -548,9 +536,9 @@ class _JuzTab extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: _kCard,
+              color: style.card,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _kBorder),
+              border: Border.all(color: style.border),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -563,23 +551,17 @@ class _JuzTab extends StatelessWidget {
                     children: [
                       Text(
                         surah.arabicName,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        style: style.amiri(
+                          18,
+                          color: style.text,
+                          weight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         preview,
                         textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 14,
-                          color: Colors.white54,
-                          height: 1.6,
-                        ),
+                        style: style.amiri(14, color: style.textSec),
                       ),
                     ],
                   ),
@@ -590,18 +572,16 @@ class _JuzTab extends StatelessWidget {
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFFD07010).withOpacity(0.2),
-                    border: Border.all(
-                      color: const Color(0xFFD07010).withOpacity(0.4),
-                    ),
+                    color: style.gold.withOpacity(0.2),
+                    border: Border.all(color: style.gold.withOpacity(0.4)),
                   ),
                   child: Center(
                     child: Text(
                       ar(i + 1),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 12,
-                        color: Color(0xFFE0A030),
+                        color: style.gold,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -621,7 +601,8 @@ class _JuzTab extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 class _RubTab extends StatelessWidget {
   final void Function(int) onTap;
-  const _RubTab({required this.onTap});
+  final AdaptiveStyle style;
+  const _RubTab({required this.onTap, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -672,11 +653,10 @@ class _RubTab extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 'حزب $hizb',
-                style: const TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 16,
-                  color: Colors.white54,
-                  fontWeight: FontWeight.bold,
+                style: style.amiri(
+                  16,
+                  color: style.textSec,
+                  weight: FontWeight.bold,
                 ),
               ),
             ),
@@ -690,9 +670,9 @@ class _RubTab extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 6),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _kCard,
+                    color: style.card,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _kBorder),
+                    border: Border.all(color: style.border),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -707,15 +687,15 @@ class _RubTab extends StatelessWidget {
                             CircularProgressIndicator(
                               value: progress,
                               strokeWidth: 2.5,
-                              backgroundColor: _kBorder,
+                              backgroundColor: style.border,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 idx == 0
-                                    ? Colors.white38
+                                    ? style.textDim
                                     : idx == 1
-                                    ? const Color(0xFF3AAFA9)
+                                    ? style.gold
                                     : idx == 2
-                                    ? Colors.white54
-                                    : Colors.white,
+                                    ? style.textSec
+                                    : style.text,
                               ),
                             ),
                             Text(
@@ -728,7 +708,7 @@ class _RubTab extends StatelessWidget {
                                   : '1',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: idx == 3 ? Colors.white : Colors.white38,
+                                color: idx == 3 ? style.text : style.textDim,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -742,23 +722,17 @@ class _RubTab extends StatelessWidget {
                           children: [
                             Text(
                               q['surahName'] as String,
-                              style: const TextStyle(
-                                fontFamily: 'Amiri',
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                              style: style.amiri(
+                                16,
+                                color: style.text,
+                                weight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 3),
                             Text(
                               q['preview'] as String,
                               textDirection: TextDirection.rtl,
-                              style: const TextStyle(
-                                fontFamily: 'Amiri',
-                                fontSize: 13,
-                                color: Colors.white38,
-                                height: 1.4,
-                              ),
+                              style: style.amiri(13, color: style.textSec),
                             ),
                           ],
                         ),

@@ -8,31 +8,31 @@ import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
 
 class KhatmaSettingsScreen extends ConsumerWidget {
   const KhatmaSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
     final state = ref.watch(quranStateProvider);
 
     return Scaffold(
+      backgroundColor: style.bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          const SliverAppBar(
-            backgroundColor: Color.fromARGB(46, 4, 1, 35),
-            foregroundColor: Colors.white,
+          SliverAppBar(
+            backgroundColor: style.isRamadan ? style.bg : const Color.fromARGB(46, 4, 1, 35),
+            foregroundColor: style.text,
             pinned: true,
-            leading: CustomLeadingButton(),
+            leading: const CustomLeadingButton(),
             title: Text(
               'الإعدادات',
-              style: TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 22,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+              style: style.amiri(22, color: style.text, weight: FontWeight.bold),
             ),
             centerTitle: true,
           ),
@@ -43,40 +43,31 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  _sectionHeader('إعدادات القراءة'),
+                  _sectionHeader(style, 'إعدادات القراءة'),
                   const SizedBox(height: 14),
 
                   // Font size
                   _settingsCard(
+                    style: style,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.format_size_rounded,
-                              color: kGoldChip,
+                              color: style.gold,
                               size: 20,
                             ),
                             const SizedBox(width: 10),
-                            const Text(
+                            Text(
                               'حجم الخط',
-                              style: TextStyle(
-                                fontFamily: 'Amiri',
-                                fontSize: 17,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: style.amiri(17, color: style.text, weight: FontWeight.bold),
                             ),
                             const Spacer(),
                             Text(
-                              '${state.fontSize.toInt()}',
-                              style: const TextStyle(
-                                fontFamily: 'NotoNaskhArabic',
-                                fontSize: 15,
-                                color: kGoldChip,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              ar(state.fontSize.toInt()),
+                              style: style.naskh(15, color: style.gold, weight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -84,8 +75,8 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           value: state.fontSize,
                           min: 14,
                           max: 34,
-                          activeColor: kGoldChip,
-                          inactiveColor: Colors.white12,
+                          activeColor: style.gold,
+                          inactiveColor: style.gold.withOpacity(0.1),
                           onChanged: (v) => ref
                               .read(quranStateProvider.notifier)
                               .setFontSize(v),
@@ -94,17 +85,13 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black26,
+                            color: style.card,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
                             child: Text(
                               'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-                              style: TextStyle(
-                                fontFamily: 'Amiri',
-                                fontSize: state.fontSize,
-                                color: Colors.white,
-                              ),
+                              style: style.amiri(state.fontSize, color: style.text),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -116,25 +103,21 @@ class KhatmaSettingsScreen extends ConsumerWidget {
 
                   // Theme
                   _settingsCard(
+                    style: style,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             Icon(
                               Icons.palette_rounded,
-                              color: kGoldChip,
+                              color: style.gold,
                               size: 20,
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
                               'مظهر القراءة',
-                              style: TextStyle(
-                                fontFamily: 'Amiri',
-                                fontSize: 17,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: style.amiri(17, color: style.text, weight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -170,7 +153,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: selected
-                                          ? kGoldChip
+                                          ? style.gold
                                           : Colors.transparent,
                                       width: 2,
                                     ),
@@ -210,44 +193,49 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  _sectionHeader('إعدادات الختمة'),
+                  _sectionHeader(style, 'إعدادات الختمة'),
                   const SizedBox(height: 14),
 
                   // Daily target
                   _settingsCard(
+                    style: style,
                     child: Column(
                       children: [
                         _tileRow(
+                          style,
                           Icons.today_rounded,
                           'الهدف اليومي',
                           '${ar(5)} صفحات',
                         ),
-                        const Divider(color: Colors.white10, height: 20),
+                        Divider(color: style.gold.withOpacity(0.05), height: 20),
                         _tileRow(
+                          style,
                           Icons.notifications_rounded,
                           'تذكير يومي',
                           '',
                           trailing: Switch(
                             value: true,
-                            activeColor: kGoldChip,
+                            activeColor: style.gold,
                             onChanged: (_) {},
                           ),
                         ),
-                        const Divider(color: Colors.white10, height: 20),
-                        _tileRow(Icons.mic_rounded, 'القارئ', 'الشيخ المنشاوي'),
+                        Divider(color: style.gold.withOpacity(0.05), height: 20),
+                        _tileRow(style, Icons.mic_rounded, 'القارئ', 'الشيخ المنشاوي'),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 24),
-                  _sectionHeader('معلومات التطبيق'),
+                  _sectionHeader(style, 'معلومات التطبيق'),
                   const SizedBox(height: 14),
                   _settingsCard(
+                    style: style,
                     child: Column(
                       children: [
-                        _tileRow(Icons.info_outline, 'الإصدار', '١.٠.٠'),
-                        const Divider(color: Colors.white10, height: 20),
+                        _tileRow(style, Icons.info_outline, 'الإصدار', '١.٠.٠'),
+                        Divider(color: style.gold.withOpacity(0.05), height: 20),
                         _tileRow(
+                          style,
                           Icons.star_outline_rounded,
                           'تقييم التطبيق',
                           '',
@@ -265,45 +253,41 @@ class KhatmaSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _sectionHeader(String title) => Padding(
+  Widget _sectionHeader(AdaptiveStyle style, String title) => Padding(
     padding: const EdgeInsets.only(right: 4),
     child: Text(
       title,
-      style: const TextStyle(
-        fontFamily: 'Amiri',
-        fontSize: 16,
-        color: Colors.white54,
-        fontWeight: FontWeight.bold,
+      style: style.amiri(
+        16,
+        color: style.text.withOpacity(0.5),
+        weight: FontWeight.bold,
       ),
     ),
   );
 
-  Widget _settingsCard({required Widget child}) => Container(
+  Widget _settingsCard({required AdaptiveStyle style, required Widget child}) => Container(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.07),
+      color: style.card,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Colors.white.withOpacity(0.1)),
+      border: Border.all(color: style.gold.withOpacity(0.1)),
     ),
     child: child,
   );
 
   Widget _tileRow(
+    AdaptiveStyle style,
     IconData icon,
     String label,
     String value, {
     Widget? trailing,
   }) => Row(
     children: [
-      Icon(icon, color: kGoldChip, size: 20),
+      Icon(icon, color: style.gold, size: 20),
       const SizedBox(width: 12),
       Text(
         label,
-        style: const TextStyle(
-          fontFamily: 'NotoNaskhArabic',
-          fontSize: 14,
-          color: Colors.white70,
-        ),
+        style: style.naskh(14, color: style.text.withOpacity(0.7)),
       ),
       const Spacer(),
       if (trailing != null)
@@ -311,11 +295,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
       else
         Text(
           value,
-          style: const TextStyle(
-            fontFamily: 'NotoNaskhArabic',
-            fontSize: 13,
-            color: Colors.white38,
-          ),
+          style: style.naskh(13, color: style.text.withOpacity(0.4)),
         ),
     ],
   );

@@ -8,12 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 
-const _kBg = Color(0xFF08121E);
-const _kCard = Color(0xFF0F1E2D);
-const _kGreen = Color(0xFF1A5234);
-const _kGold = Color(0xFFC8A96E);
-const _kBorder = Color(0xFF1E3040);
+// Styles are managed via AdaptiveStyle
 
 class KhatmaHistoryScreen extends ConsumerStatefulWidget {
   const KhatmaHistoryScreen({super.key});
@@ -42,6 +40,9 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    final style = AdaptiveStyle(context, isRamadan);
+
     final completed = ref.watch(khatmaCompletedProvider);
     final cancelled = ref.watch(khatmaCancelledProvider);
 
@@ -49,19 +50,19 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     final cancelledCount = cancelled.value?.length ?? 0;
 
     return Scaffold(
-      backgroundColor: _kBg,
-      bottomSheet: _toastMsg != null ? _buildToast() : null,
+      backgroundColor: style.bg,
+      bottomSheet: _toastMsg != null ? _buildToast(style) : null,
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(),
-            _buildTabBar(completedCount, cancelledCount),
+            _buildHeader(style),
+            _buildTabBar(style, completedCount, cancelledCount),
             Expanded(
               child: TabBarView(
                 controller: _tab,
                 children: [
-                  _buildCompletedList(completed),
-                  _buildCancelledList(cancelled),
+                  _buildCompletedList(style, completed),
+                  _buildCancelledList(style, cancelled),
                 ],
               ),
             ),
@@ -71,43 +72,38 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildHeader() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(18, 14, 18, 0),
+  Widget _buildHeader(AdaptiveStyle style) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
         children: [
-          CustomLeadingButton(),
-          Spacer(),
+          const CustomLeadingButton(),
+          const Spacer(),
           Text(
             'تاريخ الختمات',
-            style: TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
-          Spacer(),
-          SizedBox(width: 28),
+          const Spacer(),
+          const SizedBox(width: 28),
         ],
       ),
     );
   }
 
-  Widget _buildTabBar(int completedCount, int cancelledCount) {
+  Widget _buildTabBar(AdaptiveStyle style, int completedCount, int cancelledCount) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: _kBorder)),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: style.border)),
       ),
       child: TabBar(
         controller: _tab,
         splashFactory: NoSplash.splashFactory,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
-        indicatorColor: Colors.white,
+        indicatorColor: style.gold,
         indicatorWeight: 2,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white38,
+        labelColor: style.gold,
+        unselectedLabelColor: style.textDim,
         dividerColor: Colors.transparent,
         tabs: [
           Tab(
@@ -117,11 +113,8 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
                 const Icon(Icons.check_circle_outline, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  'مكتملة ومنتهية ($completedCount)',
-                  style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 13,
-                  ),
+                  'مكتملة ($completedCount)',
+                  style: style.naskh(13, weight: FontWeight.bold),
                 ),
               ],
             ),
@@ -134,10 +127,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
                 const SizedBox(width: 6),
                 Text(
                   'ملغاة ($cancelledCount)',
-                  style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 13,
-                  ),
+                  style: style.naskh(13, weight: FontWeight.bold),
                 ),
               ],
             ),
@@ -147,16 +137,17 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildCompletedList(AsyncValue<List<KhatmaSessionEx>> async) {
+  Widget _buildCompletedList(AdaptiveStyle style, AsyncValue<List<KhatmaSessionEx>> async) {
     return async.when(
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: _kGreen)),
-      error: (_, __) => const Center(
-        child: Text('خطأ', style: TextStyle(color: Colors.white)),
+          Center(child: CircularProgressIndicator(color: style.gold)),
+      error: (_, __) => Center(
+        child: Text('خطأ', style: style.naskh(14, color: style.text)),
       ),
       data: (list) {
         if (list.isEmpty) {
           return _buildEmpty(
+            style: style,
             icon: Icons.history_rounded,
             title: 'لا توجد ختمات مكتملة أو منتهية',
             subtitle: 'ابدأ ختمة جديدة لتظهر هنا عند اكتمالها أو إنهائها',
@@ -165,22 +156,23 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: list.length,
-          itemBuilder: (_, i) => _KhatmaCard(session: list[i], onDelete: null),
+          itemBuilder: (_, i) => _KhatmaCard(session: list[i], onDelete: null, style: style),
         );
       },
     );
   }
 
-  Widget _buildCancelledList(AsyncValue<List<KhatmaSessionEx>> async) {
+  Widget _buildCancelledList(AdaptiveStyle style, AsyncValue<List<KhatmaSessionEx>> async) {
     return async.when(
       loading: () =>
-          const Center(child: CircularProgressIndicator(color: _kGreen)),
-      error: (_, __) => const Center(
-        child: Text('خطأ', style: TextStyle(color: Colors.white)),
+          Center(child: CircularProgressIndicator(color: style.gold)),
+      error: (_, __) => Center(
+        child: Text('خطأ', style: style.naskh(14, color: style.text)),
       ),
       data: (list) {
         if (list.isEmpty) {
           return _buildEmpty(
+            style: style,
             icon: Icons.archive_outlined,
             title: 'لا توجد ختمات ملغاة',
             subtitle: 'الختمات الملغاة ستظهر هنا',
@@ -191,7 +183,8 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
           itemCount: list.length,
           itemBuilder: (_, i) => _KhatmaCard(
             session: list[i],
-            onDelete: () => _showDeleteConfirm(list[i]),
+            onDelete: () => _showDeleteConfirm(style, list[i]),
+            style: style,
           ),
         );
       },
@@ -199,6 +192,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
   }
 
   Widget _buildEmpty({
+    required AdaptiveStyle style,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -207,15 +201,11 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 72, color: Colors.white.withOpacity(0.15)),
+          Icon(icon, size: 72, color: style.textDim.withOpacity(0.15)),
           const SizedBox(height: 20),
           Text(
             title,
-            style: const TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 18,
-              color: Colors.white38,
-            ),
+            style: style.naskh(18, color: style.textDim),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -223,11 +213,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               subtitle,
-              style: const TextStyle(
-                fontFamily: 'NotoNaskhArabic',
-                fontSize: 13,
-                color: Colors.white24,
-              ),
+              style: style.naskh(13, color: style.textSec.withOpacity(0.5)),
               textAlign: TextAlign.center,
             ),
           ),
@@ -236,32 +222,29 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  void _showDeleteConfirm(KhatmaSessionEx session) {
+  void _showDeleteConfirm(AdaptiveStyle style, KhatmaSessionEx session) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _kCard,
+        backgroundColor: style.card,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: _kBorder),
+          side: BorderSide(color: style.border),
         ),
-        title: const Text(
+        title: Text(
           'حذف الختمة',
           textAlign: TextAlign.right,
-          style: TextStyle(fontFamily: 'Amiri', color: Colors.white),
+          style: style.amiri(20, color: style.text, weight: FontWeight.bold),
         ),
-        content: const Text(
+        content: Text(
           'هل تريد حذف هذه الختمة نهائياً؟',
           textAlign: TextAlign.right,
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
-            color: Colors.white60,
-          ),
+          style: style.naskh(14, color: style.textSec),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white38)),
+            child: Text('إلغاء', style: style.naskh(14, color: style.textDim)),
           ),
           TextButton(
             onPressed: () {
@@ -283,19 +266,15 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     });
   }
 
-  Widget _buildToast() {
+  Widget _buildToast(AdaptiveStyle style) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      color: _kGreen,
+      color: style.gold.withOpacity(0.9),
       child: Text(
         _toastMsg ?? '',
         textAlign: TextAlign.right,
-        style: const TextStyle(
-          fontFamily: 'NotoNaskhArabic',
-          fontSize: 14,
-          color: Colors.white,
-        ),
+        style: style.naskh(14, color: Colors.white, weight: FontWeight.bold),
       ),
     );
   }
@@ -304,7 +283,8 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 class _KhatmaCard extends StatelessWidget {
   final KhatmaSessionEx session;
   final VoidCallback? onDelete;
-  const _KhatmaCard({required this.session, required this.onDelete});
+  final AdaptiveStyle style;
+  const _KhatmaCard({required this.session, required this.onDelete, required this.style});
 
   @override
   Widget build(BuildContext context) {
@@ -319,9 +299,9 @@ class _KhatmaCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _kCard,
+        color: style.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: style.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -352,29 +332,22 @@ class _KhatmaCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: session.isCompleted
-                      ? _kGold.withOpacity(0.18)
+                      ? style.gold.withOpacity(0.18)
                       : Colors.redAccent.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
                   session.isCompleted ? 'مكتملة' : 'ملغاة',
-                  style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 12,
-                    color: session.isCompleted ? _kGold : Colors.redAccent,
-                    fontWeight: FontWeight.w600,
+                  style: style.naskh(12, 
+                    color: session.isCompleted ? style.gold : Colors.redAccent,
+                    weight: FontWeight.w600,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Text(
                 session.label,
-                style: const TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                style: style.amiri(18, color: style.text, weight: FontWeight.bold),
               ),
             ],
           ),
@@ -385,7 +358,7 @@ class _KhatmaCard extends StatelessWidget {
               value: session.progress,
               backgroundColor: Colors.white.withOpacity(0.08),
               valueColor: AlwaysStoppedAnimation<Color>(
-                session.isCompleted ? _kGold : Colors.white24,
+                session.isCompleted ? style.gold : style.textDim,
               ),
               minHeight: 5,
             ),
@@ -394,12 +367,14 @@ class _KhatmaCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _info(Icons.timer_rounded, '${ar(days)} يوم'),
-              _info(
+              _buildInfo(style, Icons.timer_rounded, '${ar(days)} يوم'),
+              _buildInfo(
+                style,
                 Icons.auto_stories_rounded,
                 '${ar(session.pagesRead)} / ${ar(KhatmaSessionEx.totalPages)} صفحة',
               ),
-              _info(
+              _buildInfo(
+                style,
                 Icons.calendar_today_rounded,
                 fmt.format(session.startDate),
               ),
@@ -410,18 +385,14 @@ class _KhatmaCard extends StatelessWidget {
     );
   }
 
-  Widget _info(IconData icon, String text) => Row(
+  Widget _buildInfo(AdaptiveStyle style, IconData icon, String text) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Icon(icon, size: 12, color: Colors.white30),
+      Icon(icon, size: 12, color: style.textDim),
       const SizedBox(width: 4),
       Text(
         text,
-        style: const TextStyle(
-          fontFamily: 'NotoNaskhArabic',
-          fontSize: 11,
-          color: Colors.white38,
-        ),
+        style: style.naskh(11, color: style.textSec),
       ),
     ],
   );

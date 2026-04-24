@@ -20,13 +20,7 @@ import 'ai_memorize_screen.dart';
 import 'quran_reader_screen.dart';
 import 'free_reading_screen.dart';
 
-const _kBg = Color(0xFF08121E);
-const _kCard = Color(0xFF0F1E2D);
-const _kGreenDark = Color(0xFF1A5234);
-const _kGreenMid = Color(0xFF236644);
-const _kGold = Color(0xFFC8A96E);
-const _kGoldLight = Color(0xFFD4B483);
-const _kBorder = Color(0xFF1E3040);
+// Styles are handled by AdaptiveStyle
 
 class QuranScreen extends ConsumerStatefulWidget {
   const QuranScreen({super.key});
@@ -72,16 +66,16 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
                 slivers: [
-                  SliverToBoxAdapter(child: _buildTopBar()),
-                  SliverToBoxAdapter(child: _buildDatePill()),
+                  SliverToBoxAdapter(child: _buildTopBar(style)),
+                  SliverToBoxAdapter(child: _buildDatePill(style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                  SliverToBoxAdapter(child: _buildVerseCard(dailyVerse)),
+                  SliverToBoxAdapter(child: _buildVerseCard(dailyVerse, style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                  SliverToBoxAdapter(child: _buildKhatmaButton(khatma)),
+                  SliverToBoxAdapter(child: _buildKhatmaButton(khatma, style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                  SliverToBoxAdapter(child: _buildFreeReadingButton()),
+                  SliverToBoxAdapter(child: _buildFreeReadingButton(style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 18)),
-                  SliverToBoxAdapter(child: _buildGrid()),
+                  SliverToBoxAdapter(child: _buildGrid(style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 ],
               ),
@@ -92,7 +86,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _buildTopBar() {
+  Widget _buildTopBar(AdaptiveStyle style) {
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -105,32 +99,20 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             // Center: title
             Column(
               children: [
-                const Text(
-                  'ختمة',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('ختمة', style: style.amiri(28, color: style.text)),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: _kGold.withOpacity(0.18),
+                    color: style.gold.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: _kGold.withOpacity(0.45)),
+                    border: Border.all(color: style.gold.withOpacity(0.45)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'القرآن الكريم',
-                    style: TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 13,
-                      color: _kGold,
-                    ),
+                    style: style.amiri(13, color: style.gold),
                   ),
                 ),
               ],
@@ -141,15 +123,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: _kGold.withOpacity(0.15),
+                color: style.gold.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _kGold.withOpacity(0.35)),
+                border: Border.all(color: style.gold.withOpacity(0.35)),
               ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                color: _kGold,
-                size: 22,
-              ),
+              child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
             ),
           ],
         ),
@@ -157,46 +135,39 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _kBorder),
-      ),
-      child: Icon(icon, color: Colors.white60, size: 22),
-    ),
-  );
+  Widget _iconBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: style.text.withOpacity(0.07),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: style.border),
+          ),
+          child: Icon(icon, color: style.textSec, size: 22),
+        ),
+      );
 
-  Widget _buildDatePill() {
+  Widget _buildDatePill(AdaptiveStyle style) {
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: style.text.withOpacity(0.06),
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: _kBorder),
+          border: Border.all(color: style.border),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.calendar_today_rounded,
-              color: Colors.white38,
-              size: 14,
-            ),
+            Icon(Icons.calendar_today_rounded, color: style.textDim, size: 14),
             const SizedBox(width: 8),
             Text(
               hijriDateString(),
-              style: const TextStyle(
-                fontFamily: 'NotoNaskhArabic',
-                fontSize: 13,
-                color: Colors.white70,
-              ),
+              style: style.naskh(13, color: style.textSec),
             ),
           ],
         ),
@@ -204,13 +175,13 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _buildVerseCard(Map<String, dynamic> verse) {
+  Widget _buildVerseCard(Map<String, dynamic> verse, AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
-        color: _kCard,
+        color: style.card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: style.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,11 +190,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
             child: Row(
               children: [
-                _surahChip(verse['surahName'] as String),
+                _surahChip(verse['surahName'] as String, style),
                 const Spacer(),
-                _tinyBtn(Icons.share_rounded, () {}),
+                _tinyBtn(Icons.share_rounded, () {}, style),
                 const SizedBox(width: 6),
-                _tinyBtn(Icons.refresh_rounded, () => setState(() {})),
+                _tinyBtn(Icons.refresh_rounded, () => setState(() {}), style),
               ],
             ),
           ),
@@ -233,12 +204,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               verse['text'] as String,
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
-              style: const TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 20,
-                color: Colors.white,
-                height: 2.0,
-              ),
+              style: style.amiri(20, color: style.text, height: 2.0),
             ),
           ),
           Padding(
@@ -251,9 +217,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                       initialSurah: verse['surahNumber'] as int,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.chevron_left,
-                    color: Colors.white38,
+                    color: style.textDim,
                     size: 22,
                   ),
                 ),
@@ -264,7 +230,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.06),
+                    color: style.text.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -272,16 +238,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     children: [
                       Text(
                         'آية ${ar(verse['ayahNumber'] as int)}',
-                        style: const TextStyle(
-                          fontFamily: 'Amiri',
-                          fontSize: 13,
-                          color: Colors.white70,
-                        ),
+                        style: style.amiri(13, color: style.textSec),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         '»»',
-                        style: TextStyle(color: Colors.white30, fontSize: 11),
+                        style: TextStyle(color: style.textDim, fontSize: 11),
                       ),
                     ],
                   ),
@@ -294,44 +256,40 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _surahChip(String name) => Container(
+  Widget _surahChip(String name, AdaptiveStyle style) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
     decoration: BoxDecoration(
-      color: _kGold.withOpacity(0.2),
+      color: style.gold.withOpacity(0.2),
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: _kGold.withOpacity(0.4)),
+      border: Border.all(color: style.gold.withOpacity(0.4)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.auto_awesome, color: _kGold, size: 12),
+        Icon(Icons.auto_awesome, color: style.gold, size: 12),
         const SizedBox(width: 5),
         Text(
           name,
-          style: const TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 14,
-            color: _kGold,
-            fontWeight: FontWeight.bold,
-          ),
+          style: style.amiri(14, color: style.gold, weight: FontWeight.bold),
         ),
       ],
     ),
   );
 
-  Widget _tinyBtn(IconData icon, VoidCallback onTap) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.all(7),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, color: Colors.white60, size: 16),
-    ),
-  );
+  Widget _tinyBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: style.text.withOpacity(0.07),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: style.textSec, size: 16),
+        ),
+      );
 
-  Widget _buildKhatmaButton(KhatmaSessionEx? khatma) {
+  Widget _buildKhatmaButton(KhatmaSessionEx? khatma, AdaptiveStyle style) {
     final hasActive = khatma != null && khatma.isActive;
     return GestureDetector(
       onTap: () {
@@ -350,11 +308,13 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         margin: const EdgeInsets.symmetric(horizontal: 18),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
-          color: _kGreenDark,
+          color: style.isRamadan ? style.gold.withOpacity(0.9) : style.teal,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: _kGreenDark.withOpacity(0.4),
+              color: (style.isRamadan ? style.gold : style.teal).withOpacity(
+                0.4,
+              ),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -364,8 +324,8 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           children: [
             _circleBtn(
               Icons.chevron_left,
-              Colors.white.withOpacity(0.15),
-              Colors.white70,
+              style.text.withOpacity(0.15),
+              style.textSec,
               () => _push(const KhatmaHistoryScreen()),
             ),
             const SizedBox(width: 14),
@@ -374,11 +334,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                 children: [
                   Text(
                     hasActive ? 'متابعة الختمة' : 'ابدأ ختمة جديدة',
-                    style: const TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
+                    style: style.amiri(
+                      19,
                       color: Colors.white,
+                      weight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -386,10 +345,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     hasActive
                         ? 'أكمل القراءة من صفحة ${ar(khatma.currentPage)}'
                         : 'حدد خيارات الختمة التي تناسبك',
-                    style: const TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white70,
+                    style: style.naskh(
+                      12,
+                      color: Colors.white.withOpacity(0.85),
                     ),
                   ),
                 ],
@@ -398,7 +356,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(width: 14),
             _circleBtn(
               hasActive ? Icons.play_arrow_rounded : Icons.add,
-              Colors.white.withOpacity(0.2),
+              style.text.withOpacity(0.2),
               Colors.white,
               () => hasActive
                   ? _push(
@@ -415,18 +373,21 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _buildFreeReadingButton() {
+  Widget _buildFreeReadingButton(AdaptiveStyle style) {
     return GestureDetector(
       onTap: () => _push(const FreeReadingScreen()),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 18),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
-          color: _kGreenMid,
+          color: style.isRamadan
+              ? style.goldDim
+              : style.success.withOpacity(0.8),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: _kGreenMid.withOpacity(0.35),
+              color: (style.isRamadan ? style.goldDim : style.success)
+                  .withOpacity(0.35),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -436,30 +397,28 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           children: [
             _circleBtn(
               Icons.chevron_left,
-              Colors.white.withOpacity(0.15),
-              Colors.white70,
+              style.text.withOpacity(0.15),
+              style.textSec,
               () => _push(const FreeReadingScreen()),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Column(
                 children: [
                   Text(
                     'قراءة حرة',
-                    style: TextStyle(
-                      fontFamily: 'Amiri',
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
+                    style: style.amiri(
+                      19,
                       color: Colors.white,
+                      weight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Text(
                     'اقرأ القرآن الكريم بحرية',
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 12,
-                      color: Colors.white70,
+                    style: style.naskh(
+                      12,
+                      color: Colors.white.withOpacity(0.85),
                     ),
                   ),
                 ],
@@ -468,7 +427,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(width: 14),
             _circleBtn(
               Icons.menu_book_rounded,
-              Colors.white.withOpacity(0.2),
+              style.text.withOpacity(0.2),
               Colors.white,
               () => _push(const FreeReadingScreen()),
             ),
@@ -489,34 +448,42 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         ),
       );
 
-  Widget _buildGrid() {
+  Widget _buildGrid(AdaptiveStyle style) {
     final items = [
       _GridItem(
         icon: Icons.history_rounded,
         title: 'تاريخ الختمات',
         subtitle: 'الختمات المكتملة',
-        color: const Color(0xFF7A6833),
+        color: style.isRamadan
+            ? style.gold.withOpacity(0.7)
+            : const Color(0xFF7A6833),
         onTap: () => _push(const KhatmaHistoryScreen()),
       ),
       _GridItem(
         icon: Icons.bar_chart_rounded,
         title: 'تقدم الختمة',
         subtitle: 'إحصائيات القراءة',
-        color: const Color(0xFF1A5C3A),
+        color: style.isRamadan
+            ? style.goldDark.withOpacity(0.7)
+            : const Color(0xFF1A5C3A),
         onTap: () => _push(const KhatmaProgressScreen()),
       ),
       _GridItem(
         icon: Icons.settings_rounded,
         title: 'الإعدادات',
         subtitle: 'تخصيص التطبيق',
-        color: const Color(0xFF7A6833),
+        color: style.isRamadan
+            ? style.gold.withOpacity(0.7)
+            : const Color(0xFF7A6833),
         onTap: () => _push(const KhatmaSettingsScreen()),
       ),
       _GridItem(
         isAi: true,
         title: 'تحفيظ ذكي',
         subtitle: 'حفظ القرآن بالذكاء الاصطناعي',
-        color: const Color(0xFF1A4060),
+        color: style.isRamadan
+            ? style.teal.withOpacity(0.7)
+            : const Color(0xFF1A4060),
         onTap: () => _push(const AiMemorizeScreen()),
       ),
     ];
@@ -530,19 +497,19 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
         childAspectRatio: 1.1,
-        children: items.map(_buildGridItem).toList(),
+        children: items.map((item) => _buildGridItem(item, style)).toList(),
       ),
     );
   }
 
-  Widget _buildGridItem(_GridItem item) {
+  Widget _buildGridItem(_GridItem item, AdaptiveStyle style) {
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: _kCard,
+          color: style.card,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: _kBorder),
+          border: Border.all(color: style.border),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -555,14 +522,13 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                 borderRadius: BorderRadius.circular(14),
               ),
               child: item.isAi
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'AI',
-                        style: TextStyle(
-                          fontFamily: 'NotoNaskhArabic',
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                        style: style.naskh(
+                          18,
                           color: Colors.white,
+                          weight: FontWeight.bold,
                         ),
                       ),
                     )
@@ -571,21 +537,16 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(height: 10),
             Text(
               item.title,
-              style: const TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              style: style.amiri(
+                15,
+                color: style.text,
+                weight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 3),
             Text(
               item.subtitle,
-              style: const TextStyle(
-                fontFamily: 'NotoNaskhArabic',
-                fontSize: 10,
-                color: Colors.white54,
-              ),
+              style: style.naskh(10, color: style.textSec),
               textAlign: TextAlign.center,
             ),
           ],

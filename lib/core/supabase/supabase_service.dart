@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added for secure config
 import 'supabase_config.dart';
 
 class SupabaseService {
@@ -24,11 +25,15 @@ class SupabaseService {
         return await request();
       } on SocketException catch (e) {
         if (attempts >= maxAttempts) rethrow;
-        print('Supabase Request failed (SocketException), retrying $attempts/$maxAttempts: $e');
+        print(
+          'Supabase Request failed (SocketException), retrying $attempts/$maxAttempts: $e',
+        );
         await Future.delayed(const Duration(seconds: 1));
       } on http.ClientException catch (e) {
         if (attempts >= maxAttempts) rethrow;
-        print('Supabase Request failed (ClientException), retrying $attempts/$maxAttempts: $e');
+        print(
+          'Supabase Request failed (ClientException), retrying $attempts/$maxAttempts: $e',
+        );
         await Future.delayed(const Duration(seconds: 1));
       } catch (e) {
         // الأخطاء الأخرى نمررها مباشرة (مثل أخطاء الـ SQL أو الصلاحيات)
@@ -63,10 +68,12 @@ class SupabaseService {
 
   static Future<AuthResponse?> signInWithGoogle() async {
     try {
-      // 1. Web client ID from Google Cloud Console
-      // Note: In a real app, this should be in .env
-      const webClientId = 'YOUR_WEB_CLIENT_ID_FROM_GOOGLE_CONSOLE';
-      const iosClientId = 'YOUR_IOS_CLIENT_ID_FROM_GOOGLE_CONSOLE';
+      final webClientId = dotenv.env['SUPABASE_WEB_CLIENT_ID'];
+      final iosClientId = dotenv.env['SUPABASE_IOS_CLIENT_ID'];
+
+      if (webClientId == null || iosClientId == null) {
+        throw 'Security Error: Google Client IDs are not configured in environment.';
+      }
 
       final googleSignIn = GoogleSignIn(
         clientId: iosClientId,
@@ -141,11 +148,13 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _safeRequest(() => _db.from('daily_records').upsert({
-          ...record,
-          'user_id': uid,
-          'updated_at': DateTime.now().toIso8601String(),
-        }, onConflict: 'user_id,date'));
+    await _safeRequest(
+      () => _db.from('daily_records').upsert({
+        ...record,
+        'user_id': uid,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id,date'),
+    );
   }
 
   static Future<List<Map<String, dynamic>>> getRecordsRange({
@@ -169,11 +178,9 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return null;
 
-    return await _safeRequest(() => _db
-        .from('user_settings')
-        .select()
-        .eq('user_id', uid)
-        .maybeSingle());
+    return await _safeRequest(
+      () => _db.from('user_settings').select().eq('user_id', uid).maybeSingle(),
+    );
   }
 
   static Future<void> updateSettings(Map<String, dynamic> settings) async {
@@ -238,10 +245,12 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    await _safeRequest(() => _db.from('prohibitions_log').upsert({
-          ...log,
-          'user_id': uid,
-        }, onConflict: 'record_id,category'));
+    await _safeRequest(
+      () => _db.from('prohibitions_log').upsert({
+        ...log,
+        'user_id': uid,
+      }, onConflict: 'record_id,category'),
+    );
   }
 
   static Future<List<Map<String, dynamic>>> getProhibitionLogs({
@@ -279,7 +288,7 @@ class SupabaseService {
   }
 
   static Future<void> upsertCustomIbadahLog(Map<String, dynamic> log) async {
-    final uid = SupabaseConfig.userId; 
+    final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
     await _safeRequest(
