@@ -76,7 +76,7 @@ class SupabaseService {
       }
 
       final googleSignIn = GoogleSignIn(
-        clientId: iosClientId,
+        clientId: (Platform.isIOS || Platform.isMacOS) ? iosClientId : null,
         serverClientId: webClientId,
       );
 

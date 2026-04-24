@@ -40,6 +40,8 @@ import 'package:takwa/features/qiyam/presentation/screens/qiyam_virtues_screen.d
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_sleep_calculator_screen.dart';
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_beginner_guide_screen.dart';
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_sunnah_guide_screen.dart';
+import 'package:takwa/features/auth/presentation/screens/email_confirmation_screen.dart';
+import 'package:takwa/features/auth/presentation/screens/update_password_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -89,6 +91,8 @@ class Routes {
   static const String qiyamSleepCalculator = '/qiyam-sleep-calculator';
   static const String qiyamBeginnerGuide = '/qiyam-beginner-guide';
   static const String qiyamSunnahGuide = '/qiyam-sunnah-guide';
+  static const String emailConfirmation = '/email-confirmation';
+  static const String updatePassword = '/update-password';
 }
 
 /// Centralized route generation and management.
@@ -216,6 +220,15 @@ class AppRoutes {
       case Routes.qiyamSunnahGuide:
         return MaterialPageRoute(
           builder: (_) => const QiyamSunnahGuideScreen(),
+        );
+      case Routes.emailConfirmation:
+        final email = settings.arguments as String? ?? '';
+        return MaterialPageRoute(
+          builder: (_) => EmailConfirmationScreen(email: email),
+        );
+      case Routes.updatePassword:
+        return MaterialPageRoute(
+          builder: (_) => const UpdatePasswordScreen(),
         );
       default:
         return MaterialPageRoute(

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
@@ -120,7 +121,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         password: _passCtrl.text,
         username: _userCtrl.text.trim(),
       );
-      if (mounted) Navigator.pushReplacementNamed(context, '/');
+      if (mounted) {
+        Navigator.pushReplacementNamed(
+          context,
+          Routes.emailConfirmation,
+          arguments: _emailCtrl.text.trim(),
+        );
+      }
     } on AuthException catch (e) {
       if (mounted) setState(() => _error = _authError(e.message));
     } catch (_) {
@@ -138,8 +145,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     try {
       final res = await SupabaseService.signInWithGoogle();
       if (res != null && mounted) Navigator.pushReplacementNamed(context, '/');
-    } catch (_) {
-      if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل');
+    } catch (e) {
+      debugPrint('Google Sign-In Error: $e');
+      if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -171,6 +171,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -272,6 +273,19 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
     // بدء مراقبة أوقات الصلاة لتشغيل الأذان تلقائياً
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AdhanAutoTrigger.start(ref, NotificationRouter.navigatorKey);
+      _setupAuthListener();
+    });
+  }
+
+  void _setupAuthListener() {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      if (event == AuthChangeEvent.passwordRecovery) {
+        debugPrint('Auth: Password Recovery mode detected');
+        NotificationRouter.navigatorKey.currentState?.pushNamed(
+          Routes.updatePassword,
+        );
+      }
     });
   }
 
