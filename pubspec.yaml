@@ -3,3 +3,6 @@ description: Takwa Monorepo Root
 publish_to: none
 environment:
   sdk: ^3.11.4
+
+dev_dependencies:
+  melos: ^6.0.0

@@ -8,8 +8,8 @@
   "scripts": {
     "web:dev": "npm run dev --workspace=@takwa/web",
     "web:build": "npm run build --workspace=@takwa/web",
-    "mobile:bootstrap": "melos bootstrap",
-    "mobile:clean": "melos clean",
-    "test": "melos run test"
+    "mobile:bootstrap": "dart run melos bootstrap",
+    "mobile:clean": "dart run melos clean",
+    "test": "dart run melos run test"
   }
 }
