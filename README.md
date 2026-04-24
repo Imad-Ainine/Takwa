@@ -62,6 +62,22 @@ npm run mobile:bootstrap
 
 ---
 
+## 🌐 Deployment
+
+### Web (Vercel)
+
+The web application is set up for automated deployment via Vercel:
+
+1. **Connect Repository**: Link your GitHub repo to a new Vercel project.
+2. **Configure Settings**:
+   - **Framework Preset**: Next.js
+   - **Root Directory**: `apps/web`
+   - **Build Command**: `npm run build`
+   - **Install Command**: `npm install`
+3. **CI/CD**: Every push to `main` triggers a production deploy, while other branches trigger preview deploys. The [GitHub Action](.github/workflows/deploy-web.yml) ensures code quality before deployment.
+
+---
+
 ## 🏗️ Technical Stack
 
 - **Mobile**: Flutter, Riverpod, Drift (SQLite), Adhan API.
