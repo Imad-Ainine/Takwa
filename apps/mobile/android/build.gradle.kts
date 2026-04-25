@@ -15,6 +15,9 @@ subprojects {
     if (project.name != "app") {
         project.evaluationDependsOn(":app")
     }
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.addAll(listOf("-Xlint:-options", "-Xlint:-deprecation", "-Xlint:-unchecked"))
+    }
 }
 
 tasks.register<Delete>("clean") {
