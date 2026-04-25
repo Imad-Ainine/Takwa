@@ -485,9 +485,9 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
   String _getEmoji(String key) {
     switch (key) {
       case 'fajr':
-        return '🌅';
+        return '🌙';
       case 'sunrise':
-        return '☀️';
+        return '🌅';
       case 'dhuhr':
         return '🌤';
       case 'asr':
@@ -754,9 +754,9 @@ class _MihrabPrayerChip extends StatelessWidget {
   String _getEmoji(String key) {
     switch (key) {
       case 'fajr':
-        return '🌅';
+        return '🌙';
       case 'sunrise':
-        return '☀️';
+        return '🌅';
       case 'dhuhr':
         return '🌤';
       case 'asr':

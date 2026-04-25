@@ -905,9 +905,16 @@ class PrayerTimesService {
       PrayerTimeInfo(
         name: 'fajr',
         nameAr: 'الفجر',
-        emoji: '🌅',
+        emoji: '🌙',
         time: times.fajr,
         notifId: NotifIds.fajr,
+      ),
+      PrayerTimeInfo(
+        name: 'sunrise',
+        nameAr: 'الشروق',
+        emoji: '🌅',
+        time: times.sunrise,
+        notifId: -1, // لا يوجد إشعار للشروق حالياً
       ),
       PrayerTimeInfo(
         name: 'dhuhr',
@@ -979,6 +986,20 @@ class PrayerTimesService {
   static adhan.CalculationParameters _calcParams(String method, String madhab) {
     adhan.CalculationParameters p;
     switch (method) {
+      case 'Algeria':
+        // وزارة الشؤون الدينية والأوقاف - الجزائر
+        // تعتمد زوايا قريبة من المصري (19.5/17.5) مع تعديلات طفيفة
+        p = adhan.CalculationMethod.egyptian.getParameters();
+        p.fajrAngle =
+            19.2; // تعديل ليتوافق مع أوقات الفجر الرسمية (19.1-19.2 درجة)
+        p.ishaAngle = 17.5;
+        // تعديلات دقيقة لتطابق الرزنامة الرسمية (احتياط)
+        p.methodAdjustments.fajr = -1;
+        p.methodAdjustments.dhuhr = -1;
+        p.methodAdjustments.asr = -1;
+        p.methodAdjustments.maghrib = 3;
+        p.methodAdjustments.isha = 0;
+        break;
       case 'Egypt':
         p = adhan.CalculationMethod.egyptian.getParameters();
         break;
@@ -987,7 +1008,7 @@ class PrayerTimesService {
         break;
       case 'UmmAlQura':
         p = adhan.CalculationMethod.umm_al_qura.getParameters();
-        break;
+        break; 
       case 'ISNA':
         p = adhan.CalculationMethod.north_america.getParameters();
         break;

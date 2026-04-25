@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/books/presentation/screens/books_chapter_screen.dart
-//  تقوى — Chapter List Screen
+//  تقوى — Premium Chapter & Book Details Screen
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
@@ -16,9 +16,12 @@ class BooksChapterScreen extends ConsumerWidget {
   final IslamicBook book;
   const BooksChapterScreen({super.key, required this.book});
 
-  Color _parseColor(String hex) {
+  Color _parseColor(String? hex) {
+    if (hex == null) return const Color(0xFFC8A96E);
     try {
-      return Color(int.parse(hex));
+      if (hex.startsWith('0x')) return Color(int.parse(hex));
+      if (hex.startsWith('#')) return Color(int.parse('0xFF${hex.substring(1)}'));
+      return Color(int.parse('0xFF$hex'));
     } catch (_) {
       return const Color(0xFFC8A96E);
     }
@@ -37,181 +40,218 @@ class BooksChapterScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: colors.background,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          // ── Book header / hero ────────────────────────────────
+          // ── Premium Book Header ──────────────────────────────
           SliverAppBar(
-            expandedHeight: 230,
+            expandedHeight: 300,
             pinned: true,
+            stretch: true,
             backgroundColor: colors.deep,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new,
-                  color: Colors.white, size: 20),
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Colors.black26,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+              ),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              collapseMode: CollapseMode.parallax,
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [c1, c2],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    book.titleAr,
-                                    style: const TextStyle(
-                                      fontFamily: 'Amiri',
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      height: 1.4,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    book.authorAr,
-                                    style: const TextStyle(
-                                      fontFamily: 'Amiri',
-                                      fontSize: 15,
-                                      color: Colors.white70,
-                                    ),
-                                    textAlign: TextAlign.right,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Text(
-                              book.emoji,
-                              style: const TextStyle(fontSize: 50),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        // Description
-                        Text(
-                          book.descriptionAr,
-                          style: const TextStyle(
-                            fontFamily: 'Amiri',
-                            fontSize: 13,
-                            color: Colors.white70,
-                            height: 1.6,
-                          ),
-                          textAlign: TextAlign.right,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 10),
-                        // Meta chips row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            _MetaChip(
-                                label: book.categoryLabel,
-                                icon: Icons.bookmark_outline),
-                            const SizedBox(width: 8),
-                            _MetaChip(
-                                label: '${book.totalPages} صفحة',
-                                icon: Icons.menu_book_outlined),
-                            const SizedBox(width: 8),
-                            _MetaChip(
-                                label:
-                                    '~${book.estimatedReadingMinutes} د',
-                                icon: Icons.timer_outlined),
-                          ],
-                        ),
-                      ],
+              stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Gradient Background
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [c1, c2],
+                      ),
                     ),
                   ),
-                ),
+
+                  // Decorative Pattern
+                  Opacity(
+                    opacity: 0.1,
+                    child: Image.asset(
+                      'assets/images/pattern_bg.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const SizedBox(),
+                    ),
+                  ),
+
+                  // Book Info Overlay
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      book.titleAr,
+                                      style: const TextStyle(
+                                        fontFamily: 'Amiri',
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        height: 1.2,
+                                        shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      book.authorAr,
+                                      style: TextStyle(
+                                        fontFamily: 'Amiri',
+                                        fontSize: 16,
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Hero(
+                                tag: 'book-emoji-${book.id}',
+                                child: Text(
+                                  book.emoji,
+                                  style: const TextStyle(fontSize: 64),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          // Stats row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              _StatChip(label: book.categoryLabel, icon: Icons.category_outlined),
+                              const SizedBox(width: 8),
+                              _StatChip(label: '${book.totalPages} صفحة', icon: Icons.menu_book_rounded),
+                              const SizedBox(width: 8),
+                              _StatChip(label: '~${book.estimatedReadingMinutes} د', icon: Icons.schedule_rounded),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          _ReadingProgressBar(
+                            book: book,
+                            accentColor: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // ── Continue reading banner / PDF button ─────────────────
-          if (book.pdfUrl != null)
-            SliverToBoxAdapter(
-              child: _PdfReadBanner(
-                accentColor: c1,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookPdfReaderScreen(book: book),
+          // ── Book Description ──────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'عن الكتاب',
+                        style: typography.headingMedium.copyWith(
+                          color: c1,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Amiri',
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(width: 4, height: 20, decoration: BoxDecoration(color: c1, borderRadius: BorderRadius.circular(2))),
+                    ],
                   ),
-                ),
-              ),
-            )
-          else if (savedProgress != null &&
-              savedProgress.chapterIndex < book.chapters.length)
-            SliverToBoxAdapter(
-              child: _ContinueBanner(
-                book: book,
-                progress: savedProgress,
-                accentColor: c1,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BookReaderScreen(
-                      book: book,
-                      initialChapterIndex: savedProgress.chapterIndex,
-                      initialPageIndex: savedProgress.pageIndex,
+                  const SizedBox(height: 12),
+                  Text(
+                    book.descriptionAr,
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 15,
+                      color: colors.textSecondary,
+                      height: 1.8,
                     ),
+                    textAlign: TextAlign.right,
                   ),
-                ),
+                ],
               ),
             ),
+          ),
 
-          // ── Chapters section label ────────────────────────────
+          // ── Primary Action ──────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: _PrimaryActionButton(
+                book: book,
+                savedProgress: savedProgress,
+                accentColor: c1,
+              ),
+            ),
+          ),
+
+          // ── Chapters List ──────────────────────────────────
           if (book.pdfUrl == null) ...[
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
               sliver: SliverToBoxAdapter(
-                child: Text(
-                  'الفصول (${book.chapters.length})',
-                  style: typography.labelLarge,
-                  textAlign: TextAlign.right,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${book.chapters.length} فصل',
+                      style: typography.caption.copyWith(color: colors.textDim),
+                    ),
+                    Text(
+                      'الفصول المحتواة',
+                      style: typography.labelLarge.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri'),
+                    ),
+                  ],
                 ),
               ),
             ),
-
-            // ── Chapter list ──────────────────────────────────────
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) {
                     final ch = book.chapters[i];
-                    final isCurrentChapter = savedProgress?.chapterIndex == i;
-                    return _ChapterRow(
+                    final isCurrent = savedProgress?.chapterIndex == i;
+                    return _ChapterItem(
                       chapter: ch,
                       index: i,
                       accentColor: c1,
-                      isCurrent: isCurrentChapter,
-                      currentPage: isCurrentChapter ? savedProgress!.pageIndex : 0,
+                      isCurrent: isCurrent,
+                      currentPage: isCurrent ? savedProgress!.pageIndex : 0,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => BookReaderScreen(
                             book: book,
                             initialChapterIndex: i,
-                            initialPageIndex: isCurrentChapter ? savedProgress!.pageIndex : 0,
+                            initialPageIndex: isCurrent ? savedProgress!.pageIndex : 0,
                           ),
                         ),
                       ),
@@ -223,126 +263,98 @@ class BooksChapterScreen extends ConsumerWidget {
             ),
           ],
 
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          const SliverToBoxAdapter(child: SizedBox(height: 60)),
         ],
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────
-//  META CHIP
-// ─────────────────────────────────────────
-
-class _MetaChip extends StatelessWidget {
+class _StatChip extends StatelessWidget {
   final String label;
   final IconData icon;
-  const _MetaChip({required this.label, required this.icon});
+  const _StatChip({required this.label, required this.icon});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border:
-            Border.all(color: Colors.white.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Amiri',
-              fontSize: 12,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Icon(icon, color: Colors.white70, size: 13),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Amiri')),
+          const SizedBox(width: 6),
+          Icon(icon, color: Colors.white70, size: 14),
         ],
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────
-//  CONTINUE READING BANNER
-// ─────────────────────────────────────────
-
-class _ContinueBanner extends StatelessWidget {
+class _PrimaryActionButton extends StatelessWidget {
   final IslamicBook book;
-  final BookReadingProgress progress;
+  final BookReadingProgress? savedProgress;
   final Color accentColor;
-  final VoidCallback onTap;
 
-  const _ContinueBanner({
+  const _PrimaryActionButton({
     required this.book,
-    required this.progress,
+    required this.savedProgress,
     required this.accentColor,
-    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final typography = context.typography;
-    final chapter = book.chapters[progress.chapterIndex];
-    final page = chapter.pages[progress.pageIndex];
+    final isPdf = book.pdfUrl != null;
+
+    String label = isPdf ? 'قراءة نسخة PDF' : 'ابدأ القراءة';
+    IconData icon = isPdf ? Icons.picture_as_pdf_outlined : Icons.menu_book_rounded;
+
+    if (!isPdf && savedProgress != null) {
+      label = 'متابعة القراءة';
+      icon = Icons.play_arrow_rounded;
+    }
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        if (isPdf) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => BookPdfReaderScreen(book: book)));
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BookReaderScreen(
+                book: book,
+                initialChapterIndex: savedProgress?.chapterIndex ?? 0,
+                initialPageIndex: savedProgress?.pageIndex ?? 0,
+              ),
+            ),
+          );
+        }
+      },
       child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        padding: const EdgeInsets.all(16),
+        height: 64,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              accentColor.withOpacity(0.15),
-              accentColor.withOpacity(0.05),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border:
-              Border.all(color: accentColor.withOpacity(0.3)),
+          gradient: LinearGradient(colors: [accentColor, accentColor.withOpacity(0.8)]),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: accentColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+          ],
         ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.play_arrow_rounded,
-                  color: accentColor, size: 22),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Amiri'),
             ),
             const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'متابعة القراءة',
-                    style: typography.labelLarge
-                        .copyWith(color: accentColor),
-                    textAlign: TextAlign.right,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    '${chapter.titleAr}  •  ${page.title ?? 'صفحة ${progress.pageIndex + 1}'}',
-                    style: typography.caption,
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
+            Icon(icon, color: Colors.white, size: 24),
           ],
         ),
       ),
@@ -350,81 +362,7 @@ class _ContinueBanner extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────
-//  PDF READ BANNER
-// ─────────────────────────────────────────
-
-class _PdfReadBanner extends StatelessWidget {
-  final Color accentColor;
-  final VoidCallback onTap;
-
-  const _PdfReadBanner({
-    required this.accentColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final typography = context.typography;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              accentColor.withOpacity(0.15),
-              accentColor.withOpacity(0.05),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: accentColor.withOpacity(0.3)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.picture_as_pdf_rounded, color: accentColor, size: 22),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'قراءة الكتاب (PDF)',
-                    style: typography.labelLarge.copyWith(color: accentColor),
-                    textAlign: TextAlign.right,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'فتح الغلاف المصور والصفحات المطابقة للأصل',
-                    style: typography.caption,
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────
-//  CHAPTER ROW
-// ─────────────────────────────────────────
-
-class _ChapterRow extends StatelessWidget {
+class _ChapterItem extends StatelessWidget {
   final BookChapter chapter;
   final int index;
   final Color accentColor;
@@ -432,7 +370,7 @@ class _ChapterRow extends StatelessWidget {
   final int currentPage;
   final VoidCallback onTap;
 
-  const _ChapterRow({
+  const _ChapterItem({
     required this.chapter,
     required this.index,
     required this.accentColor,
@@ -449,119 +387,135 @@ class _ChapterRow extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isCurrent
-              ? accentColor.withOpacity(0.08)
-              : colors.card,
-          borderRadius: BorderRadius.circular(16),
+          color: isCurrent ? accentColor.withOpacity(0.05) : colors.card,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isCurrent
-                ? accentColor.withOpacity(0.35)
-                : colors.border,
+            color: isCurrent ? accentColor.withOpacity(0.3) : colors.border,
+            width: isCurrent ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            // Chapter number badge
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: isCurrent
-                    ? accentColor.withOpacity(0.2)
-                    : colors.card2,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isCurrent
-                      ? accentColor
-                      : colors.border,
-                ),
-              ),
-              child: Text(
-                '${index + 1}',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color:
-                      isCurrent ? accentColor : colors.textDim,
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            // Info
+            Icon(Icons.chevron_left, color: colors.textDim, size: 20),
+            const Spacer(),
             Expanded(
+              flex: 8,
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     chapter.titleAr,
-                    style: typography.labelLarge
-                        .copyWith(fontSize: 16),
+                    style: typography.labelLarge.copyWith(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: isCurrent ? accentColor : colors.textPrimary,
+                      fontFamily: 'Amiri',
+                    ),
                     textAlign: TextAlign.right,
                   ),
-                  if (chapter.intro != null) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      chapter.intro!,
-                      style: typography.caption,
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      if (isCurrent && currentPage > 0) ...[
-                        Text(
-                          'صفحة ${currentPage + 1} / ${chapter.totalPages}',
-                          style: typography.caption
-                              .copyWith(color: accentColor),
-                        ),
-                        const SizedBox(width: 6),
-                      ],
-                      Text(
-                        '${chapter.totalPages} صفحة',
-                        style: typography.caption,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '~${chapter.estimatedMinutes} د',
-                        style: typography.caption,
-                      ),
+                      Text('${chapter.totalPages} صفحة', style: typography.caption),
+                      const SizedBox(width: 8),
+                      Text('•', style: typography.caption.copyWith(color: colors.textDim)),
+                      const SizedBox(width: 8),
+                      Text('~${chapter.estimatedMinutes} دقيقة', style: typography.caption),
                     ],
                   ),
-                  if (isCurrent && currentPage > 0) ...[
-                    const SizedBox(height: 6),
-                    LinearProgressIndicator(
-                      value: currentPage /
-                          chapter.totalPages,
-                      backgroundColor: colors.border,
-                      color: accentColor,
-                      minHeight: 3,
-                      borderRadius:
-                          BorderRadius.circular(4),
+                  if (isCurrent) ...[
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: (currentPage + 1) / chapter.totalPages,
+                        backgroundColor: accentColor.withOpacity(0.1),
+                        color: accentColor,
+                        minHeight: 4,
+                      ),
                     ),
                   ],
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            Icon(
-              Icons.arrow_back_ios_new,
-              color: colors.textDim,
-              size: 14,
+            const SizedBox(width: 20),
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: isCurrent ? accentColor : colors.card2,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  color: isCurrent ? Colors.white : colors.textDim,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontFamily: 'Amiri',
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+class _ReadingProgressBar extends ConsumerWidget {
+  final IslamicBook book;
+  final Color accentColor;
+
+  const _ReadingProgressBar({required this.book, required this.accentColor});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(readingProgressProvider.notifier).getProgress(
+          book.id,
+          book.totalPages,
+        );
+    final percentage = (progress * 100).toInt();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '$percentage%',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Text(
+              'تقدم القراءة',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontFamily: 'Amiri',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: Colors.white.withOpacity(0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+            minHeight: 6,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -50,10 +50,18 @@ const _kPrayerVisuals = {
   'fajr': _PrayerVisual(
     key: 'fajr',
     nameAr: 'الفجر',
-    emoji: '🌅',
+    emoji: '🌙',
     primaryColor: Color(0xFF4A5568),
     secondaryColor: Color(0xFF7B8FA6),
     skyPhase: 'dawn',
+  ),
+  'sunrise': _PrayerVisual(
+    key: 'sunrise',
+    nameAr: 'الشروق',
+    emoji: '🌅',
+    primaryColor: Color(0xFFE8945A),
+    secondaryColor: Color(0xFFF6AD55),
+    skyPhase: 'morning',
   ),
   'dhuhr': _PrayerVisual(
     key: 'dhuhr',
@@ -1402,7 +1410,7 @@ class _PrayerTableRow extends StatelessWidget {
                       ),
                     ),
                     _MihrabPrayerChip(
-                      label: 'أذان',
+                      label: prayer.name == 'sunrise' ? 'شروق' : 'أذان',
                       color: isNext
                           ? visual.secondaryColor
                           : Colors.white.withOpacity(0.3),
@@ -1411,42 +1419,44 @@ class _PrayerTableRow extends StatelessWidget {
                   ],
                 ),
 
-                Container(
-                  width: 1,
-                  height: 28,
-                  margin: const EdgeInsets.symmetric(horizontal: 12),
-                  color: Colors.white.withOpacity(0.08),
-                ),
+                if (prayer.name != 'sunrise') ...[
+                  Container(
+                    width: 1,
+                    height: 28,
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    color: Colors.white.withOpacity(0.08),
+                  ),
 
-                // وقت الإقامة
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      formatTime(iqamaTime),
-                      style: TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 14,
+                  // وقت الإقامة
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        formatTime(iqamaTime),
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
+                          fontSize: 14,
+                          color: isNext
+                              ? context.colors.success
+                              : isPast
+                              ? Colors.white.withOpacity(0.25)
+                              : Colors.white.withOpacity(0.5),
+                          fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
+                        ),
+                      ),
+                      _MihrabPrayerChip(
+                        label: 'إقامة',
                         color: isNext
                             ? context.colors.success
-                            : isPast
-                            ? Colors.white.withOpacity(0.25)
-                            : Colors.white.withOpacity(0.5),
-                        fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
+                            : Colors.white.withOpacity(0.2),
+                        isActive: isNext,
                       ),
-                    ),
-                    _MihrabPrayerChip(
-                      label: 'إقامة',
-                      color: isNext
-                          ? context.colors.success
-                          : Colors.white.withOpacity(0.2),
-                      isActive: isNext,
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
 
                 // علامة ✓ للماضي
-                if (isPast && !isNext) ...[
+                if (isPast && !isNext && prayer.name != 'sunrise') ...[
                   const SizedBox(width: 8),
                   Icon(
                     Icons.check_circle_rounded,

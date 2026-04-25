@@ -5,62 +5,102 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data/books_data.dart';
+import '../../../core/supabase/supabase_service.dart';
 
 // ─────────────────────────────────────────
 //  READING PROGRESS (bookId → pageIndex)
 // ─────────────────────────────────────────
 
 class ReadingProgressNotifier
-    extends StateNotifier<Map<String, _BookProgress>> {
+    extends StateNotifier<Map<String, BookProgress>> {
   ReadingProgressNotifier() : super({}) {
     _load();
   }
 
   static const _prefPrefix = 'book_progress_';
   static const _chapterSuffix = '_chapter';
+  static const _readPagesSuffix = '_read_pages';
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final keys = prefs.getKeys().where((k) => k.startsWith(_prefPrefix));
-    final map = <String, _BookProgress>{};
+    final map = <String, BookProgress>{};
     for (final key in keys) {
-      if (key.endsWith(_chapterSuffix)) continue;
+      if (key.endsWith(_chapterSuffix) || key.endsWith(_readPagesSuffix)) {
+        continue;
+      }
       final bookId = key.substring(_prefPrefix.length);
       final page = prefs.getInt(key) ?? 0;
-      final chapter =
-          prefs.getInt('$_prefPrefix$bookId$_chapterSuffix') ?? 0;
-      map[bookId] = _BookProgress(chapterIndex: chapter, pageIndex: page);
+      final chapter = prefs.getInt('$_prefPrefix$bookId$_chapterSuffix') ?? 0;
+      final readPagesStr =
+          prefs.getString('$_prefPrefix$bookId$_readPagesSuffix') ?? '';
+      final readPages = readPagesStr.isEmpty
+          ? <int>{}
+          : readPagesStr.split(',').map(int.parse).toSet();
+
+      map[bookId] = BookProgress(
+        chapterIndex: chapter,
+        pageIndex: page,
+        readPages: readPages,
+      );
     }
     state = map;
   }
 
   Future<void> save(String bookId, int chapterIndex, int pageIndex) async {
+    final existing = state[bookId];
+    final updatedReadPages = (existing?.readPages ?? <int>{})..add(pageIndex);
+
     state = {
       ...state,
-      bookId: _BookProgress(chapterIndex: chapterIndex, pageIndex: pageIndex),
+      bookId: BookProgress(
+        chapterIndex: chapterIndex,
+        pageIndex: pageIndex,
+        readPages: updatedReadPages,
+      ),
     };
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('$_prefPrefix$bookId', pageIndex);
     await prefs.setInt('$_prefPrefix$bookId$_chapterSuffix', chapterIndex);
+    await prefs.setString(
+      '$_prefPrefix$bookId$_readPagesSuffix',
+      updatedReadPages.join(','),
+    );
   }
 
-  _BookProgress? progressFor(String bookId) => state[bookId];
+  BookProgress? progressFor(String bookId) => state[bookId];
+
+  bool isPageRead(String bookId, int pageIndex) {
+    return state[bookId]?.readPages.contains(pageIndex) ?? false;
+  }
+
+  double getProgress(String bookId, int totalPages) {
+    if (totalPages == 0) return 0;
+    final readCount = state[bookId]?.readPages.length ?? 0;
+    return (readCount / totalPages).clamp(0, 1.0);
+  }
 }
 
-class _BookProgress {
+class BookProgress {
   final int chapterIndex;
   final int pageIndex;
-  const _BookProgress({required this.chapterIndex, required this.pageIndex});
+  final Set<int> readPages;
+  const BookProgress({
+    required this.chapterIndex,
+    required this.pageIndex,
+    required this.readPages,
+  });
 }
 
 final readingProgressProvider =
-    StateNotifierProvider<ReadingProgressNotifier, Map<String, _BookProgress>>(
+    StateNotifierProvider<ReadingProgressNotifier, Map<String, BookProgress>>(
   (ref) => ReadingProgressNotifier(),
 );
 
 // Helper to read progress for a specific book
 BookReadingProgress? getProgress(
-    Map<String, _BookProgress> map, String bookId) {
+    Map<String, BookProgress> map, String bookId) {
   final p = map[bookId];
   if (p == null) return null;
   return BookReadingProgress(
@@ -114,3 +154,9 @@ double fontSizeFromLevel(int level) {
       return 20.0;
   }
 }
+
+/// Fetches the list of books from Supabase
+final booksListProvider = FutureProvider<List<IslamicBook>>((ref) async {
+  final data = await SupabaseService.getBooks();
+  return data.map((json) => IslamicBook.fromJson(json)).toList();
+});

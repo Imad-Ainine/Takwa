@@ -495,4 +495,10 @@ class SupabaseService {
       'emoji': emoji,
     });
   }
+
+  // ─────────────── BOOKS ───────────────
+  static Future<List<Map<String, dynamic>>> getBooks() async {
+    final data = await _db.from('books').select().order('created_at');
+    return List<Map<String, dynamic>>.from(data);
+  }
 }

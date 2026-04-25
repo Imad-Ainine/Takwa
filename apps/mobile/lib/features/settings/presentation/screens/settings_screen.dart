@@ -337,6 +337,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             label: 'طريقة الحساب',
                             value: _method,
                             options: const {
+                              'Algeria': 'الجزائر (وزارة الشؤون الدينية)',
                               'MWL': 'رابطة العالم الإسلامي',
                               'Egypt': 'دار الإفتاء المصرية',
                               'Karachi': 'جامعة كراتشي',

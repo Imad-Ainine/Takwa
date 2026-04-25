@@ -11,6 +11,8 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 
+enum ReaderTheme { light, sepia, dark }
+
 class BookReaderScreen extends ConsumerStatefulWidget {
   final IslamicBook book;
   final int initialChapterIndex;
@@ -32,9 +34,9 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
   late int _chapterIdx;
   late int _pageIdx;
   bool _showUI = true;
+  ReaderTheme _currentTheme = ReaderTheme.light;
   late AnimationController _uiAnim;
   late Animation<double> _uiFade;
-  final PageController _pageController = PageController();
 
   // ── Computed helpers ─────────────────────────────────────────
   BookChapter get _chapter => widget.book.chapters[_chapterIdx];
@@ -58,12 +60,16 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
     _uiFade = CurvedAnimation(parent: _uiAnim, curve: Curves.easeInOut);
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+    // Initial progress save
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _saveProgress();
+    });
   }
 
   @override
   void dispose() {
     _uiAnim.dispose();
-    _pageController.dispose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
@@ -109,13 +115,28 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
         .save(widget.book.id, _chapterIdx, _pageIdx);
   }
 
-  Color _parseColor(String hex) {
+  Color _parseColor(String? hex) {
+    if (hex == null) return const Color(0xFFC8A96E);
     try {
-      return Color(int.parse(hex));
+      if (hex.startsWith('0x')) return Color(int.parse(hex));
+      if (hex.startsWith('#')) return Color(int.parse('0xFF${hex.substring(1)}'));
+      return Color(int.parse('0xFF$hex'));
     } catch (_) {
       return const Color(0xFFC8A96E);
     }
   }
+
+  Color _getBgColor() => switch (_currentTheme) {
+        ReaderTheme.light => Colors.white,
+        ReaderTheme.sepia => const Color(0xFFF4ECD8),
+        ReaderTheme.dark => const Color(0xFF121212),
+      };
+
+  Color _getTextColor() => switch (_currentTheme) {
+        ReaderTheme.light => const Color(0xFF2D2D2D),
+        ReaderTheme.sepia => const Color(0xFF5B4636),
+        ReaderTheme.dark => const Color(0xFFE0E0E0),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -125,72 +146,112 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
     final fontSize = fontSizeFromLevel(fontSizeLevel);
     final accentColor = _parseColor(widget.book.coverColor);
 
+    final bgColor = _getBgColor();
+    final textColor = _getTextColor();
+
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: bgColor,
       body: GestureDetector(
         onTap: _toggleUI,
         behavior: HitTestBehavior.translucent,
         child: Stack(
           children: [
+            // ── Decorative background in Sepia ────────────────
+            if (_currentTheme == ReaderTheme.sepia)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.03,
+                  child: Image.asset(
+                    'assets/images/pattern_bg.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const SizedBox(),
+                  ),
+                ),
+              ),
+
             // ── Page Content ──────────────────────────────────
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 100, 20, 120),
+                padding: const EdgeInsets.fromLTRB(24, 110, 24, 130),
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    // Chapter indicator
-                    Text(
-                      _chapter.titleAr,
-                      style: typography.caption.copyWith(
-                        color: accentColor,
-                        fontSize: 13,
+                    // Chapter title at top
+                    Center(
+                      child: Text(
+                        '◈ ${_chapter.titleAr} ◈',
+                        style: TextStyle(
+                          fontFamily: 'Amiri',
+                          fontSize: 16,
+                          color: accentColor.withOpacity(0.8),
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.right,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 32),
 
-                    // Hadith card style
+                    // Content Rendering
                     if (_page.isHadith) ...[
                       _HadithCard(
                         page: _page,
                         accentColor: accentColor,
                         bodyFontSize: fontSize,
+                        textColor: textColor,
+                        theme: _currentTheme,
                       ),
                     ] else ...[
-                      // Title
                       if (_page.title != null) ...[
                         Text(
                           _page.title!,
                           style: typography.headingMedium.copyWith(
                             color: accentColor,
-                            fontSize: 20,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Amiri',
                           ),
                           textAlign: TextAlign.right,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
                       ],
-                      // Body text
                       Text(
                         _page.content,
                         style: TextStyle(
                           fontFamily: 'Amiri',
                           fontSize: fontSize,
-                          color: colors.textPrimary,
-                          height: 2.0,
+                          color: textColor,
+                          height: 2.2,
                         ),
                         textAlign: TextAlign.right,
                         textDirection: TextDirection.rtl,
                       ),
                     ],
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 60),
+                    
+                    // Ornamental Footer
+                    Center(
+                      child: Opacity(
+                        opacity: 0.3,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 40, height: 1, color: accentColor),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Icon(Icons.auto_awesome, color: accentColor, size: 18),
+                            ),
+                            Container(width: 40, height: 1, color: accentColor),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
 
-            // ── Top bar (fade in/out) ─────────────────────────
+            // ── Top Bar ─────────────────────────────────────
             Positioned(
               top: 0,
               left: 0,
@@ -202,13 +263,15 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                   chapter: _chapter,
                   accentColor: accentColor,
                   fontSizeLevel: fontSizeLevel,
+                  currentTheme: _currentTheme,
                   onFontSizeToggle: () =>
                       ref.read(bookFontSizeProvider.notifier).cycle(),
+                  onThemeChange: (t) => setState(() => _currentTheme = t),
                 ),
               ),
             ),
 
-            // ── Bottom navigation ─────────────────────────────
+            // ── Bottom Bar ──────────────────────────────────
             Positioned(
               bottom: 0,
               left: 0,
@@ -242,11 +305,15 @@ class _HadithCard extends StatelessWidget {
   final BookPage page;
   final Color accentColor;
   final double bodyFontSize;
+  final Color textColor;
+  final ReaderTheme theme;
 
   const _HadithCard({
     required this.page,
     required this.accentColor,
     required this.bodyFontSize,
+    required this.textColor,
+    required this.theme,
   });
 
   @override
@@ -254,27 +321,29 @@ class _HadithCard extends StatelessWidget {
     final colors = context.colors;
     final typography = context.typography;
 
+    final cardBg = theme == ReaderTheme.dark
+        ? Colors.white.withOpacity(0.05)
+        : accentColor.withOpacity(0.05);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        // Hadith number + source row
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             if (page.source != null) ...[
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: colors.tealDim,
+                  color: accentColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: colors.teal.withOpacity(0.3)),
                 ),
                 child: Text(
                   page.source!,
-                  style: typography.caption.copyWith(color: colors.teal),
+                  style: typography.caption.copyWith(
+                    color: accentColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -283,9 +352,16 @@ class _HadithCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [accentColor, accentColor.withOpacity(0.7)],
+                  colors: [accentColor, accentColor.withOpacity(0.8)],
                 ),
                 borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Text(
                 page.hadithNumber ?? '',
@@ -293,50 +369,41 @@ class _HadithCard extends StatelessWidget {
                   fontFamily: 'Amiri',
                   fontSize: 13,
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-
-        // Title
+        const SizedBox(height: 20),
         if (page.title != null) ...[
           Text(
             page.title!,
             style: typography.headingMedium.copyWith(
               color: accentColor,
-              fontSize: 18,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Amiri',
             ),
             textAlign: TextAlign.right,
           ),
           const SizedBox(height: 16),
         ],
-
-        // Hadith text in a decorative frame
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                accentColor.withOpacity(0.12),
-                accentColor.withOpacity(0.04),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: accentColor.withOpacity(0.3)),
+            color: cardBg,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: accentColor.withOpacity(0.2)),
           ),
           child: Text(
             page.content,
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: bodyFontSize,
-              color: context.colors.textPrimary,
-              height: 2.2,
+              color: textColor,
+              height: 2.4,
             ),
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
@@ -356,60 +423,81 @@ class _TopBar extends StatelessWidget {
   final BookChapter chapter;
   final Color accentColor;
   final int fontSizeLevel;
+  final ReaderTheme currentTheme;
   final VoidCallback onFontSizeToggle;
+  final ValueChanged<ReaderTheme> onThemeChange;
 
   const _TopBar({
     required this.book,
     required this.chapter,
     required this.accentColor,
     required this.fontSizeLevel,
+    required this.currentTheme,
     required this.onFontSizeToggle,
+    required this.onThemeChange,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final typography = context.typography;
-    final fontLabels = ['ص', 'م', 'ك'];
+
+    final isDark = currentTheme == ReaderTheme.dark;
+    final barBg = isDark ? Colors.black : Colors.white;
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [colors.background, colors.background.withOpacity(0.0)],
+          colors: [barBg, barBg.withOpacity(0.0)],
         ),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 4, 8, 16),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
           child: Row(
             children: [
-              // Font size button
+              // Settings Button
               _IconBtn(
-                onTap: onFontSizeToggle,
-                child: Text(
-                  fontLabels[fontSizeLevel],
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 16,
-                    color: accentColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    builder: (_) => _SettingsSheet(
+                      currentTheme: currentTheme,
+                      onThemeChange: onThemeChange,
+                      fontSizeLevel: fontSizeLevel,
+                      onFontSizeToggle: onFontSizeToggle,
+                      accentColor: accentColor,
+                    ),
+                  );
+                },
+                currentTheme: currentTheme,
+                child: Icon(Icons.settings_outlined, color: accentColor, size: 22),
               ),
+
+              const SizedBox(width: 12),
 
               Expanded(
                 child: Column(
                   children: [
                     Text(
                       book.titleAr,
-                      style: typography.caption.copyWith(color: accentColor),
+                      style: typography.caption.copyWith(
+                        color: accentColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       chapter.titleAr,
-                      style: typography.caption,
+                      style: typography.caption.copyWith(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                      ),
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -418,16 +506,215 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(width: 12),
+
               // Back button
               _IconBtn(
                 onTap: () => Navigator.pop(context),
+                currentTheme: currentTheme,
                 child: Icon(
-                  Icons.arrow_back_ios_new,
-                  color: colors.textSecondary,
-                  size: 18,
+                  Icons.close,
+                  color: accentColor,
+                  size: 22,
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsSheet extends StatelessWidget {
+  final ReaderTheme currentTheme;
+  final ValueChanged<ReaderTheme> onThemeChange;
+  final int fontSizeLevel;
+  final VoidCallback onFontSizeToggle;
+  final Color accentColor;
+
+  const _SettingsSheet({
+    required this.currentTheme,
+    required this.onThemeChange,
+    required this.fontSizeLevel,
+    required this.onFontSizeToggle,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final typography = context.typography;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: colors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'تخصيص القراءة',
+            style: typography.headingMedium.copyWith(fontFamily: 'Amiri'),
+          ),
+          const SizedBox(height: 32),
+
+          // Themes
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: ReaderTheme.values.map((t) {
+              final isSelected = currentTheme == t;
+              final color = switch (t) {
+                ReaderTheme.light => Colors.white,
+                ReaderTheme.sepia => const Color(0xFFF4ECD8),
+                ReaderTheme.dark => const Color(0xFF1E1E1E),
+              };
+              return GestureDetector(
+                onTap: () => onThemeChange(t),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? accentColor : colors.border,
+                          width: isSelected ? 3 : 1,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: accentColor.withOpacity(0.3),
+                                  blurRadius: 10,
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: isSelected
+                          ? Icon(Icons.check,
+                              color: t == ReaderTheme.dark
+                                  ? Colors.white
+                                  : accentColor)
+                          : null,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      switch (t) {
+                        ReaderTheme.light => 'نهاري',
+                        ReaderTheme.sepia => 'ورقي',
+                        ReaderTheme.dark => 'ليلي',
+                      },
+                      style: typography.caption.copyWith(
+                        color: isSelected ? colors.gold : colors.textSecondary,
+                        fontWeight: isSelected ? FontWeight.bold : null,
+                        fontFamily: 'Amiri',
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: 40),
+          const Divider(),
+          const SizedBox(height: 32),
+
+          // Font Size
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('حجم الخط', style: typography.labelLarge.copyWith(fontFamily: 'Amiri')),
+              Row(
+                children: [
+                  _SizeBtn(
+                    label: 'أ',
+                    isSelected: fontSizeLevel == 0,
+                    onTap: onFontSizeToggle,
+                    fontSize: 14,
+                  ),
+                  const SizedBox(width: 12),
+                  _SizeBtn(
+                    label: 'أ',
+                    isSelected: fontSizeLevel == 1,
+                    onTap: onFontSizeToggle,
+                    fontSize: 18,
+                  ),
+                  const SizedBox(width: 12),
+                  _SizeBtn(
+                    label: 'أ',
+                    isSelected: fontSizeLevel == 2,
+                    onTap: onFontSizeToggle,
+                    fontSize: 22,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+}
+
+class _SizeBtn extends StatelessWidget {
+  final String label;
+  final double fontSize;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _SizeBtn({
+    required this.label,
+    required this.fontSize,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? colors.gold.withOpacity(0.1) : colors.background,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? colors.gold : colors.border,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: fontSize,
+            color: isSelected ? colors.gold : colors.textPrimary,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -465,20 +752,19 @@ class _BottomNav extends StatelessWidget {
     final colors = context.colors;
     final typography = context.typography;
 
-    // Compute global page number for progress display
+    // Compute global page progress
     int globalDone = 0;
-    for (int ci = 0; ci < chapterIndex; ci++) {
-      globalDone += book.chapters[ci].totalPages;
+    if (book.chapters.isNotEmpty) {
+      for (int ci = 0; ci < chapterIndex; ci++) {
+        globalDone += book.chapters[ci].totalPages;
+      }
     }
     globalDone += pageIndex + 1;
-    final total = book.totalPages;
-    final progress = globalDone / total;
-
-    final chapter = book.chapters[chapterIndex];
-    final localPage = pageIndex + 1;
-    final localTotal = chapter.totalPages;
+    final total = book.totalPages > 0 ? book.totalPages : 1;
+    final progress = (globalDone / total).clamp(0.0, 1.0);
 
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
@@ -487,63 +773,73 @@ class _BottomNav extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Progress bar
-              LinearProgressIndicator(
-                value: progress,
-                backgroundColor: colors.border,
-                color: accentColor,
-                minHeight: 3,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  // Next (in Arabic RTL = left is next)
-                  _NavButton(
-                    icon: Icons.arrow_back_ios_new,
-                    label: 'التالي',
-                    enabled: !isLast,
-                    accentColor: accentColor,
-                    onTap: onNext,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Progress Track
+            Stack(
+              children: [
+                Container(
+                  height: 6,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: colors.border.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(3),
                   ),
-
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Text(
-                          '$localPage / $localTotal',
-                          style: typography.labelMedium.copyWith(
-                            color: accentColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          '$globalDone من $total',
-                          style: typography.caption,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                ),
+                FractionallySizedBox(
+                  widthFactor: progress,
+                  child: Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [accentColor, accentColor.withOpacity(0.7)],
+                      ),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                   ),
-
-                  // Prev
-                  _NavButton(
-                    icon: Icons.arrow_forward_ios,
-                    label: 'السابق',
-                    enabled: !isFirst,
-                    accentColor: accentColor,
-                    onTap: onPrev,
-                    iconFirst: true,
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _NavButton(
+                  icon: Icons.chevron_left,
+                  label: 'التالي',
+                  enabled: !isLast,
+                  accentColor: accentColor,
+                  onTap: onNext,
+                ),
+                Column(
+                  children: [
+                    Text(
+                      '$globalDone من $total',
+                      style: TextStyle(
+                        fontFamily: 'Amiri',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: accentColor,
+                      ),
+                    ),
+                    Text(
+                      'صفحة',
+                      style: typography.caption.copyWith(fontSize: 10),
+                    ),
+                  ],
+                ),
+                _NavButton(
+                  icon: Icons.chevron_right,
+                  label: 'السابق',
+                  enabled: !isFirst,
+                  accentColor: accentColor,
+                  onTap: onPrev,
+                  isRtl: true,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -556,7 +852,7 @@ class _NavButton extends StatelessWidget {
   final bool enabled;
   final Color accentColor;
   final VoidCallback onTap;
-  final bool iconFirst;
+  final bool isRtl;
 
   const _NavButton({
     required this.icon,
@@ -564,66 +860,66 @@ class _NavButton extends StatelessWidget {
     required this.enabled,
     required this.accentColor,
     required this.onTap,
-    this.iconFirst = false,
+    this.isRtl = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final color = enabled ? accentColor : colors.textDim;
-
-    final iconW = Icon(icon, color: color, size: 16);
-    final labelW = Text(
-      label,
-      style: TextStyle(fontFamily: 'Amiri', fontSize: 14, color: color),
-    );
+    if (!enabled) return const SizedBox(width: 100);
 
     return GestureDetector(
-      onTap: enabled ? onTap : null,
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: enabled ? accentColor.withOpacity(0.1) : colors.card2,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: enabled ? accentColor.withOpacity(0.3) : colors.border,
-          ),
+          color: accentColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: accentColor.withOpacity(0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: iconFirst
-              ? [iconW, const SizedBox(width: 4), labelW]
-              : [labelW, const SizedBox(width: 4), iconW],
+          children: isRtl
+              ? [
+                  Text(label, style: const TextStyle(fontFamily: 'Amiri', fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 4),
+                  Icon(icon, size: 20, color: accentColor),
+                ]
+              : [
+                  Icon(icon, size: 20, color: accentColor),
+                  const SizedBox(width: 4),
+                  Text(label, style: const TextStyle(fontFamily: 'Amiri', fontWeight: FontWeight.bold)),
+                ],
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────
-//  GENERIC ICON BUTTON
-// ─────────────────────────────────────────
-
 class _IconBtn extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
-  const _IconBtn({required this.child, required this.onTap});
+  final ReaderTheme currentTheme;
+
+  const _IconBtn({
+    required this.child,
+    required this.onTap,
+    required this.currentTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
+    final isDark = currentTheme == ReaderTheme.dark;
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
+        width: 46,
+        height: 46,
         decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colors.border),
+          color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
-        child: child,
+        child: Center(child: child),
       ),
     );
   }

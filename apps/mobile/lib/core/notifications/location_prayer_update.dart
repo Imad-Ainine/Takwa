@@ -259,6 +259,16 @@ class PrayerTimesWithTimezone {
   ) {
     adhan.CalculationParameters p;
     switch (method) {
+      case 'Algeria':
+        p = adhan.CalculationMethod.egyptian.getParameters();
+        p.fajrAngle = 19.2;
+        p.ishaAngle = 17.5;
+        p.methodAdjustments.fajr = -1;
+        p.methodAdjustments.dhuhr = -1;
+        p.methodAdjustments.asr = -1;
+        p.methodAdjustments.maghrib = 3;
+        p.methodAdjustments.isha = 0;
+        break;
       case 'Egypt':
         p = adhan.CalculationMethod.egyptian.getParameters();
         break;

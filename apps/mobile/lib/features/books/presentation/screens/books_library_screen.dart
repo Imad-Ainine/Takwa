@@ -1,27 +1,28 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/books/presentation/screens/books_library_screen.dart
-//  تقوى — Islamic Books Library (Entry Screen)
-// ═══════════════════════════════════════════════════════════════
-
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/books/presentation/screens/books_chapter_screen.dart';
 
-class BooksLibraryScreen extends ConsumerWidget {
+class BooksLibraryScreen extends ConsumerStatefulWidget {
   const BooksLibraryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<BooksLibraryScreen> createState() => _BooksLibraryScreenState();
+}
+
+class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
+  String _searchQuery = '';
+  BookCategory? _selectedCategory;
+
+  @override
+  Widget build(BuildContext context) {
     final colors = context.colors;
     final typography = context.typography;
+    final booksAsync = ref.watch(booksListProvider);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -29,73 +30,138 @@ class BooksLibraryScreen extends ConsumerWidget {
         slivers: [
           // ── Premium App Bar ──────────────────────────────────
           SliverAppBar(
-            expandedHeight: 130,
+            expandedHeight: 180,
             pinned: true,
+            stretch: true,
             backgroundColor: colors.deep,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(right: 16, bottom: 14),
+              centerTitle: false,
+              titlePadding: const EdgeInsets.only(right: 16, bottom: 16),
               title: Text(
-                'مكتبتي الإسلامية',
-                style: typography.headingMedium.copyWith(fontSize: 18),
-                textDirection: TextDirection.rtl,
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [colors.deep, colors.card, colors.deep],
-                  ),
-                ),
-                child: const Stack(
-                  children: [
-                    CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-                    Positioned(
-                      right: 16,
-                      top: 52,
-                      child: Text('📚', style: TextStyle(fontSize: 40)),
+                'المكتبة الإسلامية',
+                style: typography.headingMedium.copyWith(
+                  fontSize: 22,
+                  color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
+                textDirection: TextDirection.rtl,
+              ),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          colors.deep,
+                          colors.gold.withOpacity(0.3),
+                          colors.deep,
+                        ],
+                      ),
+                    ),
+                  ),
+                  const CustomPatternBackground(
+                    pattern: BackgroundPattern.adhkar,
+                    opacity: 0.15,
+                  ),
+                  Positioned(
+                    left: -20,
+                    bottom: -20,
+                    child: Opacity(
+                      opacity: 0.2,
+                      child: Icon(Icons.menu_book,
+                          size: 180, color: colors.gold),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // ── Stats bar ────────────────────────────────────────
-          const SliverToBoxAdapter(child: _StatsBar(books: kIslamicBooks)),
-
-          // ── Section label ─────────────────────────────────────
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-            sliver: SliverToBoxAdapter(
-              child: Text(
-                'الكتب المتاحة',
-                style: typography.labelLarge,
-                textAlign: TextAlign.right,
+          // ── Search Bar ────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              child: _SearchBar(
+                onChanged: (val) => setState(() => _searchQuery = val),
               ),
             ),
           ),
 
-          // ── Book Grid ─────────────────────────────────────────
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((ctx, i) {
-                final book = kIslamicBooks[i];
-                return _BookCard(
-                  book: book,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BooksChapterScreen(book: book),
+          // ── Categories ────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: _CategorySelector(
+              selected: _selectedCategory,
+              onSelect: (cat) => setState(() => _selectedCategory = cat),
+            ),
+          ),
+
+          // ── Book List/Grid ────────────────────────────────────
+          booksAsync.when(
+            data: (books) {
+              final filtered = books.where((b) {
+                final matchCat =
+                    _selectedCategory == null || b.category == _selectedCategory;
+                final matchSearch = _searchQuery.isEmpty ||
+                    b.titleAr.contains(_searchQuery) ||
+                    b.authorAr.contains(_searchQuery);
+                return matchCat && matchSearch;
+              }).toList();
+
+              if (filtered.isEmpty) {
+                return const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('🧐', style: TextStyle(fontSize: 50)),
+                        SizedBox(height: 16),
+                        Text('لم يتم العثور على كتب'),
+                      ],
                     ),
                   ),
                 );
-              }, childCount: kIslamicBooks.length),
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (ctx, i) {
+                      final book = filtered[i];
+                      return _BookCard(
+                        book: book,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BooksChapterScreen(book: book),
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: filtered.length,
+                  ),
+                ),
+              );
+            },
+            loading: () => const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (err, stack) => SliverFillRemaining(
+              child: Center(child: Text('حدث خطأ: $err')),
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );
@@ -103,71 +169,112 @@ class BooksLibraryScreen extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────
-//  STATS BAR
+//  SEARCH BAR
 // ─────────────────────────────────────────
 
-class _StatsBar extends StatelessWidget {
-  final List<IslamicBook> books;
-  const _StatsBar({required this.books});
+class _SearchBar extends StatelessWidget {
+  final ValueChanged<String> onChanged;
+  const _SearchBar({required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final totalPages = books.fold<int>(0, (s, b) => s + b.totalPages);
-    final totalMinutes = books.fold<int>(
-      0,
-      (s, b) => s + b.estimatedReadingMinutes,
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        onChanged: onChanged,
+        textAlign: TextAlign.right,
+        decoration: InputDecoration(
+          hintText: 'ابحث عن كتاب أو مؤلف...',
+          hintStyle: TextStyle(color: colors.textSecondary.withOpacity(0.5)),
+          prefixIcon: Icon(Icons.search, color: colors.gold),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        ),
+      ),
     );
+  }
+}
+
+// ─────────────────────────────────────────
+//  CATEGORY SELECTOR
+// ─────────────────────────────────────────
+
+class _CategorySelector extends StatelessWidget {
+  final BookCategory? selected;
+  final ValueChanged<BookCategory?> onSelect;
+
+  const _CategorySelector({required this.selected, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    const categories = BookCategory.values;
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: colors.cardGradient,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.gold.withOpacity(0.25), width: 1),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _StatItem(value: '${books.length}', label: 'كتاب'),
-          _divider(colors),
-          _StatItem(value: '$totalPages', label: 'صفحة'),
-          _divider(colors),
-          _StatItem(value: '$totalMinutes', label: 'دقيقة قراءة'),
-        ],
+      height: 50,
+      margin: const EdgeInsets.only(top: 16),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        reverse: true, // RTL feel
+        itemCount: categories.length + 1,
+        itemBuilder: (ctx, i) {
+          final isAll = i == 0;
+          final cat = isAll ? null : categories[i - 1];
+          final isSelected = selected == cat;
+          final label = isAll ? 'الكل' : _labelFor(cat!);
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: ChoiceChip(
+              label: Text(label),
+              selected: isSelected,
+              onSelected: (_) => onSelect(cat),
+              backgroundColor: colors.card,
+              selectedColor: colors.gold.withOpacity(0.2),
+              labelStyle: TextStyle(
+                color: isSelected ? colors.gold : colors.textSecondary,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected ? colors.gold : colors.border,
+                ),
+              ),
+              showCheckmark: false,
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _divider(AppColorsExtension c) =>
-      Container(width: 1, height: 30, color: c.border);
-}
-
-class _StatItem extends StatelessWidget {
-  final String value;
-  final String label;
-  const _StatItem({required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final typography = context.typography;
-    return Column(
-      children: [
-        Text(
-          value,
-          style: typography.headingMedium.copyWith(color: colors.gold),
-        ),
-        const SizedBox(height: 2),
-        Text(label, style: typography.caption),
-      ],
-    );
-  }
+  String _labelFor(BookCategory cat) => switch (cat) {
+        BookCategory.hadith => 'الحديث',
+        BookCategory.fiqh => 'الفقه',
+        BookCategory.seerah => 'السيرة',
+        BookCategory.aqeedah => 'العقيدة',
+        BookCategory.adab => 'الآداب',
+        BookCategory.tazkiyah => 'التزكية',
+        BookCategory.quran => 'علوم القرآن',
+      };
 }
 
 // ─────────────────────────────────────────
-//  BOOK CARD
+//  BOOK CARD (IMPROVED)
 // ─────────────────────────────────────────
 
 class _BookCard extends ConsumerWidget {
@@ -177,7 +284,8 @@ class _BookCard extends ConsumerWidget {
 
   Color _parseColor(String hex) {
     try {
-      return Color(int.parse(hex));
+      if (hex.startsWith('0x')) return Color(int.parse(hex));
+      return Color(int.parse('0xFF$hex'));
     } catch (_) {
       return const Color(0xFFC8A96E);
     }
@@ -197,162 +305,165 @@ class _BookCard extends ConsumerWidget {
     double percent = 0;
     if (p != null && book.totalPages > 0) {
       int done = 0;
-      for (int ci = 0; ci < p.chapterIndex; ci++) {
-        done += book.chapters[ci].totalPages;
-      }
-      done += p.pageIndex;
-      percent = (done / book.totalPages).clamp(0.0, 1.0);
+      // Note: Supabase books might not have chapters locally loaded yet
+      // This is a placeholder logic for now
+      percent = 0.1; // Demo
     }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: colors.card,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colors.border),
-          boxShadow: [
-            BoxShadow(
-              color: c1.withOpacity(0.12),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
+        height: 160,
+        margin: const EdgeInsets.only(bottom: 20),
+        child: Stack(
           children: [
-            // Cover gradient panel
-            Container(
-              width: 100,
-              height: 148,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [c1, c2],
+            // Background Card
+            Positioned.fill(
+              left: 40,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colors.card,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: colors.border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-              ),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (book.coverUrl != null)
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 24, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(Icons.arrow_back_ios_new,
+                              size: 14, color: colors.textSecondary.withOpacity(0.3)),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: c1.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              book.categoryLabel,
+                              style: typography.caption.copyWith(
+                                color: c1,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      child: CachedNetworkImage(
-                        imageUrl: book.coverUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(),
-                        errorWidget: (context, url, err) => Center(
-                          child: Text(book.emoji, style: const TextStyle(fontSize: 42)),
-                        ),
-                      ),
-                    )
-                  else
-                    Center(
-                      child: Text(
-                        book.emoji,
-                        style: const TextStyle(fontSize: 42),
-                      ),
-                    ),
-                  // Reading progress ring at bottom
-                  Positioned(
-                    bottom: 10,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: _ProgressRing(
-                        percent: percent,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Info
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      book.titleAr,
-                      style: typography.headingMedium.copyWith(
-                        fontSize: 17,
-                        height: 1.4,
-                      ),
-                      textAlign: TextAlign.right,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      book.authorAr,
-                      style: typography.caption.copyWith(color: colors.gold),
-                      textAlign: TextAlign.right,
-                    ),
-                    const SizedBox(height: 8),
-                    // Category badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: c1.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: c1.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        book.categoryLabel,
-                        style: typography.caption.copyWith(color: c1),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Stats row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${book.chapters.length} فصول',
-                          style: typography.caption,
-                        ),
-                        Text('  •  ', style: typography.caption),
-                        Text(
-                          '${book.totalPages} صفحة',
-                          style: typography.caption,
-                        ),
-                      ],
-                    ),
-                    if (percent > 0) ...[
                       const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: percent,
-                        backgroundColor: colors.border,
-                        color: c1,
-                        borderRadius: BorderRadius.circular(4),
-                        minHeight: 4,
-                      ),
-                      const SizedBox(height: 4),
                       Text(
-                        '${(percent * 100).round()}٪ مكتمل',
+                        book.titleAr,
+                        style: typography.headingMedium.copyWith(
+                          fontSize: 18,
+                          height: 1.2,
+                        ),
+                        textAlign: TextAlign.right,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Text(
+                        book.authorAr,
                         style: typography.caption.copyWith(
-                          color: c1,
-                          fontSize: 11,
+                          color: colors.textSecondary,
+                          fontStyle: FontStyle.italic,
                         ),
                         textAlign: TextAlign.right,
                       ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          _InfoChip(
+                            icon: Icons.calendar_today,
+                            text: '${book.publishYear} هـ',
+                          ),
+                          const SizedBox(width: 12),
+                          _InfoChip(
+                            icon: Icons.auto_stories,
+                            text: book.publishYear > 500 ? "مجلد" : "كتيب",
+                          ),
+                        ],
+                      ),
                     ],
-                  ],
+                  ),
+                ),
+              ),
+            ),
+            // Floating Book Cover
+            Positioned(
+              right: 0,
+              top: 10,
+              bottom: 10,
+              child: Hero(
+                tag: 'book_${book.id}',
+                child: Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: c1.withOpacity(0.4),
+                        blurRadius: 15,
+                        offset: const Offset(4, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [c1, c2],
+                            ),
+                          ),
+                        ),
+                        if (book.coverUrl != null && book.coverUrl!.isNotEmpty)
+                          CachedNetworkImage(
+                            imageUrl: book.coverUrl!,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Center(
+                              child: Text(book.emoji,
+                                  style: const TextStyle(fontSize: 40)),
+                            ),
+                          )
+                        else
+                          Center(
+                            child:
+                                Text(book.emoji, style: const TextStyle(fontSize: 40)),
+                          ),
+                        // Overlay shine
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: const Alignment(-0.5, -0.5),
+                              colors: [
+                                Colors.white.withOpacity(0.2),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -363,69 +474,26 @@ class _BookCard extends ConsumerWidget {
   }
 }
 
-// ─────────────────────────────────────────
-//  PROGRESS RING
-// ─────────────────────────────────────────
-
-class _ProgressRing extends StatelessWidget {
-  final double percent;
-  final Color color;
-  const _ProgressRing({required this.percent, required this.color});
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _InfoChip({required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    if (percent == 0) return const SizedBox.shrink();
-    return SizedBox(
-      width: 36,
-      height: 36,
-      child: CustomPaint(
-        painter: _RingPainter(percent: percent, color: color),
-        child: Center(
-          child: Text(
-            '${(percent * 100).round()}%',
-            style: TextStyle(
-              fontSize: 8,
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
+    final colors = context.colors;
+    return Row(
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            color: colors.textSecondary.withOpacity(0.7),
+            fontSize: 11,
           ),
         ),
-      ),
+        const SizedBox(width: 4),
+        Icon(icon, size: 12, color: colors.gold.withOpacity(0.6)),
+      ],
     );
   }
-}
-
-class _RingPainter extends CustomPainter {
-  final double percent;
-  final Color color;
-  _RingPainter({required this.percent, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const stroke = 3.0;
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - stroke) / 2;
-
-    final bg = Paint()
-      ..color = color.withOpacity(0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    canvas.drawCircle(center, radius, bg);
-
-    final fg = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.round;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi * percent,
-      false,
-      fg,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter old) => old.percent != percent;
 }

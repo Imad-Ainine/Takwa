@@ -30,6 +30,24 @@ class BookChapter {
     this.intro,
   });
 
+  factory BookChapter.fromJson(Map<String, dynamic> json) {
+    return BookChapter(
+      index: json['index'] ?? 0,
+      titleAr: json['title_ar'] ?? '',
+      pages: (json['pages'] as List? ?? [])
+          .map((p) => BookPage.fromJson(p))
+          .toList(),
+      intro: json['intro'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'index': index,
+        'title_ar': titleAr,
+        'pages': pages.map((p) => p.toJson()).toList(),
+        'intro': intro,
+      };
+
   int get totalPages => pages.length;
   int get estimatedMinutes =>
       (pages.fold<int>(0, (sum, p) => sum + p.content.split(' ').length) ~/ 200)
@@ -52,6 +70,26 @@ class BookPage {
     this.hadithNumber,
     this.source,
   });
+
+  factory BookPage.fromJson(Map<String, dynamic> json) {
+    return BookPage(
+      index: json['index'] ?? 0,
+      content: json['content'] ?? '',
+      title: json['title'],
+      isHadith: json['is_hadith'] ?? false,
+      hadithNumber: json['hadith_number'].toString(),
+      source: json['source'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'index': index,
+        'content': content,
+        'title': title,
+        'is_hadith': isHadith,
+        'hadith_number': hadithNumber,
+        'source': source,
+      };
 }
 
 class IslamicBook {
@@ -87,20 +125,62 @@ class IslamicBook {
     required this.coverColor2,
   });
 
+  factory IslamicBook.fromJson(Map<String, dynamic> json) {
+    return IslamicBook(
+      id: json['id'].toString(),
+      titleAr: json['title_ar'] ?? '',
+      titleEn: json['title_en'] ?? '',
+      authorAr: json['author_ar'] ?? '',
+      authorEn: json['author_en'] ?? '',
+      descriptionAr: json['description_ar'] ?? '',
+      emoji: json['emoji'] ?? '📚',
+      category: BookCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => BookCategory.hadith,
+      ),
+      chapters: (json['chapters'] as List? ?? [])
+          .map((c) => BookChapter.fromJson(c))
+          .toList(),
+      coverUrl: json['cover_url'],
+      pdfUrl: json['pdf_url'],
+      publishYear: json['publish_year'] ?? 0,
+      coverColor: json['cover_color'] ?? '0xFFC8A96E',
+      coverColor2: json['cover_color_2'] ?? '0xFF3AAFA9',
+    );
+  }
+
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title_ar': titleAr,
+        'title_en': titleEn,
+        'author_ar': authorAr,
+        'author_en': authorEn,
+        'description_ar': descriptionAr,
+        'emoji': emoji,
+        'category': category.name,
+        'chapters': chapters.map((c) => c.toJson()).toList(),
+        'cover_url': coverUrl,
+        'pdf_url': pdfUrl,
+        'publish_year': publishYear,
+        'cover_color': coverColor,
+        'cover_color_2': coverColor2,
+      };
+
   int get totalPages => chapters.fold<int>(0, (sum, c) => sum + c.totalPages);
 
   int get estimatedReadingMinutes =>
       chapters.fold<int>(0, (sum, c) => sum + c.estimatedMinutes);
 
   String get categoryLabel => switch (category) {
-    BookCategory.hadith => 'الحديث',
-    BookCategory.fiqh => 'الفقه',
-    BookCategory.seerah => 'السيرة',
-    BookCategory.aqeedah => 'العقيدة',
-    BookCategory.adab => 'الآداب',
-    BookCategory.tazkiyah => 'التزكية',
-    BookCategory.quran => 'علوم القرآن',
-  };
+        BookCategory.hadith => 'الحديث',
+        BookCategory.fiqh => 'الفقه',
+        BookCategory.seerah => 'السيرة',
+        BookCategory.aqeedah => 'العقيدة',
+        BookCategory.adab => 'الآداب',
+        BookCategory.tazkiyah => 'التزكية',
+        BookCategory.quran => 'علوم القرآن',
+      };
 }
 
 // ─────────────────────────────────────────
