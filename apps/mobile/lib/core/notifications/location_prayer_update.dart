@@ -76,8 +76,8 @@ class LocationPrayerManager {
 
       // الحصول على الموقع
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 8),
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 12),
       );
 
       final lat = pos.latitude;
@@ -271,8 +271,11 @@ class PrayerTimesWithTimezone {
       case 'ISNA':
         p = adhan.CalculationMethod.north_america.getParameters();
         break;
+      case 'MWL':
       default:
         p = adhan.CalculationMethod.muslim_world_league.getParameters();
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
     }
     p.madhab = madhab == 'hanafi' ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
     return p;

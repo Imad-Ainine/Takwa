@@ -318,8 +318,8 @@ class _OverlayTaskHandler extends TaskHandler {
     for (final prayer in _todayPrayers) {
       if (triggered.contains(prayer.name)) continue;
 
-      final diffSecs = now.difference(prayer.time).inSeconds.abs();
-      if (diffSecs <= _kPrayerWindowSecs) {
+      final diffSecs = now.difference(prayer.time).inSeconds;
+      if (diffSecs >= 0 && diffSecs <= 60) {
         triggered.add(prayer.name);
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
@@ -615,8 +615,11 @@ class _OverlayTaskHandler extends TaskHandler {
       case 'ISNA':
         p = adhan.CalculationMethod.north_america.getParameters();
         break;
+      case 'MWL':
       default:
         p = adhan.CalculationMethod.muslim_world_league.getParameters();
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
     }
     p.madhab = (madhab == 'hanafi') ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
     return p;
@@ -628,8 +631,8 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _handleLocationUpdate() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-        timeLimit: const Duration(seconds: 10),
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 12),
       );
 
       final lat = pos.latitude;

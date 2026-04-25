@@ -93,8 +93,8 @@ class AdhanAutoTrigger {
 
       final now = DateTime.now();
       for (final prayer in prayers) {
-        final diffSecs = now.difference(prayer.time).inSeconds.abs();
-        if (diffSecs > 90) continue; // فقط ±90 ثانية من وقت الأذان
+        final diffSecs = now.difference(prayer.time).inSeconds;
+        if (diffSecs < 0 || diffSecs > 60) continue; // فقط 0-60 ثانية من وقت الأذان
 
         final key = '${prayer.name}_${prayer.time.day}';
         if (_lastTriggeredPrayer == key) continue;
