@@ -18,7 +18,7 @@ _Track your daily prayers, Quran recitation, adhkar, fasting, and guard against 
 
 | Screenshot 1 | Screenshot 2 |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/579b78d7-f1d8-4ec3-9560-99e89d0fdbb4" width="400" /> | <img src="https://github.com/user-attachments/assets/5e38a470-3f09-4304-8d7d-d3417f6a241e" width="400" /> |
+| <img src="https://github.com/user-attachments/assets/579b78d7-f1d8-4ec3-9560-99e89d0fdbb4" width="440" /> | <img src="https://github.com/user-attachments/assets/5e38a470-3f09-4304-8d7d-d3417f6a241e" width="440" /> |
 
 
 
