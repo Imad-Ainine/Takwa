@@ -18,6 +18,7 @@ import '../core/widgets/custom_pattern_background.dart';
 import '../core/supabase/supabase_service.dart';
 import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
+import 'main_shell.dart' show currentTabProvider;
 
 // ─────────────────────────────────────────
 //  DRAWER STATE PROVIDER
@@ -512,10 +513,11 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     _NavItem('🏠', 'الرئيسية', '/home', 0),
     _NavItem('✅', 'محاسبة اليوم', '/checklist', 1),
     _NavItem('🕌', 'أوقات الصلاة', '/prayer', 2),
-    _NavItem('📊', 'الإحصائيات', '/statistics', 3),
-    _NavItem('🏆', 'الإنجازات', '/achievements', 4),
-    _NavItem('👤', 'الملف الشخصي', '/profile', 5),
-    _NavItem('⚙️', 'الإعدادات', '/settings', 6),
+    _NavItem('📚', 'المكتبة الإسلامية', '/books', 3),
+    _NavItem('📊', 'الإحصائيات', '/statistics', 4),
+    _NavItem('🏆', 'الإنجازات', '/achievements', 5),
+    _NavItem('👤', 'الملف الشخصي', '/profile', 6),
+    _NavItem('⚙️', 'الإعدادات', '/settings', 7),
   ];
 
   @override
@@ -585,9 +587,25 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
               isActive: currentRoute == item.route,
               onTap: () {
                 widget.onClose();
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  Navigator.pushNamed(context, item.route);
-                });
+                // Routes embedded in the PageView shell → switch tab
+                const shellRouteToTab = <String, int>{
+                  '/home': 0,
+                  '/checklist': 2,
+                  '/statistics': 3,
+                  '/settings': 5,
+                };
+                final tabIdx = shellRouteToTab[item.route];
+                if (tabIdx != null) {
+                  Future.delayed(const Duration(milliseconds: 320), () {
+                    ref.read(currentTabProvider.notifier).state = tabIdx;
+                  });
+                } else {
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    if (context.mounted) {
+                      Navigator.pushNamed(context, item.route);
+                    }
+                  });
+                }
               },
             ),
           ),

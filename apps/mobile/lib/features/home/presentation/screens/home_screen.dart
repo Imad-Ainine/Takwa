@@ -36,7 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late final List<Animation<Offset>> _slideAnims;
   final _scrollCtrl = ScrollController();
   bool _headerCollapsed = false;
-  static const _sectionCount = 10;
+  static const _sectionCount = 11;
 
   @override
   void initState() {
@@ -235,19 +235,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       _anim(5, _FeatureRow(style: style)),
                       const SizedBox(height: 14),
 
-                      // ⑦ Verse Card
+                      // ⑦ Books Section
+                      //     _anim(6, _BooksSection(style: style)),
+                      // const SizedBox(height: 14),
+
+                      // ⑧ Verse Card
                       _anim(
-                        6,
+                        7,
                         _VerseCardMerged(style: style, isRamadan: isRamadan),
                       ),
                       const SizedBox(height: 14),
 
-                      // ⑧ Ramadan Iftar
+                      // ⑨ Ramadan Iftar
                       if (isRamadan)
-                        _anim(7, _RamadanIftar(style: style, hijri: hijri)),
+                        _anim(8, _RamadanIftar(style: style, hijri: hijri)),
 
-                      // ⑨ Daily Dhikr
-                      _anim(8, _DailyDhikrCard(style: style)),
+                      // ⑩ Daily Dhikr
+                      _anim(9, _DailyDhikrCard(style: style)),
                       const SizedBox(height: 100),
                     ]),
                   ),
@@ -1192,7 +1196,10 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
             ),
             const SizedBox(width: 8),
             GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/checklist'),
+              onTap: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                ref.read(currentTabProvider.notifier).state = 2;
+              },
               child: Text('عرض الكل ←', style: s.naskh(11, color: s.teal)),
             ),
           ],
@@ -1324,6 +1331,7 @@ class _FeatureRow extends StatelessWidget {
     ('🤲', 'الأدعية', '/duas'),
     ('✨', 'المسبحة', '/misbaha'),
     ('🕋', 'المساجد', '/mosques'),
+    ('📚', 'المكتبة', '/books'),
     ('📊', 'إحصائيات', '/statistics'),
     ('🏆', 'الإنجازات', '/achievements'),
     ('🔔', 'التذكيرات', '/reminders'),

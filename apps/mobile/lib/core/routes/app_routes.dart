@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:takwa/features/books/presentation/screens/books_library_screen.dart';
+import 'package:takwa/features/books/presentation/screens/books_chapter_screen.dart';
+import 'package:takwa/features/books/presentation/screens/book_pdf_reader_screen.dart';
+import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/adhkar/favorite_adhkar_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/mosques_screen.dart';
 import 'package:takwa/features/adhkar/presentation/screens/misbaha_screen.dart';
@@ -93,6 +97,9 @@ class Routes {
   static const String qiyamSunnahGuide = '/qiyam-sunnah-guide';
   static const String emailConfirmation = '/email-confirmation';
   static const String updatePassword = '/update-password';
+  static const String books = '/books';
+  static const String booksChapter = '/books/chapter';
+  static const String booksPdf = '/books/pdf';
 }
 
 /// Centralized route generation and management.
@@ -229,6 +236,20 @@ class AppRoutes {
       case Routes.updatePassword:
         return MaterialPageRoute(
           builder: (_) => const UpdatePasswordScreen(),
+        );
+      case Routes.books:
+        return MaterialPageRoute(
+          builder: (_) => const BooksLibraryScreen(),
+        );
+      case Routes.booksChapter:
+        final book = settings.arguments as IslamicBook;
+        return MaterialPageRoute(
+          builder: (_) => BooksChapterScreen(book: book),
+        );
+      case Routes.booksPdf:
+        final book = settings.arguments as IslamicBook;
+        return MaterialPageRoute(
+          builder: (_) => BookPdfReaderScreen(book: book),
         );
       default:
         return MaterialPageRoute(

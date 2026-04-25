@@ -1,0 +1,187 @@
+// ═══════════════════════════════════════════════════════════════
+//  lib/features/books/data/books_data.dart
+//  تقوى — Islamic Books Library (Local)
+// ═══════════════════════════════════════════════════════════════
+
+// ─────────────────────────────────────────
+//  MODELS
+// ─────────────────────────────────────────
+
+enum BookCategory {
+  hadith, // الحديث
+  fiqh, // الفقه
+  seerah, // السيرة
+  aqeedah, // العقيدة
+  adab, // الآداب والأخلاق
+  tazkiyah, // التزكية
+  quran, // علوم القرآن
+}
+
+class BookChapter {
+  final int index;
+  final String titleAr;
+  final List<BookPage> pages;
+  final String? intro;
+
+  const BookChapter({
+    required this.index,
+    required this.titleAr,
+    required this.pages,
+    this.intro,
+  });
+
+  int get totalPages => pages.length;
+  int get estimatedMinutes =>
+      (pages.fold<int>(0, (sum, p) => sum + p.content.split(' ').length) ~/ 200)
+          .clamp(1, 999);
+}
+
+class BookPage {
+  final int index;
+  final String content;
+  final String? title;
+  final bool isHadith;
+  final String? hadithNumber;
+  final String? source;
+
+  const BookPage({
+    required this.index,
+    required this.content,
+    this.title,
+    this.isHadith = false,
+    this.hadithNumber,
+    this.source,
+  });
+}
+
+class IslamicBook {
+  final String id;
+  final String titleAr;
+  final String titleEn;
+  final String authorAr;
+  final String authorEn;
+  final String descriptionAr;
+  final String emoji;
+  final BookCategory category;
+  final List<BookChapter> chapters;
+  final String? coverUrl;
+  final String? pdfUrl;
+  final int publishYear; // hijri
+  final String coverColor; // hex
+  final String coverColor2;
+
+  const IslamicBook({
+    required this.id,
+    required this.titleAr,
+    required this.titleEn,
+    required this.authorAr,
+    required this.authorEn,
+    required this.descriptionAr,
+    required this.emoji,
+    required this.category,
+    this.chapters = const [],
+    this.coverUrl,
+    this.pdfUrl,
+    required this.publishYear,
+    required this.coverColor,
+    required this.coverColor2,
+  });
+
+  int get totalPages => chapters.fold<int>(0, (sum, c) => sum + c.totalPages);
+
+  int get estimatedReadingMinutes =>
+      chapters.fold<int>(0, (sum, c) => sum + c.estimatedMinutes);
+
+  String get categoryLabel => switch (category) {
+    BookCategory.hadith => 'الحديث',
+    BookCategory.fiqh => 'الفقه',
+    BookCategory.seerah => 'السيرة',
+    BookCategory.aqeedah => 'العقيدة',
+    BookCategory.adab => 'الآداب',
+    BookCategory.tazkiyah => 'التزكية',
+    BookCategory.quran => 'علوم القرآن',
+  };
+}
+
+// ─────────────────────────────────────────
+//  BOOK 1: الأربعون النووية
+// ─────────────────────────────────────────
+const _arbaounNawawiyya = IslamicBook(
+  id: 'arboun_nawawi',
+  titleAr: 'الأربعون النووية',
+  titleEn: 'The Forty Hadith of Imam al-Nawawi',
+  authorAr: 'الإمام يحيى بن شرف النووي',
+  authorEn: 'Imam al-Nawawi',
+  descriptionAr:
+      'مجموعة من أهم الأحاديث النبوية الشريفة، جمعها الإمام النووي رحمه الله، وهي تمثل أسس الإسلام وأركانه، تشمل مواضيع شتى من العقيدة والعبادات والمعاملات والأخلاق.',
+  emoji: '📜',
+  category: BookCategory.hadith,
+  publishYear: 631,
+  coverColor: '0xFFC8A96E',
+  coverColor2: '0xFF3AAFA9',
+  coverUrl:
+      'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1381021768i/6740315.jpg', // Sample real cover
+  pdfUrl:
+      'https://d1.islamhouse.com/data/ar/ih_books/parts/Forty_Nawawi_Hadith/ar_Forty_Nawawi_Hadith_Dar_Alsalam.pdf', // Direct PDF url to Arbaoun Nawawiyya
+);
+
+// ─────────────────────────────────────────
+//  BOOK 2: رياض الصالحين
+// ─────────────────────────────────────────
+const _riyadhSalihin = IslamicBook(
+  id: 'riyad_salihin',
+  titleAr: 'رياض الصالحين',
+  titleEn: 'Gardens of the Righteous',
+  authorAr: 'الإمام يحيى بن شرف النووي',
+  authorEn: 'Imam al-Nawawi',
+  descriptionAr:
+      'كتاب جامع للآيات القرآنية والأحاديث النبوية الشريفة في ترقية النفوس وتزكيتها والسمو بها نحو الكمال، مرتب على أبواب من الآداب والأخلاق والعبادات.',
+  emoji: '🌿',
+  category: BookCategory.adab,
+  publishYear: 670,
+  coverColor: '0xFF2E7D32',
+  coverColor2: '0xFFC8A96E',
+  coverUrl:
+      'https://www.noor-book.com/publice/covers_cache_webp/3/b/6/2/277b87d65ab623e3b228d355b7322ae6.jpg.webp',
+  pdfUrl:
+      'https://d1.islamhouse.com/data/ar/ih_books/single_01/ar_Riyad_usSaliheen.pdf',
+);
+
+// ─────────────────────────────────────────
+//  BOOK 3: زاد المعاد
+// ─────────────────────────────────────────
+const _zadAlMaad = IslamicBook(
+  id: 'zad_al_maad_4',
+  titleAr: 'زاد المعاد المجلد الرابع',
+  titleEn: 'Provisions for the Hereafter Vol 4',
+  authorAr: 'الإمام ابن قيم الجوزية',
+  authorEn: 'Ibn Qayyim al-Jawziyyah',
+  descriptionAr:
+      'كتاب نفيس في السيرة النبوية وهَدي النبي ﷺ في عباداته ومعاملاته وأحكامه، يجمع بين الفقه والسيرة في أسلوب علمي رائع.',
+  emoji: '🏹',
+  category: BookCategory.seerah,
+  publishYear: 751,
+  coverColor: '0xFF1565C0',
+  coverColor2: '0xFFC8A96E',
+  coverUrl:
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSZge4_YviGc-FhpZ5O4YRV1t_9Nmuqw16gQ&s',
+  pdfUrl:
+      'https://d1.islamhouse.com/data/ar/ih_books/single-03/ar-Zaad-Almaad4.pdf',
+);
+
+// ─────────────────────────────────────────
+//  BOOKS REGISTRY
+// ─────────────────────────────────────────
+const kIslamicBooks = <IslamicBook>[
+  _arbaounNawawiyya,
+  _riyadhSalihin,
+  _zadAlMaad,
+];
+
+IslamicBook? findBook(String id) {
+  try {
+    return kIslamicBooks.firstWhere((b) => b.id == id);
+  } catch (_) {
+    return null;
+  }
+}

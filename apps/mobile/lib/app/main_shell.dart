@@ -45,7 +45,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
   static const _tabs = [
     _TabInfo('🏠', 'الرئيسية', 0),
-    _TabInfo('🌙', 'قيام الليل', 1),
+    _TabInfo('🌙', 'قيام', 1),
     _TabInfo('✅', 'المحاسبة', 2),
     _TabInfo('📊', 'إحصائيات', 3),
     _TabInfo('✨', 'أسماء الله', 4),
