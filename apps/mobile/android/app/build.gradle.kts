@@ -27,6 +27,8 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
+        // Add the line below to satisfy the Kotlin 2.x compiler requirements
+        freeCompilerArgs += listOf("-Xannotation-default-target=param-property")
     }
 
     defaultConfig {
@@ -65,5 +67,5 @@ flutter {
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
