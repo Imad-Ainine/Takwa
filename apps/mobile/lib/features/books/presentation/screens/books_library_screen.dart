@@ -77,8 +77,11 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                     bottom: -20,
                     child: Opacity(
                       opacity: 0.2,
-                      child: Icon(Icons.menu_book,
-                          size: 180, color: colors.gold),
+                      child: Icon(
+                        Icons.menu_book,
+                        size: 180,
+                        color: colors.gold,
+                      ),
                     ),
                   ),
                 ],
@@ -109,8 +112,10 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
             data: (books) {
               final filtered = books.where((b) {
                 final matchCat =
-                    _selectedCategory == null || b.category == _selectedCategory;
-                final matchSearch = _searchQuery.isEmpty ||
+                    _selectedCategory == null ||
+                    b.category == _selectedCategory;
+                final matchSearch =
+                    _searchQuery.isEmpty ||
                     b.titleAr.contains(_searchQuery) ||
                     b.authorAr.contains(_searchQuery);
                 return matchCat && matchSearch;
@@ -133,23 +138,23 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
               }
 
               return SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 20,
+                ),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (ctx, i) {
-                      final book = filtered[i];
-                      return _BookCard(
-                        book: book,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BooksChapterScreen(book: book),
-                          ),
+                  delegate: SliverChildBuilderDelegate((ctx, i) {
+                    final book = filtered[i];
+                    return _BookCard(
+                      book: book,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BooksChapterScreen(book: book),
                         ),
-                      );
-                    },
-                    childCount: filtered.length,
-                  ),
+                      ),
+                    );
+                  }, childCount: filtered.length),
                 ),
               );
             },
@@ -200,7 +205,10 @@ class _SearchBar extends StatelessWidget {
           hintStyle: TextStyle(color: colors.textSecondary.withOpacity(0.5)),
           prefixIcon: Icon(Icons.search, color: colors.gold),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: 20,
+          ),
         ),
       ),
     );
@@ -263,14 +271,14 @@ class _CategorySelector extends StatelessWidget {
   }
 
   String _labelFor(BookCategory cat) => switch (cat) {
-        BookCategory.hadith => 'الحديث',
-        BookCategory.fiqh => 'الفقه',
-        BookCategory.seerah => 'السيرة',
-        BookCategory.aqeedah => 'العقيدة',
-        BookCategory.adab => 'الآداب',
-        BookCategory.tazkiyah => 'التزكية',
-        BookCategory.quran => 'علوم القرآن',
-      };
+    BookCategory.hadith => 'الحديث',
+    BookCategory.fiqh => 'الفقه',
+    BookCategory.seerah => 'السيرة',
+    BookCategory.aqeedah => 'العقيدة',
+    BookCategory.adab => 'الآداب',
+    BookCategory.tazkiyah => 'التزكية',
+    BookCategory.quran => 'علوم القرآن',
+  };
 }
 
 // ─────────────────────────────────────────
@@ -341,11 +349,16 @@ class _BookCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.arrow_back_ios_new,
-                              size: 14, color: colors.textSecondary.withOpacity(0.3)),
+                          Icon(
+                            Icons.arrow_back_ios_new,
+                            size: 14,
+                            color: colors.textSecondary.withOpacity(0.3),
+                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: c1.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -403,7 +416,7 @@ class _BookCard extends ConsumerWidget {
             ),
             // Floating Book Cover
             Positioned(
-              right: 0,
+              right: 20,
               top: 10,
               bottom: 10,
               child: Hero(
@@ -439,14 +452,18 @@ class _BookCard extends ConsumerWidget {
                             imageUrl: book.coverUrl!,
                             fit: BoxFit.cover,
                             errorWidget: (context, url, error) => Center(
-                              child: Text(book.emoji,
-                                  style: const TextStyle(fontSize: 40)),
+                              child: Text(
+                                book.emoji,
+                                style: const TextStyle(fontSize: 40),
+                              ),
                             ),
                           )
                         else
                           Center(
-                            child:
-                                Text(book.emoji, style: const TextStyle(fontSize: 40)),
+                            child: Text(
+                              book.emoji,
+                              style: const TextStyle(fontSize: 40),
+                            ),
                           ),
                         // Overlay shine
                         Container(

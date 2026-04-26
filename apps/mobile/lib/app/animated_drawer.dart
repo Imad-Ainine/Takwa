@@ -967,18 +967,18 @@ class _LogoutButton extends ConsumerWidget {
   ) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: context.colors.card,
+      builder: (dCtx) => AlertDialog(
+        backgroundColor: dCtx.colors.card,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: context.colors.border),
+          side: BorderSide(color: dCtx.colors.border),
         ),
         title: Text(
           'تسجيل الخروج',
           style: TextStyle(
             fontFamily: 'Amiri',
             fontSize: 18,
-            color: context.colors.danger,
+            color: dCtx.colors.danger,
           ),
         ),
         content: Text(
@@ -986,29 +986,29 @@ class _LogoutButton extends ConsumerWidget {
           style: TextStyle(
             fontFamily: 'NotoNaskhArabic',
             fontSize: 13,
-            color: context.colors.textSecondary,
+            color: dCtx.colors.textSecondary,
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dCtx, false),
             child: Text(
               'إلغاء',
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
-                color: context.colors.textSecondary,
+                color: dCtx.colors.textSecondary,
               ),
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dCtx, true),
             child: Text(
               'خروج',
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
-                color: context.colors.danger,
+                color: dCtx.colors.danger,
               ),
             ),
           ),
