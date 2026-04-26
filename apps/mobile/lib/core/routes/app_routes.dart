@@ -3,7 +3,7 @@ import 'package:takwa/features/books/presentation/screens/books_library_screen.d
 import 'package:takwa/features/books/presentation/screens/books_chapter_screen.dart';
 import 'package:takwa/features/books/presentation/screens/book_pdf_reader_screen.dart';
 import 'package:takwa/features/books/data/books_data.dart';
-import 'package:takwa/features/adhkar/favorite_adhkar_screen.dart';
+import 'package:takwa/features/adhkar/presentation/screens/favorite_adhkar_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/mosques_screen.dart';
 import 'package:takwa/features/adhkar/presentation/screens/misbaha_screen.dart';
 
@@ -14,7 +14,7 @@ import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/features/onboarding/onboarding_screen.dart';
 import 'package:takwa/features/auth/presentation/pages/auth_choice_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
-import 'package:takwa/features/adhkar/adhkar _screen.dart';
+import 'package:takwa/features/adhkar/presentation/screens/adhkar%20_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/about_me_screen.dart';
 import 'package:takwa/features/qibla/presentation/screens/qibla_screen.dart';
 import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
@@ -31,6 +31,7 @@ import 'package:takwa/features/quran/presentation/screens/khatma_progress_screen
 import 'package:takwa/features/quran/presentation/screens/khatma_progress_settings_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/khatma_settings_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
+import 'package:takwa/features/prayer/presentation/screens/wake_up_overlay_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
 import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
 import 'package:takwa/features/checklist/screens/manage_custom_ibadah_screen.dart';
@@ -78,6 +79,7 @@ class Routes {
       '/quran/khatma-extended-settings';
   static const String khatmaSettings = '/quran/khatma-settings';
   static const String adhan = '/adhan';
+  static const String wakeUpOverlay = '/wake-up-overlay';
   static const String terms = '/terms';
   static const String reminders = '/reminders';
   static const String favoriteAdhkar = '/favorite-adhkar';
@@ -185,6 +187,11 @@ class AppRoutes {
         return MaterialPageRoute(
           fullscreenDialog: true,
           builder: (_) => AdhanOverlayScreen(prayerName: prayerName),
+        );
+      case Routes.wakeUpOverlay:
+        return MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => const WakeUpOverlayScreen(),
         );
       case Routes.terms:
         return MaterialPageRoute(builder: (_) => const TermsPrivacyScreen());

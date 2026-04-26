@@ -97,9 +97,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/sounds/Adhan-Makkah.mp3
-    - assets/sounds/ayah.mp3
-    - assets/sounds/notification.mp3
+    - assets/sounds/
     - assets/images/
     - assets/
     - .env

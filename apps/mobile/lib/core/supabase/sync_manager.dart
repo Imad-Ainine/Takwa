@@ -13,6 +13,8 @@ import '../providers/favorites_providers.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+final isSyncingProvider = StateProvider<bool>((ref) => false);
+
 final syncManagerProvider = Provider((ref) => SyncManager(ref));
 
 class SyncManager {
@@ -34,6 +36,7 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     _syncing = true;
+    _ref.read(isSyncingProvider.notifier).state = true;
     try {
       await _syncDailyRecords();
       await _syncProhibitions();
@@ -45,6 +48,7 @@ class SyncManager {
       await _syncReminders();
     } finally {
       _syncing = false;
+      _ref.read(isSyncingProvider.notifier).state = false;
     }
   }
 
@@ -297,10 +301,15 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    final dao = _ref.read(settingsDaoProvider);
-    final settings = await dao.getAllSettings();
-    if (settings.isNotEmpty) {
-      await SupabaseService.updateSettings(settings);
+    _ref.read(isSyncingProvider.notifier).state = true;
+    try {
+      final dao = _ref.read(settingsDaoProvider);
+      final settings = await dao.getAllSettings();
+      if (settings.isNotEmpty) {
+        await SupabaseService.updateSettings(settings);
+      }
+    } finally {
+      _ref.read(isSyncingProvider.notifier).state = false;
     }
   }
 

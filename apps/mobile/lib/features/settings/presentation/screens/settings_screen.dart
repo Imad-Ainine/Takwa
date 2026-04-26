@@ -8,20 +8,38 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
-import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
-import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/notifications/overlay_settings_tile.dart';
+import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../widgets/location_picker_sheet.dart';
+
+const adhanOptions = {
+  'Adhan-Makkah.mp3': 'أذان مكة المكرمة',
+  'Adhan-Madinah.mp3': 'أذان المدينة المنورة',
+  'Adhan-Alaqsa.mp3': 'أذان المسجد الأقصى',
+  'Adhan-Egypt.mp3': 'الأذان المصري',
+  'Abdul-Basit.mp3': 'عبد الباسط عبد الصمد',
+  'Minshawi.mp3': 'محمد صديق المنشاوي',
+  'Naghshbandi.mp3': 'سيد النقشبندي',
+  'Saber.mp3': 'جامع صابر',
+  'Al-Hussaini.mp3': 'الحسيني',
+  'Bakir-Bash.mp3': 'بكير باش',
+  'Hafez.mp3': 'حافظ',
+  'Hafiz-Murad.mp3': 'حافظ مراد',
+  'Sharif-Doman.mp3': 'شريف دومان',
+  'Yusuf-Islam.mp3': 'يوسف إسلام',
+};
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -30,92 +48,15 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  // local state mirrors DB
-  bool _prayerReminder = true;
-  bool _muhasabaReminder = true;
-  bool _morningAdhkar = true;
-  bool _eveningAdhkar = true;
-  bool _wakeUpFajr = false;
-  bool _ramadanMode = false;
-  String _madhab = 'shafi';
-  String _method = 'MWL';
-  TimeOfDay _muhasabaTime = const TimeOfDay(hour: 21, minute: 0);
-  bool _dailyDuas = true;
-  bool _specialReminders = true;
-  bool _fastingReminders = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSettings();
-  }
-
-  Future<void> _loadSettings() async {
-    final s = ref.read(settingsDaoProvider);
-
-    final results = await Future.wait([
-      s.getBool('prayerReminder', defaultVal: true),
-      s.getBool('eveningMuhasabaReminder', defaultVal: true),
-      s.getBool('morningAdhkarReminder', defaultVal: true),
-      s.getBool('eveningAdhkarReminder', defaultVal: true),
-      s.getBool('wakeUpBeforeFajr', defaultVal: false),
-      s.getBool('ramadanMode', defaultVal: false),
-      s.get('madhab'),
-      s.get('calcMethod'),
-      s.get('eveningReminderTime'),
-      s.getBool('dailyDuasOn', defaultVal: true),
-      s.getBool('specialRemindersOn', defaultVal: true),
-      s.getBool('fastingRemindersOn', defaultVal: true),
-    ]);
-
-    final prayerReminder = results[0] as bool;
-    final muhasabaReminder = results[1] as bool;
-    final morningAdhkar = results[2] as bool;
-    final eveningAdhkar = results[3] as bool;
-    final wakeUpFajr = results[4] as bool;
-    final ramadanMode = results[5] as bool;
-    final madhab = (results[6] as String?) ?? 'shafi';
-    final method = (results[7] as String?) ?? 'MWL';
-    final tStr = (results[8] as String?) ?? '21:00';
-
-    final parts = tStr.split(':');
-    final muhasabaTime = TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
-
-    if (mounted) {
-      setState(() {
-        _prayerReminder = prayerReminder;
-        _muhasabaReminder = muhasabaReminder;
-        _morningAdhkar = morningAdhkar;
-        _eveningAdhkar = eveningAdhkar;
-        _wakeUpFajr = wakeUpFajr;
-        _ramadanMode = ramadanMode;
-        _madhab = madhab;
-        _method = method;
-        _muhasabaTime = muhasabaTime;
-        _dailyDuas = results[9] as bool;
-        _specialReminders = results[10] as bool;
-        _fastingReminders = results[11] as bool;
-      });
-    }
-  }
-
-  Future<void> _save(String key, dynamic value) async {
-    final s = ref.read(settingsDaoProvider);
-    if (value is bool) {
-      await s.setBool(key, value);
-    } else {
-      await s.set(key, value.toString());
-    }
-    // إعادة جدولة الإشعارات
-    await ref.read(notificationsManagerProvider).reschedule();
-    await ref.read(syncManagerProvider).syncSettings();
+  Future<void> _updatePref(String key, dynamic value) async {
+    await ref.read(userPreferencesProvider.notifier).updatePref(key, value);
   }
 
   @override
   Widget build(BuildContext context) {
+    final prefsAsync = ref.watch(userPreferencesProvider);
+    final isSyncing = ref.watch(isSyncingProvider);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
@@ -142,6 +83,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       color: context.colors.gold,
                     ),
                   ),
+                  actions: [
+                    if (isSyncing)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Center(
+                          child: SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: context.colors.gold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                   centerTitle: true,
                   elevation: 0,
                   surfaceTintColor: Colors.transparent,
@@ -152,213 +109,235 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     delegate: SliverChildListDelegate([
                       const SizedBox(height: 8),
 
-                      // ── التذكيرات ──
-                      const _SectionHeader(
-                        title: 'التذكيرات والإشعارات',
-                        icon: '🔔',
-                      ),
-                      _SettingsCard(
-                        children: [
-                          _ToggleSetting(
-                            icon: '🕌',
-                            label: 'تذكيرات أوقات الصلاة',
-                            sublabel: 'إشعار عند كل أذان',
-                            value: _prayerReminder,
-                            onChanged: (v) {
-                              setState(() => _prayerReminder = v);
-                              _save('prayerReminder', v);
-                            },
+                      prefsAsync.when(
+                        loading: () => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32.0),
+                            child: CircularProgressIndicator(),
                           ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '🌙',
-                            label: 'الاستيقاظ قبل الفجر',
-                            sublabel: 'تنبيه قبل ١٥ دقيقة من الفجر',
-                            value: _wakeUpFajr,
-                            onChanged: (v) {
-                              setState(() => _wakeUpFajr = v);
-                              _save('wakeUpBeforeFajr', v);
-                            },
+                        ),
+                        error: (err, st) => Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Text('Error loading settings: $err'),
                           ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '☀️',
-                            label: 'أذكار الصباح',
-                            sublabel: 'تذكير يومي الساعة ٦:٣٠ ص',
-                            value: _morningAdhkar,
-                            onChanged: (v) {
-                              setState(() => _morningAdhkar = v);
-                              _save('morningAdhkarReminder', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '🌆',
-                            label: 'أذكار المساء',
-                            sublabel: 'تذكير يومي الساعة ٥:٠٠ م',
-                            value: _eveningAdhkar,
-                            onChanged: (v) {
-                              setState(() => _eveningAdhkar = v);
-                              _save('eveningAdhkarReminder', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '📝',
-                            label: 'محاسبة مسائية',
-                            sublabel: 'تذكير يومي للمحاسبة',
-                            value: _muhasabaReminder,
-                            onChanged: (v) {
-                              setState(() => _muhasabaReminder = v);
-                              _save('eveningMuhasabaReminder', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '🤲',
-                            label: 'الأدعية اليومية',
-                            sublabel: 'نفحات من الأدعية النبوية',
-                            value: _dailyDuas,
-                            onChanged: (v) {
-                              setState(() => _dailyDuas = v);
-                              _save('dailyDuasOn', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '🕌',
-                            label: 'سنن الجمعة',
-                            sublabel: 'تذكير بسورة الكهف والجمعة',
-                            value: _specialReminders,
-                            onChanged: (v) {
-                              setState(() => _specialReminders = v);
-                              _save('specialRemindersOn', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ToggleSetting(
-                            icon: '🥘',
-                            label: 'تنبيهات الصيام',
-                            sublabel: 'الاثنين والخميس والأيام البيض',
-                            value: _fastingReminders,
-                            onChanged: (v) {
-                              setState(() => _fastingReminders = v);
-                              _save('fastingRemindersOn', v);
-                            },
-                          ),
-                          if (_muhasabaReminder) ...[
-                            _Divider(),
-                            _TimeSetting(
-                              icon: '⏰',
-                              label: 'وقت المحاسبة',
-                              time: _muhasabaTime,
-                              onChanged: (t) async {
-                                setState(() => _muhasabaTime = t);
-                                final str =
-                                    '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                await _save('eveningReminderTime', str);
-                              },
+                        ),
+                        data: (prefs) => Column(
+                          children: [
+                            // ── التذكيرات ──
+                            const _SectionHeader(
+                              title: 'التذكيرات والإشعارات',
+                              icon: '🔔',
                             ),
+                            _SettingsCard(
+                              children: [
+                                _ToggleSetting(
+                                  icon: '🕌',
+                                  label: 'تذكيرات أوقات الصلاة',
+                                  sublabel: 'إشعار عند كل أذان',
+                                  value: prefs.prayerReminder,
+                                  onChanged: (v) =>
+                                      _updatePref('prayerReminder', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '🌙',
+                                  label: 'الاستيقاظ قبل الفجر',
+                                  sublabel: 'تنبيه بصوت الأذان في الوقت المحدد',
+                                  value: prefs.wakeUpBeforeFajr,
+                                  onChanged: (v) =>
+                                      _updatePref('wakeUpBeforeFajr', v),
+                                ),
+                                if (prefs.wakeUpBeforeFajr) ...[
+                                  _Divider(),
+                                  _TimeSetting(
+                                    icon: '⏰',
+                                    label: 'وقت الاستيقاظ',
+                                    time: prefs.wakeUpTime,
+                                    onChanged: (t) async {
+                                      final str =
+                                          '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
+                                      await _updatePref('wakeUpTime', str);
+                                    },
+                                  ),
+                                ],
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '☀️',
+                                  label: 'أذكار الصباح',
+                                  sublabel: 'تذكير يومي الساعة ٦:٣٠ ص',
+                                  value: prefs.morningAdhkarReminder,
+                                  onChanged: (v) =>
+                                      _updatePref('morningAdhkarReminder', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '🌆',
+                                  label: 'أذكار المساء',
+                                  sublabel: 'تذكير يومي الساعة ٥:٠٠ م',
+                                  value: prefs.eveningAdhkarReminder,
+                                  onChanged: (v) =>
+                                      _updatePref('eveningAdhkarReminder', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '📝',
+                                  label: 'محاسبة مسائية',
+                                  sublabel: 'تذكير يومي للمحاسبة',
+                                  value: prefs.muhasabaReminder,
+                                  onChanged: (v) =>
+                                      _updatePref('eveningMuhasabaReminder', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '🤲',
+                                  label: 'الأدعية اليومية',
+                                  sublabel: 'نفحات من الأدعية النبوية',
+                                  value: prefs.dailyDuasOn,
+                                  onChanged: (v) =>
+                                      _updatePref('dailyDuasOn', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '🕌',
+                                  label: 'سنن الجمعة',
+                                  sublabel: 'تذكير بسورة الكهف والجمعة',
+                                  value: prefs.specialRemindersOn,
+                                  onChanged: (v) =>
+                                      _updatePref('specialRemindersOn', v),
+                                ),
+                                _Divider(),
+                                _ToggleSetting(
+                                  icon: '🥘',
+                                  label: 'تنبيهات الصيام',
+                                  sublabel: 'الاثنين والخميس والأيام البيض',
+                                  value: prefs.fastingRemindersOn,
+                                  onChanged: (v) =>
+                                      _updatePref('fastingRemindersOn', v),
+                                ),
+                                if (prefs.muhasabaReminder) ...[
+                                  _Divider(),
+                                  _TimeSetting(
+                                    icon: '⏰',
+                                    label: 'وقت المحاسبة',
+                                    time: prefs.muhasabaTime,
+                                    onChanged: (t) async {
+                                      final str =
+                                          '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
+                                      await _updatePref(
+                                        'eveningReminderTime',
+                                        str,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const OverlayNotificationSettings(),
+                            const SizedBox(height: 16),
+
+                            // ── المظهر ──
+                            const _SectionHeader(title: 'المظهر', icon: '🎨'),
+                            _SettingsCard(
+                              children: [
+                                _SelectSetting(
+                                  icon: '🌓',
+                                  label: 'وضع المظهر',
+                                  value: ref.watch(themeModeProvider).name,
+                                  options: const {
+                                    'system': 'تلقائي (حسب النظام)',
+                                    'light': 'الوضع الفاتح',
+                                    'dark': 'الوضع الداكن',
+                                  },
+                                  onChanged: (v) {
+                                    final mode = ThemeMode.values.firstWhere(
+                                      (e) => e.name == v,
+                                    );
+                                    ref
+                                        .read(themeModeProvider.notifier)
+                                        .setTheme(mode);
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // ── وضع رمضان ──
+                            const _SectionHeader(
+                              title: 'وضع رمضان',
+                              icon: '🌙',
+                            ),
+                            _SettingsCard(
+                              children: [
+                                _ToggleSetting(
+                                  icon: '🌙',
+                                  label: 'وضع رمضان',
+                                  sublabel: 'تفعيل المميزات الرمضانية',
+                                  value: prefs.ramadanMode,
+                                  onChanged: (v) =>
+                                      _updatePref('ramadanMode', v),
+                                  accentColor: context.colors.gold,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // ── أوقات الصلاة ──
+                            const _SectionHeader(
+                              title: 'حساب أوقات الصلاة',
+                              icon: '🕌',
+                            ),
+                            _SettingsCard(
+                              children: [
+                                _SelectSetting(
+                                  icon: '📐',
+                                  label: 'المذهب الفقهي',
+                                  value: prefs.madhab,
+                                  options: const {
+                                    'shafi': 'شافعي / مالكي / حنبلي',
+                                    'hanafi': 'حنفي',
+                                  },
+                                  onChanged: (v) => _updatePref('madhab', v),
+                                ),
+                                _Divider(),
+                                _SelectSetting(
+                                  icon: '🌍',
+                                  label: 'طريقة الحساب',
+                                  value: prefs.calcMethod,
+                                  options: const {
+                                    'Algeria': 'الجزائر (وزارة الشؤون الدينية)',
+                                    'MWL': 'رابطة العالم الإسلامي',
+                                    'Egypt': 'دار الإفتاء المصرية',
+                                    'Karachi': 'جامعة كراتشي',
+                                    'UmmAlQura': 'أم القرى (مكة المكرمة)',
+                                    'ISNA': 'أمريكا الشمالية',
+                                  },
+                                  onChanged: (v) =>
+                                      _updatePref('calcMethod', v),
+                                ),
+                                _Divider(),
+                                _AdhanSelectSetting(
+                                  icon: '🎵',
+                                  label: 'صوت الأذان',
+                                  value: prefs.adhanSound,
+                                  options: adhanOptions,
+                                  onChanged: (v) => _updatePref('adhanSound', v),
+                                ),
+                                _Divider(),
+                                _ActionSetting(
+                                  icon: '📍',
+                                  label: 'تحديث الموقع الجغرافي',
+                                  sublabel: 'للحصول على أدق أوقات الصلاة',
+                                  onTap: () =>
+                                      LocationPickerSheet.show(context),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                           ],
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      const OverlayNotificationSettings(),
-                      const SizedBox(height: 16),
-
-                      // ── المظهر ──
-                      const _SectionHeader(title: 'المظهر', icon: '🎨'),
-                      _SettingsCard(
-                        children: [
-                          _SelectSetting(
-                            icon: '🌓',
-                            label: 'وضع المظهر',
-                            value: ref.watch(themeModeProvider).name,
-                            options: const {
-                              'system': 'تلقائي (حسب النظام)',
-                              'light': 'الوضع الفاتح',
-                              'dark': 'الوضع الداكن',
-                            },
-                            onChanged: (v) {
-                              final mode = ThemeMode.values.firstWhere(
-                                (e) => e.name == v,
-                              );
-                              ref
-                                  .read(themeModeProvider.notifier)
-                                  .setTheme(mode);
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ── وضع رمضان ──
-                      const _SectionHeader(title: 'وضع رمضان', icon: '🌙'),
-                      _SettingsCard(
-                        children: [
-                          _ToggleSetting(
-                            icon: '🌙',
-                            label: 'وضع رمضان',
-                            sublabel: 'تفعيل المميزات الرمضانية',
-                            value: _ramadanMode,
-                            onChanged: (v) {
-                              setState(() => _ramadanMode = v);
-                              _save('ramadanMode', v);
-                            },
-                            accentColor: context.colors.gold,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // ── أوقات الصلاة ──
-                      const _SectionHeader(
-                        title: 'حساب أوقات الصلاة',
-                        icon: '🕌',
-                      ),
-                      _SettingsCard(
-                        children: [
-                          _SelectSetting(
-                            icon: '📐',
-                            label: 'المذهب الفقهي',
-                            value: _madhab,
-                            options: const {
-                              'shafi': 'شافعي / مالكي / حنبلي',
-                              'hanafi': 'حنفي',
-                            },
-                            onChanged: (v) {
-                              setState(() => _madhab = v);
-                              _save('madhab', v);
-                            },
-                          ),
-                          _Divider(),
-                          _SelectSetting(
-                            icon: '🌍',
-                            label: 'طريقة الحساب',
-                            value: _method,
-                            options: const {
-                              'Algeria': 'الجزائر (وزارة الشؤون الدينية)',
-                              'MWL': 'رابطة العالم الإسلامي',
-                              'Egypt': 'دار الإفتاء المصرية',
-                              'Karachi': 'جامعة كراتشي',
-                              'UmmAlQura': 'أم القرى (مكة المكرمة)',
-                              'ISNA': 'أمريكا الشمالية',
-                            },
-                            onChanged: (v) {
-                              setState(() => _method = v);
-                              _save('calcMethod', v);
-                            },
-                          ),
-                          _Divider(),
-                          _ActionSetting(
-                            icon: '📍',
-                            label: 'تحديث الموقع الجغرافي',
-                            sublabel: 'للحصول على أدق أوقات الصلاة',
-                            onTap: () => LocationPickerSheet.show(context),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
 
                       // ── معلومات ──
                       const _SectionHeader(title: 'التطبيق', icon: 'ℹ️'),
@@ -1059,5 +1038,227 @@ class _ActionSetting extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _AdhanSelectSetting extends StatefulWidget {
+  final String icon, label, value;
+  final Map<String, String> options;
+  final void Function(String) onChanged;
+
+  const _AdhanSelectSetting({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.options,
+    required this.onChanged,
+  });
+
+  @override
+  State<_AdhanSelectSetting> createState() => _AdhanSelectSettingState();
+}
+
+class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
+  final AudioPlayer _player = AudioPlayer();
+  String? _currentlyPlayingKey;
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showPicker(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: context.colors.teal.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(widget.icon, style: const TextStyle(fontSize: 18)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 13,
+                      color: context.colors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    widget.options[widget.value] ?? widget.value,
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 10,
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: context.colors.textDim,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: context.colors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => StatefulBuilder(
+        builder: (ctx, setStateSheet) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(16, 20, 16, MediaQuery.of(ctx).padding.bottom + 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: context.colors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 18,
+                    color: context.colors.gold,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Flexible(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(ctx).size.height * 0.6,
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: widget.options.entries.map((e) {
+                          final isSelected = widget.value == e.key;
+                          final isPlaying = _currentlyPlayingKey == e.key;
+
+                          return GestureDetector(
+                            onTap: () async {
+                              await _player.stop();
+                              widget.onChanged(e.key);
+                              if (ctx.mounted) {
+                                Navigator.pop(ctx);
+                              }
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? context.colors.teal.withOpacity(0.12)
+                                    : context.colors.background,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? context.colors.teal.withOpacity(0.35)
+                                      : context.colors.border,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      e.value,
+                                      style: TextStyle(
+                                        fontFamily: 'NotoNaskhArabic',
+                                        fontSize: 13,
+                                        color: isSelected
+                                            ? context.colors.teal
+                                            : context.colors.textPrimary,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      isPlaying ? Icons.stop_circle_rounded : Icons.play_circle_fill_rounded,
+                                      color: isSelected ? context.colors.teal : context.colors.gold,
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () async {
+                                      if (isPlaying) {
+                                        await _player.stop();
+                                        setStateSheet(() => _currentlyPlayingKey = null);
+                                      } else {
+                                        setStateSheet(() => _currentlyPlayingKey = e.key);
+                                        await _player.setAsset('assets/sounds/${e.key}');
+                                        _player.playerStateStream.listen((state) {
+                                          if (state.processingState == ProcessingState.completed) {
+                                            if (ctx.mounted) {
+                                              setStateSheet(() => _currentlyPlayingKey = null);
+                                            }
+                                          }
+                                        });
+                                        await _player.play();
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: 8),
+                                  if (isSelected)
+                                    Icon(
+                                      Icons.check_circle_rounded,
+                                      color: context.colors.teal,
+                                      size: 18,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    ).whenComplete(() {
+      _player.stop();
+    });
   }
 }

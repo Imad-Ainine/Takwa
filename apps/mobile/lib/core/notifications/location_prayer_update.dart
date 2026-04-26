@@ -159,7 +159,6 @@ class LocationPrayerManager {
 
     await NotificationsService.schedulePrayerNotifications(
       prayers: prayers,
-      wakeUpBeforeFajr: wakeUpFajr,
     );
 
     _scheduled = true;

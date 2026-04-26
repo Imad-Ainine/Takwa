@@ -136,10 +136,27 @@ class SupabaseService {
       'user_id': user.id,
       'madhab': 'shafi',
       'calc_method': 'MWL',
+      'language': 'ar',
       'prayer_reminder': true,
+      'pre_adhan_notif': true,
+      'iqama_notif': true,
+      'wake_up_before_fajr': false,
+      'wake_up_time': '04:30',
+      'morning_adhkar_reminder': true,
+      'evening_adhkar_reminder': true,
+      'adhkar_notif_enabled': true,
+      'morning_adhkar_time': '06:30',
+      'evening_adhkar_time': '17:00',
+      'sleep_adhkar_time': '22:00',
+      'after_fajr_adhkar': true,
+      'after_asr_adhkar': true,
       'muhasaba_reminder': true,
       'evening_reminder_time': '21:00',
+      'daily_duas_on': true,
+      'special_reminders_on': true,
+      'fasting_reminders_on': true,
       'ramadan_mode': false,
+      'theme_mode': 'system',
     });
   }
 
@@ -187,32 +204,12 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
 
-    // Ensure we only send valid columns and map them if necessary
+    // We assume 'settings' contains snake_case keys mapped accurately using UserPreferences.toMap()
     final payload = <String, dynamic>{
+      ...settings,
       'user_id': uid,
       'updated_at': DateTime.now().toIso8601String(),
     };
-
-    final mapping = {
-      'madhab': 'madhab',
-      'ramadanMode': 'ramadan_mode',
-      'calcMethod': 'calc_method',
-      'prayerReminder': 'prayer_reminder',
-      'eveningMuhasabaReminder': 'muhasaba_reminder',
-      'eveningReminderTime': 'evening_reminder_time',
-      'language': 'language',
-      'wakeUpBeforeFajr': 'wake_up_before_fajr',
-      'morningAdhkarReminder': 'morning_adhkar_reminder',
-      'eveningAdhkarReminder': 'evening_adhkar_reminder',
-    };
-
-    for (var entry in mapping.entries) {
-      if (settings.containsKey(entry.key)) {
-        payload[entry.value] = settings[entry.key];
-      } else if (settings.containsKey(entry.value)) {
-        payload[entry.value] = settings[entry.value];
-      }
-    }
 
     await _safeRequest(
       () => _db.from('user_settings').upsert(payload, onConflict: 'user_id'),

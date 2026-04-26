@@ -8,13 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
-import 'package:takwa/core/utils/overlay_helper.dart';
-import 'package:takwa/core/widgets/primary_button.dart';
+// import 'package:takwa/core/utils/overlay_helper.dart';
+// import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
-import 'package:takwa/features/adhkar/_user_community_adhkar_views.dart';
+import 'package:takwa/features/adhkar/presentation/screens/_user_community_adhkar_views.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 
@@ -794,7 +795,8 @@ class _CounterBubble extends StatelessWidget {
 class _NotifSettingsButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final enabled = ref.watch(adhkarNotifEnabledProvider);
+    final prefsAsync = ref.watch(userPreferencesProvider);
+    final enabled = prefsAsync.valueOrNull?.adhkarNotifEnabled ?? true;
     return GestureDetector(
       onTap: () => _showNotifSettings(context, ref),
       child: AnimatedContainer(
@@ -843,12 +845,14 @@ class _AdhkarNotifSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final enabled = ref.watch(adhkarNotifEnabledProvider);
-    final morningTime = ref.watch(adhkarMorningTimeProvider);
-    final eveningTime = ref.watch(adhkarEveningTimeProvider);
-    final afterFajr = ref.watch(adhkarAfterFajrProvider);
-    final afterAsr = ref.watch(adhkarAfterAsrProvider);
-    final sleepTime = ref.watch(adhkarSleepTimeProvider);
+    final prefsAsync = ref.watch(userPreferencesProvider);
+    final prefs = prefsAsync.valueOrNull;
+    final enabled = prefs?.adhkarNotifEnabled ?? true;
+    final morningTime = prefs?.morningAdhkarTime ?? const TimeOfDay(hour: 6, minute: 30);
+    final eveningTime = prefs?.eveningAdhkarTime ?? const TimeOfDay(hour: 17, minute: 0);
+    final sleepTime = prefs?.sleepAdhkarTime ?? const TimeOfDay(hour: 22, minute: 0);
+    final afterFajr = prefs?.afterFajrAdhkar ?? true;
+    final afterAsr = prefs?.afterAsrAdhkar ?? true;
 
     return Container(
       decoration: BoxDecoration(
@@ -885,8 +889,8 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 Switch(
                   value: enabled,
                   onChanged: (v) {
-                    ref.read(adhkarNotifEnabledProvider.notifier).set(v);
-                    if (!v) AdhkarNotificationService.cancelAll();
+                    ref.read(userPreferencesProvider.notifier).update('adhkar_notif_enabled', v);
+                    // AdhkarNotificationService will handle the cancellation upon next update in reschedule
                   },
                   activeColor: context.colors.gold,
                   activeTrackColor: context.colors.gold.withOpacity(0.3),
@@ -929,8 +933,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, morningTime);
                     if (t != null) {
-                      ref.read(adhkarMorningTimeProvider.notifier).set(t);
-                      await AdhkarNotificationService.scheduleMorning(t);
+                      ref.read(userPreferencesProvider.notifier).update('morning_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
                     }
                   },
                 ),
@@ -941,8 +944,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, eveningTime);
                     if (t != null) {
-                      ref.read(adhkarEveningTimeProvider.notifier).set(t);
-                      await AdhkarNotificationService.scheduleEvening(t);
+                      ref.read(userPreferencesProvider.notifier).update('evening_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
                     }
                   },
                 ),
@@ -953,7 +955,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, sleepTime);
                     if (t != null) {
-                      ref.read(adhkarSleepTimeProvider.notifier).set(t);
+                      ref.read(userPreferencesProvider.notifier).update('sleep_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
                     }
                   },
                 ),
@@ -965,43 +967,44 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   label: 'بعد صلاة الفجر',
                   value: afterFajr,
                   onChanged: (v) =>
-                      ref.read(adhkarAfterFajrProvider.notifier).set(v),
+                      ref.read(userPreferencesProvider.notifier).update('after_fajr_adhkar', v),
                 ),
                 _ToggleRow(
                   icon: '🌇',
                   label: 'بعد صلاة العصر',
                   value: afterAsr,
                   onChanged: (v) =>
-                      ref.read(adhkarAfterAsrProvider.notifier).set(v),
+                      ref.read(userPreferencesProvider.notifier).update('after_asr_adhkar', v),
                 ),
                 const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    onTap: () async {
-                      final dhikr = (kAdhkarData[AdhkarCategory.morning]!)[0];
-                      await AdhkarNotificationService.showDhikrNow(dhikr);
-                      if (context.mounted) Navigator.pop(context);
-                    },
-                    icon: Icons.notifications_active_outlined,
-                    label: 'اختبار إشعار ذكر الآن',
-                    isOutline: true,
-                    baseColor: context.colors.gold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    onTap: () async {
-                      OverlayHelper.show(type: 'adhkar');
-                    },
-                    icon: Icons.star_rounded,
-                    label: 'اختبار الـ Overlay',
-                    isOutline: false,
-                    baseColor: context.colors.teal,
-                  ),
-                ),
+
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: PrimaryButton(
+                //     onTap: () async {
+                //       final dhikr = (kAdhkarData[AdhkarCategory.morning]!)[0];
+                //       await AdhkarNotificationService.showDhikrNow(dhikr);
+                //       if (context.mounted) Navigator.pop(context);
+                //     },
+                //     icon: Icons.notifications_active_outlined,
+                //     label: 'اختبار إشعار ذكر الآن',
+                //     isOutline: true,
+                //     baseColor: context.colors.gold,
+                //   ),
+                // ),
+                // const SizedBox(height: 12),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: PrimaryButton(
+                //     onTap: () async {
+                //       OverlayHelper.show(type: 'adhkar');
+                //     },
+                //     icon: Icons.star_rounded,
+                //     label: 'اختبار الـ Overlay',
+                //     isOutline: false,
+                //     baseColor: context.colors.teal,
+                //   ),
+                // ),
               ],
             ),
           ),

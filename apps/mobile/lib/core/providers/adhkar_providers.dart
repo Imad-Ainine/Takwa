@@ -11,8 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
-
-
+import '../../features/settings/data/user_preferences.dart';
 
 // ═══════════════════════════════════════════════════════════════
 //  MODELS
@@ -465,90 +464,7 @@ final adhkarProgressProvider =
       AdhkarCategory
     >((ref, cat) => AdhkarProgressNotifier(cat));
 
-// ── إعداد الإشعارات ──
-final adhkarNotifEnabledProvider = StateNotifierProvider<_BoolNotifier, bool>(
-  (ref) => _BoolNotifier('adhkar_notif_enabled', true),
-);
-
-final adhkarMorningTimeProvider =
-    StateNotifierProvider<_TimeNotifier, TimeOfDay>(
-      (ref) => _TimeNotifier(
-        'adhkar_morning_time',
-        const TimeOfDay(hour: 6, minute: 30),
-      ),
-    );
-
-final adhkarEveningTimeProvider =
-    StateNotifierProvider<_TimeNotifier, TimeOfDay>(
-      (ref) => _TimeNotifier(
-        'adhkar_evening_time',
-        const TimeOfDay(hour: 17, minute: 0),
-      ),
-    );
-
-final adhkarAfterFajrProvider = StateNotifierProvider<_BoolNotifier, bool>(
-  (ref) => _BoolNotifier('adhkar_after_fajr', true),
-);
-
-final adhkarAfterAsrProvider = StateNotifierProvider<_BoolNotifier, bool>(
-  (ref) => _BoolNotifier('adhkar_after_asr', true),
-);
-
-final adhkarSleepTimeProvider = StateNotifierProvider<_TimeNotifier, TimeOfDay>(
-  (ref) =>
-      _TimeNotifier('adhkar_sleep_time', const TimeOfDay(hour: 22, minute: 0)),
-);
-
-// ── Notifiers helpers ──
-class _BoolNotifier extends StateNotifier<bool> {
-  final String _key;
-  _BoolNotifier(this._key, bool defaultVal) : super(defaultVal) {
-    _load(defaultVal);
-  }
-
-  Future<void> _load(bool def) async {
-    final prefs = await SharedPreferences.getInstance();
-    state = prefs.getBool(_key) ?? def;
-  }
-
-  Future<void> toggle() async {
-    state = !state;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_key, state);
-  }
-
-  Future<void> set(bool v) async {
-    state = v;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_key, v);
-  }
-}
-
-class _TimeNotifier extends StateNotifier<TimeOfDay> {
-  final String _key;
-  _TimeNotifier(this._key, TimeOfDay defaultVal) : super(defaultVal) {
-    _load(defaultVal);
-  }
-
-  Future<void> _load(TimeOfDay def) async {
-    final prefs = await SharedPreferences.getInstance();
-    final v = prefs.getString(_key);
-    if (v != null) {
-      final parts = v.split(':');
-      state = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
-    }
-  }
-
-  Future<void> set(TimeOfDay t) async {
-    state = t;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _key,
-      '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}',
-    );
-  }
-}
-
+// Legacy SharedPreference providers removed since we now use UserPreferences.
 // ═══════════════════════════════════════════════════════════════
 //  ADHKAR NOTIFICATION SERVICE
 // ═══════════════════════════════════════════════════════════════
@@ -561,6 +477,46 @@ class AdhkarNotificationService {
   static const _afterAsrId = 313;
   static const _sleepId = 314;
   static const _dhikrId = 315;
+
+  static Future<void> rescheduleAll(UserPreferences prefs) async {
+    await cancelAll();
+    
+    if (prefs.adhkarNotifEnabled) {
+      if (prefs.morningAdhkarReminder) {
+        await scheduleMorning(prefs.morningAdhkarTime);
+      }
+      if (prefs.eveningAdhkarReminder) {
+        await scheduleEvening(prefs.eveningAdhkarTime);
+      }
+      // Assuming sleep reminders are global if adhkarNotifEnabled is true
+      await _scheduleSleep(prefs.sleepAdhkarTime);
+    }
+  }
+
+  static Future<void> _scheduleSleep(TimeOfDay time) async {
+    await _cancelId(_sleepId);
+    final now = DateTime.now();
+    var scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    if (scheduled.isBefore(now)) scheduled = scheduled.add(const Duration(days: 1));
+    
+    final dhikr = _randomDhikr(AdhkarCategory.sleep);
+    await _plugin.zonedSchedule(
+      _sleepId,
+      '🌙 حان وقت أذكار النوم',
+      dhikr.arabic.replaceAll('\n', ' ').substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
+      tz.TZDateTime.from(scheduled, tz.local),
+      _buildDetails(
+        channelId: 'adhkar_sleep', channelName: 'أذكار النوم',
+        actions: [
+          const AndroidNotificationAction('read_sleep', 'قرأت الأذكار ✓', showsUserInterface: false, cancelNotification: true),
+        ]
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+      payload: 'adhkar:sleep',
+    );
+  }
 
   static Future<void> scheduleMorning(TimeOfDay time) async {
     await _cancelId(_morningId);
