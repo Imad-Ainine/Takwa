@@ -49,14 +49,42 @@ create table if not exists public.user_settings (
   user_id uuid primary key references public.profiles(id) on delete cascade,
   madhab text default 'shafi',
   calc_method text default 'MWL',
-  prayer_reminder boolean default true,
-  muhasaba_reminder boolean default true,
-  evening_reminder_time text default '21:00',
-  ramadan_mode boolean default false,
   language text default 'ar',
+
+  prayer_reminder boolean default true,
+  pre_adhan_notif boolean default true,
+  iqama_notif boolean default true,
+
   wake_up_before_fajr boolean default false,
+  wake_up_time text default '04:30',
+
   morning_adhkar_reminder boolean default true,
   evening_adhkar_reminder boolean default true,
+
+  adhkar_notif_enabled boolean default true,
+  morning_adhkar_time text default '06:30',
+  evening_adhkar_time text default '17:00',
+  sleep_adhkar_time text default '22:00',
+  after_fajr_adhkar boolean default true,
+  after_asr_adhkar boolean default true,
+
+  muhasaba_reminder boolean default true,
+  evening_reminder_time text default '21:00',
+
+  daily_duas_on boolean default true,
+  special_reminders_on boolean default true,
+  fasting_reminders_on boolean default true,
+
+  ramadan_mode boolean default false,
+  theme_mode text default 'system',
+  adhan_sound text default 'Adhan-Makkah.mp3',
+
+  -- overlay / in-screen settings
+  overlay_popups_enabled boolean default true,
+  adhan_sound_enabled boolean default true,
+  adhan_screen_enabled boolean default true,
+  popup_interval_minutes int default 24,
+
   favorite_adhkar int[] default '{}',
   favorite_duas int[] default '{}',
   updated_at timestamptz default now()

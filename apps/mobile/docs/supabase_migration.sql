@@ -180,6 +180,13 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
 
     ramadan_mode BOOLEAN DEFAULT false,
     theme_mode TEXT DEFAULT 'system',
+    adhan_sound TEXT DEFAULT 'Adhan-Makkah.mp3',
+
+    -- Overlay / in-screen settings
+    overlay_popups_enabled BOOLEAN DEFAULT true,
+    adhan_sound_enabled BOOLEAN DEFAULT true,
+    adhan_screen_enabled BOOLEAN DEFAULT true,
+    popup_interval_minutes INTEGER DEFAULT 24,
 
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -213,5 +220,10 @@ ALTER TABLE public.user_settings
   ADD COLUMN IF NOT EXISTS daily_duas_on BOOLEAN DEFAULT true,
   ADD COLUMN IF NOT EXISTS special_reminders_on BOOLEAN DEFAULT true,
   ADD COLUMN IF NOT EXISTS fasting_reminders_on BOOLEAN DEFAULT true,
-  ADD COLUMN IF NOT EXISTS theme_mode TEXT DEFAULT 'system';
+  ADD COLUMN IF NOT EXISTS theme_mode TEXT DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS adhan_sound TEXT DEFAULT 'Adhan-Makkah.mp3',
+  ADD COLUMN IF NOT EXISTS overlay_popups_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS adhan_sound_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS adhan_screen_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS popup_interval_minutes INTEGER DEFAULT 24;
 

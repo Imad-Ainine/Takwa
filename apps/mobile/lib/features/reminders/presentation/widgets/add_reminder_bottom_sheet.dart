@@ -5,6 +5,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/database/app_database.dart';
+import 'package:takwa/core/widgets/custom_time_picker.dart';
 
 /// Map from human-readable icon key to IconData.
 /// Used to persist and restore icons from the database.
@@ -41,22 +42,9 @@ class _AddReminderBottomSheetState
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? picked = await showCustomTimePicker(
       context: context,
       initialTime: _selectedTime,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: context.colors.gold,
-              onPrimary: context.colors.background,
-              surface: context.colors.card,
-              onSurface: context.colors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null && mounted) {
       setState(() => _selectedTime = picked);

@@ -1,90 +1,17 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/notifications/overlay_settings_tile.dart
 //  تقوى — Overlay & Notification Settings Widget
+//  Settings are stored in SQLite and synced to Supabase via
+//  userPreferencesProvider. The old overlaySettingsProvider
+//  (SharedPreferences) has been removed.
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/app_theme.dart';
+import '../../features/settings/providers/user_preferences_provider.dart';
 import 'overlay_background_service.dart';
-
-// ─────────────────────────────────────────
-//  OVERLAY SETTINGS PROVIDER
-// ─────────────────────────────────────────
-class OverlaySettings {
-  final bool overlayEnabled;
-  final bool adhanSoundEnabled;
-  final bool adhanScreenEnabled;
-  final int popupIntervalMins;
-
-  const OverlaySettings({
-    this.overlayEnabled = true,
-    this.adhanSoundEnabled = true,
-    this.adhanScreenEnabled = true,
-    this.popupIntervalMins = 24,
-  });
-}
-
-class OverlaySettingsNotifier extends AsyncNotifier<OverlaySettings> {
-  @override
-  Future<OverlaySettings> build() async {
-    final prefs = await SharedPreferences.getInstance();
-    return OverlaySettings(
-      overlayEnabled: prefs.getBool('overlay_popups_enabled') ?? true,
-      adhanSoundEnabled: prefs.getBool('adhan_sound_enabled') ?? true,
-      adhanScreenEnabled: prefs.getBool('adhan_screen_enabled') ?? true,
-      popupIntervalMins: prefs.getInt('popup_interval_minutes') ?? 24,
-    );
-  }
-
-  Future<void> setOverlayEnabled(bool v) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('overlay_popups_enabled', v);
-    OverlayBackgroundService.updateSettings(overlayEnabled: v);
-    state = AsyncData((await future).copyWith(overlayEnabled: v));
-  }
-
-  Future<void> setAdhanSound(bool v) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('adhan_sound_enabled', v);
-    OverlayBackgroundService.updateSettings(adhanSoundEnabled: v);
-    state = AsyncData((await future).copyWith(adhanSoundEnabled: v));
-  }
-
-  Future<void> setAdhanScreen(bool v) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('adhan_screen_enabled', v);
-    state = AsyncData((await future).copyWith(adhanScreenEnabled: v));
-  }
-
-  Future<void> setPopupInterval(int mins) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('popup_interval_minutes', mins);
-    OverlayBackgroundService.updateSettings(popupIntervalMins: mins);
-    state = AsyncData((await future).copyWith(popupIntervalMins: mins));
-  }
-}
-
-extension _SettingsCopy on OverlaySettings {
-  OverlaySettings copyWith({
-    bool? overlayEnabled,
-    bool? adhanSoundEnabled,
-    bool? adhanScreenEnabled,
-    int? popupIntervalMins,
-  }) => OverlaySettings(
-    overlayEnabled: overlayEnabled ?? this.overlayEnabled,
-    adhanSoundEnabled: adhanSoundEnabled ?? this.adhanSoundEnabled,
-    adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
-    popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
-  );
-}
-
-final overlaySettingsProvider =
-    AsyncNotifierProvider<OverlaySettingsNotifier, OverlaySettings>(
-      OverlaySettingsNotifier.new,
-    );
 
 // ─────────────────────────────────────────
 //  OVERLAY SETTINGS SECTION
@@ -94,15 +21,15 @@ class OverlayNotificationSettings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settingsAsync = ref.watch(overlaySettingsProvider);
+    final prefsAsync = ref.watch(userPreferencesProvider);
 
-    return settingsAsync.when(
+    return prefsAsync.when(
       loading: () => const SizedBox(
         height: 48,
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (_, __) => const SizedBox(),
-      data: (settings) => Column(
+      data: (prefs) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── عنوان القسم ──
@@ -122,9 +49,10 @@ class OverlayNotificationSettings extends ConsumerWidget {
             icon: '🕌',
             title: 'شاشة الأذان التلقائية',
             subtitle: 'يُظهر شاشة الأذان عند دخول وقت الصلاة',
-            value: settings.adhanScreenEnabled,
-            onChanged: (v) =>
-                ref.read(overlaySettingsProvider.notifier).setAdhanScreen(v),
+            value: prefs.adhanScreenEnabled,
+            onChanged: (v) => ref
+                .read(userPreferencesProvider.notifier)
+                .updatePref('adhan_screen_enabled', v),
           ),
 
           // ── صوت الأذان ──
@@ -132,9 +60,13 @@ class OverlayNotificationSettings extends ConsumerWidget {
             icon: '🔊',
             title: 'صوت الأذان',
             subtitle: 'تشغيل صوت الأذان تلقائياً عند دخول الوقت',
-            value: settings.adhanSoundEnabled,
-            onChanged: (v) =>
-                ref.read(overlaySettingsProvider.notifier).setAdhanSound(v),
+            value: prefs.adhanSoundEnabled,
+            onChanged: (v) {
+              ref
+                  .read(userPreferencesProvider.notifier)
+                  .updatePref('adhan_sound_enabled', v);
+              OverlayBackgroundService.updateSettings(adhanSoundEnabled: v);
+            },
           ),
 
           // ── نوافذ الأذكار المنبثقة ──
@@ -142,25 +74,33 @@ class OverlayNotificationSettings extends ConsumerWidget {
             icon: '📿',
             title: 'نوافذ الأذكار والأدعية',
             subtitle: 'يُظهر أذكاراً وأدعيةً بشكل منبثق على الشاشة',
-            value: settings.overlayEnabled,
-            onChanged: (v) =>
-                ref.read(overlaySettingsProvider.notifier).setOverlayEnabled(v),
+            value: prefs.overlayEnabled,
+            onChanged: (v) {
+              ref
+                  .read(userPreferencesProvider.notifier)
+                  .updatePref('overlay_popups_enabled', v);
+              OverlayBackgroundService.updateSettings(overlayEnabled: v);
+            },
           ),
 
           // ── فترة الظهور ──
-          if (settings.overlayEnabled) ...[
+          if (prefs.overlayEnabled) ...[
             const SizedBox(height: 8),
             _IntervalSelector(
-              value: settings.popupIntervalMins,
-              onChanged: (v) => ref
-                  .read(overlaySettingsProvider.notifier)
-                  .setPopupInterval(v),
+              value: prefs.popupIntervalMins,
+              onChanged: (v) {
+                ref
+                    .read(userPreferencesProvider.notifier)
+                    .updatePref('popup_interval_minutes', v);
+                OverlayBackgroundService.updateSettings(popupIntervalMins: v);
+              },
             ),
           ],
 
           const SizedBox(height: 8),
+
           // إحصاء: عدد المرات في اليوم
-          if (settings.overlayEnabled)
+          if (prefs.overlayEnabled)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
@@ -174,7 +114,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'ستظهر النوافذ ~${(1440 / settings.popupIntervalMins).floor()} مرة يومياً',
+                      'ستظهر النوافذ ~${(1440 / prefs.popupIntervalMins).floor()} مرة يومياً',
                       style: context.typography.caption.copyWith(
                         color: context.colors.teal,
                         fontSize: 12,
@@ -189,6 +129,10 @@ class OverlayNotificationSettings extends ConsumerWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────
+//  SHARED CHILD WIDGETS (unchanged)
+// ─────────────────────────────────────────
 
 class _SettingTile extends StatelessWidget {
   final String icon;
@@ -323,9 +267,8 @@ class _IntervalSelector extends StatelessWidget {
                       color: isSelected
                           ? context.colors.gold
                           : context.colors.textSecondary,
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w400,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w400,
                     ),
                   ),
                 ),

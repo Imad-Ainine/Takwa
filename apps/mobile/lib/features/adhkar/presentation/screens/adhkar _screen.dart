@@ -12,8 +12,8 @@ import 'package:takwa/features/settings/providers/user_preferences_provider.dart
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 // import 'package:takwa/core/utils/overlay_helper.dart';
-// import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/custom_time_picker.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/adhkar/presentation/screens/_user_community_adhkar_views.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
@@ -197,7 +197,9 @@ class _AdhkarTopBar extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Consumer(builder: (_, ref, _) => _NotifSettingsButton()),
+                      Consumer(
+                        builder: (context, ref, _) => _NotifSettingsButton(),
+                      ),
                     ],
                   ),
                 ],
@@ -848,9 +850,12 @@ class _AdhkarNotifSheet extends ConsumerWidget {
     final prefsAsync = ref.watch(userPreferencesProvider);
     final prefs = prefsAsync.valueOrNull;
     final enabled = prefs?.adhkarNotifEnabled ?? true;
-    final morningTime = prefs?.morningAdhkarTime ?? const TimeOfDay(hour: 6, minute: 30);
-    final eveningTime = prefs?.eveningAdhkarTime ?? const TimeOfDay(hour: 17, minute: 0);
-    final sleepTime = prefs?.sleepAdhkarTime ?? const TimeOfDay(hour: 22, minute: 0);
+    final morningTime =
+        prefs?.morningAdhkarTime ?? const TimeOfDay(hour: 6, minute: 30);
+    final eveningTime =
+        prefs?.eveningAdhkarTime ?? const TimeOfDay(hour: 17, minute: 0);
+    final sleepTime =
+        prefs?.sleepAdhkarTime ?? const TimeOfDay(hour: 22, minute: 0);
     final afterFajr = prefs?.afterFajrAdhkar ?? true;
     final afterAsr = prefs?.afterAsrAdhkar ?? true;
 
@@ -889,8 +894,11 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 Switch(
                   value: enabled,
                   onChanged: (v) {
-                    ref.read(userPreferencesProvider.notifier).update('adhkar_notif_enabled', v);
-                    // AdhkarNotificationService will handle the cancellation upon next update in reschedule
+                    ref
+                        .read(userPreferencesProvider.notifier)
+                        .updatePref('adhkar_notif_enabled', v);
+                    // Immediately cancel all adhkar notifications when disabled
+                    if (!v) AdhkarNotificationService.cancelAll();
                   },
                   activeColor: context.colors.gold,
                   activeTrackColor: context.colors.gold.withOpacity(0.3),
@@ -933,7 +941,12 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, morningTime);
                     if (t != null) {
-                      ref.read(userPreferencesProvider.notifier).update('morning_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
+                      ref
+                          .read(userPreferencesProvider.notifier)
+                          .updatePref(
+                            'morning_adhkar_time',
+                            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+                          );
                     }
                   },
                 ),
@@ -944,7 +957,12 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, eveningTime);
                     if (t != null) {
-                      ref.read(userPreferencesProvider.notifier).update('evening_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
+                      ref
+                          .read(userPreferencesProvider.notifier)
+                          .updatePref(
+                            'evening_adhkar_time',
+                            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+                          );
                     }
                   },
                 ),
@@ -955,7 +973,12 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   onTimeTap: () async {
                     final t = await _pickTime(context, sleepTime);
                     if (t != null) {
-                      ref.read(userPreferencesProvider.notifier).update('sleep_adhkar_time', '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}');
+                      ref
+                          .read(userPreferencesProvider.notifier)
+                          .updatePref(
+                            'sleep_adhkar_time',
+                            '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}',
+                          );
                     }
                   },
                 ),
@@ -966,15 +989,17 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   icon: '🌅',
                   label: 'بعد صلاة الفجر',
                   value: afterFajr,
-                  onChanged: (v) =>
-                      ref.read(userPreferencesProvider.notifier).update('after_fajr_adhkar', v),
+                  onChanged: (v) => ref
+                      .read(userPreferencesProvider.notifier)
+                      .updatePref('after_fajr_adhkar', v),
                 ),
                 _ToggleRow(
                   icon: '🌇',
                   label: 'بعد صلاة العصر',
                   value: afterAsr,
-                  onChanged: (v) =>
-                      ref.read(userPreferencesProvider.notifier).update('after_asr_adhkar', v),
+                  onChanged: (v) => ref
+                      .read(userPreferencesProvider.notifier)
+                      .updatePref('after_asr_adhkar', v),
                 ),
                 const SizedBox(height: 14),
 
@@ -1014,15 +1039,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
   }
 
   Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay current) =>
-      showTimePicker(
+      showCustomTimePicker(
         context: context,
         initialTime: current,
-        builder: (ctx, child) => Theme(
-          data: Theme.of(ctx).copyWith(
-            colorScheme: ColorScheme.dark(primary: context.colors.gold),
-          ),
-          child: child!,
-        ),
       );
 }
 

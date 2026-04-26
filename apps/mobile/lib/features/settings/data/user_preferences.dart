@@ -33,6 +33,12 @@ class UserPreferences {
   final String themeMode; // "system", "light", "dark"
   final String adhanSound;
 
+  // ── Overlay / in-screen settings ──
+  final bool overlayEnabled;
+  final bool adhanSoundEnabled;
+  final bool adhanScreenEnabled;
+  final int popupIntervalMins;
+
   const UserPreferences({
     this.madhab = 'shafi',
     this.calcMethod = 'MWL',
@@ -65,6 +71,11 @@ class UserPreferences {
     this.ramadanMode = false,
     this.themeMode = 'system',
     this.adhanSound = 'Adhan-Makkah.mp3',
+
+    this.overlayEnabled = true,
+    this.adhanSoundEnabled = true,
+    this.adhanScreenEnabled = true,
+    this.popupIntervalMins = 24,
   });
 
   UserPreferences copyWith({
@@ -92,6 +103,10 @@ class UserPreferences {
     bool? ramadanMode,
     String? themeMode,
     String? adhanSound,
+    bool? overlayEnabled,
+    bool? adhanSoundEnabled,
+    bool? adhanScreenEnabled,
+    int? popupIntervalMins,
   }) {
     return UserPreferences(
       madhab: madhab ?? this.madhab,
@@ -120,6 +135,10 @@ class UserPreferences {
       ramadanMode: ramadanMode ?? this.ramadanMode,
       themeMode: themeMode ?? this.themeMode,
       adhanSound: adhanSound ?? this.adhanSound,
+      overlayEnabled: overlayEnabled ?? this.overlayEnabled,
+      adhanSoundEnabled: adhanSoundEnabled ?? this.adhanSoundEnabled,
+      adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
+      popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
     );
   }
 
@@ -155,6 +174,10 @@ class UserPreferences {
       'ramadan_mode': ramadanMode,
       'theme_mode': themeMode,
       'adhan_sound': adhanSound,
+      'overlay_popups_enabled': overlayEnabled,
+      'adhan_sound_enabled': adhanSoundEnabled,
+      'adhan_screen_enabled': adhanScreenEnabled,
+      'popup_interval_minutes': popupIntervalMins,
     };
   }
 
@@ -278,7 +301,29 @@ class UserPreferences {
           map['theme_mode'] as String? ??
           map['themeMode'] as String? ??
           'system',
-      adhanSound: map['adhan_sound'] as String? ?? map['adhanSound'] as String? ?? 'Adhan-Makkah.mp3',
+      adhanSound:
+          map['adhan_sound'] as String? ??
+          map['adhanSound'] as String? ??
+          'Adhan-Makkah.mp3',
+
+      overlayEnabled: parseBool(
+        map['overlay_popups_enabled'] ?? map['overlayEnabled'],
+        defaultVal: true,
+      ),
+      adhanSoundEnabled: parseBool(
+        map['adhan_sound_enabled'] ?? map['adhanSoundEnabled'],
+        defaultVal: true,
+      ),
+      adhanScreenEnabled: parseBool(
+        map['adhan_screen_enabled'] ?? map['adhanScreenEnabled'],
+        defaultVal: true,
+      ),
+      popupIntervalMins: () {
+        final v = map['popup_interval_minutes'] ?? map['popupIntervalMins'];
+        if (v == null) return 24;
+        if (v is int) return v;
+        return int.tryParse(v.toString()) ?? 24;
+      }(),
     );
   }
 }

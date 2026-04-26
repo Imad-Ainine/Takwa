@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import '../../../../core/widgets/custom_time_picker.dart';
 
 class QiyamSleepCalculatorScreen extends StatefulWidget {
   const QiyamSleepCalculatorScreen({super.key});
@@ -138,7 +139,7 @@ class _QiyamSleepCalculatorScreenState
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
-                final picked = await showTimePicker(
+                final picked = await showCustomTimePicker(
                   context: context,
                   initialTime: _wakeupTime,
                 );
@@ -148,7 +149,7 @@ class _QiyamSleepCalculatorScreenState
               },
               child: InkWell(
                 onTap: () async {
-                  final TimeOfDay? picked = await showTimePicker(
+                  final TimeOfDay? picked = await showCustomTimePicker(
                     context: context,
                     initialTime: _wakeupTime,
                   );

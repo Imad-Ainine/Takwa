@@ -10,6 +10,7 @@ import '../../features/books/providers/books_reading_provider.dart';
 import 'supabase_providers.dart';
 import 'supabase_service.dart';
 import '../providers/favorites_providers.dart';
+import '../../features/settings/data/user_preferences.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -306,7 +307,8 @@ class SyncManager {
       final dao = _ref.read(settingsDaoProvider);
       final settings = await dao.getAllSettings();
       if (settings.isNotEmpty) {
-        await SupabaseService.updateSettings(settings);
+        final prefs = UserPreferences.fromMap(settings);
+        await SupabaseService.updateSettings(prefs.toMap());
       }
     } finally {
       _ref.read(isSyncingProvider.notifier).state = false;

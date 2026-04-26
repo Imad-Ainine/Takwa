@@ -369,7 +369,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     return SafeArea(
       child: Column(
         children: [
-          // ── Prayer Header (Combined Mosque & Top Bar) ──
+          // ── Prayer Header ──
           _PrayerHeader(
             cityName: state.cityName,
             onRefresh: () => ref.read(prayerScreenProvider.notifier).refresh(),
@@ -384,6 +384,10 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                 children: [
                   const SizedBox(height: 12),
 
+                  // ── ساعة حية ──
+                  _LiveClockBanner(style: style, entryCtrl: _entryCtrl),
+                  const SizedBox(height: 12),
+
                   // ── البطاقة الرئيسية ──
                   _MainPrayerCard(
                     state: state,
@@ -392,9 +396,13 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                     entryCtrl: _entryCtrl,
                     style: style,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
 
-                  // ── جدول الصلوات اليومي (Mihrab Chips) ──
+                  // ── مراحل الشمس ──
+                  _SunPhaseRow(prayers: state.prayers, style: style),
+                  const SizedBox(height: 16),
+
+                  // ── جدول الصلوات اليومي ──
                   _DailyPrayersTable(
                     prayers: state.prayers,
                     currentKey: state.next?.name ?? '',
@@ -1111,7 +1119,7 @@ class _AdhanIqamaRow extends StatelessWidget {
   String _fmt(DateTime dt) {
     final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final m = dt.minute.toString().padLeft(2, '0');
-    final ampm = dt.hour < 12 ? 'ص' : 'م';
+    final ampm = dt.hour < 12 ? 'AM' : 'PM';
     return '$h:$m $ampm';
   }
 
@@ -1193,13 +1201,31 @@ class _TimeCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            time,
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: isActive ? color : Colors.white,
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: time.contains(' ') ? time.split(' ').first : time,
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: isActive ? color : Colors.white,
+                  ),
+                ),
+                TextSpan(
+                  text: time.contains(' ') ? ' ${time.split(' ').last}' : '',
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: isActive
+                        ? color.withOpacity(0.85)
+                        : Colors.white.withOpacity(0.45),
+                  ),
+                ),
+              ],
             ),
           ),
           if (subtitle != null) ...[
@@ -1240,7 +1266,7 @@ class _DailyPrayersTable extends StatelessWidget {
   String _fmt(DateTime dt) {
     final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final m = dt.minute.toString().padLeft(2, '0');
-    final ampm = dt.hour < 12 ? 'ص' : 'م';
+    final ampm = dt.hour < 12 ? 'AM' : 'PM';
     return '$h:$m $ampm';
   }
 
@@ -1265,27 +1291,47 @@ class _DailyPrayersTable extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Container(
+                      width: 3,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: context.colors.gold,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
                     Text(
-                      'جدول الصلوات اليوم',
+                      'صلوات اليوم',
                       style: TextStyle(
                         fontFamily: 'Amiri',
-                        fontSize: 15,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: context.colors.gold,
                       ),
                     ),
-                    Text(
-                      DateFormat('EEEE d MMMM', 'ar').format(DateTime.now()),
-                      style: TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.4),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.07),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Text(
+                        DateFormat('EEE، d MMM', 'ar').format(DateTime.now()),
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
+                          fontSize: 10,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
                       ),
                     ),
                   ],
@@ -1504,6 +1550,267 @@ class _MihrabPrayerChip extends StatelessWidget {
           color: color.withOpacity(isActive ? 1.0 : 0.6),
           fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
         ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LIVE CLOCK BANNER
+// ═══════════════════════════════════════════════════════════════
+class _LiveClockBanner extends StatefulWidget {
+  final AdaptiveStyle style;
+  final AnimationController entryCtrl;
+  const _LiveClockBanner({required this.style, required this.entryCtrl});
+
+  @override
+  State<_LiveClockBanner> createState() => _LiveClockBannerState();
+}
+
+class _LiveClockBannerState extends State<_LiveClockBanner> {
+  late Timer _timer;
+  DateTime _now = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _now = DateTime.now());
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final h = _now.hour % 12 == 0 ? 12 : _now.hour % 12;
+    final m = _now.minute.toString().padLeft(2, '0');
+    final s = _now.second.toString().padLeft(2, '0');
+    final ampm = _now.hour < 12 ? 'AM' : 'PM';
+    final weekday = DateFormat('EEEE', 'ar').format(_now);
+    final date = DateFormat('d MMMM yyyy', 'ar').format(_now);
+
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: widget.entryCtrl,
+        curve: const Interval(0.0, 0.55),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.white.withOpacity(0.09)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // ── Clock ──
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$h:$m',
+                      style: const TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
+                        fontSize: 40,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        height: 1.0,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' $ampm',
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: widget.style.gold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                ':$s',
+                style: TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
+                  fontSize: 13,
+                  color: Colors.white.withOpacity(0.35),
+                ),
+              ),
+              const Spacer(),
+              // ── Date ──
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    weekday,
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: widget.style.gold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    date,
+                    style: TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 11,
+                      color: Colors.white.withOpacity(0.45),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  SUN PHASE ROW
+// ─────────────────────────────────────────
+class _SunPhaseRow extends StatelessWidget {
+  final List<PrayerTimeInfo> prayers;
+  final AdaptiveStyle style;
+  const _SunPhaseRow({required this.prayers, required this.style});
+
+  String _fmt(DateTime dt) {
+    final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    final m = dt.minute.toString().padLeft(2, '0');
+    final ampm = dt.hour < 12 ? 'AM' : 'PM';
+    return '$h:$m $ampm';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    PrayerTimeInfo? fajrP, sunriseP, maghribP;
+    for (final p in prayers) {
+      if (p.name == 'fajr') fajrP = p;
+      if (p.name == 'sunrise') sunriseP = p;
+      if (p.name == 'maghrib') maghribP = p;
+    }
+    if (fajrP == null && sunriseP == null && maghribP == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          if (fajrP != null)
+            Expanded(
+              child: _SunChip(
+                icon: '🌙',
+                label: 'الفجر',
+                time: _fmt(fajrP.time),
+                color: const Color(0xFF7B8FA6),
+              ),
+            ),
+          if (fajrP != null && sunriseP != null) const SizedBox(width: 8),
+          if (sunriseP != null)
+            Expanded(
+              child: _SunChip(
+                icon: '🌅',
+                label: 'الشروق',
+                time: _fmt(sunriseP.time),
+                color: const Color(0xFFE8945A),
+              ),
+            ),
+          if (sunriseP != null && maghribP != null) const SizedBox(width: 8),
+          if (maghribP != null)
+            Expanded(
+              child: _SunChip(
+                icon: '🌆',
+                label: 'المغرب',
+                time: _fmt(maghribP.time),
+                color: const Color(0xFF7B3F6E),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SunChip extends StatelessWidget {
+  final String icon, label, time;
+  final Color color;
+  const _SunChip({
+    required this.icon,
+    required this.label,
+    required this.time,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withOpacity(0.22)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 20)),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'NotoNaskhArabic',
+              fontSize: 10,
+              color: Colors.white.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 3),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: time.contains(' ') ? time.split(' ').first : time,
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                TextSpan(
+                  text: time.contains(' ') ? ' ${time.split(' ').last}' : '',
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: color.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

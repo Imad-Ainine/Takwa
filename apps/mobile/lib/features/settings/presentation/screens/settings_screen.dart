@@ -23,6 +23,7 @@ import 'package:takwa/features/settings/providers/user_preferences_provider.dart
 import 'package:just_audio/just_audio.dart';
 
 import '../widgets/location_picker_sheet.dart';
+import 'package:takwa/core/widgets/custom_time_picker.dart';
 
 const adhanOptions = {
   'Adhan-Makkah.mp3': 'أذان مكة المكرمة',
@@ -746,15 +747,9 @@ class _TimeSetting extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
-        final picked = await showTimePicker(
+        final picked = await showCustomTimePicker(
           context: context,
           initialTime: time,
-          builder: (ctx, child) => Theme(
-            data: Theme.of(ctx).copyWith(
-              colorScheme: ColorScheme.dark(primary: context.colors.gold),
-            ),
-            child: child!,
-          ),
         );
         if (picked != null) onChanged(picked);
       },
