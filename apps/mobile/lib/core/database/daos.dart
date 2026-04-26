@@ -579,6 +579,122 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     ).watch().asyncMap((_) => getWeeklyPoints());
   }
 
+  // ── Range-based queries for period selector ──
+
+  /// Returns per-prayer attendance rates for records within [from, to].
+  Future<List<PrayerRateData>> getPerPrayerRates(
+    DateTime from,
+    DateTime to,
+  ) async {
+    final rows = await (select(dailyRecords)
+          ..where((r) => r.date.isBetweenValues(from, to)))
+        .get();
+
+    if (rows.isEmpty) {
+      return const [
+        PrayerRateData(name: 'الفجر', emoji: '🌅', rate: 0),
+        PrayerRateData(name: 'الظهر', emoji: '☀️', rate: 0),
+        PrayerRateData(name: 'العصر', emoji: '🌤', rate: 0),
+        PrayerRateData(name: 'المغرب', emoji: '🌆', rate: 0),
+        PrayerRateData(name: 'العشاء', emoji: '🌃', rate: 0),
+      ];
+    }
+
+    int fajr = 0, dhuhr = 0, asr = 0, maghrib = 0, isha = 0;
+    for (final r in rows) {
+      if (r.fajrStatus == PrayerStatus.performed) fajr++;
+      if (r.dhuhrStatus == PrayerStatus.performed) dhuhr++;
+      if (r.asrStatus == PrayerStatus.performed) asr++;
+      if (r.maghribStatus == PrayerStatus.performed) maghrib++;
+      if (r.ishaStatus == PrayerStatus.performed) isha++;
+    }
+    final n = rows.length;
+    return [
+      PrayerRateData(name: 'الفجر', emoji: '🌅', rate: fajr / n),
+      PrayerRateData(name: 'الظهر', emoji: '☀️', rate: dhuhr / n),
+      PrayerRateData(name: 'العصر', emoji: '🌤', rate: asr / n),
+      PrayerRateData(name: 'المغرب', emoji: '🌆', rate: maghrib / n),
+      PrayerRateData(name: 'العشاء', emoji: '🌃', rate: isha / n),
+    ];
+  }
+
+  /// Returns MonthStats aggregated over any date range [from, to].
+  Future<MonthStats> getStatsForRange(DateTime from, DateTime to) async {
+    final rows = await (select(dailyRecords)
+          ..where((r) => r.date.isBetweenValues(from, to)))
+        .get();
+
+    final totalPoints = rows.fold<int>(0, (s, r) => s + r.netPoints);
+    final quranPages = rows.fold<int>(0, (s, r) => s + r.quranPages);
+
+    int performed = 0;
+    for (final r in rows) {
+      for (final s in [
+        r.fajrStatus,
+        r.dhuhrStatus,
+        r.asrStatus,
+        r.maghribStatus,
+        r.ishaStatus,
+      ]) {
+        if (s == PrayerStatus.performed) performed++;
+      }
+    }
+    final prayerRate =
+        rows.isEmpty ? 0.0 : performed / (rows.length * 5);
+
+    return MonthStats(
+      totalPoints: totalPoints,
+      longestStreak: await getLongestStreak(),
+      currentStreak: await getCurrentStreak(),
+      prayerRate: prayerRate,
+      quranPages: quranPages,
+    );
+  }
+
+  /// Returns one [WeeklyPoint] per day in [from..to] for the bar chart.
+  Future<List<WeeklyPoint>> getPointsPerDay(
+    DateTime from,
+    DateTime to,
+  ) async {
+    final results = <WeeklyPoint>[];
+    var cursor = DateTime(from.year, from.month, from.day);
+    final end = DateTime(to.year, to.month, to.day);
+    while (!cursor.isAfter(end)) {
+      final record = await (select(dailyRecords)
+            ..where((r) => r.date.equals(cursor)))
+          .getSingleOrNull();
+      results.add(WeeklyPoint(date: cursor, points: record?.netPoints ?? 0));
+      cursor = cursor.add(const Duration(days: 1));
+    }
+    return results;
+  }
+
+  // ── Stream watchers for range queries ──
+
+  Stream<MonthStats> watchStatsForRange(DateTime from, DateTime to) {
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getStatsForRange(from, to));
+  }
+
+  Stream<List<WeeklyPoint>> watchPointsPerDay(DateTime from, DateTime to) {
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getPointsPerDay(from, to));
+  }
+
+  Stream<List<PrayerRateData>> watchPerPrayerRates(
+    DateTime from,
+    DateTime to,
+  ) {
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getPerPrayerRates(from, to));
+  }
+
   Future<void> addAchievement({
     required String type,
     required String titleAr,
@@ -795,17 +911,54 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
-    final mapping = {
+    // Map every Supabase column name → local key used by SettingsDao.set()
+    // Local key must match what UserPreferences.fromMap() looks up.
+    final mapping = <String, String>{
+      // Prayer calculation
       'madhab': 'madhab',
-      'ramadan_mode': 'ramadanMode',
       'calc_method': 'calcMethod',
+
+      // General toggles
       'prayer_reminder': 'prayerReminder',
-      'muhasaba_reminder': 'eveningMuhasabaReminder',
-      'evening_reminder_time': 'eveningReminderTime',
-      'language': 'language',
+      'pre_adhan_notif': 'preAdhanNotif',
+      'iqama_notif': 'iqamaNotif',
+
+      // Wake-up
       'wake_up_before_fajr': 'wakeUpBeforeFajr',
+      'wake_up_time': 'wakeUpTime',
+
+      // Adhkar reminders
       'morning_adhkar_reminder': 'morningAdhkarReminder',
       'evening_adhkar_reminder': 'eveningAdhkarReminder',
+      'adhkar_notif_enabled': 'adhkarNotifEnabled',
+      'morning_adhkar_time': 'morningAdhkarTime',
+      'evening_adhkar_time': 'eveningAdhkarTime',
+      'sleep_adhkar_time': 'sleepAdhkarTime',
+      'after_fajr_adhkar': 'afterFajrAdhkar',
+      'after_asr_adhkar': 'afterAsrAdhkar',
+
+      // Muhasaba
+      'muhasaba_reminder': 'eveningMuhasabaReminder',
+      'evening_reminder_time': 'eveningReminderTime',
+
+      // Extra reminders
+      'daily_duas_on': 'dailyDuasOn',
+      'special_reminders_on': 'specialRemindersOn',
+      'fasting_reminders_on': 'fastingRemindersOn',
+
+      // Appearance / mode
+      'ramadan_mode': 'ramadanMode',
+      'theme_mode': 'themeMode',
+      'language': 'language',
+
+      // Adhan sound
+      'adhan_sound': 'adhan_sound',
+
+      // Overlay / screen settings
+      'overlay_popups_enabled': 'overlayEnabled',
+      'adhan_sound_enabled': 'adhan_sound_enabled',
+      'adhan_screen_enabled': 'adhan_screen_enabled',
+      'popup_interval_minutes': 'popupIntervalMins',
     };
 
     for (final entry in mapping.entries) {
@@ -829,6 +982,28 @@ class WeeklyPoint {
     const days = ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'];
     return days[date.weekday % 7];
   }
+
+  String get fullDayName {
+    const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    return days[date.weekday % 7];
+  }
+
+  String get shortDayName {
+    const days = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
+    return days[date.weekday % 7];
+  }
+}
+
+/// Per-prayer attendance rate for a given date range.
+class PrayerRateData {
+  final String name;
+  final String emoji;
+  final double rate;
+  const PrayerRateData({
+    required this.name,
+    required this.emoji,
+    required this.rate,
+  });
 }
 
 class MonthStats {

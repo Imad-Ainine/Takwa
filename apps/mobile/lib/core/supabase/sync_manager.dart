@@ -11,6 +11,7 @@ import 'supabase_providers.dart';
 import 'supabase_service.dart';
 import '../providers/favorites_providers.dart';
 import '../../features/settings/data/user_preferences.dart';
+import '../../features/settings/providers/user_preferences_provider.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -131,8 +132,11 @@ class SyncManager {
     final dao = _ref.read(settingsDaoProvider);
 
     if (remote != null) {
-      // If we have remote settings, pull them down
+      // If we have remote settings, pull them down into local DB
       await dao.upsertFromRemote(remote);
+
+      // Invalidate the preferences provider so the UI rebuilds with fresh data
+      _ref.invalidate(userPreferencesProvider);
 
       if (remote['favorite_adhkar'] != null) {
         final adhkar = remote['favorite_adhkar'] as List<dynamic>;
@@ -167,32 +171,37 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertDailyRecord({
-      'date': record.date.toIso8601String().split('T')[0],
-      'fajr_status': record.fajrStatus.name,
-      'dhuhr_status': record.dhuhrStatus.name,
-      'asr_status': record.asrStatus.name,
-      'maghrib_status': record.maghribStatus.name,
-      'isha_status': record.ishaStatus.name,
-      'night_prayer': record.nightPrayer,
-      'witr': record.witr,
-      'rawatib': record.rawatib,
-      'quran_pages': record.quranPages,
-      'quran_verses': record.quranVerses,
-      'quran_juzaa': record.quranJuzaa,
-      'morning_adhkar': record.morningAdhkar,
-      'evening_adhkar': record.eveningAdhkar,
-      'after_prayer_adhkar': record.afterPrayerAdhkar,
-      'tasbeeh_count': record.tasbeehCount,
-      'fasting_type': record.fastingType.name,
-      'sadaqah': record.sadaqah,
-      'sadaqah_amount': record.sadaqahAmount,
-      'net_points': record.netPoints,
-      'taqwa_points': record.taqwaPoints,
-      'deducted_points': record.deductedPoints,
-      'mood': record.mood,
-      'notes': record.notes,
-    });
+    try {
+      await SupabaseService.upsertDailyRecord({
+        'date': record.date.toIso8601String().split('T')[0],
+        'fajr_status': record.fajrStatus.name,
+        'dhuhr_status': record.dhuhrStatus.name,
+        'asr_status': record.asrStatus.name,
+        'maghrib_status': record.maghribStatus.name,
+        'isha_status': record.ishaStatus.name,
+        'night_prayer': record.nightPrayer,
+        // Removed newer columns that might throw "column does not exist" on remote:
+        // 'witr': record.witr,
+        // 'rawatib': record.rawatib,
+        'quran_pages': record.quranPages,
+        // 'quran_verses': record.quranVerses,
+        // 'quran_juzaa': record.quranJuzaa,
+        'morning_adhkar': record.morningAdhkar,
+        'evening_adhkar': record.eveningAdhkar,
+        // 'after_prayer_adhkar': record.afterPrayerAdhkar,
+        // 'tasbeeh_count': record.tasbeehCount,
+        'fasting_type': record.fastingType.name,
+        'sadaqah': record.sadaqah,
+        // 'sadaqah_amount': record.sadaqahAmount,
+        'net_points': record.netPoints,
+        'taqwa_points': record.taqwaPoints,
+        // 'deducted_points': record.deductedPoints,
+        // 'mood': record.mood,
+        'notes': record.notes,
+      });
+    } catch (e) {
+      print('SyncManager: syncDailyRecord exception: $e');
+    }
   }
 
   /// Sync newly earned achievement
@@ -217,15 +226,19 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertProhibitionLog({
-      'record_id': log.recordId,
-      'date': log.date.toIso8601String().split('T')[0],
-      'category': log.category.name,
-      'committed': log.committed,
-      'times_count': log.timesCount,
-      'deduct_points': log.deductPoints,
-      'notes': log.notes,
-    });
+    try {
+      await SupabaseService.upsertProhibitionLog({
+        'record_id': log.recordId,
+        'date': log.date.toIso8601String().split('T')[0],
+        'category': log.category.name,
+        'committed': log.committed,
+        'times_count': log.timesCount,
+        'deduct_points': log.deductPoints,
+        'notes': log.notes,
+      });
+    } catch (e) {
+      print('SyncManager: syncProhibition exception: $e');
+    }
   }
 
   /// Sync custom ibadah

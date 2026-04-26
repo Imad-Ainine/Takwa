@@ -21,6 +21,7 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/notifications/overlay_settings_tile.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:just_audio/just_audio.dart';
+import 'dart:async';
 
 import '../widgets/location_picker_sheet.dart';
 import 'package:takwa/core/widgets/custom_time_picker.dart';
@@ -323,7 +324,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   label: 'صوت الأذان',
                                   value: prefs.adhanSound,
                                   options: adhanOptions,
-                                  onChanged: (v) => _updatePref('adhanSound', v),
+                                  onChanged: (v) =>
+                                      _updatePref('adhan_sound', v),
                                 ),
                                 _Divider(),
                                 _ActionSetting(
@@ -1054,13 +1056,24 @@ class _AdhanSelectSetting extends StatefulWidget {
 }
 
 class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
-  final AudioPlayer _player = AudioPlayer();
+  AudioPlayer? _player;
+  StreamSubscription<PlayerState>? _playerSub;
   String? _currentlyPlayingKey;
 
   @override
   void dispose() {
-    _player.dispose();
+    _playerSub?.cancel();
+    _player?.dispose();
     super.dispose();
+  }
+
+  Future<void> _stopPreview() async {
+    await _playerSub?.cancel();
+    _playerSub = null;
+    await _player?.stop();
+    await _player?.dispose();
+    _player = null;
+    if (mounted) setState(() => _currentlyPlayingKey = null);
   }
 
   @override
@@ -1118,6 +1131,9 @@ class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
   }
 
   void _showPicker(BuildContext context) {
+    // Snapshot current playing key for the sheet
+    String? playingKey = _currentlyPlayingKey;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1125,13 +1141,19 @@ class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => StatefulBuilder(
+      builder: (sheetCtx) => StatefulBuilder(
         builder: (ctx, setStateSheet) {
           return Padding(
-            padding: EdgeInsets.fromLTRB(16, 20, 16, MediaQuery.of(ctx).padding.bottom + 16),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              20,
+              16,
+              MediaQuery.of(ctx).padding.bottom + 16,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Drag handle
                 Container(
                   width: 40,
                   height: 4,
@@ -1161,15 +1183,22 @@ class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
                         mainAxisSize: MainAxisSize.min,
                         children: widget.options.entries.map((e) {
                           final isSelected = widget.value == e.key;
-                          final isPlaying = _currentlyPlayingKey == e.key;
+                          final isPlaying = playingKey == e.key;
 
                           return GestureDetector(
                             onTap: () async {
-                              await _player.stop();
-                              widget.onChanged(e.key);
-                              if (ctx.mounted) {
-                                Navigator.pop(ctx);
+                              // Stop any preview first
+                              await _playerSub?.cancel();
+                              _playerSub = null;
+                              await _player?.stop();
+                              await _player?.dispose();
+                              _player = null;
+                              if (mounted) {
+                                setState(() => _currentlyPlayingKey = null);
                               }
+                              // Save selection
+                              widget.onChanged(e.key);
+                              if (ctx.mounted) Navigator.pop(ctx);
                             },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 180),
@@ -1206,38 +1235,99 @@ class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
                                       ),
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: Icon(
-                                      isPlaying ? Icons.stop_circle_rounded : Icons.play_circle_fill_rounded,
-                                      color: isSelected ? context.colors.teal : context.colors.gold,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    onPressed: () async {
+                                  // Preview play/stop button
+                                  GestureDetector(
+                                    onTap: () async {
                                       if (isPlaying) {
-                                        await _player.stop();
-                                        setStateSheet(() => _currentlyPlayingKey = null);
+                                        // Stop preview
+                                        await _playerSub?.cancel();
+                                        _playerSub = null;
+                                        await _player?.stop();
+                                        await _player?.dispose();
+                                        _player = null;
+                                        playingKey = null;
+                                        setStateSheet(() {});
+                                        if (mounted) {
+                                          setState(
+                                            () => _currentlyPlayingKey = null,
+                                          );
+                                        }
                                       } else {
-                                        setStateSheet(() => _currentlyPlayingKey = e.key);
-                                        await _player.setAsset('assets/sounds/${e.key}');
-                                        _player.playerStateStream.listen((state) {
-                                          if (state.processingState == ProcessingState.completed) {
-                                            if (ctx.mounted) {
-                                              setStateSheet(() => _currentlyPlayingKey = null);
-                                            }
-                                          }
-                                        });
-                                        await _player.play();
+                                        // Stop current preview first
+                                        await _playerSub?.cancel();
+                                        _playerSub = null;
+                                        await _player?.stop();
+                                        await _player?.dispose();
+                                        _player = null;
+
+                                        // Start new preview
+                                        final ap = AudioPlayer();
+                                        _player = ap;
+                                        playingKey = e.key;
+                                        if (mounted) {
+                                          setState(
+                                            () => _currentlyPlayingKey = e.key,
+                                          );
+                                        }
+                                        setStateSheet(() {});
+
+                                        await ap.setAsset(
+                                          'assets/sounds/${e.key}',
+                                        );
+                                        _playerSub = ap.playerStateStream
+                                            .listen((state) {
+                                              if (state.processingState ==
+                                                  ProcessingState.completed) {
+                                                playingKey = null;
+                                                if (mounted) {
+                                                  setState(
+                                                    () => _currentlyPlayingKey =
+                                                        null,
+                                                  );
+                                                }
+                                                if (ctx.mounted) {
+                                                  setStateSheet(() {});
+                                                }
+                                              }
+                                            });
+                                        await ap.play();
                                       }
                                     },
+                                    child: Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: BoxDecoration(
+                                        color: isPlaying
+                                            ? context.colors.gold.withOpacity(
+                                                0.18,
+                                              )
+                                            : context.colors.gold.withOpacity(
+                                                0.09,
+                                              ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: context.colors.gold
+                                              .withOpacity(0.25),
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        isPlaying
+                                            ? Icons.stop_rounded
+                                            : Icons.play_arrow_rounded,
+                                        size: 20,
+                                        color: context.colors.gold,
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  if (isSelected)
+                                  if (isSelected) ...[
+                                    const SizedBox(width: 8),
                                     Icon(
                                       Icons.check_circle_rounded,
                                       color: context.colors.teal,
                                       size: 18,
                                     ),
+                                  ] else
+                                    const SizedBox(width: 26),
                                 ],
                               ),
                             ),
@@ -1252,8 +1342,8 @@ class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
           );
         },
       ),
-    ).whenComplete(() {
-      _player.stop();
+    ).whenComplete(() async {
+      await _stopPreview();
     });
   }
 }

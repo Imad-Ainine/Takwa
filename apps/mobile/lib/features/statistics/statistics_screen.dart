@@ -12,6 +12,7 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/database/daos.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
@@ -91,11 +92,14 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
       );
     });
 
-    // check and grant achievements on load
+    // check and grant achievements on load, then sync from Supabase
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(statsDaoProvider).checkAndGrantAchievements();
-      if (!mounted) return;
       _entryCtrl.forward();
+      await ref.read(statsDaoProvider).checkAndGrantAchievements();
+      // Pull latest daily records from Supabase so charts are up-to-date
+      try {
+        await ref.read(syncManagerProvider).fullSync();
+      } catch (_) {}
     });
   }
 
@@ -110,15 +114,62 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
     child: SlideTransition(position: _slideAnims[i], child: child),
   );
 
+  /// Compute the (from, to) date range for the selected period.
+  static (DateTime, DateTime) _dateRange(StatsPeriod period) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    switch (period) {
+      case StatsPeriod.week:
+        return (today.subtract(const Duration(days: 6)), today);
+      case StatsPeriod.month:
+        return (DateTime(now.year, now.month, 1), today);
+      case StatsPeriod.ramadan:
+        // Use Hijri calendar to find Ramadan 1 of the current year
+        final hijri = HijriCalendar.now();
+        // Ramadan = month 9; use current Hijri year
+        final ramadanStart = HijriCalendar()
+          ..hYear = hijri.hYear
+          ..hMonth = 9
+          ..hDay = 1;
+        final ramadanEnd = HijriCalendar()
+          ..hYear = hijri.hYear
+          ..hMonth = 9
+          ..hDay = 30;
+        final gStart = ramadanStart.hijriToGregorian(
+          ramadanStart.hYear,
+          ramadanStart.hMonth,
+          ramadanStart.hDay,
+        );
+        final gEnd = ramadanEnd.hijriToGregorian(
+          ramadanEnd.hYear,
+          ramadanEnd.hMonth,
+          ramadanEnd.hDay,
+        );
+        return (
+          DateTime(gStart.year, gStart.month, gStart.day),
+          DateTime(gEnd.year, gEnd.month, gEnd.day),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // final period = ref.watch(_statsPeriodProvider);
-    final statsAsync = ref.watch(monthStatsProvider);
-    final weekAsync = ref.watch(weeklyPointsProvider);
+    final period = ref.watch(_statsPeriodProvider);
+    final range = _dateRange(period);
+
+    final statsAsync = ref.watch(periodStatsProvider(range));
+    final weekAsync = ref.watch(periodChartPointsProvider(range));
     final streakAsync = ref.watch(currentStreakProvider);
     final unseenAsync = ref.watch(_unseenAchievementsProvider);
 
     final hijri = HijriCalendar.now();
+
+    // Label shown in the bar chart header
+    final chartLabel = switch (period) {
+      StatsPeriod.week => 'آخر ٧ أيام',
+      StatsPeriod.month => 'هذا الشهر',
+      StatsPeriod.ramadan => 'رمضان',
+    };
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value:
@@ -172,13 +223,16 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // ③ Weekly Bar Chart
+                        // ③ Bar Chart (period-aware)
                         _anim(
                           2,
                           weekAsync.when(
                             loading: () => const _StatSkeleton(height: 180),
                             error: (_, _) => const SizedBox(),
-                            data: (pts) => _WeeklyChart(points: pts),
+                            data: (pts) => _WeeklyChart(
+                              points: pts,
+                              periodLabel: chartLabel,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -192,15 +246,8 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                           ),
                         ),
                         const SizedBox(height: 16),
-                        // ⑤ Prayer Attendance Radial
-                        _anim(
-                          4,
-                          statsAsync.when(
-                            loading: () => const _StatSkeleton(height: 150),
-                            error: (_, _) => const SizedBox(),
-                            data: (s) => _PrayerAttendanceCard(stats: s),
-                          ),
-                        ),
+                        // ⑤ Prayer Attendance (real data)
+                        _anim(4, _PrayerAttendanceCard(range: range)),
                         const SizedBox(height: 16),
                         // ⑥ Achievements
                         _anim(5, _AchievementsSection()),
@@ -755,7 +802,8 @@ class _StreakBadgeLarge extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════
 class _WeeklyChart extends StatefulWidget {
   final List<WeeklyPoint> points;
-  const _WeeklyChart({required this.points});
+  final String periodLabel;
+  const _WeeklyChart({required this.points, required this.periodLabel});
 
   @override
   State<_WeeklyChart> createState() => _WeeklyChartState();
@@ -788,6 +836,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
   Widget build(BuildContext context) {
     if (widget.points.isEmpty) return const SizedBox();
     final maxPts = widget.points.map((p) => p.points).fold(0, math.max);
+    final isWeekly = widget.points.length <= 7;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -798,7 +847,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
           Row(
             children: [
               Text(
-                'أداء الأسبوع',
+                'أداء الفترة',
                 style: context.typography.headingMedium.copyWith(
                   color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -806,7 +855,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
               ),
               const Spacer(),
               Text(
-                'آخر ٧ أيام',
+                widget.periodLabel,
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
                 ),
@@ -904,7 +953,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
 
                             const SizedBox(height: 6),
                             Text(
-                              pt.dayLabel,
+                              isWeekly ? pt.fullDayName : pt.shortDayName,
                               style: context.typography.caption.copyWith(
                                 color: isToday
                                     ? context.colors.gold
@@ -1108,23 +1157,16 @@ class _StatCardState extends State<_StatCard>
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  PRAYER ATTENDANCE RADIAL
+//  PRAYER ATTENDANCE CARD (real per-prayer rates from DB)
 // ═══════════════════════════════════════════════════════════════
-class _PrayerAttendanceCard extends StatelessWidget {
-  final MonthStats stats;
-  const _PrayerAttendanceCard({required this.stats});
-
-  // mock per-prayer data (يُستبدل بـ DAO حقيقي)
-  static const _prayerRates = [
-    ('الفجر', 0.72, '🌅'),
-    ('الظهر', 0.91, '☀️'),
-    ('العصر', 0.85, '🌤'),
-    ('المغرب', 0.96, '🌆'),
-    ('العشاء', 0.88, '🌃'),
-  ];
+class _PrayerAttendanceCard extends ConsumerWidget {
+  final (DateTime, DateTime) range;
+  const _PrayerAttendanceCard({required this.range});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ratesAsync = ref.watch(periodPrayerRatesProvider(range));
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: context.decorations.card,
@@ -1139,8 +1181,25 @@ class _PrayerAttendanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          ..._prayerRates.map(
-            (p) => _PrayerRateRow(name: p.$1, rate: p.$2, emoji: p.$3),
+          ratesAsync.when(
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+            error: (_, _) => const SizedBox(),
+            data: (rates) => Column(
+              children: rates
+                  .map(
+                    (p) => _PrayerRateRow(
+                      name: p.name,
+                      rate: p.rate,
+                      emoji: p.emoji,
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
         ],
       ),

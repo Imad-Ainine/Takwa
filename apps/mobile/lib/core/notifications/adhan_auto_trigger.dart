@@ -91,6 +91,10 @@ class AdhanAutoTrigger {
         defaultVal: true,
       );
 
+      // Read the user-selected adhan sound
+      final adhanSoundFile =
+          await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
+
       final now = DateTime.now();
       for (final prayer in prayers) {
         final diffSecs = now.difference(prayer.time).inSeconds;
@@ -110,9 +114,11 @@ class AdhanAutoTrigger {
 
         debugPrint('🕌 Auto-trigger adhan: ${prayer.nameAr}');
 
-        // تشغيل صوت الأذان
+        // تشغيل صوت الأذان المختار من الإعدادات
         if (adhanSound) {
-          await AdhanAudioPlayer.play();
+          await AdhanAudioPlayer.play(
+            asset: 'assets/sounds/$adhanSoundFile',
+          );
         }
 
         // فتح شاشة الأذان
@@ -157,7 +163,12 @@ class AdhanAutoTrigger {
     );
 
     if (adhanSound && playSound) {
-      await AdhanAudioPlayer.play();
+      // Read the user-selected adhan sound file
+      final adhanSoundFile =
+          await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
+      await AdhanAudioPlayer.play(
+        asset: 'assets/sounds/$adhanSoundFile',
+      );
     }
 
     if (adhanScreen) {

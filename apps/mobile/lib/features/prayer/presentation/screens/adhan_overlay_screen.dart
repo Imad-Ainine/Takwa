@@ -11,6 +11,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 
 // ══════════════════════════════════════════════════════
 //  ADHAN OVERLAY SCREEN
@@ -64,9 +65,22 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   Future<void> _initAudio() async {
     // تأخير قصير للسماح بتهيئة الـ Widget
     await Future.delayed(const Duration(milliseconds: 300));
+
+    // Read user-selected adhan sound from preferences
+    final prefsAsync = ref.read(userPreferencesProvider);
+    final prefs = prefsAsync.valueOrNull;
+
+    // Respect the adhan sound enabled toggle
+    final soundEnabled = prefs?.adhanSoundEnabled ?? true;
+    if (!soundEnabled) return;
+
+    // Use the user-selected sound file, fall back to Makkah if not set
+    final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
+    final asset = 'assets/sounds/$soundFile';
+
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
-        await _player.setAsset('assets/sounds/Adhan-Makkah.mp3');
+        await _player.setAsset(asset);
         await _player.play();
         return; // نجح
       } catch (e) {

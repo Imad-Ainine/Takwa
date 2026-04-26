@@ -215,9 +215,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
         children: [
           // ── PDF Viewer ──────────────────
           if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white54),
-            )
+            const Center(child: _PdfLoadingSkeleton())
           else if (_error != null)
             _buildErrorView()
           else
@@ -694,6 +692,49 @@ class _ActionBtn extends StatelessWidget {
           Text(
             label,
             style: TextStyle(color: c, fontSize: 10, fontFamily: 'Amiri'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  PDF SKELETON (LOADING STATE)
+// ─────────────────────────────────────────
+class _PdfLoadingSkeleton extends StatelessWidget {
+  const _PdfLoadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2C2C),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white12),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircularProgressIndicator(color: Color(0xFFC8A96E), strokeWidth: 2.5),
+          SizedBox(height: 20),
+          Text(
+            'جاري تحميل الملف...',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontFamily: 'Amiri',
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

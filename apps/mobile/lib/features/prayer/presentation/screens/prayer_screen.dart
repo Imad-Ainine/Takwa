@@ -312,13 +312,6 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
         backgroundColor: style.bg,
         body: Stack(
           children: [
-            // ── Premium Background System ──
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/SL-020520-27660-18.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -334,12 +327,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
               ),
             ),
             const Positioned.fill(
-              child: Opacity(
-                opacity: 0.08,
-                child: CustomPatternBackground(
-                  pattern: BackgroundPattern.adhkar,
-                ),
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
 
             // ── Floating Particles ──
@@ -764,7 +752,7 @@ class _MainPrayerCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: style.bg,
               borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: style.border),
+              border: Border.all(color: style.bg),
               boxShadow: [
                 BoxShadow(
                   color: style.bg.withOpacity(0.4),
@@ -1281,11 +1269,11 @@ class _DailyPrayersTable extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.35),
+            color: style.bg,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
+            border: Border.all(color: style.bg),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20),
+              BoxShadow(color: style.bg.withOpacity(0.3), blurRadius: 20),
             ],
           ),
           child: Column(
@@ -1487,7 +1475,9 @@ class _PrayerTableRow extends StatelessWidget {
                               : isPast
                               ? Colors.white.withOpacity(0.25)
                               : Colors.white.withOpacity(0.5),
-                          fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
+                          fontWeight: isNext
+                              ? FontWeight.w700
+                              : FontWeight.w400,
                         ),
                       ),
                       _MihrabPrayerChip(
@@ -1619,38 +1609,46 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // ── Clock ──
-              RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '$h:$m',
-                      style: const TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 40,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1.0,
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '$h:$m',
+                        style: const TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
+                          fontSize: 40,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          height: 1.0,
+                        ),
                       ),
-                    ),
-                    TextSpan(
-                      text: ' $ampm',
-                      style: TextStyle(
-                        fontFamily: 'NotoNaskhArabic',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: widget.style.gold,
+                      TextSpan(
+                        text: ' $ampm',
+                        style: TextStyle(
+                          fontFamily: 'NotoNaskhArabic',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: widget.style.gold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
-              Text(
-                ':$s',
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  fontSize: 13,
-                  color: Colors.white.withOpacity(0.35),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Text(
+                  ':$s',
+                  style: TextStyle(
+                    fontFamily: 'NotoNaskhArabic',
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white.withOpacity(0.35),
+                  ),
                 ),
               ),
               const Spacer(),

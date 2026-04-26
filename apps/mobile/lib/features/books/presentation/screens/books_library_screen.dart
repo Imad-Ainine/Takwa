@@ -159,7 +159,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
               );
             },
             loading: () => const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
+              child: _BooksSkeleton(),
             ),
             error: (err, stack) => SliverFillRemaining(
               child: Center(child: Text('حدث خطأ: $err')),
@@ -511,6 +511,57 @@ class _InfoChip extends StatelessWidget {
         const SizedBox(width: 4),
         Icon(icon, size: 12, color: colors.gold.withOpacity(0.6)),
       ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  BOOKS SKELETON (LOADING STATE)
+// ─────────────────────────────────────────
+class _BooksSkeleton extends StatelessWidget {
+  const _BooksSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    
+    return Center(
+      child: Container(
+        height: 160,
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: colors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: colors.gold,
+                strokeWidth: 2.5,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'جاري تحميل الكتب...',
+                style: TextStyle(
+                  color: colors.textSecondary,
+                  fontSize: 14,
+                  fontFamily: 'Amiri',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

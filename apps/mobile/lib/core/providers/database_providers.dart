@@ -79,3 +79,31 @@ final remindersDaoProvider = Provider<RemindersDao>((ref) {
 final remindersProvider = StreamProvider<List<Reminder>>((ref) {
   return ref.watch(remindersDaoProvider).watchAll();
 });
+
+// ── Period-aware family providers (driven by the stats period selector) ──
+
+/// Stats aggregated over a (from, to) date range.
+final periodStatsProvider =
+    StreamProvider.family<MonthStats, (DateTime, DateTime)>((ref, range) {
+      return ref.watch(statsDaoProvider).watchStatsForRange(range.$1, range.$2);
+    });
+
+/// Daily point totals for every day in a (from, to) range (for bar chart).
+final periodChartPointsProvider =
+    StreamProvider.family<List<WeeklyPoint>, (DateTime, DateTime)>((
+      ref,
+      range,
+    ) {
+      return ref.watch(statsDaoProvider).watchPointsPerDay(range.$1, range.$2);
+    });
+
+/// Per-prayer attendance rates for a (from, to) date range.
+final periodPrayerRatesProvider =
+    StreamProvider.family<List<PrayerRateData>, (DateTime, DateTime)>((
+      ref,
+      range,
+    ) {
+      return ref
+          .watch(statsDaoProvider)
+          .watchPerPrayerRates(range.$1, range.$2);
+    });
