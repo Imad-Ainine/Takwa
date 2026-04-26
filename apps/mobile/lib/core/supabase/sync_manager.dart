@@ -11,6 +11,8 @@ import 'supabase_providers.dart';
 import 'supabase_service.dart';
 import '../providers/favorites_providers.dart';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 final syncManagerProvider = Provider((ref) => SyncManager(ref));
 
 class SyncManager {
@@ -19,10 +21,15 @@ class SyncManager {
 
   static bool _syncing = false;
 
+  Future<bool> get _hasConnection async {
+    final results = await Connectivity().checkConnectivity();
+    return !results.contains(ConnectivityResult.none);
+  }
+
   /// Full synchronization on App Start
   Future<void> fullSync() async {
     if (_syncing) return;
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -42,13 +49,21 @@ class SyncManager {
   }
 
   Future<void> _syncDailyRecords() async {
+    final dao = _ref.read(dailyRecordDaoProvider);
+
+    // 1. Push recent local records to Supabase (e.g., last 7 days)
+    final localRecords = await dao.getLastNDays(7);
+    for (final record in localRecords) {
+      await syncDailyRecord(record);
+    }
+
+    // 2. Pull from Supabase
     final from = DateTime.now().subtract(const Duration(days: 30));
     final remoteRecords = await SupabaseService.getRecordsRange(
       from: from,
       to: DateTime.now(),
     );
 
-    final dao = _ref.read(dailyRecordDaoProvider);
     for (final record in remoteRecords) {
       await dao.upsertFromRemote(record);
     }
@@ -86,7 +101,15 @@ class SyncManager {
   Future<void> _syncAchievements() async {
     final remoteAchievements = await SupabaseService.getEarnedAchievements();
     final statsDao = _ref.read(statsDaoProvider);
+    final db = _ref.read(appDatabaseProvider);
 
+    // 1. Push local earned achievements
+    final localEarned = await (db.select(db.achievements)).get();
+    for (final ach in localEarned) {
+      await syncAchievement(ach);
+    }
+
+    // 2. Pull from Supabase
     for (final data in remoteAchievements) {
       await statsDao.addAchievement(
         type: data['type'],
@@ -135,7 +158,7 @@ class SyncManager {
 
   /// Single record sync (call after local update)
   Future<void> syncDailyRecord(DailyRecord record) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -169,7 +192,7 @@ class SyncManager {
 
   /// Sync newly earned achievement
   Future<void> syncAchievement(Achievement achievement) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -185,7 +208,7 @@ class SyncManager {
 
   /// Sync prohibition log
   Future<void> syncProhibition(ProhibitionsLogData log) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -202,7 +225,7 @@ class SyncManager {
 
   /// Sync custom ibadah
   Future<void> syncCustomIbadah(CustomIbadahData ibadah) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -219,7 +242,7 @@ class SyncManager {
 
   /// Delete custom ibadah
   Future<void> deleteCustomIbadah(int id) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -232,7 +255,7 @@ class SyncManager {
 
   /// Sync custom ibadah log
   Future<void> syncCustomIbadahLog(CustomIbadahLogData log) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -270,7 +293,7 @@ class SyncManager {
 
   /// Sync all local settings to Supabase
   Future<void> syncSettings() async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -306,7 +329,7 @@ class SyncManager {
 
   /// Sync local reminder to remote
   Future<void> syncReminder(Reminder reminder) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
@@ -320,7 +343,7 @@ class SyncManager {
   }
 
   Future<void> deleteReminder(int localId) async {
-    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isOnline = await _hasConnection;
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 

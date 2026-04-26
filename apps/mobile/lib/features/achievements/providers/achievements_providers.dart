@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/features/achievements/domain/models/achievement_definition.dart';
 
@@ -23,21 +23,14 @@ class AchievementView {
 final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
   final statsDao = ref.watch(statsDaoProvider);
   final db = ref.watch(appDatabaseProvider);
+  final syncManager = ref.watch(syncManagerProvider);
 
   // 1. Check and grant new achievements automatically
   final newEarned = await statsDao.checkAndGrantAchievements();
   for (final ach in newEarned) {
     try {
-      await SupabaseService.upsertAchievement({
-        'type': ach.type,
-        'title_ar': ach.titleAr,
-        'desc_ar': ach.descAr,
-        'emoji': ach.emoji,
-        'points_reward': ach.pointsReward,
-        'earned_at': ach.earnedAt.toIso8601String(),
-      });
+      await syncManager.syncAchievement(ach);
     } catch (e) {
-      // Silently fail if not authenticated or network error
       print('[Achievements] Cannot sync to Supabase: $e');
     }
   }

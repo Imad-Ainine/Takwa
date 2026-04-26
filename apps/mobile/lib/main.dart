@@ -18,6 +18,7 @@ import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:quran_library/quran_library.dart';
 
 import 'package:takwa/core/notifications/overlay_background_service.dart';
@@ -113,6 +114,9 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
         NotificationRouter.navigatorKey.currentState?.pushNamed(
           Routes.updatePassword,
         );
+      } else if (event == AuthChangeEvent.signedIn) {
+        debugPrint('Auth: User signed in. Triggering fullSync...');
+        ref.read(syncManagerProvider).fullSync();
       }
     });
   }
