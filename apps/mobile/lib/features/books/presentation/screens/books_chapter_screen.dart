@@ -20,7 +20,9 @@ class BooksChapterScreen extends ConsumerWidget {
     if (hex == null) return const Color(0xFFC8A96E);
     try {
       if (hex.startsWith('0x')) return Color(int.parse(hex));
-      if (hex.startsWith('#')) return Color(int.parse('0xFF${hex.substring(1)}'));
+      if (hex.startsWith('#')) {
+        return Color(int.parse('0xFF${hex.substring(1)}'));
+      }
       return Color(int.parse('0xFF$hex'));
     } catch (_) {
       return const Color(0xFFC8A96E);
@@ -55,12 +57,19 @@ class BooksChapterScreen extends ConsumerWidget {
                   color: Colors.black26,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+                child: const Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+              stretchModes: const [
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground,
+              ],
               background: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -108,7 +117,13 @@ class BooksChapterScreen extends ConsumerWidget {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                         height: 1.2,
-                                        shadows: [Shadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black26,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
                                       ),
                                       textAlign: TextAlign.right,
                                     ),
@@ -141,11 +156,20 @@ class BooksChapterScreen extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              _StatChip(label: book.categoryLabel, icon: Icons.category_outlined),
+                              _StatChip(
+                                label: book.categoryLabel,
+                                icon: Icons.category_outlined,
+                              ),
                               const SizedBox(width: 8),
-                              _StatChip(label: '${book.totalPages} صفحة', icon: Icons.menu_book_rounded),
+                              _StatChip(
+                                label: '${book.totalPages} صفحة',
+                                icon: Icons.menu_book_rounded,
+                              ),
                               const SizedBox(width: 8),
-                              _StatChip(label: '~${book.estimatedReadingMinutes} د', icon: Icons.schedule_rounded),
+                              _StatChip(
+                                label: '~${book.estimatedReadingMinutes} د',
+                                icon: Icons.schedule_rounded,
+                              ),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -181,7 +205,14 @@ class BooksChapterScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(width: 4, height: 20, decoration: BoxDecoration(color: c1, borderRadius: BorderRadius.circular(2))),
+                      Container(
+                        width: 4,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: c1,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -226,7 +257,10 @@ class BooksChapterScreen extends ConsumerWidget {
                     ),
                     Text(
                       'الفصول المحتواة',
-                      style: typography.labelLarge.copyWith(fontWeight: FontWeight.bold, fontFamily: 'Amiri'),
+                      style: typography.labelLarge.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Amiri',
+                      ),
                     ),
                   ],
                 ),
@@ -235,30 +269,29 @@ class BooksChapterScreen extends ConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, i) {
-                    final ch = book.chapters[i];
-                    final isCurrent = savedProgress?.chapterIndex == i;
-                    return _ChapterItem(
-                      chapter: ch,
-                      index: i,
-                      accentColor: c1,
-                      isCurrent: isCurrent,
-                      currentPage: isCurrent ? savedProgress!.pageIndex : 0,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BookReaderScreen(
-                            book: book,
-                            initialChapterIndex: i,
-                            initialPageIndex: isCurrent ? savedProgress!.pageIndex : 0,
-                          ),
+                delegate: SliverChildBuilderDelegate((ctx, i) {
+                  final ch = book.chapters[i];
+                  final isCurrent = savedProgress?.chapterIndex == i;
+                  return _ChapterItem(
+                    chapter: ch,
+                    index: i,
+                    accentColor: c1,
+                    isCurrent: isCurrent,
+                    currentPage: isCurrent ? savedProgress!.pageIndex : 0,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BookReaderScreen(
+                          book: book,
+                          initialChapterIndex: i,
+                          initialPageIndex: isCurrent
+                              ? savedProgress!.pageIndex
+                              : 0,
                         ),
                       ),
-                    );
-                  },
-                  childCount: book.chapters.length,
-                ),
+                    ),
+                  );
+                }, childCount: book.chapters.length),
               ),
             ),
           ],
@@ -287,7 +320,15 @@ class _StatChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Amiri')),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Amiri',
+            ),
+          ),
           const SizedBox(width: 6),
           Icon(icon, color: Colors.white70, size: 14),
         ],
@@ -313,7 +354,9 @@ class _PrimaryActionButton extends StatelessWidget {
     final isPdf = book.pdfUrl != null;
 
     String label = isPdf ? 'قراءة نسخة PDF' : 'ابدأ القراءة';
-    IconData icon = isPdf ? Icons.picture_as_pdf_outlined : Icons.menu_book_rounded;
+    IconData icon = isPdf
+        ? Icons.picture_as_pdf_outlined
+        : Icons.menu_book_rounded;
 
     if (!isPdf && savedProgress != null) {
       label = 'متابعة القراءة';
@@ -323,7 +366,10 @@ class _PrimaryActionButton extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (isPdf) {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => BookPdfReaderScreen(book: book)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => BookPdfReaderScreen(book: book)),
+          );
         } else {
           Navigator.push(
             context,
@@ -340,10 +386,16 @@ class _PrimaryActionButton extends StatelessWidget {
       child: Container(
         height: 64,
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [accentColor, accentColor.withOpacity(0.8)]),
+          gradient: LinearGradient(
+            colors: [accentColor, accentColor.withOpacity(0.8)],
+          ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: accentColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+            BoxShadow(
+              color: accentColor.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
         child: Row(
@@ -351,7 +403,12 @@ class _PrimaryActionButton extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Amiri'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Amiri',
+              ),
             ),
             const SizedBox(width: 12),
             Icon(icon, color: Colors.white, size: 24),
@@ -420,11 +477,22 @@ class _ChapterItem extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text('${chapter.totalPages} صفحة', style: typography.caption),
+                      Text(
+                        '${chapter.totalPages} صفحة',
+                        style: typography.caption,
+                      ),
                       const SizedBox(width: 8),
-                      Text('•', style: typography.caption.copyWith(color: colors.textDim)),
+                      Text(
+                        '•',
+                        style: typography.caption.copyWith(
+                          color: colors.textDim,
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Text('~${chapter.estimatedMinutes} دقيقة', style: typography.caption),
+                      Text(
+                        '~${chapter.estimatedMinutes} دقيقة',
+                        style: typography.caption,
+                      ),
                     ],
                   ),
                   if (isCurrent) ...[
@@ -467,6 +535,7 @@ class _ChapterItem extends StatelessWidget {
     );
   }
 }
+
 class _ReadingProgressBar extends ConsumerWidget {
   final IslamicBook book;
   final Color accentColor;
@@ -475,10 +544,9 @@ class _ReadingProgressBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(readingProgressProvider.notifier).getProgress(
-          book.id,
-          book.totalPages,
-        );
+    final progress = ref
+        .watch(readingProgressProvider.notifier)
+        .getProgress(book.id, book.totalPages);
     final percentage = (progress * 100).toInt();
 
     return Column(

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:takwa/core/utils/timezone_resolver.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -117,7 +118,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
       Navigator.pop(context);
     }
 
-    _showSnackBar(result.messageAr, result.isSuccess);
+    _showResultSnackBar(result);
   }
 
   Future<void> _selectManualLocation(Map<String, dynamic> cityData) async {
@@ -140,6 +141,44 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     if (!mounted) return;
     Navigator.pop(context);
     _showSnackBar('تم تحيين الموقع إلى ${cityData['name']} ✓', true);
+  }
+
+  void _showResultSnackBar(LocationResult result) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result.messageAr,
+          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
+        ),
+        action:
+            result == LocationResult.serviceDisabled ||
+                result == LocationResult.permissionDeniedForever
+            ? SnackBarAction(
+                label: 'تفعيل',
+                textColor: Colors.white,
+                onPressed: () {
+                  if (result == LocationResult.serviceDisabled) {
+                    Geolocator.openLocationSettings();
+                  } else {
+                    Geolocator.openAppSettings();
+                  }
+                },
+              )
+            : null,
+        backgroundColor: result.isSuccess
+            ? context.colors.success
+            : context.colors.danger,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: Duration(
+          seconds:
+              result == LocationResult.serviceDisabled ||
+                  result == LocationResult.permissionDeniedForever
+              ? 5
+              : 3,
+        ),
+      ),
+    );
   }
 
   void _showSnackBar(String message, bool isSuccess) {

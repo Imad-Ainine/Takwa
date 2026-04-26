@@ -67,6 +67,52 @@ class ReadingProgressNotifier
       '$_prefPrefix$bookId$_readPagesSuffix',
       updatedReadPages.join(','),
     );
+
+    // Sync to Supabase (Best effort)
+    try {
+      await SupabaseService.upsertBookProgress(bookId, {
+        'chapter_index': chapterIndex,
+        'page_index': pageIndex,
+        'read_pages': updatedReadPages.toList(),
+      });
+    } catch (e) {
+      print('Failed to sync book progress to Supabase: $e');
+    }
+  }
+
+  Future<void> syncFromRemote() async {
+    try {
+      final remoteData = await SupabaseService.getAllBookProgress();
+      if (remoteData.isEmpty) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final map = Map<String, BookProgress>.from(state);
+
+      for (final item in remoteData) {
+        final bookId = item['book_id'] as String;
+        final chapter = item['chapter_index'] as int;
+        final page = item['page_index'] as int;
+        final readPagesRaw = item['read_pages'] as List? ?? [];
+        final readPages = readPagesRaw.map((e) => e as int).toSet();
+
+        // Local storage update
+        await prefs.setInt('$_prefPrefix$bookId', page);
+        await prefs.setInt('$_prefPrefix$bookId$_chapterSuffix', chapter);
+        await prefs.setString(
+          '$_prefPrefix$bookId$_readPagesSuffix',
+          readPages.join(','),
+        );
+
+        map[bookId] = BookProgress(
+          chapterIndex: chapter,
+          pageIndex: page,
+          readPages: readPages,
+        );
+      }
+      state = map;
+    } catch (e) {
+      print('Failed to sync remote book progress: $e');
+    }
   }
 
   BookProgress? progressFor(String bookId) => state[bookId];

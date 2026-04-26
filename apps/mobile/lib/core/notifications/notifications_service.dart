@@ -1116,11 +1116,18 @@ final nextPrayerProvider = Provider<AsyncValue<PrayerTimeInfo?>>(
 // ═══════════════════════════════════════════════════════════════
 //  NOTIFICATIONS MANAGER
 // ═══════════════════════════════════════════════════════════════
+final notificationsManagerProvider = Provider<NotificationsManager>((ref) {
+  return NotificationsManager(ref);
+});
+
 class NotificationsManager {
-  static Future<void> scheduleAll(WidgetRef ref) async {
+  final Ref _ref;
+  NotificationsManager(this._ref);
+
+  Future<void> scheduleAll() async {
     if (!await NotificationsService.checkPermissions()) return;
 
-    final settings = ref.read(settingsDaoProvider);
+    final settings = _ref.read(settingsDaoProvider);
     final prayerReminder = await settings.getBool(
       'prayerReminder',
       defaultVal: true,
@@ -1158,7 +1165,7 @@ class NotificationsManager {
 
     // أوقات الصلاة
     if (prayerReminder) {
-      final prayers = await ref.read(prayerTimesProvider.future);
+      final prayers = await _ref.read(prayerTimesProvider.future);
       await NotificationsService.schedulePrayerNotifications(
         prayers: prayers,
         wakeUpBeforeFajr: wakeUpFajr,
@@ -1194,9 +1201,9 @@ class NotificationsManager {
     );
   }
 
-  static Future<void> reschedule(WidgetRef ref) async {
+  Future<void> reschedule() async {
     await NotificationsService.cancelAll();
-    await scheduleAll(ref);
+    await scheduleAll();
   }
 }
 

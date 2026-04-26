@@ -378,6 +378,7 @@ class SupabaseService {
   }
 
   // ─────────────── USER PERSONAL DUAS ───────────────
+
   static Future<List<Map<String, dynamic>>> getUserDuas() async {
     final uid = SupabaseConfig.userId;
     if (uid == null) return [];
@@ -413,6 +414,7 @@ class SupabaseService {
   }
 
   // ─────────────── COMMUNITY ADHKAR ───────────────
+
   static Future<List<Map<String, dynamic>>> getCommunityAdhkar() async {
     final data = await _db
         .from('community_adhkar')
@@ -454,6 +456,7 @@ class SupabaseService {
   }
 
   // ─────────────── COMMUNITY DUAS ───────────────
+  
   static Future<List<Map<String, dynamic>>> getCommunityDuas() async {
     final data = await _db
         .from('community_duas')
@@ -496,9 +499,142 @@ class SupabaseService {
     });
   }
 
-  // ─────────────── BOOKS ───────────────
+  // ─────────────────────────────────────────
+  //  BOOKS & READING PROGRESS
+  // ─────────────────────────────────────────
+
   static Future<List<Map<String, dynamic>>> getBooks() async {
-    final data = await _db.from('books').select().order('created_at');
-    return List<Map<String, dynamic>>.from(data);
+    return _safeRequest<List<Map<String, dynamic>>>(
+      () async {
+        final data = await _db.from('books').select().order('title_ar');
+        return List<Map<String, dynamic>>.from(data);
+      },
+    );
+  }
+
+  static Future<void> upsertBookProgress(
+      String bookId, Map<String, dynamic> data) async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('book_reading_progress').upsert({
+        'user_id': userId,
+        'book_id': bookId,
+        'chapter_index': data['chapter_index'],
+        'page_index': data['page_index'],
+        'read_pages': data['read_pages'],
+        'updated_at': DateTime.now().toIso8601String(),
+      }),
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllBookProgress() async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return [];
+
+    return _safeRequest<List<Map<String, dynamic>>>(
+      () async {
+        final data = await _db
+            .from('book_reading_progress')
+            .select('book_id, chapter_index, page_index, read_pages')
+            .eq('user_id', userId);
+        return List<Map<String, dynamic>>.from(data);
+      },
+    );
+  }
+
+  // ─────────────────────────────────────────
+  //  PDF SESSION (timer + page)
+  // ─────────────────────────────────────────
+
+  /// Save or update the PDF reading session:
+  /// current page, total PDF pages, and accumulated reading seconds.
+  static Future<void> upsertPdfSession(
+    String bookId,
+    int pdfPage,
+    int totalPdfPages,
+    int readingSeconds,
+  ) async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('book_reading_progress').upsert({
+        'user_id': userId,
+        'book_id': bookId,
+        'pdf_page': pdfPage,
+        'total_pdf_pages': totalPdfPages,
+        'reading_seconds': readingSeconds,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id,book_id'),
+    );
+  }
+
+  /// Fetch saved PDF session for a book (pdf_page, total_pdf_pages, reading_seconds).
+  static Future<Map<String, dynamic>?> getPdfSession(String bookId) async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return null;
+
+    return _safeRequest<Map<String, dynamic>?>(
+      () async {
+        final data = await _db
+            .from('book_reading_progress')
+            .select('pdf_page, total_pdf_pages, reading_seconds')
+            .eq('user_id', userId)
+            .eq('book_id', bookId)
+            .maybeSingle();
+        return data;
+      },
+    );
+  }
+
+  // ─────────────────────────────────────────
+  //  REMINDERS
+  // ─────────────────────────────────────────
+
+  static Future<void> upsertReminder(Map<String, dynamic> data) async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('reminders').upsert({
+        'user_id': userId,
+        'local_id': data['local_id'],
+        'title': data['title'],
+        'icon_name': data['icon_name'],
+        'time': data['time'],
+        'is_enabled': data['is_enabled'],
+        'updated_at': DateTime.now().toIso8601String(),
+      }),
+    );
+  }
+
+  static Future<void> deleteReminder(int localId) async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db
+          .from('reminders')
+          .delete()
+          .eq('user_id', userId)
+          .eq('local_id', localId),
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getReminders() async {
+    final userId = SupabaseConfig.userId;
+    if (userId == null) return [];
+
+    return _safeRequest<List<Map<String, dynamic>>>(
+      () async {
+        final data = await _db
+            .from('reminders')
+            .select('local_id, title, icon_name, time, is_enabled')
+            .eq('user_id', userId);
+        return List<Map<String, dynamic>>.from(data);
+      },
+    );
   }
 }

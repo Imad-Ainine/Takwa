@@ -4,10 +4,11 @@
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/database/app_database.dart';
 import '../../core/providers/database_providers.dart';
-import 'supabase_service.dart';
+import '../../core/database/app_database.dart';
+import '../../features/books/providers/books_reading_provider.dart';
 import 'supabase_providers.dart';
+import 'supabase_service.dart';
 import '../providers/favorites_providers.dart';
 
 final syncManagerProvider = Provider((ref) => SyncManager(ref));
@@ -33,6 +34,8 @@ class SyncManager {
       await _syncAchievements();
       await _syncSettings();
       await _syncStats();
+      await _syncBookProgress();
+      await _syncReminders();
     } finally {
       _syncing = false;
     }
@@ -247,7 +250,7 @@ class SyncManager {
           final dao = _ref.read(customIbadahDaoProvider);
           final ibadahItems = await dao.getAllIbadat();
           final ibadah = ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
-          
+
           if (ibadah != null) {
             await syncCustomIbadah(ibadah);
             // Retry log sync
@@ -276,5 +279,51 @@ class SyncManager {
     if (settings.isNotEmpty) {
       await SupabaseService.updateSettings(settings);
     }
+  }
+
+  Future<void> _syncBookProgress() async {
+    try {
+      await _ref.read(readingProgressProvider.notifier).syncFromRemote();
+    } catch (e) {
+      print('SyncManager: Failed to sync book progress: $e');
+    }
+  }
+
+  Future<void> _syncReminders() async {
+    try {
+      final remoteReminders = await SupabaseService.getReminders();
+      final dao = _ref.read(remindersDaoProvider);
+
+      for (final remote in remoteReminders) {
+        // Upsert remote into local DB
+        // We need a method in RemindersDao to handle this
+        await dao.upsertFromRemote(remote);
+      }
+    } catch (e) {
+      print('SyncManager: Failed to sync reminders: $e');
+    }
+  }
+
+  /// Sync local reminder to remote
+  Future<void> syncReminder(Reminder reminder) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.upsertReminder({
+      'local_id': reminder.id,
+      'title': reminder.title,
+      'icon_name': reminder.iconName,
+      'time': reminder.time,
+      'is_enabled': reminder.isEnabled,
+    });
+  }
+
+  Future<void> deleteReminder(int localId) async {
+    final isOnline = _ref.read(connectivityProvider).value ?? false;
+    final isAuth = _ref.read(currentUserProvider) != null;
+    if (!isOnline || !isAuth) return;
+
+    await SupabaseService.deleteReminder(localId);
   }
 }

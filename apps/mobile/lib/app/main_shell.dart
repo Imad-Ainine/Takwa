@@ -118,7 +118,7 @@ class _MainShellState extends ConsumerState<MainShell>
   }
 
   void _initializePostOnboardingServices() {
-    NotificationsManager.scheduleAll(ref);
+    ref.read(notificationsManagerProvider).scheduleAll();
     OverlayBackgroundService.start();
   }
 

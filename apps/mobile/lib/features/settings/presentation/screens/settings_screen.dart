@@ -110,7 +110,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await s.set(key, value.toString());
     }
     // إعادة جدولة الإشعارات
-    await NotificationsManager.reschedule(ref);
+    await ref.read(notificationsManagerProvider).reschedule();
     await ref.read(syncManagerProvider).syncSettings();
   }
 

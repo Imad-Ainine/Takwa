@@ -42,11 +42,11 @@ class BookChapter {
   }
 
   Map<String, dynamic> toJson() => {
-        'index': index,
-        'title_ar': titleAr,
-        'pages': pages.map((p) => p.toJson()).toList(),
-        'intro': intro,
-      };
+    'index': index,
+    'title_ar': titleAr,
+    'pages': pages.map((p) => p.toJson()).toList(),
+    'intro': intro,
+  };
 
   int get totalPages => pages.length;
   int get estimatedMinutes =>
@@ -83,13 +83,13 @@ class BookPage {
   }
 
   Map<String, dynamic> toJson() => {
-        'index': index,
-        'content': content,
-        'title': title,
-        'is_hadith': isHadith,
-        'hadith_number': hadithNumber,
-        'source': source,
-      };
+    'index': index,
+    'content': content,
+    'title': title,
+    'is_hadith': isHadith,
+    'hadith_number': hadithNumber,
+    'source': source,
+  };
 }
 
 class IslamicBook {
@@ -149,23 +149,22 @@ class IslamicBook {
     );
   }
 
-
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title_ar': titleAr,
-        'title_en': titleEn,
-        'author_ar': authorAr,
-        'author_en': authorEn,
-        'description_ar': descriptionAr,
-        'emoji': emoji,
-        'category': category.name,
-        'chapters': chapters.map((c) => c.toJson()).toList(),
-        'cover_url': coverUrl,
-        'pdf_url': pdfUrl,
-        'publish_year': publishYear,
-        'cover_color': coverColor,
-        'cover_color_2': coverColor2,
-      };
+    'id': id,
+    'title_ar': titleAr,
+    'title_en': titleEn,
+    'author_ar': authorAr,
+    'author_en': authorEn,
+    'description_ar': descriptionAr,
+    'emoji': emoji,
+    'category': category.name,
+    'chapters': chapters.map((c) => c.toJson()).toList(),
+    'cover_url': coverUrl,
+    'pdf_url': pdfUrl,
+    'publish_year': publishYear,
+    'cover_color': coverColor,
+    'cover_color_2': coverColor2,
+  };
 
   int get totalPages => chapters.fold<int>(0, (sum, c) => sum + c.totalPages);
 
@@ -173,14 +172,14 @@ class IslamicBook {
       chapters.fold<int>(0, (sum, c) => sum + c.estimatedMinutes);
 
   String get categoryLabel => switch (category) {
-        BookCategory.hadith => 'الحديث',
-        BookCategory.fiqh => 'الفقه',
-        BookCategory.seerah => 'السيرة',
-        BookCategory.aqeedah => 'العقيدة',
-        BookCategory.adab => 'الآداب',
-        BookCategory.tazkiyah => 'التزكية',
-        BookCategory.quran => 'علوم القرآن',
-      };
+    BookCategory.hadith => 'الحديث',
+    BookCategory.fiqh => 'الفقه',
+    BookCategory.seerah => 'السيرة',
+    BookCategory.aqeedah => 'العقيدة',
+    BookCategory.adab => 'الآداب',
+    BookCategory.tazkiyah => 'التزكية',
+    BookCategory.quran => 'علوم القرآن',
+  };
 }
 
 // ─────────────────────────────────────────

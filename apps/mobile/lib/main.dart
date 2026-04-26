@@ -57,13 +57,13 @@ void main() async {
 
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();
-  try {
-    await FlutterWindowManagerPlus.addFlags(
-      FlutterWindowManagerPlus.FLAG_SECURE,
-    );
-  } catch (e) {
-    debugPrint('WindowManager Error: $e');
-  }
+  // try {
+  //   await FlutterWindowManagerPlus.addFlags(
+  //     FlutterWindowManagerPlus.FLAG_SECURE,
+  //   );
+  // } catch (e) {
+  //   debugPrint('WindowManager Error: $e');
+  // }
 
   OverlayBackgroundService.init();
 

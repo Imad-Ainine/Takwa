@@ -620,7 +620,7 @@ class RamadanToggle extends ConsumerWidget {
               ref.invalidate(ramadanModeProvider);
 
               // ── Sync with Cloud & Reschedule Notifications ──
-              await NotificationsManager.reschedule(ref);
+              await ref.read(notificationsManagerProvider).reschedule();
               await ref.read(syncManagerProvider).syncSettings();
             },
             accentColor: style.gold,

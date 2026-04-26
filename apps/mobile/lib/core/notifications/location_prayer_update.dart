@@ -388,12 +388,33 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
           result.messageAr,
           style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
         ),
+        action:
+            result == LocationResult.serviceDisabled ||
+                result == LocationResult.permissionDeniedForever
+            ? SnackBarAction(
+                label: 'تفعيل',
+                textColor: Colors.white,
+                onPressed: () {
+                  if (result == LocationResult.serviceDisabled) {
+                    Geolocator.openLocationSettings();
+                  } else {
+                    Geolocator.openAppSettings();
+                  }
+                },
+              )
+            : null,
         backgroundColor: result.isSuccess
             ? context.colors.success
             : context.colors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 3),
+        duration: Duration(
+          seconds:
+              result == LocationResult.serviceDisabled ||
+                  result == LocationResult.permissionDeniedForever
+              ? 5
+              : 3,
+        ),
       ),
     );
 

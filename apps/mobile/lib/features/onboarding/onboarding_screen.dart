@@ -133,10 +133,70 @@ class OnboardingScreen extends ConsumerWidget {
         return _LocationStep(
           onAllow: () async {
             try {
+              bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+              if (!serviceEnabled) {
+                // If service is disabled, prompt user to enable it
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'GPS غير مفعّل، يرجى تفعيله للمتابعة.',
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
+                        fontSize: 13,
+                      ),
+                    ),
+                    action: SnackBarAction(
+                      label: 'إعدادات',
+                      textColor: Colors.white,
+                      onPressed: () {
+                        Geolocator.openLocationSettings();
+                      },
+                    ),
+                    backgroundColor: AppColors.danger,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    duration: const Duration(seconds: 5),
+                  ),
+                );
+                return; // Wait for them to enable it, we don't proceed yet
+              }
+
               final p = await Geolocator.requestPermission().timeout(
                 const Duration(seconds: 15),
               );
-              // We move forward even if denied or restricted, as long as it's not a permanent block that requires UI changes
+
+              if (p == LocationPermission.deniedForever) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'يرجى تفعيل إذن الموقع من الإعدادات.',
+                      style: TextStyle(
+                        fontFamily: 'NotoNaskhArabic',
+                        fontSize: 13,
+                      ),
+                    ),
+                    action: SnackBarAction(
+                      label: 'إعدادات',
+                      textColor: Colors.white,
+                      onPressed: () {
+                        Geolocator.openAppSettings();
+                      },
+                    ),
+                    backgroundColor: AppColors.danger,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    duration: const Duration(seconds: 5),
+                  ),
+                );
+                return;
+              }
+              // We move forward even if denied or restricted (not forever), as long as it's not a permanent block that requires UI changes
               notifier.next();
             } catch (e) {
               notifier.next();
@@ -498,7 +558,7 @@ class _GenderStep extends StatelessWidget {
                           child: Text(
                             'تجربة استخدام مناسبة، وختمات عامة للرجال وأخرى للنساء',
                             style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                              fontFamily: 'NotoNaskhArabic',
                               fontSize: 11,
                               color: AppColors.textSecondary,
                               height: 1.6,
@@ -646,7 +706,7 @@ class _GenderCardState extends State<_GenderCard>
               Text(
                 widget.label,
                 style: TextStyle(
-                    fontFamily: 'Amiri',
+                  fontFamily: 'Amiri',
                   fontSize: 18,
                   color: widget.selected
                       ? AppColors.gold
@@ -791,7 +851,7 @@ class _AuthStepState extends State<_AuthStep>
                   Text(
                     'تقوى',
                     style: TextStyle(
-                    fontFamily: 'Amiri',
+                      fontFamily: 'Amiri',
                       fontSize: 28,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
@@ -802,7 +862,7 @@ class _AuthStepState extends State<_AuthStep>
                     'سجّل دخولك لحفظ بياناتك ومزامنتها',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -843,7 +903,7 @@ class _AuthStepState extends State<_AuthStep>
                   child: const Text(
                     'متابعة بدون حساب',
                     style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textDim,
                     ),
@@ -870,7 +930,7 @@ class _BenefitRow extends StatelessWidget {
       Text(
         label,
         style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+          fontFamily: 'NotoNaskhArabic',
           fontSize: 13,
           color: AppColors.textPrimary,
         ),
@@ -946,7 +1006,7 @@ class _PlanStepState extends State<_PlanStep>
                   Text(
                     'اختر خطتك',
                     style: TextStyle(
-                    fontFamily: 'Amiri',
+                      fontFamily: 'Amiri',
                       fontSize: 26,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
@@ -956,7 +1016,7 @@ class _PlanStepState extends State<_PlanStep>
                   Text(
                     'انضم إلى عائلة تقوى',
                     style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -1119,7 +1179,7 @@ class _PlanCard extends StatelessWidget {
                   child: Text(
                     title,
                     style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -1142,7 +1202,7 @@ class _PlanCard extends StatelessWidget {
                     child: Text(
                       badge!,
                       style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                        fontFamily: 'NotoNaskhArabic',
                         fontSize: 10,
                         color: badgeColor ?? AppColors.gold,
                         fontWeight: FontWeight.w600,
@@ -1154,7 +1214,7 @@ class _PlanCard extends StatelessWidget {
                   Text(
                     price!,
                     style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                      fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
@@ -1167,7 +1227,7 @@ class _PlanCard extends StatelessWidget {
             Text(
               desc,
               style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 11,
                 color: AppColors.textSecondary,
                 height: 1.6,
@@ -1236,7 +1296,7 @@ class _InfoCard extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-                    fontFamily: 'Amiri',
+              fontFamily: 'Amiri',
               fontSize: 22,
               color: titleColor,
               fontWeight: FontWeight.w700,
@@ -1247,7 +1307,7 @@ class _InfoCard extends StatelessWidget {
             subtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 14,
               color: AppColors.textPrimary,
               height: 1.7,
@@ -1259,7 +1319,7 @@ class _InfoCard extends StatelessWidget {
             hint,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 11,
               color: AppColors.textDim,
             ),
@@ -1277,7 +1337,7 @@ class _InfoCard extends StatelessWidget {
               child: Text(
                 skipLabel!,
                 style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 13,
                   color: AppColors.textDim,
                 ),
@@ -1320,7 +1380,7 @@ class _BottomActions extends StatelessWidget {
             child: Text(
               skipLabel!,
               style: const TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
                 color: AppColors.textDim,
               ),

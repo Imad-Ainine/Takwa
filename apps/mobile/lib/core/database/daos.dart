@@ -904,6 +904,27 @@ class RemindersDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteReminder(int id) {
     return (delete(reminders)..where((r) => r.id.equals(id))).go();
   }
+
+  /// Sync from remote Supabase record
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final companion = RemindersCompanion(
+      title: Value(data['title'] as String),
+      iconName: Value(data['icon_name'] as String? ?? 'favorite_rounded'),
+      time: Value(data['time'] as String),
+      isEnabled: Value(data['is_enabled'] as bool? ?? true),
+      // We don't necessarily want to force the ID from remote if it's auto-incrementing locally,
+      // but we need a way to link them. For now, we'll use the local_id if provided.
+    );
+
+    final localId = data['local_id'] as int?;
+    if (localId != null) {
+      await into(reminders).insertOnConflictUpdate(
+        companion.copyWith(id: Value(localId)),
+      );
+    } else {
+      await into(reminders).insert(companion);
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════

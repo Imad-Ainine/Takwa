@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/core/database/app_database.dart';
 
 /// Map from human-readable icon key to IconData.
 /// Used to persist and restore icons from the database.
@@ -71,9 +73,21 @@ class _AddReminderBottomSheetState
     final timeStr = '$hour:$minute';
 
     try {
-      await ref
+      final id = await ref
           .read(remindersDaoProvider)
           .addReminder(title: title, iconName: _selectedIconKey, time: timeStr);
+
+      // Fetch the created reminder and sync
+      final reminder = Reminder(
+        id: id,
+        title: title,
+        iconName: _selectedIconKey,
+        time: timeStr,
+        isEnabled: true,
+        createdAt: DateTime.now(),
+      );
+      await ref.read(syncManagerProvider).syncReminder(reminder);
+
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {

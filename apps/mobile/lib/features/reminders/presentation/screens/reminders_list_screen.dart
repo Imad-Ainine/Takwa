@@ -4,6 +4,7 @@ import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/reminders/presentation/widgets/advice_card.dart';
 import 'package:takwa/features/reminders/presentation/widgets/reminder_card.dart';
@@ -234,6 +235,7 @@ class RemindersListScreen extends ConsumerWidget {
               },
               onDismissed: (_) {
                 ref.read(remindersDaoProvider).deleteReminder(reminder.id);
+                ref.read(syncManagerProvider).deleteReminder(reminder.id);
               },
               child: ReminderCard(
                 title: reminder.title,
@@ -244,6 +246,10 @@ class RemindersListScreen extends ConsumerWidget {
                   ref
                       .read(remindersDaoProvider)
                       .toggleEnabled(reminder.id, val);
+                  // Sync updated reminder
+                  ref.read(syncManagerProvider).syncReminder(
+                        reminder.copyWith(isEnabled: val),
+                      );
                 },
               ),
             ),

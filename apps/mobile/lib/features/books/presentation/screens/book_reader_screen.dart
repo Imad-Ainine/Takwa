@@ -228,7 +228,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                       ),
                     ],
                     const SizedBox(height: 60),
-                    
+
                     // Ornamental Footer
                     Center(
                       child: Opacity(

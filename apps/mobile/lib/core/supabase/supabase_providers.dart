@@ -5,6 +5,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:async';
 import '../../core/supabase/supabase_config.dart';
 
@@ -18,17 +19,10 @@ final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(authStateProvider).value?.session?.user;
 });
 
-final connectivityProvider = StreamProvider<bool>((ref) async* {
-  // Logic to check internet etc. For now simple supabase ping
-  while (true) {
-    try {
-      await SupabaseConfig.client.from('profiles').select('id').limit(1);
-      yield true;
-    } catch (_) {
-      yield false;
-    }
-    await Future.delayed(const Duration(seconds: 30));
-  }
+final connectivityProvider = StreamProvider<bool>((ref) {
+  return Connectivity()
+      .onConnectivityChanged
+      .map((results) => !results.contains(ConnectivityResult.none));
 });
 
 /// Fetches the user's profile information (username, avatar, etc.)
