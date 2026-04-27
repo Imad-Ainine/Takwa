@@ -142,5 +142,21 @@ class AchievementDefinition {
       pointsReward: 100,
       category: AchievementCategory.special,
     ),
+    AchievementDefinition(
+      id: 'perfect_week_prayer',
+      titleAr: 'الصلاة نور',
+      descAr: 'أديت جميع الصلوات في وقتها لسبعة أيام',
+      emoji: '🕌',
+      pointsReward: 150,
+      category: AchievementCategory.special,
+    ),
+    AchievementDefinition(
+      id: 'constant_reader',
+      titleAr: 'القارئ المداوم',
+      descAr: 'قرأت القرآن لثلاثة أيام متتالية',
+      emoji: '📚',
+      pointsReward: 40,
+      category: AchievementCategory.special,
+    ),
   ];
 }

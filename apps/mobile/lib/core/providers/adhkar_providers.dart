@@ -480,7 +480,7 @@ class AdhkarNotificationService {
 
   static Future<void> rescheduleAll(UserPreferences prefs) async {
     await cancelAll();
-    
+
     if (prefs.adhkarNotifEnabled) {
       if (prefs.morningAdhkarReminder) {
         await scheduleMorning(prefs.morningAdhkarTime);
@@ -496,23 +496,40 @@ class AdhkarNotificationService {
   static Future<void> _scheduleSleep(TimeOfDay time) async {
     await _cancelId(_sleepId);
     final now = DateTime.now();
-    var scheduled = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    if (scheduled.isBefore(now)) scheduled = scheduled.add(const Duration(days: 1));
-    
+    var scheduled = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+    if (scheduled.isBefore(now)) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+
     final dhikr = _randomDhikr(AdhkarCategory.sleep);
     await _plugin.zonedSchedule(
       _sleepId,
       '🌙 حان وقت أذكار النوم',
-      dhikr.arabic.replaceAll('\n', ' ').substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
+      dhikr.arabic
+          .replaceAll('\n', ' ')
+          .substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
       tz.TZDateTime.from(scheduled, tz.local),
       _buildDetails(
-        channelId: 'adhkar_sleep', channelName: 'أذكار النوم',
+        channelId: 'adhkar_sleep',
+        channelName: 'أذكار النوم',
         actions: [
-          const AndroidNotificationAction('read_sleep', 'قرأت الأذكار ✓', showsUserInterface: false, cancelNotification: true),
-        ]
+          const AndroidNotificationAction(
+            'read_sleep',
+            'قرأت الأذكار ✓',
+            showsUserInterface: false,
+            cancelNotification: true,
+          ),
+        ],
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
       payload: 'adhkar:sleep',
     );

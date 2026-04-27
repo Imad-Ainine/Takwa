@@ -3,6 +3,7 @@
 //  تقوى — شاشة الاستيقاظ قبل الفجر
 // ═══════════════════════════════════════════════════════════════
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
 
 // ══════════════════════════════════════════════════════
 //  WAKE UP OVERLAY SCREEN
@@ -29,12 +31,23 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   late final AnimationController _pulseCtrl;
   late final AnimationController _starsCtrl;
   late final AnimationController _entryCtrl;
+  
+  late Timer _clockTimer;
+  DateTime _now = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     WakelockPlus.enable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        setState(() {
+          _now = DateTime.now();
+        });
+      }
+    });
 
     _pulseCtrl = AnimationController(
       vsync: this,
@@ -74,6 +87,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
 
   @override
   void dispose() {
+    _clockTimer.cancel();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _player.dispose();
@@ -81,6 +95,13 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
     _starsCtrl.dispose();
     _entryCtrl.dispose();
     super.dispose();
+  }
+
+  String get _formattedTime {
+    final h = _now.hour % 12 == 0 ? 12 : _now.hour % 12;
+    final m = _now.minute.toString().padLeft(2, '0');
+    final ap = _now.hour < 12 ? 'ص' : 'م';
+    return '$h:$m $ap';
   }
 
   void _close() {
@@ -187,10 +208,10 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                 ),
                               );
                             }),
-                            // Center clock icon
+                            // Center clock text
                             Container(
-                              width: 100,
-                              height: 100,
+                              width: 140,
+                              height: 140,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
@@ -213,11 +234,16 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                   ),
                                 ],
                               ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.alarm,
-                                  size: 42,
-                                  color: Colors.white,
+                              child: Center(
+                                child: Text(
+                                  _formattedTime,
+                                  style: const TextStyle(
+                                    fontFamily: 'NotoNaskhArabic',
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
                             ),
@@ -339,8 +365,21 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                         children: [
                           Expanded(
                             child: PrimaryButton(
+                              onTap: () async {
+                                await NotificationsService.scheduleSnooze(minutes: 10);
+                                _close();
+                              },
+                              icon: Icons.snooze,
+                              label: 'غفوة 10د',
+                              isOutline: true,
+                              baseColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: PrimaryButton(
                               onTap: () async => _close(),
-                              icon: Icons.check,
+                              icon: Icons.stop_circle_outlined,
                               label: 'إيقاف المنبه',
                             ),
                           ),

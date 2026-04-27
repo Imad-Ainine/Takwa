@@ -17,6 +17,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -212,10 +213,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         _anim(
                           1,
                           statsAsync.when(
-                            loading: () => const _StatSkeleton(height: 150),
+                            loading: () => const Center(child: TakwaLoadingIndicator()),
                             error: (_, _) => const SizedBox(),
                             data: (s) => streakAsync.when(
-                              loading: () => const _StatSkeleton(height: 150),
+                              loading: () => const Center(child: TakwaLoadingIndicator()),
                               error: (_, _) => const SizedBox(),
                               data: (streak) =>
                                   _TaqwaHeroCard(stats: s, streak: streak),
@@ -1185,7 +1186,7 @@ class _PrayerAttendanceCard extends ConsumerWidget {
             loading: () => const Center(
               child: Padding(
                 padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: TakwaLoadingIndicator(strokeWidth: 2),
               ),
             ),
             error: (_, _) => const SizedBox(),
@@ -1366,7 +1367,7 @@ class _AchievementsSection extends ConsumerWidget {
 
           allAsync.when(
             loading: () => Center(
-              child: CircularProgressIndicator(
+              child: TakwaLoadingIndicator(
                 color: context.colors.gold,
                 strokeWidth: 2,
               ),
@@ -1833,7 +1834,7 @@ class _StatSkeleton extends StatelessWidget {
       border: Border.all(color: context.colors.border),
     ),
     child: Center(
-      child: CircularProgressIndicator(
+      child: TakwaLoadingIndicator(
         color: context.colors.gold,
         strokeWidth: 2,
       ),

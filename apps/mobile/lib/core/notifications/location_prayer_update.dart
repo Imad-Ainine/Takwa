@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:adhan/adhan.dart' as adhan;
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import 'package:geocoding/geocoding.dart';
@@ -157,9 +158,7 @@ class LocationPrayerManager {
       method: method,
     );
 
-    await NotificationsService.schedulePrayerNotifications(
-      prayers: prayers,
-    );
+    await NotificationsService.schedulePrayerNotifications(prayers: prayers);
 
     _scheduled = true;
     _lastUpdate = DateTime.now();
@@ -260,12 +259,12 @@ class PrayerTimesWithTimezone {
     switch (method) {
       case 'Algeria':
         p = adhan.CalculationMethod.egyptian.getParameters();
-        p.fajrAngle = 19.2;
-        p.ishaAngle = 17.5;
-        p.methodAdjustments.fajr = -1;
-        p.methodAdjustments.dhuhr = -1;
-        p.methodAdjustments.asr = -1;
-        p.methodAdjustments.maghrib = 3;
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
+        p.methodAdjustments.fajr = 0;
+        p.methodAdjustments.dhuhr = 0;
+        p.methodAdjustments.asr = 1;
+        p.methodAdjustments.maghrib = 5;
         p.methodAdjustments.isha = 0;
         break;
       case 'Egypt':
@@ -440,9 +439,10 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                     ? SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(
+                        child: TakwaLoadingIndicator(
                           color: context.colors.teal,
                           strokeWidth: 2,
+                          size: 18,
                         ),
                       )
                     : const Text('📍', style: TextStyle(fontSize: 18)),

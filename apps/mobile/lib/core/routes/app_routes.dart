@@ -241,13 +241,9 @@ class AppRoutes {
           builder: (_) => EmailConfirmationScreen(email: email),
         );
       case Routes.updatePassword:
-        return MaterialPageRoute(
-          builder: (_) => const UpdatePasswordScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const UpdatePasswordScreen());
       case Routes.books:
-        return MaterialPageRoute(
-          builder: (_) => const BooksLibraryScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const BooksLibraryScreen());
       case Routes.booksChapter:
         final book = settings.arguments as IslamicBook;
         return MaterialPageRoute(

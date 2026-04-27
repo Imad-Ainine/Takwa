@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:takwa/core/theme/app_theme.dart';
-import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/books/presentation/screens/books_chapter_screen.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 
 class BooksLibraryScreen extends ConsumerStatefulWidget {
   const BooksLibraryScreen({super.key});
@@ -17,6 +20,7 @@ class BooksLibraryScreen extends ConsumerStatefulWidget {
 class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
   String _searchQuery = '';
   BookCategory? _selectedCategory;
+  bool _isGridView = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,148 +30,190 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
 
     return Scaffold(
       backgroundColor: colors.background,
-      body: CustomScrollView(
-        slivers: [
-          // ── Premium App Bar ──────────────────────────────────
-          SliverAppBar(
-            expandedHeight: 180,
-            pinned: true,
-            stretch: true,
-            backgroundColor: colors.deep,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: false,
-              titlePadding: const EdgeInsets.only(right: 16, bottom: 16),
-              title: Text(
-                'المكتبة الإسلامية',
-                style: typography.headingMedium.copyWith(
-                  fontSize: 22,
-                  color: Colors.white,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+      appBar: AppBarWidget(
+        title: 'المكتبة الإسلامية',
+        leading: const CustomLeadingButton(),
+        actions: [
+          IconButton(
+            onPressed: () => setState(() => _isGridView = !_isGridView),
+            icon: Icon(
+              _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
+              color: Colors.white,
+            ),
+            tooltip: _isGridView ? 'عرض القائمة' : 'عرض الشبكة',
+          ),
+        ],
+      ),
+      body: TakwaRefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(booksListProvider);
+          try {
+            await ref.read(booksListProvider.future);
+          } catch (_) {}
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // ── Search Bar ────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                child: _SearchBar(
+                  onChanged: (val) => setState(() => _searchQuery = val),
                 ),
-                textDirection: TextDirection.rtl,
               ),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [
-                          colors.deep,
-                          colors.gold.withOpacity(0.3),
-                          colors.deep,
+            ),
+
+            // ── Categories ────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: _CategorySelector(
+                selected: _selectedCategory,
+                onSelect: (cat) => setState(() => _selectedCategory = cat),
+              ),
+            ),
+
+            // ── Book List/Grid ────────────────────────────────────
+            booksAsync.when(
+              data: (books) {
+                final filtered = books.where((b) {
+                  final matchCat =
+                      _selectedCategory == null ||
+                      b.category == _selectedCategory;
+                  final matchSearch =
+                      _searchQuery.isEmpty ||
+                      b.titleAr.contains(_searchQuery) ||
+                      b.authorAr.contains(_searchQuery);
+                  return matchCat && matchSearch;
+                }).toList();
+
+                if (filtered.isEmpty) {
+                  return const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('🧐', style: TextStyle(fontSize: 50)),
+                          SizedBox(height: 16),
+                          Text('لم يتم العثور على كتب'),
                         ],
                       ),
                     ),
-                  ),
-                  const CustomPatternBackground(
-                    pattern: BackgroundPattern.adhkar,
-                    opacity: 0.15,
-                  ),
-                  Positioned(
-                    left: -20,
-                    bottom: -20,
-                    child: Opacity(
-                      opacity: 0.2,
-                      child: Icon(
-                        Icons.menu_book,
-                        size: 180,
-                        color: colors.gold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+                  );
+                }
 
-          // ── Search Bar ────────────────────────────────────────
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-              child: _SearchBar(
-                onChanged: (val) => setState(() => _searchQuery = val),
-              ),
-            ),
-          ),
-
-          // ── Categories ────────────────────────────────────────
-          SliverToBoxAdapter(
-            child: _CategorySelector(
-              selected: _selectedCategory,
-              onSelect: (cat) => setState(() => _selectedCategory = cat),
-            ),
-          ),
-
-          // ── Book List/Grid ────────────────────────────────────
-          booksAsync.when(
-            data: (books) {
-              final filtered = books.where((b) {
-                final matchCat =
-                    _selectedCategory == null ||
-                    b.category == _selectedCategory;
-                final matchSearch =
-                    _searchQuery.isEmpty ||
-                    b.titleAr.contains(_searchQuery) ||
-                    b.authorAr.contains(_searchQuery);
-                return matchCat && matchSearch;
-              }).toList();
-
-              if (filtered.isEmpty) {
-                return const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('🧐', style: TextStyle(fontSize: 50)),
-                        SizedBox(height: 16),
-                        Text('لم يتم العثور على كتب'),
-                      ],
-                    ),
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
                   ),
+                  sliver: _isGridView
+                      ? SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.65,
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                              ),
+                          delegate: SliverChildBuilderDelegate((ctx, i) {
+                            final book = filtered[i];
+                            return _BookGridCard(
+                              book: book,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      BooksChapterScreen(book: book),
+                                ),
+                              ),
+                            );
+                          }, childCount: filtered.length),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate((ctx, i) {
+                            final book = filtered[i];
+                            return _BookCard(
+                              book: book,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      BooksChapterScreen(book: book),
+                                ),
+                              ),
+                            );
+                          }, childCount: filtered.length),
+                        ),
                 );
-              }
-
-              return SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((ctx, i) {
-                    final book = filtered[i];
-                    return _BookCard(
-                      book: book,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BooksChapterScreen(book: book),
+              },
+              loading: () => const SliverFillRemaining(child: _BooksSkeleton()),
+              error: (err, stack) => SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.wifi_off_rounded,
+                        size: 80,
+                        color: colors.textSecondary.withOpacity(0.3),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'تعذر الاتصال بالخادم',
+                        style: typography.headingMedium.copyWith(fontSize: 22),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً\nأو اسحب الشاشة للأسفل للتحديث',
+                        style: TextStyle(
+                          color: colors.textSecondary,
+                          fontSize: 15,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: () => ref.invalidate(booksListProvider),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colors.gold,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.refresh, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'إعادة المحاولة',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    );
-                  }, childCount: filtered.length),
+                    ],
+                  ),
                 ),
-              );
-            },
-            loading: () => const SliverFillRemaining(
-              child: _BooksSkeleton(),
+              ),
             ),
-            error: (err, stack) => SliverFillRemaining(
-              child: Center(child: Text('حدث خطأ: $err')),
-            ),
-          ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
       ),
     );
   }
@@ -491,6 +537,154 @@ class _BookCard extends ConsumerWidget {
   }
 }
 
+// ─────────────────────────────────────────
+//  BOOK GRID CARD
+// ─────────────────────────────────────────
+
+class _BookGridCard extends StatelessWidget {
+  final IslamicBook book;
+  final VoidCallback onTap;
+  const _BookGridCard({required this.book, required this.onTap});
+
+  Color _parseColor(String hex) {
+    try {
+      if (hex.startsWith('0x')) return Color(int.parse(hex));
+      return Color(int.parse('0xFF$hex'));
+    } catch (_) {
+      return const Color(0xFFC8A96E);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final typography = context.typography;
+    final c1 = _parseColor(book.coverColor);
+    final c2 = _parseColor(book.coverColor2);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: colors.border),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 5,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [c1, c2],
+                        ),
+                      ),
+                    ),
+                    if (book.coverUrl != null && book.coverUrl!.isNotEmpty)
+                      CachedNetworkImage(
+                        imageUrl: book.coverUrl!,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Center(
+                          child: Text(
+                            book.emoji,
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                        ),
+                      )
+                    else
+                      Center(
+                        child: Text(
+                          book.emoji,
+                          style: const TextStyle(fontSize: 30),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      book.titleAr,
+                      style: typography.labelLarge.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      book.authorAr,
+                      style: typography.caption.copyWith(
+                        color: colors.textSecondary,
+                        fontSize: 11,
+                      ),
+                      textAlign: TextAlign.right,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.goldDim,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        book.categoryLabel,
+                        style: typography.caption.copyWith(
+                          color: colors.gold,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  INFO CHIP
+// ─────────────────────────────────────────
 class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -524,7 +718,7 @@ class _BooksSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    
+
     return Center(
       child: Container(
         height: 160,
@@ -545,10 +739,7 @@ class _BooksSkeleton extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(
-                color: colors.gold,
-                strokeWidth: 2.5,
-              ),
+              const TakwaLoadingIndicator(),
               const SizedBox(height: 16),
               Text(
                 'جاري تحميل الكتب...',

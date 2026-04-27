@@ -586,9 +586,9 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     DateTime from,
     DateTime to,
   ) async {
-    final rows = await (select(dailyRecords)
-          ..where((r) => r.date.isBetweenValues(from, to)))
-        .get();
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(from, to))).get();
 
     if (rows.isEmpty) {
       return const [
@@ -620,9 +620,9 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
 
   /// Returns MonthStats aggregated over any date range [from, to].
   Future<MonthStats> getStatsForRange(DateTime from, DateTime to) async {
-    final rows = await (select(dailyRecords)
-          ..where((r) => r.date.isBetweenValues(from, to)))
-        .get();
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(from, to))).get();
 
     final totalPoints = rows.fold<int>(0, (s, r) => s + r.netPoints);
     final quranPages = rows.fold<int>(0, (s, r) => s + r.quranPages);
@@ -639,8 +639,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
         if (s == PrayerStatus.performed) performed++;
       }
     }
-    final prayerRate =
-        rows.isEmpty ? 0.0 : performed / (rows.length * 5);
+    final prayerRate = rows.isEmpty ? 0.0 : performed / (rows.length * 5);
 
     return MonthStats(
       totalPoints: totalPoints,
@@ -652,17 +651,14 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   /// Returns one [WeeklyPoint] per day in [from..to] for the bar chart.
-  Future<List<WeeklyPoint>> getPointsPerDay(
-    DateTime from,
-    DateTime to,
-  ) async {
+  Future<List<WeeklyPoint>> getPointsPerDay(DateTime from, DateTime to) async {
     final results = <WeeklyPoint>[];
     var cursor = DateTime(from.year, from.month, from.day);
     final end = DateTime(to.year, to.month, to.day);
     while (!cursor.isAfter(end)) {
-      final record = await (select(dailyRecords)
-            ..where((r) => r.date.equals(cursor)))
-          .getSingleOrNull();
+      final record = await (select(
+        dailyRecords,
+      )..where((r) => r.date.equals(cursor))).getSingleOrNull();
       results.add(WeeklyPoint(date: cursor, points: record?.netPoints ?? 0));
       cursor = cursor.add(const Duration(days: 1));
     }
@@ -685,10 +681,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     ).watch().asyncMap((_) => getPointsPerDay(from, to));
   }
 
-  Stream<List<PrayerRateData>> watchPerPrayerRates(
-    DateTime from,
-    DateTime to,
-  ) {
+  Stream<List<PrayerRateData>> watchPerPrayerRates(DateTime from, DateTime to) {
     return customSelect(
       'SELECT 1',
       readsFrom: {dailyRecords},
@@ -701,6 +694,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     required String descAr,
     required String emoji,
     int pointsReward = 0,
+    DateTime? earnedAt,
   }) async {
     final existing = await (select(
       achievements,
@@ -714,7 +708,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
         descAr: Value(descAr),
         emoji: Value(emoji),
         pointsReward: Value(pointsReward),
-        earnedAt: Value(DateTime.now()),
+        earnedAt: Value(earnedAt ?? DateTime.now()),
       ),
     );
   }
@@ -816,10 +810,101 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
         );
         if (a != null) newAchievements.add(a);
       }
+      if (today.tasbeehCount >= 100) {
+        final a = await _tryGrant(
+          'tasbeeh_100',
+          'الذاكر الشاكر',
+          'سبحت الله 100 مرة في يوم واحد',
+          '📿',
+          20,
+        );
+        if (a != null) newAchievements.add(a);
+      }
     }
 
-    // 4. Points Milestones
-    final totalPoints = await getMonthlyPoints(now.year, now.month);
+    // 4. Historical Checks (last 3-7 days)
+    final last7Rows =
+        await (select(dailyRecords)
+              ..orderBy([(r) => OrderingTerm.desc(r.date)])
+              ..limit(7))
+            .get();
+
+    if (last7Rows.length >= 3) {
+      final last3 = last7Rows.sublist(0, 3);
+      if (last3.every((r) => r.fajrStatus == PrayerStatus.performed)) {
+        final a = await _tryGrant(
+          'fajr_on_time',
+          'في ذمة الله',
+          'صليت الفجر في وقته لثلاثة أيام متتالية',
+          '🕌',
+          30,
+        );
+        if (a != null) newAchievements.add(a);
+      }
+      if (last3.every((r) => r.quranPages > 0)) {
+        final a = await _tryGrant(
+          'constant_reader',
+          'القارئ المداوم',
+          'قرأت القرآن لثلاثة أيام متتالية',
+          '📚',
+          40,
+        );
+        if (a != null) newAchievements.add(a);
+      }
+    }
+
+    if (last7Rows.length == 7) {
+      if (last7Rows.every(
+        (r) =>
+            r.fajrStatus == PrayerStatus.performed &&
+            r.dhuhrStatus == PrayerStatus.performed &&
+            r.asrStatus == PrayerStatus.performed &&
+            r.maghribStatus == PrayerStatus.performed &&
+            r.ishaStatus == PrayerStatus.performed,
+      )) {
+        final a = await _tryGrant(
+          'perfect_week_prayer',
+          'الصلاة نور',
+          'أديت جميع الصلوات في وقتها لسبعة أيام',
+          '🕌',
+          150,
+        );
+        if (a != null) newAchievements.add(a);
+      }
+    }
+
+    // 5. Global Lifetime Checks
+    final allRows = await (select(dailyRecords)).get();
+
+    // Fasting Nafl Check
+    if (allRows.any((r) => r.fastingType == FastingType.nafl)) {
+      final a = await _tryGrant(
+        'fasting_nafl',
+        'باب الريان',
+        'أكملت صيام النفل الأول لك',
+        '🌙',
+        40,
+      );
+      if (a != null) newAchievements.add(a);
+    }
+
+    // Ramadan Knight Check (10 days of fard fasting)
+    final ramadanDays = allRows
+        .where((r) => r.fastingType == FastingType.fard)
+        .length;
+    if (ramadanDays >= 10) {
+      final a = await _tryGrant(
+        'ramadan_knight',
+        'فارس رمضان',
+        'أكملت 10 أيام من رمضان في المحاسبة',
+        '✨',
+        100,
+      );
+      if (a != null) newAchievements.add(a);
+    }
+
+    // Total Lifetime Points Check
+    final totalPoints = allRows.fold<int>(0, (sum, r) => sum + r.netPoints);
     if (totalPoints >= 100) {
       final a = await _tryGrant(
         'points_100',
@@ -830,7 +915,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       );
       if (a != null) newAchievements.add(a);
     }
-    if (totalPoints >= 3000) {
+    if (totalPoints >= 1000) {
       final a = await _tryGrant(
         'points_1000',
         'فارس التقوى',
@@ -984,7 +1069,15 @@ class WeeklyPoint {
   }
 
   String get fullDayName {
-    const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    const days = [
+      'الأحد',
+      'الإثنين',
+      'الثلاثاء',
+      'الأربعاء',
+      'الخميس',
+      'الجمعة',
+      'السبت',
+    ];
     return days[date.weekday % 7];
   }
 
@@ -1093,9 +1186,9 @@ class RemindersDao extends DatabaseAccessor<AppDatabase>
 
     final localId = data['local_id'] as int?;
     if (localId != null) {
-      await into(reminders).insertOnConflictUpdate(
-        companion.copyWith(id: Value(localId)),
-      );
+      await into(
+        reminders,
+      ).insertOnConflictUpdate(companion.copyWith(id: Value(localId)));
     } else {
       await into(reminders).insert(companion);
     }
@@ -1228,8 +1321,9 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
     bool done,
     int count,
   ) async {
-    final dr = await (select(dailyRecords)..where((r) => r.date.equals(date)))
-        .getSingleOrNull();
+    final dr = await (select(
+      dailyRecords,
+    )..where((r) => r.date.equals(date))).getSingleOrNull();
     int drId;
     if (dr == null) {
       drId = await into(dailyRecords).insert(
@@ -1237,22 +1331,25 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
         mode: InsertMode.insertOrIgnore,
       );
       if (drId == 0 || drId == -1) {
-        final existingDr = await (select(dailyRecords)
-              ..where((r) => r.date.equals(date)))
-            .getSingle();
+        final existingDr = await (select(
+          dailyRecords,
+        )..where((r) => r.date.equals(date))).getSingle();
         drId = existingDr.id;
       }
     } else {
       drId = dr.id;
     }
 
-    final existing = await (select(customIbadahLog)
-          ..where((l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId)))
-        .getSingleOrNull();
+    final existing =
+        await (select(customIbadahLog)..where(
+              (l) => l.recordId.equals(drId) & l.ibadahId.equals(ibadahId),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
-      await (update(customIbadahLog)..where((l) => l.id.equals(existing.id)))
-          .write(
+      await (update(
+        customIbadahLog,
+      )..where((l) => l.id.equals(existing.id))).write(
         CustomIbadahLogCompanion(done: Value(done), count: Value(count)),
       );
     } else {

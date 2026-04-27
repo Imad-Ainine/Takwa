@@ -59,10 +59,10 @@ class AdhanAutoTrigger {
   static String? _lastTriggeredPrayer;
   static DateTime? _lastTriggeredTime;
 
-  /// يبدأ مراقبة أوقات الصلاة كل 30 ثانية
+  /// يبدأ مراقبة أوقات الصلاة كل ثانية بدقة عالية
   static void start(WidgetRef ref, GlobalKey<NavigatorState> navigatorKey) {
     _checkTimer?.cancel();
-    _checkTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _checkTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       _check(ref, navigatorKey);
     });
   }
@@ -98,7 +98,10 @@ class AdhanAutoTrigger {
       final now = DateTime.now();
       for (final prayer in prayers) {
         final diffSecs = now.difference(prayer.time).inSeconds;
-        if (diffSecs < 0 || diffSecs > 60) continue; // فقط 0-60 ثانية من وقت الأذان
+        // نُطلق الشاشة فقط عند وقت الصلاة تماماً (0-3 ثوانٍ)
+        if (diffSecs < 0 || diffSecs > 3) {
+          continue;
+        }
 
         final key = '${prayer.name}_${prayer.time.day}';
         if (_lastTriggeredPrayer == key) continue;
@@ -116,9 +119,7 @@ class AdhanAutoTrigger {
 
         // تشغيل صوت الأذان المختار من الإعدادات
         if (adhanSound) {
-          await AdhanAudioPlayer.play(
-            asset: 'assets/sounds/$adhanSoundFile',
-          );
+          await AdhanAudioPlayer.play(asset: 'assets/sounds/$adhanSoundFile');
         }
 
         // فتح شاشة الأذان
@@ -166,9 +167,7 @@ class AdhanAutoTrigger {
       // Read the user-selected adhan sound file
       final adhanSoundFile =
           await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
-      await AdhanAudioPlayer.play(
-        asset: 'assets/sounds/$adhanSoundFile',
-      );
+      await AdhanAudioPlayer.play(asset: 'assets/sounds/$adhanSoundFile');
     }
 
     if (adhanScreen) {

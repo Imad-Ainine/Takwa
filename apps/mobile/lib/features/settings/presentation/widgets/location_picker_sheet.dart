@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/utils/timezone_resolver.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -479,11 +480,9 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   ),
                   child: Center(
                     child: widget.isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
+                        ? const Center(
+                            child: TakwaLoadingIndicator(
+                              size: 20,
                               color: Colors.white,
                             ),
                           )

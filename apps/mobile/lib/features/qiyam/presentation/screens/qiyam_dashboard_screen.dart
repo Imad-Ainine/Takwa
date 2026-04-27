@@ -9,6 +9,7 @@ import 'package:takwa/app/main_shell.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../widgets/qiyam_onboarding_overlay.dart';
 
 class QiyamDashboardScreen extends ConsumerStatefulWidget {
@@ -285,11 +286,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           SizedBox(
             width: 240,
             height: 240,
-            child: CircularProgressIndicator(
-              value: progress,
+            child: TakwaLoadingIndicator(
+              size: 240,
               strokeWidth: 4,
-              backgroundColor: context.colors.border.withOpacity(0.2),
-              valueColor: AlwaysStoppedAnimation<Color>(stage.color),
+              color: stage.color,
             ),
           ),
           // Main Circle Content

@@ -6,6 +6,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 import 'package:takwa/core/providers/user_content_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
@@ -80,7 +82,7 @@ class UserAdhkarTabView extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: TakwaLoadingIndicator()),
         error: (e, s) => Center(
           child: Text(
             'حدث خطأ: $e',
@@ -510,10 +512,9 @@ class CommunityAdhkarTabView extends ConsumerWidget {
     return state.when(
       data: (adhkar) {
         if (adhkar.isEmpty) {
-          return RefreshIndicator(
+          return TakwaRefreshIndicator(
             onRefresh: () =>
                 ref.read(communityAdhkarProvider.notifier).refresh(),
-            color: context.colors.gold,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -547,9 +548,8 @@ class CommunityAdhkarTabView extends ConsumerWidget {
           );
         }
 
-        return RefreshIndicator(
+        return TakwaRefreshIndicator(
           onRefresh: () => ref.read(communityAdhkarProvider.notifier).refresh(),
-          color: context.colors.gold,
           child: ListView.builder(
             physics: const BouncingScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -574,7 +574,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (e, s) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -9,6 +9,7 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
 
 class ManageCustomIbadahScreen extends ConsumerStatefulWidget {
@@ -125,7 +126,7 @@ class _IbadahList extends ConsumerWidget {
         );
       },
       loading: () =>
-          Center(child: CircularProgressIndicator(color: context.colors.gold)),
+          Center(child: TakwaLoadingIndicator(color: context.colors.gold)),
       error: (e, st) => Center(
         child: Text(
           'حدث خطأ في تحميل البيانات',

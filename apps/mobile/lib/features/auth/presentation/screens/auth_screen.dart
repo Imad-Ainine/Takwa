@@ -12,6 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/supabase/supabase_service.dart';
@@ -256,14 +257,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
                 child: Container(
                   color: Colors.black38,
-                  child: Center(
-                    child: _GlowPulse(
-                      child: CircularProgressIndicator(
-                        color: s.gold,
-                        strokeWidth: 3,
-                      ),
-                    ),
-                  ),
+                  child: const TakwaLoadingIndicator(),
                 ),
               ),
           ],

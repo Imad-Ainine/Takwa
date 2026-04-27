@@ -17,6 +17,9 @@ import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/features/books/data/books_data.dart';
+import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -236,8 +239,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       const SizedBox(height: 14),
 
                       // ⑦ Books Section
-                      //     _anim(6, _BooksSection(style: style)),
-                      // const SizedBox(height: 14),
+                      _anim(6, _BooksSection(style: style)),
+                      const SizedBox(height: 14),
 
                       // ⑧ Verse Card
                       _anim(
@@ -1331,7 +1334,6 @@ class _FeatureRow extends StatelessWidget {
     ('🤲', 'الأدعية', '/duas'),
     ('✨', 'المسبحة', '/misbaha'),
     ('🕋', 'المساجد', '/mosques'),
-    ('📚', 'المكتبة', '/books'),
     ('📊', 'إحصائيات', '/statistics'),
     ('🏆', 'الإنجازات', '/achievements'),
     ('🔔', 'التذكيرات', '/reminders'),
@@ -1694,8 +1696,209 @@ class _Skeleton extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: style.border),
     ),
-    child: Center(
-      child: CircularProgressIndicator(color: style.gold, strokeWidth: 2),
-    ),
+    child: const Center(child: TakwaLoadingIndicator(size: 24)),
   );
+}
+
+// ─────────────────────────────────────────
+//  BOOKS SECTION (REDESIGNED)
+// ─────────────────────────────────────────
+class _BooksSection extends ConsumerWidget {
+  final AdaptiveStyle style;
+  const _BooksSection({required this.style});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final booksAsync = ref.watch(booksListProvider);
+    final s = style;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8, bottom: 12),
+          child: Row(
+            children: [
+              Text('المكتبة الإسلامية', style: s.amiri(16, color: s.gold)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(height: 1, color: s.gold.withOpacity(0.15)),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/books'),
+                child: Text(
+                  'عرض الكل ←',
+                  style: s.naskh(11, color: s.goldLight),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 190,
+          child: booksAsync.when(
+            loading: () => ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              itemCount: 3,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, __) => _Skeleton(style: s, height: 180),
+            ),
+            error: (_, __) => const SizedBox(),
+            data: (books) => ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              itemCount: books.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, i) => _BookCard(book: books[i], style: s),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BookCard extends StatelessWidget {
+  final IslamicBook book;
+  final AdaptiveStyle style;
+  const _BookCard({required this.book, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = style;
+    final color = Color(int.parse(book.coverColor));
+
+    return GestureDetector(
+      onTap: () =>
+          Navigator.pushNamed(context, '/books/chapter', arguments: book),
+      child: Container(
+        width: 130,
+        decoration: BoxDecoration(
+          color: s.card,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.15),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Book Cover
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withOpacity(0.8),
+                      Color(int.parse(book.coverColor2)).withOpacity(0.6),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    if (book.coverUrl != null)
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
+                        ),
+                        child: Image.network(
+                          book.coverUrl!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (_, __, ___) => const SizedBox(),
+                        ),
+                      ),
+                    // Glassmorphism Overlay for Emoji info if no cover
+                    if (book.coverUrl == null)
+                      Center(
+                        child: Text(
+                          book.emoji,
+                          style: const TextStyle(fontSize: 40),
+                        ),
+                      ),
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          book.categoryLabel,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Book Info
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      book.titleAr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: s.amiri(
+                        13,
+                        color: s.text,
+                        weight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      book.authorAr,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: s.naskh(9, color: s.textSec),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, size: 10, color: s.gold),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${book.estimatedReadingMinutes} دقيقة',
+                          style: s.naskh(8, color: s.textDim),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

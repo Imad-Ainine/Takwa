@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
@@ -12,6 +13,7 @@ import 'package:takwa/features/prayer/data/mosque_repository.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:intl/intl.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -116,7 +118,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
       return Scaffold(
         backgroundColor: style.bg,
         body: const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
+          child: TakwaLoadingIndicator(),
         ),
       );
     }
@@ -145,7 +147,116 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             ),
             Column(
               children: [
-                _buildDynamicHeader(style, context),
+                AppBarWidget(
+                  title: 'المساجد القريبة',
+                  height: 380,
+                  showBackground: true,
+                  child: Column(
+                    children: [
+                      // AppBar replacement
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const CustomLeadingButton(),
+                            Text(
+                              'المساجد القريبة',
+                              style: style.amiri(
+                                22,
+                                color: Colors.white,
+                                weight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 40),
+                          ],
+                        ),
+                      ),
+                      // Current Location Indicator
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.location_on_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'الموقع الحالي: $_cityName',
+                              style: style.naskh(
+                                14,
+                                color: Colors.white,
+                                weight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Hero Map Section
+                      Container(
+                        margin: const EdgeInsets.only(
+                          left: 24,
+                          right: 24,
+                          top: 8,
+                          bottom: 24,
+                        ),
+                        height: 120,
+                        width: 200,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            const Icon(
+                              Icons.map_outlined,
+                              size: 80,
+                              color: Colors.white24,
+                            ),
+                            const Icon(
+                              Icons.location_on_rounded,
+                              size: 48,
+                              color: Colors.white,
+                            ),
+                            Positioned(
+                              bottom: 4,
+                              left: 12,
+                              child: SizedBox(
+                                width: 180,
+                                child: PrimaryButton(
+                                  onTap: () async => _openMap(0, 0),
+                                  label: 'عرض على الخريطة',
+                                  isBg: true,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Expanded(
                   child: mosquesAsyncValue.when(
                     data: (mosques) {
@@ -177,136 +288,12 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       );
                     },
                     loading: () => const Center(
-                      child: CircularProgressIndicator(color: AppColors.gold),
+                      child: TakwaLoadingIndicator(),
                     ),
                     error: (err, stack) => _buildErrorState(err, style),
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDynamicHeader(AdaptiveStyle style, BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/mosquesbg.png'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black45, // Darken background slightly to maintain contrast
-            BlendMode.darken,
-          ),
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // AppBar replacement
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CustomLeadingButton(),
-                  Text(
-                    'المساجد القريبة',
-                    style: style.amiri(
-                      22,
-                      color: Colors.white,
-                      weight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 40),
-                ],
-              ),
-            ),
-            // Current Location Indicator
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.location_on_rounded,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'الموقع الحالي: $_cityName',
-                    style: style.naskh(
-                      14,
-                      color: Colors.white,
-                      weight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Hero Map Section
-            Container(
-              margin: const EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 8,
-                bottom: 24,
-              ),
-              height: 120,
-              width: 200,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.3)),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(
-                    Icons.map_outlined,
-                    size: 80,
-                    color: Colors.white24,
-                  ),
-                  const Icon(
-                    Icons.location_on_rounded,
-                    size: 48,
-                    color: Colors.white,
-                  ),
-                  Positioned(
-                    bottom: 4,
-                    left: 12,
-                    child: SizedBox(
-                      width: 180,
-                      child: PrimaryButton(
-                        onTap: () async => _openMap(0, 0),
-                        label: 'عرض على الخريطة',
-                        isBg: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

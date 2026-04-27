@@ -157,9 +157,11 @@ class _CustomPatternBackgroundState
     }
 
     final colors = context.colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     CustomPainter painter;
     final baseColor = widget.color ?? colors.gold;
-    final baseOpacity = widget.opacity ?? 0.08;
+    // In light mode, use a lower default opacity so the pattern stays subtle.
+    final baseOpacity = widget.opacity ?? (isDark ? 0.08 : 0.04);
 
     switch (widget.pattern) {
       case BackgroundPattern.twelveFoldStar:

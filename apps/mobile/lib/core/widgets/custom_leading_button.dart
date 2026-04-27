@@ -34,9 +34,10 @@ class _CustomLeadingButtonState extends State<CustomLeadingButton>
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.9,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -58,10 +59,13 @@ class _CustomLeadingButtonState extends State<CustomLeadingButton>
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    
+
     // Icon selection
-    final IconData effectiveIcon = widget.icon ?? 
-        (widget.isClose ? Icons.close_rounded : Icons.arrow_back_ios_new_rounded);
+    final IconData effectiveIcon =
+        widget.icon ??
+        (widget.isClose
+            ? Icons.close_rounded
+            : Icons.arrow_back_ios_new_rounded);
 
     return Center(
       child: GestureDetector(
@@ -74,10 +78,7 @@ class _CustomLeadingButtonState extends State<CustomLeadingButton>
             decoration: BoxDecoration(
               color: colors.goldDim,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colors.gold.withOpacity(0.2),
-                width: 1,
-              ),
+              border: Border.all(color: colors.gold.withOpacity(0.2), width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),

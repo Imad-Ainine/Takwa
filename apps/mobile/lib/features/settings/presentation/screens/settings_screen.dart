@@ -13,6 +13,7 @@ import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
@@ -87,17 +88,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   actions: [
                     if (isSyncing)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Center(
-                          child: SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: context.colors.gold,
-                            ),
-                          ),
+                            child: TakwaLoadingIndicator(size: 14),
                         ),
                       ),
                   ],
@@ -115,7 +109,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         loading: () => const Center(
                           child: Padding(
                             padding: EdgeInsets.all(32.0),
-                            child: CircularProgressIndicator(),
+                            child: TakwaLoadingIndicator(size: 32),
                           ),
                         ),
                         error: (err, st) => Center(
@@ -319,13 +313,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       _updatePref('calcMethod', v),
                                 ),
                                 _Divider(),
-                                _AdhanSelectSetting(
+                                  _AdhanSelectSetting(
                                   icon: '🎵',
                                   label: 'صوت الأذان',
                                   value: prefs.adhanSound,
                                   options: adhanOptions,
                                   onChanged: (v) =>
                                       _updatePref('adhan_sound', v),
+                                ),
+                                _Divider(),
+                                _SelectSetting(
+                                  icon: '🔈',
+                                  label: 'وضع الأذان',
+                                  value: prefs.adhanMode,
+                                  options: const {
+                                    'sound': 'صوت',
+                                    'vibrate': 'اهتزاز',
+                                    'silent': 'صامت',
+                                  },
+                                  onChanged: (v) => _updatePref('adhan_mode', v),
                                 ),
                                 _Divider(),
                                 _ActionSetting(

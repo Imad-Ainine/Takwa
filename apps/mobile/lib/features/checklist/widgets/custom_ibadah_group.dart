@@ -200,19 +200,20 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
   @override
   void initState() {
     super.initState();
-    _committed = widget.log?.done ?? false;
-    _count = widget.log?.count ?? 0;
+    if (widget.log != null) {
+      _committed = widget.log!.done;
+      _count = widget.log!.count;
+    }
   }
 
   @override
   void didUpdateWidget(covariant _CustomIbadahRow oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // Only update internal state if the log is non-null.
+    // This prevents the UI from flickering to 'unchecked' while the stream is loading.
     if (widget.log != null) {
       _committed = widget.log!.done;
       _count = widget.log!.count;
-    } else {
-      _committed = false;
-      _count = 0;
     }
   }
 

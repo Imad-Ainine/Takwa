@@ -20,9 +20,9 @@ final currentUserProvider = Provider<User?>((ref) {
 });
 
 final connectivityProvider = StreamProvider<bool>((ref) {
-  return Connectivity()
-      .onConnectivityChanged
-      .map((results) => !results.contains(ConnectivityResult.none));
+  return Connectivity().onConnectivityChanged.map(
+    (results) => !results.contains(ConnectivityResult.none),
+  );
 });
 
 /// Fetches the user's profile information (username, avatar, etc.)

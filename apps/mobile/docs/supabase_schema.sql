@@ -90,24 +90,18 @@ create table if not exists public.user_settings (
   updated_at timestamptz default now()
 );
 
--- achievements (Definition)
+-- achievements (Earned per user)
 create table if not exists public.achievements (
   id uuid primary key default uuid_generate_v4(),
-  type text not null unique,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  type text not null,
   title_ar text not null,
   desc_ar text not null,
   emoji text not null,
   points_reward int not null default 0,
-  created_at timestamptz not null default now()
-);
-
--- user_achievements
-create table if not exists public.user_achievements (
-  id uuid primary key default uuid_generate_v4(),
-  user_id uuid not null references public.profiles(id) on delete cascade,
-  achievement_id uuid not null references public.achievements(id) on delete cascade,
   earned_at timestamptz not null default now(),
-  seen boolean not null default false
+  seen boolean not null default false,
+  unique (user_id, type)
 );
 
 -- daily_records
@@ -337,16 +331,10 @@ alter table public.user_settings enable row level security;
 drop policy if exists "own settings" on public.user_settings;
 create policy "own settings" on public.user_settings for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
--- achievements (Global)
+-- achievements (Per user)
 alter table public.achievements enable row level security;
-drop policy if exists "viewable by all achievements" on public.achievements;
-create policy "viewable by all achievements" on public.achievements for select using (true);
 drop policy if exists "own achievements" on public.achievements;
-
--- user_achievements
-alter table public.user_achievements enable row level security;
-drop policy if exists "own user_achievements" on public.user_achievements;
-create policy "own user_achievements" on public.user_achievements for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own achievements" on public.achievements for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- daily_records
 alter table public.daily_records enable row level security;

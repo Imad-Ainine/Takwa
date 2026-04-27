@@ -1,10 +1,10 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/books/presentation/screens/book_pdf_reader_screen.dart
-//  تقوى — Premium Islamic Books PDF Reader (full tracker edition)
+//  تقوى — Premium Islamic Books PDF Reader (manual download edition)
 // ═══════════════════════════════════════════════════════════════
 
+import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +13,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
+import 'package:takwa/features/books/data/pdf_download_service.dart';
 import 'package:takwa/features/books/providers/pdf_session_provider.dart';
 
 class BookPdfReaderScreen extends ConsumerStatefulWidget {
@@ -33,17 +36,19 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   final PdfViewerController _pdfController = PdfViewerController();
 
   // ── Download state ────────────────────────
-  Uint8List? _pdfBytes;
+  File? _localFile;
   bool _isLoading = true;
+  double _downloadProgress = 0.0;
   String? _error;
+  StreamController<double>? _progressCtrl;
 
   // ── UI visibility animation ───────────────
   bool _showUI = true;
   late AnimationController _uiAnim;
-  late Animation<double> _uiFade;
 
   // ── Text selection overlay ────────────────
   String _selectedText = '';
+  PdfTextSelectionChangedDetails? _selectionDetails;
 
   // ── Session Notifier ──────────────────────
   late PdfSessionNotifier _sessionNotifier;
@@ -60,7 +65,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       duration: const Duration(milliseconds: 250),
       value: 1.0,
     );
-    _uiFade = CurvedAnimation(parent: _uiAnim, curve: Curves.easeInOut);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     // Load persisted session (page + timer)
@@ -69,8 +73,9 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       _sessionNotifier.loadSession(_bookId);
     });
 
+    // Kick off PDF download
     if (widget.book.pdfUrl != null) {
-      _downloadPdf(widget.book.pdfUrl!);
+      _startDownload();
     } else {
       setState(() => _isLoading = false);
     }
@@ -80,40 +85,38 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   void dispose() {
     _uiAnim.dispose();
     _pdfController.dispose();
+    _progressCtrl?.close();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
   // ── PDF Download ──────────────────────────
 
-  Future<void> _downloadPdf(String url) async {
+  Future<void> _startDownload() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      _downloadProgress = 0.0;
+      _localFile = null;
+    });
+
+    // Close any existing stream
+    await _progressCtrl?.close();
+    _progressCtrl = StreamController<double>.broadcast();
+
+    _progressCtrl!.stream.listen((progress) {
+      if (mounted) setState(() => _downloadProgress = progress);
+    });
+
     try {
-      final client = HttpClient()
-        ..badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-
-      final request = await client.getUrl(Uri.parse(url));
-      request.headers
-        ..set(
-          HttpHeaders.userAgentHeader,
-          'Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36',
-        )
-        ..set(HttpHeaders.acceptHeader, 'application/pdf,*/*');
-
-      final response = await request.close();
-      if (response.statusCode != 200) {
-        throw Exception('HTTP ${response.statusCode}');
-      }
-
-      final builder = BytesBuilder();
-      await for (final chunk in response) {
-        builder.add(chunk);
-      }
-      client.close();
-
+      final file = await PdfDownloadService.getOrDownload(
+        widget.book.pdfUrl!,
+        progressController: _progressCtrl,
+      );
       if (mounted) {
         setState(() {
-          _pdfBytes = builder.toBytes();
+          _localFile = file;
           _isLoading = false;
         });
       }
@@ -185,6 +188,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       return Scaffold(
         backgroundColor: colors.background,
         appBar: AppBar(
+          leading: const CustomLeadingButton(),
           title: Text(
             widget.book.titleAr,
             style: const TextStyle(fontFamily: 'Amiri'),
@@ -213,26 +217,25 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       backgroundColor: const Color(0xFF1A1A1A),
       body: Stack(
         children: [
-          // ── PDF Viewer ──────────────────
-          if (_isLoading)
-            const Center(child: _PdfLoadingSkeleton())
-          else if (_error != null)
+          // ── PDF Viewer / Loading / Error ──
+          if (_error != null)
             _buildErrorView()
+          else if (_isLoading || _localFile == null)
+            _buildLoadingView(accentColor)
           else
-            SfPdfViewer.memory(
-              _pdfBytes!,
+            SfPdfViewer.file(
+              _localFile!,
               key: _pdfViewerKey,
               controller: _pdfController,
+              enableTextSelection: true,
               onDocumentLoaded: (details) {
                 final total = details.document.pages.count;
-                // Wrap in microtask to avoid updating during build
                 Future.microtask(() {
                   if (!mounted) return;
                   _sessionNotifier.setTotal(total);
                   _sessionNotifier.start();
                 });
 
-                // Restore last page
                 final savedPage = session.currentPage;
                 if (savedPage > 1 && savedPage <= total) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -241,14 +244,21 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                 }
               },
               onTap: (details) {
-                // Only toggle UI when no text is selected
                 if (_selectedText.isEmpty) _toggleUI();
               },
               onPageChanged: (details) {
                 _sessionNotifier.setPage(details.newPageNumber);
               },
               onTextSelectionChanged: (details) {
-                setState(() => _selectedText = details.selectedText ?? '');
+                setState(() {
+                  _selectedText = details.selectedText ?? '';
+                  _selectionDetails = details;
+                });
+              },
+              onDocumentLoadFailed: (details) {
+                setState(() {
+                  _error = details.error;
+                });
               },
               canShowScrollHead: false,
               enableDoubleTapZooming: true,
@@ -259,53 +269,72 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
             top: 0,
             left: 0,
             right: 0,
-            child: IgnorePointer(
-              ignoring: !_showUI,
-              child: FadeTransition(
-                opacity: _uiFade,
+            child: AnimatedOpacity(
+              opacity: _showUI ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: IgnorePointer(
+                ignoring: !_showUI,
                 child: _buildTopBar(session, accentColor),
               ),
             ),
           ),
 
           // ── Bottom Progress Panel ───────
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              ignoring: !_showUI,
-              child: FadeTransition(
-                opacity: _uiFade,
-                child: _buildBottomPanel(session, accentColor),
+          if (!_isLoading && _localFile != null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: _showUI ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                child: IgnorePointer(
+                  ignoring: !_showUI,
+                  child: _buildBottomPanel(session, accentColor),
+                ),
               ),
             ),
-          ),
 
           // ── Text Selection Action Bar ───
-          if (_selectedText.isNotEmpty)
-            Positioned(
-              top:
-                  MediaQuery.of(context).padding.top +
-                  70, // safe positioning below TopBar
-              left: 16,
-              right: 16,
-              child: _TextActionBar(
-                onCopy: () {
-                  _copyText();
-                  setState(() => _selectedText = '');
-                  _pdfController.clearSelection();
-                },
-                onShare: () {
-                  _shareText();
-                  setState(() => _selectedText = '');
-                  _pdfController.clearSelection();
-                },
-                onDismiss: () {
-                  setState(() => _selectedText = '');
-                  _pdfController.clearSelection();
-                },
-              ),
+          if (_selectedText.isNotEmpty && _selectionDetails != null)
+            Builder(
+              builder: (context) {
+                final mq = MediaQuery.of(context);
+                final topPadding = mq.padding.top + 8;
+                // Float 72px above the selection region; clamp so it stays on-screen
+                final selTop =
+                    _selectionDetails!.globalSelectedRegion?.top ?? 200;
+                final rawTop = selTop - 72;
+                final clampedTop = rawTop.clamp(
+                  topPadding,
+                  mq.size.height - 140.0,
+                );
+                return Positioned(
+                  top: clampedTop,
+                  left: 16,
+                  right: 16,
+                  child: Center(
+                    child: _TextActionBar(
+                      onCopy: () {
+                        _copyText();
+                        setState(() => _selectedText = '');
+                        _pdfController.clearSelection();
+                      },
+                      onShare: () {
+                        _shareText();
+                        setState(() => _selectedText = '');
+                        _pdfController.clearSelection();
+                      },
+                      onDismiss: () {
+                        setState(() => _selectedText = '');
+                        _pdfController.clearSelection();
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
         ],
       ),
@@ -314,6 +343,56 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
   // ── Sub-widgets ───────────────────────────
 
+  Widget _buildLoadingView(Color accentColor) {
+    final pct = (_downloadProgress * 100).toInt();
+    return Center(
+      child: Container(
+        width: 240,
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2C2C2C),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TakwaLoadingIndicator(color: accentColor, strokeWidth: 2.5),
+            const SizedBox(height: 20),
+            Text(
+              _downloadProgress > 0
+                  ? 'جاري التحميل... $pct%'
+                  : 'جاري التحميل...',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+                fontFamily: 'Amiri',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: _downloadProgress > 0 ? _downloadProgress : null,
+                backgroundColor: Colors.white12,
+                valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                minHeight: 4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildErrorView() {
     return Center(
       child: Padding(
@@ -321,36 +400,51 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 48),
-            const SizedBox(height: 12),
+            const Icon(
+              Icons.wifi_off_rounded,
+              color: Colors.orangeAccent,
+              size: 56,
+            ),
+            const SizedBox(height: 16),
             const Text(
               'تعذّر تحميل الملف',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 18,
                 fontFamily: 'Amiri',
+                fontWeight: FontWeight.bold,
               ),
               textDirection: TextDirection.rtl,
             ),
             const SizedBox(height: 8),
             Text(
-              _error!,
-              style: const TextStyle(color: Colors.white54, fontSize: 11),
+              _error ?? '',
+              style: const TextStyle(color: Colors.white38, fontSize: 11),
               textAlign: TextAlign.center,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  _isLoading = true;
-                  _error = null;
-                });
-                _downloadPdf(widget.book.pdfUrl!);
-              },
-              icon: const Icon(Icons.refresh, color: Colors.white70),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: _startDownload,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC8A96E),
+                foregroundColor: Colors.black87,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text(
                 'إعادة المحاولة',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(
+                  fontFamily: 'Amiri',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -362,10 +456,10 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   Widget _buildTopBar(PdfSessionState session, Color accentColor) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        MediaQuery.of(context).padding.top + 8,
-        16,
-        16,
+        18,
+        MediaQuery.of(context).padding.top + 18,
+        18,
+        18,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -376,10 +470,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       ),
       child: Row(
         children: [
-          _CircleBtn(
-            onTap: () => Navigator.pop(context),
-            icon: Icons.arrow_back_ios_new_rounded,
-          ),
+          const CustomLeadingButton(),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -408,9 +499,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          // Timer chip
-          // _TimerChip(label: session.timerLabel, accentColor: accentColor),
         ],
       ),
     );
@@ -423,10 +511,10 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        12,
-        16,
-        MediaQuery.of(context).padding.bottom + 12,
+        18,
+        18,
+        18,
+        MediaQuery.of(context).padding.bottom + 18,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -438,7 +526,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Progress bar
+          // Reading progress bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
@@ -450,7 +538,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           ),
           const SizedBox(height: 8),
 
-          // Slider row
           Row(
             children: [
               // Reading time
@@ -506,65 +593,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 // ─────────────────────────────────────────
 //  SMALL WIDGETS
 // ─────────────────────────────────────────
-
-class _CircleBtn extends StatelessWidget {
-  final VoidCallback onTap;
-  final IconData icon;
-
-  const _CircleBtn({required this.onTap, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.black38,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white12),
-        ),
-        child: Icon(icon, color: Colors.white, size: 20),
-      ),
-    );
-  }
-}
-
-class _TimerChip extends StatelessWidget {
-  final String label;
-  final Color accentColor;
-
-  const _TimerChip({required this.label, required this.accentColor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accentColor.withOpacity(0.5)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.timer_outlined, color: accentColor, size: 13),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: accentColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _InfoChip extends StatelessWidget {
   final IconData icon;
@@ -630,36 +658,34 @@ class _TextActionBar extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _ActionBtn(icon: Icons.copy_rounded, label: 'نسخ', onTap: onCopy),
-            const SizedBox(width: 4),
-            const VerticalDivider(
-              color: Colors.white12,
-              width: 16,
-              thickness: 1,
-            ),
-            const SizedBox(width: 4),
-            _ActionBtn(
-              icon: Icons.share_rounded,
-              label: 'مشاركة',
-              onTap: onShare,
-            ),
-            const SizedBox(width: 4),
-            const VerticalDivider(
-              color: Colors.white12,
-              width: 16,
-              thickness: 1,
-            ),
-            const SizedBox(width: 4),
-            _ActionBtn(
-              icon: Icons.close_rounded,
-              label: 'إغلاق',
-              onTap: onDismiss,
-              color: Colors.white38,
-            ),
-          ],
+        child: IntrinsicHeight(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _ActionBtn(icon: Icons.copy_rounded, label: 'نسخ', onTap: onCopy),
+              const VerticalDivider(
+                color: Colors.white12,
+                width: 24,
+                thickness: 1,
+              ),
+              _ActionBtn(
+                icon: Icons.share_rounded,
+                label: 'مشاركة',
+                onTap: onShare,
+              ),
+              const VerticalDivider(
+                color: Colors.white12,
+                width: 24,
+                thickness: 1,
+              ),
+              _ActionBtn(
+                icon: Icons.close_rounded,
+                label: 'إغلاق',
+                onTap: onDismiss,
+                color: Colors.white38,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -684,59 +710,20 @@ class _ActionBtn extends StatelessWidget {
     final c = color ?? const Color(0xFFC8A96E);
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: c, size: 20),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(color: c, fontSize: 10, fontFamily: 'Amiri'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────
-//  PDF SKELETON (LOADING STATE)
-// ─────────────────────────────────────────
-class _PdfLoadingSkeleton extends StatelessWidget {
-  const _PdfLoadingSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black54,
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircularProgressIndicator(color: Color(0xFFC8A96E), strokeWidth: 2.5),
-          SizedBox(height: 20),
-          Text(
-            'جاري تحميل الملف...',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontFamily: 'Amiri',
-              fontWeight: FontWeight.bold,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: c, size: 20),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(color: c, fontSize: 10, fontFamily: 'Amiri'),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

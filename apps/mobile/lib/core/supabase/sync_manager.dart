@@ -89,18 +89,52 @@ class SyncManager {
   }
 
   Future<void> _syncCustomIbadah() async {
+    final ibadahDao = _ref.read(customIbadahDaoProvider);
+
+    // 1. Push local logs (last 7 days)
+    for (int i = 0; i < 7; i++) {
+      final date = DateTime.now().subtract(Duration(days: i));
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      final localLogs = await ibadahDao.getLogsForDate(dateOnly);
+      for (final log in localLogs) {
+        await syncCustomIbadahLog(log);
+      }
+    }
+
+    // 2. Pull from Supabase
     final remoteIbadah = await SupabaseService.getCustomIbadah();
     final remoteLogs = await SupabaseService.getCustomIbadahLogs(
       from: DateTime.now().subtract(const Duration(days: 14)),
       to: DateTime.now(),
     );
 
-    final ibadahDao = _ref.read(customIbadahDaoProvider);
     for (final item in remoteIbadah) {
       await ibadahDao.upsertCustomIbadahFromRemote(item);
     }
+
+    // Keep track of dates to recalc points later
+    final updatedDates = <DateTime>{};
     for (final log in remoteLogs) {
       await ibadahDao.upsertCustomIbadahLogFromRemote(log);
+      final dateStr = log['date'] as String;
+      updatedDates.add(DateTime.parse(dateStr));
+    }
+
+    // 3. Recalculate points for all affected dates
+    final dailyDao = _ref.read(dailyRecordDaoProvider);
+    for (final date in updatedDates) {
+      final dr = await dailyDao.getRecordByDate(date);
+      if (dr != null) {
+        // Ensure points are correct in the local daily_records table
+        await dailyDao.recalcPoints(dr.id);
+        
+        // Fetch the recalculated record and push to Supabase 
+        // to keep points in sync on the remote server
+        final afterRecalc = await dailyDao.getRecordByDate(date);
+        if (afterRecalc != null) {
+          await syncDailyRecord(afterRecalc);
+        }
+      }
     }
   }
 
@@ -109,21 +143,27 @@ class SyncManager {
     final statsDao = _ref.read(statsDaoProvider);
     final db = _ref.read(appDatabaseProvider);
 
-    // 1. Push local earned achievements
-    final localEarned = await (db.select(db.achievements)).get();
-    for (final ach in localEarned) {
-      await syncAchievement(ach);
-    }
-
-    // 2. Pull from Supabase
+    // 1. Pull from Supabase FIRST
     for (final data in remoteAchievements) {
+      final earnedAtStr = data['earned_at'] as String?;
+      final earnedAt = earnedAtStr != null
+          ? DateTime.tryParse(earnedAtStr)
+          : null;
+
       await statsDao.addAchievement(
         type: data['type'],
         titleAr: data['title_ar'] ?? '',
         descAr: data['desc_ar'] ?? '',
         emoji: data['emoji'] ?? '✨',
         pointsReward: data['points_reward'] ?? 0,
+        earnedAt: earnedAt,
       );
+    }
+
+    // 2. Push local earned achievements (that might not be on Supabase yet)
+    final localEarned = await (db.select(db.achievements)).get();
+    for (final ach in localEarned) {
+      await syncAchievement(ach);
     }
   }
 
@@ -284,13 +324,21 @@ class SyncManager {
         'done': log.done,
         'count': log.count,
       });
+
+      // Also sync the daily record to update points on remote
+      final dailyDao = _ref.read(dailyRecordDaoProvider);
+      final dr = await dailyDao.getRecordByDate(log.date);
+      if (dr != null) {
+        await syncDailyRecord(dr);
+      }
     } catch (e) {
       if (e.toString().contains('23503')) {
         // Foreign key violation: custom_ibadah might be missing on remote
         try {
           final dao = _ref.read(customIbadahDaoProvider);
           final ibadahItems = await dao.getAllIbadat();
-          final ibadah = ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
+          final ibadah =
+              ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
 
           if (ibadah != null) {
             await syncCustomIbadah(ibadah);
@@ -301,6 +349,13 @@ class SyncManager {
               'done': log.done,
               'count': log.count,
             });
+
+            // Also sync daily record on retry
+            final dailyDao = _ref.read(dailyRecordDaoProvider);
+            final dr = await dailyDao.getRecordByDate(log.date);
+            if (dr != null) {
+              await syncDailyRecord(dr);
+            }
           }
         } catch (retryError) {
           // Fallback or ignore

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'takwa_loading_indicator.dart';
 import 'custom_pattern_background.dart';
 
 /// A premium, animated primary button unified across the application.
@@ -53,20 +54,27 @@ class _PrimaryButtonState extends State<PrimaryButton>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final disabled = widget.onTap == null || widget.isLoading || _loading;
-    final primaryColor = widget.baseColor ?? AppColors.gold;
-    // We add a slightly darker shade for the gradient. Color(0xFFB8920E) was used for gold.
-    // If a custom color is provided, we can slightly darken it for the gradient end color.
+    final primaryColor = widget.baseColor ?? colors.gold;
+
+    // Slightly darken the caller color (or gold default) for the gradient end.
     final endColor = widget.baseColor != null
         ? HSLColor.fromColor(widget.baseColor!)
               .withLightness(
-                (HSLColor.fromColor(widget.baseColor!).lightness - 0.1).clamp(
-                  0.0,
-                  1.0,
-                ),
+                (HSLColor.fromColor(widget.baseColor!).lightness - 0.1)
+                    .clamp(0.0, 1.0),
               )
               .toColor()
-        : const Color(0xFFB8920E);
+        : colors.goldDark;
+
+    // Content text/icon color: on filled → white (always contrasts the gradient).
+    // On outline or disabled → use theme tokens.
+    final contentColor = disabled
+        ? colors.textDim
+        : widget.isOutline
+        ? primaryColor
+        : (widget.isBg ? Colors.white : colors.textPrimary);
 
     return GestureDetector(
       onTapDown: disabled
@@ -98,7 +106,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                 ? null
                 : LinearGradient(colors: [primaryColor, endColor]),
             color: disabled
-                ? AppColors.border
+                ? colors.border
                 : widget.isOutline
                 ? Colors.transparent
                 : null,
@@ -110,7 +118,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                 ? null
                 : [
                     BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
+                      color: primaryColor.withOpacity(0.30),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -129,14 +137,11 @@ class _PrimaryButtonState extends State<PrimaryButton>
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: _loading
-                    ? const Center(
-                        child: SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: AppColors.night,
-                            strokeWidth: 2,
-                          ),
+                    ? Center(
+                        child: TakwaLoadingIndicator(
+                          size: 20,
+                          // On a gradient surface the indicator should always be white.
+                          color: widget.isBg ? Colors.white : colors.textPrimary,
                         ),
                       )
                     : widget.customContent ??
@@ -147,11 +152,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                                 Icon(
                                   widget.icon,
                                   size: 18,
-                                  color: widget.isOutline
-                                      ? primaryColor
-                                      : (widget.isBg
-                                            ? Colors.white
-                                            : AppColors.night),
+                                  color: contentColor,
                                 ),
                                 const SizedBox(width: 8),
                               ],
@@ -161,13 +162,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                                   fontFamily: 'NotoNaskhArabic',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: disabled
-                                      ? AppColors.textDim
-                                      : widget.isOutline
-                                      ? primaryColor
-                                      : (widget.isBg
-                                            ? Colors.white
-                                            : AppColors.night),
+                                  color: contentColor,
                                 ),
                               ),
                             ],

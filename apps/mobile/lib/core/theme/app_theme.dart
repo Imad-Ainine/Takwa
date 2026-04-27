@@ -590,6 +590,10 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: colors.background,
       appBarTheme: AppBarTheme(
+        // Removes the shadow/elevation for all AppBars
+        scrolledUnderElevation: 0.0,
+        // Removes the color tint highlight for all AppBars
+        surfaceTintColor: Colors.transparent,
         backgroundColor: colors.deep,
         elevation: 0,
         centerTitle: true,

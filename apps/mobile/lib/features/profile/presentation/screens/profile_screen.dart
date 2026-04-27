@@ -10,6 +10,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
 import '../../../../core/supabase/supabase_providers.dart';
@@ -94,7 +95,7 @@ class ProfileScreen extends ConsumerWidget {
     AsyncValue<Map<String, dynamic>?> profileAsync,
   ) {
     return profileAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (e, _) => Center(
         child: Text(
           'خطأ في تحميل البيانات',

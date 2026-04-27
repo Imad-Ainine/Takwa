@@ -16,6 +16,8 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/providers/user_content_providers.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
 import 'package:takwa/features/duas/presentation/screens/favorite_duas_screen.dart';
 
@@ -652,8 +654,7 @@ class _UserDuasTabView extends ConsumerWidget {
         child: Icon(Icons.add, color: style.bg),
       ),
       body: state.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: style.gold)),
+        loading: () => const Center(child: TakwaLoadingIndicator()),
         error: (err, _) => Center(
           child: Text(
             'حدث خطأ في جلب أدعيتك',
@@ -979,7 +980,7 @@ class _CommunityDuasTabView extends ConsumerWidget {
 
     return state.when(
       loading: () =>
-          Center(child: CircularProgressIndicator(color: style.teal)),
+          Center(child: TakwaLoadingIndicator(color: style.teal)),
       error: (err, _) => Center(
         child: Text(
           'تعذر تحميل أدعية المجتمع',
@@ -988,7 +989,7 @@ class _CommunityDuasTabView extends ConsumerWidget {
       ),
       data: (items) {
         if (items.isEmpty) {
-          return RefreshIndicator(
+          return TakwaRefreshIndicator(
             color: style.teal,
             onRefresh: () => ref.read(communityDuasProvider.notifier).refresh(),
             child: ListView(
@@ -1020,8 +1021,7 @@ class _CommunityDuasTabView extends ConsumerWidget {
           );
         }
 
-        return RefreshIndicator(
-          color: style.teal,
+        return TakwaRefreshIndicator(
           onRefresh: () => ref.read(communityDuasProvider.notifier).refresh(),
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),

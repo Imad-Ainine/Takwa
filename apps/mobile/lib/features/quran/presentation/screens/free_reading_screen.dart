@@ -13,6 +13,7 @@ import '../../utils/quran_helpers.dart';
 import '../../data/quran_data.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'quran_reader_screen.dart';
 
 // Styles are managed via AdaptiveStyle
@@ -684,19 +685,16 @@ class _RubTab extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            CircularProgressIndicator(
-                              value: progress,
+                            TakwaLoadingIndicator(
+                              size: 36,
                               strokeWidth: 2.5,
-                              backgroundColor: style.border,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                idx == 0
-                                    ? style.textDim
-                                    : idx == 1
-                                    ? style.gold
-                                    : idx == 2
-                                    ? style.textSec
-                                    : style.text,
-                              ),
+                              color: idx == 0
+                                  ? style.textDim
+                                  : idx == 1
+                                      ? style.gold
+                                      : idx == 2
+                                          ? style.textSec
+                                          : style.text,
                             ),
                             Text(
                               idx == 0

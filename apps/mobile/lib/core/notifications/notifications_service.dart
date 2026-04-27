@@ -82,6 +82,9 @@ class NotifIds {
   // رمضان
   static const ramadanSuhoor = 700;
   static const ramadanIftar = 701;
+
+  // تنبيهات الاستيقاظ
+  static const wakeUpAlarm = 105;
 }
 
 // ─────────────────────────────────────────
@@ -172,6 +175,20 @@ class NotifChannels {
     enableVibration: true,
   );
 
+  /// قناة منبه الاستيقاظ
+  static const AndroidNotificationChannel wakeUpAlarm =
+      AndroidNotificationChannel(
+        'wakeup_alarm_channel',
+        'منبه الاستيقاظ',
+        description: 'منبه مخصص للاستيقاظ لصلاة الفجر',
+        importance: Importance.max,
+        sound: RawResourceAndroidNotificationSound('adhan'),
+        playSound: true,
+        enableVibration: true,
+        enableLights: true,
+        ledColor: Color(0xFFC8A96E),
+      );
+
   static List<AndroidNotificationChannel> get all => [
     prayer,
     alert,
@@ -181,6 +198,7 @@ class NotifChannels {
     achievement,
     reminders,
     ramadan,
+    wakeUpAlarm,
   ];
 }
 
@@ -587,6 +605,34 @@ class NotificationsService {
     }
   }
 
+  // ── المنبه / الاستيقاظ ──
+  static Future<void> scheduleWakeUpAlarm({required TimeOfDay time}) async {
+    await _scheduleDailyAt(
+      id: NotifIds.wakeUpAlarm,
+      title: '🌙 حان وقت الاستيقاظ',
+      body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
+      time: time,
+      channelId: NotifChannels.wakeUpAlarm.id,
+      sound: 'adhan',
+      payload: 'wakeup:fajr',
+      fullScreenIntent: true,
+    );
+  }
+
+  static Future<void> scheduleSnooze({required int minutes}) async {
+    final snoozeTime = DateTime.now().add(Duration(minutes: minutes));
+    await _scheduleExact(
+      id: NotifIds.wakeUpAlarm,
+      title: '🌙 حان وقت الاستيقاظ (غفوة)',
+      body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
+      scheduledTime: snoozeTime,
+      channelId: NotifChannels.wakeUpAlarm.id,
+      sound: 'adhan',
+      payload: 'wakeup:fajr',
+      fullScreenIntent: true,
+    );
+  }
+
   // ── إشعار إنجاز فوري ──
   static Future<void> showAchievementNotif({
     required String title,
@@ -685,6 +731,11 @@ class NotificationsService {
           playSound: sound != null,
           enableVibration: true,
           fullScreenIntent: fullScreenIntent,
+          category: fullScreenIntent ? AndroidNotificationCategory.alarm : null,
+          audioAttributesUsage: fullScreenIntent
+              ? AudioAttributesUsage.alarm
+              : AudioAttributesUsage.notification,
+          visibility: NotificationVisibility.public,
           styleInformation: BigTextStyleInformation(body),
           color: const Color(0xFFC8A96E),
         ),
@@ -744,6 +795,11 @@ class NotificationsService {
           playSound: sound != null,
           enableVibration: true,
           fullScreenIntent: fullScreenIntent,
+          category: fullScreenIntent ? AndroidNotificationCategory.alarm : null,
+          audioAttributesUsage: fullScreenIntent
+              ? AudioAttributesUsage.alarm
+              : AudioAttributesUsage.notification,
+          visibility: NotificationVisibility.public,
           styleInformation: BigTextStyleInformation(body),
           color: const Color(0xFFC8A96E),
         ),
@@ -987,14 +1043,13 @@ class PrayerTimesService {
         // وزارة الشؤون الدينية والأوقاف - الجزائر
         // تعتمد زوايا قريبة من المصري (19.5/17.5) مع تعديلات طفيفة
         p = adhan.CalculationMethod.egyptian.getParameters();
-        p.fajrAngle =
-            19.2; // تعديل ليتوافق مع أوقات الفجر الرسمية (19.1-19.2 درجة)
-        p.ishaAngle = 17.5;
-        // تعديلات دقيقة لتطابق الرزنامة الرسمية (احتياط)
-        p.methodAdjustments.fajr = -1;
-        p.methodAdjustments.dhuhr = -1;
-        p.methodAdjustments.asr = -1;
-        p.methodAdjustments.maghrib = 3;
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
+        // تعديلات دقيقة لتطابق تطبيق صلاتك والرزنامة الرسمية
+        p.methodAdjustments.fajr = 0;
+        p.methodAdjustments.dhuhr = 0;
+        p.methodAdjustments.asr = 1;
+        p.methodAdjustments.maghrib = 5;
         p.methodAdjustments.isha = 0;
         break;
       case 'Egypt':
@@ -1140,18 +1195,9 @@ class NotificationsManager {
 
     // تنبيه اليقظة قبل الفجر
     if (prefs.wakeUpBeforeFajr) {
-      await NotificationsService._scheduleDailyAt(
-        id: 105,
-        title: '🌙 حان وقت الاستيقاظ',
-        body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
-        time: prefs.wakeUpTime,
-        channelId: NotifChannels.prayer.id,
-        sound: 'adhan',
-        payload: 'wakeup:fajr',
-        fullScreenIntent: true,
-      );
+      await NotificationsService.scheduleWakeUpAlarm(time: prefs.wakeUpTime);
     } else {
-      await NotificationsService.cancel(105);
+      await NotificationsService.cancel(NotifIds.wakeUpAlarm);
     }
 
     // المحاسبة

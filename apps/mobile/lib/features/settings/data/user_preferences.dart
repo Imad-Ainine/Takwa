@@ -38,6 +38,8 @@ class UserPreferences {
   final bool adhanSoundEnabled;
   final bool adhanScreenEnabled;
   final int popupIntervalMins;
+  /// 'sound' | 'vibrate' | 'silent'
+  final String adhanMode;
 
   const UserPreferences({
     this.madhab = 'shafi',
@@ -76,6 +78,7 @@ class UserPreferences {
     this.adhanSoundEnabled = true,
     this.adhanScreenEnabled = true,
     this.popupIntervalMins = 24,
+    this.adhanMode = 'sound',
   });
 
   UserPreferences copyWith({
@@ -107,6 +110,7 @@ class UserPreferences {
     bool? adhanSoundEnabled,
     bool? adhanScreenEnabled,
     int? popupIntervalMins,
+    String? adhanMode,
   }) {
     return UserPreferences(
       madhab: madhab ?? this.madhab,
@@ -139,6 +143,7 @@ class UserPreferences {
       adhanSoundEnabled: adhanSoundEnabled ?? this.adhanSoundEnabled,
       adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
       popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
+      adhanMode: adhanMode ?? this.adhanMode,
     );
   }
 
@@ -178,6 +183,7 @@ class UserPreferences {
       'adhan_sound_enabled': adhanSoundEnabled,
       'adhan_screen_enabled': adhanScreenEnabled,
       'popup_interval_minutes': popupIntervalMins,
+      'adhan_mode': adhanMode,
     };
   }
 
@@ -324,6 +330,10 @@ class UserPreferences {
         if (v is int) return v;
         return int.tryParse(v.toString()) ?? 24;
       }(),
+      adhanMode:
+          map['adhan_mode'] as String? ??
+          map['adhanMode'] as String? ??
+          'sound',
     );
   }
 }

@@ -18,6 +18,7 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
 
 // ═══════════════════════════════════════════════════════════════
@@ -109,7 +110,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
             ),
             todayAsync.when(
               loading: () => Center(
-                child: CircularProgressIndicator(
+                child: TakwaLoadingIndicator(
                   color: context.colors.gold,
                   strokeWidth: 2,
                 ),

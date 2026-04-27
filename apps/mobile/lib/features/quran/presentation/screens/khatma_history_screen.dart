@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
@@ -90,7 +91,11 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildTabBar(AdaptiveStyle style, int completedCount, int cancelledCount) {
+  Widget _buildTabBar(
+    AdaptiveStyle style,
+    int completedCount,
+    int cancelledCount,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
@@ -137,10 +142,12 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildCompletedList(AdaptiveStyle style, AsyncValue<List<KhatmaSessionEx>> async) {
+  Widget _buildCompletedList(
+    AdaptiveStyle style,
+    AsyncValue<List<KhatmaSessionEx>> async,
+  ) {
     return async.when(
-      loading: () =>
-          Center(child: CircularProgressIndicator(color: style.gold)),
+      loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (_, __) => Center(
         child: Text('خطأ', style: style.naskh(14, color: style.text)),
       ),
@@ -156,16 +163,19 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: list.length,
-          itemBuilder: (_, i) => _KhatmaCard(session: list[i], onDelete: null, style: style),
+          itemBuilder: (_, i) =>
+              _KhatmaCard(session: list[i], onDelete: null, style: style),
         );
       },
     );
   }
 
-  Widget _buildCancelledList(AdaptiveStyle style, AsyncValue<List<KhatmaSessionEx>> async) {
+  Widget _buildCancelledList(
+    AdaptiveStyle style,
+    AsyncValue<List<KhatmaSessionEx>> async,
+  ) {
     return async.when(
-      loading: () =>
-          Center(child: CircularProgressIndicator(color: style.gold)),
+      loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (_, __) => Center(
         child: Text('خطأ', style: style.naskh(14, color: style.text)),
       ),
@@ -284,7 +294,11 @@ class _KhatmaCard extends StatelessWidget {
   final KhatmaSessionEx session;
   final VoidCallback? onDelete;
   final AdaptiveStyle style;
-  const _KhatmaCard({required this.session, required this.onDelete, required this.style});
+  const _KhatmaCard({
+    required this.session,
+    required this.onDelete,
+    required this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +352,8 @@ class _KhatmaCard extends StatelessWidget {
                 ),
                 child: Text(
                   session.isCompleted ? 'مكتملة' : 'ملغاة',
-                  style: style.naskh(12, 
+                  style: style.naskh(
+                    12,
                     color: session.isCompleted ? style.gold : Colors.redAccent,
                     weight: FontWeight.w600,
                   ),
@@ -347,7 +362,11 @@ class _KhatmaCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 session.label,
-                style: style.amiri(18, color: style.text, weight: FontWeight.bold),
+                style: style.amiri(
+                  18,
+                  color: style.text,
+                  weight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -390,10 +409,7 @@ class _KhatmaCard extends StatelessWidget {
     children: [
       Icon(icon, size: 12, color: style.textDim),
       const SizedBox(width: 4),
-      Text(
-        text,
-        style: style.naskh(11, color: style.textSec),
-      ),
+      Text(text, style: style.naskh(11, color: style.textSec)),
     ],
   );
 }

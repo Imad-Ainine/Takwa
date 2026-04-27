@@ -295,6 +295,10 @@ class RamadanTheme {
       );
 
   static AppBarTheme _buildAppBarTheme(Color accent) => AppBarTheme(
+    // Removes the shadow/elevation for all AppBars
+    scrolledUnderElevation: 0.0,
+    // Removes the color tint highlight for all AppBars
+    surfaceTintColor: Colors.transparent,
     backgroundColor: Colors.transparent,
     elevation: 0,
     titleTextStyle: TextStyle(

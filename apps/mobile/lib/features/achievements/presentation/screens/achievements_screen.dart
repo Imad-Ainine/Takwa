@@ -12,6 +12,7 @@ import 'package:takwa/features/achievements/providers/achievements_providers.dar
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
@@ -97,7 +98,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               achievementsAsync.when(
                 data: (list) => _buildContent(context, list),
                 loading: () => const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: TakwaLoadingIndicator()),
                 ),
                 error: (e, s) => SliverFillRemaining(
                   child: Center(child: Text('حدث خطأ ما: $e')),

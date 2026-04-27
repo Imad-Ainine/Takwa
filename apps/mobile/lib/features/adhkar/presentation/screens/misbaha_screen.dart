@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/adhkar/providers/misbaha_provider.dart';
 
 class MisbahaScreen extends ConsumerStatefulWidget {
@@ -326,11 +327,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               SizedBox(
                 width: size,
                 height: size,
-                child: CircularProgressIndicator(
-                  value: state.count / state.selectedDhikr!.count,
+                child: TakwaLoadingIndicator(
+                  size: size,
                   strokeWidth: 4 * scale,
                   color: style.gold.withOpacity(0.6),
-                  backgroundColor: style.gold.withOpacity(0.05),
                 ),
               ),
             Column(

@@ -453,7 +453,7 @@ class SupabaseService {
   }
 
   // ─────────────── COMMUNITY DUAS ───────────────
-  
+
   static Future<List<Map<String, dynamic>>> getCommunityDuas() async {
     final data = await _db
         .from('community_duas')
@@ -501,16 +501,16 @@ class SupabaseService {
   // ─────────────────────────────────────────
 
   static Future<List<Map<String, dynamic>>> getBooks() async {
-    return _safeRequest<List<Map<String, dynamic>>>(
-      () async {
-        final data = await _db.from('books').select().order('title_ar');
-        return List<Map<String, dynamic>>.from(data);
-      },
-    );
+    return _safeRequest<List<Map<String, dynamic>>>(() async {
+      final data = await _db.from('books').select().order('title_ar');
+      return List<Map<String, dynamic>>.from(data);
+    });
   }
 
   static Future<void> upsertBookProgress(
-      String bookId, Map<String, dynamic> data) async {
+    String bookId,
+    Map<String, dynamic> data,
+  ) async {
     final userId = SupabaseConfig.userId;
     if (userId == null) return;
 
@@ -530,15 +530,13 @@ class SupabaseService {
     final userId = SupabaseConfig.userId;
     if (userId == null) return [];
 
-    return _safeRequest<List<Map<String, dynamic>>>(
-      () async {
-        final data = await _db
-            .from('book_reading_progress')
-            .select('book_id, chapter_index, page_index, read_pages')
-            .eq('user_id', userId);
-        return List<Map<String, dynamic>>.from(data);
-      },
-    );
+    return _safeRequest<List<Map<String, dynamic>>>(() async {
+      final data = await _db
+          .from('book_reading_progress')
+          .select('book_id, chapter_index, page_index, read_pages')
+          .eq('user_id', userId);
+      return List<Map<String, dynamic>>.from(data);
+    });
   }
 
   // ─────────────────────────────────────────
@@ -573,17 +571,15 @@ class SupabaseService {
     final userId = SupabaseConfig.userId;
     if (userId == null) return null;
 
-    return _safeRequest<Map<String, dynamic>?>(
-      () async {
-        final data = await _db
-            .from('book_reading_progress')
-            .select('pdf_page, total_pdf_pages, reading_seconds')
-            .eq('user_id', userId)
-            .eq('book_id', bookId)
-            .maybeSingle();
-        return data;
-      },
-    );
+    return _safeRequest<Map<String, dynamic>?>(() async {
+      final data = await _db
+          .from('book_reading_progress')
+          .select('pdf_page, total_pdf_pages, reading_seconds')
+          .eq('user_id', userId)
+          .eq('book_id', bookId)
+          .maybeSingle();
+      return data;
+    });
   }
 
   // ─────────────────────────────────────────
@@ -624,14 +620,12 @@ class SupabaseService {
     final userId = SupabaseConfig.userId;
     if (userId == null) return [];
 
-    return _safeRequest<List<Map<String, dynamic>>>(
-      () async {
-        final data = await _db
-            .from('reminders')
-            .select('local_id, title, icon_name, time, is_enabled')
-            .eq('user_id', userId);
-        return List<Map<String, dynamic>>.from(data);
-      },
-    );
+    return _safeRequest<List<Map<String, dynamic>>>(() async {
+      final data = await _db
+          .from('reminders')
+          .select('local_id, title, icon_name, time, is_enabled')
+          .eq('user_id', userId);
+      return List<Map<String, dynamic>>.from(data);
+    });
   }
 }

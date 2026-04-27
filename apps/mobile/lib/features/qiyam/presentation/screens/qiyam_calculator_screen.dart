@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/notifications/notifications_service.dart';
 
 class QiyamCalculatorScreen extends ConsumerWidget {
@@ -22,7 +23,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
           SafeArea(
             child: prayersAsync.when(
               data: (prayers) => _buildContent(context, prayers),
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: TakwaLoadingIndicator()),
               error: (e, _) => Center(child: Text('خطأ في تحميل الأوقات: $e')),
             ),
           ),

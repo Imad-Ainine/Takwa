@@ -23,7 +23,7 @@ class AchievementView {
 final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
   final statsDao = ref.watch(statsDaoProvider);
   final db = ref.watch(appDatabaseProvider);
-  final syncManager = ref.watch(syncManagerProvider);
+  final syncManager = ref.read(syncManagerProvider);
 
   // 1. Check and grant new achievements automatically
   final newEarned = await statsDao.checkAndGrantAchievements();

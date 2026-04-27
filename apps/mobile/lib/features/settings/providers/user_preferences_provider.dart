@@ -13,12 +13,10 @@ final userPreferencesProvider =
 
 class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
   late SettingsDao _dao;
-  late SyncManager _syncManager;
 
   @override
   Future<UserPreferences> build() async {
     _dao = ref.watch(settingsDaoProvider);
-    _syncManager = ref.watch(syncManagerProvider);
 
     // Read all raw local settings
     final allSettings = await _dao.getAllSettings();
@@ -34,7 +32,7 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     await _dao.set(key, value.toString());
 
     // 2. Trigger syncManager to push the change
-    unawaited(_syncManager.syncSettings());
+    unawaited(ref.read(syncManagerProvider).syncSettings());
 
     // 3. Immediately re-build state from local defaults
     final allSettings = await _dao.getAllSettings();
@@ -49,7 +47,7 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     for (final entry in updates.entries) {
       await _dao.set(entry.key, entry.value.toString());
     }
-    unawaited(_syncManager.syncSettings());
+    unawaited(ref.read(syncManagerProvider).syncSettings());
     final allSettings = await _dao.getAllSettings();
     state = AsyncData(UserPreferences.fromMap(allSettings));
 

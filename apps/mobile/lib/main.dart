@@ -54,7 +54,7 @@ void notificationTapBackground(NotificationResponse response) {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await initializeDateFormatting('ar', null);
+  await initializeDateFormatting('ar', null);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();

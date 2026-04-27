@@ -8,6 +8,7 @@ import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/reminders/presentation/widgets/advice_card.dart';
 import 'package:takwa/features/reminders/presentation/widgets/reminder_card.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/reminders/presentation/widgets/add_reminder_bottom_sheet.dart';
 
 class RemindersListScreen extends ConsumerWidget {
@@ -49,7 +50,7 @@ class RemindersListScreen extends ConsumerWidget {
                       loading: () => const Center(
                         child: Padding(
                           padding: EdgeInsets.all(32.0),
-                          child: CircularProgressIndicator(),
+                          child: TakwaLoadingIndicator(size: 32),
                         ),
                       ),
                       error: (e, _) => Center(
@@ -247,9 +248,9 @@ class RemindersListScreen extends ConsumerWidget {
                       .read(remindersDaoProvider)
                       .toggleEnabled(reminder.id, val);
                   // Sync updated reminder
-                  ref.read(syncManagerProvider).syncReminder(
-                        reminder.copyWith(isEnabled: val),
-                      );
+                  ref
+                      .read(syncManagerProvider)
+                      .syncReminder(reminder.copyWith(isEnabled: val));
                 },
               ),
             ),

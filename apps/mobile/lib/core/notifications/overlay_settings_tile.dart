@@ -13,6 +13,8 @@ import '../theme/app_theme.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
 import 'overlay_background_service.dart';
 
+import '../../core/widgets/takwa_loading_indicator.dart';
+
 // ─────────────────────────────────────────
 //  OVERLAY SETTINGS SECTION
 // ─────────────────────────────────────────
@@ -26,7 +28,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
     return prefsAsync.when(
       loading: () => const SizedBox(
         height: 48,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: TakwaLoadingIndicator()),
       ),
       error: (_, __) => const SizedBox(),
       data: (prefs) => Column(
@@ -267,8 +269,9 @@ class _IntervalSelector extends StatelessWidget {
                       color: isSelected
                           ? context.colors.gold
                           : context.colors.textSecondary,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w400,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w400,
                     ),
                   ),
                 ),

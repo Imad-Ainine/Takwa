@@ -45,12 +45,13 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
     _selectedHour = h % 12 == 0 ? 12 : h % 12;
     _selectedMinute = widget.initialTime.minute;
 
-    _hourController =
-        FixedExtentScrollController(initialItem: _selectedHour - 1);
-    _minuteController =
-        FixedExtentScrollController(initialItem: _selectedMinute);
-    _ampmController =
-        FixedExtentScrollController(initialItem: _selectedPeriod);
+    _hourController = FixedExtentScrollController(
+      initialItem: _selectedHour - 1,
+    );
+    _minuteController = FixedExtentScrollController(
+      initialItem: _selectedMinute,
+    );
+    _ampmController = FixedExtentScrollController(initialItem: _selectedPeriod);
   }
 
   @override
@@ -67,7 +68,11 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-          20, 24, 20, MediaQuery.of(context).padding.bottom + 24),
+        20,
+        24,
+        20,
+        MediaQuery.of(context).padding.bottom + 24,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -181,8 +186,10 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                     int h = _selectedHour;
                     if (_selectedPeriod == 0 && h == 12) h = 0;
                     if (_selectedPeriod == 1 && h < 12) h += 12;
-                    Navigator.pop(context,
-                        TimeOfDay(hour: h, minute: _selectedMinute));
+                    Navigator.pop(
+                      context,
+                      TimeOfDay(hour: h, minute: _selectedMinute),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colors.teal,

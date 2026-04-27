@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
@@ -941,10 +942,7 @@ class _BottomBar extends StatelessWidget {
                         child: audio.isLoading
                             ? const Padding(
                                 padding: EdgeInsets.all(10),
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
+                                child: TakwaLoadingIndicator(size: 24),
                               )
                             : Icon(
                                 audio.isPlaying
