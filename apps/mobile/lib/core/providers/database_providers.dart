@@ -57,6 +57,10 @@ final settingProvider = FutureProvider.family<String?, String>((ref, key) {
   return ref.watch(settingsDaoProvider).get(key);
 });
 
+final settingStreamProvider = StreamProvider.family<String?, String>((ref, key) {
+  return ref.watch(settingsDaoProvider).watch(key);
+});
+
 // ── وضع رمضان ──
 final ramadanModeProvider = StreamProvider<bool>((ref) {
   return ref

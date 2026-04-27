@@ -38,8 +38,23 @@ class UserPreferences {
   final bool adhanSoundEnabled;
   final bool adhanScreenEnabled;
   final int popupIntervalMins;
+
   /// 'sound' | 'vibrate' | 'silent'
   final String adhanMode;
+
+  final bool autoSilentAfterAdhan;
+  final bool adhanInSilentEnabled;
+  final bool notifsInSilentEnabled;
+  final double adhanVolume;
+  final bool silentModeEnabled;
+  final bool silentVibrationEnabled;
+  final String silentModeAlertStyle; // 'none', 'vibrate', 'tone', 'toneVibrate'
+  final String silentAdhanPrayers; // "fajr,dhuhr,asr,maghrib,isha,jumuah"
+  final String silentNotifPrayers; // "fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah"
+  final bool flipToSilenceEnabled;
+  final bool wakeScreenEnabled;
+  final bool vibrateWithAdhan;
+  final bool adhanAlarmEnabled;
 
   const UserPreferences({
     this.madhab = 'shafi',
@@ -79,6 +94,19 @@ class UserPreferences {
     this.adhanScreenEnabled = true,
     this.popupIntervalMins = 24,
     this.adhanMode = 'sound',
+    this.autoSilentAfterAdhan = false,
+    this.adhanInSilentEnabled = true,
+    this.notifsInSilentEnabled = true,
+    this.adhanVolume = 1.0,
+    this.silentModeEnabled = false,
+    this.silentVibrationEnabled = true,
+    this.silentModeAlertStyle = 'vibrate',
+    this.silentAdhanPrayers = 'fajr,dhuhr,asr,maghrib,isha,jumuah',
+    this.silentNotifPrayers = 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
+    this.flipToSilenceEnabled = true,
+    this.wakeScreenEnabled = true,
+    this.vibrateWithAdhan = true,
+    this.adhanAlarmEnabled = true,
   });
 
   UserPreferences copyWith({
@@ -111,6 +139,19 @@ class UserPreferences {
     bool? adhanScreenEnabled,
     int? popupIntervalMins,
     String? adhanMode,
+    double? adhanVolume,
+    bool? silentModeEnabled,
+    bool? silentVibrationEnabled,
+    String? silentModeAlertStyle,
+    String? silentAdhanPrayers,
+    String? silentNotifPrayers,
+    bool? flipToSilenceEnabled,
+    bool? wakeScreenEnabled,
+    bool? vibrateWithAdhan,
+    bool? adhanAlarmEnabled,
+    bool? autoSilentAfterAdhan,
+    bool? adhanInSilentEnabled,
+    bool? notifsInSilentEnabled,
   }) {
     return UserPreferences(
       madhab: madhab ?? this.madhab,
@@ -144,6 +185,20 @@ class UserPreferences {
       adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
       popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
       adhanMode: adhanMode ?? this.adhanMode,
+      autoSilentAfterAdhan: autoSilentAfterAdhan ?? this.autoSilentAfterAdhan,
+      adhanInSilentEnabled: adhanInSilentEnabled ?? this.adhanInSilentEnabled,
+      notifsInSilentEnabled: notifsInSilentEnabled ?? this.notifsInSilentEnabled,
+      adhanVolume: adhanVolume ?? this.adhanVolume,
+      silentModeEnabled: silentModeEnabled ?? this.silentModeEnabled,
+      silentVibrationEnabled:
+          silentVibrationEnabled ?? this.silentVibrationEnabled,
+      silentModeAlertStyle: silentModeAlertStyle ?? this.silentModeAlertStyle,
+      silentAdhanPrayers: silentAdhanPrayers ?? this.silentAdhanPrayers,
+      silentNotifPrayers: silentNotifPrayers ?? this.silentNotifPrayers,
+      flipToSilenceEnabled: flipToSilenceEnabled ?? this.flipToSilenceEnabled,
+      wakeScreenEnabled: wakeScreenEnabled ?? this.wakeScreenEnabled,
+      vibrateWithAdhan: vibrateWithAdhan ?? this.vibrateWithAdhan,
+      adhanAlarmEnabled: adhanAlarmEnabled ?? this.adhanAlarmEnabled,
     );
   }
 
@@ -184,6 +239,20 @@ class UserPreferences {
       'adhan_screen_enabled': adhanScreenEnabled,
       'popup_interval_minutes': popupIntervalMins,
       'adhan_mode': adhanMode,
+      'auto_silent_after_adhan': autoSilentAfterAdhan,
+      // Temporarily commented out to avoid Supabase sync errors if columns missing
+      // 'adhan_in_silent_enabled': adhanInSilentEnabled,
+      // 'notifs_in_silent_enabled': notifsInSilentEnabled,
+      'adhan_volume_level': adhanVolume,
+      'silent_mode_enabled': silentModeEnabled,
+      'silent_vibration_enabled': silentVibrationEnabled,
+      'silent_mode_alert_style': silentModeAlertStyle,
+      'silent_adhan_prayers': silentAdhanPrayers,
+      'silent_notif_prayers': silentNotifPrayers,
+      'flip_to_silence_enabled': flipToSilenceEnabled,
+      'wake_screen_enabled': wakeScreenEnabled,
+      'vibrate_with_adhan': vibrateWithAdhan,
+      'adhan_alarm_enabled': adhanAlarmEnabled,
     };
   }
 
@@ -334,6 +403,61 @@ class UserPreferences {
           map['adhan_mode'] as String? ??
           map['adhanMode'] as String? ??
           'sound',
+      autoSilentAfterAdhan: parseBool(
+        map['auto_silent_after_adhan'] ?? map['autoSilentAfterAdhan'],
+        defaultVal: false,
+      ),
+      adhanInSilentEnabled: parseBool(
+        map['adhan_in_silent_enabled'] ?? map['adhanInSilentEnabled'],
+        defaultVal: true,
+      ),
+      notifsInSilentEnabled: parseBool(
+        map['notifs_in_silent_enabled'] ?? map['notifsInSilentEnabled'],
+        defaultVal: true,
+      ),
+      adhanVolume: () {
+        final v = map['adhan_volume_level'] ?? map['adhanVolume'];
+        if (v == null) return 1.0;
+        if (v is double) return v;
+        if (v is int) return v.toDouble();
+        return double.tryParse(v.toString()) ?? 1.0;
+      }(),
+      silentModeEnabled: parseBool(
+        map['silent_mode_enabled'] ?? map['silentModeEnabled'],
+        defaultVal: false,
+      ),
+      silentVibrationEnabled: parseBool(
+        map['silent_vibration_enabled'] ?? map['silentVibrationEnabled'],
+        defaultVal: true,
+      ),
+      silentModeAlertStyle:
+          map['silent_mode_alert_style'] as String? ??
+          map['silentModeAlertStyle'] as String? ??
+          'vibrate',
+      silentAdhanPrayers:
+          map['silent_adhan_prayers'] as String? ??
+          map['silentAdhanPrayers'] as String? ??
+          'fajr,dhuhr,asr,maghrib,isha,jumuah',
+      silentNotifPrayers:
+          map['silent_notif_prayers'] as String? ??
+          map['silentNotifPrayers'] as String? ??
+          'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
+      flipToSilenceEnabled: parseBool(
+        map['flip_to_silence_enabled'] ?? map['flipToSilenceEnabled'],
+        defaultVal: true,
+      ),
+      wakeScreenEnabled: parseBool(
+        map['wake_screen_enabled'] ?? map['wakeScreenEnabled'],
+        defaultVal: true,
+      ),
+      vibrateWithAdhan: parseBool(
+        map['vibrate_with_adhan'] ?? map['vibrateWithAdhan'],
+        defaultVal: true,
+      ),
+      adhanAlarmEnabled: parseBool(
+        map['adhan_alarm_enabled'] ?? map['adhanAlarmEnabled'],
+        defaultVal: true,
+      ),
     );
   }
 }

@@ -1136,8 +1136,13 @@ final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
   final prefs = await ref.watch(userPreferencesProvider.future);
   final settings = ref.watch(settingsDaoProvider);
 
-  final savedLat = await settings.get('latitude');
-  final savedLng = await settings.get('longitude');
+  // مراقبة الموقع بشكل تفاعلي
+  final savedLat =
+      ref.watch(settingStreamProvider('latitude')).value ??
+      await settings.get('latitude');
+  final savedLng =
+      ref.watch(settingStreamProvider('longitude')).value ??
+      await settings.get('longitude');
 
   double lat, lng;
   if (savedLat != null && savedLng != null) {

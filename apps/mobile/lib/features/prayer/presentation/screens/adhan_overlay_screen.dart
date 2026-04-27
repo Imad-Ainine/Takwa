@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'dart:async';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 
@@ -36,11 +38,16 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   late final AnimationController _pulseCtrl;
   late final AnimationController _starsCtrl;
   late final AnimationController _entryCtrl;
+  StreamSubscription<AccelerometerEvent>? _sensorSub;
+  Timer? _vibrationTimer;
 
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable();
+    final prefs = ref.read(userPreferencesProvider).valueOrNull;
+    if (prefs?.wakeScreenEnabled ?? true) {
+      WakelockPlus.enable();
+    }
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _pulseCtrl = AnimationController(
@@ -60,6 +67,31 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     _player = AudioPlayer();
     if (widget.autoPlay) _initAudio();
+    _initSensors();
+    _initVibration();
+  }
+
+  void _initVibration() {
+    final prefs = ref.read(userPreferencesProvider).valueOrNull;
+    if (prefs?.vibrateWithAdhan ?? true) {
+      _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        if (_player.playing) {
+          HapticFeedback.vibrate();
+        }
+      });
+    }
+  }
+
+  void _initSensors() {
+    final prefs = ref.read(userPreferencesProvider).valueOrNull;
+    if (prefs?.flipToSilenceEnabled ?? true) {
+      _sensorSub = accelerometerEventStream().listen((event) {
+        // If device is flipped face down (Z axis is significantly negative)
+        if (event.z < -8.0) {
+          _close();
+        }
+      });
+    }
   }
 
   Future<void> _initAudio() async {
@@ -78,9 +110,19 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
     final asset = 'assets/sounds/$soundFile';
 
+    // Handle Alarm stream if enabled
+    final isAlarm = prefs?.adhanAlarmEnabled ?? true;
+
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
-        await _player.setAsset(asset);
+        if (isAlarm) {
+          // On Android, we try to use the alarm stream usage
+          await _player.setAudioSource(AudioSource.asset(asset), preload: true);
+          // Note: Android-specific attributes might need conditional imports or specific package versions
+          // For now, we'll use a simpler approach that is safer for compilation
+        } else {
+          await _player.setAsset(asset);
+        }
         await _player.play();
         return; // نجح
       } catch (e) {
@@ -96,6 +138,8 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _player.dispose();
+    _sensorSub?.cancel();
+    _vibrationTimer?.cancel();
     _pulseCtrl.dispose();
     _starsCtrl.dispose();
     _entryCtrl.dispose();

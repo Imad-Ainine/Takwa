@@ -23,26 +23,9 @@ import 'package:takwa/core/notifications/overlay_settings_tile.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:async';
+import 'adhan_notifications_settings_screen.dart';
 
-import '../widgets/location_picker_sheet.dart';
 import 'package:takwa/core/widgets/custom_time_picker.dart';
-
-const adhanOptions = {
-  'Adhan-Makkah.mp3': 'أذان مكة المكرمة',
-  'Adhan-Madinah.mp3': 'أذان المدينة المنورة',
-  'Adhan-Alaqsa.mp3': 'أذان المسجد الأقصى',
-  'Adhan-Egypt.mp3': 'الأذان المصري',
-  'Abdul-Basit.mp3': 'عبد الباسط عبد الصمد',
-  'Minshawi.mp3': 'محمد صديق المنشاوي',
-  'Naghshbandi.mp3': 'سيد النقشبندي',
-  'Saber.mp3': 'جامع صابر',
-  'Al-Hussaini.mp3': 'الحسيني',
-  'Bakir-Bash.mp3': 'بكير باش',
-  'Hafez.mp3': 'حافظ',
-  'Hafiz-Murad.mp3': 'حافظ مراد',
-  'Sharif-Doman.mp3': 'شريف دومان',
-  'Yusuf-Islam.mp3': 'يوسف إسلام',
-};
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -90,9 +73,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (isSyncing)
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Center(
-                            child: TakwaLoadingIndicator(size: 14),
-                        ),
+                        child: Center(child: TakwaLoadingIndicator(size: 14)),
                       ),
                   ],
                   centerTitle: true,
@@ -127,13 +108,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                             _SettingsCard(
                               children: [
-                                _ToggleSetting(
+                                _ActionSetting(
                                   icon: '🕌',
-                                  label: 'تذكيرات أوقات الصلاة',
-                                  sublabel: 'إشعار عند كل أذان',
-                                  value: prefs.prayerReminder,
-                                  onChanged: (v) =>
-                                      _updatePref('prayerReminder', v),
+                                  label: 'الأذان والتنبيهات',
+                                  sublabel:
+                                      'تخصيص الأذان، الوضع الصامت، والتنبيهات',
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          const AdhanNotificationSettingsScreen(),
+                                    ),
+                                  ),
                                 ),
                                 _Divider(),
                                 _ToggleSetting(
@@ -274,72 +260,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('ramadanMode', v),
                                   accentColor: context.colors.gold,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-
-                            // ── أوقات الصلاة ──
-                            const _SectionHeader(
-                              title: 'حساب أوقات الصلاة',
-                              icon: '🕌',
-                            ),
-                            _SettingsCard(
-                              children: [
-                                _SelectSetting(
-                                  icon: '📐',
-                                  label: 'المذهب الفقهي',
-                                  value: prefs.madhab,
-                                  options: const {
-                                    'shafi': 'شافعي / مالكي / حنبلي',
-                                    'hanafi': 'حنفي',
-                                  },
-                                  onChanged: (v) => _updatePref('madhab', v),
-                                ),
-                                _Divider(),
-                                _SelectSetting(
-                                  icon: '🌍',
-                                  label: 'طريقة الحساب',
-                                  value: prefs.calcMethod,
-                                  options: const {
-                                    'Algeria': 'الجزائر (وزارة الشؤون الدينية)',
-                                    'MWL': 'رابطة العالم الإسلامي',
-                                    'Egypt': 'دار الإفتاء المصرية',
-                                    'Karachi': 'جامعة كراتشي',
-                                    'UmmAlQura': 'أم القرى (مكة المكرمة)',
-                                    'ISNA': 'أمريكا الشمالية',
-                                  },
-                                  onChanged: (v) =>
-                                      _updatePref('calcMethod', v),
-                                ),
-                                _Divider(),
-                                  _AdhanSelectSetting(
-                                  icon: '🎵',
-                                  label: 'صوت الأذان',
-                                  value: prefs.adhanSound,
-                                  options: adhanOptions,
-                                  onChanged: (v) =>
-                                      _updatePref('adhan_sound', v),
-                                ),
-                                _Divider(),
-                                _SelectSetting(
-                                  icon: '🔈',
-                                  label: 'وضع الأذان',
-                                  value: prefs.adhanMode,
-                                  options: const {
-                                    'sound': 'صوت',
-                                    'vibrate': 'اهتزاز',
-                                    'silent': 'صامت',
-                                  },
-                                  onChanged: (v) => _updatePref('adhan_mode', v),
-                                ),
-                                _Divider(),
-                                _ActionSetting(
-                                  icon: '📍',
-                                  label: 'تحديث الموقع الجغرافي',
-                                  sublabel: 'للحصول على أدق أوقات الصلاة',
-                                  onTap: () =>
-                                      LocationPickerSheet.show(context),
                                 ),
                               ],
                             ),

@@ -158,6 +158,7 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
   Timer? _ticker;
 
   Future<void> _init() async {
+    _listenToPrayers();
     state = state.copyWith(loading: true);
     try {
       final settings = _ref.read(settingsDaoProvider);
@@ -183,6 +184,18 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
     }
+  }
+
+  void _listenToPrayers() {
+    _ref.listen<AsyncValue<List<PrayerTimeInfo>>>(prayerTimesProvider, (
+      prev,
+      next,
+    ) {
+      next.whenData((prayers) {
+        state = state.copyWith(prayers: prayers);
+        _tick(); // تحديث فوري للحسابات عند تغير الأوقات
+      });
+    }, fireImmediately: false);
   }
 
   Future<void> refresh() async {

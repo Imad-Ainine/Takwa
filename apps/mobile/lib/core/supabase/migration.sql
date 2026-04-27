@@ -1,0 +1,22 @@
+-- Add missing notification and adhan settings columns to user_settings table
+ALTER TABLE user_settings 
+ADD COLUMN IF NOT EXISTS adhan_sound TEXT DEFAULT 'Adhan-Makkah.mp3',
+ADD COLUMN IF NOT EXISTS overlay_popups_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS adhan_sound_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS adhan_screen_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS popup_interval_minutes INTEGER DEFAULT 24,
+ADD COLUMN IF NOT EXISTS adhan_mode TEXT DEFAULT 'sound',
+ADD COLUMN IF NOT EXISTS ongoing_notif_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS auto_silent_after_adhan BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS adhan_in_silent_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS notifs_in_silent_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS vibrate_with_adhan BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS adhan_volume_level DOUBLE PRECISION DEFAULT 1.0,
+ADD COLUMN IF NOT EXISTS silent_mode_enabled BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS silent_vibration_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS silent_mode_alert_style TEXT DEFAULT 'vibrate',
+ADD COLUMN IF NOT EXISTS silent_adhan_prayers TEXT DEFAULT 'fajr,dhuhr,asr,maghrib,isha,jumuah',
+ADD COLUMN IF NOT EXISTS silent_notif_prayers TEXT DEFAULT 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
+ADD COLUMN IF NOT EXISTS flip_to_silence_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS adhan_alarm_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS wake_screen_enabled BOOLEAN DEFAULT true;
