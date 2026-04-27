@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/daos.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/supabase/sync_manager.dart';
 import '../../../core/notifications/notifications_service.dart';
 import '../data/user_preferences.dart';
+
+enum NotificationCategory { prayer, adhkar, reminders, all, none }
 
 final userPreferencesProvider =
     AsyncNotifierProvider<UserPreferencesNotifier, UserPreferences>(() {
@@ -27,7 +30,14 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
 
   /// Update a single preference. It updates the local database immediately,
   /// triggers a sync to Supabase in the background, and updates the reactive state.
-  Future<void> updatePref(String key, dynamic value) async {
+  Future<void> updatePref(
+    String key,
+    dynamic value, {
+    NotificationCategory category = NotificationCategory.all,
+    bool haptic = true,
+  }) async {
+    if (haptic) unawaited(HapticFeedback.lightImpact());
+
     // 1. Save directly to local SQLite
     await _dao.set(key, value.toString());
 
@@ -38,12 +48,20 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     final allSettings = await _dao.getAllSettings();
     state = AsyncData(UserPreferences.fromMap(allSettings));
 
-    // 4. Trigger global notification reschedule to apply changes
-    unawaited(ref.read(notificationsManagerProvider).reschedule());
+    // 4. Trigger granular notification rescheduling
+    if (category != NotificationCategory.none) {
+      unawaited(ref.read(notificationsManagerProvider).reschedule(category));
+    }
   }
-  
+
   /// Helper method for modifying multiple preferences at once
-  Future<void> updateMultiplePrefs(Map<String, dynamic> updates) async {
+  Future<void> updateMultiplePrefs(
+    Map<String, dynamic> updates, {
+    NotificationCategory category = NotificationCategory.all,
+    bool haptic = true,
+  }) async {
+    if (haptic) unawaited(HapticFeedback.mediumImpact());
+
     for (final entry in updates.entries) {
       await _dao.set(entry.key, entry.value.toString());
     }
@@ -51,7 +69,9 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     final allSettings = await _dao.getAllSettings();
     state = AsyncData(UserPreferences.fromMap(allSettings));
 
-    // Trigger global notification reschedule
-    unawaited(ref.read(notificationsManagerProvider).reschedule());
+    // Trigger granular notification rescheduling
+    if (category != NotificationCategory.none) {
+      unawaited(ref.read(notificationsManagerProvider).reschedule(category));
+    }
   }
 }

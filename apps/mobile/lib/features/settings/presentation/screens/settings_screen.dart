@@ -12,7 +12,6 @@ import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
-import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
@@ -21,11 +20,9 @@ import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/notifications/overlay_settings_tile.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:takwa/features/settings/presentation/widgets/settings_widgets.dart';
 import 'dart:async';
 import 'adhan_notifications_settings_screen.dart';
-
-import 'package:takwa/core/widgets/custom_time_picker.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -70,11 +67,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   actions: [
-                    if (isSyncing)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Center(child: TakwaLoadingIndicator(size: 14)),
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: SyncStatusIndicator(isSyncing: isSyncing),
                       ),
+                    ),
                   ],
                   centerTitle: true,
                   elevation: 0,
@@ -102,13 +100,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         data: (prefs) => Column(
                           children: [
                             // ── التذكيرات ──
-                            const _SectionHeader(
-                              title: 'التذكيرات والإشعارات',
+                            const SectionHeader(
+                              title: 'إعدادات الأذان و التنبيهات',
                               icon: '🔔',
                             ),
-                            _SettingsCard(
+                            SettingsCard(
                               children: [
-                                _ActionSetting(
+                                ActionSetting(
                                   icon: '🕌',
                                   label: 'الأذان والتنبيهات',
                                   sublabel:
@@ -121,8 +119,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ),
                                   ),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '🌙',
                                   label: 'الاستيقاظ قبل الفجر',
                                   sublabel: 'تنبيه بصوت الأذان في الوقت المحدد',
@@ -131,8 +129,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       _updatePref('wakeUpBeforeFajr', v),
                                 ),
                                 if (prefs.wakeUpBeforeFajr) ...[
-                                  _Divider(),
-                                  _TimeSetting(
+                                  const SettingsDivider(),
+                                  TimeSetting(
                                     icon: '⏰',
                                     label: 'وقت الاستيقاظ',
                                     time: prefs.wakeUpTime,
@@ -143,8 +141,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     },
                                   ),
                                 ],
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '☀️',
                                   label: 'أذكار الصباح',
                                   sublabel: 'تذكير يومي الساعة ٦:٣٠ ص',
@@ -152,8 +150,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('morningAdhkarReminder', v),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '🌆',
                                   label: 'أذكار المساء',
                                   sublabel: 'تذكير يومي الساعة ٥:٠٠ م',
@@ -161,8 +159,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('eveningAdhkarReminder', v),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '📝',
                                   label: 'محاسبة مسائية',
                                   sublabel: 'تذكير يومي للمحاسبة',
@@ -170,8 +168,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('eveningMuhasabaReminder', v),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '🤲',
                                   label: 'الأدعية اليومية',
                                   sublabel: 'نفحات من الأدعية النبوية',
@@ -179,8 +177,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('dailyDuasOn', v),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '🕌',
                                   label: 'سنن الجمعة',
                                   sublabel: 'تذكير بسورة الكهف والجمعة',
@@ -188,8 +186,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   onChanged: (v) =>
                                       _updatePref('specialRemindersOn', v),
                                 ),
-                                _Divider(),
-                                _ToggleSetting(
+                                const SettingsDivider(),
+                                ToggleSetting(
                                   icon: '🥘',
                                   label: 'تنبيهات الصيام',
                                   sublabel: 'الاثنين والخميس والأيام البيض',
@@ -198,8 +196,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       _updatePref('fastingRemindersOn', v),
                                 ),
                                 if (prefs.muhasabaReminder) ...[
-                                  _Divider(),
-                                  _TimeSetting(
+                                  const SettingsDivider(),
+                                  TimeSetting(
                                     icon: '⏰',
                                     label: 'وقت المحاسبة',
                                     time: prefs.muhasabaTime,
@@ -215,15 +213,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ],
                               ],
                             ),
-                            const SizedBox(height: 8),
                             const OverlayNotificationSettings(),
-                            const SizedBox(height: 16),
 
                             // ── المظهر ──
-                            const _SectionHeader(title: 'المظهر', icon: '🎨'),
-                            _SettingsCard(
+                            const SectionHeader(title: 'المظهر', icon: '🎨'),
+                            SettingsCard(
                               children: [
-                                _SelectSetting(
+                                SelectSetting(
                                   icon: '🌓',
                                   label: 'وضع المظهر',
                                   value: ref.watch(themeModeProvider).name,
@@ -246,13 +242,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const SizedBox(height: 16),
 
                             // ── وضع رمضان ──
-                            const _SectionHeader(
-                              title: 'وضع رمضان',
-                              icon: '🌙',
-                            ),
-                            _SettingsCard(
+                            const SectionHeader(title: 'وضع رمضان', icon: '🌙'),
+                            SettingsCard(
                               children: [
-                                _ToggleSetting(
+                                ToggleSetting(
                                   icon: '🌙',
                                   label: 'وضع رمضان',
                                   sublabel: 'تفعيل المميزات الرمضانية',
@@ -263,23 +256,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 32),
                           ],
                         ),
                       ),
 
                       // ── معلومات ──
-                      const _SectionHeader(title: 'التطبيق', icon: 'ℹ️'),
-                      _SettingsCard(
+                      const SectionHeader(title: 'التطبيق', icon: 'ℹ️'),
+                      SettingsCard(
                         children: [
-                          _ActionSetting(
+                          ActionSetting(
                             icon: '🔔',
                             label: 'اختبار الإشعارات والنافذة',
                             sublabel: 'تأكد من عمل الإشعارات والنوافذ العائمة',
                             onTap: _showTestMenu,
                           ),
-                          _Divider(),
-                          _ActionSetting(
+                          const SettingsDivider(),
+                          ActionSetting(
                             icon: '💎',
                             label: 'الاشتراك',
                             sublabel: 'دعم المشروع والاستمرار',
@@ -288,16 +281,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               Routes.subscription,
                             ),
                           ),
-                          _Divider(),
-                          _ActionSetting(
+                          const SettingsDivider(),
+                          ActionSetting(
                             icon: '👨‍💻',
                             label: 'عن المطور',
                             sublabel: 'تعرف على مبرمج التطبيق',
                             onTap: () =>
                                 Navigator.pushNamed(context, '/about-me'),
                           ),
-                          _Divider(),
-                          _ActionSetting(
+                          const SettingsDivider(),
+                          ActionSetting(
                             icon: '📜',
                             label: 'الشروط والخصوصية',
                             sublabel: 'شروط الدخول والخصوصية',
@@ -305,7 +298,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           if (ref.watch(authStatusProvider) ==
                               AuthStatus.authenticated)
-                            _ActionSetting(
+                            ActionSetting(
                               icon: '🚪',
                               label: 'تسجيل الخروج',
                               sublabel: 'الخروج من الحساب أو وضع الزائر',
@@ -382,7 +375,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            _ActionSetting(
+            ActionSetting(
               icon: '🔔',
               label: 'إشعار عادي',
               sublabel: 'إشعار النظام التقليدي',
@@ -396,8 +389,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               },
             ),
-            _Divider(),
-            _ActionSetting(
+            const SettingsDivider(),
+            ActionSetting(
               icon: '🕌',
               label: 'أذان الصلاة',
               sublabel: 'شاشة الأذان الكاملة مع الصوت',
@@ -540,736 +533,4 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-// ── Shared Settings Widgets ──
-class _SectionHeader extends StatelessWidget {
-  final String title, icon;
-  const _SectionHeader({required this.title, required this.icon});
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 8, top: 4),
-    child: Row(
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 14)),
-        const SizedBox(width: 6),
-        Text(
-          title,
-          style: TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 15,
-            color: context.colors.textSecondary,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _SettingsCard extends StatelessWidget {
-  final List<Widget> children;
-  const _SettingsCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(
-      color: context.colors.card,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: context.colors.border),
-    ),
-    child: Column(children: children),
-  );
-}
-
-class _Divider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => Container(
-    height: 1,
-    margin: const EdgeInsets.only(right: 50),
-    color: context.colors.border,
-  );
-}
-
-class _ToggleSetting extends StatelessWidget {
-  final String icon, label, sublabel;
-  final bool value;
-  final void Function(bool) onChanged;
-  final Color? accentColor;
-
-  const _ToggleSetting({
-    required this.icon,
-    required this.label,
-    required this.sublabel,
-    required this.value,
-    required this.onChanged,
-    this.accentColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: (accentColor ?? context.colors.teal).withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(icon, style: const TextStyle(fontSize: 18)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 13,
-                    color: context.colors.textPrimary,
-                  ),
-                ),
-                Text(
-                  sublabel,
-                  style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 10,
-                    color: context.colors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          PrimarySwitch(
-            value: value,
-            onChanged: onChanged,
-            accentColor: accentColor,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TimeSetting extends StatelessWidget {
-  final String icon, label;
-  final TimeOfDay time;
-  final void Function(TimeOfDay) onChanged;
-
-  const _TimeSetting({
-    required this.icon,
-    required this.label,
-    required this.time,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final h = time.hour.toString().padLeft(2, '0');
-    final m = time.minute.toString().padLeft(2, '0');
-
-    return GestureDetector(
-      onTap: () async {
-        final picked = await showCustomTimePicker(
-          context: context,
-          initialTime: time,
-        );
-        if (picked != null) onChanged(picked);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: context.colors.gold.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(icon, style: const TextStyle(fontSize: 18)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  fontSize: 13,
-                  color: context.colors.textPrimary,
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: context.colors.goldDim,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: context.colors.gold.withOpacity(0.25),
-                ),
-              ),
-              child: Text(
-                '$h:$m',
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  fontSize: 14,
-                  color: context.colors.gold,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SelectSetting extends StatelessWidget {
-  final String icon, label, value;
-  final Map<String, String> options;
-  final void Function(String) onChanged;
-
-  const _SelectSetting({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showPicker(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: context.colors.teal.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(icon, style: const TextStyle(fontSize: 18)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 13,
-                      color: context.colors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    options[value] ?? value,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: context.colors.textDim,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: context.colors.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: context.colors.border,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Amiri',
-                fontSize: 18,
-                color: context.colors.gold,
-              ),
-            ),
-            const SizedBox(height: 14),
-            ...options.entries.map(
-              (e) => GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  onChanged(e.key);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: value == e.key
-                        ? context.colors.teal.withOpacity(0.12)
-                        : context.colors.background,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: value == e.key
-                          ? context.colors.teal.withOpacity(0.35)
-                          : context.colors.border,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          e.value,
-                          style: TextStyle(
-                            fontFamily: 'NotoNaskhArabic',
-                            fontSize: 13,
-                            color: value == e.key
-                                ? context.colors.teal
-                                : context.colors.textPrimary,
-                            fontWeight: value == e.key
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                      if (value == e.key)
-                        Icon(
-                          Icons.check_circle_rounded,
-                          color: context.colors.teal,
-                          size: 18,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionSetting extends StatelessWidget {
-  final String icon, label, sublabel;
-  final VoidCallback onTap;
-  final bool isDestructive;
-
-  const _ActionSetting({
-    required this.icon,
-    required this.label,
-    required this.sublabel,
-    required this.onTap,
-    this.isDestructive = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isDestructive
-        ? context.colors.danger
-        : context.colors.textPrimary;
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color:
-                    (isDestructive
-                            ? context.colors.danger
-                            : context.colors.gold)
-                        .withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(icon, style: const TextStyle(fontSize: 18)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 13,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    sublabel,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: context.colors.textDim,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AdhanSelectSetting extends StatefulWidget {
-  final String icon, label, value;
-  final Map<String, String> options;
-  final void Function(String) onChanged;
-
-  const _AdhanSelectSetting({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.options,
-    required this.onChanged,
-  });
-
-  @override
-  State<_AdhanSelectSetting> createState() => _AdhanSelectSettingState();
-}
-
-class _AdhanSelectSettingState extends State<_AdhanSelectSetting> {
-  AudioPlayer? _player;
-  StreamSubscription<PlayerState>? _playerSub;
-  String? _currentlyPlayingKey;
-
-  @override
-  void dispose() {
-    _playerSub?.cancel();
-    _player?.dispose();
-    super.dispose();
-  }
-
-  Future<void> _stopPreview() async {
-    await _playerSub?.cancel();
-    _playerSub = null;
-    await _player?.stop();
-    await _player?.dispose();
-    _player = null;
-    if (mounted) setState(() => _currentlyPlayingKey = null);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showPicker(context),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: context.colors.teal.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(widget.icon, style: const TextStyle(fontSize: 18)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 13,
-                      color: context.colors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    widget.options[widget.value] ?? widget.value,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: context.colors.textDim,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showPicker(BuildContext context) {
-    // Snapshot current playing key for the sheet
-    String? playingKey = _currentlyPlayingKey;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: context.colors.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (sheetCtx) => StatefulBuilder(
-        builder: (ctx, setStateSheet) {
-          return Padding(
-            padding: EdgeInsets.fromLTRB(
-              16,
-              20,
-              16,
-              MediaQuery.of(ctx).padding.bottom + 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Drag handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: context.colors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 18,
-                    color: context.colors.gold,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Flexible(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(ctx).size.height * 0.6,
-                    ),
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: widget.options.entries.map((e) {
-                          final isSelected = widget.value == e.key;
-                          final isPlaying = playingKey == e.key;
-
-                          return GestureDetector(
-                            onTap: () async {
-                              // Stop any preview first
-                              await _playerSub?.cancel();
-                              _playerSub = null;
-                              await _player?.stop();
-                              await _player?.dispose();
-                              _player = null;
-                              if (mounted) {
-                                setState(() => _currentlyPlayingKey = null);
-                              }
-                              // Save selection
-                              widget.onChanged(e.key);
-                              if (ctx.mounted) Navigator.pop(ctx);
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? context.colors.teal.withOpacity(0.12)
-                                    : context.colors.background,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? context.colors.teal.withOpacity(0.35)
-                                      : context.colors.border,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      e.value,
-                                      style: TextStyle(
-                                        fontFamily: 'NotoNaskhArabic',
-                                        fontSize: 13,
-                                        color: isSelected
-                                            ? context.colors.teal
-                                            : context.colors.textPrimary,
-                                        fontWeight: isSelected
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                  // Preview play/stop button
-                                  GestureDetector(
-                                    onTap: () async {
-                                      if (isPlaying) {
-                                        // Stop preview
-                                        await _playerSub?.cancel();
-                                        _playerSub = null;
-                                        await _player?.stop();
-                                        await _player?.dispose();
-                                        _player = null;
-                                        playingKey = null;
-                                        setStateSheet(() {});
-                                        if (mounted) {
-                                          setState(
-                                            () => _currentlyPlayingKey = null,
-                                          );
-                                        }
-                                      } else {
-                                        // Stop current preview first
-                                        await _playerSub?.cancel();
-                                        _playerSub = null;
-                                        await _player?.stop();
-                                        await _player?.dispose();
-                                        _player = null;
-
-                                        // Start new preview
-                                        final ap = AudioPlayer();
-                                        _player = ap;
-                                        playingKey = e.key;
-                                        if (mounted) {
-                                          setState(
-                                            () => _currentlyPlayingKey = e.key,
-                                          );
-                                        }
-                                        setStateSheet(() {});
-
-                                        await ap.setAsset(
-                                          'assets/sounds/${e.key}',
-                                        );
-                                        _playerSub = ap.playerStateStream
-                                            .listen((state) {
-                                              if (state.processingState ==
-                                                  ProcessingState.completed) {
-                                                playingKey = null;
-                                                if (mounted) {
-                                                  setState(
-                                                    () => _currentlyPlayingKey =
-                                                        null,
-                                                  );
-                                                }
-                                                if (ctx.mounted) {
-                                                  setStateSheet(() {});
-                                                }
-                                              }
-                                            });
-                                        await ap.play();
-                                      }
-                                    },
-                                    child: Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: isPlaying
-                                            ? context.colors.gold.withOpacity(
-                                                0.18,
-                                              )
-                                            : context.colors.gold.withOpacity(
-                                                0.09,
-                                              ),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: context.colors.gold
-                                              .withOpacity(0.25),
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        isPlaying
-                                            ? Icons.stop_rounded
-                                            : Icons.play_arrow_rounded,
-                                        size: 20,
-                                        color: context.colors.gold,
-                                      ),
-                                    ),
-                                  ),
-                                  if (isSelected) ...[
-                                    const SizedBox(width: 8),
-                                    Icon(
-                                      Icons.check_circle_rounded,
-                                      color: context.colors.teal,
-                                      size: 18,
-                                    ),
-                                  ] else
-                                    const SizedBox(width: 26),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    ).whenComplete(() async {
-      await _stopPreview();
-    });
-  }
-}
+// ── End of SettingsScreen ──

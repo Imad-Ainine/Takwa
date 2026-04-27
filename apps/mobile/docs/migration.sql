@@ -1,5 +1,5 @@
 -- Add missing notification and adhan settings columns to user_settings table
-ALTER TABLE user_settings 
+ALTER TABLE user_settings
 ADD COLUMN IF NOT EXISTS adhan_sound TEXT DEFAULT 'Adhan-Makkah.mp3',
 ADD COLUMN IF NOT EXISTS overlay_popups_enabled BOOLEAN DEFAULT true,
 ADD COLUMN IF NOT EXISTS adhan_sound_enabled BOOLEAN DEFAULT true,
@@ -19,4 +19,5 @@ ADD COLUMN IF NOT EXISTS silent_adhan_prayers TEXT DEFAULT 'fajr,dhuhr,asr,maghr
 ADD COLUMN IF NOT EXISTS silent_notif_prayers TEXT DEFAULT 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
 ADD COLUMN IF NOT EXISTS flip_to_silence_enabled BOOLEAN DEFAULT true,
 ADD COLUMN IF NOT EXISTS adhan_alarm_enabled BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS silent_duration_mins INTEGER DEFAULT 20,
 ADD COLUMN IF NOT EXISTS wake_screen_enabled BOOLEAN DEFAULT true;

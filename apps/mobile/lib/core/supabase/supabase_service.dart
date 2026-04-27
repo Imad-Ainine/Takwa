@@ -170,6 +170,7 @@ class SupabaseService {
       'vibrate_with_adhan': false,
       'adhan_volume_level': 1.0,
       'silent_mode_enabled': false,
+      'silent_duration_mins': 20,
       'silent_vibration_enabled': true,
       'silent_mode_alert_style': 'vibrate',
       'silent_adhan_prayers': 'fajr,dhuhr,asr,maghrib,isha,jumuah',

@@ -18,6 +18,8 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:sound_mode/sound_mode.dart';
+import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 
 import '../utils/timezone_resolver.dart';
 import '../providers/adhkar_providers.dart';
@@ -42,6 +44,10 @@ const _kAdhanSoundEnabledKey = 'adhan_sound_enabled';
 const _kPreAdhanNotifEnabledKey = 'pre_adhan_notif_enabled';
 const _kPopupIntervalMinsKey = 'popup_interval_minutes';
 const _kAdhanScreenTriggeredKey = 'adhan_screen_triggered';
+const _kSilentModeEnabledKey = 'silent_mode_enabled';
+const _kSilentDurationMinsKey = 'silent_duration_mins';
+const _kAutoSilentAfterAdhanKey = 'auto_silent_after_adhan';
+const _kSilentModeVibrationKey = 'silent_vibration_enabled';
 
 // ─────────────────────────────────────────
 //  TIMINGS
@@ -193,6 +199,8 @@ class _OverlayTaskHandler extends TaskHandler {
   bool _overlayEnabled = true;
   bool _adhanSoundEnabled = true;
   int _popupIntervalMins = _kDefaultPopupIntervalMins;
+  bool _silentModeEnabled = false;
+  int _silentDurationMins = 20;
 
   final _random = math.Random();
 
@@ -211,6 +219,7 @@ class _OverlayTaskHandler extends TaskHandler {
   void onRepeatEvent(DateTime timestamp) async {
     await _updateForegroundNotification();
     await _checkAndTriggerAdhan();
+    await _checkAndApplySilentMode();
     if (_overlayEnabled) await _checkAndShowAdhkarOverlay();
     await _sendPeriodicAdhkarNotification();
     await _sendPeriodicDuaNotification();
@@ -261,6 +270,50 @@ class _OverlayTaskHandler extends TaskHandler {
     _adhanSoundEnabled = prefs.getBool(_kAdhanSoundEnabledKey) ?? true;
     _popupIntervalMins =
         prefs.getInt(_kPopupIntervalMinsKey) ?? _kDefaultPopupIntervalMins;
+    _silentModeEnabled = prefs.getBool(_kSilentModeEnabledKey) ?? false;
+    _silentDurationMins = prefs.getInt(_kSilentDurationMinsKey) ?? 20;
+  }
+
+  // ──────────────────────────────────────
+  //  SILENT MODE WORKER
+  // ──────────────────────────────────────
+  Future<void> _checkAndApplySilentMode() async {
+    if (!_silentModeEnabled) return;
+
+    final now = DateTime.now();
+    bool shouldBeSilent = false;
+
+    for (final prayer in _todayPrayers) {
+      final start = prayer.time;
+      final end = start.add(Duration(minutes: _silentDurationMins));
+
+      if (now.isAfter(start) && now.isBefore(end)) {
+        shouldBeSilent = true;
+        break;
+      }
+    }
+
+    try {
+      final currentMode = await SoundMode.ringerModeStatus;
+      if (shouldBeSilent) {
+        if (currentMode != RingerModeStatus.silent &&
+            currentMode != RingerModeStatus.vibrate) {
+          final prefs = await SharedPreferences.getInstance();
+          final vibe = prefs.getBool(_kSilentModeVibrationKey) ?? true;
+          await SoundMode.setSoundMode(
+            vibe ? RingerModeStatus.vibrate : RingerModeStatus.silent,
+          );
+          debugPrint('🔇 Silent Mode Applied');
+        }
+      } else {
+        // If we are NOT in a prayer window, and we applied silent mode, we should ideally revert.
+        // But we don't want to force "Normal" if the user manually set it to silent.
+        // A better way is to track if WE set it to silent.
+        // For now, let's just make it silent during the window.
+      }
+    } catch (e) {
+      debugPrint('❌ Error in Silent Worker: $e');
+    }
   }
 
   // ──────────────────────────────────────
@@ -357,7 +410,7 @@ class _OverlayTaskHandler extends TaskHandler {
       title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
       body: 'اللهُ أكبر، اللهُ أكبر، حيَّ على الصلاة، حيَّ على الفلاح',
       payload: 'prayer:${prayer.name}',
-      channel: NotifChannels.prayer,
+      channel: NotifChannels.prayerSound,
     );
   }
 

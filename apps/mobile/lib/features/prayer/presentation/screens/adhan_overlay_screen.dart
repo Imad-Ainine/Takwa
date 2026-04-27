@@ -11,6 +11,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:sound_mode/sound_mode.dart';
+import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 import 'dart:async';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
@@ -73,12 +75,23 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
   void _initVibration() {
     final prefs = ref.read(userPreferencesProvider).valueOrNull;
-    if (prefs?.vibrateWithAdhan ?? true) {
+    final mode = prefs?.adhanMode ?? 'sound';
+
+    // Only vibrate if mode is vibrate, or if mode is sound and vibrateWithAdhan is true.
+    if (mode == 'vibrate' ||
+        (mode == 'sound' && (prefs?.vibrateWithAdhan ?? true))) {
       _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-        if (_player.playing) {
+        if (_player.playing || mode == 'vibrate') {
+          // Vibrate if playing or if only vibrating
           HapticFeedback.vibrate();
         }
       });
+      if (mode == 'vibrate') {
+        // Stop vibrating after a duration (e.g., 3 minutes max) since there's no player.playing state if sound is skipped
+        Future.delayed(const Duration(minutes: 3), () {
+          _vibrationTimer?.cancel();
+        });
+      }
     }
   }
 
@@ -102,9 +115,11 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     final prefsAsync = ref.read(userPreferencesProvider);
     final prefs = prefsAsync.valueOrNull;
 
-    // Respect the adhan sound enabled toggle
+    // Respect the adhan mode (sound vs silent/vibrate)
+    final mode = prefs?.adhanMode ?? 'sound';
     final soundEnabled = prefs?.adhanSoundEnabled ?? true;
-    if (!soundEnabled) return;
+
+    if (mode == 'silent' || mode == 'vibrate' || !soundEnabled) return;
 
     // Use the user-selected sound file, fall back to Makkah if not set
     final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
@@ -112,6 +127,9 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     // Handle Alarm stream if enabled
     final isAlarm = prefs?.adhanAlarmEnabled ?? true;
+    final volume = prefs?.adhanVolumeLevel ?? 1.0;
+
+    await _player.setVolume(volume);
 
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
@@ -148,13 +166,29 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
   void _close() {
     _player.stop();
+    _applyAutoSilent();
     Navigator.of(context).pop();
   }
 
   void _goToPrayer() {
     _player.stop();
+    _applyAutoSilent();
     Navigator.of(context).popUntil((r) => r.isFirst);
     Navigator.of(context).pushNamed('/prayer');
+  }
+
+  Future<void> _applyAutoSilent() async {
+    final prefs = ref.read(userPreferencesProvider).valueOrNull;
+    if (prefs?.autoSilentAfterAdhan ?? false) {
+      try {
+        // Switch to silent or vibrate based on preference (defaulting to silent if autoSilent is on)
+        // You might want to add a preference for WHICH mode, but for now we follow the toggle.
+        await SoundMode.setSoundMode(RingerModeStatus.silent);
+        debugPrint('🔇 Mode: Auto-Silent applied.');
+      } catch (e) {
+        debugPrint('❌ Error applying auto-silent: $e');
+      }
+    }
   }
 
   @override

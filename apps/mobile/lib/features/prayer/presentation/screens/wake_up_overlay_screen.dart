@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
@@ -31,7 +32,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   late final AnimationController _pulseCtrl;
   late final AnimationController _starsCtrl;
   late final AnimationController _entryCtrl;
-  
+
   late Timer _clockTimer;
   DateTime _now = DateTime.now();
 
@@ -69,12 +70,20 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   }
 
   Future<void> _initAudio() async {
+    // Read user-selected adhan sound from preferences
+    final prefsAsync = ref.read(userPreferencesProvider);
+    final prefs = prefsAsync.valueOrNull;
+
+    final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
+    final asset = 'assets/sounds/$soundFile';
     // تأخير قصير للسماح بتهيئة الـ Widget
     await Future.delayed(const Duration(milliseconds: 300));
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
-        await _player.setAsset('assets/sounds/Adhan-Makkah.mp3');
-        _player.setLoopMode(LoopMode.one); // Loop the sound until the user turns it off
+        await _player.setAsset(asset);
+        _player.setLoopMode(
+          LoopMode.one,
+        ); // Loop the sound until the user turns it off
         await _player.play();
         return; // نجح
       } catch (e) {
@@ -366,7 +375,9 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                           Expanded(
                             child: PrimaryButton(
                               onTap: () async {
-                                await NotificationsService.scheduleSnooze(minutes: 10);
+                                await NotificationsService.scheduleSnooze(
+                                  minutes: 10,
+                                );
                                 _close();
                               },
                               icon: Icons.snooze,

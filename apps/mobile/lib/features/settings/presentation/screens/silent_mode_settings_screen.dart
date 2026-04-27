@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import '../widgets/settings_widgets.dart';
 
 class SilentModeSettingsScreen extends ConsumerWidget {
@@ -12,6 +14,7 @@ class SilentModeSettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefsAsync = ref.watch(userPreferencesProvider);
+    final isSyncing = ref.watch(isSyncingProvider);
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -35,13 +38,23 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                 ),
                 centerTitle: true,
                 elevation: 0,
+                actions: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: SyncStatusIndicator(isSyncing: isSyncing),
+                    ),
+                  ),
+                ],
               ),
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     prefsAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      loading: () => const Center(
+                        child: TakwaLoadingIndicator(size: 40),
+                      ),
                       error: (err, _) => Center(child: Text('Error: $err')),
                       data: (prefs) => Column(
                         children: [
@@ -50,7 +63,8 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                               ToggleSetting(
                                 icon: '🔇',
                                 label: 'تفعيل وضع الصامت',
-                                sublabel: 'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم',
+                                sublabel:
+                                    'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم',
                                 value: prefs.silentModeEnabled,
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)

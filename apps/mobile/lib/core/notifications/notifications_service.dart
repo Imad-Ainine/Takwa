@@ -92,14 +92,38 @@ class NotifIds {
 // ─────────────────────────────────────────
 class NotifChannels {
   /// قناة الأذان — أعلى أولوية مع صوت الأذان
-  static const AndroidNotificationChannel prayer = AndroidNotificationChannel(
-    'prayer_adhan',
-    'أذان الصلاة',
+  static const AndroidNotificationChannel prayerSound = AndroidNotificationChannel(
+    'prayer_adhan_sound',
+    'أذان الصلاة (صوت)',
     description: 'إشعار وقت الأذان مع صوت الأذان',
     importance: Importance.max,
     sound: RawResourceAndroidNotificationSound('adhan'),
     playSound: true,
     enableVibration: true,
+    enableLights: true,
+    ledColor: Color(0xFFC8A96E),
+  );
+
+  /// قناة الأذان — اهتزاز فقط
+  static const AndroidNotificationChannel prayerVibrate = AndroidNotificationChannel(
+    'prayer_adhan_vibrate',
+    'أذان الصلاة (اهتزاز)',
+    description: 'إشعار وقت الأذان باهتزاز فقط',
+    importance: Importance.high,
+    playSound: false,
+    enableVibration: true,
+    enableLights: true,
+    ledColor: Color(0xFFC8A96E),
+  );
+
+  /// قناة الأذان — صامت
+  static const AndroidNotificationChannel prayerSilent = AndroidNotificationChannel(
+    'prayer_adhan_silent',
+    'أذان الصلاة (صامت)',
+    description: 'إشعار صامت لوقت الأذان',
+    importance: Importance.high,
+    playSound: false,
+    enableVibration: false,
     enableLights: true,
     ledColor: Color(0xFFC8A96E),
   );
@@ -190,7 +214,9 @@ class NotifChannels {
       );
 
   static List<AndroidNotificationChannel> get all => [
-    prayer,
+    prayerSound,
+    prayerVibrate,
+    prayerSilent,
     alert,
     muhasaba,
     adhkar,
@@ -305,6 +331,7 @@ class NotificationsService {
     required List<PrayerTimeInfo> prayers,
     bool preAdhanEnabled = true,
     bool iqamaEnabled = true,
+    String adhanMode = 'sound',
   }) async {
     // إلغاء القديمة
     final ids = [
@@ -344,17 +371,28 @@ class NotificationsService {
         }
       }
 
-      // 2. إشعار الأذان مع الصوت
+      // 2. إشعار الأذان مع الصوت أو الاهتزاز أو الصامت
       if (prayer.time.isAfter(now)) {
+        AndroidNotificationChannel selectedChannel = NotifChannels.prayerSound;
+        String? soundAsset = 'adhan';
+        
+        if (adhanMode == 'vibrate') {
+          selectedChannel = NotifChannels.prayerVibrate;
+          soundAsset = null;
+        } else if (adhanMode == 'silent') {
+          selectedChannel = NotifChannels.prayerSilent;
+          soundAsset = null;
+        }
+
         await _scheduleExact(
           id: prayer.notifId,
           title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
           body: 'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح',
           scheduledTime: prayer.time,
-          channelId: NotifChannels.prayer.id,
-          sound: 'adhan',
+          channelId: selectedChannel.id,
+          sound: soundAsset,
           payload: 'prayer:${prayer.name}',
-          fullScreenIntent: true,
+          fullScreenIntent: adhanMode != 'silent', // Show full screen overlay unless silent
         );
       }
 
@@ -1195,6 +1233,7 @@ class NotificationsManager {
         prayers: prayers,
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
+        adhanMode: prefs.adhanMode,
       );
     }
 
@@ -1225,9 +1264,104 @@ class NotificationsManager {
     );
   }
 
-  Future<void> reschedule() async {
-    await NotificationsService.cancelAll();
-    await scheduleAll();
+  Future<void> reschedule([
+    NotificationCategory category = NotificationCategory.all,
+  ]) async {
+    switch (category) {
+      case NotificationCategory.prayer:
+        await _reschedulePrayers();
+        break;
+      case NotificationCategory.adhkar:
+        await _rescheduleAdhkar();
+        break;
+      case NotificationCategory.reminders:
+        await _rescheduleReminders();
+        break;
+      case NotificationCategory.all:
+        await NotificationsService.cancelAll();
+        await scheduleAll();
+        break;
+      case NotificationCategory.none:
+        break;
+    }
+  }
+
+  Future<void> _reschedulePrayers() async {
+    // Cancel only prayer-related IDs
+    final ids = [
+      NotifIds.fajr,
+      NotifIds.dhuhr,
+      NotifIds.asr,
+      NotifIds.maghrib,
+      NotifIds.isha,
+      NotifIds.preFajr,
+      NotifIds.preDhuhr,
+      NotifIds.preAsr,
+      NotifIds.preMaghrib,
+      NotifIds.preIsha,
+      NotifIds.iqamaFajr,
+      NotifIds.iqamaDhuhr,
+      NotifIds.iqamaAsr,
+      NotifIds.iqamaMaghrib,
+      NotifIds.iqamaIsha,
+      NotifIds.wakeUpAlarm,
+    ];
+
+    for (final id in ids) {
+      await NotificationsService.cancel(id);
+    }
+
+    final prefs = await _ref.read(userPreferencesProvider.future);
+    final prayers = await _ref.read(prayerTimesProvider.future);
+
+    if (prefs.prayerReminder) {
+      await NotificationsService.schedulePrayerNotifications(
+        prayers: prayers,
+        preAdhanEnabled: prefs.preAdhanNotif,
+        iqamaEnabled: prefs.iqamaNotif,
+        adhanMode: prefs.adhanMode,
+      );
+    }
+
+    if (prefs.wakeUpBeforeFajr) {
+      await NotificationsService.scheduleWakeUpAlarm(time: prefs.wakeUpTime);
+    }
+  }
+
+  Future<void> _rescheduleAdhkar() async {
+    // Adhkar IDs are handled internally by AdhkarNotificationService.rescheduleAll
+    final prefs = await _ref.read(userPreferencesProvider.future);
+    await AdhkarNotificationService.rescheduleAll(prefs);
+  }
+
+  Future<void> _rescheduleReminders() async {
+    final ids = [
+      NotifIds.eveningMuhasaba,
+      NotifIds.fastingWhiteDays,
+      NotifIds.fastingMonday,
+      NotifIds.fastingThursday,
+      NotifIds.fridayKahf,
+      NotifIds.fridaySalawat,
+    ];
+
+    for (final id in ids) {
+      await NotificationsService.cancel(id);
+    }
+
+    final prefs = await _ref.read(userPreferencesProvider.future);
+
+    if (prefs.muhasabaReminder) {
+      await NotificationsService.scheduleEveningMuhasaba(
+        time: prefs.muhasabaTime,
+      );
+    }
+
+    if (prefs.dailyDuasOn) await NotificationsService.scheduleDailyDuas();
+
+    await NotificationsService.scheduleSpecialReminders(
+      fridayReminders: prefs.specialRemindersOn,
+      fastingReminders: prefs.fastingRemindersOn,
+    );
   }
 }
 

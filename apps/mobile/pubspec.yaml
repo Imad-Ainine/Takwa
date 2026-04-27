@@ -84,6 +84,7 @@ dependencies:
 
   google_fonts: any
   share_plus: 7.2.2
+  sound_mode: ^3.0.1
   custom_refresh_indicator: ^4.0.1
   sensors_plus: ^7.0.0
 

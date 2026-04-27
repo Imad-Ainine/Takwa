@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/core/supabase/sync_manager.dart';
 import '../widgets/settings_widgets.dart';
 import 'silent_mode_settings_screen.dart';
 import '../widgets/prayer_selection_sheet.dart';
@@ -25,12 +28,21 @@ const adhanOptions = {
   'Yusuf-Islam.mp3': 'يوسف إسلام',
 };
 
+final adhanPreviewPlayerProvider = Provider.autoDispose((ref) {
+  final player = AudioPlayer();
+  ref.onDispose(() => player.dispose());
+  return player;
+});
+
+final currentlyPlayingAdhanProvider = StateProvider<String?>((ref) => null);
+
 class AdhanNotificationSettingsScreen extends ConsumerWidget {
   const AdhanNotificationSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefsAsync = ref.watch(userPreferencesProvider);
+    final isSyncing = ref.watch(isSyncingProvider);
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -54,16 +66,30 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                 ),
                 centerTitle: true,
                 elevation: 0,
+                actions: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: SyncStatusIndicator(isSyncing: isSyncing),
+                    ),
+                  ),
+                ],
               ),
               SliverPadding(
                 padding: const EdgeInsets.all(16),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     prefsAsync.when(
-                      loading: () => const Center(child: CircularProgressIndicator()),
+                      loading: () =>
+                          const Center(child: TakwaLoadingIndicator(size: 40)),
                       error: (err, _) => Center(child: Text('Error: $err')),
                       data: (prefs) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SectionHeader(
+                            icon: '🕌',
+                            title: 'إعدادات الحساب',
+                          ),
                           SettingsCard(
                             children: [
                               SelectSetting(
@@ -95,12 +121,19 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('calcMethod', v),
                               ),
-                              const SettingsDivider(),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          const SectionHeader(icon: '🔊', title: 'صوت الأذان'),
+                          SettingsCard(
+                            children: [
                               SelectSetting(
                                 icon: '🎵',
                                 label: 'صوت الأذان',
                                 value: prefs.adhanSound,
                                 options: adhanOptions,
+                                itemTrailingBuilder: (ctx, key, isSelected) =>
+                                    AdhanSoundPreviewButton(soundPath: key),
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('adhan_sound', v),
@@ -120,6 +153,33 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                     .updatePref('adhan_mode', v),
                               ),
                               const SettingsDivider(),
+                              SliderSetting(
+                                icon: '🔊',
+                                label: 'مستوى الصوت',
+                                value: prefs.adhanVolumeLevel,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('adhan_volume_level', v),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '📳',
+                                label: 'نوع الاهتزاز',
+                                sublabel: 'اهتزاز مصاحب للأذان',
+                                value: prefs.vibrateWithAdhan,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('vibrate_with_adhan', v),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          const SectionHeader(
+                            icon: '⚙️',
+                            title: 'خصائص متقدمة',
+                          ),
+                          SettingsCard(
+                            children: [
                               ToggleSetting(
                                 icon: '🔇',
                                 label: 'التحويل إلى الصامت',
@@ -137,7 +197,8 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const SilentModeSettingsScreen(),
+                                    builder: (_) =>
+                                        const SilentModeSettingsScreen(),
                                   ),
                                 ),
                               ),
@@ -145,64 +206,50 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               ActionSetting(
                                 icon: '🕌',
                                 label: 'تفعيل الأذان في الوضع الصامت',
-                                sublabel: 'تشغيل الأذان حتى وإن كان الجهاز في وضع الصامت',
+                                sublabel:
+                                    'تشغيل الأذان حتى وإن كان الجهاز في وضع الصامت',
                                 onTap: () => PrayerSelectionSheet.show(
                                   context: context,
                                   title: 'تفعيل الأذان في الوضع الصامت',
-                                  selectedPrayers: prefs.silentAdhanPrayers.split(','),
+                                  selectedPrayers: prefs.silentAdhanPrayers
+                                      .split(','),
                                   onChanged: (prayers) => ref
                                       .read(userPreferencesProvider.notifier)
-                                      .updatePref('silent_adhan_prayers', prayers.join(',')),
+                                      .updatePref(
+                                        'silent_adhan_prayers',
+                                        prayers.join(','),
+                                      ),
                                 ),
                               ),
                               const SettingsDivider(),
                               ActionSetting(
                                 icon: '📢',
                                 label: 'تفعيل التنبيهات في الوضع الصامت',
-                                sublabel: 'تشغيل صوت التنبيهات حتى وإن كان الجهاز في وضع الصامت',
+                                sublabel:
+                                    'تشغيل صوت التنبيهات حتى وإن كان الجهاز في وضع الصامت',
                                 onTap: () => PrayerSelectionSheet.show(
                                   context: context,
                                   title: 'التنبيهات المفعلة في الوضع الصامت',
-                                  selectedPrayers: prefs.silentNotifPrayers.split(','),
+                                  selectedPrayers: prefs.silentNotifPrayers
+                                      .split(','),
                                   includeSunrise: true,
                                   onChanged: (prayers) => ref
                                       .read(userPreferencesProvider.notifier)
-                                      .updatePref('silent_notif_prayers', prayers.join(',')),
+                                      .updatePref(
+                                        'silent_notif_prayers',
+                                        prayers.join(','),
+                                      ),
                                 ),
                               ),
-                              const SettingsDivider(),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Text('🔊', style: TextStyle(fontSize: 18)),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          'مستوى الصوت',
-                                          style: TextStyle(
-                                            fontFamily: 'NotoNaskhArabic',
-                                            fontSize: 13,
-                                            color: context.colors.textPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Slider(
-                                      value: prefs.adhanVolume,
-                                      onChanged: (v) => ref
-                                          .read(userPreferencesProvider.notifier)
-                                          .updatePref('adhan_volume_level', v),
-                                      activeColor: context.colors.gold,
-                                      inactiveColor: context.colors.border,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SettingsDivider(),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          const SectionHeader(
+                            icon: '📱',
+                            title: 'تنبيهات النظام',
+                          ),
+                          SettingsCard(
+                            children: [
                               CheckboxSetting(
                                 label: 'تشغيل الشاشة أثناء الأذان',
                                 sublabel: 'إبقاء الشاشة مفعلة عند تشغيل الأذان',
@@ -214,21 +261,12 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               const SettingsDivider(),
                               CheckboxSetting(
                                 label: 'ايقاف الأذان عند قلب الجهاز',
-                                sublabel: 'اقلب الهاتف على وجهه لإسكات صوت الأذان',
+                                sublabel:
+                                    'اقلب الهاتف على وجهه لإسكات صوت الأذان',
                                 value: prefs.flipToSilenceEnabled,
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('flip_to_silence_enabled', v),
-                              ),
-                              const SettingsDivider(),
-                              ToggleSetting(
-                                icon: '📳',
-                                label: 'نوع الاهتزاز',
-                                sublabel: 'اهتزاز مصاحب للأذان',
-                                value: prefs.vibrateWithAdhan,
-                                onChanged: (v) => ref
-                                    .read(userPreferencesProvider.notifier)
-                                    .updatePref('vibrate_with_adhan', v),
                               ),
                               const SettingsDivider(),
                               CheckboxSetting(
@@ -239,17 +277,81 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('adhan_alarm_enabled', v),
                               ),
+                              const SettingsDivider(),
+                              CheckboxSetting(
+                                label: 'إشعار دائم بأوقات الصلاة',
+                                sublabel:
+                                    'إظهار شريط إشعار دائم بالمتبقي للصلاة',
+                                value: prefs.ongoingNotifEnabled,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('ongoing_notif_enabled', v),
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 32),
                   ]),
                 ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class AdhanSoundPreviewButton extends ConsumerWidget {
+  final String soundPath;
+  const AdhanSoundPreviewButton({super.key, required this.soundPath});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final player = ref.watch(adhanPreviewPlayerProvider);
+    final playingPath = ref.watch(currentlyPlayingAdhanProvider);
+    final isPlaying = playingPath == soundPath;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: IconButton(
+        onPressed: () async {
+          if (isPlaying) {
+            await player.stop();
+            ref.read(currentlyPlayingAdhanProvider.notifier).state = null;
+          } else {
+            await player.stop();
+            try {
+              await player.setAsset('assets/sounds/$soundPath');
+              ref.read(currentlyPlayingAdhanProvider.notifier).state =
+                  soundPath;
+              await player.play();
+              // Reset when finished
+              player.processingStateStream.listen((state) {
+                if (state == ProcessingState.completed) {
+                  if (ref.read(currentlyPlayingAdhanProvider) == soundPath) {
+                    ref.read(currentlyPlayingAdhanProvider.notifier).state =
+                        null;
+                  }
+                }
+              });
+            } catch (e) {
+              debugPrint('Error playing adhan preview: $e');
+            }
+          }
+        },
+        icon: Icon(
+          isPlaying
+              ? Icons.stop_circle_rounded
+              : Icons.play_circle_fill_rounded,
+          color: context.colors.gold,
+          size: 32,
+        ),
+        visualDensity: VisualDensity.compact,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
       ),
     );
   }

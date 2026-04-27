@@ -38,75 +38,73 @@ class UserPreferences {
   final bool adhanSoundEnabled;
   final bool adhanScreenEnabled;
   final int popupIntervalMins;
+  final double adhanVolumeLevel;
 
   /// 'sound' | 'vibrate' | 'silent'
   final String adhanMode;
 
+  final bool silentModeEnabled;
+  final int silentDurationMins;
+  final String silentModeAlertStyle;
+  final bool silentVibrationEnabled;
+  final String silentAdhanPrayers;
+  final String silentNotifPrayers;
+
   final bool autoSilentAfterAdhan;
+
   final bool adhanInSilentEnabled;
   final bool notifsInSilentEnabled;
-  final double adhanVolume;
-  final bool silentModeEnabled;
-  final bool silentVibrationEnabled;
-  final String silentModeAlertStyle; // 'none', 'vibrate', 'tone', 'toneVibrate'
-  final String silentAdhanPrayers; // "fajr,dhuhr,asr,maghrib,isha,jumuah"
-  final String silentNotifPrayers; // "fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah"
   final bool flipToSilenceEnabled;
   final bool wakeScreenEnabled;
   final bool vibrateWithAdhan;
   final bool adhanAlarmEnabled;
+  final bool ongoingNotifEnabled;
 
   const UserPreferences({
     this.madhab = 'shafi',
     this.calcMethod = 'MWL',
     this.language = 'ar',
-
     this.prayerReminder = true,
     this.preAdhanNotif = true,
     this.iqamaNotif = true,
-
     this.wakeUpBeforeFajr = false,
     this.wakeUpTime = const TimeOfDay(hour: 4, minute: 30),
-
     this.morningAdhkarReminder = true,
     this.eveningAdhkarReminder = true,
-
     this.adhkarNotifEnabled = true,
     this.morningAdhkarTime = const TimeOfDay(hour: 6, minute: 30),
     this.eveningAdhkarTime = const TimeOfDay(hour: 17, minute: 0),
     this.sleepAdhkarTime = const TimeOfDay(hour: 22, minute: 0),
     this.afterFajrAdhkar = true,
     this.afterAsrAdhkar = true,
-
     this.muhasabaReminder = true,
     this.muhasabaTime = const TimeOfDay(hour: 21, minute: 0),
-
     this.dailyDuasOn = true,
     this.specialRemindersOn = true,
     this.fastingRemindersOn = true,
-
     this.ramadanMode = false,
     this.themeMode = 'system',
     this.adhanSound = 'Adhan-Makkah.mp3',
-
     this.overlayEnabled = true,
     this.adhanSoundEnabled = true,
     this.adhanScreenEnabled = true,
     this.popupIntervalMins = 24,
     this.adhanMode = 'sound',
+    this.adhanVolumeLevel = 1.0,
+    this.silentModeEnabled = false,
+    this.silentDurationMins = 20,
+    this.silentModeAlertStyle = 'vibrate',
+    this.silentVibrationEnabled = true,
+    this.silentAdhanPrayers = 'fajr,dhuhr,asr,maghrib,isha,jumuah',
+    this.silentNotifPrayers = 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
     this.autoSilentAfterAdhan = false,
     this.adhanInSilentEnabled = true,
     this.notifsInSilentEnabled = true,
-    this.adhanVolume = 1.0,
-    this.silentModeEnabled = false,
-    this.silentVibrationEnabled = true,
-    this.silentModeAlertStyle = 'vibrate',
-    this.silentAdhanPrayers = 'fajr,dhuhr,asr,maghrib,isha,jumuah',
-    this.silentNotifPrayers = 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
     this.flipToSilenceEnabled = true,
     this.wakeScreenEnabled = true,
     this.vibrateWithAdhan = true,
     this.adhanAlarmEnabled = true,
+    this.ongoingNotifEnabled = true,
   });
 
   UserPreferences copyWith({
@@ -139,19 +137,21 @@ class UserPreferences {
     bool? adhanScreenEnabled,
     int? popupIntervalMins,
     String? adhanMode,
-    double? adhanVolume,
+    double? adhanVolumeLevel,
     bool? silentModeEnabled,
-    bool? silentVibrationEnabled,
+    int? silentDurationMins,
     String? silentModeAlertStyle,
+    bool? silentVibrationEnabled,
     String? silentAdhanPrayers,
     String? silentNotifPrayers,
+    bool? autoSilentAfterAdhan,
+    bool? adhanInSilentEnabled,
+    bool? notifsInSilentEnabled,
     bool? flipToSilenceEnabled,
     bool? wakeScreenEnabled,
     bool? vibrateWithAdhan,
     bool? adhanAlarmEnabled,
-    bool? autoSilentAfterAdhan,
-    bool? adhanInSilentEnabled,
-    bool? notifsInSilentEnabled,
+    bool? ongoingNotifEnabled,
   }) {
     return UserPreferences(
       madhab: madhab ?? this.madhab,
@@ -185,24 +185,26 @@ class UserPreferences {
       adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
       popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
       adhanMode: adhanMode ?? this.adhanMode,
-      autoSilentAfterAdhan: autoSilentAfterAdhan ?? this.autoSilentAfterAdhan,
-      adhanInSilentEnabled: adhanInSilentEnabled ?? this.adhanInSilentEnabled,
-      notifsInSilentEnabled: notifsInSilentEnabled ?? this.notifsInSilentEnabled,
-      adhanVolume: adhanVolume ?? this.adhanVolume,
+      adhanVolumeLevel: adhanVolumeLevel ?? this.adhanVolumeLevel,
       silentModeEnabled: silentModeEnabled ?? this.silentModeEnabled,
+      silentDurationMins: silentDurationMins ?? this.silentDurationMins,
+      silentModeAlertStyle: silentModeAlertStyle ?? this.silentModeAlertStyle,
       silentVibrationEnabled:
           silentVibrationEnabled ?? this.silentVibrationEnabled,
-      silentModeAlertStyle: silentModeAlertStyle ?? this.silentModeAlertStyle,
       silentAdhanPrayers: silentAdhanPrayers ?? this.silentAdhanPrayers,
       silentNotifPrayers: silentNotifPrayers ?? this.silentNotifPrayers,
+      autoSilentAfterAdhan: autoSilentAfterAdhan ?? this.autoSilentAfterAdhan,
+      adhanInSilentEnabled: adhanInSilentEnabled ?? this.adhanInSilentEnabled,
+      notifsInSilentEnabled:
+          notifsInSilentEnabled ?? this.notifsInSilentEnabled,
       flipToSilenceEnabled: flipToSilenceEnabled ?? this.flipToSilenceEnabled,
       wakeScreenEnabled: wakeScreenEnabled ?? this.wakeScreenEnabled,
       vibrateWithAdhan: vibrateWithAdhan ?? this.vibrateWithAdhan,
       adhanAlarmEnabled: adhanAlarmEnabled ?? this.adhanAlarmEnabled,
+      ongoingNotifEnabled: ongoingNotifEnabled ?? this.ongoingNotifEnabled,
     );
   }
 
-  /// Maps exactly to Supabase column names
   Map<String, dynamic> toMap() {
     return {
       'madhab': madhab,
@@ -239,26 +241,25 @@ class UserPreferences {
       'adhan_screen_enabled': adhanScreenEnabled,
       'popup_interval_minutes': popupIntervalMins,
       'adhan_mode': adhanMode,
-      'auto_silent_after_adhan': autoSilentAfterAdhan,
-      // Temporarily commented out to avoid Supabase sync errors if columns missing
-      // 'adhan_in_silent_enabled': adhanInSilentEnabled,
-      // 'notifs_in_silent_enabled': notifsInSilentEnabled,
-      'adhan_volume_level': adhanVolume,
+      'adhan_volume_level': adhanVolumeLevel,
       'silent_mode_enabled': silentModeEnabled,
-      'silent_vibration_enabled': silentVibrationEnabled,
+      'silent_duration_mins': silentDurationMins,
       'silent_mode_alert_style': silentModeAlertStyle,
+      'silent_vibration_enabled': silentVibrationEnabled,
       'silent_adhan_prayers': silentAdhanPrayers,
       'silent_notif_prayers': silentNotifPrayers,
+      'auto_silent_after_adhan': autoSilentAfterAdhan,
+      'adhan_in_silent_enabled': adhanInSilentEnabled,
+      'notifs_in_silent_enabled': notifsInSilentEnabled,
       'flip_to_silence_enabled': flipToSilenceEnabled,
       'wake_screen_enabled': wakeScreenEnabled,
       'vibrate_with_adhan': vibrateWithAdhan,
       'adhan_alarm_enabled': adhanAlarmEnabled,
+      'ongoing_notif_enabled': ongoingNotifEnabled,
     };
   }
 
-  /// Expects a map with Supabase column names (snake_case) or local string keys
   factory UserPreferences.fromMap(Map<String, dynamic> map) {
-    // Helper to parse bool from DB or strings (SQLite)
     bool parseBool(dynamic val, {bool defaultVal = false}) {
       if (val == null) return defaultVal;
       if (val is bool) return val;
@@ -269,7 +270,6 @@ class UserPreferences {
       return defaultVal;
     }
 
-    // Helper to parse TimeOfDay
     TimeOfDay parseTime(dynamic val, {required TimeOfDay defaultVal}) {
       if (val == null || val is! String || !val.contains(':')) {
         return defaultVal;
@@ -285,11 +285,23 @@ class UserPreferences {
       return defaultVal;
     }
 
+    int parseInt(dynamic val, {int defaultVal = 0}) {
+      if (val == null) return defaultVal;
+      if (val is int) return val;
+      return int.tryParse(val.toString()) ?? defaultVal;
+    }
+
+    double parseDouble(dynamic val, {double defaultVal = 0.0}) {
+      if (val == null) return defaultVal;
+      if (val is double) return val;
+      if (val is int) return val.toDouble();
+      return double.tryParse(val.toString()) ?? defaultVal;
+    }
+
     return UserPreferences(
       madhab: map['madhab'] as String? ?? 'shafi',
       calcMethod: (map['calc_method'] ?? map['calcMethod']) as String? ?? 'MWL',
       language: map['language'] as String? ?? 'ar',
-
       prayerReminder: parseBool(
         map['prayer_reminder'] ?? map['prayerReminder'],
         defaultVal: true,
@@ -302,16 +314,13 @@ class UserPreferences {
         map['iqama_notif'] ?? map['iqamaNotif'],
         defaultVal: true,
       ),
-
       wakeUpBeforeFajr: parseBool(
         map['wake_up_before_fajr'] ?? map['wakeUpBeforeFajr'],
-        defaultVal: false,
       ),
       wakeUpTime: parseTime(
         map['wake_up_time'] ?? map['wakeUpTime'],
         defaultVal: const TimeOfDay(hour: 4, minute: 30),
       ),
-
       morningAdhkarReminder: parseBool(
         map['morning_adhkar_reminder'] ?? map['morningAdhkarReminder'],
         defaultVal: true,
@@ -320,7 +329,6 @@ class UserPreferences {
         map['evening_adhkar_reminder'] ?? map['eveningAdhkarReminder'],
         defaultVal: true,
       ),
-
       adhkarNotifEnabled: parseBool(
         map['adhkar_notif_enabled'] ?? map['adhkarNotifEnabled'],
         defaultVal: true,
@@ -345,16 +353,14 @@ class UserPreferences {
         map['after_asr_adhkar'] ?? map['afterAsrAdhkar'],
         defaultVal: true,
       ),
-
       muhasabaReminder: parseBool(
-        map['muhasaba_reminder'] ?? map['eveningMuhasabaReminder'],
+        map['muhasaba_reminder'] ?? map['muhasabaReminder'],
         defaultVal: true,
       ),
       muhasabaTime: parseTime(
-        map['evening_reminder_time'] ?? map['eveningReminderTime'],
+        map['evening_reminder_time'] ?? map['muhasabaTime'],
         defaultVal: const TimeOfDay(hour: 21, minute: 0),
       ),
-
       dailyDuasOn: parseBool(
         map['daily_duas_on'] ?? map['dailyDuasOn'],
         defaultVal: true,
@@ -367,20 +373,9 @@ class UserPreferences {
         map['fasting_reminders_on'] ?? map['fastingRemindersOn'],
         defaultVal: true,
       ),
-
-      ramadanMode: parseBool(
-        map['ramadan_mode'] ?? map['ramadanMode'],
-        defaultVal: false,
-      ),
-      themeMode:
-          map['theme_mode'] as String? ??
-          map['themeMode'] as String? ??
-          'system',
-      adhanSound:
-          map['adhan_sound'] as String? ??
-          map['adhanSound'] as String? ??
-          'Adhan-Makkah.mp3',
-
+      ramadanMode: parseBool(map['ramadan_mode'] ?? map['ramadanMode']),
+      themeMode: map['theme_mode'] ?? map['themeMode'] ?? 'system',
+      adhanSound: map['adhan_sound'] ?? map['adhanSound'] ?? 'Adhan-Makkah.mp3',
       overlayEnabled: parseBool(
         map['overlay_popups_enabled'] ?? map['overlayEnabled'],
         defaultVal: true,
@@ -393,19 +388,40 @@ class UserPreferences {
         map['adhan_screen_enabled'] ?? map['adhanScreenEnabled'],
         defaultVal: true,
       ),
-      popupIntervalMins: () {
-        final v = map['popup_interval_minutes'] ?? map['popupIntervalMins'];
-        if (v == null) return 24;
-        if (v is int) return v;
-        return int.tryParse(v.toString()) ?? 24;
-      }(),
-      adhanMode:
-          map['adhan_mode'] as String? ??
-          map['adhanMode'] as String? ??
-          'sound',
+      popupIntervalMins: parseInt(
+        map['popup_interval_minutes'] ?? map['popupIntervalMins'],
+        defaultVal: 24,
+      ),
+      adhanMode: map['adhan_mode'] ?? map['adhanMode'] ?? 'sound',
+      adhanVolumeLevel: parseDouble(
+        map['adhan_volume_level'] ?? map['adhanVolume'],
+        defaultVal: 1.0,
+      ),
+      silentModeEnabled: parseBool(
+        map['silent_mode_enabled'] ?? map['silentModeEnabled'],
+      ),
+      silentDurationMins: parseInt(
+        map['silent_duration_mins'] ?? map['silentDurationMins'],
+        defaultVal: 20,
+      ),
+      silentModeAlertStyle:
+          map['silent_mode_alert_style'] ??
+          map['silentModeAlertStyle'] ??
+          'vibrate',
+      silentVibrationEnabled: parseBool(
+        map['silent_vibration_enabled'] ?? map['silentVibrationEnabled'],
+        defaultVal: true,
+      ),
+      silentAdhanPrayers:
+          map['silent_adhan_prayers'] ??
+          map['silentAdhanPrayers'] ??
+          'fajr,dhuhr,asr,maghrib,isha,jumuah',
+      silentNotifPrayers:
+          map['silent_notif_prayers'] ??
+          map['silentNotifPrayers'] ??
+          'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
       autoSilentAfterAdhan: parseBool(
         map['auto_silent_after_adhan'] ?? map['autoSilentAfterAdhan'],
-        defaultVal: false,
       ),
       adhanInSilentEnabled: parseBool(
         map['adhan_in_silent_enabled'] ?? map['adhanInSilentEnabled'],
@@ -415,33 +431,6 @@ class UserPreferences {
         map['notifs_in_silent_enabled'] ?? map['notifsInSilentEnabled'],
         defaultVal: true,
       ),
-      adhanVolume: () {
-        final v = map['adhan_volume_level'] ?? map['adhanVolume'];
-        if (v == null) return 1.0;
-        if (v is double) return v;
-        if (v is int) return v.toDouble();
-        return double.tryParse(v.toString()) ?? 1.0;
-      }(),
-      silentModeEnabled: parseBool(
-        map['silent_mode_enabled'] ?? map['silentModeEnabled'],
-        defaultVal: false,
-      ),
-      silentVibrationEnabled: parseBool(
-        map['silent_vibration_enabled'] ?? map['silentVibrationEnabled'],
-        defaultVal: true,
-      ),
-      silentModeAlertStyle:
-          map['silent_mode_alert_style'] as String? ??
-          map['silentModeAlertStyle'] as String? ??
-          'vibrate',
-      silentAdhanPrayers:
-          map['silent_adhan_prayers'] as String? ??
-          map['silentAdhanPrayers'] as String? ??
-          'fajr,dhuhr,asr,maghrib,isha,jumuah',
-      silentNotifPrayers:
-          map['silent_notif_prayers'] as String? ??
-          map['silentNotifPrayers'] as String? ??
-          'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
       flipToSilenceEnabled: parseBool(
         map['flip_to_silence_enabled'] ?? map['flipToSilenceEnabled'],
         defaultVal: true,
@@ -456,6 +445,10 @@ class UserPreferences {
       ),
       adhanAlarmEnabled: parseBool(
         map['adhan_alarm_enabled'] ?? map['adhanAlarmEnabled'],
+        defaultVal: true,
+      ),
+      ongoingNotifEnabled: parseBool(
+        map['ongoing_notif_enabled'] ?? map['ongoingNotifEnabled'],
         defaultVal: true,
       ),
     );
