@@ -213,10 +213,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         _anim(
                           1,
                           statsAsync.when(
-                            loading: () => const Center(child: TakwaLoadingIndicator()),
+                            loading: () =>
+                                const Center(child: TakwaLoadingIndicator()),
                             error: (_, _) => const SizedBox(),
                             data: (s) => streakAsync.when(
-                              loading: () => const Center(child: TakwaLoadingIndicator()),
+                              loading: () =>
+                                  const Center(child: TakwaLoadingIndicator()),
                               error: (_, _) => const SizedBox(),
                               data: (streak) =>
                                   _TaqwaHeroCard(stats: s, streak: streak),
@@ -1684,7 +1686,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 70,
+      top: MediaQuery.of(context).padding.top + 120,
       left: 16,
       right: 16,
       child: SlideTransition(
@@ -1695,7 +1697,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [context.colors.gold, context.colors.goldDim],
+                colors: [context.colors.goldDim, context.colors.gold],
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.colors.gold.withOpacity(0.4)),
@@ -1834,10 +1836,7 @@ class _StatSkeleton extends StatelessWidget {
       border: Border.all(color: context.colors.border),
     ),
     child: Center(
-      child: TakwaLoadingIndicator(
-        color: context.colors.gold,
-        strokeWidth: 2,
-      ),
+      child: TakwaLoadingIndicator(color: context.colors.gold, strokeWidth: 2),
     ),
   );
 }

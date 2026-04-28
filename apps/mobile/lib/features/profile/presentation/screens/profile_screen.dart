@@ -213,7 +213,7 @@ class ProfileScreen extends ConsumerWidget {
         _MenuTile(
           icon: Icons.settings_outlined,
           title: 'إعدادات الحساب',
-          onTap: () => Navigator.pushNamed(context, '/settings'),
+          onTap: () => Navigator.pushNamed(context, '/account-settings'),
         ),
       ],
     );

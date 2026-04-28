@@ -28,7 +28,11 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
         // Add the line below to satisfy the Kotlin 2.x compiler requirements
-        freeCompilerArgs += listOf("-Xannotation-default-target=param-property")
+        freeCompilerArgs += listOf(
+            "-Xannotation-default-target=param-property",
+            "-Xopt-in=kotlin.RequiresOptIn",
+            "-Xsuppress-version-warnings",
+        )
     }
 
     defaultConfig {
@@ -57,6 +61,19 @@ android {
             // Enable shrinking, obfuscation, and optimization
             isMinifyEnabled = true
             isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
+            // 1. Signing Config (Always use debug keystore)
+            signingConfigs.getByName("debug")
+            //isDebuggable = false
+            isMinifyEnabled = false
+            isShrinkResources = false
+            // 2. ProGuard/R8 Rules (Order matters!)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

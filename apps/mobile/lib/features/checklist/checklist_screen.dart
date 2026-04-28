@@ -150,6 +150,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
           pinned: true,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
+          automaticallyImplyLeading: false,
           flexibleSpace: FlexibleSpaceBar(
             collapseMode: CollapseMode.pin,
             background: _TopBar(

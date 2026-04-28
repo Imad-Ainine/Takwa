@@ -21,6 +21,7 @@ import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';
 import 'package:takwa/features/auth/presentation/screens/auth_screen.dart';
 import 'package:takwa/features/achievements/presentation/screens/achievements_screen.dart';
 import 'package:takwa/features/profile/presentation/screens/profile_screen.dart';
+import 'package:takwa/features/profile/presentation/screens/account_settings_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/quran_reader_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/ai_memorize_screen.dart';
@@ -55,6 +56,7 @@ class Routes {
   static const String checklist = '/checklist';
   static const String statistics = '/statistics';
   static const String settings = '/settings';
+  static const String accountSettings = '/account-settings';
   static const String aboutMe = '/about-me';
   static const String onboarding = '/onboarding';
   static const String prayer = '/prayer';
@@ -115,16 +117,18 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const MainShell());
       case Routes.checklist:
         return MaterialPageRoute(
-          builder: (_) => const MainShell(initialIndex: 1),
+          builder: (_) => const MainShell(initialIndex: 2),
         );
       case Routes.statistics:
         return MaterialPageRoute(
-          builder: (_) => const MainShell(initialIndex: 2),
+          builder: (_) => const MainShell(initialIndex: 3),
         );
       case Routes.settings:
         return MaterialPageRoute(
-          builder: (_) => const MainShell(initialIndex: 4),
+          builder: (_) => const MainShell(initialIndex: 5),
         );
+      case Routes.accountSettings:
+        return MaterialPageRoute(builder: (_) => const AccountSettingsScreen());
       case Routes.aboutMe:
         return MaterialPageRoute(builder: (_) => const AboutMeScreen());
       case Routes.onboarding:

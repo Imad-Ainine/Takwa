@@ -10,7 +10,9 @@
 		"web:build": "npm run build --workspace=@takwa/web",
 		"mobile:bootstrap": "dart run melos bootstrap",
 		"mobile:clean": "dart run melos clean",
-		"test": "dart run melos run test"
+		"test": "dart run melos run test",
+		"flutter_build_abi": "cd apps/mobile && flutter build apk --release --split-per-abi",
+		"flutter_build_appbundle": "cd apps/mobile && flutter build appbundle --release"
 	},
 	"optionalDependencies": {
 		"@next/swc-linux-x64-gnu": "16.2.4",
