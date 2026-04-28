@@ -31,7 +31,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.duas),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Column(
               children: [

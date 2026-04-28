@@ -136,7 +136,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(
-                pattern: BackgroundPattern.crystalFacets,
+                pattern: BackgroundPattern.adhkar,
               ),
             ),
             Padding(

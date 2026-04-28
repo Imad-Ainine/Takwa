@@ -71,7 +71,7 @@ class _ManageCustomIbadahScreenState
       ),
       body: Stack(
         children: [
-          const CustomPatternBackground(pattern: BackgroundPattern.asma),
+          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           SafeArea(
             child: TabBarView(
               controller: _tabController,

@@ -104,9 +104,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.arrowKite,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             todayAsync.when(
               loading: () => Center(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -92,9 +91,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),

@@ -274,7 +274,7 @@
 //           // ── Background Pattern ──
 //           const Positioned.fill(
 //             child: CustomPatternBackground(
-//               pattern: BackgroundPattern.geometric,
+//               pattern: BackgroundPattern.adhkar
 //             ),
 //           ),
 

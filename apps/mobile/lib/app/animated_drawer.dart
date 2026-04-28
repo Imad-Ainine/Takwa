@@ -189,7 +189,7 @@ class _DrawerContent extends ConsumerWidget {
         children: [
           // نمط خلفية عصري
           const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
 
           SafeArea(

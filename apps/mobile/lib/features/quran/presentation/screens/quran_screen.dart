@@ -60,7 +60,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         backgroundColor: style.bg,
         body: Stack(
           children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.duas),
+            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             FadeTransition(
               opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
               child: CustomScrollView(

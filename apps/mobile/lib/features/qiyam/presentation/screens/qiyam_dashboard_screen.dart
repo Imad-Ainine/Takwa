@@ -467,7 +467,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
               children: [
                 const Positioned.fill(
                   child: CustomPatternBackground(
-                    pattern: BackgroundPattern.curvedPetals,
+                    pattern: BackgroundPattern.adhkar,
                   ),
                 ),
                 Padding(
@@ -615,7 +615,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             children: [
               const Positioned.fill(
                 child: CustomPatternBackground(
-                  pattern: BackgroundPattern.curvedPetals,
+                  pattern: BackgroundPattern.adhkar,
                 ),
               ),
               Center(
@@ -662,13 +662,13 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 400),
     );
     _slide = Tween<Offset>(
-      begin: const Offset(0, -1.2),
+      begin: const Offset(0, -1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack));
-    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
 
     _ctrl.forward();
 
@@ -693,7 +693,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 10,
+      top: MediaQuery.of(context).padding.top + 60,
       left: 16,
       right: 16,
       child: SlideTransition(
@@ -706,36 +706,24 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [context.colors.gold, context.colors.goldDark],
+                  colors: [
+                    context.colors.goldDim.withOpacity(0.5),
+                    context.colors.gold,
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.colors.gold.withOpacity(0.4)),
                 boxShadow: [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
+                    color: context.colors.gold.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1,
-                ),
               ),
               child: Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text('🌙', style: TextStyle(fontSize: 24)),
-                    ),
-                  ),
+                  const Text('🌙', style: TextStyle(fontSize: 28)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -743,30 +731,33 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
+                          'تنبيه',
+                          style: context.typography.caption.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                        Text(
                           'قيام الليل',
                           style: context.typography.headingMedium.copyWith(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w800,
+                            color: context.colors.background,
                           ),
                         ),
                         Text(
                           'برنامج متكامل لصلاة الليل... خطوة للقرب من الله.',
-                          style: context.typography.caption.copyWith(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 12,
+                          style: context.typography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: context.colors.background.withOpacity(0.8),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: _handleDismiss,
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close,
-                      color: Colors.white,
+                      color: context.colors.background,
                       size: 20,
                     ),
                     padding: EdgeInsets.zero,

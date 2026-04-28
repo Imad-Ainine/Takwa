@@ -613,7 +613,7 @@ class _PrayerHeader extends StatelessWidget {
                       child: const Opacity(
                         opacity: 0.1,
                         child: CustomPatternBackground(
-                          pattern: BackgroundPattern.duas,
+                          pattern: BackgroundPattern.adhkar,
                         ),
                       ),
                     ),

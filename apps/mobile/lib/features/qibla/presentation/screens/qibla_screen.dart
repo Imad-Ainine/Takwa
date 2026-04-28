@@ -334,7 +334,7 @@ class _QiblaCompassPainter extends CustomPainter {
       tp.text = TextSpan(
         text: d.$1,
         style: TextStyle(
-                    fontFamily: 'Amiri',
+          fontFamily: 'Amiri',
           fontSize: 13,
           color: d.$1 == 'ش' ? primaryColor : primaryColor.withOpacity(0.4),
         ),
@@ -622,9 +622,7 @@ class _QiblaLoading extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
-    return const Center(
-      child: TakwaLoadingIndicator(size: 32),
-    );
+    return const Center(child: TakwaLoadingIndicator(size: 32));
   }
 }
 

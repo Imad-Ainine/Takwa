@@ -62,8 +62,10 @@ class _PrimaryButtonState extends State<PrimaryButton>
     final endColor = widget.baseColor != null
         ? HSLColor.fromColor(widget.baseColor!)
               .withLightness(
-                (HSLColor.fromColor(widget.baseColor!).lightness - 0.1)
-                    .clamp(0.0, 1.0),
+                (HSLColor.fromColor(widget.baseColor!).lightness - 0.1).clamp(
+                  0.0,
+                  1.0,
+                ),
               )
               .toColor()
         : colors.goldDark;
@@ -131,7 +133,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                 if (widget.isBg)
                   const Positioned.fill(
                     child: CustomPatternBackground(
-                      pattern: BackgroundPattern.eightWithCrosses,
+                      pattern: BackgroundPattern.adhkar,
                     ),
                   ),
               Padding(
@@ -141,7 +143,9 @@ class _PrimaryButtonState extends State<PrimaryButton>
                         child: TakwaLoadingIndicator(
                           size: 20,
                           // On a gradient surface the indicator should always be white.
-                          color: widget.isBg ? Colors.white : colors.textPrimary,
+                          color: widget.isBg
+                              ? Colors.white
+                              : colors.textPrimary,
                         ),
                       )
                     : widget.customContent ??

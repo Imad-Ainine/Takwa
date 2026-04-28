@@ -86,9 +86,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),

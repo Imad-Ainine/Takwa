@@ -15,7 +15,7 @@ class SubscriptionScreen extends ConsumerWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
             child: Column(

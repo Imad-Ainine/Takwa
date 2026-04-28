@@ -132,7 +132,7 @@ class _AppBarWidgetState extends State<AppBarWidget>
               Container(
                 decoration: BoxDecoration(gradient: gradient),
                 child: CustomPatternBackground(
-                  pattern: BackgroundPattern.starCluster,
+                  pattern: BackgroundPattern.adhkar,
                   // Slightly lower opacity in light mode so the pattern stays subtle.
                   opacity: isDark ? 0.08 : 0.05,
                 ),

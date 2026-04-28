@@ -18,9 +18,7 @@ class TermsPrivacyScreen extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
@@ -108,7 +106,7 @@ class TermsPrivacyScreen extends StatelessWidget {
           Text(
             'تطبيق تقوى',
             style: TextStyle(
-                    fontFamily: 'Amiri',
+              fontFamily: 'Amiri',
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: context.colors.textPrimary,
@@ -117,7 +115,7 @@ class TermsPrivacyScreen extends StatelessWidget {
           Text(
             'الشروط وسياسة الخصوصية',
             style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 14,
               color: context.colors.goldLight,
               letterSpacing: 0.5,
@@ -146,7 +144,7 @@ class TermsPrivacyScreen extends StatelessWidget {
         Text(
           english,
           style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+            fontFamily: 'NotoNaskhArabic',
             fontSize: 12,
             color: context.colors.textDim,
             fontWeight: FontWeight.w500,

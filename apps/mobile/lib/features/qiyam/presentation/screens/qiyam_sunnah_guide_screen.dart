@@ -13,7 +13,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
             child: Column(
@@ -148,9 +148,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
         child: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.curvedPetals,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
               padding: const EdgeInsets.all(20),

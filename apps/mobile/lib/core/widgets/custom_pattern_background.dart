@@ -92,7 +92,7 @@ class CustomPatternBackground extends ConsumerStatefulWidget {
 
   const CustomPatternBackground({
     super.key,
-    this.pattern = BackgroundPattern.geometric,
+    this.pattern = BackgroundPattern.adhkar,
     this.color,
     this.opacity,
   });

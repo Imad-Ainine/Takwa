@@ -705,7 +705,7 @@ class _MosquePrayerSection extends StatelessWidget {
                   child: Opacity(
                     opacity: 0.1,
                     child: CustomPatternBackground(
-                      pattern: BackgroundPattern.duas,
+                      pattern: BackgroundPattern.adhkar,
                     ),
                   ),
                 ),

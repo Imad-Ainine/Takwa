@@ -117,9 +117,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     if (_currentPosition == null) {
       return Scaffold(
         backgroundColor: style.bg,
-        body: const Center(
-          child: TakwaLoadingIndicator(),
-        ),
+        body: const Center(child: TakwaLoadingIndicator()),
       );
     }
 
@@ -143,7 +141,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Column(
               children: [
@@ -287,9 +285,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         },
                       );
                     },
-                    loading: () => const Center(
-                      child: TakwaLoadingIndicator(),
-                    ),
+                    loading: () => const Center(child: TakwaLoadingIndicator()),
                     error: (err, stack) => _buildErrorState(err, style),
                   ),
                 ),

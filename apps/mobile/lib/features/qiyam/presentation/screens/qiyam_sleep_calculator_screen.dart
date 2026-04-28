@@ -174,7 +174,7 @@ class _QiyamSleepCalculatorScreenState
                       children: [
                         const Positioned.fill(
                           child: CustomPatternBackground(
-                            pattern: BackgroundPattern.crystalFacets,
+                            pattern: BackgroundPattern.adhkar,
                           ),
                         ),
                         Padding(
@@ -232,7 +232,7 @@ class _QiyamSleepCalculatorScreenState
               children: [
                 const Positioned.fill(
                   child: CustomPatternBackground(
-                    pattern: BackgroundPattern.curvedPetals,
+                    pattern: BackgroundPattern.adhkar,
                   ),
                 ),
                 Padding(

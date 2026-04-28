@@ -114,7 +114,7 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.duas),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
 
             Column(
@@ -979,8 +979,7 @@ class _CommunityDuasTabView extends ConsumerWidget {
     final state = ref.watch(communityDuasProvider);
 
     return state.when(
-      loading: () =>
-          Center(child: TakwaLoadingIndicator(color: style.teal)),
+      loading: () => Center(child: TakwaLoadingIndicator(color: style.teal)),
       error: (err, _) => Center(
         child: Text(
           'تعذر تحميل أدعية المجتمع',

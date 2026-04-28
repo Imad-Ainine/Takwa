@@ -72,7 +72,7 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.asma),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Column(
               children: [

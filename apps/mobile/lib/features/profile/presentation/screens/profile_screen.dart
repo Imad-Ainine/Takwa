@@ -31,9 +31,7 @@ class ProfileScreen extends ConsumerWidget {
         children: [
           // Background Pattern
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
 
           CustomScrollView(

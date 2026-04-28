@@ -42,13 +42,14 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   String? _error;
   StreamController<double>? _progressCtrl;
 
+  // ── Text Selection / Share ────────────────
+  OverlayEntry? _shareOverlayEntry;
+  String _selectedText = '';
+  bool _isTextSelected = false;
+
   // ── UI visibility animation ───────────────
   bool _showUI = true;
   late AnimationController _uiAnim;
-
-  // ── Text selection overlay ────────────────
-  String _selectedText = '';
-  PdfTextSelectionChangedDetails? _selectionDetails;
 
   // ── Session Notifier ──────────────────────
   late PdfSessionNotifier _sessionNotifier;
@@ -83,6 +84,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
   @override
   void dispose() {
+    _hideShareMenu();
     _uiAnim.dispose();
     _pdfController.dispose();
     _progressCtrl?.close();
@@ -141,6 +143,87 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
     }
   }
 
+  void _showShareMenu() {
+    _hideShareMenu();
+    _shareOverlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          bottom: 120,
+          left: 0,
+          right: 0,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutBack,
+            builder: (context, val, child) {
+              return Transform.scale(
+                scale: val,
+                child: Opacity(opacity: val.clamp(0.0, 1.0), child: child),
+              );
+            },
+            child: Center(
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Share.share(_selectedText);
+                    _pdfController.clearSelection();
+                  },
+                  borderRadius: BorderRadius.circular(30),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFC8A96E),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.share_rounded,
+                          color: Colors.black87,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'مشاركة النص',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontFamily: 'Amiri',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    Overlay.of(context).insert(_shareOverlayEntry!);
+  }
+
+  void _hideShareMenu() {
+    if (_shareOverlayEntry != null) {
+      _shareOverlayEntry!.remove();
+      _shareOverlayEntry = null;
+    }
+  }
+
   Color _parseColor(String? hex) {
     if (hex == null) return const Color(0xFFC8A96E);
     try {
@@ -152,24 +235,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
     } catch (_) {
       return const Color(0xFFC8A96E);
     }
-  }
-
-  // ── Text selection actions ────────────────
-
-  void _copyText() {
-    if (_selectedText.isEmpty) return;
-    Clipboard.setData(ClipboardData(text: _selectedText));
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم النسخ', textDirection: TextDirection.rtl),
-        duration: Duration(seconds: 1),
-      ),
-    );
-  }
-
-  void _shareText() {
-    if (_selectedText.isEmpty) return;
-    Share.share(_selectedText);
   }
 
   // ─────────────────────────────────────────
@@ -228,6 +293,20 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               key: _pdfViewerKey,
               controller: _pdfController,
               enableTextSelection: true,
+              canShowTextSelectionMenu: true,
+              canShowPageLoadingIndicator: true,
+              canShowScrollHead: true,
+              onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
+                if (details.selectedText == null ||
+                    details.selectedText!.isEmpty) {
+                  _isTextSelected = false;
+                  _hideShareMenu();
+                } else {
+                  _isTextSelected = true;
+                  _selectedText = details.selectedText!;
+                  _showShareMenu();
+                }
+              },
               onDocumentLoaded: (details) {
                 final total = details.document.pages.count;
                 Future.microtask(() {
@@ -244,23 +323,22 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                 }
               },
               onTap: (details) {
-                if (_selectedText.isEmpty) _toggleUI();
+                if (_isTextSelected) {
+                  _pdfController.clearSelection();
+                } else {
+                  _toggleUI();
+                }
               },
               onPageChanged: (details) {
+                _hideShareMenu();
+                _pdfController.clearSelection();
                 _sessionNotifier.setPage(details.newPageNumber);
-              },
-              onTextSelectionChanged: (details) {
-                setState(() {
-                  _selectedText = details.selectedText ?? '';
-                  _selectionDetails = details;
-                });
               },
               onDocumentLoadFailed: (details) {
                 setState(() {
                   _error = details.error;
                 });
               },
-              canShowScrollHead: false,
               enableDoubleTapZooming: true,
             ),
 
@@ -295,46 +373,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                   child: _buildBottomPanel(session, accentColor),
                 ),
               ),
-            ),
-
-          // ── Text Selection Action Bar ───
-          if (_selectedText.isNotEmpty && _selectionDetails != null)
-            Builder(
-              builder: (context) {
-                final mq = MediaQuery.of(context);
-                final topPadding = mq.padding.top + 8;
-                // Float 72px above the selection region; clamp so it stays on-screen
-                final selTop =
-                    _selectionDetails!.globalSelectedRegion?.top ?? 200;
-                final rawTop = selTop - 72;
-                final clampedTop = rawTop.clamp(
-                  topPadding,
-                  mq.size.height - 140.0,
-                );
-                return Positioned(
-                  top: clampedTop,
-                  left: 16,
-                  right: 16,
-                  child: Center(
-                    child: _TextActionBar(
-                      onCopy: () {
-                        _copyText();
-                        setState(() => _selectedText = '');
-                        _pdfController.clearSelection();
-                      },
-                      onShare: () {
-                        _shareText();
-                        setState(() => _selectedText = '');
-                        _pdfController.clearSelection();
-                      },
-                      onDismiss: () {
-                        setState(() => _selectedText = '');
-                        _pdfController.clearSelection();
-                      },
-                    ),
-                  ),
-                );
-              },
             ),
         ],
       ),
@@ -624,106 +662,6 @@ class _InfoChip extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TextActionBar extends StatelessWidget {
-  final VoidCallback onCopy;
-  final VoidCallback onShare;
-  final VoidCallback onDismiss;
-
-  const _TextActionBar({
-    required this.onCopy,
-    required this.onShare,
-    required this.onDismiss,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFF2C2C2C),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white12),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black54,
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: IntrinsicHeight(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _ActionBtn(icon: Icons.copy_rounded, label: 'نسخ', onTap: onCopy),
-              const VerticalDivider(
-                color: Colors.white12,
-                width: 24,
-                thickness: 1,
-              ),
-              _ActionBtn(
-                icon: Icons.share_rounded,
-                label: 'مشاركة',
-                onTap: onShare,
-              ),
-              const VerticalDivider(
-                color: Colors.white12,
-                width: 24,
-                thickness: 1,
-              ),
-              _ActionBtn(
-                icon: Icons.close_rounded,
-                label: 'إغلاق',
-                onTap: onDismiss,
-                color: Colors.white38,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionBtn extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final Color? color;
-
-  const _ActionBtn({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final c = color ?? const Color(0xFFC8A96E);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: c, size: 20),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(color: c, fontSize: 10, fontFamily: 'Amiri'),
-            ),
-          ],
-        ),
       ),
     );
   }

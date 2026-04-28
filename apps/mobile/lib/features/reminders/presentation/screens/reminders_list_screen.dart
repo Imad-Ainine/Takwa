@@ -32,9 +32,7 @@ class RemindersListScreen extends ConsumerWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),

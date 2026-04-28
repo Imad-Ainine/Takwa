@@ -20,9 +20,7 @@ class AboutMeScreen extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned.fill(
-            child: CustomPatternBackground(
-              pattern: BackgroundPattern.geometric,
-            ),
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
@@ -121,7 +119,7 @@ class AboutMeScreen extends StatelessWidget {
           Text(
             'عماد الدين عينين',
             style: TextStyle(
-                    fontFamily: 'Amiri',
+              fontFamily: 'Amiri',
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: context.colors.textPrimary,
@@ -131,7 +129,7 @@ class AboutMeScreen extends StatelessWidget {
           Text(
             'Imadeddine Ainine',
             style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+              fontFamily: 'NotoNaskhArabic',
               fontSize: 18,
               color: context.colors.goldLight,
               letterSpacing: 0.5,
@@ -163,7 +161,7 @@ class AboutMeScreen extends StatelessWidget {
         Text(
           english,
           style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+            fontFamily: 'NotoNaskhArabic',
             fontSize: 12,
             color: context.colors.textDim,
             fontWeight: FontWeight.w500,
@@ -346,7 +344,7 @@ class AboutMeScreen extends StatelessWidget {
               Text(
                 '© 2026 - Imadeddine Ainine',
                 style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
+                  fontFamily: 'NotoNaskhArabic',
                   fontSize: 11,
                   color: context.colors.textDim,
                 ),

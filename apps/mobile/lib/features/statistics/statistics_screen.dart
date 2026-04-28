@@ -183,9 +183,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.pattern1,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             GuestModeGuard(
               child: CustomScrollView(
@@ -1697,7 +1695,10 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [context.colors.goldDim, context.colors.gold],
+                colors: [
+                  context.colors.goldDim.withOpacity(0.5),
+                  context.colors.gold,
+                ],
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: context.colors.gold.withOpacity(0.4)),
@@ -1737,7 +1738,8 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                       ),
                       Text(
                         widget.achievement.descAr,
-                        style: context.typography.bodySmall.copyWith(
+                        style: context.typography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w800,
                           color: context.colors.background.withOpacity(0.8),
                         ),
                       ),

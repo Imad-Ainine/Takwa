@@ -64,7 +64,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
         body: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.duas),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
 
             // Decorative Glows
