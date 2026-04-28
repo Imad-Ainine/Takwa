@@ -84,7 +84,7 @@ class NotifIds {
   static const ramadanIftar = 701;
 
   // تنبيهات الاستيقاظ
-  static const wakeUpAlarm = 105;
+  static const wakeUpAlarm = 800;
 }
 
 // ─────────────────────────────────────────
@@ -645,16 +645,35 @@ class NotificationsService {
 
   // ── المنبه / الاستيقاظ ──
   static Future<void> scheduleWakeUpAlarm({required TimeOfDay time}) async {
-    await _scheduleDailyAt(
-      id: NotifIds.wakeUpAlarm,
-      title: '🌙 حان وقت الاستيقاظ',
-      body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
-      time: time,
-      channelId: NotifChannels.wakeUpAlarm.id,
-      sound: 'adhan',
-      payload: 'wakeup:fajr',
-      fullScreenIntent: true,
-    );
+    for (int i = 0; i < 7; i++) {
+      await _plugin.cancel(NotifIds.wakeUpAlarm + i);
+    }
+
+    final now = DateTime.now();
+    for (int i = 0; i < 7; i++) {
+      var scheduled = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        time.hour,
+        time.minute,
+      ).add(Duration(days: i));
+
+      if (scheduled.isBefore(now)) {
+        scheduled = scheduled.add(const Duration(days: 7));
+      }
+
+      await _scheduleExact(
+        id: NotifIds.wakeUpAlarm + i,
+        title: '🌙 حان وقت الاستيقاظ',
+        body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
+        scheduledTime: scheduled,
+        channelId: NotifChannels.wakeUpAlarm.id,
+        sound: 'adhan',
+        payload: 'wakeup:fajr',
+        fullScreenIntent: true,
+      );
+    }
   }
 
   static Future<void> scheduleSnooze({required int minutes}) async {

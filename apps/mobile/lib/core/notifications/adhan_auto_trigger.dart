@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import '../routes/app_routes.dart';
 import 'notifications_service.dart';
@@ -20,10 +21,11 @@ class AdhanAudioPlayer {
   static AudioPlayer? _player;
   static bool _isPlaying = false;
 
-  static Future<void> play({String asset = 'assets/audio/adhan.mp3'}) async {
+  static Future<void> play({String asset = 'assets/sounds/Adhan-Makkah.mp3', double volume = 1.0}) async {
     try {
       await stop();
       _player = AudioPlayer();
+      await _player!.setVolume(volume);
       await _player!.setAsset(asset);
       _player!.playerStateStream.listen((state) {
         _isPlaying = state.playing;
@@ -32,6 +34,12 @@ class AdhanAudioPlayer {
       _isPlaying = true;
     } catch (e) {
       debugPrint('AdhanAudio: play error: $e');
+    }
+  }
+
+  static Future<void> setVolume(double volume) async {
+    if (_player != null) {
+      await _player!.setVolume(volume);
     }
   }
 
@@ -82,10 +90,11 @@ class AdhanAutoTrigger {
       if (prayers == null) return;
 
       final settings = ref.read(settingsDaoProvider);
-      final adhanSound = await settings.getBool(
-        'adhan_sound_enabled',
-        defaultVal: true,
-      );
+      
+      final adhanMode = await settings.get('adhan_mode') ?? 'sound';
+      final playSound = adhanMode == 'sound';
+      final adhanVolumeLevel = double.tryParse((await settings.get('adhan_volume_level')) ?? '1.0') ?? 1.0;
+      
       final adhanScreen = await settings.getBool(
         'adhan_screen_enabled',
         defaultVal: true,
@@ -98,8 +107,8 @@ class AdhanAutoTrigger {
       final now = DateTime.now();
       for (final prayer in prayers) {
         final diffSecs = now.difference(prayer.time).inSeconds;
-        // نُطلق الشاشة فقط عند وقت الصلاة تماماً (0-3 ثوانٍ)
-        if (diffSecs < 0 || diffSecs > 3) {
+        // نُطلق الشاشة فقط عند وقت الصلاة تماماً (0-180 ثانية)
+        if (diffSecs < 0 || diffSecs > 180) {
           continue;
         }
 
@@ -118,12 +127,16 @@ class AdhanAutoTrigger {
         debugPrint('🕌 Auto-trigger adhan: ${prayer.nameAr}');
 
         // تشغيل صوت الأذان المختار من الإعدادات
-        if (adhanSound) {
-          await AdhanAudioPlayer.play(asset: 'assets/sounds/$adhanSoundFile');
+        if (playSound) {
+          await AdhanAudioPlayer.play(
+            asset: 'assets/sounds/$adhanSoundFile',
+            volume: adhanVolumeLevel,
+          );
         }
 
         // فتح شاشة الأذان
         if (adhanScreen) {
+          FlutterForegroundTask.wakeUpScreen();
           final ctx = navigatorKey.currentContext;
           if (ctx != null) {
             await Future.delayed(const Duration(milliseconds: 300));
@@ -151,23 +164,26 @@ class AdhanAutoTrigger {
     if (action != 'show_adhan') return;
 
     final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
-    final playSound = (data['sound'] as bool?) ?? true;
+    final requestPlaySound = (data['sound'] as bool?) ?? true;
 
     final settings = ref.read(settingsDaoProvider);
-    final adhanSound = await settings.getBool(
-      'adhan_sound_enabled',
-      defaultVal: true,
-    );
+    final adhanMode = await settings.get('adhan_mode') ?? 'sound';
+    final playSoundPref = adhanMode == 'sound';
+    final adhanVolumeLevel = double.tryParse((await settings.get('adhan_volume_level')) ?? '1.0') ?? 1.0;
+
     final adhanScreen = await settings.getBool(
       'adhan_screen_enabled',
       defaultVal: true,
     );
 
-    if (adhanSound && playSound) {
+    if (playSoundPref && requestPlaySound) {
       // Read the user-selected adhan sound file
       final adhanSoundFile =
           await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
-      await AdhanAudioPlayer.play(asset: 'assets/sounds/$adhanSoundFile');
+      await AdhanAudioPlayer.play(
+        asset: 'assets/sounds/$adhanSoundFile',
+        volume: adhanVolumeLevel,
+      );
     }
 
     if (adhanScreen) {

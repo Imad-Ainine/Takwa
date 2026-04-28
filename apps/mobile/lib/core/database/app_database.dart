@@ -95,6 +95,9 @@ class DailyRecords extends Table {
   BoolColumn get sadaqah => boolean().withDefault(const Constant(false))();
   RealColumn get sadaqahAmount => real().withDefault(const Constant(0.0))();
 
+  // ── غضّ البصر ──
+  BoolColumn get ghadhBasar => boolean().withDefault(const Constant(false))();
+
   // ── النقاط المحسوبة ──
   IntColumn get taqwaPoints => integer().withDefault(const Constant(0))();
   IntColumn get deductedPoints => integer().withDefault(const Constant(0))();
@@ -242,7 +245,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -253,6 +256,9 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (Migrator m, int from, int to) async {
       if (from < 2) {
         await m.createTable(reminders);
+      }
+      if (from < 3) {
+        await m.addColumn(dailyRecords, dailyRecords.ghadhBasar);
       }
     },
   );

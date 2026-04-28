@@ -128,6 +128,16 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     await recalcPoints(recordId);
   }
 
+  Future<void> toggleGhadhBasar(int recordId, bool value) async {
+    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+      DailyRecordsCompanion(
+        ghadhBasar: Value(value),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+    await recalcPoints(recordId);
+  }
+
   Future<void> logProhibition({
     required int recordId,
     required ProhibitionCategory category,
@@ -234,6 +244,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     if (record.fastingType.index == FastingType.nafl.index) points += 10;
 
     if (record.sadaqah) points += 10;
+    if (record.ghadhBasar) points += 10;
 
     final prohibs = await getTodayProhibitions(recordId);
     int deducted = 0;
@@ -410,6 +421,7 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       eveningAdhkar: Value(_toBool(data['evening_adhkar'])),
       fastingType: Value(_parseFastingType(data['fasting_type'])),
       sadaqah: Value(_toBool(data['sadaqah'])),
+      ghadhBasar: Value(_toBool(data['ghadh_basar'])),
       netPoints: Value(_toInt(data['net_points'])),
       taqwaPoints: Value(_toInt(data['taqwa_points'])),
       notes: Value(data['notes'] as String?),

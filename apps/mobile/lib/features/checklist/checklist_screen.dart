@@ -344,7 +344,7 @@ class _DayProgressBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const totalIbadah = 10;
+    const totalIbadah = 11;
     int done = 0;
     if (record != null) {
       if (record!.fajrStatus == PrayerStatus.performed) done++;
@@ -357,6 +357,7 @@ class _DayProgressBar extends ConsumerWidget {
       if (record!.quranPages > 0) done++;
       if (record!.fastingType != FastingType.none) done++;
       if (record!.nightPrayer) done++;
+      if (record!.ghadhBasar) done++;
     }
     final pct = done / totalIbadah;
 
@@ -923,6 +924,23 @@ class _IbadahGroup extends ConsumerWidget {
                 );
           },
         ),
+        _ToggleRow(
+          emoji: '👁️',
+          label: 'غضّ البصر',
+          sublabel: 'حفظ النظر عن الحرام',
+          points: '+١٠',
+          value: record?.ghadhBasar ?? false,
+          onChanged: (v) async {
+            final rec =
+                await ref.read(dailyRecordDaoProvider).getOrCreateToday();
+            await ref.read(dailyRecordDaoProvider).toggleGhadhBasar(rec.id, v);
+            await ref
+                .read(syncManagerProvider)
+                .syncDailyRecord(
+                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
+                );
+          },
+        ),
       ],
     );
   }
@@ -1281,7 +1299,6 @@ class _ProhibitionsGroup extends ConsumerWidget {
   const _ProhibitionsGroup({required this.record});
 
   static const _items = [
-    (ProhibitionCategory.ghadhBasar, '👁️', 'غضّ البصر', 'حفظ النظر عن الحرام'),
     (ProhibitionCategory.gheeba, '🗣️', 'الغيبة', 'ذكر الناس بما يكرهون'),
     (ProhibitionCategory.nameema, '👂', 'النميمة', 'نقل الكلام بقصد الإفساد'),
     (ProhibitionCategory.kadhb, '🚫', 'الكذب', 'قول غير الحق'),

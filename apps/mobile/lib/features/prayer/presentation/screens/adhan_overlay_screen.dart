@@ -1,13 +1,7 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/prayer/presentation/screens/adhan_overlay_screen.dart
-//  تقوى — شاشة الأذان الجميلة
-// ═══════════════════════════════════════════════════════════════
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -16,6 +10,7 @@ import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 import 'dart:async';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 
 // ══════════════════════════════════════════════════════
 //  ADHAN OVERLAY SCREEN
@@ -36,7 +31,6 @@ class AdhanOverlayScreen extends ConsumerStatefulWidget {
 
 class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     with TickerProviderStateMixin {
-  late final AudioPlayer _player;
   late final AnimationController _pulseCtrl;
   late final AnimationController _starsCtrl;
   late final AnimationController _entryCtrl;
@@ -67,7 +61,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       duration: const Duration(milliseconds: 1000),
     )..forward();
 
-    _player = AudioPlayer();
     if (widget.autoPlay) _initAudio();
     _initSensors();
     _initVibration();
@@ -81,7 +74,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     if (mode == 'vibrate' ||
         (mode == 'sound' && (prefs?.vibrateWithAdhan ?? true))) {
       _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-        if (_player.playing || mode == 'vibrate') {
+        if (AdhanAudioPlayer.isPlaying || mode == 'vibrate') {
           // Vibrate if playing or if only vibrating
           HapticFeedback.vibrate();
         }
@@ -101,10 +94,15 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       _sensorSub = accelerometerEventStream().listen((event) {
         // If device is flipped face down (Z axis is significantly negative)
         if (event.z < -8.0) {
-          _close();
+          _silenceAdhan();
         }
       });
     }
+  }
+
+  void _silenceAdhan() {
+    AdhanAudioPlayer.stop();
+    _vibrationTimer?.cancel();
   }
 
   Future<void> _initAudio() async {
@@ -117,37 +115,19 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     // Respect the adhan mode (sound vs silent/vibrate)
     final mode = prefs?.adhanMode ?? 'sound';
-    final soundEnabled = prefs?.adhanSoundEnabled ?? true;
-
-    if (mode == 'silent' || mode == 'vibrate' || !soundEnabled) return;
+    
+    if (mode == 'silent' || mode == 'vibrate') return;
 
     // Use the user-selected sound file, fall back to Makkah if not set
     final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
     final asset = 'assets/sounds/$soundFile';
 
-    // Handle Alarm stream if enabled
-    final isAlarm = prefs?.adhanAlarmEnabled ?? true;
     final volume = prefs?.adhanVolumeLevel ?? 1.0;
 
-    await _player.setVolume(volume);
-
-    for (int attempt = 0; attempt < 3; attempt++) {
-      try {
-        if (isAlarm) {
-          // On Android, we try to use the alarm stream usage
-          await _player.setAudioSource(AudioSource.asset(asset), preload: true);
-          // Note: Android-specific attributes might need conditional imports or specific package versions
-          // For now, we'll use a simpler approach that is safer for compilation
-        } else {
-          await _player.setAsset(asset);
-        }
-        await _player.play();
-        return; // نجح
-      } catch (e) {
-        if (attempt < 2) {
-          await Future.delayed(const Duration(milliseconds: 500));
-        }
-      }
+    if (!AdhanAudioPlayer.isPlaying) {
+      await AdhanAudioPlayer.play(asset: asset, volume: volume);
+    } else {
+      await AdhanAudioPlayer.setVolume(volume);
     }
   }
 
@@ -155,7 +135,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   void dispose() {
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    _player.dispose();
     _sensorSub?.cancel();
     _vibrationTimer?.cancel();
     _pulseCtrl.dispose();
@@ -165,13 +144,13 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   }
 
   void _close() {
-    _player.stop();
+    AdhanAudioPlayer.stop();
     _applyAutoSilent();
     Navigator.of(context).pop();
   }
 
   void _goToPrayer() {
-    _player.stop();
+    AdhanAudioPlayer.stop();
     _applyAutoSilent();
     Navigator.of(context).popUntil((r) => r.isFirst);
     Navigator.of(context).pushNamed('/prayer');
@@ -200,7 +179,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     return WillPopScope(
       onWillPop: () async {
-        _player.stop();
+        AdhanAudioPlayer.stop();
         return true;
       },
       child: Scaffold(

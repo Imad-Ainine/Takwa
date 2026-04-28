@@ -252,6 +252,21 @@ class $DailyRecordsTable extends DailyRecords
     requiredDuringInsert: false,
     defaultValue: const Constant(0.0),
   );
+  static const VerificationMeta _ghadhBasarMeta = const VerificationMeta(
+    'ghadhBasar',
+  );
+  @override
+  late final GeneratedColumn<bool> ghadhBasar = GeneratedColumn<bool>(
+    'ghadh_basar',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("ghadh_basar" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _taqwaPointsMeta = const VerificationMeta(
     'taqwaPoints',
   );
@@ -354,6 +369,7 @@ class $DailyRecordsTable extends DailyRecords
     fastingType,
     sadaqah,
     sadaqahAmount,
+    ghadhBasar,
     taqwaPoints,
     deductedPoints,
     netPoints,
@@ -476,6 +492,12 @@ class $DailyRecordsTable extends DailyRecords
           data['sadaqah_amount']!,
           _sadaqahAmountMeta,
         ),
+      );
+    }
+    if (data.containsKey('ghadh_basar')) {
+      context.handle(
+        _ghadhBasarMeta,
+        ghadhBasar.isAcceptableOrUnknown(data['ghadh_basar']!, _ghadhBasarMeta),
       );
     }
     if (data.containsKey('taqwa_points')) {
@@ -627,6 +649,10 @@ class $DailyRecordsTable extends DailyRecords
         DriftSqlType.double,
         data['${effectivePrefix}sadaqah_amount'],
       )!,
+      ghadhBasar: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}ghadh_basar'],
+      )!,
       taqwaPoints: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}taqwa_points'],
@@ -698,6 +724,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
   final FastingType fastingType;
   final bool sadaqah;
   final double sadaqahAmount;
+  final bool ghadhBasar;
   final int taqwaPoints;
   final int deductedPoints;
   final int netPoints;
@@ -726,6 +753,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
     required this.fastingType,
     required this.sadaqah,
     required this.sadaqahAmount,
+    required this.ghadhBasar,
     required this.taqwaPoints,
     required this.deductedPoints,
     required this.netPoints,
@@ -781,6 +809,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
     }
     map['sadaqah'] = Variable<bool>(sadaqah);
     map['sadaqah_amount'] = Variable<double>(sadaqahAmount);
+    map['ghadh_basar'] = Variable<bool>(ghadhBasar);
     map['taqwa_points'] = Variable<int>(taqwaPoints);
     map['deducted_points'] = Variable<int>(deductedPoints);
     map['net_points'] = Variable<int>(netPoints);
@@ -817,6 +846,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
       fastingType: Value(fastingType),
       sadaqah: Value(sadaqah),
       sadaqahAmount: Value(sadaqahAmount),
+      ghadhBasar: Value(ghadhBasar),
       taqwaPoints: Value(taqwaPoints),
       deductedPoints: Value(deductedPoints),
       netPoints: Value(netPoints),
@@ -867,6 +897,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
       ),
       sadaqah: serializer.fromJson<bool>(json['sadaqah']),
       sadaqahAmount: serializer.fromJson<double>(json['sadaqahAmount']),
+      ghadhBasar: serializer.fromJson<bool>(json['ghadhBasar']),
       taqwaPoints: serializer.fromJson<int>(json['taqwaPoints']),
       deductedPoints: serializer.fromJson<int>(json['deductedPoints']),
       netPoints: serializer.fromJson<int>(json['netPoints']),
@@ -912,6 +943,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
       ),
       'sadaqah': serializer.toJson<bool>(sadaqah),
       'sadaqahAmount': serializer.toJson<double>(sadaqahAmount),
+      'ghadhBasar': serializer.toJson<bool>(ghadhBasar),
       'taqwaPoints': serializer.toJson<int>(taqwaPoints),
       'deductedPoints': serializer.toJson<int>(deductedPoints),
       'netPoints': serializer.toJson<int>(netPoints),
@@ -943,6 +975,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
     FastingType? fastingType,
     bool? sadaqah,
     double? sadaqahAmount,
+    bool? ghadhBasar,
     int? taqwaPoints,
     int? deductedPoints,
     int? netPoints,
@@ -971,6 +1004,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
     fastingType: fastingType ?? this.fastingType,
     sadaqah: sadaqah ?? this.sadaqah,
     sadaqahAmount: sadaqahAmount ?? this.sadaqahAmount,
+    ghadhBasar: ghadhBasar ?? this.ghadhBasar,
     taqwaPoints: taqwaPoints ?? this.taqwaPoints,
     deductedPoints: deductedPoints ?? this.deductedPoints,
     netPoints: netPoints ?? this.netPoints,
@@ -1029,6 +1063,9 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
       sadaqahAmount: data.sadaqahAmount.present
           ? data.sadaqahAmount.value
           : this.sadaqahAmount,
+      ghadhBasar: data.ghadhBasar.present
+          ? data.ghadhBasar.value
+          : this.ghadhBasar,
       taqwaPoints: data.taqwaPoints.present
           ? data.taqwaPoints.value
           : this.taqwaPoints,
@@ -1066,6 +1103,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
           ..write('fastingType: $fastingType, ')
           ..write('sadaqah: $sadaqah, ')
           ..write('sadaqahAmount: $sadaqahAmount, ')
+          ..write('ghadhBasar: $ghadhBasar, ')
           ..write('taqwaPoints: $taqwaPoints, ')
           ..write('deductedPoints: $deductedPoints, ')
           ..write('netPoints: $netPoints, ')
@@ -1099,6 +1137,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
     fastingType,
     sadaqah,
     sadaqahAmount,
+    ghadhBasar,
     taqwaPoints,
     deductedPoints,
     netPoints,
@@ -1131,6 +1170,7 @@ class DailyRecord extends DataClass implements Insertable<DailyRecord> {
           other.fastingType == this.fastingType &&
           other.sadaqah == this.sadaqah &&
           other.sadaqahAmount == this.sadaqahAmount &&
+          other.ghadhBasar == this.ghadhBasar &&
           other.taqwaPoints == this.taqwaPoints &&
           other.deductedPoints == this.deductedPoints &&
           other.netPoints == this.netPoints &&
@@ -1161,6 +1201,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
   final Value<FastingType> fastingType;
   final Value<bool> sadaqah;
   final Value<double> sadaqahAmount;
+  final Value<bool> ghadhBasar;
   final Value<int> taqwaPoints;
   final Value<int> deductedPoints;
   final Value<int> netPoints;
@@ -1189,6 +1230,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
     this.fastingType = const Value.absent(),
     this.sadaqah = const Value.absent(),
     this.sadaqahAmount = const Value.absent(),
+    this.ghadhBasar = const Value.absent(),
     this.taqwaPoints = const Value.absent(),
     this.deductedPoints = const Value.absent(),
     this.netPoints = const Value.absent(),
@@ -1218,6 +1260,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
     this.fastingType = const Value.absent(),
     this.sadaqah = const Value.absent(),
     this.sadaqahAmount = const Value.absent(),
+    this.ghadhBasar = const Value.absent(),
     this.taqwaPoints = const Value.absent(),
     this.deductedPoints = const Value.absent(),
     this.netPoints = const Value.absent(),
@@ -1247,6 +1290,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
     Expression<int>? fastingType,
     Expression<bool>? sadaqah,
     Expression<double>? sadaqahAmount,
+    Expression<bool>? ghadhBasar,
     Expression<int>? taqwaPoints,
     Expression<int>? deductedPoints,
     Expression<int>? netPoints,
@@ -1276,6 +1320,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
       if (fastingType != null) 'fasting_type': fastingType,
       if (sadaqah != null) 'sadaqah': sadaqah,
       if (sadaqahAmount != null) 'sadaqah_amount': sadaqahAmount,
+      if (ghadhBasar != null) 'ghadh_basar': ghadhBasar,
       if (taqwaPoints != null) 'taqwa_points': taqwaPoints,
       if (deductedPoints != null) 'deducted_points': deductedPoints,
       if (netPoints != null) 'net_points': netPoints,
@@ -1307,6 +1352,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
     Value<FastingType>? fastingType,
     Value<bool>? sadaqah,
     Value<double>? sadaqahAmount,
+    Value<bool>? ghadhBasar,
     Value<int>? taqwaPoints,
     Value<int>? deductedPoints,
     Value<int>? netPoints,
@@ -1336,6 +1382,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
       fastingType: fastingType ?? this.fastingType,
       sadaqah: sadaqah ?? this.sadaqah,
       sadaqahAmount: sadaqahAmount ?? this.sadaqahAmount,
+      ghadhBasar: ghadhBasar ?? this.ghadhBasar,
       taqwaPoints: taqwaPoints ?? this.taqwaPoints,
       deductedPoints: deductedPoints ?? this.deductedPoints,
       netPoints: netPoints ?? this.netPoints,
@@ -1421,6 +1468,9 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
     if (sadaqahAmount.present) {
       map['sadaqah_amount'] = Variable<double>(sadaqahAmount.value);
     }
+    if (ghadhBasar.present) {
+      map['ghadh_basar'] = Variable<bool>(ghadhBasar.value);
+    }
     if (taqwaPoints.present) {
       map['taqwa_points'] = Variable<int>(taqwaPoints.value);
     }
@@ -1468,6 +1518,7 @@ class DailyRecordsCompanion extends UpdateCompanion<DailyRecord> {
           ..write('fastingType: $fastingType, ')
           ..write('sadaqah: $sadaqah, ')
           ..write('sadaqahAmount: $sadaqahAmount, ')
+          ..write('ghadhBasar: $ghadhBasar, ')
           ..write('taqwaPoints: $taqwaPoints, ')
           ..write('deductedPoints: $deductedPoints, ')
           ..write('netPoints: $netPoints, ')
@@ -5146,6 +5197,7 @@ typedef $$DailyRecordsTableCreateCompanionBuilder =
       Value<FastingType> fastingType,
       Value<bool> sadaqah,
       Value<double> sadaqahAmount,
+      Value<bool> ghadhBasar,
       Value<int> taqwaPoints,
       Value<int> deductedPoints,
       Value<int> netPoints,
@@ -5176,6 +5228,7 @@ typedef $$DailyRecordsTableUpdateCompanionBuilder =
       Value<FastingType> fastingType,
       Value<bool> sadaqah,
       Value<double> sadaqahAmount,
+      Value<bool> ghadhBasar,
       Value<int> taqwaPoints,
       Value<int> deductedPoints,
       Value<int> netPoints,
@@ -5371,6 +5424,11 @@ class $$DailyRecordsTableFilterComposer
 
   ColumnFilters<double> get sadaqahAmount => $composableBuilder(
     column: $table.sadaqahAmount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get ghadhBasar => $composableBuilder(
+    column: $table.ghadhBasar,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5594,6 +5652,11 @@ class $$DailyRecordsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get ghadhBasar => $composableBuilder(
+    column: $table.ghadhBasar,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get taqwaPoints => $composableBuilder(
     column: $table.taqwaPoints,
     builder: (column) => ColumnOrderings(column),
@@ -5729,6 +5792,11 @@ class $$DailyRecordsTableAnnotationComposer
 
   GeneratedColumn<double> get sadaqahAmount => $composableBuilder(
     column: $table.sadaqahAmount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get ghadhBasar => $composableBuilder(
+    column: $table.ghadhBasar,
     builder: (column) => column,
   );
 
@@ -5885,6 +5953,7 @@ class $$DailyRecordsTableTableManager
                 Value<FastingType> fastingType = const Value.absent(),
                 Value<bool> sadaqah = const Value.absent(),
                 Value<double> sadaqahAmount = const Value.absent(),
+                Value<bool> ghadhBasar = const Value.absent(),
                 Value<int> taqwaPoints = const Value.absent(),
                 Value<int> deductedPoints = const Value.absent(),
                 Value<int> netPoints = const Value.absent(),
@@ -5913,6 +5982,7 @@ class $$DailyRecordsTableTableManager
                 fastingType: fastingType,
                 sadaqah: sadaqah,
                 sadaqahAmount: sadaqahAmount,
+                ghadhBasar: ghadhBasar,
                 taqwaPoints: taqwaPoints,
                 deductedPoints: deductedPoints,
                 netPoints: netPoints,
@@ -5943,6 +6013,7 @@ class $$DailyRecordsTableTableManager
                 Value<FastingType> fastingType = const Value.absent(),
                 Value<bool> sadaqah = const Value.absent(),
                 Value<double> sadaqahAmount = const Value.absent(),
+                Value<bool> ghadhBasar = const Value.absent(),
                 Value<int> taqwaPoints = const Value.absent(),
                 Value<int> deductedPoints = const Value.absent(),
                 Value<int> netPoints = const Value.absent(),
@@ -5971,6 +6042,7 @@ class $$DailyRecordsTableTableManager
                 fastingType: fastingType,
                 sadaqah: sadaqah,
                 sadaqahAmount: sadaqahAmount,
+                ghadhBasar: ghadhBasar,
                 taqwaPoints: taqwaPoints,
                 deductedPoints: deductedPoints,
                 netPoints: netPoints,

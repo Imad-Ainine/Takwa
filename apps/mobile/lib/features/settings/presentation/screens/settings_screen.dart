@@ -31,8 +31,12 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  Future<void> _updatePref(String key, dynamic value) async {
-    await ref.read(userPreferencesProvider.notifier).updatePref(key, value);
+  Future<void> _updatePref(
+    String key,
+    dynamic value, {
+    NotificationCategory category = NotificationCategory.all,
+  }) async {
+    await ref.read(userPreferencesProvider.notifier).updatePref(key, value, category: category);
   }
 
   @override
@@ -126,7 +130,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تنبيه بصوت الأذان في الوقت المحدد',
                                   value: prefs.wakeUpBeforeFajr,
                                   onChanged: (v) =>
-                                      _updatePref('wakeUpBeforeFajr', v),
+                                      _updatePref('wakeUpBeforeFajr', v, category: NotificationCategory.prayer),
                                 ),
                                 if (prefs.wakeUpBeforeFajr) ...[
                                   const SettingsDivider(),
@@ -137,7 +141,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     onChanged: (t) async {
                                       final str =
                                           '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                      await _updatePref('wakeUpTime', str);
+                                      await _updatePref('wakeUpTime', str, category: NotificationCategory.prayer);
                                     },
                                   ),
                                 ],
