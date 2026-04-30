@@ -1,57 +1,68 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/features/books/providers/books_reading_provider.dart
-//  تقوى — Books Reading State (Riverpod + SharedPreferences)
+//  تقوى — Books Reading State (Riverpod + Drift offline-first)
 // ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/books_data.dart';
 import '../../../core/supabase/supabase_service.dart';
+import '../../../core/providers/database_providers.dart';
+import '../../../core/database/daos.dart';
 
 // ─────────────────────────────────────────
-//  READING PROGRESS (bookId → pageIndex)
+//  READING PROGRESS (bookId → BookProgress)
+//  Source of truth: local Drift table `book_reading_progress`
 // ─────────────────────────────────────────
 
-class ReadingProgressNotifier
-    extends StateNotifier<Map<String, BookProgress>> {
-  ReadingProgressNotifier() : super({}) {
+class BookProgress {
+  final int chapterIndex;
+  final int pageIndex;
+  final Set<int> readPages;
+
+  const BookProgress({
+    required this.chapterIndex,
+    required this.pageIndex,
+    required this.readPages,
+  });
+}
+
+class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
+  ReadingProgressNotifier(this._ref) : super({}) {
     _load();
   }
 
-  static const _prefPrefix = 'book_progress_';
-  static const _chapterSuffix = '_chapter';
-  static const _readPagesSuffix = '_read_pages';
+  final Ref _ref;
 
+  BookProgressDao get _dao => _ref.read(bookProgressDaoProvider);
+
+  /// Load all book progress from local Drift DB.
   Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final keys = prefs.getKeys().where((k) => k.startsWith(_prefPrefix));
-    final map = <String, BookProgress>{};
-    for (final key in keys) {
-      if (key.endsWith(_chapterSuffix) || key.endsWith(_readPagesSuffix)) {
-        continue;
+    try {
+      final rows = await _dao.getAll();
+      final map = <String, BookProgress>{};
+      for (final row in rows) {
+        final readPages = row.readPages.isEmpty
+            ? <int>{}
+            : row.readPages.split(',').map(int.parse).toSet();
+        map[row.bookId] = BookProgress(
+          chapterIndex: row.chapterIndex,
+          pageIndex: row.pageIndex,
+          readPages: readPages,
+        );
       }
-      final bookId = key.substring(_prefPrefix.length);
-      final page = prefs.getInt(key) ?? 0;
-      final chapter = prefs.getInt('$_prefPrefix$bookId$_chapterSuffix') ?? 0;
-      final readPagesStr =
-          prefs.getString('$_prefPrefix$bookId$_readPagesSuffix') ?? '';
-      final readPages = readPagesStr.isEmpty
-          ? <int>{}
-          : readPagesStr.split(',').map(int.parse).toSet();
-
-      map[bookId] = BookProgress(
-        chapterIndex: chapter,
-        pageIndex: page,
-        readPages: readPages,
-      );
+      state = map;
+    } catch (e) {
+      print('Failed to load book progress from local DB: $e');
     }
-    state = map;
   }
 
+  /// Save progress locally (Drift) and opportunistically push to Supabase.
   Future<void> save(String bookId, int chapterIndex, int pageIndex) async {
     final existing = state[bookId];
-    final updatedReadPages = (existing?.readPages ?? <int>{})..add(pageIndex);
+    final updatedReadPages = {...(existing?.readPages ?? <int>{}), pageIndex};
 
+    // 1. Update in-memory state immediately.
     state = {
       ...state,
       bookId: BookProgress(
@@ -60,15 +71,20 @@ class ReadingProgressNotifier
         readPages: updatedReadPages,
       ),
     };
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('$_prefPrefix$bookId', pageIndex);
-    await prefs.setInt('$_prefPrefix$bookId$_chapterSuffix', chapterIndex);
-    await prefs.setString(
-      '$_prefPrefix$bookId$_readPagesSuffix',
-      updatedReadPages.join(','),
-    );
 
-    // Sync to Supabase (Best effort)
+    // 2. Write to local Drift DB (works offline).
+    try {
+      await _dao.markPage(
+        bookId: bookId,
+        chapterIndex: chapterIndex,
+        pageIndex: pageIndex,
+        readPages: updatedReadPages,
+      );
+    } catch (e) {
+      print('Failed to write book progress to local DB: $e');
+    }
+
+    // 3. Best-effort push to Supabase (ignored if offline).
     try {
       await SupabaseService.upsertBookProgress(bookId, {
         'chapter_index': chapterIndex,
@@ -76,40 +92,48 @@ class ReadingProgressNotifier
         'read_pages': updatedReadPages.toList(),
       });
     } catch (e) {
-      print('Failed to sync book progress to Supabase: $e');
+      print('Offline book sync skipped: $e');
     }
   }
 
+  /// Save PDF page progress locally and push to Supabase.
+  Future<void> savePdfSession(
+    String bookId,
+    int pdfPage,
+    int totalPdfPages,
+    int readingSeconds,
+  ) async {
+    try {
+      await _dao.savePdfSession(
+        bookId: bookId,
+        pdfPage: pdfPage,
+        totalPdfPages: totalPdfPages,
+        readingSeconds: readingSeconds,
+      );
+    } catch (e) {
+      print('Failed to write pdf session to local DB: $e');
+    }
+    try {
+      await SupabaseService.upsertPdfSession(
+        bookId,
+        pdfPage,
+        totalPdfPages,
+        readingSeconds,
+      );
+    } catch (e) {
+      print('Offline pdf session sync skipped: $e');
+    }
+  }
+
+  /// Pull remote progress from Supabase and merge into local Drift DB.
   Future<void> syncFromRemote() async {
     try {
       final remoteData = await SupabaseService.getAllBookProgress();
       if (remoteData.isEmpty) return;
-
-      final prefs = await SharedPreferences.getInstance();
-      final map = Map<String, BookProgress>.from(state);
-
       for (final item in remoteData) {
-        final bookId = item['book_id'] as String;
-        final chapter = item['chapter_index'] as int;
-        final page = item['page_index'] as int;
-        final readPagesRaw = item['read_pages'] as List? ?? [];
-        final readPages = readPagesRaw.map((e) => e as int).toSet();
-
-        // Local storage update
-        await prefs.setInt('$_prefPrefix$bookId', page);
-        await prefs.setInt('$_prefPrefix$bookId$_chapterSuffix', chapter);
-        await prefs.setString(
-          '$_prefPrefix$bookId$_readPagesSuffix',
-          readPages.join(','),
-        );
-
-        map[bookId] = BookProgress(
-          chapterIndex: chapter,
-          pageIndex: page,
-          readPages: readPages,
-        );
+        await _dao.upsertFromRemote(item);
       }
-      state = map;
+      await _load();
     } catch (e) {
       print('Failed to sync remote book progress: $e');
     }
@@ -117,9 +141,8 @@ class ReadingProgressNotifier
 
   BookProgress? progressFor(String bookId) => state[bookId];
 
-  bool isPageRead(String bookId, int pageIndex) {
-    return state[bookId]?.readPages.contains(pageIndex) ?? false;
-  }
+  bool isPageRead(String bookId, int pageIndex) =>
+      state[bookId]?.readPages.contains(pageIndex) ?? false;
 
   double getProgress(String bookId, int totalPages) {
     if (totalPages == 0) return 0;
@@ -128,40 +151,32 @@ class ReadingProgressNotifier
   }
 }
 
-class BookProgress {
-  final int chapterIndex;
-  final int pageIndex;
-  final Set<int> readPages;
-  const BookProgress({
-    required this.chapterIndex,
-    required this.pageIndex,
-    required this.readPages,
-  });
-}
-
 final readingProgressProvider =
     StateNotifierProvider<ReadingProgressNotifier, Map<String, BookProgress>>(
-  (ref) => ReadingProgressNotifier(),
-);
+      (ref) => ReadingProgressNotifier(ref),
+    );
 
 // Helper to read progress for a specific book
-BookReadingProgress? getProgress(
-    Map<String, BookProgress> map, String bookId) {
+BookReadingProgress? getProgress(Map<String, BookProgress> map, String bookId) {
   final p = map[bookId];
   if (p == null) return null;
   return BookReadingProgress(
-      chapterIndex: p.chapterIndex, pageIndex: p.pageIndex);
+    chapterIndex: p.chapterIndex,
+    pageIndex: p.pageIndex,
+  );
 }
 
 class BookReadingProgress {
   final int chapterIndex;
   final int pageIndex;
-  const BookReadingProgress(
-      {required this.chapterIndex, required this.pageIndex});
+  const BookReadingProgress({
+    required this.chapterIndex,
+    required this.pageIndex,
+  });
 }
 
 // ─────────────────────────────────────────
-//  FONT SIZE (0=small, 1=medium, 2=large)
+//  FONT SIZE (0=small 1=medium 2=large)
 // ─────────────────────────────────────────
 
 class BookFontSizeNotifier extends StateNotifier<int> {
@@ -184,12 +199,10 @@ class BookFontSizeNotifier extends StateNotifier<int> {
   }
 }
 
-final bookFontSizeProvider =
-    StateNotifierProvider<BookFontSizeNotifier, int>(
+final bookFontSizeProvider = StateNotifierProvider<BookFontSizeNotifier, int>(
   (ref) => BookFontSizeNotifier(),
 );
 
-/// Returns the actual pixel size from the font-size level
 double fontSizeFromLevel(int level) {
   switch (level) {
     case 0:
@@ -201,8 +214,18 @@ double fontSizeFromLevel(int level) {
   }
 }
 
-/// Fetches the list of books from Supabase
+// ─────────────────────────────────────────
+//  BOOKS LIST — offline-first
+//  Tries Supabase first, falls back to kIslamicBooks if offline.
+// ─────────────────────────────────────────
 final booksListProvider = FutureProvider<List<IslamicBook>>((ref) async {
-  final data = await SupabaseService.getBooks();
-  return data.map((json) => IslamicBook.fromJson(json)).toList();
+  try {
+    final data = await SupabaseService.getBooks();
+    if (data.isNotEmpty) {
+      return data.map((json) => IslamicBook.fromJson(json)).toList();
+    }
+  } catch (_) {
+    // Network unavailable — fall through to local data.
+  }
+  return kIslamicBooks;
 });

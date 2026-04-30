@@ -25,3 +25,21 @@ mixin _$CustomIbadahDaoMixin on DatabaseAccessor<AppDatabase> {
   $DailyRecordsTable get dailyRecords => attachedDatabase.dailyRecords;
   $CustomIbadahLogTable get customIbadahLog => attachedDatabase.customIbadahLog;
 }
+mixin _$PrayerTimesCacheDaoMixin on DatabaseAccessor<AppDatabase> {
+  $PrayerTimesCacheTable get prayerTimesCache =>
+      attachedDatabase.prayerTimesCache;
+}
+mixin _$RamadanProgressDaoMixin on DatabaseAccessor<AppDatabase> {
+  $DailyRecordsTable get dailyRecords => attachedDatabase.dailyRecords;
+  $RamadanProgressTable get ramadanProgress => attachedDatabase.ramadanProgress;
+}
+mixin _$UserAdhkarDaoMixin on DatabaseAccessor<AppDatabase> {
+  $UserAdhkarTable get userAdhkar => attachedDatabase.userAdhkar;
+}
+mixin _$UserDuasDaoMixin on DatabaseAccessor<AppDatabase> {
+  $UserDuasTable get userDuas => attachedDatabase.userDuas;
+}
+mixin _$BookProgressDaoMixin on DatabaseAccessor<AppDatabase> {
+  $BookReadingProgressTable get bookReadingProgress =>
+      attachedDatabase.bookReadingProgress;
+}

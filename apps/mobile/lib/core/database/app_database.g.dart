@@ -5138,6 +5138,1342 @@ class RemindersCompanion extends UpdateCompanion<Reminder> {
   }
 }
 
+class $UserAdhkarTable extends UserAdhkar
+    with TableInfo<$UserAdhkarTable, UserAdhkarData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserAdhkarTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textArMeta = const VerificationMeta('textAr');
+  @override
+  late final GeneratedColumn<String> textAr = GeneratedColumn<String>(
+    'text_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countMeta = const VerificationMeta('count');
+  @override
+  late final GeneratedColumn<int> count = GeneratedColumn<int>(
+    'count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _categoryHintMeta = const VerificationMeta(
+    'categoryHint',
+  );
+  @override
+  late final GeneratedColumn<String> categoryHint = GeneratedColumn<String>(
+    'category_hint',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    textAr,
+    count,
+    categoryHint,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_adhkar';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserAdhkarData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('text_ar')) {
+      context.handle(
+        _textArMeta,
+        textAr.isAcceptableOrUnknown(data['text_ar']!, _textArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textArMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+        _countMeta,
+        count.isAcceptableOrUnknown(data['count']!, _countMeta),
+      );
+    }
+    if (data.containsKey('category_hint')) {
+      context.handle(
+        _categoryHintMeta,
+        categoryHint.isAcceptableOrUnknown(
+          data['category_hint']!,
+          _categoryHintMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UserAdhkarData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserAdhkarData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      textAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_ar'],
+      )!,
+      count: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count'],
+      )!,
+      categoryHint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category_hint'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $UserAdhkarTable createAlias(String alias) {
+    return $UserAdhkarTable(attachedDatabase, alias);
+  }
+}
+
+class UserAdhkarData extends DataClass implements Insertable<UserAdhkarData> {
+  final String id;
+  final String textAr;
+  final int count;
+  final String? categoryHint;
+  final DateTime createdAt;
+  const UserAdhkarData({
+    required this.id,
+    required this.textAr,
+    required this.count,
+    this.categoryHint,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['text_ar'] = Variable<String>(textAr);
+    map['count'] = Variable<int>(count);
+    if (!nullToAbsent || categoryHint != null) {
+      map['category_hint'] = Variable<String>(categoryHint);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  UserAdhkarCompanion toCompanion(bool nullToAbsent) {
+    return UserAdhkarCompanion(
+      id: Value(id),
+      textAr: Value(textAr),
+      count: Value(count),
+      categoryHint: categoryHint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoryHint),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory UserAdhkarData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserAdhkarData(
+      id: serializer.fromJson<String>(json['id']),
+      textAr: serializer.fromJson<String>(json['textAr']),
+      count: serializer.fromJson<int>(json['count']),
+      categoryHint: serializer.fromJson<String?>(json['categoryHint']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'textAr': serializer.toJson<String>(textAr),
+      'count': serializer.toJson<int>(count),
+      'categoryHint': serializer.toJson<String?>(categoryHint),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  UserAdhkarData copyWith({
+    String? id,
+    String? textAr,
+    int? count,
+    Value<String?> categoryHint = const Value.absent(),
+    DateTime? createdAt,
+  }) => UserAdhkarData(
+    id: id ?? this.id,
+    textAr: textAr ?? this.textAr,
+    count: count ?? this.count,
+    categoryHint: categoryHint.present ? categoryHint.value : this.categoryHint,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  UserAdhkarData copyWithCompanion(UserAdhkarCompanion data) {
+    return UserAdhkarData(
+      id: data.id.present ? data.id.value : this.id,
+      textAr: data.textAr.present ? data.textAr.value : this.textAr,
+      count: data.count.present ? data.count.value : this.count,
+      categoryHint: data.categoryHint.present
+          ? data.categoryHint.value
+          : this.categoryHint,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserAdhkarData(')
+          ..write('id: $id, ')
+          ..write('textAr: $textAr, ')
+          ..write('count: $count, ')
+          ..write('categoryHint: $categoryHint, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, textAr, count, categoryHint, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserAdhkarData &&
+          other.id == this.id &&
+          other.textAr == this.textAr &&
+          other.count == this.count &&
+          other.categoryHint == this.categoryHint &&
+          other.createdAt == this.createdAt);
+}
+
+class UserAdhkarCompanion extends UpdateCompanion<UserAdhkarData> {
+  final Value<String> id;
+  final Value<String> textAr;
+  final Value<int> count;
+  final Value<String?> categoryHint;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const UserAdhkarCompanion({
+    this.id = const Value.absent(),
+    this.textAr = const Value.absent(),
+    this.count = const Value.absent(),
+    this.categoryHint = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UserAdhkarCompanion.insert({
+    required String id,
+    required String textAr,
+    this.count = const Value.absent(),
+    this.categoryHint = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       textAr = Value(textAr);
+  static Insertable<UserAdhkarData> custom({
+    Expression<String>? id,
+    Expression<String>? textAr,
+    Expression<int>? count,
+    Expression<String>? categoryHint,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (textAr != null) 'text_ar': textAr,
+      if (count != null) 'count': count,
+      if (categoryHint != null) 'category_hint': categoryHint,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UserAdhkarCompanion copyWith({
+    Value<String>? id,
+    Value<String>? textAr,
+    Value<int>? count,
+    Value<String?>? categoryHint,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return UserAdhkarCompanion(
+      id: id ?? this.id,
+      textAr: textAr ?? this.textAr,
+      count: count ?? this.count,
+      categoryHint: categoryHint ?? this.categoryHint,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (textAr.present) {
+      map['text_ar'] = Variable<String>(textAr.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    if (categoryHint.present) {
+      map['category_hint'] = Variable<String>(categoryHint.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserAdhkarCompanion(')
+          ..write('id: $id, ')
+          ..write('textAr: $textAr, ')
+          ..write('count: $count, ')
+          ..write('categoryHint: $categoryHint, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $UserDuasTable extends UserDuas with TableInfo<$UserDuasTable, UserDua> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UserDuasTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleArMeta = const VerificationMeta(
+    'titleAr',
+  );
+  @override
+  late final GeneratedColumn<String> titleAr = GeneratedColumn<String>(
+    'title_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textArMeta = const VerificationMeta('textAr');
+  @override
+  late final GeneratedColumn<String> textAr = GeneratedColumn<String>(
+    'text_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _occasionMeta = const VerificationMeta(
+    'occasion',
+  );
+  @override
+  late final GeneratedColumn<String> occasion = GeneratedColumn<String>(
+    'occasion',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emojiMeta = const VerificationMeta('emoji');
+  @override
+  late final GeneratedColumn<String> emoji = GeneratedColumn<String>(
+    'emoji',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    titleAr,
+    textAr,
+    occasion,
+    source,
+    emoji,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'user_duas';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<UserDua> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title_ar')) {
+      context.handle(
+        _titleArMeta,
+        titleAr.isAcceptableOrUnknown(data['title_ar']!, _titleArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleArMeta);
+    }
+    if (data.containsKey('text_ar')) {
+      context.handle(
+        _textArMeta,
+        textAr.isAcceptableOrUnknown(data['text_ar']!, _textArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_textArMeta);
+    }
+    if (data.containsKey('occasion')) {
+      context.handle(
+        _occasionMeta,
+        occasion.isAcceptableOrUnknown(data['occasion']!, _occasionMeta),
+      );
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    }
+    if (data.containsKey('emoji')) {
+      context.handle(
+        _emojiMeta,
+        emoji.isAcceptableOrUnknown(data['emoji']!, _emojiMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  UserDua map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return UserDua(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      titleAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_ar'],
+      )!,
+      textAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_ar'],
+      )!,
+      occasion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}occasion'],
+      ),
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      ),
+      emoji: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}emoji'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $UserDuasTable createAlias(String alias) {
+    return $UserDuasTable(attachedDatabase, alias);
+  }
+}
+
+class UserDua extends DataClass implements Insertable<UserDua> {
+  final String id;
+  final String titleAr;
+  final String textAr;
+  final String? occasion;
+  final String? source;
+  final String? emoji;
+  final DateTime createdAt;
+  const UserDua({
+    required this.id,
+    required this.titleAr,
+    required this.textAr,
+    this.occasion,
+    this.source,
+    this.emoji,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title_ar'] = Variable<String>(titleAr);
+    map['text_ar'] = Variable<String>(textAr);
+    if (!nullToAbsent || occasion != null) {
+      map['occasion'] = Variable<String>(occasion);
+    }
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
+    if (!nullToAbsent || emoji != null) {
+      map['emoji'] = Variable<String>(emoji);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  UserDuasCompanion toCompanion(bool nullToAbsent) {
+    return UserDuasCompanion(
+      id: Value(id),
+      titleAr: Value(titleAr),
+      textAr: Value(textAr),
+      occasion: occasion == null && nullToAbsent
+          ? const Value.absent()
+          : Value(occasion),
+      source: source == null && nullToAbsent
+          ? const Value.absent()
+          : Value(source),
+      emoji: emoji == null && nullToAbsent
+          ? const Value.absent()
+          : Value(emoji),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory UserDua.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return UserDua(
+      id: serializer.fromJson<String>(json['id']),
+      titleAr: serializer.fromJson<String>(json['titleAr']),
+      textAr: serializer.fromJson<String>(json['textAr']),
+      occasion: serializer.fromJson<String?>(json['occasion']),
+      source: serializer.fromJson<String?>(json['source']),
+      emoji: serializer.fromJson<String?>(json['emoji']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'titleAr': serializer.toJson<String>(titleAr),
+      'textAr': serializer.toJson<String>(textAr),
+      'occasion': serializer.toJson<String?>(occasion),
+      'source': serializer.toJson<String?>(source),
+      'emoji': serializer.toJson<String?>(emoji),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  UserDua copyWith({
+    String? id,
+    String? titleAr,
+    String? textAr,
+    Value<String?> occasion = const Value.absent(),
+    Value<String?> source = const Value.absent(),
+    Value<String?> emoji = const Value.absent(),
+    DateTime? createdAt,
+  }) => UserDua(
+    id: id ?? this.id,
+    titleAr: titleAr ?? this.titleAr,
+    textAr: textAr ?? this.textAr,
+    occasion: occasion.present ? occasion.value : this.occasion,
+    source: source.present ? source.value : this.source,
+    emoji: emoji.present ? emoji.value : this.emoji,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  UserDua copyWithCompanion(UserDuasCompanion data) {
+    return UserDua(
+      id: data.id.present ? data.id.value : this.id,
+      titleAr: data.titleAr.present ? data.titleAr.value : this.titleAr,
+      textAr: data.textAr.present ? data.textAr.value : this.textAr,
+      occasion: data.occasion.present ? data.occasion.value : this.occasion,
+      source: data.source.present ? data.source.value : this.source,
+      emoji: data.emoji.present ? data.emoji.value : this.emoji,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserDua(')
+          ..write('id: $id, ')
+          ..write('titleAr: $titleAr, ')
+          ..write('textAr: $textAr, ')
+          ..write('occasion: $occasion, ')
+          ..write('source: $source, ')
+          ..write('emoji: $emoji, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, titleAr, textAr, occasion, source, emoji, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is UserDua &&
+          other.id == this.id &&
+          other.titleAr == this.titleAr &&
+          other.textAr == this.textAr &&
+          other.occasion == this.occasion &&
+          other.source == this.source &&
+          other.emoji == this.emoji &&
+          other.createdAt == this.createdAt);
+}
+
+class UserDuasCompanion extends UpdateCompanion<UserDua> {
+  final Value<String> id;
+  final Value<String> titleAr;
+  final Value<String> textAr;
+  final Value<String?> occasion;
+  final Value<String?> source;
+  final Value<String?> emoji;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const UserDuasCompanion({
+    this.id = const Value.absent(),
+    this.titleAr = const Value.absent(),
+    this.textAr = const Value.absent(),
+    this.occasion = const Value.absent(),
+    this.source = const Value.absent(),
+    this.emoji = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  UserDuasCompanion.insert({
+    required String id,
+    required String titleAr,
+    required String textAr,
+    this.occasion = const Value.absent(),
+    this.source = const Value.absent(),
+    this.emoji = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       titleAr = Value(titleAr),
+       textAr = Value(textAr);
+  static Insertable<UserDua> custom({
+    Expression<String>? id,
+    Expression<String>? titleAr,
+    Expression<String>? textAr,
+    Expression<String>? occasion,
+    Expression<String>? source,
+    Expression<String>? emoji,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (titleAr != null) 'title_ar': titleAr,
+      if (textAr != null) 'text_ar': textAr,
+      if (occasion != null) 'occasion': occasion,
+      if (source != null) 'source': source,
+      if (emoji != null) 'emoji': emoji,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  UserDuasCompanion copyWith({
+    Value<String>? id,
+    Value<String>? titleAr,
+    Value<String>? textAr,
+    Value<String?>? occasion,
+    Value<String?>? source,
+    Value<String?>? emoji,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return UserDuasCompanion(
+      id: id ?? this.id,
+      titleAr: titleAr ?? this.titleAr,
+      textAr: textAr ?? this.textAr,
+      occasion: occasion ?? this.occasion,
+      source: source ?? this.source,
+      emoji: emoji ?? this.emoji,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (titleAr.present) {
+      map['title_ar'] = Variable<String>(titleAr.value);
+    }
+    if (textAr.present) {
+      map['text_ar'] = Variable<String>(textAr.value);
+    }
+    if (occasion.present) {
+      map['occasion'] = Variable<String>(occasion.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (emoji.present) {
+      map['emoji'] = Variable<String>(emoji.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UserDuasCompanion(')
+          ..write('id: $id, ')
+          ..write('titleAr: $titleAr, ')
+          ..write('textAr: $textAr, ')
+          ..write('occasion: $occasion, ')
+          ..write('source: $source, ')
+          ..write('emoji: $emoji, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $BookReadingProgressTable extends BookReadingProgress
+    with TableInfo<$BookReadingProgressTable, BookReadingProgressData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BookReadingProgressTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _bookIdMeta = const VerificationMeta('bookId');
+  @override
+  late final GeneratedColumn<String> bookId = GeneratedColumn<String>(
+    'book_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _chapterIndexMeta = const VerificationMeta(
+    'chapterIndex',
+  );
+  @override
+  late final GeneratedColumn<int> chapterIndex = GeneratedColumn<int>(
+    'chapter_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _pageIndexMeta = const VerificationMeta(
+    'pageIndex',
+  );
+  @override
+  late final GeneratedColumn<int> pageIndex = GeneratedColumn<int>(
+    'page_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _readPagesMeta = const VerificationMeta(
+    'readPages',
+  );
+  @override
+  late final GeneratedColumn<String> readPages = GeneratedColumn<String>(
+    'read_pages',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _pdfPageMeta = const VerificationMeta(
+    'pdfPage',
+  );
+  @override
+  late final GeneratedColumn<int> pdfPage = GeneratedColumn<int>(
+    'pdf_page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _totalPdfPagesMeta = const VerificationMeta(
+    'totalPdfPages',
+  );
+  @override
+  late final GeneratedColumn<int> totalPdfPages = GeneratedColumn<int>(
+    'total_pdf_pages',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _readingSecondsMeta = const VerificationMeta(
+    'readingSeconds',
+  );
+  @override
+  late final GeneratedColumn<int> readingSeconds = GeneratedColumn<int>(
+    'reading_seconds',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    bookId,
+    chapterIndex,
+    pageIndex,
+    readPages,
+    pdfPage,
+    totalPdfPages,
+    readingSeconds,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'book_reading_progress';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BookReadingProgressData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('book_id')) {
+      context.handle(
+        _bookIdMeta,
+        bookId.isAcceptableOrUnknown(data['book_id']!, _bookIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bookIdMeta);
+    }
+    if (data.containsKey('chapter_index')) {
+      context.handle(
+        _chapterIndexMeta,
+        chapterIndex.isAcceptableOrUnknown(
+          data['chapter_index']!,
+          _chapterIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('page_index')) {
+      context.handle(
+        _pageIndexMeta,
+        pageIndex.isAcceptableOrUnknown(data['page_index']!, _pageIndexMeta),
+      );
+    }
+    if (data.containsKey('read_pages')) {
+      context.handle(
+        _readPagesMeta,
+        readPages.isAcceptableOrUnknown(data['read_pages']!, _readPagesMeta),
+      );
+    }
+    if (data.containsKey('pdf_page')) {
+      context.handle(
+        _pdfPageMeta,
+        pdfPage.isAcceptableOrUnknown(data['pdf_page']!, _pdfPageMeta),
+      );
+    }
+    if (data.containsKey('total_pdf_pages')) {
+      context.handle(
+        _totalPdfPagesMeta,
+        totalPdfPages.isAcceptableOrUnknown(
+          data['total_pdf_pages']!,
+          _totalPdfPagesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reading_seconds')) {
+      context.handle(
+        _readingSecondsMeta,
+        readingSeconds.isAcceptableOrUnknown(
+          data['reading_seconds']!,
+          _readingSecondsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {bookId};
+  @override
+  BookReadingProgressData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BookReadingProgressData(
+      bookId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_id'],
+      )!,
+      chapterIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chapter_index'],
+      )!,
+      pageIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_index'],
+      )!,
+      readPages: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}read_pages'],
+      )!,
+      pdfPage: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pdf_page'],
+      )!,
+      totalPdfPages: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_pdf_pages'],
+      )!,
+      readingSeconds: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reading_seconds'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BookReadingProgressTable createAlias(String alias) {
+    return $BookReadingProgressTable(attachedDatabase, alias);
+  }
+}
+
+class BookReadingProgressData extends DataClass
+    implements Insertable<BookReadingProgressData> {
+  final String bookId;
+  final int chapterIndex;
+  final int pageIndex;
+
+  /// Comma-separated list of read page indices, e.g. "0,1,3,7"
+  final String readPages;
+
+  /// PDF page (if applicable)
+  final int pdfPage;
+  final int totalPdfPages;
+  final int readingSeconds;
+  final DateTime updatedAt;
+  const BookReadingProgressData({
+    required this.bookId,
+    required this.chapterIndex,
+    required this.pageIndex,
+    required this.readPages,
+    required this.pdfPage,
+    required this.totalPdfPages,
+    required this.readingSeconds,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['book_id'] = Variable<String>(bookId);
+    map['chapter_index'] = Variable<int>(chapterIndex);
+    map['page_index'] = Variable<int>(pageIndex);
+    map['read_pages'] = Variable<String>(readPages);
+    map['pdf_page'] = Variable<int>(pdfPage);
+    map['total_pdf_pages'] = Variable<int>(totalPdfPages);
+    map['reading_seconds'] = Variable<int>(readingSeconds);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BookReadingProgressCompanion toCompanion(bool nullToAbsent) {
+    return BookReadingProgressCompanion(
+      bookId: Value(bookId),
+      chapterIndex: Value(chapterIndex),
+      pageIndex: Value(pageIndex),
+      readPages: Value(readPages),
+      pdfPage: Value(pdfPage),
+      totalPdfPages: Value(totalPdfPages),
+      readingSeconds: Value(readingSeconds),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BookReadingProgressData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BookReadingProgressData(
+      bookId: serializer.fromJson<String>(json['bookId']),
+      chapterIndex: serializer.fromJson<int>(json['chapterIndex']),
+      pageIndex: serializer.fromJson<int>(json['pageIndex']),
+      readPages: serializer.fromJson<String>(json['readPages']),
+      pdfPage: serializer.fromJson<int>(json['pdfPage']),
+      totalPdfPages: serializer.fromJson<int>(json['totalPdfPages']),
+      readingSeconds: serializer.fromJson<int>(json['readingSeconds']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'bookId': serializer.toJson<String>(bookId),
+      'chapterIndex': serializer.toJson<int>(chapterIndex),
+      'pageIndex': serializer.toJson<int>(pageIndex),
+      'readPages': serializer.toJson<String>(readPages),
+      'pdfPage': serializer.toJson<int>(pdfPage),
+      'totalPdfPages': serializer.toJson<int>(totalPdfPages),
+      'readingSeconds': serializer.toJson<int>(readingSeconds),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BookReadingProgressData copyWith({
+    String? bookId,
+    int? chapterIndex,
+    int? pageIndex,
+    String? readPages,
+    int? pdfPage,
+    int? totalPdfPages,
+    int? readingSeconds,
+    DateTime? updatedAt,
+  }) => BookReadingProgressData(
+    bookId: bookId ?? this.bookId,
+    chapterIndex: chapterIndex ?? this.chapterIndex,
+    pageIndex: pageIndex ?? this.pageIndex,
+    readPages: readPages ?? this.readPages,
+    pdfPage: pdfPage ?? this.pdfPage,
+    totalPdfPages: totalPdfPages ?? this.totalPdfPages,
+    readingSeconds: readingSeconds ?? this.readingSeconds,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BookReadingProgressData copyWithCompanion(BookReadingProgressCompanion data) {
+    return BookReadingProgressData(
+      bookId: data.bookId.present ? data.bookId.value : this.bookId,
+      chapterIndex: data.chapterIndex.present
+          ? data.chapterIndex.value
+          : this.chapterIndex,
+      pageIndex: data.pageIndex.present ? data.pageIndex.value : this.pageIndex,
+      readPages: data.readPages.present ? data.readPages.value : this.readPages,
+      pdfPage: data.pdfPage.present ? data.pdfPage.value : this.pdfPage,
+      totalPdfPages: data.totalPdfPages.present
+          ? data.totalPdfPages.value
+          : this.totalPdfPages,
+      readingSeconds: data.readingSeconds.present
+          ? data.readingSeconds.value
+          : this.readingSeconds,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookReadingProgressData(')
+          ..write('bookId: $bookId, ')
+          ..write('chapterIndex: $chapterIndex, ')
+          ..write('pageIndex: $pageIndex, ')
+          ..write('readPages: $readPages, ')
+          ..write('pdfPage: $pdfPage, ')
+          ..write('totalPdfPages: $totalPdfPages, ')
+          ..write('readingSeconds: $readingSeconds, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    bookId,
+    chapterIndex,
+    pageIndex,
+    readPages,
+    pdfPage,
+    totalPdfPages,
+    readingSeconds,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BookReadingProgressData &&
+          other.bookId == this.bookId &&
+          other.chapterIndex == this.chapterIndex &&
+          other.pageIndex == this.pageIndex &&
+          other.readPages == this.readPages &&
+          other.pdfPage == this.pdfPage &&
+          other.totalPdfPages == this.totalPdfPages &&
+          other.readingSeconds == this.readingSeconds &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BookReadingProgressCompanion
+    extends UpdateCompanion<BookReadingProgressData> {
+  final Value<String> bookId;
+  final Value<int> chapterIndex;
+  final Value<int> pageIndex;
+  final Value<String> readPages;
+  final Value<int> pdfPage;
+  final Value<int> totalPdfPages;
+  final Value<int> readingSeconds;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BookReadingProgressCompanion({
+    this.bookId = const Value.absent(),
+    this.chapterIndex = const Value.absent(),
+    this.pageIndex = const Value.absent(),
+    this.readPages = const Value.absent(),
+    this.pdfPage = const Value.absent(),
+    this.totalPdfPages = const Value.absent(),
+    this.readingSeconds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BookReadingProgressCompanion.insert({
+    required String bookId,
+    this.chapterIndex = const Value.absent(),
+    this.pageIndex = const Value.absent(),
+    this.readPages = const Value.absent(),
+    this.pdfPage = const Value.absent(),
+    this.totalPdfPages = const Value.absent(),
+    this.readingSeconds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : bookId = Value(bookId);
+  static Insertable<BookReadingProgressData> custom({
+    Expression<String>? bookId,
+    Expression<int>? chapterIndex,
+    Expression<int>? pageIndex,
+    Expression<String>? readPages,
+    Expression<int>? pdfPage,
+    Expression<int>? totalPdfPages,
+    Expression<int>? readingSeconds,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (bookId != null) 'book_id': bookId,
+      if (chapterIndex != null) 'chapter_index': chapterIndex,
+      if (pageIndex != null) 'page_index': pageIndex,
+      if (readPages != null) 'read_pages': readPages,
+      if (pdfPage != null) 'pdf_page': pdfPage,
+      if (totalPdfPages != null) 'total_pdf_pages': totalPdfPages,
+      if (readingSeconds != null) 'reading_seconds': readingSeconds,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BookReadingProgressCompanion copyWith({
+    Value<String>? bookId,
+    Value<int>? chapterIndex,
+    Value<int>? pageIndex,
+    Value<String>? readPages,
+    Value<int>? pdfPage,
+    Value<int>? totalPdfPages,
+    Value<int>? readingSeconds,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BookReadingProgressCompanion(
+      bookId: bookId ?? this.bookId,
+      chapterIndex: chapterIndex ?? this.chapterIndex,
+      pageIndex: pageIndex ?? this.pageIndex,
+      readPages: readPages ?? this.readPages,
+      pdfPage: pdfPage ?? this.pdfPage,
+      totalPdfPages: totalPdfPages ?? this.totalPdfPages,
+      readingSeconds: readingSeconds ?? this.readingSeconds,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (bookId.present) {
+      map['book_id'] = Variable<String>(bookId.value);
+    }
+    if (chapterIndex.present) {
+      map['chapter_index'] = Variable<int>(chapterIndex.value);
+    }
+    if (pageIndex.present) {
+      map['page_index'] = Variable<int>(pageIndex.value);
+    }
+    if (readPages.present) {
+      map['read_pages'] = Variable<String>(readPages.value);
+    }
+    if (pdfPage.present) {
+      map['pdf_page'] = Variable<int>(pdfPage.value);
+    }
+    if (totalPdfPages.present) {
+      map['total_pdf_pages'] = Variable<int>(totalPdfPages.value);
+    }
+    if (readingSeconds.present) {
+      map['reading_seconds'] = Variable<int>(readingSeconds.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BookReadingProgressCompanion(')
+          ..write('bookId: $bookId, ')
+          ..write('chapterIndex: $chapterIndex, ')
+          ..write('pageIndex: $pageIndex, ')
+          ..write('readPages: $readPages, ')
+          ..write('pdfPage: $pdfPage, ')
+          ..write('totalPdfPages: $totalPdfPages, ')
+          ..write('readingSeconds: $readingSeconds, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5158,6 +6494,30 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $RemindersTable reminders = $RemindersTable(this);
+  late final $UserAdhkarTable userAdhkar = $UserAdhkarTable(this);
+  late final $UserDuasTable userDuas = $UserDuasTable(this);
+  late final $BookReadingProgressTable bookReadingProgress =
+      $BookReadingProgressTable(this);
+  late final DailyRecordDao dailyRecordDao = DailyRecordDao(
+    this as AppDatabase,
+  );
+  late final StatsDao statsDao = StatsDao(this as AppDatabase);
+  late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
+  late final RemindersDao remindersDao = RemindersDao(this as AppDatabase);
+  late final CustomIbadahDao customIbadahDao = CustomIbadahDao(
+    this as AppDatabase,
+  );
+  late final PrayerTimesCacheDao prayerTimesCacheDao = PrayerTimesCacheDao(
+    this as AppDatabase,
+  );
+  late final RamadanProgressDao ramadanProgressDao = RamadanProgressDao(
+    this as AppDatabase,
+  );
+  late final UserAdhkarDao userAdhkarDao = UserAdhkarDao(this as AppDatabase);
+  late final UserDuasDao userDuasDao = UserDuasDao(this as AppDatabase);
+  late final BookProgressDao bookProgressDao = BookProgressDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5172,6 +6532,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     userSettings,
     ramadanProgress,
     reminders,
+    userAdhkar,
+    userDuas,
+    bookReadingProgress,
   ];
 }
 
@@ -8634,6 +9997,719 @@ typedef $$RemindersTableProcessedTableManager =
       Reminder,
       PrefetchHooks Function()
     >;
+typedef $$UserAdhkarTableCreateCompanionBuilder =
+    UserAdhkarCompanion Function({
+      required String id,
+      required String textAr,
+      Value<int> count,
+      Value<String?> categoryHint,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$UserAdhkarTableUpdateCompanionBuilder =
+    UserAdhkarCompanion Function({
+      Value<String> id,
+      Value<String> textAr,
+      Value<int> count,
+      Value<String?> categoryHint,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$UserAdhkarTableFilterComposer
+    extends Composer<_$AppDatabase, $UserAdhkarTable> {
+  $$UserAdhkarTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textAr => $composableBuilder(
+    column: $table.textAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get categoryHint => $composableBuilder(
+    column: $table.categoryHint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$UserAdhkarTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserAdhkarTable> {
+  $$UserAdhkarTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textAr => $composableBuilder(
+    column: $table.textAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get categoryHint => $composableBuilder(
+    column: $table.categoryHint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UserAdhkarTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserAdhkarTable> {
+  $$UserAdhkarTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get textAr =>
+      $composableBuilder(column: $table.textAr, builder: (column) => column);
+
+  GeneratedColumn<int> get count =>
+      $composableBuilder(column: $table.count, builder: (column) => column);
+
+  GeneratedColumn<String> get categoryHint => $composableBuilder(
+    column: $table.categoryHint,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$UserAdhkarTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UserAdhkarTable,
+          UserAdhkarData,
+          $$UserAdhkarTableFilterComposer,
+          $$UserAdhkarTableOrderingComposer,
+          $$UserAdhkarTableAnnotationComposer,
+          $$UserAdhkarTableCreateCompanionBuilder,
+          $$UserAdhkarTableUpdateCompanionBuilder,
+          (
+            UserAdhkarData,
+            BaseReferences<_$AppDatabase, $UserAdhkarTable, UserAdhkarData>,
+          ),
+          UserAdhkarData,
+          PrefetchHooks Function()
+        > {
+  $$UserAdhkarTableTableManager(_$AppDatabase db, $UserAdhkarTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserAdhkarTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserAdhkarTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserAdhkarTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> textAr = const Value.absent(),
+                Value<int> count = const Value.absent(),
+                Value<String?> categoryHint = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserAdhkarCompanion(
+                id: id,
+                textAr: textAr,
+                count: count,
+                categoryHint: categoryHint,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String textAr,
+                Value<int> count = const Value.absent(),
+                Value<String?> categoryHint = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserAdhkarCompanion.insert(
+                id: id,
+                textAr: textAr,
+                count: count,
+                categoryHint: categoryHint,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UserAdhkarTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UserAdhkarTable,
+      UserAdhkarData,
+      $$UserAdhkarTableFilterComposer,
+      $$UserAdhkarTableOrderingComposer,
+      $$UserAdhkarTableAnnotationComposer,
+      $$UserAdhkarTableCreateCompanionBuilder,
+      $$UserAdhkarTableUpdateCompanionBuilder,
+      (
+        UserAdhkarData,
+        BaseReferences<_$AppDatabase, $UserAdhkarTable, UserAdhkarData>,
+      ),
+      UserAdhkarData,
+      PrefetchHooks Function()
+    >;
+typedef $$UserDuasTableCreateCompanionBuilder =
+    UserDuasCompanion Function({
+      required String id,
+      required String titleAr,
+      required String textAr,
+      Value<String?> occasion,
+      Value<String?> source,
+      Value<String?> emoji,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$UserDuasTableUpdateCompanionBuilder =
+    UserDuasCompanion Function({
+      Value<String> id,
+      Value<String> titleAr,
+      Value<String> textAr,
+      Value<String?> occasion,
+      Value<String?> source,
+      Value<String?> emoji,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$UserDuasTableFilterComposer
+    extends Composer<_$AppDatabase, $UserDuasTable> {
+  $$UserDuasTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titleAr => $composableBuilder(
+    column: $table.titleAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textAr => $composableBuilder(
+    column: $table.textAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get occasion => $composableBuilder(
+    column: $table.occasion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get emoji => $composableBuilder(
+    column: $table.emoji,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$UserDuasTableOrderingComposer
+    extends Composer<_$AppDatabase, $UserDuasTable> {
+  $$UserDuasTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titleAr => $composableBuilder(
+    column: $table.titleAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textAr => $composableBuilder(
+    column: $table.textAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get occasion => $composableBuilder(
+    column: $table.occasion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get emoji => $composableBuilder(
+    column: $table.emoji,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$UserDuasTableAnnotationComposer
+    extends Composer<_$AppDatabase, $UserDuasTable> {
+  $$UserDuasTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get titleAr =>
+      $composableBuilder(column: $table.titleAr, builder: (column) => column);
+
+  GeneratedColumn<String> get textAr =>
+      $composableBuilder(column: $table.textAr, builder: (column) => column);
+
+  GeneratedColumn<String> get occasion =>
+      $composableBuilder(column: $table.occasion, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get emoji =>
+      $composableBuilder(column: $table.emoji, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$UserDuasTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $UserDuasTable,
+          UserDua,
+          $$UserDuasTableFilterComposer,
+          $$UserDuasTableOrderingComposer,
+          $$UserDuasTableAnnotationComposer,
+          $$UserDuasTableCreateCompanionBuilder,
+          $$UserDuasTableUpdateCompanionBuilder,
+          (UserDua, BaseReferences<_$AppDatabase, $UserDuasTable, UserDua>),
+          UserDua,
+          PrefetchHooks Function()
+        > {
+  $$UserDuasTableTableManager(_$AppDatabase db, $UserDuasTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UserDuasTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UserDuasTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UserDuasTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> titleAr = const Value.absent(),
+                Value<String> textAr = const Value.absent(),
+                Value<String?> occasion = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<String?> emoji = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserDuasCompanion(
+                id: id,
+                titleAr: titleAr,
+                textAr: textAr,
+                occasion: occasion,
+                source: source,
+                emoji: emoji,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String titleAr,
+                required String textAr,
+                Value<String?> occasion = const Value.absent(),
+                Value<String?> source = const Value.absent(),
+                Value<String?> emoji = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => UserDuasCompanion.insert(
+                id: id,
+                titleAr: titleAr,
+                textAr: textAr,
+                occasion: occasion,
+                source: source,
+                emoji: emoji,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$UserDuasTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $UserDuasTable,
+      UserDua,
+      $$UserDuasTableFilterComposer,
+      $$UserDuasTableOrderingComposer,
+      $$UserDuasTableAnnotationComposer,
+      $$UserDuasTableCreateCompanionBuilder,
+      $$UserDuasTableUpdateCompanionBuilder,
+      (UserDua, BaseReferences<_$AppDatabase, $UserDuasTable, UserDua>),
+      UserDua,
+      PrefetchHooks Function()
+    >;
+typedef $$BookReadingProgressTableCreateCompanionBuilder =
+    BookReadingProgressCompanion Function({
+      required String bookId,
+      Value<int> chapterIndex,
+      Value<int> pageIndex,
+      Value<String> readPages,
+      Value<int> pdfPage,
+      Value<int> totalPdfPages,
+      Value<int> readingSeconds,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BookReadingProgressTableUpdateCompanionBuilder =
+    BookReadingProgressCompanion Function({
+      Value<String> bookId,
+      Value<int> chapterIndex,
+      Value<int> pageIndex,
+      Value<String> readPages,
+      Value<int> pdfPage,
+      Value<int> totalPdfPages,
+      Value<int> readingSeconds,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BookReadingProgressTableFilterComposer
+    extends Composer<_$AppDatabase, $BookReadingProgressTable> {
+  $$BookReadingProgressTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get chapterIndex => $composableBuilder(
+    column: $table.chapterIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pageIndex => $composableBuilder(
+    column: $table.pageIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get readPages => $composableBuilder(
+    column: $table.readPages,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pdfPage => $composableBuilder(
+    column: $table.pdfPage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalPdfPages => $composableBuilder(
+    column: $table.totalPdfPages,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get readingSeconds => $composableBuilder(
+    column: $table.readingSeconds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BookReadingProgressTableOrderingComposer
+    extends Composer<_$AppDatabase, $BookReadingProgressTable> {
+  $$BookReadingProgressTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get chapterIndex => $composableBuilder(
+    column: $table.chapterIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pageIndex => $composableBuilder(
+    column: $table.pageIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get readPages => $composableBuilder(
+    column: $table.readPages,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pdfPage => $composableBuilder(
+    column: $table.pdfPage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalPdfPages => $composableBuilder(
+    column: $table.totalPdfPages,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get readingSeconds => $composableBuilder(
+    column: $table.readingSeconds,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BookReadingProgressTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BookReadingProgressTable> {
+  $$BookReadingProgressTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get bookId =>
+      $composableBuilder(column: $table.bookId, builder: (column) => column);
+
+  GeneratedColumn<int> get chapterIndex => $composableBuilder(
+    column: $table.chapterIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get pageIndex =>
+      $composableBuilder(column: $table.pageIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get readPages =>
+      $composableBuilder(column: $table.readPages, builder: (column) => column);
+
+  GeneratedColumn<int> get pdfPage =>
+      $composableBuilder(column: $table.pdfPage, builder: (column) => column);
+
+  GeneratedColumn<int> get totalPdfPages => $composableBuilder(
+    column: $table.totalPdfPages,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get readingSeconds => $composableBuilder(
+    column: $table.readingSeconds,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BookReadingProgressTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BookReadingProgressTable,
+          BookReadingProgressData,
+          $$BookReadingProgressTableFilterComposer,
+          $$BookReadingProgressTableOrderingComposer,
+          $$BookReadingProgressTableAnnotationComposer,
+          $$BookReadingProgressTableCreateCompanionBuilder,
+          $$BookReadingProgressTableUpdateCompanionBuilder,
+          (
+            BookReadingProgressData,
+            BaseReferences<
+              _$AppDatabase,
+              $BookReadingProgressTable,
+              BookReadingProgressData
+            >,
+          ),
+          BookReadingProgressData,
+          PrefetchHooks Function()
+        > {
+  $$BookReadingProgressTableTableManager(
+    _$AppDatabase db,
+    $BookReadingProgressTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BookReadingProgressTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BookReadingProgressTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$BookReadingProgressTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> bookId = const Value.absent(),
+                Value<int> chapterIndex = const Value.absent(),
+                Value<int> pageIndex = const Value.absent(),
+                Value<String> readPages = const Value.absent(),
+                Value<int> pdfPage = const Value.absent(),
+                Value<int> totalPdfPages = const Value.absent(),
+                Value<int> readingSeconds = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BookReadingProgressCompanion(
+                bookId: bookId,
+                chapterIndex: chapterIndex,
+                pageIndex: pageIndex,
+                readPages: readPages,
+                pdfPage: pdfPage,
+                totalPdfPages: totalPdfPages,
+                readingSeconds: readingSeconds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String bookId,
+                Value<int> chapterIndex = const Value.absent(),
+                Value<int> pageIndex = const Value.absent(),
+                Value<String> readPages = const Value.absent(),
+                Value<int> pdfPage = const Value.absent(),
+                Value<int> totalPdfPages = const Value.absent(),
+                Value<int> readingSeconds = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BookReadingProgressCompanion.insert(
+                bookId: bookId,
+                chapterIndex: chapterIndex,
+                pageIndex: pageIndex,
+                readPages: readPages,
+                pdfPage: pdfPage,
+                totalPdfPages: totalPdfPages,
+                readingSeconds: readingSeconds,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BookReadingProgressTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BookReadingProgressTable,
+      BookReadingProgressData,
+      $$BookReadingProgressTableFilterComposer,
+      $$BookReadingProgressTableOrderingComposer,
+      $$BookReadingProgressTableAnnotationComposer,
+      $$BookReadingProgressTableCreateCompanionBuilder,
+      $$BookReadingProgressTableUpdateCompanionBuilder,
+      (
+        BookReadingProgressData,
+        BaseReferences<
+          _$AppDatabase,
+          $BookReadingProgressTable,
+          BookReadingProgressData
+        >,
+      ),
+      BookReadingProgressData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8656,4 +10732,10 @@ class $AppDatabaseManager {
       $$RamadanProgressTableTableManager(_db, _db.ramadanProgress);
   $$RemindersTableTableManager get reminders =>
       $$RemindersTableTableManager(_db, _db.reminders);
+  $$UserAdhkarTableTableManager get userAdhkar =>
+      $$UserAdhkarTableTableManager(_db, _db.userAdhkar);
+  $$UserDuasTableTableManager get userDuas =>
+      $$UserDuasTableTableManager(_db, _db.userDuas);
+  $$BookReadingProgressTableTableManager get bookReadingProgress =>
+      $$BookReadingProgressTableTableManager(_db, _db.bookReadingProgress);
 }

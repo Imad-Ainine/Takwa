@@ -31,6 +31,26 @@ final customIbadahDaoProvider = Provider<CustomIbadahDao>((ref) {
   return CustomIbadahDao(ref.watch(appDatabaseProvider));
 });
 
+final prayerTimesCacheDaoProvider = Provider<PrayerTimesCacheDao>((ref) {
+  return PrayerTimesCacheDao(ref.watch(appDatabaseProvider));
+});
+
+final ramadanProgressDaoProvider = Provider<RamadanProgressDao>((ref) {
+  return RamadanProgressDao(ref.watch(appDatabaseProvider));
+});
+
+final userAdhkarDaoProvider = Provider<UserAdhkarDao>((ref) {
+  return UserAdhkarDao(ref.watch(appDatabaseProvider));
+});
+
+final userDuasDaoProvider = Provider<UserDuasDao>((ref) {
+  return UserDuasDao(ref.watch(appDatabaseProvider));
+});
+
+final bookProgressDaoProvider = Provider<BookProgressDao>((ref) {
+  return BookProgressDao(ref.watch(appDatabaseProvider));
+});
+
 // ── سجل اليوم (Stream) ──
 final todayRecordProvider = StreamProvider<DailyRecord?>((ref) {
   return ref.watch(dailyRecordDaoProvider).watchTodayRecord();
@@ -65,7 +85,7 @@ final settingStreamProvider = StreamProvider.family<String?, String>((ref, key) 
 final ramadanModeProvider = StreamProvider<bool>((ref) {
   return ref
       .watch(settingsDaoProvider)
-      .watch('ramadanMode')
+      .watch('ramadan_mode')
       .map((v) => v == 'true');
 });
 

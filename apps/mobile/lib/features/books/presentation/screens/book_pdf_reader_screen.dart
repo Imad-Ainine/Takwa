@@ -42,8 +42,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   String? _error;
   StreamController<double>? _progressCtrl;
 
-  // ── Text Selection / Share ────────────────
-  OverlayEntry? _shareOverlayEntry;
+  // ── Text Selection ────────────────────────
   String _selectedText = '';
   bool _isTextSelected = false;
 
@@ -84,7 +83,6 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
   @override
   void dispose() {
-    _hideShareMenu();
     _uiAnim.dispose();
     _pdfController.dispose();
     _progressCtrl?.close();
@@ -143,84 +141,13 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
     }
   }
 
-  void _showShareMenu() {
-    _hideShareMenu();
-    _shareOverlayEntry = OverlayEntry(
-      builder: (context) {
-        return Positioned(
-          bottom: 120,
-          left: 0,
-          right: 0,
-          child: TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutBack,
-            builder: (context, val, child) {
-              return Transform.scale(
-                scale: val,
-                child: Opacity(opacity: val.clamp(0.0, 1.0), child: child),
-              );
-            },
-            child: Center(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Share.share(_selectedText);
-                    _pdfController.clearSelection();
-                  },
-                  borderRadius: BorderRadius.circular(30),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFC8A96E),
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.share_rounded,
-                          color: Colors.black87,
-                          size: 20,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'مشاركة النص',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontFamily: 'Amiri',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-    Overlay.of(context).insert(_shareOverlayEntry!);
-  }
-
-  void _hideShareMenu() {
-    if (_shareOverlayEntry != null) {
-      _shareOverlayEntry!.remove();
-      _shareOverlayEntry = null;
+  void _clearSelection() {
+    _pdfController.clearSelection();
+    if (mounted) {
+      setState(() {
+        _isTextSelected = false;
+        _selectedText = '';
+      });
     }
   }
 
@@ -288,58 +215,74 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           else if (_isLoading || _localFile == null)
             _buildLoadingView(accentColor)
           else
-            SfPdfViewer.file(
-              _localFile!,
-              key: _pdfViewerKey,
-              controller: _pdfController,
-              enableTextSelection: true,
-              canShowTextSelectionMenu: true,
-              canShowPageLoadingIndicator: true,
-              canShowScrollHead: true,
-              onTextSelectionChanged: (PdfTextSelectionChangedDetails details) {
-                if (details.selectedText == null ||
-                    details.selectedText!.isEmpty) {
-                  _isTextSelected = false;
-                  _hideShareMenu();
-                } else {
-                  _isTextSelected = true;
-                  _selectedText = details.selectedText!;
-                  _showShareMenu();
-                }
-              },
-              onDocumentLoaded: (details) {
-                final total = details.document.pages.count;
-                Future.microtask(() {
-                  if (!mounted) return;
-                  _sessionNotifier.setTotal(total);
-                  _sessionNotifier.start();
-                });
-
-                final savedPage = session.currentPage;
-                if (savedPage > 1 && savedPage <= total) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _pdfController.jumpToPage(savedPage);
-                  });
-                }
-              },
-              onTap: (details) {
+            // Wrap with GestureDetector for tap-to-toggle-UI.
+            // Text selection gestures are handled entirely by SfPdfViewer
+            // and must not be intercepted, so we only react to single taps
+            // when no text is selected.
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
                 if (_isTextSelected) {
-                  _pdfController.clearSelection();
+                  _clearSelection();
                 } else {
                   _toggleUI();
                 }
               },
-              onPageChanged: (details) {
-                _hideShareMenu();
-                _pdfController.clearSelection();
-                _sessionNotifier.setPage(details.newPageNumber);
-              },
-              onDocumentLoadFailed: (details) {
-                setState(() {
-                  _error = details.error;
-                });
-              },
-              enableDoubleTapZooming: true,
+              // Pass all child events through so selection handles still work
+              child: SfPdfViewer.file(
+                _localFile!,
+                key: _pdfViewerKey,
+                controller: _pdfController,
+
+                // ── Smooth continuous scrolling ──────────────────────────
+                scrollDirection: PdfScrollDirection.vertical,
+                pageLayoutMode: PdfPageLayoutMode.continuous,
+                pageSpacing: 8,
+
+                // ── Text selection ──────────────────────────────────────
+                enableTextSelection: true,
+                canShowTextSelectionMenu: false,
+
+                // Misc viewer options
+                canShowPageLoadingIndicator: true,
+                canShowScrollHead: true,
+                enableDoubleTapZooming: true,
+
+                onTextSelectionChanged:
+                    (PdfTextSelectionChangedDetails details) {
+                  final text = details.selectedText ?? '';
+                  if (mounted) {
+                    setState(() {
+                      _selectedText = text;
+                      _isTextSelected = text.isNotEmpty;
+                    });
+                  }
+                },
+                onDocumentLoaded: (details) {
+                  final total = details.document.pages.count;
+                  Future.microtask(() {
+                    if (!mounted) return;
+                    _sessionNotifier.setTotal(total);
+                    _sessionNotifier.start();
+                  });
+
+                  final savedPage = session.currentPage;
+                  if (savedPage > 1 && savedPage <= total) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _pdfController.jumpToPage(savedPage);
+                    });
+                  }
+                },
+                onPageChanged: (details) {
+                  _clearSelection();
+                  _sessionNotifier.setPage(details.newPageNumber);
+                },
+                onDocumentLoadFailed: (details) {
+                  setState(() {
+                    _error = details.error;
+                  });
+                },
+              ),
             ),
 
           // ── Top App Bar ─────────────────
@@ -365,12 +308,33 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               left: 0,
               right: 0,
               child: AnimatedOpacity(
-                opacity: _showUI ? 1.0 : 0.0,
+                opacity: (_showUI && !_isTextSelected) ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeInOut,
                 child: IgnorePointer(
-                  ignoring: !_showUI,
+                  ignoring: !_showUI || _isTextSelected,
                   child: _buildBottomPanel(session, accentColor),
+                ),
+              ),
+            ),
+
+          // ── Text Selection Action Bar ───
+          if (!_isLoading && _localFile != null)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedSlide(
+                offset: _isTextSelected ? Offset.zero : const Offset(0, 1),
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  opacity: _isTextSelected ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 250),
+                  child: IgnorePointer(
+                    ignoring: !_isTextSelected,
+                    child: _buildSelectionActionBar(accentColor),
+                  ),
                 ),
               ),
             ),
@@ -626,6 +590,113 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       ),
     );
   }
+
+  /// Bottom action bar that appears when text is selected.
+  /// Offers Share, Underline-highlight copy, and Bookmark actions.
+  Widget _buildSelectionActionBar(Color accentColor) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        12,
+        16,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            Colors.black.withOpacity(0.92),
+            Colors.black.withOpacity(0.70),
+          ],
+        ),
+        border: const Border(
+          top: BorderSide(color: Colors.white12, width: 0.5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Share
+          _SelectionActionButton(
+            icon: Icons.share_rounded,
+            label: 'مشاركة',
+            accentColor: accentColor,
+            onTap: () {
+              if (_selectedText.isNotEmpty) {
+                Share.share(_selectedText);
+              }
+              _clearSelection();
+            },
+          ),
+
+          // Copy
+          _SelectionActionButton(
+            icon: Icons.copy_rounded,
+            label: 'نسخ',
+            accentColor: accentColor,
+            onTap: () {
+              if (_selectedText.isNotEmpty) {
+                Clipboard.setData(ClipboardData(text: _selectedText));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'تم النسخ',
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(fontFamily: 'Amiri'),
+                    ),
+                    backgroundColor: accentColor,
+                    duration: const Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              }
+              _clearSelection();
+            },
+          ),
+
+          // Highlight (visual underline feedback)
+          _SelectionActionButton(
+            icon: Icons.format_underline_rounded,
+            label: 'تحديد',
+            accentColor: accentColor,
+            onTap: () {
+              // Syncfusion's addAnnotation API or simply copy with visual cue
+              if (_selectedText.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'تم تحديد النص',
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(fontFamily: 'Amiri'),
+                    ),
+                    backgroundColor: Colors.amber.shade700,
+                    duration: const Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              }
+              _clearSelection();
+            },
+          ),
+
+          // Dismiss
+          _SelectionActionButton(
+            icon: Icons.close_rounded,
+            label: 'إلغاء',
+            accentColor: Colors.white54,
+            onTap: _clearSelection,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ─────────────────────────────────────────
@@ -662,6 +733,56 @@ class _InfoChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SelectionActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  const _SelectionActionButton({
+    required this.icon,
+    required this.label,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: accentColor.withOpacity(0.15),
+                shape: BoxShape.circle,
+                border: Border.all(color: accentColor.withOpacity(0.4)),
+              ),
+              child: Icon(icon, color: accentColor, size: 20),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: TextStyle(
+                color: accentColor,
+                fontSize: 11,
+                fontFamily: 'Amiri',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

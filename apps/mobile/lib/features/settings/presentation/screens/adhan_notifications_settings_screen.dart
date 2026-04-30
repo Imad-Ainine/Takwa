@@ -119,7 +119,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 },
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
-                                    .updatePref('calcMethod', v),
+                                    .updatePref('calc_method', v),
                               ),
                             ],
                           ),

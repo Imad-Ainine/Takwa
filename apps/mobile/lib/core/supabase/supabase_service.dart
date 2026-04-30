@@ -377,6 +377,7 @@ class SupabaseService {
   }
 
   static Future<void> addUserAdhkar({
+    String? id,
     required String textAr,
     int count = 1,
     String categoryHint = 'general',
@@ -384,6 +385,7 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
     await _db.from('user_adhkar').insert({
+      if (id != null) 'id': id,
       'user_id': uid,
       'text_ar': textAr,
       'count': count,
@@ -409,6 +411,7 @@ class SupabaseService {
   }
 
   static Future<void> addUserDua({
+    String? id,
     required String titleAr,
     required String textAr,
     String occasion = '',
@@ -418,6 +421,7 @@ class SupabaseService {
     final uid = SupabaseConfig.userId;
     if (uid == null) return;
     await _db.from('user_duas').insert({
+      if (id != null) 'id': id,
       'user_id': uid,
       'title_ar': titleAr,
       'text_ar': textAr,

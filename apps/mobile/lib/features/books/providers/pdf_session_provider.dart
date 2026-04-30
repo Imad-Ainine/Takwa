@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/supabase/supabase_service.dart';
+import '../../../core/providers/database_providers.dart';
 
 // ─────────────────────────────────────────
 //  STATE MODEL
@@ -59,7 +60,9 @@ class PdfSessionState {
 // ─────────────────────────────────────────
 
 class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
-  PdfSessionNotifier() : super(const PdfSessionState());
+  PdfSessionNotifier(this._ref) : super(const PdfSessionState());
+
+  final Ref _ref;
 
   Timer? _ticker;
   Timer? _autoSave;
@@ -149,14 +152,27 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
     state = state.copyWith(totalPages: total);
   }
 
-  /// Persist session locally + push to Supabase (best effort).
+  /// Persist session locally (SharedPreferences + Drift) + push to Supabase.
   Future<void> saveSession(String bookId) async {
-    // Cache variables synchronously to survive Notifier disposal
     final page = state.currentPage;
     final total = state.totalPages;
     final secs = state.readingSeconds;
 
     await _saveLocal(bookId, page, total, secs);
+
+    // Also write to Drift for SyncManager
+    try {
+      await _ref
+          .read(bookProgressDaoProvider)
+          .savePdfSession(
+            bookId: bookId,
+            pdfPage: page,
+            totalPdfPages: total,
+            readingSeconds: secs,
+          );
+    } catch (_) {
+      // Drift may not be ready — SharedPreferences fallback is already saved.
+    }
 
     try {
       await SupabaseService.upsertPdfSession(bookId, page, total, secs);
@@ -194,5 +210,5 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
 /// Scoped per book via family — use book.id as key.
 final pdfSessionProvider = StateNotifierProvider.autoDispose
     .family<PdfSessionNotifier, PdfSessionState, String>(
-      (ref, bookId) => PdfSessionNotifier(),
+      (ref, bookId) => PdfSessionNotifier(ref),
     );

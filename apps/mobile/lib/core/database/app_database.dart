@@ -9,6 +9,8 @@ import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
+import 'daos.dart';
+
 part 'app_database.g.dart';
 
 // ─────────────────────────────────────────
@@ -226,6 +228,55 @@ class RamadanProgress extends Table {
 }
 
 // ─────────────────────────────────────────
+//  TABLE: user_adhkar
+// ─────────────────────────────────────────
+class UserAdhkar extends Table {
+  TextColumn get id => text()(); // UUID String
+  TextColumn get textAr => text()();
+  IntColumn get count => integer().withDefault(const Constant(1))();
+  TextColumn get categoryHint => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// ─────────────────────────────────────────
+//  TABLE: user_duas
+// ─────────────────────────────────────────
+class UserDuas extends Table {
+  TextColumn get id => text()(); // UUID String
+  TextColumn get titleAr => text()();
+  TextColumn get textAr => text()();
+  TextColumn get occasion => text().nullable()();
+  TextColumn get source => text().nullable()();
+  TextColumn get emoji => text().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// ─────────────────────────────────────────
+//  TABLE: book_reading_progress
+// ─────────────────────────────────────────
+class BookReadingProgress extends Table {
+  TextColumn get bookId => text()();
+  IntColumn get chapterIndex => integer().withDefault(const Constant(0))();
+  IntColumn get pageIndex => integer().withDefault(const Constant(0))();
+  /// Comma-separated list of read page indices, e.g. "0,1,3,7"
+  TextColumn get readPages => text().withDefault(const Constant(''))();
+  /// PDF page (if applicable)
+  IntColumn get pdfPage => integer().withDefault(const Constant(0))();
+  IntColumn get totalPdfPages => integer().withDefault(const Constant(0))();
+  IntColumn get readingSeconds => integer().withDefault(const Constant(0))();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {bookId};
+}
+
+// ─────────────────────────────────────────
 //  DATABASE CLASS
 // ─────────────────────────────────────────
 @DriftDatabase(
@@ -239,13 +290,28 @@ class RamadanProgress extends Table {
     UserSettings,
     RamadanProgress,
     Reminders,
+    UserAdhkar,
+    UserDuas,
+    BookReadingProgress,
+  ],
+  daos: [
+    DailyRecordDao,
+    StatsDao,
+    SettingsDao,
+    RemindersDao,
+    CustomIbadahDao,
+    PrayerTimesCacheDao,
+    RamadanProgressDao,
+    UserAdhkarDao,
+    UserDuasDao,
+    BookProgressDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -260,16 +326,88 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.addColumn(dailyRecords, dailyRecords.ghadhBasar);
       }
+      if (from < 4) {
+        // Rename all legacy camelCase setting keys → snake_case
+        // so that UserPreferences.fromMap() and SettingsDao.get() use
+        // a single consistent key format matching the Supabase columns.
+        const renames = [
+          ('calcMethod', 'calc_method'),
+          ('ramadanMode', 'ramadan_mode'),
+          ('prayerReminder', 'prayer_reminder'),
+          ('preAdhanNotif', 'pre_adhan_notif'),
+          ('iqamaNotif', 'iqama_notif'),
+          ('wakeUpBeforeFajr', 'wake_up_before_fajr'),
+          ('wakeUpTime', 'wake_up_time'),
+          ('morningAdhkarReminder', 'morning_adhkar_reminder'),
+          ('eveningAdhkarReminder', 'evening_adhkar_reminder'),
+          ('adhkarNotifEnabled', 'adhkar_notif_enabled'),
+          ('morningAdhkarTime', 'morning_adhkar_time'),
+          ('eveningAdhkarTime', 'evening_adhkar_time'),
+          ('sleepAdhkarTime', 'sleep_adhkar_time'),
+          ('afterFajrAdhkar', 'after_fajr_adhkar'),
+          ('afterAsrAdhkar', 'after_asr_adhkar'),
+          ('eveningMuhasabaReminder', 'muhasaba_reminder'),
+          ('eveningReminderTime', 'evening_reminder_time'),
+          ('dailyDuasOn', 'daily_duas_on'),
+          ('specialRemindersOn', 'special_reminders_on'),
+          ('fastingRemindersOn', 'fasting_reminders_on'),
+          ('ramadanMode', 'ramadan_mode'),
+          ('themeMode', 'theme_mode'),
+          ('adhanSound', 'adhan_sound'),
+          ('overlayEnabled', 'overlay_popups_enabled'),
+          ('adhanSoundEnabled', 'adhan_sound_enabled'),
+          ('adhanScreenEnabled', 'adhan_screen_enabled'),
+          ('popupIntervalMins', 'popup_interval_minutes'),
+          ('adhanMode', 'adhan_mode'),
+          ('adhanVolumeLevel', 'adhan_volume_level'),
+          ('silentModeEnabled', 'silent_mode_enabled'),
+          ('silentDurationMins', 'silent_duration_mins'),
+          ('silentModeAlertStyle', 'silent_mode_alert_style'),
+          ('silentVibrationEnabled', 'silent_vibration_enabled'),
+          ('silentAdhanPrayers', 'silent_adhan_prayers'),
+          ('silentNotifPrayers', 'silent_notif_prayers'),
+          ('autoSilentAfterAdhan', 'auto_silent_after_adhan'),
+          ('adhanInSilentEnabled', 'adhan_in_silent_enabled'),
+          ('notifsInSilentEnabled', 'notifs_in_silent_enabled'),
+          ('flipToSilenceEnabled', 'flip_to_silence_enabled'),
+          ('wakeScreenEnabled', 'wake_screen_enabled'),
+          ('vibrateWithAdhan', 'vibrate_with_adhan'),
+          ('adhanAlarmEnabled', 'adhan_alarm_enabled'),
+          ('ongoingNotifEnabled', 'ongoing_notif_enabled'),
+        ];
+        final db = m.database;
+        for (final (oldKey, newKey) in renames) {
+          // Copy old value into new key (if new key doesn't exist yet)
+          await db.customStatement(
+            'INSERT OR IGNORE INTO user_settings (key, value) '
+            'SELECT ?, value FROM user_settings WHERE key = ?',
+            [newKey, oldKey],
+          );
+          // Remove the old camelCase row
+          await db.customStatement(
+            'DELETE FROM user_settings WHERE key = ?',
+            [oldKey],
+          );
+        }
+      }
+      if (from < 5) {
+        await m.createTable(userAdhkar);
+        await m.createTable(userDuas);
+      }
+      if (from < 6) {
+        await m.createTable(bookReadingProgress);
+      }
     },
   );
 
   Future<void> _seedDefaultData() async {
+    // All keys are snake_case to match Supabase columns and UserPreferences.fromMap()
     await _insertSetting('madhab', 'shafi');
-    await _insertSetting('calcMethod', 'MWL');
-    await _insertSetting('ramadanMode', 'false');
-    await _insertSetting('prayerReminder', 'true');
-    await _insertSetting('eveningMuhasabaReminder', 'true');
-    await _insertSetting('eveningReminderTime', '21:00');
+    await _insertSetting('calc_method', 'MWL');
+    await _insertSetting('ramadan_mode', 'false');
+    await _insertSetting('prayer_reminder', 'true');
+    await _insertSetting('muhasaba_reminder', 'true');
+    await _insertSetting('evening_reminder_time', '21:00');
     await _insertSetting('language', 'ar');
 
     final defaultIbadaat = [

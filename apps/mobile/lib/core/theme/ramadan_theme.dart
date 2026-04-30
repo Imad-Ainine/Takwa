@@ -620,7 +620,7 @@ class RamadanToggle extends ConsumerWidget {
             onChanged: (v) async {
               HapticFeedback.mediumImpact();
               final dao = ref.read(settingsDaoProvider);
-              await dao.setBool('ramadanMode', v);
+              await dao.setBool('ramadan_mode', v);
               ref.invalidate(ramadanModeProvider);
 
               // ── Sync with Cloud & Reschedule Notifications ──

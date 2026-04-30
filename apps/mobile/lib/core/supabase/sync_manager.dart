@@ -48,6 +48,8 @@ class SyncManager {
       await _syncStats();
       await _syncBookProgress();
       await _syncReminders();
+      await _syncUserAdhkar();
+      await _syncUserDuas();
     } finally {
       _syncing = false;
       _ref.read(isSyncingProvider.notifier).state = false;
@@ -428,5 +430,31 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     await SupabaseService.deleteReminder(localId);
+  }
+
+  Future<void> _syncUserAdhkar() async {
+    try {
+      final remoteItems = await SupabaseService.getUserAdhkar();
+      final dao = _ref.read(userAdhkarDaoProvider);
+      
+      for (final remote in remoteItems) {
+        await dao.upsertFromRemote(remote);
+      }
+    } catch (e) {
+      print('SyncManager: Failed to sync user adhkar: $e');
+    }
+  }
+
+  Future<void> _syncUserDuas() async {
+    try {
+      final remoteItems = await SupabaseService.getUserDuas();
+      final dao = _ref.read(userDuasDaoProvider);
+      
+      for (final remote in remoteItems) {
+        await dao.upsertFromRemote(remote);
+      }
+    } catch (e) {
+      print('SyncManager: Failed to sync user duas: $e');
+    }
   }
 }

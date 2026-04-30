@@ -1008,54 +1008,81 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
-    // Map every Supabase column name → local key used by SettingsDao.set()
-    // Local key must match what UserPreferences.fromMap() looks up.
+    // Map every Supabase column name → local SQLite key used by SettingsDao.set()
+    // Local keys use snake_case to match what UserPreferences.fromMap() looks up
+    // via map['snake_case'] ?? map['camelCase'] fallback.
     final mapping = <String, String>{
-      // Prayer calculation
+      // ── Prayer calculation ──────────────────────────────────────
       'madhab': 'madhab',
-      'calc_method': 'calcMethod',
+      'calc_method': 'calc_method',
 
-      // General toggles
-      'prayer_reminder': 'prayerReminder',
-      'pre_adhan_notif': 'preAdhanNotif',
-      'iqama_notif': 'iqamaNotif',
+      // ── General toggles ─────────────────────────────────────────
+      'prayer_reminder': 'prayer_reminder',
+      'pre_adhan_notif': 'pre_adhan_notif',
+      'iqama_notif': 'iqama_notif',
 
-      // Wake-up
-      'wake_up_before_fajr': 'wakeUpBeforeFajr',
-      'wake_up_time': 'wakeUpTime',
+      // ── Wake-up before Fajr ─────────────────────────────────────
+      'wake_up_before_fajr': 'wake_up_before_fajr',
+      'wake_up_time': 'wake_up_time',
 
-      // Adhkar reminders
-      'morning_adhkar_reminder': 'morningAdhkarReminder',
-      'evening_adhkar_reminder': 'eveningAdhkarReminder',
-      'adhkar_notif_enabled': 'adhkarNotifEnabled',
-      'morning_adhkar_time': 'morningAdhkarTime',
-      'evening_adhkar_time': 'eveningAdhkarTime',
-      'sleep_adhkar_time': 'sleepAdhkarTime',
-      'after_fajr_adhkar': 'afterFajrAdhkar',
-      'after_asr_adhkar': 'afterAsrAdhkar',
+      // ── Adhkar reminders ────────────────────────────────────────
+      'morning_adhkar_reminder': 'morning_adhkar_reminder',
+      'evening_adhkar_reminder': 'evening_adhkar_reminder',
+      'adhkar_notif_enabled': 'adhkar_notif_enabled',
+      'morning_adhkar_time': 'morning_adhkar_time',
+      'evening_adhkar_time': 'evening_adhkar_time',
+      'sleep_adhkar_time': 'sleep_adhkar_time',
+      'after_fajr_adhkar': 'after_fajr_adhkar',
+      'after_asr_adhkar': 'after_asr_adhkar',
 
-      // Muhasaba
-      'muhasaba_reminder': 'eveningMuhasabaReminder',
-      'evening_reminder_time': 'eveningReminderTime',
+      // ── Muhasaba ────────────────────────────────────────────────
+      // FIX: was mapped to 'eveningMuhasabaReminder' — fromMap reads 'muhasaba_reminder'
+      'muhasaba_reminder': 'muhasaba_reminder',
+      'evening_reminder_time': 'evening_reminder_time',
 
-      // Extra reminders
-      'daily_duas_on': 'dailyDuasOn',
-      'special_reminders_on': 'specialRemindersOn',
-      'fasting_reminders_on': 'fastingRemindersOn',
+      // ── Extra reminders ─────────────────────────────────────────
+      'daily_duas_on': 'daily_duas_on',
+      'special_reminders_on': 'special_reminders_on',
+      'fasting_reminders_on': 'fasting_reminders_on',
 
-      // Appearance / mode
-      'ramadan_mode': 'ramadanMode',
-      'theme_mode': 'themeMode',
+      // ── Appearance / mode ───────────────────────────────────────
+      'ramadan_mode': 'ramadan_mode',
+      'theme_mode': 'theme_mode',
       'language': 'language',
 
-      // Adhan sound
+      // ── Adhan sound ─────────────────────────────────────────────
       'adhan_sound': 'adhan_sound',
 
-      // Overlay / screen settings
-      'overlay_popups_enabled': 'overlayEnabled',
+      // ── Adhan mode & volume ─────────────────────────────────────
+      // FIX: these were completely missing from the mapping
+      'adhan_mode': 'adhan_mode',
+      'adhan_volume_level': 'adhan_volume_level',
+      'vibrate_with_adhan': 'vibrate_with_adhan',
+
+      // ── Overlay / screen settings ───────────────────────────────
+      'overlay_popups_enabled': 'overlay_popups_enabled',
       'adhan_sound_enabled': 'adhan_sound_enabled',
       'adhan_screen_enabled': 'adhan_screen_enabled',
-      'popup_interval_minutes': 'popupIntervalMins',
+      'popup_interval_minutes': 'popup_interval_minutes',
+
+      // ── System notification flags ───────────────────────────────
+      // FIX: these were completely missing from the mapping
+      'adhan_alarm_enabled': 'adhan_alarm_enabled',
+      'ongoing_notif_enabled': 'ongoing_notif_enabled',
+      'wake_screen_enabled': 'wake_screen_enabled',
+      'flip_to_silence_enabled': 'flip_to_silence_enabled',
+
+      // ── Silent mode ─────────────────────────────────────────────
+      // FIX: these were completely missing from the mapping
+      'silent_mode_enabled': 'silent_mode_enabled',
+      'silent_duration_mins': 'silent_duration_mins',
+      'silent_mode_alert_style': 'silent_mode_alert_style',
+      'silent_vibration_enabled': 'silent_vibration_enabled',
+      'silent_adhan_prayers': 'silent_adhan_prayers',
+      'silent_notif_prayers': 'silent_notif_prayers',
+      'auto_silent_after_adhan': 'auto_silent_after_adhan',
+      'adhan_in_silent_enabled': 'adhan_in_silent_enabled',
+      'notifs_in_silent_enabled': 'notifs_in_silent_enabled',
     };
 
     for (final entry in mapping.entries) {
@@ -1064,6 +1091,7 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
       }
     }
   }
+
 }
 
 // ─────────────────────────────────────────
@@ -1376,5 +1404,251 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
       );
     }
     await DailyRecordDao(db).recalcPoints(drId);
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO 6: PrayerTimesCacheDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [PrayerTimesCache])
+class PrayerTimesCacheDao extends DatabaseAccessor<AppDatabase>
+    with _$PrayerTimesCacheDaoMixin {
+  PrayerTimesCacheDao(super.db);
+
+  Future<PrayerTimesCacheData?> getForDate(DateTime date) {
+    return (select(prayerTimesCache)..where((t) => t.date.equals(date)))
+        .getSingleOrNull();
+  }
+
+  Future<void> insertOrUpdate(PrayerTimesCacheCompanion companion) {
+    return into(prayerTimesCache).insertOnConflictUpdate(companion);
+  }
+
+  Future<void> clearAll() {
+    return delete(prayerTimesCache).go();
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO 7: RamadanProgressDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [RamadanProgress, DailyRecords])
+class RamadanProgressDao extends DatabaseAccessor<AppDatabase>
+    with _$RamadanProgressDaoMixin {
+  RamadanProgressDao(super.db);
+
+  Future<RamadanProgressData?> getProgress(int year, int day) {
+    return (select(ramadanProgress)
+          ..where((t) => t.year.equals(year) & t.dayNumber.equals(day)))
+        .getSingleOrNull();
+  }
+
+  Future<void> updateProgress(RamadanProgressCompanion companion) {
+    return into(ramadanProgress).insertOnConflictUpdate(companion);
+  }
+
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final year = data['year'] as int;
+    final dayNum = data['day_number'] as int;
+    
+    final existing = await getProgress(year, dayNum);
+    int? recordId;
+    if (data['record_id'] != null) {
+      recordId = data['record_id'] as int;
+    }
+    
+    final companion = RamadanProgressCompanion(
+      year: Value(year),
+      dayNumber: Value(dayNum),
+      recordId: recordId != null ? Value(recordId) : const Value.absent(),
+      duaOfDay: Value(data['dua_of_day'] as String?),
+      iHyaLayl: Value(data['i_hya_layl'] as bool? ?? false),
+      totalPoints: Value(data['total_points'] as int? ?? 0),
+    );
+
+    if (existing != null) {
+      await (update(ramadanProgress)..where((t) => t.id.equals(existing.id)))
+          .write(companion);
+    } else {
+      await into(ramadanProgress).insert(companion);
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO 8: UserAdhkarDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [UserAdhkar])
+class UserAdhkarDao extends DatabaseAccessor<AppDatabase>
+    with _$UserAdhkarDaoMixin {
+  UserAdhkarDao(super.db);
+
+  Future<List<UserAdhkarData>> getAll() {
+    return select(userAdhkar).get();
+  }
+
+  Future<void> insertOrUpdate(UserAdhkarCompanion companion) {
+    return into(userAdhkar).insertOnConflictUpdate(companion);
+  }
+
+  Future<void> insertItem(UserAdhkarData item) {
+    return into(userAdhkar).insertOnConflictUpdate(item);
+  }
+
+  Future<void> deleteItem(String id) {
+    return (delete(userAdhkar)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final item = UserAdhkarCompanion(
+      id: Value(data['id'] as String),
+      textAr: Value(data['text_ar'] as String),
+      count: Value(data['count'] as int? ?? 1),
+      categoryHint: Value(data['category_hint'] as String?),
+      createdAt: data['created_at'] != null
+          ? Value(DateTime.parse(data['created_at'] as String))
+          : const Value.absent(),
+    );
+    await insertOrUpdate(item);
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO 9: UserDuasDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [UserDuas])
+class UserDuasDao extends DatabaseAccessor<AppDatabase>
+    with _$UserDuasDaoMixin {
+  UserDuasDao(super.db);
+
+  Future<List<UserDua>> getAll() {
+    return select(userDuas).get();
+  }
+
+  Future<void> insertOrUpdate(UserDuasCompanion companion) {
+    return into(userDuas).insertOnConflictUpdate(companion);
+  }
+
+  Future<void> insertItem(UserDua item) {
+    return into(userDuas).insertOnConflictUpdate(item);
+  }
+
+  Future<void> deleteItem(String id) {
+    return (delete(userDuas)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final item = UserDuasCompanion(
+      id: Value(data['id'] as String),
+      titleAr: Value(data['title_ar'] as String),
+      textAr: Value(data['text_ar'] as String),
+      occasion: Value(data['occasion'] as String?),
+      source: Value(data['source'] as String?),
+      emoji: Value(data['emoji'] as String?),
+      createdAt: data['created_at'] != null
+          ? Value(DateTime.parse(data['created_at'] as String))
+          : const Value.absent(),
+    );
+    await insertOrUpdate(item);
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO 10: BookProgressDao
+// ─────────────────────────────────────────
+@DriftAccessor(tables: [BookReadingProgress])
+class BookProgressDao extends DatabaseAccessor<AppDatabase>
+    with _$BookProgressDaoMixin {
+  BookProgressDao(super.db);
+
+  /// Get progress for a specific book (returns null if never opened).
+  Future<BookReadingProgressData?> getProgress(String bookId) {
+    return (select(bookReadingProgress)
+          ..where((t) => t.bookId.equals(bookId)))
+        .getSingleOrNull();
+  }
+
+  /// Get progress for all books at once.
+  Future<List<BookReadingProgressData>> getAll() {
+    return select(bookReadingProgress).get();
+  }
+
+  /// Upsert progress for a book (local writes).
+  Future<void> upsertProgress(BookReadingProgressCompanion companion) {
+    return into(bookReadingProgress).insertOnConflictUpdate(companion);
+  }
+
+  /// Helper: mark a page as read and update chapter/page position.
+  Future<void> markPage({
+    required String bookId,
+    required int chapterIndex,
+    required int pageIndex,
+    required Set<int> readPages,
+  }) async {
+    await into(bookReadingProgress).insertOnConflictUpdate(
+      BookReadingProgressCompanion(
+        bookId: Value(bookId),
+        chapterIndex: Value(chapterIndex),
+        pageIndex: Value(pageIndex),
+        readPages: Value(readPages.join(',')),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Helper: save PDF session data.
+  Future<void> savePdfSession({
+    required String bookId,
+    required int pdfPage,
+    required int totalPdfPages,
+    required int readingSeconds,
+  }) async {
+    final existing = await getProgress(bookId);
+    await into(bookReadingProgress).insertOnConflictUpdate(
+      BookReadingProgressCompanion(
+        bookId: Value(bookId),
+        pdfPage: Value(pdfPage),
+        totalPdfPages: Value(totalPdfPages),
+        readingSeconds: Value(readingSeconds),
+        // Preserve existing chapter/page/readPages
+        chapterIndex: Value(existing?.chapterIndex ?? 0),
+        pageIndex: Value(existing?.pageIndex ?? 0),
+        readPages: Value(existing?.readPages ?? ''),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Upsert progress received from Supabase remote.
+  Future<void> upsertFromRemote(Map<String, dynamic> data) async {
+    final readPagesRaw = data['read_pages'];
+    String readPagesStr = '';
+    if (readPagesRaw is List) {
+      readPagesStr = readPagesRaw.map((e) => e.toString()).join(',');
+    } else if (readPagesRaw is String) {
+      readPagesStr = readPagesRaw;
+    }
+
+    await into(bookReadingProgress).insertOnConflictUpdate(
+      BookReadingProgressCompanion(
+        bookId: Value(data['book_id'] as String),
+        chapterIndex: Value(data['chapter_index'] as int? ?? 0),
+        pageIndex: Value(data['page_index'] as int? ?? 0),
+        readPages: Value(readPagesStr),
+        pdfPage: Value(data['pdf_page'] as int? ?? 0),
+        totalPdfPages: Value(data['total_pdf_pages'] as int? ?? 0),
+        readingSeconds: Value(data['reading_seconds'] as int? ?? 0),
+        updatedAt: data['updated_at'] != null
+            ? Value(DateTime.parse(data['updated_at'] as String))
+            : Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Delete progress for a book.
+  Future<void> deleteProgress(String bookId) {
+    return (delete(bookReadingProgress)
+          ..where((t) => t.bookId.equals(bookId)))
+        .go();
   }
 }

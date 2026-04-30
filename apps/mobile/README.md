@@ -14,13 +14,9 @@ _Track your daily prayers, Quran recitation, adhkar, fasting, and guard against 
 
 </div>
 
-
-
-| Screenshot 1 | Screenshot 2 |
-| :---: | :---: |
+|                                               Screenshot 1                                                |                                               Screenshot 2                                                |
+| :-------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------: |
 | <img src="https://github.com/user-attachments/assets/579b78d7-f1d8-4ec3-9560-99e89d0fdbb4" width="480" /> | <img src="https://github.com/user-attachments/assets/5e38a470-3f09-4304-8d7d-d3417f6a241e" width="480" /> |
-
-
 
 ---
 
@@ -148,8 +144,8 @@ Powered by **Drift** (type-safe SQLite wrapper):
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/muhasabah.git
-cd muhasabah
+git clone https://github.com/YOUR_USERNAME/takwa.git
+cd takwa
 
 # 2. Install dependencies
 flutter pub get

@@ -170,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تذكير يومي للمحاسبة',
                                   value: prefs.muhasabaReminder,
                                   onChanged: (v) =>
-                                      _updatePref('eveningMuhasabaReminder', v),
+                                      _updatePref('muhasaba_reminder', v, category: NotificationCategory.reminders),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -209,8 +209,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       final str =
                                           '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
                                       await _updatePref(
-                                        'eveningReminderTime',
+                                        'evening_reminder_time',
                                         str,
+                                        category: NotificationCategory.reminders,
                                       );
                                     },
                                   ),
@@ -255,7 +256,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تفعيل المميزات الرمضانية',
                                   value: prefs.ramadanMode,
                                   onChanged: (v) =>
-                                      _updatePref('ramadanMode', v),
+                                      _updatePref('ramadan_mode', v),
                                   accentColor: context.colors.gold,
                                 ),
                               ],
