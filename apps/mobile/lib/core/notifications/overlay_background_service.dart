@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -26,7 +25,7 @@ const _kTriggeredPrayersDateKey = 'overlay_triggered_prayers_date';
 const _kLatKey = 'latitude';
 const _kLngKey = 'longitude';
 const _kMadhabKey = 'madhab';
-const _kCalcMethodKey = 'calcMethod';
+const _kCalcMethodKey = 'calc_method';
 const _kCityNameKey = 'cityName';
 const _kLastPopupMsKey = 'last_adhkar_popup_ms';
 const _kLastAdhkarNotifMsKey = 'last_adhkar_notif_ms';
@@ -164,10 +163,14 @@ class OverlayBackgroundService {
     bool? adhanSoundEnabled,
     int? popupIntervalMins,
   }) {
-    final data = <String, dynamic>{};
-    if (overlayEnabled != null) data['overlay_enabled'] = overlayEnabled;
-    if (adhanSoundEnabled != null) data['adhan_sound'] = adhanSoundEnabled;
-    if (popupIntervalMins != null) data['popup_interval'] = popupIntervalMins;
+    final Map<String, dynamic> data = {};
+    if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
+    if (adhanSoundEnabled != null)
+      data['adhan_sound_enabled'] = adhanSoundEnabled;
+    if (popupIntervalMins != null) {
+      data['popup_interval_minutes'] = popupIntervalMins;
+    }
+
     if (data.isNotEmpty) FlutterForegroundTask.sendDataToTask(data);
   }
 }
@@ -219,14 +222,14 @@ class _OverlayTaskHandler extends TaskHandler {
     if (data is Map) {
       final action = data['action'];
       if (action == 'update_location') _handleLocationUpdate();
-      if (data.containsKey('overlay_enabled')) {
-        _overlayEnabled = data['overlay_enabled'] as bool;
+      if (data.containsKey('overlay_popups_enabled')) {
+        _overlayEnabled = data['overlay_popups_enabled'] as bool;
       }
-      if (data.containsKey('adhan_sound')) {
-        _adhanSoundEnabled = data['adhan_sound'] as bool;
+      if (data.containsKey('adhan_sound_enabled')) {
+        _adhanSoundEnabled = data['adhan_sound_enabled'] as bool;
       }
-      if (data.containsKey('popup_interval')) {
-        _popupIntervalMins = data['popup_interval'] as int;
+      if (data.containsKey('popup_interval_minutes')) {
+        _popupIntervalMins = data['popup_interval_minutes'] as int;
       }
     }
   }

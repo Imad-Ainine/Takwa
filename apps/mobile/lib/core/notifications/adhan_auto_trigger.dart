@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,7 +12,10 @@ class AdhanAudioPlayer {
   static AudioPlayer? _player;
   static bool _isPlaying = false;
 
-  static Future<void> play({String asset = 'assets/sounds/Adhan-Makkah.mp3', double volume = 1.0}) async {
+  static Future<void> play({
+    String asset = 'assets/sounds/Adhan-Makkah.mp3',
+    double volume = 1.0,
+  }) async {
     try {
       await stop();
       _player = AudioPlayer();

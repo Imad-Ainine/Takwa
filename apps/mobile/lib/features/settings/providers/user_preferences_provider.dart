@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/database/daos.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/supabase/sync_manager.dart';
@@ -52,6 +53,9 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     if (category != NotificationCategory.none) {
       unawaited(ref.read(notificationsManagerProvider).reschedule(category));
     }
+
+    // 5. Sync to SharedPreferences for background isolates
+    unawaited(_syncToSharedPreferences(key, value));
   }
 
   /// Helper method for modifying multiple preferences at once
@@ -72,6 +76,25 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     // Trigger granular notification rescheduling
     if (category != NotificationCategory.none) {
       unawaited(ref.read(notificationsManagerProvider).reschedule(category));
+    }
+
+    // Sync all to SharedPreferences
+    for (final entry in updates.entries) {
+      unawaited(_syncToSharedPreferences(entry.key, entry.value));
+    }
+  }
+
+  /// Syncs critical settings to SharedPreferences so background isolates can access them.
+  Future<void> _syncToSharedPreferences(String key, dynamic value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (value is bool) {
+      await prefs.setBool(key, value);
+    } else if (value is int) {
+      await prefs.setInt(key, value);
+    } else if (value is double) {
+      await prefs.setDouble(key, value);
+    } else {
+      await prefs.setString(key, value.toString());
     }
   }
 }

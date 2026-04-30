@@ -31,8 +31,8 @@ import 'package:takwa/features/quran/presentation/screens/khatma_history_screen.
 import 'package:takwa/features/quran/presentation/screens/khatma_progress_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/khatma_progress_settings_screen.dart';
 import 'package:takwa/features/quran/presentation/screens/khatma_settings_screen.dart';
-import 'package:takwa/features/prayer/presentation/screens/adhan_overlay_screen.dart';
-import 'package:takwa/features/prayer/presentation/screens/wake_up_overlay_screen.dart';
+import 'package:takwa/core/notifications/overlays/adhan_overlay_screen.dart';
+import 'package:takwa/core/notifications/overlays/wake_up_overlay_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/terms_privacy_screen.dart';
 import 'package:takwa/features/reminders/presentation/screens/reminders_list_screen.dart';
 import 'package:takwa/features/checklist/screens/manage_custom_ibadah_screen.dart';
