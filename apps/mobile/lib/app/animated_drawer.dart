@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/app/animated_drawer.dart
-//   — Animated Drawer تقوى
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -306,13 +302,49 @@ class _DrawerHeader extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            username,
-                            style: context.typography.headingLarge.copyWith(
-                              fontSize: 18,
-                              color: context.colors.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  username,
+                                  style: context.typography.headingLarge
+                                      .copyWith(
+                                        fontSize: 18,
+                                        color: context.colors.textPrimary,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (profile?['gender'] != null) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.gold.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color: context.colors.gold.withOpacity(
+                                        0.3,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    profile!['gender'] == 'male'
+                                        ? 'ذكر'
+                                        : 'أنثى',
+                                    style: context.typography.caption.copyWith(
+                                      color: context.colors.gold,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           if (ref.watch(authStatusProvider) ==
                               AuthStatus.authenticated)

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/supabase/supabase_service.dart
-//  تقوى — Supabase Unified Service
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:io';
@@ -179,6 +175,15 @@ class SupabaseService {
       'adhan_alarm_enabled': true,
       'wake_screen_enabled': true,
     });
+  }
+
+  static Future<void> updateProfile(Map<String, dynamic> data) async {
+    final uid = SupabaseConfig.userId;
+    if (uid == null) throw 'User not logged in';
+    
+    await _safeRequest(
+      () => _db.from('profiles').update(data).eq('id', uid),
+    );
   }
 
   // ─────────────── DATA ───────────────

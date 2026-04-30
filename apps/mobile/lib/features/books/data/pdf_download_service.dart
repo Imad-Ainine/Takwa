@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/books/data/pdf_download_service.dart
-//  تقوى — PDF Download Service (cache + retry + progress)
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:io';

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/database/daos.dart
-// تقوى — Data Access Objects (DAOs)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:drift/drift.dart';
 import 'app_database.dart';
@@ -1235,9 +1231,6 @@ class RemindersDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  CUSTOM IBADAH DAO
-// ═══════════════════════════════════════════════════════════════
 @DriftAccessor(tables: [CustomIbadah, CustomIbadahLog, DailyRecords])
 class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
     with _$CustomIbadahDaoMixin {

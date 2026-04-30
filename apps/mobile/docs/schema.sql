@@ -225,6 +225,7 @@
 | `username` | `text` |  Nullable |
 | `email` | `text` |  Nullable |
 | `avatar_emoji` | `text` |  Nullable |
+| `gender` | `text` |  Nullable |
 | `total_points` | `int4` |  Nullable |
 | `current_streak` | `int4` |  Nullable |
 | `highest_streak` | `int4` |  Nullable |

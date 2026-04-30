@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/achievements/presentation/widgets/achievement_card.dart
-//  تقوى — Achievement Card (بطاقة الإنجاز)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';

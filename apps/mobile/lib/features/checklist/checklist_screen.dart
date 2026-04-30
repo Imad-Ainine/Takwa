@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/checklist/checklist_screen.dart
-//  تقوى — Daily Checklist (قائمة المحاسبة اليومية)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
@@ -21,9 +17,6 @@ import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  CHECKLIST SCREEN
-// ═══════════════════════════════════════════════════════════════
 class ChecklistScreen extends ConsumerStatefulWidget {
   const ChecklistScreen({super.key});
 
@@ -211,9 +204,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
   ][m - 1];
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TOP BAR
-// ═══════════════════════════════════════════════════════════════
 class _TopBar extends StatelessWidget {
   final String hijriStr;
   final int netPoints, grossPoints, deducted;
@@ -335,9 +325,6 @@ class _PointsPill extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DAY PROGRESS BAR
-// ═══════════════════════════════════════════════════════════════
 class _DayProgressBar extends ConsumerWidget {
   final DailyRecord? record;
   const _DayProgressBar({required this.record});
@@ -507,9 +494,6 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYERS GROUP
-// ═══════════════════════════════════════════════════════════════
 class _PrayersGroup extends ConsumerWidget {
   final DailyRecord? record;
   const _PrayersGroup({required this.record});
@@ -822,9 +806,6 @@ class _StatusOption extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  IBADAH GROUP (قرآن + أذكار + صيام + صدقة + قيام)
-// ═══════════════════════════════════════════════════════════════
 class _IbadahGroup extends ConsumerWidget {
   final DailyRecord? record;
   final TextEditingController quranCtrl;
@@ -931,8 +912,9 @@ class _IbadahGroup extends ConsumerWidget {
           points: '+١٠',
           value: record?.ghadhBasar ?? false,
           onChanged: (v) async {
-            final rec =
-                await ref.read(dailyRecordDaoProvider).getOrCreateToday();
+            final rec = await ref
+                .read(dailyRecordDaoProvider)
+                .getOrCreateToday();
             await ref.read(dailyRecordDaoProvider).toggleGhadhBasar(rec.id, v);
             await ref
                 .read(syncManagerProvider)
@@ -1291,9 +1273,6 @@ class _FastingSelector extends ConsumerWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PROHIBITIONS GROUP
-// ═══════════════════════════════════════════════════════════════
 class _ProhibitionsGroup extends ConsumerWidget {
   final DailyRecord? record;
   const _ProhibitionsGroup({required this.record});
@@ -1537,9 +1516,6 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DAY NOTE FIELD
-// ═══════════════════════════════════════════════════════════════
 class _DayNoteField extends ConsumerStatefulWidget {
   final DailyRecord? record;
   const _DayNoteField({required this.record});
@@ -1652,9 +1628,6 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SHARED WIDGETS
-// ═══════════════════════════════════════════════════════════════
 class _GroupCard extends StatelessWidget {
   final String icon, title;
   final Color? titleColor, trailingColor;

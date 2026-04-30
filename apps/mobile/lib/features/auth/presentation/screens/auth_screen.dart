@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/auth/presentation/screens/auth_screen.dart
-//  تقوى — شاشة المصادقة — Professional Islamic UI
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'dart:ui';
@@ -20,9 +16,6 @@ import '../../../../core/providers/database_providers.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/auth_field.dart';
 
-// ══════════════════════════════════════════════════════
-//  AUTH SCREEN
-// ══════════════════════════════════════════════════════
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
   @override
@@ -78,6 +71,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     super.dispose();
   }
 
+  Future<void> _syncGender() async {
+    try {
+      final gender = await ref.read(settingsDaoProvider).get('gender');
+      if (gender != null) {
+        await SupabaseService.updateProfile({'gender': gender});
+      }
+    } catch (e) {
+      debugPrint('Error syncing gender: $e');
+    }
+  }
+
   // ── Actions ──────────────────────────────────────────
   Future<void> _signIn() async {
     if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
@@ -93,6 +97,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text,
       );
+      await _syncGender();
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
       if (mounted) setState(() => _error = _authError(e.message));
@@ -122,6 +127,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         password: _passCtrl.text,
         username: _userCtrl.text.trim(),
       );
+      await _syncGender();
       if (mounted) {
         Navigator.pushReplacementNamed(
           context,
@@ -145,7 +151,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     });
     try {
       final res = await SupabaseService.signInWithGoogle();
-      if (res != null && mounted) Navigator.pushReplacementNamed(context, '/');
+      if (res != null) {
+        await _syncGender();
+        if (mounted) Navigator.pushReplacementNamed(context, '/');
+      }
     } catch (e) {
       debugPrint('Google Sign-In Error: $e');
       if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل: $e');
@@ -508,9 +517,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  ANIMATED STAR-FIELD BACKGROUND
-// ══════════════════════════════════════════════════════
 class _StarFieldBg extends StatelessWidget {
   final AnimationController controller;
   final AdaptiveStyle style;
@@ -580,9 +586,6 @@ class _StarsPainter extends CustomPainter {
   bool shouldRepaint(_StarsPainter old) => old.progress != progress;
 }
 
-// ══════════════════════════════════════════════════════
-//  AUTH HEADER
-// ══════════════════════════════════════════════════════
 class _AuthHeader extends StatelessWidget {
   final AdaptiveStyle style;
   final AnimationController entryCtrl;

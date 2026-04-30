@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/adhan_foreground_service.dart
-//  تقوى — Adhan Foreground Service (shows adhan screen from background)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';

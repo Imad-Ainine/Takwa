@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/presentation/screens/free_reading_screen.dart
-//  Free Reading with Surah / Review / Index / Juz / Rub tabs
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

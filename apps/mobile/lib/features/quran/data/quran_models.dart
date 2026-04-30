@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/data/quran_models.dart
-// ═══════════════════════════════════════════════════════════════
 
 enum ReaderMode { reading, tahajjud, tafseer, translation }
 

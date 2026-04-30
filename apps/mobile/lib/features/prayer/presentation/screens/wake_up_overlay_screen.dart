@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/prayer/presentation/screens/wake_up_overlay_screen.dart
-//  تقوى — شاشة الاستيقاظ قبل الفجر
-// ═══════════════════════════════════════════════════════════════
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -15,9 +10,6 @@ import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 
-// ══════════════════════════════════════════════════════
-//  WAKE UP OVERLAY SCREEN
-// ══════════════════════════════════════════════════════
 class WakeUpOverlayScreen extends ConsumerStatefulWidget {
   const WakeUpOverlayScreen({super.key});
 
@@ -70,14 +62,12 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   }
 
   Future<void> _initAudio() async {
-    // Read user-selected adhan sound from preferences
-    final prefsAsync = ref.read(userPreferencesProvider);
-    final prefs = prefsAsync.valueOrNull;
+    // Read user-selected adhan sound from preferences asynchronously
+    final prefs = await ref.read(userPreferencesProvider.future);
 
-    final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
+    final soundFile = prefs.adhanSound;
     final asset = 'assets/sounds/$soundFile';
-    // تأخير قصير للسماح بتهيئة الـ Widget
-    await Future.delayed(const Duration(milliseconds: 300));
+
     for (int attempt = 0; attempt < 3; attempt++) {
       try {
         await _player.setAsset(asset);
@@ -428,9 +418,6 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  STAR FIELD PAINTER
-// ══════════════════════════════════════════════════════
 class _AdhanStarsPainter extends CustomPainter {
   final double progress;
   _AdhanStarsPainter({required this.progress});
@@ -459,9 +446,6 @@ class _AdhanStarsPainter extends CustomPainter {
   bool shouldRepaint(_AdhanStarsPainter old) => old.progress != progress;
 }
 
-// ══════════════════════════════════════════════════════
-//  MOSQUE SILHOUETTE PAINTER
-// ══════════════════════════════════════════════════════
 class _MosqueSilhouettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

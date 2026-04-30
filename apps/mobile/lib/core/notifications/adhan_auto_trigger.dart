@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/adhan_auto_trigger.dart
-//  تقوى — Adhan Auto Trigger Service
-//  يُطلق شاشة الأذان تلقائياً مع صوت الأذان
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -12,11 +7,8 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import '../routes/app_routes.dart';
 import 'notifications_service.dart';
-import '../providers/database_providers.dart';
+import '../../features/settings/providers/user_preferences_provider.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  ADHAN AUDIO PLAYER
-// ═══════════════════════════════════════════════════════════════
 class AdhanAudioPlayer {
   static AudioPlayer? _player;
   static bool _isPlaying = false;
@@ -59,9 +51,6 @@ class AdhanAudioPlayer {
   static bool get isPlaying => _isPlaying;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADHAN AUTO TRIGGER — يُشغَّل من main.dart عبر listener
-// ═══════════════════════════════════════════════════════════════
 class AdhanAutoTrigger {
   static Timer? _checkTimer;
   static String? _lastTriggeredPrayer;
@@ -89,20 +78,16 @@ class AdhanAutoTrigger {
       final prayers = ref.read(prayerTimesProvider).value;
       if (prayers == null) return;
 
-      final settings = ref.read(settingsDaoProvider);
-      
-      final adhanMode = await settings.get('adhan_mode') ?? 'sound';
+      final prefs = await ref.read(userPreferencesProvider.future);
+
+      final adhanMode = prefs.adhanMode;
       final playSound = adhanMode == 'sound';
-      final adhanVolumeLevel = double.tryParse((await settings.get('adhan_volume_level')) ?? '1.0') ?? 1.0;
-      
-      final adhanScreen = await settings.getBool(
-        'adhan_screen_enabled',
-        defaultVal: true,
-      );
+      final adhanVolumeLevel = prefs.adhanVolumeLevel;
+
+      final adhanScreen = prefs.adhanScreenEnabled;
 
       // Read the user-selected adhan sound
-      final adhanSoundFile =
-          await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
+      final adhanSoundFile = prefs.adhanSound;
 
       final now = DateTime.now();
       for (final prayer in prayers) {
@@ -166,20 +151,16 @@ class AdhanAutoTrigger {
     final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
     final requestPlaySound = (data['sound'] as bool?) ?? true;
 
-    final settings = ref.read(settingsDaoProvider);
-    final adhanMode = await settings.get('adhan_mode') ?? 'sound';
+    final prefs = await ref.read(userPreferencesProvider.future);
+    final adhanMode = prefs.adhanMode;
     final playSoundPref = adhanMode == 'sound';
-    final adhanVolumeLevel = double.tryParse((await settings.get('adhan_volume_level')) ?? '1.0') ?? 1.0;
+    final adhanVolumeLevel = prefs.adhanVolumeLevel;
 
-    final adhanScreen = await settings.getBool(
-      'adhan_screen_enabled',
-      defaultVal: true,
-    );
+    final adhanScreen = prefs.adhanScreenEnabled;
 
     if (playSoundPref && requestPlaySound) {
       // Read the user-selected adhan sound file
-      final adhanSoundFile =
-          await settings.get('adhan_sound') ?? 'Adhan-Makkah.mp3';
+      final adhanSoundFile = prefs.adhanSound;
       await AdhanAudioPlayer.play(
         asset: 'assets/sounds/$adhanSoundFile',
         volume: adhanVolumeLevel,
@@ -193,11 +174,6 @@ class AdhanAutoTrigger {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADHAN OVERLAY SCREEN (شاشة الأذان الكاملة)
-//  الشاشة الفعلية موجودة في features/prayer/presentation/screens/adhan_overlay_screen.dart
-//  هذا فقط controller لتشغيل الصوت ومزامنته مع الشاشة
-// ═══════════════════════════════════════════════════════════════
 class AdhanScreenController {
   static final _instance = AdhanScreenController._();
   AdhanScreenController._();
@@ -226,10 +202,6 @@ class AdhanScreenController {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  MAIN APP INTEGRATION MIXIN
-//  يُضاف لـ _TakwaAppState في main.dart
-// ═══════════════════════════════════════════════════════════════
 mixin AdhanAutoMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   void initAdhanAuto(GlobalKey<NavigatorState> navigatorKey) {
     AdhanAutoTrigger.start(ref, navigatorKey);

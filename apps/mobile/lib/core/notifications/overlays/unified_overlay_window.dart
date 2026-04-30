@@ -1,447 +1,3 @@
-// import 'dart:async';
-// import 'dart:math' as math;
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-
-// import '../../providers/adhkar_providers.dart';
-// import '../../theme/app_theme.dart';
-// import '../../widgets/custom_pattern_background.dart';
-// import 'package:takwa/features/duas/data/duas_data.dart';
-
-// // ─────────────────────────────────────────
-// //  نموذج بيانات موحّد للعرض
-// // ─────────────────────────────────────────
-// class _PopupItem {
-//   final String arabic;
-//   final String? meaning;
-//   final String? fadl;
-//   final String? source;
-//   final String emoji;
-//   final String categoryName;
-//   final bool isDua;
-
-//   const _PopupItem({
-//     required this.arabic,
-//     required this.emoji,
-//     required this.categoryName,
-//     required this.isDua,
-//     this.meaning,
-//     this.fadl,
-//     this.source,
-//   });
-// }
-
-// // ─────────────────────────────────────────
-// //  بناء قائمة موحّدة من كل الأذكار والأدعية
-// // ─────────────────────────────────────────
-// List<_PopupItem> _buildAllItems() {
-//   final items = <_PopupItem>[];
-
-//   // ── الأذكار ──
-//   final catNames = {
-//     AdhkarCategory.morning: ('🌅', 'أذكار الصباح'),
-//     AdhkarCategory.evening: ('🌆', 'أذكار المساء'),
-//     AdhkarCategory.afterPrayer: ('🕌', 'أذكار بعد الصلاة'),
-//     AdhkarCategory.sleep: ('🌙', 'أذكار النوم'),
-//     AdhkarCategory.misc: ('📿', 'أذكار متنوعة'),
-//   };
-//   for (final entry in kAdhkarData.entries) {
-//     final meta = catNames[entry.key]!;
-//     for (final d in entry.value) {
-//       items.add(
-//         _PopupItem(
-//           arabic: d.arabic,
-//           fadl: d.fadl,
-//           source: d.source,
-//           emoji: meta.$1,
-//           categoryName: meta.$2,
-//           isDua: false,
-//         ),
-//       );
-//     }
-//   }
-
-//   // ── الأدعية ──
-//   const duaCatNames = {
-//     DuaCategory.morning: ('🌅', 'دعاء الصباح'),
-//     DuaCategory.distress: ('🌊', 'دعاء الكرب'),
-//     DuaCategory.guidance: ('🌟', 'دعاء الهداية'),
-//     DuaCategory.forgiveness: ('🌿', 'دعاء المغفرة'),
-//     DuaCategory.rizq: ('🌾', 'دعاء الرزق'),
-//     DuaCategory.health: ('🫀', 'دعاء الصحة'),
-//     DuaCategory.parents: ('❤️', 'دعاء الوالدين'),
-//     DuaCategory.travel: ('✈️', 'دعاء السفر'),
-//     DuaCategory.rain: ('🌧️', 'دعاء الاستسقاء'),
-//     DuaCategory.general: ('🤲', 'دعاء عام'),
-//   };
-//   for (final entry in kDuasData.entries) {
-//     final meta = duaCatNames[entry.key];
-//     if (meta == null) continue;
-//     for (final d in entry.value) {
-//       items.add(
-//         _PopupItem(
-//           arabic: d.arabic,
-//           meaning: d.meaning,
-//           source: d.source,
-//           emoji: d.emoji,
-//           categoryName: meta.$2,
-//           isDua: true,
-//         ),
-//       );
-//     }
-//   }
-
-//   return items;
-// }
-
-// class UnifiedOverlayWindow extends StatefulWidget {
-//   const UnifiedOverlayWindow({super.key});
-
-//   @override
-//   State<UnifiedOverlayWindow> createState() => _UnifiedOverlayWindowState();
-// }
-
-// class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
-//     with TickerProviderStateMixin {
-//   final _allItems = _buildAllItems();
-//   final _random = math.Random();
-//   _PopupItem? _current;
-//   Timer? _autoRefreshTimer;
-//   Timer? _closeTimer;
-//   String? _filter;
-//   final Duration _displayDuration = const Duration(seconds: 15);
-
-//   // Animation
-//   late final AnimationController _slideCtrl;
-//   late final Animation<Offset> _slideAnim;
-//   late final Animation<double> _fadeAnim;
-
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     // ── Slide-in Animation ──
-//     _slideCtrl = AnimationController(
-//       vsync: this,
-//       duration: const Duration(milliseconds: 700),
-//     );
-//     _slideAnim = Tween<Offset>(begin: const Offset(1.5, 0), end: Offset.zero)
-//         .animate(
-//           CurvedAnimation(
-//             parent: _slideCtrl,
-//             curve: Curves.elasticOut,
-//             reverseCurve: Curves.easeInBack,
-//           ),
-//         );
-//     _fadeAnim = CurvedAnimation(parent: _slideCtrl, curve: Curves.easeIn);
-
-//     _pickRandom();
-//     _slideCtrl.forward();
-
-//     // Refresh if stays open
-//     _autoRefreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
-//       _pickRandom(animate: true);
-//     });
-
-//     _startCloseTimer();
-
-//     // Listen to data from main isolate
-//     FlutterOverlayWindow.overlayListener.listen((data) {
-//       if (data is Map) {
-//         if (data.containsKey('type')) {
-//           setState(() {
-//             _filter = data['type'];
-//             _pickRandom(animate: true);
-//           });
-//         }
-//       } else if (data is int && data >= 0 && data < _allItems.length) {
-//         setState(() {
-//           _current = _allItems[data];
-//           _slideCtrl.forward(from: 0);
-//           _startCloseTimer();
-//         });
-//       } else {
-//         _pickRandom(animate: true);
-//       }
-//     });
-//   }
-
-//   void _startCloseTimer() {
-//     _closeTimer?.cancel();
-//     _closeTimer = Timer(_displayDuration, () {
-//       if (mounted) _closeOverlay();
-//     });
-//   }
-
-//   void _closeOverlay() {
-//     _slideCtrl.reverse().then((_) {
-//       FlutterOverlayWindow.closeOverlay();
-//     });
-//   }
-
-//   void _pickRandom({bool animate = false}) {
-//     if (_allItems.isEmpty) return;
-
-//     List<_PopupItem> pool = _allItems;
-//     if (_filter == 'adhkar') {
-//       pool = _allItems.where((i) => !i.isDua).toList();
-//     } else if (_filter == 'dua') {
-//       pool = _allItems.where((i) => i.isDua).toList();
-//     }
-
-//     if (pool.isEmpty) pool = _allItems;
-
-//     final next = pool[_random.nextInt(pool.length)];
-//     if (animate) {
-//       _slideCtrl.reverse().then((_) {
-//         if (mounted) {
-//           setState(() => _current = next);
-//           _slideCtrl.forward();
-//           _startCloseTimer();
-//         }
-//       });
-//     } else {
-//       setState(() => _current = next);
-//     }
-//   }
-
-//   @override
-//   void dispose() {
-//     _autoRefreshTimer?.cancel();
-//     _closeTimer?.cancel();
-//     _slideCtrl.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (_current == null) return const SizedBox.shrink();
-
-//     return Scaffold(
-//       backgroundColor: Colors.transparent,
-//       body: Directionality(
-//         textDirection: TextDirection.rtl,
-//         child: Stack(
-//           children: [
-//             // ── Transparent Dismissible Area ──
-//             Positioned.fill(
-//               child: GestureDetector(
-//                 onTap: _closeOverlay,
-//                 child: Container(color: Colors.transparent),
-//               ),
-//             ),
-
-//             // ── Card Position (Top Banner) ──
-//             Positioned(
-//               top: 160,
-//               left: 12,
-//               right: 12,
-//               child: SlideTransition(
-//                 position: _slideAnim,
-//                 child: FadeTransition(
-//                   opacity: _fadeAnim,
-//                   child: GestureDetector(onTap: () {}, child: _buildCard()),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildCard() {
-//     final item = _current!;
-//     final colors = context.colors;
-
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: colors.card.withOpacity(0.95),
-//         borderRadius: BorderRadius.circular(16),
-//         border: Border.all(color: colors.gold.withOpacity(0.4), width: 1.2),
-//         boxShadow: [
-//           BoxShadow(
-//             color: colors.gold.withOpacity(0.15),
-//             blurRadius: 25,
-//             spreadRadius: 2,
-//           ),
-//         ],
-//       ),
-//       clipBehavior: Clip.antiAlias,
-//       child: Stack(
-//         children: [
-//           // ── Background Pattern ──
-//           const Positioned.fill(
-//             child: CustomPatternBackground(
-//               pattern: BackgroundPattern.adhkar
-//             ),
-//           ),
-
-//           // ── Progress Bar ──
-//           Positioned(
-//             bottom: 0,
-//             left: 0,
-//             right: 0,
-//             child: TweenAnimationBuilder<double>(
-//               key: ValueKey(item.arabic),
-//               tween: Tween(begin: 1.0, end: 0.0),
-//               duration: _displayDuration,
-//               builder: (context, value, _) {
-//                 return LinearProgressIndicator(
-//                   value: value,
-//                   minHeight: 3,
-//                   backgroundColor: Colors.transparent,
-//                   valueColor: AlwaysStoppedAnimation<Color>(
-//                     colors.gold.withOpacity(0.6),
-//                   ),
-//                 );
-//               },
-//             ),
-//           ),
-
-//           // ── Main Content ──
-//           SizedBox(
-//             width: double.infinity,
-//             child: Padding(
-//               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-//               child: Column(
-//                 mainAxisSize: MainAxisSize.min,
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   // ── Header ──
-//                   Row(
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     children: [
-//                       Container(
-//                         width: 38,
-//                         height: 38,
-//                         decoration: BoxDecoration(
-//                           color: colors.gold.withOpacity(0.12),
-//                           shape: BoxShape.circle,
-//                         ),
-//                         alignment: Alignment.center,
-//                         child: Text(
-//                           item.emoji,
-//                           style: const TextStyle(fontSize: 20),
-//                         ),
-//                       ),
-//                       const SizedBox(width: 10),
-
-//                       Expanded(
-//                         child: Column(
-//                           mainAxisSize: MainAxisSize.min,
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text(
-//                               item.categoryName,
-//                               maxLines: 1,
-//                               overflow: TextOverflow
-//                                   .ellipsis, // ✅ FIX: منع overflow النص
-//                               style: TextStyle(
-//                                 fontFamily: 'Amiri',
-//                                 fontSize: 16,
-//                                 color: colors.gold,
-//                                 fontWeight: FontWeight.w700,
-//                                 height: 1.2,
-//                               ),
-//                             ),
-//                             Text(
-//                               'انقر للمتابعة',
-//                               style: context.typography.caption.copyWith(
-//                                 color: colors.textSecondary,
-//                                 fontSize: 10,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                       SizedBox(
-//                         width: 32,
-//                         height: 32,
-//                         child: IconButton(
-//                           padding: EdgeInsets.zero,
-//                           constraints: const BoxConstraints(),
-//                           icon: Icon(
-//                             Icons.close_rounded,
-//                             color: colors.textDim,
-//                             size: 18,
-//                           ),
-//                           onPressed: _closeOverlay,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-
-//                   const SizedBox(height: 16),
-
-//                   // ── Arabic Content ──
-//                   ConstrainedBox(
-//                     constraints: const BoxConstraints(maxHeight: 160),
-//                     child: SingleChildScrollView(
-//                       physics: const BouncingScrollPhysics(),
-//                       child: SizedBox(
-//                         width: double.infinity,
-//                         child: Text(
-//                           item.arabic,
-//                           textAlign: TextAlign.right,
-//                           style: context.typography.quranicVerse.copyWith(
-//                             fontSize: 22,
-//                             color: colors.textPrimary,
-//                             height: 1.6,
-//                             fontWeight: FontWeight.w600,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-
-//                   // ── Source / Meaning ──
-//                   if (item.source != null || item.fadl != null) ...[
-//                     const SizedBox(height: 12),
-//                     Container(
-//                       padding: const EdgeInsets.symmetric(
-//                         horizontal: 10,
-//                         vertical: 4,
-//                       ),
-//                       decoration: BoxDecoration(
-//                         color: colors.teal.withOpacity(0.1),
-//                         borderRadius: BorderRadius.circular(8),
-//                       ),
-//                       child: Row(
-//                         mainAxisSize: MainAxisSize.min,
-//                         children: [
-//                           Icon(
-//                             Icons.menu_book_rounded,
-//                             color: colors.teal,
-//                             size: 14,
-//                           ),
-//                           const SizedBox(width: 6),
-//                           Flexible(
-//                             child: Text(
-//                               item.source ?? item.fadl!,
-//                               maxLines: 1,
-//                               overflow: TextOverflow.ellipsis,
-//                               style: context.typography.caption.copyWith(
-//                                 color: colors.teal,
-//                                 fontSize: 11,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -451,9 +7,6 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import '../../providers/adhkar_providers.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
 
-// ═══════════════════════════════════════════════════
-//  ISLAMIC GOLD PALETTE
-// ═══════════════════════════════════════════════════
 class _IGold {
   // static const deep = Color(0xFF0B0F1C); // خلفية عميقة
   // static const card = Color(0xFF111827); // بطاقة
@@ -468,9 +21,6 @@ class _IGold {
   // static const glow = Color(0x33F0C040); // هالة ذهبية
 }
 
-// ═══════════════════════════════════════════════════
-//  DATA MODEL
-// ═══════════════════════════════════════════════════
 class _PopupItem {
   final String arabic;
   final String? meaning;
@@ -551,9 +101,6 @@ List<_PopupItem> _buildAllItems() {
   return items;
 }
 
-// ═══════════════════════════════════════════════════
-//  ISLAMIC GEOMETRIC BACKGROUND PAINTER
-// ═══════════════════════════════════════════════════
 class _IslamicPatternPainter extends CustomPainter {
   final double opacity;
   const _IslamicPatternPainter({this.opacity = 0.07});
@@ -606,9 +153,6 @@ class _IslamicPatternPainter extends CustomPainter {
   bool shouldRepaint(_IslamicPatternPainter old) => old.opacity != opacity;
 }
 
-// ═══════════════════════════════════════════════════
-//  CORNER ORNAMENT PAINTER
-// ═══════════════════════════════════════════════════
 class _CornerOrnamentPainter extends CustomPainter {
   const _CornerOrnamentPainter();
 
@@ -690,9 +234,6 @@ class _CornerOrnamentPainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-// ═══════════════════════════════════════════════════
-//  GOLDEN DIVIDER
-// ═══════════════════════════════════════════════════
 class _GoldDivider extends StatelessWidget {
   const _GoldDivider();
   @override
@@ -734,9 +275,6 @@ class _GoldDivider extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════
-//  SHIMMER PROGRESS BAR
-// ═══════════════════════════════════════════════════
 class _GoldProgressBar extends StatefulWidget {
   final Duration duration;
   final Key barKey;
@@ -806,9 +344,6 @@ class _GoldProgressBarState extends State<_GoldProgressBar>
   }
 }
 
-// ═══════════════════════════════════════════════════
-//  MAIN WIDGET
-// ═══════════════════════════════════════════════════
 class UnifiedOverlayWindow extends StatefulWidget {
   const UnifiedOverlayWindow({super.key});
   @override

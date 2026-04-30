@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/onboarding/onboarding_screen.dart
-//  تقوى — Combined Onboarding Flow
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -15,6 +11,7 @@ import '../../core/widgets/primary_button.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/notifications/notifications_service.dart';
 import '../../core/notifications/overlay_background_service.dart';
+import '../../core/supabase/supabase_service.dart';
 
 // ── Enum for current step ──
 enum OnboardStep {
@@ -253,6 +250,15 @@ class OnboardingScreen extends ConsumerWidget {
           selected: state.gender,
           onSelect: notifier.selectGender,
           onNext: () async {
+            if (state.gender != null) {
+              await ref.read(settingsDaoProvider).set('gender', state.gender!);
+              try {
+                await SupabaseService.updateProfile({'gender': state.gender});
+              } catch (e) {
+                // Ignore error if offline
+                print('Error updating gender: $e');
+              }
+            }
             await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
             ref.invalidate(onboardingDoneProvider);
           },

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/adhkar/presentation/screens/favorite_adhkar_screen.dart
-//  تقوى — شاشة أذكاري المفضلة
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

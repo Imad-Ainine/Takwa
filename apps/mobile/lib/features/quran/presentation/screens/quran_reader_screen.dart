@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/presentation/screens/quran_reader_screen.dart
-//  Page-based Quran Reader — redesigned to match reference screenshots
-// ═══════════════════════════════════════════════════════════════
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -322,9 +318,6 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BACKGROUND DECORATION
-// ═══════════════════════════════════════════════════════════════
 class _QuranBgDecor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -399,9 +392,6 @@ class _QuranBgPainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  QURAN PAGE VIEW
-// ═══════════════════════════════════════════════════════════════
 class _QuranPageView extends StatelessWidget {
   final int page;
   final int Function(int) surahForPage;
@@ -699,9 +689,6 @@ class _AyahNumberBadge extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TOP BAR (matches screenshot 9)
-// ═══════════════════════════════════════════════════════════════
 class _TopBar extends StatelessWidget {
   final String surahName;
   final bool isDark;
@@ -806,9 +793,6 @@ class _TapIcon extends StatelessWidget {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BOTTOM BAR (matches screenshot 9)
-// ═══════════════════════════════════════════════════════════════
 class _BottomBar extends StatelessWidget {
   final int juz, currentPage, totalPages, surahNum, pagesRead;
   final bool isDark;
@@ -1044,9 +1028,6 @@ class _BottomBar extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  READING GUIDE DIALOG (matches screenshot 7)
-// ═══════════════════════════════════════════════════════════════
 class _ReadingGuideDialog extends StatelessWidget {
   const _ReadingGuideDialog();
 
@@ -1219,9 +1200,6 @@ class _GuideItem extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PAGE NAVIGATION DIALOG (matches screenshot 8)
-// ═══════════════════════════════════════════════════════════════
 class _PageNavigationDialog extends StatefulWidget {
   final int currentPage, totalPages;
   final void Function(int) onNavigate;
@@ -1412,9 +1390,6 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  AYAH OPTIONS SHEET (long-press menu)
-// ═══════════════════════════════════════════════════════════════
 class _AyahOptionsSheet extends StatelessWidget {
   final int surahNum, ayahNum;
   final VoidCallback onPlay;
@@ -1525,9 +1500,6 @@ class _OptionRow extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SETTINGS SHEET
-// ═══════════════════════════════════════════════════════════════
 class _SettingsSheet extends StatefulWidget {
   final double fontSize;
   final ReaderTheme theme;

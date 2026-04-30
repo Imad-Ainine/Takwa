@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/settings/presentation/screens/terms_privacy_screen.dart
-//  تقوى — Terms & Privacy (الشروط والخصوصية)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';

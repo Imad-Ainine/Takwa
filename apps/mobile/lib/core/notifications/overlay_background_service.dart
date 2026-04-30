@@ -1,11 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/overlay_background_service.dart
-//  تقوى — Overlay Background Service (IMPROVED)
-//  • يُظهر أذكاراً وأدعية للمستخدم كل 24 دقيقة (60 مرة/يوم)
-//  • يُظهر شاشة الأذان تلقائياً مع صوت الأذان عند دخول الوقت
-//  • إشعارات الأذكار والأدعية كل 15 دقيقة بالتناوب
-//  • تنبيهات الصلاة مع أصوات مناسبة
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -77,9 +69,6 @@ class _PrayerInfo {
   const _PrayerInfo(this.name, this.nameAr, this.emoji, this.time);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  OVERLAY BACKGROUND SERVICE
-// ═══════════════════════════════════════════════════════════════
 class OverlayBackgroundService {
   static const _channelId = 'takkwa_background_overlay';
   static const _channelName = 'Takkwa Overlay Background';
@@ -188,9 +177,6 @@ void startCallback() {
   FlutterForegroundTask.setTaskHandler(_OverlayTaskHandler());
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TASK HANDLER — قلب الخدمة
-// ═══════════════════════════════════════════════════════════════
 class _OverlayTaskHandler extends TaskHandler {
   List<_PrayerInfo> _todayPrayers = [];
   String _lastPrayerDate = '';

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/auth/presentation/screens/email_confirmation_screen.dart
-//  تقوى — شاشة تأكيد البريد الإلكتروني
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';

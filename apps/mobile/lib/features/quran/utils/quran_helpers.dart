@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/utils/quran_helpers.dart
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 

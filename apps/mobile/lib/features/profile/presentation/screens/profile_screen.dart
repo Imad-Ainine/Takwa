@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/profile/presentation/screens/profile_screen.dart
-//  تقوى — Profile Screen
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -143,6 +139,30 @@ class ProfileScreen extends ConsumerWidget {
                   color: context.colors.gold,
                 ),
               ),
+              if (profile?['gender'] != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.colors.gold.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: context.colors.gold.withOpacity(0.4),
+                    ),
+                  ),
+                  child: Text(
+                    profile!['gender'] == 'male' ? 'ذكر' : 'أنثى',
+                    style: context.typography.caption.copyWith(
+                      color: context.colors.gold,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 4),
               Text(
                 profile?['email'] ?? '',

@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/presentation/screens/khatma_progress_screen.dart
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

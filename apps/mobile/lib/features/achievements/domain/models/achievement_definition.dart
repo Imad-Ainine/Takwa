@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/achievements/domain/models/achievement_definition.dart
-//  تقوى — Achievement Definitions (تعريفات الإنجازات)
-// ═══════════════════════════════════════════════════════════════
 
 enum AchievementCategory { daily, milestone, ibadah, special }
 

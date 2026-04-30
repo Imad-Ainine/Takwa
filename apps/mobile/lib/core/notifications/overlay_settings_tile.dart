@@ -1,10 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/overlay_settings_tile.dart
-//  تقوى — Overlay & Notification Settings Widget
-//  Settings are stored in SQLite and synced to Supabase via
-//  userPreferencesProvider. The old overlaySettingsProvider
-//  (SharedPreferences) has been removed.
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

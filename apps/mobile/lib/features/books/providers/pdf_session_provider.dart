@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/books/providers/pdf_session_provider.dart
-//  تقوى — PDF Reading Session (timer, page, progress, Supabase)
-// ═══════════════════════════════════════════════════════════════
-
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

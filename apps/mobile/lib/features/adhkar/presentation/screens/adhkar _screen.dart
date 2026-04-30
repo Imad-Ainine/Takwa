@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/adhkar/presentation/screens/adhkar_screen.dart
-// تقوى — شاشة الأذكار الكاملة
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,9 +15,6 @@ import 'package:takwa/features/adhkar/presentation/screens/_user_community_adhka
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  ADHKAR SCREEN
-// ═══════════════════════════════════════════════════════════════
 class AdhkarScreen extends ConsumerStatefulWidget {
   final int initialCategoryIndex;
 
@@ -1141,9 +1134,6 @@ class _ToggleRow extends StatelessWidget {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  USER & COMMUNITY ADHKAR (delegates to _user_community_adhkar_views.dart)
-// ═══════════════════════════════════════════════════════════════
 
 class _UserAdhkarTabView extends StatelessWidget {
   final AnimationController entryCtrl;

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/location_prayer_update.dart
-//  تقوى — Location + Timezone + Prayer Auto-Update
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,10 +11,8 @@ import 'package:geocoding/geocoding.dart';
 import '../providers/database_providers.dart';
 import 'notifications_service.dart';
 import '../utils/timezone_resolver.dart';
+import '../../features/settings/providers/user_preferences_provider.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  LOCATION + PRAYER MANAGER (كامل)
-// ═══════════════════════════════════════════════════════════════
 class LocationPrayerManager {
   static bool _scheduled = false;
   static DateTime? _lastUpdate;
@@ -136,29 +130,24 @@ class LocationPrayerManager {
       return;
     }
 
-    final settings = ref.read(settingsDaoProvider);
-    final madhab = await settings.get('madhab') ?? 'shafi';
-    final method = await settings.get('calcMethod') ?? 'MWL';
-    final prayerReminder = await settings.getBool(
-      'prayerReminder',
-      defaultVal: true,
-    );
-    final wakeUpFajr = await settings.getBool(
-      'wakeUpBeforeFajr',
-      defaultVal: false,
-    );
+    final prefs = await ref.read(userPreferencesProvider.future);
 
-    if (!prayerReminder) return;
+    if (!prefs.prayerReminder) return;
 
     // حساب الأوقات بالـ timezone الصحيح
     final prayers = await PrayerTimesWithTimezone.calculate(
       latitude: lat,
       longitude: lng,
-      madhab: madhab,
-      method: method,
+      madhab: prefs.madhab,
+      method: prefs.calcMethod,
     );
 
-    await NotificationsService.schedulePrayerNotifications(prayers: prayers);
+    await NotificationsService.schedulePrayerNotifications(
+      prayers: prayers,
+      preAdhanEnabled: prefs.preAdhanNotif,
+      iqamaEnabled: prefs.iqamaNotif,
+      adhanMode: prefs.adhanMode,
+    );
 
     _scheduled = true;
     _lastUpdate = DateTime.now();
@@ -178,9 +167,6 @@ class LocationPrayerManager {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER TIMES مع TIMEZONE
-// ═══════════════════════════════════════════════════════════════
 class PrayerTimesWithTimezone {
   /// حساب الأوقات مع مراعاة الـ timezone المحلي
   static Future<List<PrayerTimeInfo>> calculate({
@@ -314,9 +300,6 @@ class PrayerTimesWithTimezone {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RESULT ENUM
-// ═══════════════════════════════════════════════════════════════
 enum LocationResult {
   success,
   serviceDisabled,
@@ -336,9 +319,6 @@ enum LocationResult {
   bool get isSuccess => this == LocationResult.success;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LOCATION UPDATE WIDGET (يُضاف للـ Settings)
-// ═══════════════════════════════════════════════════════════════
 class LocationUpdateTile extends ConsumerStatefulWidget {
   const LocationUpdateTile({super.key});
 

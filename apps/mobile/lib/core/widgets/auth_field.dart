@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/widgets/auth_field.dart
-//  تقوى — Reusable Auth Field Widget
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import '../theme/ramadan_theme.dart';
@@ -106,9 +102,6 @@ class _AuthFieldState extends State<AuthField> {
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  PASSWORD STRENGTH BAR
-// ══════════════════════════════════════════════════════
 class PasswordStrengthBar extends StatelessWidget {
   final double strength; // 0..1
   final AdaptiveStyle style;

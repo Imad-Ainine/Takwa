@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/adhkar/data/adhkar_data.dart
-//  lib/features/adhkar/providers/adhkar_providers.dart
-//  تقوى — Adhkar Data + Providers + Notification Service
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -13,9 +8,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
 import '../../features/settings/data/user_preferences.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  MODELS
-// ═══════════════════════════════════════════════════════════════
 enum AdhkarCategory {
   wakingUp,
   morning,
@@ -46,9 +38,6 @@ class DhikrItem {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADHKAR DATA  (بيانات حقيقية من حصن المسلم)
-// ═══════════════════════════════════════════════════════════════
 const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
   // ────────────── الاستيقاظ من النوم ──────────────
   AdhkarCategory.wakingUp: [
@@ -413,9 +402,6 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
   ],
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  PROVIDERS
-// ═══════════════════════════════════════════════════════════════
 
 // ── حالة تقدم كل تصنيف (index → count) ──
 class AdhkarProgressNotifier extends StateNotifier<Map<int, int>> {
@@ -465,9 +451,6 @@ final adhkarProgressProvider =
     >((ref, cat) => AdhkarProgressNotifier(cat));
 
 // Legacy SharedPreference providers removed since we now use UserPreferences.
-// ═══════════════════════════════════════════════════════════════
-//  ADHKAR NOTIFICATION SERVICE
-// ═══════════════════════════════════════════════════════════════
 class AdhkarNotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 

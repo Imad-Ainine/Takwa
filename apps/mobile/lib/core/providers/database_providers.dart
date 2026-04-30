@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/providers/database_providers.dart
-//  تقوى — Riverpod Providers
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/database/app_database.dart';

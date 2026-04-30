@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/supabase/supabase_providers.dart
-//  تقوى — Supabase Providers
-// ═══════════════════════════════════════════════════════════════
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';

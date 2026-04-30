@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/overlays/adhkar_overlay_window.dart
-//  تقوى — Overlay Helper Methods
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 

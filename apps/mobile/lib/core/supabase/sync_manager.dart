@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/supabase/sync_manager.dart
-//  تقوى — Local↔Remote Sync Manager
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/database_providers.dart';

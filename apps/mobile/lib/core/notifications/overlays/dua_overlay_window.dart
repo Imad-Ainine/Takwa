@@ -1,8 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/overlays/dua_overlay_window.dart
-//  تقوى — DuaOverlayNotification helper (لا entry point هنا)
-//  ملاحظة: overlayMain موجود في adhkar_overlay_window.dart فقط
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 

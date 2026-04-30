@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/qibla/presentation/screens/qibla_screen.dart
-//  تقوى — شاشة القبلة
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -33,9 +29,6 @@ final compassProvider = StreamProvider<double>((ref) {
       .map((e) => e.heading!);
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  QIBLA SCREEN
-// ═══════════════════════════════════════════════════════════════
 class QiblaScreen extends ConsumerStatefulWidget {
   const QiblaScreen({super.key});
   @override

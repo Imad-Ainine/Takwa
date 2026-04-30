@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/prayer/presentation/screens/prayer_screen.dart
-//  تقوى — شاشة الأذان والصلاة القادمة
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -245,9 +241,6 @@ final prayerScreenProvider =
       (ref) => PrayerNotifier(ref),
     );
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER SCREEN
-// ═══════════════════════════════════════════════════════════════
 class PrayerScreen extends ConsumerStatefulWidget {
   const PrayerScreen({super.key});
 
@@ -422,9 +415,6 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SKY BACKGROUND
-// ═══════════════════════════════════════════════════════════════
 class MosqueClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -457,9 +447,6 @@ class MosqueClipper extends CustomClipper<Path> {
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  FLOATING PARTICLES
-// ═══════════════════════════════════════════════════════════════
 class _FloatingParticles extends StatefulWidget {
   final _PrayerVisual visual;
   const _FloatingParticles({required this.visual});
@@ -562,9 +549,6 @@ class _ParticlePainter extends CustomPainter {
   bool shouldRepaint(_ParticlePainter old) => old.t != t;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER HEADER (Combined Mosque & Top Bar)
-// ═══════════════════════════════════════════════════════════════
 class _PrayerHeader extends StatelessWidget {
   final String cityName;
   final VoidCallback onRefresh;
@@ -1246,9 +1230,6 @@ class _TimeCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  DAILY PRAYERS TABLE
-// ═══════════════════════════════════════════════════════════════
 class _DailyPrayersTable extends StatelessWidget {
   final List<PrayerTimeInfo> prayers;
   final String currentKey;
@@ -1558,9 +1539,6 @@ class _MihrabPrayerChip extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  LIVE CLOCK BANNER
-// ═══════════════════════════════════════════════════════════════
 class _LiveClockBanner extends StatefulWidget {
   final AdaptiveStyle style;
   final AnimationController entryCtrl;
@@ -1827,9 +1805,6 @@ class _SunChip extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  OVERLAYS
-// ═══════════════════════════════════════════════════════════════
 class _LoadingOverlay extends StatefulWidget {
   const _LoadingOverlay();
 

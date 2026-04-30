@@ -175,9 +175,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  VERSE CARD
-// ═══════════════════════════════════════════════════════════════
 class _VerseCard extends StatelessWidget {
   final String verse;
   const _VerseCard({required this.verse});

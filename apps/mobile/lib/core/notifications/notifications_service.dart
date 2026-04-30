@@ -1,15 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/notifications/notifications_service.dart
-//  تقوى — Complete Notifications Service (IMPROVED)
-//  • إشعارات الصلاة مع صوت الأذان
-//  • تنبيهات قبل الأذان بـ 15 دقيقة
-//  • إشعارات الإقامة بعد الأذان
-//  • أذكار الصباح والمساء يومياً
-//  • دعاء الصباح ودعاء المساء
-//  • إشعارات الجمعة والأيام البيض
-//  • إشعارات الإنجازات
-// ═══════════════════════════════════════════════════════════════
-
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -92,41 +80,44 @@ class NotifIds {
 // ─────────────────────────────────────────
 class NotifChannels {
   /// قناة الأذان — أعلى أولوية مع صوت الأذان
-  static const AndroidNotificationChannel prayerSound = AndroidNotificationChannel(
-    'prayer_adhan_sound',
-    'أذان الصلاة (صوت)',
-    description: 'إشعار وقت الأذان مع صوت الأذان',
-    importance: Importance.max,
-    sound: RawResourceAndroidNotificationSound('adhan'),
-    playSound: true,
-    enableVibration: true,
-    enableLights: true,
-    ledColor: Color(0xFFC8A96E),
-  );
+  static const AndroidNotificationChannel prayerSound =
+      AndroidNotificationChannel(
+        'prayer_adhan_sound',
+        'أذان الصلاة (صوت)',
+        description: 'إشعار وقت الأذان مع صوت الأذان',
+        importance: Importance.max,
+        sound: RawResourceAndroidNotificationSound('adhan'),
+        playSound: true,
+        enableVibration: true,
+        enableLights: true,
+        ledColor: Color(0xFFC8A96E),
+      );
 
   /// قناة الأذان — اهتزاز فقط
-  static const AndroidNotificationChannel prayerVibrate = AndroidNotificationChannel(
-    'prayer_adhan_vibrate',
-    'أذان الصلاة (اهتزاز)',
-    description: 'إشعار وقت الأذان باهتزاز فقط',
-    importance: Importance.high,
-    playSound: false,
-    enableVibration: true,
-    enableLights: true,
-    ledColor: Color(0xFFC8A96E),
-  );
+  static const AndroidNotificationChannel prayerVibrate =
+      AndroidNotificationChannel(
+        'prayer_adhan_vibrate',
+        'أذان الصلاة (اهتزاز)',
+        description: 'إشعار وقت الأذان باهتزاز فقط',
+        importance: Importance.high,
+        playSound: false,
+        enableVibration: true,
+        enableLights: true,
+        ledColor: Color(0xFFC8A96E),
+      );
 
   /// قناة الأذان — صامت
-  static const AndroidNotificationChannel prayerSilent = AndroidNotificationChannel(
-    'prayer_adhan_silent',
-    'أذان الصلاة (صامت)',
-    description: 'إشعار صامت لوقت الأذان',
-    importance: Importance.high,
-    playSound: false,
-    enableVibration: false,
-    enableLights: true,
-    ledColor: Color(0xFFC8A96E),
-  );
+  static const AndroidNotificationChannel prayerSilent =
+      AndroidNotificationChannel(
+        'prayer_adhan_silent',
+        'أذان الصلاة (صامت)',
+        description: 'إشعار صامت لوقت الأذان',
+        importance: Importance.high,
+        playSound: false,
+        enableVibration: false,
+        enableLights: true,
+        ledColor: Color(0xFFC8A96E),
+      );
 
   /// تنبيهات قبل الأذان والإقامة
   static const AndroidNotificationChannel alert = AndroidNotificationChannel(
@@ -246,9 +237,6 @@ class PrayerTimeInfo {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  NOTIFICATIONS SERVICE
-// ═══════════════════════════════════════════════════════════════
 class NotificationsService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
@@ -375,7 +363,7 @@ class NotificationsService {
       if (prayer.time.isAfter(now)) {
         AndroidNotificationChannel selectedChannel = NotifChannels.prayerSound;
         String? soundAsset = 'adhan';
-        
+
         if (adhanMode == 'vibrate') {
           selectedChannel = NotifChannels.prayerVibrate;
           soundAsset = null;
@@ -392,7 +380,8 @@ class NotificationsService {
           channelId: selectedChannel.id,
           sound: soundAsset,
           payload: 'prayer:${prayer.name}',
-          fullScreenIntent: adhanMode != 'silent', // Show full screen overlay unless silent
+          fullScreenIntent:
+              adhanMode != 'silent', // Show full screen overlay unless silent
         );
       }
 
@@ -994,9 +983,6 @@ class NotificationsService {
   ];
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER TIMES SERVICE
-// ═══════════════════════════════════════════════════════════════
 class PrayerTimesService {
   static Future<List<PrayerTimeInfo>> calculate({
     required double latitude,
@@ -1129,9 +1115,6 @@ class PrayerTimesService {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  NOTIFICATION ROUTER
-// ═══════════════════════════════════════════════════════════════
 class NotificationRouter {
   static final _navigatorKey = GlobalKey<NavigatorState>();
   static GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
@@ -1186,9 +1169,6 @@ class NotificationRouter {
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER TIMES PROVIDER
-// ═══════════════════════════════════════════════════════════════
 final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
   final prefs = await ref.watch(userPreferencesProvider.future);
   final settings = ref.watch(settingsDaoProvider);
@@ -1229,9 +1209,6 @@ final nextPrayerProvider = Provider<AsyncValue<PrayerTimeInfo?>>(
       .whenData((p) => PrayerTimesService.nextPrayer(p)),
 );
 
-// ═══════════════════════════════════════════════════════════════
-//  NOTIFICATIONS MANAGER
-// ═══════════════════════════════════════════════════════════════
 final notificationsManagerProvider = Provider<NotificationsManager>((ref) {
   return NotificationsManager(ref);
 });

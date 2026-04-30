@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/duas/presentation/screens/duas_screen.dart
-//  تقوى — شاشة الأدعية
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -48,9 +44,6 @@ final _duaSearchProvider = StateProvider<String>((ref) => '');
 final _selectedCatProvider = StateProvider<DuaCategory?>((ref) => null);
 // Persistent favorites are now managed by favoriteDuasProvider from favorites_providers.dart
 
-// ═══════════════════════════════════════════════════════════════
-//  DUAS SCREEN
-// ═══════════════════════════════════════════════════════════════
 class DuasScreen extends ConsumerStatefulWidget {
   const DuasScreen({super.key});
   @override
@@ -628,9 +621,6 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TAB 2: MY DUAS
-// ═══════════════════════════════════════════════════════════════
 class _UserDuasTabView extends ConsumerWidget {
   final AdaptiveStyle style;
   const _UserDuasTabView({required this.style});
@@ -967,9 +957,6 @@ class _ShareToDuaCommunitySheetState
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TAB 3: COMMUNITY DUAS
-// ═══════════════════════════════════════════════════════════════
 class _CommunityDuasTabView extends ConsumerWidget {
   final AdaptiveStyle style;
   const _CommunityDuasTabView({required this.style});
@@ -1221,9 +1208,6 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADD DUA SHEET
-// ═══════════════════════════════════════════════════════════════
 class AddDuaSheet extends ConsumerStatefulWidget {
   const AddDuaSheet({super.key});
   @override

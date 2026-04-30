@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/duas/presentation/screens/favorite_duas_screen.dart
-//  تقوى — شاشة أدعيتي المفضلة
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

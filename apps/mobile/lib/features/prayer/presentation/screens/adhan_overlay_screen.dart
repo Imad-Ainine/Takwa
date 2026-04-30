@@ -12,9 +12,6 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 
-// ══════════════════════════════════════════════════════
-//  ADHAN OVERLAY SCREEN
-// ══════════════════════════════════════════════════════
 class AdhanOverlayScreen extends ConsumerStatefulWidget {
   final String prayerName;
   final bool autoPlay;
@@ -40,10 +37,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   @override
   void initState() {
     super.initState();
-    final prefs = ref.read(userPreferencesProvider).valueOrNull;
-    if (prefs?.wakeScreenEnabled ?? true) {
-      WakelockPlus.enable();
-    }
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _pulseCtrl = AnimationController(
@@ -61,18 +54,32 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       duration: const Duration(milliseconds: 1000),
     )..forward();
 
-    if (widget.autoPlay) _initAudio();
-    _initSensors();
-    _initVibration();
+    _initializePreferences();
   }
 
-  void _initVibration() {
-    final prefs = ref.read(userPreferencesProvider).valueOrNull;
-    final mode = prefs?.adhanMode ?? 'sound';
+  Future<void> _initializePreferences() async {
+    // Wait for the provider to finish loading the preferences
+    final prefs = await ref.read(userPreferencesProvider.future);
+    if (!mounted) return;
+
+    if (prefs.wakeScreenEnabled) {
+      WakelockPlus.enable();
+    }
+
+    _initSensors(prefs);
+    _initVibration(prefs);
+    
+    if (widget.autoPlay) {
+      await _initAudio(prefs);
+    }
+  }
+
+  void _initVibration(prefs) {
+    final mode = prefs.adhanMode;
 
     // Only vibrate if mode is vibrate, or if mode is sound and vibrateWithAdhan is true.
     if (mode == 'vibrate' ||
-        (mode == 'sound' && (prefs?.vibrateWithAdhan ?? true))) {
+        (mode == 'sound' && prefs.vibrateWithAdhan)) {
       _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
         if (AdhanAudioPlayer.isPlaying || mode == 'vibrate') {
           // Vibrate if playing or if only vibrating
@@ -88,9 +95,8 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     }
   }
 
-  void _initSensors() {
-    final prefs = ref.read(userPreferencesProvider).valueOrNull;
-    if (prefs?.flipToSilenceEnabled ?? true) {
+  void _initSensors(prefs) {
+    if (prefs.flipToSilenceEnabled) {
       _sensorSub = accelerometerEventStream().listen((event) {
         // If device is flipped face down (Z axis is significantly negative)
         if (event.z < -8.0) {
@@ -105,24 +111,17 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     _vibrationTimer?.cancel();
   }
 
-  Future<void> _initAudio() async {
-    // تأخير قصير للسماح بتهيئة الـ Widget
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    // Read user-selected adhan sound from preferences
-    final prefsAsync = ref.read(userPreferencesProvider);
-    final prefs = prefsAsync.valueOrNull;
-
+  Future<void> _initAudio(prefs) async {
     // Respect the adhan mode (sound vs silent/vibrate)
-    final mode = prefs?.adhanMode ?? 'sound';
+    final mode = prefs.adhanMode;
     
     if (mode == 'silent' || mode == 'vibrate') return;
 
-    // Use the user-selected sound file, fall back to Makkah if not set
-    final soundFile = prefs?.adhanSound ?? 'Adhan-Makkah.mp3';
+    // Use the user-selected sound file
+    final soundFile = prefs.adhanSound;
     final asset = 'assets/sounds/$soundFile';
 
-    final volume = prefs?.adhanVolumeLevel ?? 1.0;
+    final volume = prefs.adhanVolumeLevel;
 
     if (!AdhanAudioPlayer.isPlaying) {
       await AdhanAudioPlayer.play(asset: asset, volume: volume);
@@ -551,9 +550,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   }
 }
 
-// ══════════════════════════════════════════════════════
-//  STAR FIELD PAINTER
-// ══════════════════════════════════════════════════════
 class _AdhanStarsPainter extends CustomPainter {
   final double progress;
   _AdhanStarsPainter({required this.progress});
@@ -582,9 +578,6 @@ class _AdhanStarsPainter extends CustomPainter {
   bool shouldRepaint(_AdhanStarsPainter old) => old.progress != progress;
 }
 
-// ══════════════════════════════════════════════════════
-//  MOSQUE SILHOUETTE PAINTER
-// ══════════════════════════════════════════════════════
 class _MosqueSilhouettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

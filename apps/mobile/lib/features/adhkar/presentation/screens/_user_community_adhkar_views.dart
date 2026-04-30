@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/adhkar/_user_community_adhkar_views.dart
-//  تقوى — User & Community Adhkar Tab Views
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,9 +9,6 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/supabase/supabase_service.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  USER ADHKAR TAB
-// ═══════════════════════════════════════════════════════════════
 
 class UserAdhkarTabView extends ConsumerWidget {
   final AnimationController entryCtrl;
@@ -305,9 +298,6 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SHARE TO COMMUNITY CONFIRMATION SHEET
-// ═══════════════════════════════════════════════════════════════
 
 class _ShareToCommunitySheet extends ConsumerStatefulWidget {
   final UserAdhkarItem item;
@@ -497,9 +487,6 @@ class _ShareToCommunitySheetState
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  COMMUNITY ADHKAR TAB
-// ═══════════════════════════════════════════════════════════════
 
 class CommunityAdhkarTabView extends ConsumerWidget {
   final AnimationController entryCtrl;
@@ -773,9 +760,6 @@ class _CommunityAdhkarCard extends ConsumerWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADD ADHKAR SHEET  (moved here from adhkar _screen.dart)
-// ═══════════════════════════════════════════════════════════════
 
 class AddAdhkarSheet extends ConsumerStatefulWidget {
   const AddAdhkarSheet({super.key});

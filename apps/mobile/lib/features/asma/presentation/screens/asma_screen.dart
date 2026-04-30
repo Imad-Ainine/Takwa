@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/asma/presentation/screens/asma_screen.dart
-// تقوى — أسماء الله الحسنى (99 اسم)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,9 +10,6 @@ import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  ASMA SCREEN
-// ═══════════════════════════════════════════════════════════════
 class AsmaScreen extends ConsumerStatefulWidget {
   const AsmaScreen({super.key});
   @override
@@ -102,9 +95,6 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TOP BAR
-// ═══════════════════════════════════════════════════════════════
 class _AsmaTopBar extends StatelessWidget {
   final AdaptiveStyle style;
   final String query;
@@ -184,9 +174,6 @@ class _AsmaTopBar extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ASMA LIST
-// ═══════════════════════════════════════════════════════════════
 class _AsmaList extends StatelessWidget {
   final List<AsmaItem> items;
   final AdaptiveStyle style;

@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/theme/ramadan_theme.dart
-//  تقوى — Ramadan Dynamic Theme System
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'dart:ui';
@@ -14,9 +10,6 @@ import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN COLOR PALETTE  (تجاوز الألوان الأساسية)
-// ═══════════════════════════════════════════════════════════════
 class RamadanColors {
   // Deep lapis + gold + emerald — ألوان الفسيفساء الإسلامية
   static const deepLapis = Color(0xFF0A1628);
@@ -77,9 +70,6 @@ class RamadanColors {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN THEME DATA
-// ═══════════════════════════════════════════════════════════════
 class RamadanTheme {
   static ThemeData theme(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
@@ -311,9 +301,6 @@ class RamadanTheme {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN DECORATIONS
-// ═══════════════════════════════════════════════════════════════
 class RamadanDecorations {
   static BoxDecoration get card => BoxDecoration(
     gradient: RamadanColors.cardGlow,
@@ -351,9 +338,6 @@ class RamadanDecorations {
       const BoxDecoration(gradient: RamadanColors.nightSky);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN BACKGROUND PAINTER  (مزخرف إسلامي)
-// ═══════════════════════════════════════════════════════════════
 class RamadanBgPainter extends CustomPainter {
   final double animT;
   final Brightness brightness;
@@ -591,9 +575,6 @@ class RamadanBgPainter extends CustomPainter {
       old.animT != animT || old.brightness != brightness;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  RAMADAN TOGGLE WIDGET  (الزر المميز)
-// ═══════════════════════════════════════════════════════════════
 
 class RamadanToggle extends ConsumerWidget {
   const RamadanToggle({super.key});
@@ -635,9 +616,6 @@ class RamadanToggle extends ConsumerWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ADAPTIVE STYLES  (يتكيف مع وضع رمضان)
-// ═══════════════════════════════════════════════════════════════
 class AdaptiveStyle {
   final BuildContext context;
   final bool isRamadan;

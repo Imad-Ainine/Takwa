@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/settings/presentation/screens/settings_screen.dart
-//  تقوى — Settings Screen (شاشة الإعدادات)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -130,7 +126,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تنبيه بصوت الأذان في الوقت المحدد',
                                   value: prefs.wakeUpBeforeFajr,
                                   onChanged: (v) =>
-                                      _updatePref('wakeUpBeforeFajr', v, category: NotificationCategory.prayer),
+                                      _updatePref('wake_up_before_fajr', v, category: NotificationCategory.prayer),
                                 ),
                                 if (prefs.wakeUpBeforeFajr) ...[
                                   const SettingsDivider(),
@@ -141,7 +137,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     onChanged: (t) async {
                                       final str =
                                           '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                      await _updatePref('wakeUpTime', str, category: NotificationCategory.prayer);
+                                      await _updatePref('wake_up_time', str, category: NotificationCategory.prayer);
                                     },
                                   ),
                                 ],
@@ -152,7 +148,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تذكير يومي الساعة ٦:٣٠ ص',
                                   value: prefs.morningAdhkarReminder,
                                   onChanged: (v) =>
-                                      _updatePref('morningAdhkarReminder', v),
+                                      _updatePref('morning_adhkar_reminder', v),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -161,7 +157,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تذكير يومي الساعة ٥:٠٠ م',
                                   value: prefs.eveningAdhkarReminder,
                                   onChanged: (v) =>
-                                      _updatePref('eveningAdhkarReminder', v),
+                                      _updatePref('evening_adhkar_reminder', v),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -179,7 +175,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'نفحات من الأدعية النبوية',
                                   value: prefs.dailyDuasOn,
                                   onChanged: (v) =>
-                                      _updatePref('dailyDuasOn', v),
+                                      _updatePref('daily_duas_on', v),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -188,7 +184,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'تذكير بسورة الكهف والجمعة',
                                   value: prefs.specialRemindersOn,
                                   onChanged: (v) =>
-                                      _updatePref('specialRemindersOn', v),
+                                      _updatePref('special_reminders_on', v),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -197,7 +193,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   sublabel: 'الاثنين والخميس والأيام البيض',
                                   value: prefs.fastingRemindersOn,
                                   onChanged: (v) =>
-                                      _updatePref('fastingRemindersOn', v),
+                                      _updatePref('fasting_reminders_on', v),
                                 ),
                                 if (prefs.muhasabaReminder) ...[
                                   const SettingsDivider(),

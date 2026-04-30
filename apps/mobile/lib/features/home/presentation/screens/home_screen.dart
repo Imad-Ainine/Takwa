@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/home/presentation/screens/home_screen.dart
-// تقوى — Home Dashboard (الشاشة الرئيسية المدمجة)
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -22,9 +18,6 @@ import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  HOME SCREEN
-// ═══════════════════════════════════════════════════════════════
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 

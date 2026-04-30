@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/app/main_shell.dart — Shell with BottomNavigationBar
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

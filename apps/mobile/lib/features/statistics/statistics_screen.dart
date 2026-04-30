@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/statistics/presentation/screens/statistics_screen.dart
-//  تقوى — Statistics Screen (شاشة الإحصائيات)
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:math' as math;
 import 'package:drift/drift.dart' show OrderingTerm, Value;
@@ -20,9 +16,6 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 
-// ═══════════════════════════════════════════════════════════════
-//  LOCAL PROVIDERS
-// ═══════════════════════════════════════════════════════════════
 
 /// فلتر الفترة الزمنية
 enum StatsPeriod { week, month, ramadan }
@@ -46,9 +39,6 @@ final _allAchievementsProvider = StreamProvider<List<Achievement>>((ref) {
   )..orderBy([(a) => OrderingTerm.desc(a.earnedAt)])).watch();
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  STATISTICS SCREEN
-// ═══════════════════════════════════════════════════════════════
 class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
 
@@ -275,9 +265,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TOP BAR
-// ═══════════════════════════════════════════════════════════════
 class _StatsTopBar extends StatelessWidget {
   final HijriCalendar hijri;
   const _StatsTopBar({required this.hijri});
@@ -387,9 +374,6 @@ class _RamadanProgress extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PERIOD SELECTOR
-// ═══════════════════════════════════════════════════════════════
 class _PeriodSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -450,9 +434,6 @@ class _PeriodSelector extends ConsumerWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  TAQWA HERO CARD
-// ═══════════════════════════════════════════════════════════════
 class _TaqwaHeroCard extends StatelessWidget {
   final MonthStats stats;
   final int streak;
@@ -798,9 +779,6 @@ class _StreakBadgeLarge extends StatelessWidget {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  WEEKLY BAR CHART
-// ═══════════════════════════════════════════════════════════════
 class _WeeklyChart extends StatefulWidget {
   final List<WeeklyPoint> points;
   final String periodLabel;
@@ -1014,9 +992,6 @@ class _ChartLegend extends StatelessWidget {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  STATS CARDS GRID
-// ═══════════════════════════════════════════════════════════════
 class _StatsCardsGrid extends StatelessWidget {
   final MonthStats stats;
   const _StatsCardsGrid({required this.stats});
@@ -1157,9 +1132,6 @@ class _StatCardState extends State<_StatCard>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PRAYER ATTENDANCE CARD (real per-prayer rates from DB)
-// ═══════════════════════════════════════════════════════════════
 class _PrayerAttendanceCard extends ConsumerWidget {
   final (DateTime, DateTime) range;
   const _PrayerAttendanceCard({required this.range});
@@ -1327,9 +1299,6 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ACHIEVEMENTS SECTION
-// ═══════════════════════════════════════════════════════════════
 class _AchievementsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -1629,9 +1598,6 @@ class _LockedAchievementsRow extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ACHIEVEMENT TOAST (overlay for new achievements)
-// ═══════════════════════════════════════════════════════════════
 class _AchievementToast extends ConsumerStatefulWidget {
   final Achievement achievement;
   const _AchievementToast({required this.achievement});
@@ -1774,9 +1740,6 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════════
 class _SmallRingPainter extends CustomPainter {
   final double progress;
   final Color borderColor;

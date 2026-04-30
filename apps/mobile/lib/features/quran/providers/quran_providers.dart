@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/providers/quran_providers.dart
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:convert';

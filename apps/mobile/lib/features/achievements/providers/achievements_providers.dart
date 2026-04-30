@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/achievements/providers/achievements_providers.dart
-// تقوى — Achievements Providers (مزودو بيانات الإنجازات)
-// ═══════════════════════════════════════════════════════════════
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';

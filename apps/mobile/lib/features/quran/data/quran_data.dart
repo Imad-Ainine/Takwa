@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/quran/data/quran_data.dart
-// ═══════════════════════════════════════════════════════════════
 
 class SurahMeta {
   final int number, ayahCount, juzNumber, startPage;
@@ -31,9 +28,6 @@ class JuzMeta {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  SURAH DATA (114 سورة كاملة)
-// ═══════════════════════════════════════════════════════════════
 const kSurahData = <SurahMeta>[
   SurahMeta(
     number: 1,

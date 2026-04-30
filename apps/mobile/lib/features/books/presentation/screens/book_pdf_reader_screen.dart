@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/books/presentation/screens/book_pdf_reader_screen.dart
-//  تقوى — Premium Islamic Books PDF Reader (manual download edition)
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:async';
 import 'dart:io';

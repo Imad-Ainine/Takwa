@@ -1,19 +1,9 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/features/books/providers/books_reading_provider.dart
-//  تقوى — Books Reading State (Riverpod + Drift offline-first)
-// ═══════════════════════════════════════════════════════════════
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/books_data.dart';
 import '../../../core/supabase/supabase_service.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/database/daos.dart';
-
-// ─────────────────────────────────────────
-//  READING PROGRESS (bookId → BookProgress)
-//  Source of truth: local Drift table `book_reading_progress`
-// ─────────────────────────────────────────
 
 class BookProgress {
   final int chapterIndex;

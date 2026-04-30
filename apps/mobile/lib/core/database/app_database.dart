@@ -1,7 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  lib/core/database/app_database.dart
-//  تقوى — Complete Local Database (Drift / SQLite)
-// ═══════════════════════════════════════════════════════════════
 
 import 'dart:io';
 import 'package:drift/drift.dart';
