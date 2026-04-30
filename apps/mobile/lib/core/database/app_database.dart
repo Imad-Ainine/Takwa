@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -260,8 +259,10 @@ class BookReadingProgress extends Table {
   TextColumn get bookId => text()();
   IntColumn get chapterIndex => integer().withDefault(const Constant(0))();
   IntColumn get pageIndex => integer().withDefault(const Constant(0))();
+
   /// Comma-separated list of read page indices, e.g. "0,1,3,7"
   TextColumn get readPages => text().withDefault(const Constant(''))();
+
   /// PDF page (if applicable)
   IntColumn get pdfPage => integer().withDefault(const Constant(0))();
   IntColumn get totalPdfPages => integer().withDefault(const Constant(0))();
@@ -380,10 +381,9 @@ class AppDatabase extends _$AppDatabase {
             [newKey, oldKey],
           );
           // Remove the old camelCase row
-          await db.customStatement(
-            'DELETE FROM user_settings WHERE key = ?',
-            [oldKey],
-          );
+          await db.customStatement('DELETE FROM user_settings WHERE key = ?', [
+            oldKey,
+          ]);
         }
       }
       if (from < 5) {
@@ -410,8 +410,13 @@ class AppDatabase extends _$AppDatabase {
       ('قراءة حديث', '📚', true, 3),
       ('دعاء مخصص', '🤲', true, 5),
       ('صلة الرحم', '👨‍👩‍👧', true, 10),
-      ('غضّ البصر', '👁️', false, -10),
+      ('غضّ البصر', '👁️', true, 10),
       ('الغيبة', '🗣️', false, -10),
+      ('النميمة', '🗣️', false, -10),
+      ('الكذب', '🗣️', false, -10),
+      ('السب', '🗣️', false, -10),
+      ('الشتم', '🗣️', false, -10),
+      ('اللعن', '🗣️', false, -10),
     ];
     for (final item in defaultIbadaat) {
       await into(customIbadah).insert(

@@ -102,10 +102,12 @@ class _IbadahList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncData = ref.watch(provider);
+    final items = asyncData.valueOrNull ?? [];
+    final filteredItems = items.where((i) => i.nameAr != 'غضّ البصر').toList();
 
     return asyncData.when(
-      data: (items) {
-        if (items.isEmpty) {
+      data: (_) {
+        if (filteredItems.isEmpty) {
           return Center(
             child: Text(
               'لا توجد عادات مضافة بعد',
@@ -117,10 +119,10 @@ class _IbadahList extends ConsumerWidget {
         }
         return ListView.separated(
           padding: AppSpacing.cardPadding.copyWith(bottom: 100),
-          itemCount: items.length,
+          itemCount: filteredItems.length,
           separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
           itemBuilder: (context, index) {
-            final item = items[index];
+            final item = filteredItems[index];
             return _IbadahTile(item: item, isPositive: isPositive);
           },
         );
