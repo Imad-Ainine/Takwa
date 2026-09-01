@@ -207,14 +207,12 @@ dart run build_runner watch --delete-conflicting-outputs
 
 ---
 
-## 🌐 Planned: Supabase Cloud Sync
+## 🌐 Supabase Cloud Sync
 
-> See [`docs/supabase_integration_guide.md`](docs/supabase_integration_guide.md) for the full plan.
-
-- **Offline-first** — all writes go to Drift, synced in the background
-- **Auth** — Supabase Auth (email / Google / anonymous)
+- **Offline-first** — all writes go to Drift, synced in the background via [`SyncManager`](lib/core/supabase/sync_manager.dart)
+- **Auth** — Supabase Auth (email / Google)
 - **Realtime** — live sync across devices via Postgres Realtime
-- **Row Level Security** — users only access their own data
+- **Row Level Security** — users only access their own data — see [`supabase/README.md`](supabase/README.md) for auditing and version-controlling RLS policies
 
 ---
 
