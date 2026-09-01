@@ -72,7 +72,7 @@ dependencies:
   cached_network_image: ^3.4.1
 
   # ── Adhan Background & UI ──
-  flutter_foreground_task: ^8.13.0
+  flutter_foreground_task: ^11.0.1
   wakelock_plus: ^1.2.10
   flutter_windowmanager_plus: ^1.0.1
   flutter_overlay_window: ^0.5.0
