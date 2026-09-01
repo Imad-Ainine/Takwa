@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -111,6 +112,7 @@ class DailyRecords extends Table {
 // ─────────────────────────────────────────
 //  TABLE: prohibitions_log
 // ─────────────────────────────────────────
+@TableIndex(name: 'idx_prohibitions_log_record', columns: {#recordId})
 class ProhibitionsLog extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get recordId => integer().references(DailyRecords, #id)();
@@ -170,6 +172,10 @@ class CustomIbadah extends Table {
 // ─────────────────────────────────────────
 //  TABLE: custom_ibadah_log
 // ─────────────────────────────────────────
+@TableIndex(
+  name: 'idx_custom_ibadah_log_record_ibadah',
+  columns: {#recordId, #ibadahId},
+)
 class CustomIbadahLog extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get ibadahId => integer().references(CustomIbadah, #id)();
@@ -307,8 +313,14 @@ class BookReadingProgress extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  /// Test-only constructor allowing a custom [QueryExecutor] to be injected
+  /// (e.g. `NativeDatabase.memory()` in unit tests) instead of the real
+  /// on-disk database file.
+  @visibleForTesting
+  AppDatabase.forTesting(super.executor);
+
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -317,6 +329,14 @@ class AppDatabase extends _$AppDatabase {
       await _seedDefaultData();
     },
     onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 7) {
+        // Missing indexes on FK columns that are actually filtered on
+        // (ProhibitionsLog.recordId, and the CustomIbadahLog record+ibadah
+        // lookup used by recalcPoints()/logIbadah()) — previously full
+        // table scans as history grew.
+        await m.createIndex(idxProhibitionsLogRecord);
+        await m.createIndex(idxCustomIbadahLogRecordIbadah);
+      }
       if (from < 2) {
         await m.createTable(reminders);
       }

@@ -114,63 +114,6 @@ class QuranBookmark {
   );
 }
 
-// ─── Khatma Session ─────────────────────────────────────────
-class KhatmaSession {
-  final String id;
-  final DateTime startDate;
-  final DateTime? completedDate;
-  final int currentPage; // 1-604
-  final int pagesRead;
-  final String label; // e.g. "رمضان 1447"
-  static const int totalPages = 604;
-
-  const KhatmaSession({
-    required this.id,
-    required this.startDate,
-    this.completedDate,
-    this.currentPage = 1,
-    this.pagesRead = 0,
-    this.label = 'ختمة جديدة',
-  });
-
-  double get progress => pagesRead / totalPages;
-  bool get isCompleted => completedDate != null || pagesRead >= totalPages;
-
-  KhatmaSession copyWith({
-    int? currentPage,
-    int? pagesRead,
-    DateTime? completedDate,
-    String? label,
-  }) => KhatmaSession(
-    id: id,
-    startDate: startDate,
-    completedDate: completedDate ?? this.completedDate,
-    currentPage: currentPage ?? this.currentPage,
-    pagesRead: pagesRead ?? this.pagesRead,
-    label: label ?? this.label,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'startDate': startDate.toIso8601String(),
-    'completedDate': completedDate?.toIso8601String(),
-    'currentPage': currentPage,
-    'pagesRead': pagesRead,
-    'label': label,
-  };
-
-  factory KhatmaSession.fromJson(Map<String, dynamic> j) => KhatmaSession(
-    id: j['id'] as String,
-    startDate: DateTime.parse(j['startDate'].toString()),
-    completedDate: j['completedDate'] != null
-        ? DateTime.tryParse(j['completedDate'].toString())
-        : null,
-    currentPage: j['currentPage'] as int? ?? 1,
-    pagesRead: j['pagesRead'] as int? ?? 0,
-    label: j['label'] as String? ?? 'ختمة جديدة',
-  );
-}
-
 // ─── Daily Reading Log ───────────────────────────────────────
 class DailyReadingEntry {
   final DateTime date;

@@ -6498,6 +6498,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $UserDuasTable userDuas = $UserDuasTable(this);
   late final $BookReadingProgressTable bookReadingProgress =
       $BookReadingProgressTable(this);
+  late final Index idxProhibitionsLogRecord = Index(
+    'idx_prohibitions_log_record',
+    'CREATE INDEX idx_prohibitions_log_record ON prohibitions_log (record_id)',
+  );
+  late final Index idxCustomIbadahLogRecordIbadah = Index(
+    'idx_custom_ibadah_log_record_ibadah',
+    'CREATE INDEX idx_custom_ibadah_log_record_ibadah ON custom_ibadah_log (record_id, ibadah_id)',
+  );
   late final DailyRecordDao dailyRecordDao = DailyRecordDao(
     this as AppDatabase,
   );
@@ -6535,6 +6543,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     userAdhkar,
     userDuas,
     bookReadingProgress,
+    idxProhibitionsLogRecord,
+    idxCustomIbadahLogRecordIbadah,
   ];
 }
 

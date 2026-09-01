@@ -64,8 +64,16 @@ final quranAudioProvider =
     );
 
 class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
-  QuranAudioNotifier() : super(const QuranAudioState());
+  QuranAudioNotifier() : super(const QuranAudioState()) {
+    // Subscribe once; playAyah only changes the URL being played.
+    _playerStateSub = _player.playerStateStream.listen((s) {
+      if (s.processingState == ProcessingState.completed) {
+        state = state.copyWith(isPlaying: false);
+      }
+    });
+  }
   final _player = AudioPlayer();
+  StreamSubscription<PlayerState>? _playerStateSub;
   static const _base =
       'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
 
@@ -77,11 +85,6 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
       await _player.setSpeed(state.speed);
       await _player.play();
       state = state.copyWith(isLoading: false, isPlaying: true);
-      _player.playerStateStream.listen((s) {
-        if (s.processingState == ProcessingState.completed) {
-          state = state.copyWith(isPlaying: false);
-        }
-      });
     } catch (_) {
       state = state.copyWith(isLoading: false, isPlaying: false);
     }
@@ -117,6 +120,7 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
 
   @override
   void dispose() {
+    _playerStateSub?.cancel();
     _player.dispose();
     super.dispose();
   }
@@ -418,80 +422,6 @@ final khatmaCancelledProvider = FutureProvider<List<KhatmaSessionEx>>((
   return list
       .map((s) => KhatmaSessionEx.fromJson(jsonDecode(s)))
       .where((s) => s.isCancelled)
-      .toList()
-      .reversed
-      .toList();
-});
-
-// Legacy compatibility
-final khatmaProvider = StateNotifierProvider<KhatmaNotifier, KhatmaSession?>(
-  (ref) => KhatmaNotifier(),
-);
-
-class KhatmaNotifier extends StateNotifier<KhatmaSession?> {
-  KhatmaNotifier() : super(null) {
-    _load();
-  }
-  static const _activeKey = 'khatma_active';
-  static const _historyKey = 'khatma_history';
-
-  Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
-    final raw = p.getString(_activeKey);
-    if (raw != null) {
-      try {
-        state = KhatmaSession.fromJson(jsonDecode(raw));
-      } catch (_) {}
-    }
-  }
-
-  Future<void> startNew({String label = 'ختمة جديدة'}) async {
-    if (state != null) await _archive(state!);
-    final session = KhatmaSession(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      startDate: DateTime.now(),
-      label: label,
-    );
-    state = session;
-    await _persist();
-  }
-
-  Future<void> advancePage(int page) async {
-    if (state == null) return;
-    final newPagesRead = page > (state!.currentPage)
-        ? state!.pagesRead + (page - state!.currentPage)
-        : state!.pagesRead;
-    final updated = state!.copyWith(
-      currentPage: page,
-      pagesRead: newPagesRead,
-      completedDate: newPagesRead >= KhatmaSession.totalPages
-          ? DateTime.now()
-          : null,
-    );
-    state = updated;
-    await _persist();
-    if (updated.isCompleted) await _archive(updated);
-  }
-
-  Future<void> _persist() async {
-    if (state == null) return;
-    final p = await SharedPreferences.getInstance();
-    await p.setString(_activeKey, jsonEncode(state!.toJson()));
-  }
-
-  Future<void> _archive(KhatmaSession s) async {
-    final p = await SharedPreferences.getInstance();
-    final list = p.getStringList(_historyKey) ?? [];
-    list.add(jsonEncode(s.toJson()));
-    await p.setStringList(_historyKey, list);
-  }
-}
-
-final khatmaHistoryProvider = FutureProvider<List<KhatmaSession>>((ref) async {
-  final p = await SharedPreferences.getInstance();
-  final list = p.getStringList('khatma_history') ?? [];
-  return list
-      .map((s) => KhatmaSession.fromJson(jsonDecode(s)))
       .toList()
       .reversed
       .toList();

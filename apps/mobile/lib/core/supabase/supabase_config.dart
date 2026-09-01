@@ -4,8 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseConfig {
-  static String url = dotenv.env['SUPABASE_URL']!;
-  static String anonKey = dotenv.env['SUPABASE_ANON_KEY']!;
+  static String get url =>
+      dotenv.env['SUPABASE_URL'] ??
+      (throw StateError(
+        'SUPABASE_URL is missing — check that apps/mobile/.env exists and '
+        'defines SUPABASE_URL (see apps/mobile/README.md for setup).',
+      ));
+
+  static String get anonKey =>
+      dotenv.env['SUPABASE_ANON_KEY'] ??
+      (throw StateError(
+        'SUPABASE_ANON_KEY is missing — check that apps/mobile/.env exists '
+        'and defines SUPABASE_ANON_KEY (see apps/mobile/README.md for setup).',
+      ));
 
   static SupabaseClient get client => Supabase.instance.client;
 
