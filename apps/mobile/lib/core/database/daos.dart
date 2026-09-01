@@ -223,50 +223,17 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     )..where((r) => r.date.equals(today))).watchSingleOrNull();
   }
 
-  int _prayerPoints(PrayerStatus status) {
-    return switch (status) {
-      PrayerStatus.performed => 10,
-      PrayerStatus.qadaa => 5,
-      _ => 0,
-    };
-  }
-
+  /// Recomputes and persists a day's points using the shared Taqwa points
+  /// model in `package:takwa_core` — see that package for the scoring
+  /// rules themselves; this method's job is just gathering this record's
+  /// inputs (prayers, prohibitions, custom ibadah) and writing the result.
   Future<void> recalcPoints(int recordId) async {
     final record = await (select(
       dailyRecords,
     )..where((r) => r.id.equals(recordId))).getSingle();
 
-    int points = 0;
-
-    points += _prayerPoints(PrayerStatus.values[record.fajrStatus.index]);
-    points += _prayerPoints(PrayerStatus.values[record.dhuhrStatus.index]);
-    points += _prayerPoints(PrayerStatus.values[record.asrStatus.index]);
-    points += _prayerPoints(PrayerStatus.values[record.maghribStatus.index]);
-    points += _prayerPoints(PrayerStatus.values[record.ishaStatus.index]);
-    if (record.nightPrayer) points += 15;
-    if (record.witr) points += 5;
-    points += record.rawatib * 2;
-
-    points += record.quranPages * 1;
-    points += (record.quranJuzaa * 10).toInt();
-
-    if (record.morningAdhkar) points += 5;
-    if (record.eveningAdhkar) points += 5;
-    if (record.afterPrayerAdhkar) points += 3;
-
-    if (record.fastingType.index == FastingType.fard.index) points += 20;
-    if (record.fastingType.index == FastingType.nafl.index) points += 10;
-
-    if (record.sadaqah) points += 10;
-    if (record.ghadhBasar) points += 10;
-
     final prohibs = await getTodayProhibitions(recordId);
-    int deducted = 0;
-    for (final p in prohibs) {
-      if (p.committed) deducted += p.deductPoints * p.timesCount;
-    }
 
-    // ── Custom Ibadaat (Positive/Negative) ──
     final customLogs = await (select(customIbadahLog).join([
       innerJoin(
         customIbadah,
@@ -274,24 +241,49 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       ),
     ])..where(customIbadahLog.recordId.equals(recordId))).get();
 
-    for (final row in customLogs) {
-      final log = row.readTable(customIbadahLog);
-      final meta = row.readTable(customIbadah);
-      if (log.done) {
-        final pts = meta.points * log.count;
-        if (meta.isPositive) {
-          points += pts;
-        } else {
-          deducted += pts.abs();
-        }
-      }
-    }
+    final result = calculateDailyPoints(
+      DailyPointsInput(
+        fajrStatus: record.fajrStatus,
+        dhuhrStatus: record.dhuhrStatus,
+        asrStatus: record.asrStatus,
+        maghribStatus: record.maghribStatus,
+        ishaStatus: record.ishaStatus,
+        nightPrayer: record.nightPrayer,
+        witr: record.witr,
+        rawatib: record.rawatib,
+        quranPages: record.quranPages,
+        quranJuzaa: record.quranJuzaa,
+        morningAdhkar: record.morningAdhkar,
+        eveningAdhkar: record.eveningAdhkar,
+        afterPrayerAdhkar: record.afterPrayerAdhkar,
+        fastingType: record.fastingType,
+        sadaqah: record.sadaqah,
+        ghadhBasar: record.ghadhBasar,
+        prohibitions: [
+          for (final p in prohibs)
+            ProhibitionEntry(
+              committed: p.committed,
+              deductPoints: p.deductPoints,
+              timesCount: p.timesCount,
+            ),
+        ],
+        customIbadah: [
+          for (final row in customLogs)
+            CustomIbadahEntry(
+              done: row.readTable(customIbadahLog).done,
+              isPositive: row.readTable(customIbadah).isPositive,
+              points: row.readTable(customIbadah).points,
+              count: row.readTable(customIbadahLog).count,
+            ),
+        ],
+      ),
+    );
 
     await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
       DailyRecordsCompanion(
-        taqwaPoints: Value(points),
-        deductedPoints: Value(deducted),
-        netPoints: Value(points - deducted),
+        taqwaPoints: Value(result.earnedPoints),
+        deductedPoints: Value(result.deductedPoints),
+        netPoints: Value(result.netPoints),
         updatedAt: Value(DateTime.now()),
       ),
     );
@@ -571,12 +563,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     return getPointsPerDay(from, to);
   }
 
-  TaqwaLevel getTaqwaLevel(int totalPoints) {
-    if (totalPoints >= 600) return TaqwaLevel.mutaqi;
-    if (totalPoints >= 300) return TaqwaLevel.mujahid;
-    if (totalPoints >= 100) return TaqwaLevel.salik;
-    return TaqwaLevel.mubtadi;
-  }
+  TaqwaLevel getTaqwaLevel(int totalPoints) => taqwaLevelFor(totalPoints);
 
   Future<MonthStats> getMonthStats(int year, int month) async {
     return MonthStats(
@@ -1199,12 +1186,7 @@ class MonthStats {
     required this.quranPages,
   });
 
-  TaqwaLevel get level {
-    if (totalPoints >= 600) return TaqwaLevel.mutaqi;
-    if (totalPoints >= 300) return TaqwaLevel.mujahid;
-    if (totalPoints >= 100) return TaqwaLevel.salik;
-    return TaqwaLevel.mubtadi;
-  }
+  TaqwaLevel get level => taqwaLevelFor(totalPoints);
 
   String get levelLabel => switch (level) {
     TaqwaLevel.mubtadi => 'مبتدئ 🌱',

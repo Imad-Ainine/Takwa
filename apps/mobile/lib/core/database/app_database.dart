@@ -4,50 +4,22 @@ import 'package:drift/native.dart';
 import 'package:meta/meta.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:takwa_core/takwa_core.dart';
 
 import 'daos.dart';
-
-part 'app_database.g.dart';
 
 // ─────────────────────────────────────────
 //  ENUMS
 // ─────────────────────────────────────────
+//
+// PrayerStatus / FastingType / ProhibitionCategory / TaqwaLevel now live in
+// packages/takwa_core (shared, storage-agnostic domain logic — see the
+// audit's "Architecture & Code Quality" section) and are re-exported here
+// so every existing `import 'app_database.dart'` across the app keeps
+// working unchanged.
+export 'package:takwa_core/takwa_core.dart';
 
-/// حالة الصلاة
-enum PrayerStatus {
-  notDue, // لم يحن وقتها
-  pending, // حان وقتها لم تُؤدَّ
-  performed, // أُديت في وقتها
-  qadaa, // قُضيت خارج الوقت
-  missed, // فاتت
-}
-
-/// نوع الصيام
-enum FastingType {
-  none, // لم يصم
-  fard, // فريضة (رمضان)
-  nafl, // نافلة
-  makruh, // أفطر بعذر
-}
-
-/// فئة المحظور
-enum ProhibitionCategory {
-  ghadhBasar, // غضّ البصر
-  gheeba, // الغيبة
-  nameema, // النميمة
-  kadhb, // الكذب
-  ghaDab, // الغضب
-  idaatWaqt, // إضاعة الوقت
-  custom, // مخصص
-}
-
-/// مستوى التقوى
-enum TaqwaLevel {
-  mubtadi, // مبتدئ  0–99
-  salik, // سالك   100–299
-  mujahid, // مجاهد  300–599
-  mutaqi, // متقي   600+
-}
+part 'app_database.g.dart';
 
 // ─────────────────────────────────────────
 //  TABLE: daily_records

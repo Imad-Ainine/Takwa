@@ -13,6 +13,10 @@ dependencies:
   cupertino_icons: ^1.0.8
   meta: ^1.15.0
 
+  # ── Shared domain logic (workspace package) ──
+  takwa_core:
+    path: ../../packages/takwa_core
+
   # ── State Management ──
   flutter_riverpod: ^2.5.1
 
@@ -100,6 +104,7 @@ flutter:
     - assets/sounds/
     - assets/images/
     - assets/
+    - .env
   fonts:
     - family: Amiri
       fonts:
