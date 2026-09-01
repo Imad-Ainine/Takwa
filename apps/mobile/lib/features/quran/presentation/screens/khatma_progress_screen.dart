@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
@@ -17,8 +16,8 @@ class KhatmaProgressScreen extends ConsumerWidget {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
-    final khatma = ref.watch(khatmaProvider);
-    final historyAsync = ref.watch(khatmaHistoryProvider);
+    final khatma = ref.watch(khatmaExProvider);
+    final historyAsync = ref.watch(khatmaCompletedProvider);
 
     final pagesRead = khatma?.pagesRead ?? 0;
     final progress = khatma?.progress ?? 0.0;
@@ -47,7 +46,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
                 KhatmaProgressRing(
                   progress: progress,
                   pagesRead: pagesRead,
-                  totalPages: KhatmaSession.totalPages,
+                  totalPages: KhatmaSessionEx.totalPages,
                   style: style,
                   color: style.gold,
                 ),
@@ -71,10 +70,10 @@ class KhatmaProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(AdaptiveStyle style, KhatmaSession? khatma, AsyncValue historyAsync) {
+  Widget _buildStatsRow(AdaptiveStyle style, KhatmaSessionEx? khatma, AsyncValue historyAsync) {
     final completedCount = historyAsync.maybeWhen(
       data: (list) =>
-          (list as List<KhatmaSession>).where((s) => s.isCompleted).length,
+          (list as List<KhatmaSessionEx>).where((s) => s.isCompleted).length,
       orElse: () => 0,
     );
     final daysSinceStart = khatma != null

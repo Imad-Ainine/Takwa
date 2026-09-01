@@ -42,10 +42,12 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     required PrayerStatus status,
   }) async {
     final companion = _prayerCompanion(prayerName, status);
-    await (update(
-      dailyRecords,
-    )..where((r) => r.id.equals(recordId))).write(companion);
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(
+        dailyRecords,
+      )..where((r) => r.id.equals(recordId))).write(companion);
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> updateQuran({
@@ -53,14 +55,16 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     int? pages,
     double? juzaa,
   }) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        quranPages: pages != null ? Value(pages) : const Value.absent(),
-        quranJuzaa: juzaa != null ? Value(juzaa) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          quranPages: pages != null ? Value(pages) : const Value.absent(),
+          quranJuzaa: juzaa != null ? Value(juzaa) : const Value.absent(),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> updateQuranPages(int recordId, int pages) =>
@@ -72,17 +76,23 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     bool? evening,
     bool? afterPrayer,
   }) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        morningAdhkar: morning != null ? Value(morning) : const Value.absent(),
-        eveningAdhkar: evening != null ? Value(evening) : const Value.absent(),
-        afterPrayerAdhkar: afterPrayer != null
-            ? Value(afterPrayer)
-            : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          morningAdhkar: morning != null
+              ? Value(morning)
+              : const Value.absent(),
+          eveningAdhkar: evening != null
+              ? Value(evening)
+              : const Value.absent(),
+          afterPrayerAdhkar: afterPrayer != null
+              ? Value(afterPrayer)
+              : const Value.absent(),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> toggleAdhkar(int recordId, String key, bool value) {
@@ -95,43 +105,51 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> toggleSadaqah(int recordId, bool value) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        sadaqah: Value(value),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          sadaqah: Value(value),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> toggleNightPrayer(int recordId, bool value) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        nightPrayer: Value(value),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          nightPrayer: Value(value),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> updateFasting(int recordId, FastingType type) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        fastingType: Value(type),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          fastingType: Value(type),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> toggleGhadhBasar(int recordId, bool value) async {
-    await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
-      DailyRecordsCompanion(
-        ghadhBasar: Value(value),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    await recalcPoints(recordId);
+    await transaction(() async {
+      await (update(dailyRecords)..where((r) => r.id.equals(recordId))).write(
+        DailyRecordsCompanion(
+          ghadhBasar: Value(value),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+      await recalcPoints(recordId);
+    });
   }
 
   Future<void> logProhibition({
@@ -537,16 +555,14 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Future<List<WeeklyPoint>> getWeeklyPoints() async {
-    final results = <WeeklyPoint>[];
-    for (int i = 6; i >= 0; i--) {
-      final date = DateTime.now().subtract(Duration(days: i));
-      final d = DateTime(date.year, date.month, date.day);
-      final record = await (select(
-        dailyRecords,
-      )..where((r) => r.date.equals(d))).getSingleOrNull();
-      results.add(WeeklyPoint(date: d, points: record?.netPoints ?? 0));
-    }
-    return results;
+    final today = DateTime.now();
+    final from = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(const Duration(days: 6));
+    final to = DateTime(today.year, today.month, today.day);
+    return getPointsPerDay(from, to);
   }
 
   TaqwaLevel getTaqwaLevel(int totalPoints) {
@@ -659,15 +675,27 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   /// Returns one [WeeklyPoint] per day in [from..to] for the bar chart.
+  ///
+  /// Single ranged query + in-memory bucketing instead of one query per day.
   Future<List<WeeklyPoint>> getPointsPerDay(DateTime from, DateTime to) async {
-    final results = <WeeklyPoint>[];
-    var cursor = DateTime(from.year, from.month, from.day);
+    final start = DateTime(from.year, from.month, from.day);
     final end = DateTime(to.year, to.month, to.day);
+
+    final rows = await (select(
+      dailyRecords,
+    )..where((r) => r.date.isBetweenValues(start, end))).get();
+
+    final pointsByDate = {
+      for (final r in rows)
+        DateTime(r.date.year, r.date.month, r.date.day): r.netPoints,
+    };
+
+    final results = <WeeklyPoint>[];
+    var cursor = start;
     while (!cursor.isAfter(end)) {
-      final record = await (select(
-        dailyRecords,
-      )..where((r) => r.date.equals(cursor))).getSingleOrNull();
-      results.add(WeeklyPoint(date: cursor, points: record?.netPoints ?? 0));
+      results.add(
+        WeeklyPoint(date: cursor, points: pointsByDate[cursor] ?? 0),
+      );
       cursor = cursor.add(const Duration(days: 1));
     }
     return results;

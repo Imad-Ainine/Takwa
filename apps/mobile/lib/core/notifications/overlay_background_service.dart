@@ -165,8 +165,9 @@ class OverlayBackgroundService {
   }) {
     final Map<String, dynamic> data = {};
     if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
-    if (adhanSoundEnabled != null)
+    if (adhanSoundEnabled != null) {
       data['adhan_sound_enabled'] = adhanSoundEnabled;
+    }
     if (popupIntervalMins != null) {
       data['popup_interval_minutes'] = popupIntervalMins;
     }
@@ -190,6 +191,7 @@ class _OverlayTaskHandler extends TaskHandler {
   int _popupIntervalMins = _kDefaultPopupIntervalMins;
   bool _silentModeEnabled = false;
   int _silentDurationMins = 20;
+  double _adhanVolumeLevel = 1.0;
 
   final _random = math.Random();
 
@@ -228,6 +230,9 @@ class _OverlayTaskHandler extends TaskHandler {
       if (data.containsKey('adhan_sound_enabled')) {
         _adhanSoundEnabled = data['adhan_sound_enabled'] as bool;
       }
+      if (data.containsKey('adhan_volume_level')) {
+        _adhanVolumeLevel = data['adhan_volume_level'] as double;
+      }
       if (data.containsKey('popup_interval_minutes')) {
         _popupIntervalMins = data['popup_interval_minutes'] as int;
       }
@@ -261,6 +266,7 @@ class _OverlayTaskHandler extends TaskHandler {
         prefs.getInt(_kPopupIntervalMinsKey) ?? _kDefaultPopupIntervalMins;
     _silentModeEnabled = prefs.getBool(_kSilentModeEnabledKey) ?? false;
     _silentDurationMins = prefs.getInt(_kSilentDurationMinsKey) ?? 20;
+    _adhanVolumeLevel = prefs.getDouble('adhan_volume_level') ?? 1.0;
   }
 
   // ──────────────────────────────────────
@@ -370,7 +376,34 @@ class _OverlayTaskHandler extends TaskHandler {
           await _scheduleAdhanNotification(prayer);
         }
 
-        // إرسال أمر لفتح شاشة الأذان في التطبيق
+        // فتح الـ Overlay تلقائياً عند وقت الصلاة
+        final hasOverlayPerm = await ow.FlutterOverlayWindow.isPermissionGranted();
+        if (hasOverlayPerm) {
+          await ow.FlutterOverlayWindow.showOverlay(
+            enableDrag: true,
+            overlayTitle: 'وقت الصلاة',
+            overlayContent: 'حان الآن موعد أذان ${prayer.nameAr}',
+            flag: ow.OverlayFlag.defaultFlag,
+            alignment: ow.OverlayAlignment.center,
+            visibility: ow.NotificationVisibility.visibilityPublic,
+            height: ow.WindowSize.matchParent,
+            width: ow.WindowSize.matchParent,
+          );
+
+          // إرسال البيانات للـ Overlay
+          await Future.delayed(const Duration(milliseconds: 600));
+          ow.FlutterOverlayWindow.shareData({
+            'type': 'prayer',
+            'prayer': prayer.nameAr,
+            'emoji': prayer.emoji,
+            'time': DateFormat('HH:mm').format(prayer.time),
+            'volume': _adhanVolumeLevel,
+            'silentMode': _silentModeEnabled,
+            'silentDuration': _silentDurationMins,
+          });
+        }
+
+        // إرسال أمر لفتح شاشة الأذان في التطبيق (أو تقليله حسب الإعدادات)
         FlutterForegroundTask.sendDataToMain({
           'action': 'show_adhan',
           'prayer': prayer.nameAr,
@@ -379,7 +412,7 @@ class _OverlayTaskHandler extends TaskHandler {
           'sound': _adhanSoundEnabled,
         });
 
-        debugPrint('🕌 أُطلق أذان ${prayer.nameAr}');
+        debugPrint('🕌 أُطلق أذان ${prayer.nameAr} مع الـ Overlay');
         return;
       }
     }
