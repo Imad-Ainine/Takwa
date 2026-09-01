@@ -11,7 +11,7 @@ import '../core/database/daos.dart';
 import '../core/supabase/sync_manager.dart';
 import '../core/supabase/supabase_providers.dart';
 import '../core/widgets/custom_pattern_background.dart';
-import '../core/supabase/supabase_service.dart';
+import '../core/supabase/supabase_config.dart';
 import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
 import 'main_shell.dart' show currentTabProvider;
@@ -1051,7 +1051,7 @@ class _LogoutButton extends ConsumerWidget {
     if (confirm == true) {
       onClose(); // Close drawer
       ref.read(guestModeProvider.notifier).state = false;
-      await SupabaseService.signOut();
+      await ref.read(supabaseServiceProvider).signOut();
       if (context.mounted) {
         Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
       }

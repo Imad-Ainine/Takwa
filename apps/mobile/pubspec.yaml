@@ -100,7 +100,6 @@ flutter:
     - assets/sounds/
     - assets/images/
     - assets/
-    - .env
   fonts:
     - family: Amiri
       fonts:

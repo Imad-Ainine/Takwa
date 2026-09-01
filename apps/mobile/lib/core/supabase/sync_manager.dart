@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/database/app_database.dart';
 import '../../features/books/providers/books_reading_provider.dart';
+import 'supabase_config.dart';
 import 'supabase_providers.dart';
 import 'supabase_service.dart';
 import '../providers/favorites_providers.dart';
@@ -15,16 +16,24 @@ final isSyncingProvider = StateProvider<bool>((ref) => false);
 
 final syncManagerProvider = Provider((ref) => SyncManager(ref));
 
+/// The real connectivity check, wrapped behind a provider so tests can
+/// override it without needing the connectivity_plus platform channel.
+final connectivityCheckerProvider = Provider<Future<bool> Function()>((ref) {
+  return () async {
+    final results = await Connectivity().checkConnectivity();
+    return !results.contains(ConnectivityResult.none);
+  };
+});
+
 class SyncManager {
   final Ref _ref;
   SyncManager(this._ref);
 
   static bool _syncing = false;
 
-  Future<bool> get _hasConnection async {
-    final results = await Connectivity().checkConnectivity();
-    return !results.contains(ConnectivityResult.none);
-  }
+  SupabaseService get _service => _ref.read(supabaseServiceProvider);
+
+  Future<bool> get _hasConnection => _ref.read(connectivityCheckerProvider)();
 
   /// Full synchronization on App Start
   Future<void> fullSync() async {
@@ -63,7 +72,7 @@ class SyncManager {
 
     // 2. Pull from Supabase
     final from = DateTime.now().subtract(const Duration(days: 30));
-    final remoteRecords = await SupabaseService.getRecordsRange(
+    final remoteRecords = await _service.getRecordsRange(
       from: from,
       to: DateTime.now(),
     );
@@ -75,7 +84,7 @@ class SyncManager {
 
   Future<void> _syncProhibitions() async {
     final from = DateTime.now().subtract(const Duration(days: 14));
-    final remoteLogs = await SupabaseService.getProhibitionLogs(
+    final remoteLogs = await _service.getProhibitionLogs(
       from: from,
       to: DateTime.now(),
     );
@@ -100,8 +109,8 @@ class SyncManager {
     }
 
     // 2. Pull from Supabase
-    final remoteIbadah = await SupabaseService.getCustomIbadah();
-    final remoteLogs = await SupabaseService.getCustomIbadahLogs(
+    final remoteIbadah = await _service.getCustomIbadah();
+    final remoteLogs = await _service.getCustomIbadahLogs(
       from: DateTime.now().subtract(const Duration(days: 14)),
       to: DateTime.now(),
     );
@@ -137,7 +146,7 @@ class SyncManager {
   }
 
   Future<void> _syncAchievements() async {
-    final remoteAchievements = await SupabaseService.getEarnedAchievements();
+    final remoteAchievements = await _service.getEarnedAchievements();
     final statsDao = _ref.read(statsDaoProvider);
     final db = _ref.read(appDatabaseProvider);
 
@@ -166,7 +175,7 @@ class SyncManager {
   }
 
   Future<void> _syncSettings() async {
-    final remote = await SupabaseService.getSettings();
+    final remote = await _service.getSettings();
     final dao = _ref.read(settingsDaoProvider);
 
     if (remote != null) {
@@ -195,7 +204,7 @@ class SyncManager {
         .read(statsDaoProvider)
         .getMonthStats(DateTime.now().year, DateTime.now().month);
 
-    await SupabaseService.updateUserStats(
+    await _service.updateUserStats(
       totalPoints: stats.totalPoints,
       currentStreak: stats.currentStreak,
       longestStreak: stats.longestStreak,
@@ -210,7 +219,7 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     try {
-      await SupabaseService.upsertDailyRecord({
+      await _service.upsertDailyRecord({
         'date': record.date.toIso8601String().split('T')[0],
         'fajr_status': record.fajrStatus.name,
         'dhuhr_status': record.dhuhrStatus.name,
@@ -249,7 +258,7 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertAchievement({
+    await _service.upsertAchievement({
       'type': achievement.type,
       'title_ar': achievement.titleAr,
       'desc_ar': achievement.descAr,
@@ -266,7 +275,7 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     try {
-      await SupabaseService.upsertProhibitionLog({
+      await _service.upsertProhibitionLog({
         'record_id': log.recordId,
         'date': log.date.toIso8601String().split('T')[0],
         'category': log.category.name,
@@ -286,7 +295,7 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertCustomIbadah({
+    await _service.upsertCustomIbadah({
       'id': ibadah.id,
       'name_ar': ibadah.nameAr,
       'emoji': ibadah.emoji,
@@ -304,7 +313,7 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     try {
-      await SupabaseService.deleteCustomIbadah(id);
+      await _service.deleteCustomIbadah(id);
     } catch (e) {
       // Log or handle error
     }
@@ -317,7 +326,7 @@ class SyncManager {
     if (!isOnline || !isAuth) return;
 
     try {
-      await SupabaseService.upsertCustomIbadahLog({
+      await _service.upsertCustomIbadahLog({
         'ibadah_id': log.ibadahId,
         'date': log.date.toIso8601String().split('T')[0],
         'done': log.done,
@@ -342,7 +351,7 @@ class SyncManager {
           if (ibadah != null) {
             await syncCustomIbadah(ibadah);
             // Retry log sync
-            await SupabaseService.upsertCustomIbadahLog({
+            await _service.upsertCustomIbadahLog({
               'ibadah_id': log.ibadahId,
               'date': log.date.toIso8601String().split('T')[0],
               'done': log.done,
@@ -375,7 +384,7 @@ class SyncManager {
       final settings = await dao.getAllSettings();
       if (settings.isNotEmpty) {
         final prefs = UserPreferences.fromMap(settings);
-        await SupabaseService.updateSettings(prefs.toMap());
+        await _service.updateSettings(prefs.toMap());
       }
     } finally {
       _ref.read(isSyncingProvider.notifier).state = false;
@@ -392,7 +401,7 @@ class SyncManager {
 
   Future<void> _syncReminders() async {
     try {
-      final remoteReminders = await SupabaseService.getReminders();
+      final remoteReminders = await _service.getReminders();
       final dao = _ref.read(remindersDaoProvider);
 
       for (final remote in remoteReminders) {
@@ -411,7 +420,7 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.upsertReminder({
+    await _service.upsertReminder({
       'local_id': reminder.id,
       'title': reminder.title,
       'icon_name': reminder.iconName,
@@ -425,12 +434,12 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await SupabaseService.deleteReminder(localId);
+    await _service.deleteReminder(localId);
   }
 
   Future<void> _syncUserAdhkar() async {
     try {
-      final remoteItems = await SupabaseService.getUserAdhkar();
+      final remoteItems = await _service.getUserAdhkar();
       final dao = _ref.read(userAdhkarDaoProvider);
       
       for (final remote in remoteItems) {
@@ -443,7 +452,7 @@ class SyncManager {
 
   Future<void> _syncUserDuas() async {
     try {
-      final remoteItems = await SupabaseService.getUserDuas();
+      final remoteItems = await _service.getUserDuas();
       final dao = _ref.read(userDuasDaoProvider);
       
       for (final remote in remoteItems) {

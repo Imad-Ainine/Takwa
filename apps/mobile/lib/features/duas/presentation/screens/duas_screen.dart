@@ -11,7 +11,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/providers/user_content_providers.dart';
-import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
@@ -1245,7 +1245,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
           );
 
       if (_shareToCommunity && mounted) {
-        await SupabaseService.shareDuaToCommunity(
+        await ref.read(supabaseServiceProvider).shareDuaToCommunity(
           textAr: arabic,
           titleAr: title,
           occasion: _occasionCtrl.text.trim(),

@@ -5,13 +5,160 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Added for secure config
-import 'supabase_config.dart';
 
-class SupabaseService {
-  static SupabaseClient get _db => SupabaseConfig.client;
+/// All Supabase reads/writes the app makes, as an interface.
+///
+/// This exists so callers (SyncManager in particular) depend on an
+/// injectable abstraction instead of a hard-wired [SupabaseClient] — the
+/// production implementation is [SupabaseClientService] below; tests can
+/// substitute an in-memory fake instead of talking to a real backend.
+abstract class SupabaseService {
+  // ─────────────── AUTH ───────────────
+  Future<AuthResponse> signUp({
+    required String email,
+    required String password,
+    required String username,
+  });
+
+  Future<AuthResponse> signIn({required String email, required String password});
+
+  Future<AuthResponse?> signInWithGoogle();
+
+  Future<void> signOut();
+
+  Future<void> updateProfile(Map<String, dynamic> data);
+
+  // ─────────────── DATA ───────────────
+  Future<void> upsertDailyRecord(Map<String, dynamic> record);
+
+  Future<List<Map<String, dynamic>>> getRecordsRange({
+    required DateTime from,
+    required DateTime to,
+  });
+
+  Future<Map<String, dynamic>?> getSettings();
+
+  Future<void> updateSettings(Map<String, dynamic> settings);
+
+  Future<void> updateUserStats({
+    required int totalPoints,
+    required int currentStreak,
+    required int longestStreak,
+    required int quranPages,
+  });
+
+  // ─────────────── PROHIBITIONS ───────────────
+  Future<void> upsertProhibitionLog(Map<String, dynamic> log);
+
+  Future<List<Map<String, dynamic>>> getProhibitionLogs({
+    required DateTime from,
+    required DateTime to,
+  });
+
+  // ─────────────── CUSTOM IBADAH ───────────────
+  Future<void> upsertCustomIbadah(Map<String, dynamic> ibadah);
+
+  Future<List<Map<String, dynamic>>> getCustomIbadah();
+
+  Future<void> upsertCustomIbadahLog(Map<String, dynamic> log);
+
+  Future<void> deleteCustomIbadah(int id);
+
+  Future<List<Map<String, dynamic>>> getCustomIbadahLogs({
+    required DateTime from,
+    required DateTime to,
+  });
+
+  // ─────────────── ACHIEVEMENTS ───────────────
+  Future<void> upsertAchievement(Map<String, dynamic> achievement);
+
+  Future<List<Map<String, dynamic>>> getEarnedAchievements();
+
+  // ─────────────── USER PERSONAL ADHKAR ───────────────
+  Future<List<Map<String, dynamic>>> getUserAdhkar();
+
+  Future<void> addUserAdhkar({
+    String? id,
+    required String textAr,
+    int count = 1,
+    String categoryHint = 'general',
+  });
+
+  Future<void> deleteUserAdhkar(String id);
+
+  // ─────────────── USER PERSONAL DUAS ───────────────
+  Future<List<Map<String, dynamic>>> getUserDuas();
+
+  Future<void> addUserDua({
+    String? id,
+    required String titleAr,
+    required String textAr,
+    String occasion = '',
+    String source = '',
+    String emoji = '🤲',
+  });
+
+  Future<void> deleteUserDua(String id);
+
+  // ─────────────── COMMUNITY ADHKAR ───────────────
+  Future<List<Map<String, dynamic>>> getCommunityAdhkar();
+
+  Future<void> likeAdhkar(String id);
+
+  Future<void> shareAdhkarToCommunity({
+    required String textAr,
+    int count = 1,
+    String categoryHint = 'general',
+  });
+
+  // ─────────────── COMMUNITY DUAS ───────────────
+  Future<List<Map<String, dynamic>>> getCommunityDuas();
+
+  Future<void> likeDua(String id);
+
+  Future<void> shareDuaToCommunity({
+    required String titleAr,
+    required String textAr,
+    String occasion = '',
+    String source = '',
+    String emoji = '🤲',
+  });
+
+  // ─────────────── BOOKS & READING PROGRESS ───────────────
+  Future<List<Map<String, dynamic>>> getBooks();
+
+  Future<void> upsertBookProgress(String bookId, Map<String, dynamic> data);
+
+  Future<List<Map<String, dynamic>>> getAllBookProgress();
+
+  // ─────────────── PDF SESSION (timer + page) ───────────────
+  Future<void> upsertPdfSession(
+    String bookId,
+    int pdfPage,
+    int totalPdfPages,
+    int readingSeconds,
+  );
+
+  Future<Map<String, dynamic>?> getPdfSession(String bookId);
+
+  // ─────────────── REMINDERS ───────────────
+  Future<void> upsertReminder(Map<String, dynamic> data);
+
+  Future<void> deleteReminder(int localId);
+
+  Future<List<Map<String, dynamic>>> getReminders();
+}
+
+/// Real implementation, talking to an injected [SupabaseClient].
+class SupabaseClientService implements SupabaseService {
+  SupabaseClientService(this._db);
+
+  final SupabaseClient _db;
+
+  String? get _uid => _db.auth.currentUser?.id;
 
   /// Helper لإجراء الطلبات مع إعادة المحاولة في حال فشل الشبكة
-  static Future<T> _safeRequest<T>(Future<T> Function() request) async {
+  Future<T> _safeRequest<T>(Future<T> Function() request) async {
     int attempts = 0;
     const maxAttempts = 3;
 
@@ -39,7 +186,8 @@ class SupabaseService {
   }
 
   // ─────────────── AUTH ───────────────
-  static Future<AuthResponse> signUp({
+  @override
+  Future<AuthResponse> signUp({
     required String email,
     required String password,
     required String username,
@@ -55,70 +203,69 @@ class SupabaseService {
     return res;
   }
 
-  static Future<AuthResponse> signIn({
+  @override
+  Future<AuthResponse> signIn({
     required String email,
     required String password,
   }) async {
     return await _db.auth.signInWithPassword(email: email, password: password);
   }
 
-  static Future<AuthResponse?> signInWithGoogle() async {
-    try {
-      final webClientId = dotenv.env['SUPABASE_WEB_CLIENT_ID'];
-      final iosClientId = dotenv.env['SUPABASE_IOS_CLIENT_ID'];
+  @override
+  Future<AuthResponse?> signInWithGoogle() async {
+    final webClientId = dotenv.env['SUPABASE_WEB_CLIENT_ID'];
+    final iosClientId = dotenv.env['SUPABASE_IOS_CLIENT_ID'];
 
-      if (webClientId == null || iosClientId == null) {
-        throw 'Security Error: Google Client IDs are not configured in environment.';
-      }
-
-      final googleSignIn = GoogleSignIn(
-        clientId: (Platform.isIOS || Platform.isMacOS) ? iosClientId : null,
-        serverClientId: webClientId,
-      );
-
-      final googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return null;
-
-      final googleAuth = await googleUser.authentication;
-      final accessToken = googleAuth.accessToken;
-      final idToken = googleAuth.idToken;
-
-      if (idToken == null) {
-        throw 'No ID Token found.';
-      }
-
-      final res = await _db.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        accessToken: accessToken,
-      );
-
-      // If it's a new user, internal profiles are handled by DB triggers
-      // but we can ensure username is set if available
-      if (res.user != null) {
-        final username =
-            googleUser.displayName ?? 'user_${res.user!.id.substring(0, 5)}';
-        await _db.from('profiles').upsert({
-          'id': res.user!.id,
-          'username': username,
-          'email': res.user!.email,
-          'avatar_emoji': '🌙',
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      }
-
-      return res;
-    } catch (e) {
-      rethrow;
+    if (webClientId == null || iosClientId == null) {
+      throw 'Security Error: Google Client IDs are not configured in environment.';
     }
+
+    final googleSignIn = GoogleSignIn(
+      clientId: (Platform.isIOS || Platform.isMacOS) ? iosClientId : null,
+      serverClientId: webClientId,
+    );
+
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) return null;
+
+    final googleAuth = await googleUser.authentication;
+    final accessToken = googleAuth.accessToken;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      throw 'No ID Token found.';
+    }
+
+    final res = await _db.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+    );
+
+    // If it's a new user, internal profiles are handled by DB triggers
+    // but we can ensure username is set if available
+    if (res.user != null) {
+      final username =
+          googleUser.displayName ?? 'user_${res.user!.id.substring(0, 5)}';
+      await _db.from('profiles').upsert({
+        'id': res.user!.id,
+        'username': username,
+        'email': res.user!.email,
+        'avatar_emoji': '🌙',
+        'created_at': DateTime.now().toIso8601String(),
+      });
+    }
+
+    return res;
   }
 
-  static Future<void> signOut() async {
+  @override
+  Future<void> signOut() async {
     await GoogleSignIn().signOut();
     await _db.auth.signOut();
   }
 
-  static Future<void> _createProfile(User user, String username) async {
+  Future<void> _createProfile(User user, String username) async {
     await _db.from('profiles').upsert({
       'id': user.id,
       'username': username,
@@ -177,18 +324,18 @@ class SupabaseService {
     });
   }
 
-  static Future<void> updateProfile(Map<String, dynamic> data) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> updateProfile(Map<String, dynamic> data) async {
+    final uid = _uid;
     if (uid == null) throw 'User not logged in';
-    
-    await _safeRequest(
-      () => _db.from('profiles').update(data).eq('id', uid),
-    );
+
+    await _safeRequest(() => _db.from('profiles').update(data).eq('id', uid));
   }
 
   // ─────────────── DATA ───────────────
-  static Future<void> upsertDailyRecord(Map<String, dynamic> record) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> upsertDailyRecord(Map<String, dynamic> record) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _safeRequest(
@@ -200,11 +347,12 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getRecordsRange({
+  @override
+  Future<List<Map<String, dynamic>>> getRecordsRange({
     required DateTime from,
     required DateTime to,
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return [];
 
     final data = await _db
@@ -217,8 +365,9 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<Map<String, dynamic>?> getSettings() async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<Map<String, dynamic>?> getSettings() async {
+    final uid = _uid;
     if (uid == null) return null;
 
     return await _safeRequest(
@@ -226,8 +375,9 @@ class SupabaseService {
     );
   }
 
-  static Future<void> updateSettings(Map<String, dynamic> settings) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> updateSettings(Map<String, dynamic> settings) async {
+    final uid = _uid;
     if (uid == null) return;
 
     // We assume 'settings' contains snake_case keys mapped accurately using UserPreferences.toMap()
@@ -242,13 +392,14 @@ class SupabaseService {
     );
   }
 
-  static Future<void> updateUserStats({
+  @override
+  Future<void> updateUserStats({
     required int totalPoints,
     required int currentStreak,
     required int longestStreak,
     required int quranPages,
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return;
 
     await _db
@@ -264,8 +415,9 @@ class SupabaseService {
   }
 
   // ─────────────── PROHIBITIONS ───────────────
-  static Future<void> upsertProhibitionLog(Map<String, dynamic> log) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> upsertProhibitionLog(Map<String, dynamic> log) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _safeRequest(
@@ -276,11 +428,12 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getProhibitionLogs({
+  @override
+  Future<List<Map<String, dynamic>>> getProhibitionLogs({
     required DateTime from,
     required DateTime to,
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return [];
 
     final data = await _db
@@ -293,8 +446,9 @@ class SupabaseService {
   }
 
   // ─────────────── CUSTOM IBADAH ───────────────
-  static Future<void> upsertCustomIbadah(Map<String, dynamic> ibadah) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> upsertCustomIbadah(Map<String, dynamic> ibadah) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _safeRequest(
@@ -302,16 +456,18 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getCustomIbadah() async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getCustomIbadah() async {
+    final uid = _uid;
     if (uid == null) return [];
 
     final data = await _db.from('custom_ibadah').select().eq('user_id', uid);
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<void> upsertCustomIbadahLog(Map<String, dynamic> log) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> upsertCustomIbadahLog(Map<String, dynamic> log) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _safeRequest(
@@ -319,8 +475,9 @@ class SupabaseService {
     );
   }
 
-  static Future<void> deleteCustomIbadah(int id) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> deleteCustomIbadah(int id) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _safeRequest(
@@ -328,11 +485,12 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getCustomIbadahLogs({
+  @override
+  Future<List<Map<String, dynamic>>> getCustomIbadahLogs({
     required DateTime from,
     required DateTime to,
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return [];
 
     final data = await _db
@@ -345,10 +503,9 @@ class SupabaseService {
   }
 
   // ─────────────── ACHIEVEMENTS ───────────────
-  static Future<void> upsertAchievement(
-    Map<String, dynamic> achievement,
-  ) async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<void> upsertAchievement(Map<String, dynamic> achievement) async {
+    final uid = _uid;
     if (uid == null) return;
 
     await _db.from('achievements').upsert({
@@ -358,8 +515,9 @@ class SupabaseService {
     }, onConflict: 'user_id,type');
   }
 
-  static Future<List<Map<String, dynamic>>> getEarnedAchievements() async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getEarnedAchievements() async {
+    final uid = _uid;
     if (uid == null) return [];
 
     final data = await _db.from('achievements').select().eq('user_id', uid);
@@ -370,8 +528,9 @@ class SupabaseService {
       '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
 
   // ─────────────── USER PERSONAL ADHKAR ───────────────
-  static Future<List<Map<String, dynamic>>> getUserAdhkar() async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getUserAdhkar() async {
+    final uid = _uid;
     if (uid == null) return [];
     final data = await _db
         .from('user_adhkar')
@@ -381,13 +540,14 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<void> addUserAdhkar({
+  @override
+  Future<void> addUserAdhkar({
     String? id,
     required String textAr,
     int count = 1,
     String categoryHint = 'general',
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return;
     await _db.from('user_adhkar').insert({
       if (id != null) 'id': id,
@@ -398,14 +558,15 @@ class SupabaseService {
     });
   }
 
-  static Future<void> deleteUserAdhkar(String id) async {
+  @override
+  Future<void> deleteUserAdhkar(String id) async {
     await _db.from('user_adhkar').delete().eq('id', id);
   }
 
   // ─────────────── USER PERSONAL DUAS ───────────────
-
-  static Future<List<Map<String, dynamic>>> getUserDuas() async {
-    final uid = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getUserDuas() async {
+    final uid = _uid;
     if (uid == null) return [];
     final data = await _db
         .from('user_duas')
@@ -415,7 +576,8 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<void> addUserDua({
+  @override
+  Future<void> addUserDua({
     String? id,
     required String titleAr,
     required String textAr,
@@ -423,7 +585,7 @@ class SupabaseService {
     String source = '',
     String emoji = '🤲',
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return;
     await _db.from('user_duas').insert({
       if (id != null) 'id': id,
@@ -436,13 +598,14 @@ class SupabaseService {
     });
   }
 
-  static Future<void> deleteUserDua(String id) async {
+  @override
+  Future<void> deleteUserDua(String id) async {
     await _db.from('user_duas').delete().eq('id', id);
   }
 
   // ─────────────── COMMUNITY ADHKAR ───────────────
-
-  static Future<List<Map<String, dynamic>>> getCommunityAdhkar() async {
+  @override
+  Future<List<Map<String, dynamic>>> getCommunityAdhkar() async {
     final data = await _db
         .from('community_adhkar')
         .select()
@@ -452,7 +615,8 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<void> likeAdhkar(String id) async {
+  @override
+  Future<void> likeAdhkar(String id) async {
     // Use an RPC or a direct update. We do a read-then-write for simplicity;
     // on production you'd use a Postgres function to avoid race conditions.
     final row = await _db
@@ -467,12 +631,13 @@ class SupabaseService {
         .eq('id', id);
   }
 
-  static Future<void> shareAdhkarToCommunity({
+  @override
+  Future<void> shareAdhkarToCommunity({
     required String textAr,
     int count = 1,
     String categoryHint = 'general',
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return;
     await _db.from('community_adhkar').insert({
       'shared_by': uid,
@@ -483,8 +648,8 @@ class SupabaseService {
   }
 
   // ─────────────── COMMUNITY DUAS ───────────────
-
-  static Future<List<Map<String, dynamic>>> getCommunityDuas() async {
+  @override
+  Future<List<Map<String, dynamic>>> getCommunityDuas() async {
     final data = await _db
         .from('community_duas')
         .select()
@@ -494,7 +659,8 @@ class SupabaseService {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  static Future<void> likeDua(String id) async {
+  @override
+  Future<void> likeDua(String id) async {
     final row = await _db
         .from('community_duas')
         .select('likes')
@@ -507,14 +673,15 @@ class SupabaseService {
         .eq('id', id);
   }
 
-  static Future<void> shareDuaToCommunity({
+  @override
+  Future<void> shareDuaToCommunity({
     required String titleAr,
     required String textAr,
     String occasion = '',
     String source = '',
     String emoji = '🤲',
   }) async {
-    final uid = SupabaseConfig.userId;
+    final uid = _uid;
     if (uid == null) return;
     await _db.from('community_duas').insert({
       'shared_by': uid,
@@ -529,19 +696,20 @@ class SupabaseService {
   // ─────────────────────────────────────────
   //  BOOKS & READING PROGRESS
   // ─────────────────────────────────────────
-
-  static Future<List<Map<String, dynamic>>> getBooks() async {
+  @override
+  Future<List<Map<String, dynamic>>> getBooks() async {
     return _safeRequest<List<Map<String, dynamic>>>(() async {
       final data = await _db.from('books').select().order('title_ar');
       return List<Map<String, dynamic>>.from(data);
     });
   }
 
-  static Future<void> upsertBookProgress(
+  @override
+  Future<void> upsertBookProgress(
     String bookId,
     Map<String, dynamic> data,
   ) async {
-    final userId = SupabaseConfig.userId;
+    final userId = _uid;
     if (userId == null) return;
 
     await _safeRequest(
@@ -556,8 +724,9 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getAllBookProgress() async {
-    final userId = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getAllBookProgress() async {
+    final userId = _uid;
     if (userId == null) return [];
 
     return _safeRequest<List<Map<String, dynamic>>>(() async {
@@ -575,13 +744,14 @@ class SupabaseService {
 
   /// Save or update the PDF reading session:
   /// current page, total PDF pages, and accumulated reading seconds.
-  static Future<void> upsertPdfSession(
+  @override
+  Future<void> upsertPdfSession(
     String bookId,
     int pdfPage,
     int totalPdfPages,
     int readingSeconds,
   ) async {
-    final userId = SupabaseConfig.userId;
+    final userId = _uid;
     if (userId == null) return;
 
     await _safeRequest(
@@ -597,8 +767,9 @@ class SupabaseService {
   }
 
   /// Fetch saved PDF session for a book (pdf_page, total_pdf_pages, reading_seconds).
-  static Future<Map<String, dynamic>?> getPdfSession(String bookId) async {
-    final userId = SupabaseConfig.userId;
+  @override
+  Future<Map<String, dynamic>?> getPdfSession(String bookId) async {
+    final userId = _uid;
     if (userId == null) return null;
 
     return _safeRequest<Map<String, dynamic>?>(() async {
@@ -615,9 +786,9 @@ class SupabaseService {
   // ─────────────────────────────────────────
   //  REMINDERS
   // ─────────────────────────────────────────
-
-  static Future<void> upsertReminder(Map<String, dynamic> data) async {
-    final userId = SupabaseConfig.userId;
+  @override
+  Future<void> upsertReminder(Map<String, dynamic> data) async {
+    final userId = _uid;
     if (userId == null) return;
 
     await _safeRequest(
@@ -633,8 +804,9 @@ class SupabaseService {
     );
   }
 
-  static Future<void> deleteReminder(int localId) async {
-    final userId = SupabaseConfig.userId;
+  @override
+  Future<void> deleteReminder(int localId) async {
+    final userId = _uid;
     if (userId == null) return;
 
     await _safeRequest(
@@ -646,8 +818,9 @@ class SupabaseService {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getReminders() async {
-    final userId = SupabaseConfig.userId;
+  @override
+  Future<List<Map<String, dynamic>>> getReminders() async {
+    final userId = _uid;
     if (userId == null) return [];
 
     return _safeRequest<List<Map<String, dynamic>>>(() async {

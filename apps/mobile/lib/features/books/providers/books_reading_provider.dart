@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/books_data.dart';
-import '../../../core/supabase/supabase_service.dart';
+import '../../../core/supabase/supabase_config.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/database/daos.dart';
 
@@ -76,7 +76,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
 
     // 3. Best-effort push to Supabase (ignored if offline).
     try {
-      await SupabaseService.upsertBookProgress(bookId, {
+      await _ref.read(supabaseServiceProvider).upsertBookProgress(bookId, {
         'chapter_index': chapterIndex,
         'page_index': pageIndex,
         'read_pages': updatedReadPages.toList(),
@@ -104,7 +104,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
       print('Failed to write pdf session to local DB: $e');
     }
     try {
-      await SupabaseService.upsertPdfSession(
+      await _ref.read(supabaseServiceProvider).upsertPdfSession(
         bookId,
         pdfPage,
         totalPdfPages,
@@ -118,7 +118,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
   /// Pull remote progress from Supabase and merge into local Drift DB.
   Future<void> syncFromRemote() async {
     try {
-      final remoteData = await SupabaseService.getAllBookProgress();
+      final remoteData = await _ref.read(supabaseServiceProvider).getAllBookProgress();
       if (remoteData.isEmpty) return;
       for (final item in remoteData) {
         await _dao.upsertFromRemote(item);
@@ -210,7 +210,7 @@ double fontSizeFromLevel(int level) {
 // ─────────────────────────────────────────
 final booksListProvider = FutureProvider<List<IslamicBook>>((ref) async {
   try {
-    final data = await SupabaseService.getBooks();
+    final data = await ref.read(supabaseServiceProvider).getBooks();
     if (data.isNotEmpty) {
       return data.map((json) => IslamicBook.fromJson(json)).toList();
     }

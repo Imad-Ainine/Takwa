@@ -6,7 +6,7 @@ import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 import 'package:takwa/core/providers/user_content_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
-import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 
 
@@ -790,7 +790,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
           .add(textAr: text, count: _count);
 
       if (_shareWithCommunity) {
-        await SupabaseService.shareAdhkarToCommunity(
+        await ref.read(supabaseServiceProvider).shareAdhkarToCommunity(
           textAr: text,
           count: _count,
         );

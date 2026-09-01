@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 //  lib/core/providers/user_content_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -10,8 +10,12 @@ import 'dart:math';
 String _generateUuidV4() {
   final random = Random();
   String rand([int length = 4]) {
-    return List.generate(length, (_) => random.nextInt(16).toRadixString(16)).join('');
+    return List.generate(
+      length,
+      (_) => random.nextInt(16).toRadixString(16),
+    ).join('');
   }
+
   return '${rand(8)}-${rand()}-4${rand(3)}-${(random.nextInt(4) + 8).toRadixString(16)}${rand(3)}-${rand(12)}';
 }
 
@@ -140,12 +144,16 @@ class UserAdhkarNotifier extends AsyncNotifier<List<UserAdhkarItem>> {
   Future<List<UserAdhkarItem>> build() async {
     final dao = ref.watch(userAdhkarDaoProvider);
     final raw = await dao.getAll();
-    return raw.map((e) => UserAdhkarItem(
-      id: e.id,
-      textAr: e.textAr,
-      count: e.count,
-      categoryHint: e.categoryHint ?? 'general',
-    )).toList();
+    return raw
+        .map(
+          (e) => UserAdhkarItem(
+            id: e.id,
+            textAr: e.textAr,
+            count: e.count,
+            categoryHint: e.categoryHint ?? 'general',
+          ),
+        )
+        .toList();
   }
 
   Future<void> add({
@@ -155,22 +163,27 @@ class UserAdhkarNotifier extends AsyncNotifier<List<UserAdhkarItem>> {
   }) async {
     final id = _generateUuidV4();
     final dao = ref.read(userAdhkarDaoProvider);
-    
+
     // Save locally
-    await dao.insertOrUpdate(UserAdhkarCompanion.insert(
-      id: id,
-      textAr: textAr,
-      count: Value(count),
-      categoryHint: Value(categoryHint),
-    ));
+    await dao.insertOrUpdate(
+      UserAdhkarCompanion.insert(
+        id: id,
+        textAr: textAr,
+        count: Value(count),
+        categoryHint: Value(categoryHint),
+      ),
+    );
 
     // Try remote (opportunistic)
-    SupabaseService.addUserAdhkar(
-      id: id,
-      textAr: textAr,
-      count: count,
-      categoryHint: categoryHint,
-    ).catchError((_) {});
+    ref
+        .read(supabaseServiceProvider)
+        .addUserAdhkar(
+          id: id,
+          textAr: textAr,
+          count: count,
+          categoryHint: categoryHint,
+        )
+        .catchError((_) {});
 
     ref.invalidateSelf();
   }
@@ -178,18 +191,20 @@ class UserAdhkarNotifier extends AsyncNotifier<List<UserAdhkarItem>> {
   Future<void> delete(String id) async {
     final dao = ref.read(userAdhkarDaoProvider);
     await dao.deleteItem(id);
-    
-    SupabaseService.deleteUserAdhkar(id).catchError((_) {});
-    
+
+    ref.read(supabaseServiceProvider).deleteUserAdhkar(id).catchError((_) {});
+
     state = AsyncData((state.value ?? []).where((e) => e.id != id).toList());
   }
 
   Future<void> shareAdhkar(UserAdhkarItem item) async {
-    await SupabaseService.shareAdhkarToCommunity(
-      textAr: item.textAr,
-      count: item.count,
-      categoryHint: item.categoryHint,
-    );
+    await ref
+        .read(supabaseServiceProvider)
+        .shareAdhkarToCommunity(
+          textAr: item.textAr,
+          count: item.count,
+          categoryHint: item.categoryHint,
+        );
     // refresh community feed
     ref.invalidate(communityAdhkarProvider);
   }
@@ -207,14 +222,18 @@ class UserDuasNotifier extends AsyncNotifier<List<UserDuaItem>> {
   Future<List<UserDuaItem>> build() async {
     final dao = ref.watch(userDuasDaoProvider);
     final raw = await dao.getAll();
-    return raw.map((e) => UserDuaItem(
-      id: e.id,
-      titleAr: e.titleAr,
-      textAr: e.textAr,
-      occasion: e.occasion ?? '',
-      source: e.source ?? '',
-      emoji: e.emoji ?? '🤲',
-    )).toList();
+    return raw
+        .map(
+          (e) => UserDuaItem(
+            id: e.id,
+            titleAr: e.titleAr,
+            textAr: e.textAr,
+            occasion: e.occasion ?? '',
+            source: e.source ?? '',
+            emoji: e.emoji ?? '🤲',
+          ),
+        )
+        .toList();
   }
 
   Future<void> add({
@@ -228,24 +247,29 @@ class UserDuasNotifier extends AsyncNotifier<List<UserDuaItem>> {
     final dao = ref.read(userDuasDaoProvider);
 
     // Save locally
-    await dao.insertOrUpdate(UserDuasCompanion.insert(
-      id: id,
-      titleAr: titleAr,
-      textAr: textAr,
-      occasion: Value(occasion),
-      source: Value(source),
-      emoji: Value(emoji),
-    ));
+    await dao.insertOrUpdate(
+      UserDuasCompanion.insert(
+        id: id,
+        titleAr: titleAr,
+        textAr: textAr,
+        occasion: Value(occasion),
+        source: Value(source),
+        emoji: Value(emoji),
+      ),
+    );
 
     // Try remote (opportunistic)
-    SupabaseService.addUserDua(
-      id: id,
-      titleAr: titleAr,
-      textAr: textAr,
-      occasion: occasion,
-      source: source,
-      emoji: emoji,
-    ).catchError((_) {});
+    ref
+        .read(supabaseServiceProvider)
+        .addUserDua(
+          id: id,
+          titleAr: titleAr,
+          textAr: textAr,
+          occasion: occasion,
+          source: source,
+          emoji: emoji,
+        )
+        .catchError((_) {});
 
     ref.invalidateSelf();
   }
@@ -254,19 +278,21 @@ class UserDuasNotifier extends AsyncNotifier<List<UserDuaItem>> {
     final dao = ref.read(userDuasDaoProvider);
     await dao.deleteItem(id);
 
-    SupabaseService.deleteUserDua(id).catchError((_) {});
+    ref.read(supabaseServiceProvider).deleteUserDua(id).catchError((_) {});
 
     state = AsyncData((state.value ?? []).where((e) => e.id != id).toList());
   }
 
   Future<void> shareDua(UserDuaItem item) async {
-    await SupabaseService.shareDuaToCommunity(
-      textAr: item.textAr,
-      titleAr: item.titleAr,
-      occasion: item.occasion,
-      source: item.source,
-      emoji: item.emoji,
-    );
+    await ref
+        .read(supabaseServiceProvider)
+        .shareDuaToCommunity(
+          textAr: item.textAr,
+          titleAr: item.titleAr,
+          occasion: item.occasion,
+          source: item.source,
+          emoji: item.emoji,
+        );
     ref.invalidate(communityDuasProvider);
   }
 }
@@ -281,7 +307,7 @@ final userDuasProvider =
 class CommunityAdhkarNotifier extends AsyncNotifier<List<CommunityAdhkarItem>> {
   @override
   Future<List<CommunityAdhkarItem>> build() async {
-    final raw = await SupabaseService.getCommunityAdhkar();
+    final raw = await ref.read(supabaseServiceProvider).getCommunityAdhkar();
     return raw.map(CommunityAdhkarItem.fromMap).toList();
   }
 
@@ -303,7 +329,7 @@ class CommunityAdhkarNotifier extends AsyncNotifier<List<CommunityAdhkarItem>> {
           .toList(),
     );
     try {
-      await SupabaseService.likeAdhkar(id);
+      await ref.read(supabaseServiceProvider).likeAdhkar(id);
     } catch (_) {
       // rollback on failure
       state = AsyncData(
@@ -329,7 +355,7 @@ final communityAdhkarProvider =
 class CommunityDuasNotifier extends AsyncNotifier<List<CommunityDuaItem>> {
   @override
   Future<List<CommunityDuaItem>> build() async {
-    final raw = await SupabaseService.getCommunityDuas();
+    final raw = await ref.read(supabaseServiceProvider).getCommunityDuas();
     return raw.map(CommunityDuaItem.fromMap).toList();
   }
 
@@ -351,7 +377,7 @@ class CommunityDuasNotifier extends AsyncNotifier<List<CommunityDuaItem>> {
           .toList(),
     );
     try {
-      await SupabaseService.likeDua(id);
+      await ref.read(supabaseServiceProvider).likeDua(id);
     } catch (_) {
       // Rollback
       state = AsyncData(

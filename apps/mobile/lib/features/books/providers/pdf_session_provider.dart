@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/supabase/supabase_service.dart';
+import '../../../core/supabase/supabase_config.dart';
 import '../../../core/providers/database_providers.dart';
 
 // ─────────────────────────────────────────
@@ -87,7 +87,7 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
 
     // 2. Fetch remote (overrides local if newer)
     try {
-      final remote = await SupabaseService.getPdfSession(bookId);
+      final remote = await _ref.read(supabaseServiceProvider).getPdfSession(bookId);
       if (remote != null) {
         final remoteSecs = (remote['reading_seconds'] as int?) ?? 0;
         final remotePage = (remote['pdf_page'] as int?) ?? 1;
@@ -170,7 +170,7 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
     }
 
     try {
-      await SupabaseService.upsertPdfSession(bookId, page, total, secs);
+      await _ref.read(supabaseServiceProvider).upsertPdfSession(bookId, page, total, secs);
     } catch (_) {
       // Offline fallback — local already saved
     }

@@ -11,7 +11,7 @@ import '../../core/widgets/primary_button.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/notifications/notifications_service.dart';
 import '../../core/notifications/overlay_background_service.dart';
-import '../../core/supabase/supabase_service.dart';
+import '../../core/supabase/supabase_config.dart';
 
 // ── Enum for current step ──
 enum OnboardStep {
@@ -253,7 +253,7 @@ class OnboardingScreen extends ConsumerWidget {
             if (state.gender != null) {
               await ref.read(settingsDaoProvider).set('gender', state.gender!);
               try {
-                await SupabaseService.updateProfile({'gender': state.gender});
+                await ref.read(supabaseServiceProvider).updateProfile({'gender': state.gender});
               } catch (e) {
                 // Ignore error if offline
                 print('Error updating gender: $e');
