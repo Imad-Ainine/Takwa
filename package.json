@@ -23,6 +23,6 @@
 		"@swc/core-linux-x64-musl": "1.15.30"
 	},
 	"dependencies": {
-		"@tailwindcss/postcss": "^4.2.4"
+		"@tailwindcss/postcss": "^4.3.3"
 	}
 }
