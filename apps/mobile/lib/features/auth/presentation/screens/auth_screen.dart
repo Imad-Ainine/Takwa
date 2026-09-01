@@ -11,7 +11,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
-import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/supabase/supabase_config.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/auth_field.dart';
@@ -75,7 +75,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     try {
       final gender = await ref.read(settingsDaoProvider).get('gender');
       if (gender != null) {
-        await SupabaseService.updateProfile({'gender': gender});
+        await ref.read(supabaseServiceProvider).updateProfile({'gender': gender});
       }
     } catch (e) {
       debugPrint('Error syncing gender: $e');
@@ -93,7 +93,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _error = null;
     });
     try {
-      await SupabaseService.signIn(
+      await ref.read(supabaseServiceProvider).signIn(
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text,
       );
@@ -122,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _error = null;
     });
     try {
-      await SupabaseService.signUp(
+      await ref.read(supabaseServiceProvider).signUp(
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text,
         username: _userCtrl.text.trim(),
@@ -150,7 +150,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _error = null;
     });
     try {
-      final res = await SupabaseService.signInWithGoogle();
+      final res = await ref.read(supabaseServiceProvider).signInWithGoogle();
       if (res != null) {
         await _syncGender();
         if (mounted) Navigator.pushReplacementNamed(context, '/');

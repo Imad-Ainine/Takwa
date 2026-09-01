@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,7 +9,7 @@ import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
 import '../../../../core/supabase/supabase_providers.dart';
-import '../../../../core/supabase/supabase_service.dart';
+import '../../../../core/supabase/supabase_config.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -54,7 +53,7 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 40),
 
                       // Logout Button
-                      _buildLogoutButton(context),
+                      _buildLogoutButton(context, ref),
 
                       const SizedBox(height: 32),
                     ],
@@ -237,7 +236,8 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    final supabaseService = ref.read(supabaseServiceProvider);
     return PrimaryButton(
       onTap: () async {
         final proceed = await showDialog<bool>(
@@ -259,7 +259,7 @@ class ProfileScreen extends ConsumerWidget {
         );
 
         if (proceed == true) {
-          await SupabaseService.signOut();
+          await supabaseService.signOut();
           if (context.mounted) {
             Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
           }

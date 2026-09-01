@@ -1,7 +1,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../supabase/supabase_service.dart';
+import '../supabase/supabase_config.dart';
 import '../supabase/supabase_providers.dart';
 
 class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
@@ -37,7 +37,7 @@ class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
       final isOnline = ref.read(connectivityProvider).value ?? false;
       final isAuth = ref.read(currentUserProvider) != null;
       if (isOnline && isAuth) {
-        SupabaseService.updateSettings({
+        ref.read(supabaseServiceProvider).updateSettings({
           _key: state.toList(),
         }).catchError((_) {}); // Handle silently in background
       }

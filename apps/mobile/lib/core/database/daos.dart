@@ -466,23 +466,29 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Future<int> getLongestStreak() async {
-    final records = await (select(
-      dailyRecords,
-    )..orderBy([(r) => OrderingTerm.asc(r.date)])).get();
+    // Only the two columns the streak walk actually needs — this table
+    // grows without bound over a user's lifetime, so fetching full rows
+    // (15+ columns) here was needless overhead on every call.
+    final query = selectOnly(dailyRecords)
+      ..addColumns([dailyRecords.date, dailyRecords.netPoints])
+      ..orderBy([OrderingTerm.asc(dailyRecords.date)]);
 
     int longest = 0;
     int current = 0;
     DateTime? prev;
 
-    for (final r in records) {
-      if (r.netPoints > 0) {
-        if (prev != null && r.date.difference(prev).inDays == 1) {
+    final rows = await query.get();
+    for (final row in rows) {
+      final date = row.read(dailyRecords.date)!;
+      final netPoints = row.read(dailyRecords.netPoints)!;
+      if (netPoints > 0) {
+        if (prev != null && date.difference(prev).inDays == 1) {
           current++;
         } else {
           current = 1;
         }
         if (current > longest) longest = current;
-        prev = r.date;
+        prev = date;
       } else {
         current = 0;
         prev = null;
@@ -909,11 +915,20 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       }
     }
 
-    // 5. Global Lifetime Checks
-    final allRows = await (select(dailyRecords)).get();
+    // 5. Global Lifetime Checks — targeted aggregate queries instead of
+    // loading every daily_records row into memory. This table grows
+    // without bound over a user's lifetime with the app, and this method
+    // runs after most user actions, so a full-table load here scaled
+    // badly with tenure.
+    final naflCountExp = dailyRecords.id.count();
+    final naflCount = await (selectOnly(dailyRecords)
+          ..addColumns([naflCountExp])
+          ..where(dailyRecords.fastingType.equals(FastingType.nafl.index)))
+        .map((row) => row.read(naflCountExp) ?? 0)
+        .getSingle();
 
     // Fasting Nafl Check
-    if (allRows.any((r) => r.fastingType == FastingType.nafl)) {
+    if (naflCount > 0) {
       final a = await _tryGrant(
         'fasting_nafl',
         'باب الريان',
@@ -925,9 +940,12 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     }
 
     // Ramadan Knight Check (10 days of fard fasting)
-    final ramadanDays = allRows
-        .where((r) => r.fastingType == FastingType.fard)
-        .length;
+    final fardCountExp = dailyRecords.id.count();
+    final ramadanDays = await (selectOnly(dailyRecords)
+          ..addColumns([fardCountExp])
+          ..where(dailyRecords.fastingType.equals(FastingType.fard.index)))
+        .map((row) => row.read(fardCountExp) ?? 0)
+        .getSingle();
     if (ramadanDays >= 10) {
       final a = await _tryGrant(
         'ramadan_knight',
@@ -940,7 +958,10 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     }
 
     // Total Lifetime Points Check
-    final totalPoints = allRows.fold<int>(0, (sum, r) => sum + r.netPoints);
+    final totalPointsExp = dailyRecords.netPoints.sum();
+    final totalPoints = await (selectOnly(
+      dailyRecords,
+    )..addColumns([totalPointsExp])).map((row) => row.read(totalPointsExp) ?? 0).getSingle();
     if (totalPoints >= 100) {
       final a = await _tryGrant(
         'points_100',

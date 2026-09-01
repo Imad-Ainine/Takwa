@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'supabase_service.dart';
+
 class SupabaseConfig {
   static String get url =>
       dotenv.env['SUPABASE_URL'] ??
@@ -30,4 +32,10 @@ class SupabaseConfig {
 
 final supabaseProvider = Provider<SupabaseClient>(
   (ref) => SupabaseConfig.client,
+);
+
+/// The injectable [SupabaseService]. Overridden with a fake in tests
+/// instead of talking to a real Supabase backend.
+final supabaseServiceProvider = Provider<SupabaseService>(
+  (ref) => SupabaseClientService(ref.watch(supabaseProvider)),
 );

@@ -10,7 +10,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/notifications/overlays/adhan_overlay_screen.dart';
-import 'package:takwa/core/supabase/supabase_service.dart';
+import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -524,7 +524,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ref.read(guestModeProvider.notifier).state = false;
 
       // 2. Sign out from Supabase (Google/Email)
-      await SupabaseService.signOut();
+      await ref.read(supabaseServiceProvider).signOut();
 
       // 3. Navigate to splash/login
       if (mounted) {
