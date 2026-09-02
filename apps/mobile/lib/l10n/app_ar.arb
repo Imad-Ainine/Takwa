@@ -143,5 +143,210 @@
   "achievementPoints1000Desc": "بلغت 1000 نقطة في مسيرتك",
   "@achievementPoints1000Desc": {
     "description": "Achievement description: reached 1000 lifetime Taqwa points"
-  }
+  },
+
+  "prayerFajr": "الفجر",
+  "prayerDhuhr": "الظهر",
+  "prayerAsr": "العصر",
+  "prayerMaghrib": "المغرب",
+  "prayerIsha": "العشاء",
+
+  "prayerStatusOnTimeShort": "في وقتها ✓",
+  "@prayerStatusOnTimeShort": {
+    "description": "Short chip label: prayer performed on time"
+  },
+  "prayerStatusQadaaShort": "قضاء",
+  "@prayerStatusQadaaShort": {
+    "description": "Short chip label: prayer made up late"
+  },
+  "prayerStatusMissedShort": "فاتت",
+  "@prayerStatusMissedShort": {
+    "description": "Short chip label: prayer missed"
+  },
+  "prayerStatusPendingShort": "لم تُؤدَّ بعد",
+  "@prayerStatusPendingShort": {
+    "description": "Short chip label: prayer time has come but not yet marked"
+  },
+  "prayerStatusNotDueShort": "لم يحن وقتها",
+  "@prayerStatusNotDueShort": {
+    "description": "Short chip label: prayer time hasn't come yet"
+  },
+
+  "prayerStatusPerformedFull": "أُديت في وقتها",
+  "@prayerStatusPerformedFull": {
+    "description": "Status picker option: prayer performed on time"
+  },
+  "prayerStatusQadaaFull": "قُضيت خارج الوقت",
+  "@prayerStatusQadaaFull": {
+    "description": "Status picker option: prayer made up late"
+  },
+  "prayerStatusMissedFull": "فاتت (استغفر الله)",
+  "@prayerStatusMissedFull": {
+    "description": "Status picker option: prayer missed"
+  },
+
+  "ibadahMorningAdhkarLabel": "أذكار الصباح",
+  "ibadahMorningAdhkarSublabel": "بعد صلاة الفجر",
+  "ibadahEveningAdhkarLabel": "أذكار المساء",
+  "ibadahEveningAdhkarSublabel": "بعد صلاة العصر",
+  "ibadahQiyamLabel": "قيام الليل",
+  "ibadahQiyamSublabel": "الثلث الأخير من الليل",
+  "ibadahSadaqahLabel": "الصدقة",
+  "ibadahSadaqahSublabel": "ولو بكلمة طيبة",
+  "ibadahGhadhBasarLabel": "غضّ البصر",
+  "ibadahGhadhBasarSublabel": "حفظ النظر عن الحرام",
+
+  "prohibitionGheebaName": "الغيبة",
+  "prohibitionGheebaDesc": "ذكر الناس بما يكرهون",
+  "prohibitionNameemaName": "النميمة",
+  "prohibitionNameemaDesc": "نقل الكلام بقصد الإفساد",
+  "prohibitionKadhbName": "الكذب",
+  "prohibitionKadhbDesc": "قول غير الحق",
+  "prohibitionGhadabName": "الغضب",
+  "prohibitionGhadabDesc": "إن غضبت فاسكت",
+  "prohibitionIdaatWaqtName": "إضاعة الوقت",
+  "prohibitionIdaatWaqtDesc": "التقصير في استثمار الوقت",
+
+  "hijriMuharram": "محرم",
+  "hijriSafar": "صفر",
+  "hijriRabiAlAwwal": "ربيع الأول",
+  "hijriRabiAlThani": "ربيع الآخر",
+  "hijriJumadaAlAwwal": "جمادى الأولى",
+  "hijriJumadaAlThani": "جمادى الآخرة",
+  "hijriRajab": "رجب",
+  "hijriShaban": "شعبان",
+  "hijriRamadan": "رمضان",
+  "hijriShawwal": "شوال",
+  "hijriDhulQadah": "ذو القعدة",
+  "hijriDhulHijjah": "ذو الحجة",
+
+  "checklistTitle": "محاسبة اليوم",
+  "checklistTodayProgress": "إنجاز اليوم",
+  "checklistFivePrayersTitle": "الصلوات الخمس",
+  "checklistQuranAdhkarTitle": "القرآن والأذكار",
+  "checklistProhibitionsTitle": "المحظورات والمهلكات",
+  "checklistProhibitionsSubtitle": "حدد ما وقعت فيه اليوم بصدق مع نفسك",
+
+  "checklistMotivationComplete": "يوم مكتمل الحمد لله ✨",
+  "checklistMotivationGreat": "رائع، أنت على الطريق 💪",
+  "checklistMotivationKeepGoing": "استمر، لا تتوقف 🌿",
+  "checklistMotivationStart": "البداية الآن 🤲",
+
+  "checklistQuranInputLabel": "تلاوة القرآن الكريم",
+  "checklistQuranPagesHint": "أدخل عدد الصفحات التي قرأتها",
+
+  "checklistNoteTitle": "ملاحظة اليوم",
+  "checklistNoteHint": "اكتب ملاحظتك أو دعاءك لهذا اليوم...",
+  "checklistNoteSaveButton": "حفظ الملاحظة",
+  "checklistNoteSaved": "تم الحفظ ✓",
+
+  "checklistErrorPrefix": "خطأ: {error}",
+  "@checklistErrorPrefix": {
+    "description": "Error message prefix, followed by the raw error text",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "checklistIncrementSemanticLabel": "زد عدد مرات {name}، حدث {count} مرة",
+  "@checklistIncrementSemanticLabel": {
+    "description": "Screen-reader label for the prohibition '+1 count' button",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "checklistPrayerSheetTitle": "صلاة {prayerName}",
+  "@checklistPrayerSheetTitle": {
+    "description": "Status picker sheet title, e.g. 'Fajr prayer'",
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "checklistNetPointsLabel": "الصافي",
+  "checklistPointsSuffix": " نقطة",
+  "checklistFastingLabel": "الصيام",
+  "fastingTypeFard": "فريضة",
+  "fastingTypeNafl": "نافلة",
+  "fastingTypeNone": "لم أصم",
+  "checklistQuranPageSuffix": "/صفحة",
+  "semanticsSeparator": "، ",
+  "@semanticsSeparator": {
+    "description": "Separator joining two clauses in a screen-reader label, e.g. 'name, status'"
+  },
+
+  "appTitle": "تقوى",
+  "settingsLanguageLabel": "اللغة",
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "@languageArabic": {
+    "description": "Language name shown in its own native form, regardless of the app's current UI language"
+  },
+  "@languageEnglish": {
+    "description": "Language name shown in its own native form, regardless of the app's current UI language"
+  },
+
+  "settingsScreenTitle": "الإعدادات",
+  "settingsAdhanSectionTitle": "إعدادات الأذان و التنبيهات",
+  "settingsAdhanNotificationsLabel": "الأذان والتنبيهات",
+  "settingsAdhanNotificationsSublabel": "تخصيص الأذان، الوضع الصامت، والتنبيهات",
+  "settingsWakeBeforeFajrLabel": "الاستيقاظ قبل الفجر",
+  "settingsWakeBeforeFajrSublabel": "تنبيه بصوت الأذان في الوقت المحدد",
+  "settingsWakeTimeLabel": "وقت الاستيقاظ",
+  "settingsMorningAdhkarLabel": "أذكار الصباح",
+  "settingsMorningAdhkarSublabel": "تذكير يومي الساعة ٦:٣٠ ص",
+  "settingsEveningAdhkarLabel": "أذكار المساء",
+  "settingsEveningAdhkarSublabel": "تذكير يومي الساعة ٥:٠٠ م",
+  "settingsMuhasabaLabel": "محاسبة مسائية",
+  "settingsMuhasabaSublabel": "تذكير يومي للمحاسبة",
+  "settingsDailyDuasLabel": "الأدعية اليومية",
+  "settingsDailyDuasSublabel": "نفحات من الأدعية النبوية",
+  "settingsFridaySunnahLabel": "سنن الجمعة",
+  "settingsFridaySunnahSublabel": "تذكير بسورة الكهف والجمعة",
+  "settingsFastingRemindersLabel": "تنبيهات الصيام",
+  "settingsFastingRemindersSublabel": "الاثنين والخميس والأيام البيض",
+  "settingsMuhasabaTimeLabel": "وقت المحاسبة",
+  "settingsAppearanceSectionTitle": "المظهر",
+  "settingsThemeModeLabel": "وضع المظهر",
+  "themeModeSystem": "تلقائي (حسب النظام)",
+  "themeModeLight": "الوضع الفاتح",
+  "themeModeDark": "الوضع الداكن",
+  "settingsRamadanSectionTitle": "وضع رمضان",
+  "settingsRamadanModeSublabel": "تفعيل المميزات الرمضانية",
+  "settingsAppSectionTitle": "التطبيق",
+  "settingsTestNotifLabel": "اختبار الإشعارات والنافذة",
+  "settingsTestNotifSublabel": "تأكد من عمل الإشعارات والنوافذ العائمة",
+  "settingsSubscriptionLabel": "الاشتراك",
+  "settingsSubscriptionSublabel": "دعم المشروع والاستمرار",
+  "settingsAboutDevLabel": "عن المطور",
+  "settingsAboutDevSublabel": "تعرف على مبرمج التطبيق",
+  "settingsTermsLabel": "الشروط والخصوصية",
+  "settingsTermsSublabel": "شروط الدخول والخصوصية",
+  "settingsLogoutLabel": "تسجيل الخروج",
+  "settingsLogoutSublabel": "الخروج من الحساب أو وضع الزائر",
+  "settingsBismillah": "بسم الله الرحمن الرحيم",
+  "settingsAppVersionLabel": "تقوى — v1.0.0",
+  "settingsTestNotifSheetTitle": "اختبار الإشعارات",
+  "settingsTestNotifPlainLabel": "إشعار عادي",
+  "settingsTestNotifPlainSublabel": "إشعار النظام التقليدي",
+  "settingsTestAdhanLabel": "أذان الصلاة",
+  "settingsTestAdhanSublabel": "شاشة الأذان الكاملة مع الصوت",
+  "settingsResetTitle": "إعادة الضبط",
+  "settingsResetConfirm": "هل تريد حذف جميع الإعدادات؟",
+  "settingsLogoutConfirm": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+  "settingsLogoutConfirmButton": "خروج",
+  "commonCancel": "إلغاء",
+  "commonDelete": "حذف",
+  "settingsTestNotifTitle": "اختبار الإشعار",
+  "settingsTestNotifBody": "الإشعارات تعمل بشكل صحيح"
 }

@@ -16,6 +16,7 @@ import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
+import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
@@ -56,6 +57,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await initializeDateFormatting('ar', null);
+  await initializeDateFormatting('en', null);
   await SupabaseConfig.initialize();
   AdhanForegroundService.initForegroundTask();
   // try {
@@ -167,31 +169,27 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
 
     return WithForegroundTask(
       child: MaterialApp(
-        title: 'تقوى',
+        onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
         debugShowCheckedModeBanner: false,
         navigatorKey: NotificationRouter.navigatorKey,
         themeMode: ref.watch(themeModeProvider),
         theme: isRamadan ? RamadanTheme.light : AppTheme.light,
         darkTheme: isRamadan ? RamadanTheme.dark : AppTheme.dark,
-        locale: const Locale('ar'),
+        // Driven by the language switcher in Settings (persisted via
+        // localeProvider); defaults to Arabic, matching today's behavior.
+        locale: ref.watch(localeProvider),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        // 'en' added so the ARB-backed strings resolve correctly if this
-        // app is ever driven by device locale instead of the hardcoded
-        // `locale:` above — doesn't change today's all-Arabic behavior.
-        supportedLocales: const [
-          Locale('ar'),
-          Locale('en'),
-        ],
+        supportedLocales: supportedAppLocales,
         // No manual Directionality override — MaterialApp's own
         // Localizations widget already derives it from `locale:` above
         // (WidgetsLocalizationAr resolves to TextDirection.rtl for 'ar'),
-        // so this now follows the active locale instead of being pinned
-        // to RTL, without changing today's behavior at all.
+        // so this follows the active locale automatically in both
+        // directions as the user switches language.
         initialRoute: Routes.splash,
         onGenerateRoute: AppRoutes.onGenerateRoute,
       ),

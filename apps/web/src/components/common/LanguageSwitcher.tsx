@@ -7,7 +7,6 @@ import { useTransition, useState, useRef, useEffect } from 'react';
 const LOCALES = [
 	{ code: 'ar', label: 'العربية', short: 'عربي', dir: 'rtl' },
 	{ code: 'en', label: 'English', short: 'EN', dir: 'ltr' },
-	{ code: 'fr', label: 'Français', short: 'FR', dir: 'ltr' },
 ] as const;
 
 type LocaleCode = (typeof LOCALES)[number]['code'];

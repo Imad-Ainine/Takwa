@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
+import 'package:takwa/core/providers/locale_provider.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -39,6 +41,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -61,7 +64,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   pinned: true,
                   leading: const CustomLeadingButton(),
                   title: Text(
-                    'الإعدادات',
+                    l10n.settingsScreenTitle,
                     style: context.typography.headingMedium.copyWith(
                       color: context.colors.gold,
                     ),
@@ -100,17 +103,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         data: (prefs) => Column(
                           children: [
                             // ── التذكيرات ──
-                            const SectionHeader(
-                              title: 'إعدادات الأذان و التنبيهات',
+                            SectionHeader(
+                              title: l10n.settingsAdhanSectionTitle,
                               icon: '🔔',
                             ),
                             SettingsCard(
                               children: [
                                 ActionSetting(
                                   icon: '🕌',
-                                  label: 'الأذان والتنبيهات',
+                                  label: l10n.settingsAdhanNotificationsLabel,
                                   sublabel:
-                                      'تخصيص الأذان، الوضع الصامت، والتنبيهات',
+                                      l10n.settingsAdhanNotificationsSublabel,
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -122,8 +125,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '🌙',
-                                  label: 'الاستيقاظ قبل الفجر',
-                                  sublabel: 'تنبيه بصوت الأذان في الوقت المحدد',
+                                  label: l10n.settingsWakeBeforeFajrLabel,
+                                  sublabel: l10n.settingsWakeBeforeFajrSublabel,
                                   value: prefs.wakeUpBeforeFajr,
                                   onChanged: (v) =>
                                       _updatePref('wake_up_before_fajr', v, category: NotificationCategory.prayer),
@@ -132,7 +135,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   const SettingsDivider(),
                                   TimeSetting(
                                     icon: '⏰',
-                                    label: 'وقت الاستيقاظ',
+                                    label: l10n.settingsWakeTimeLabel,
                                     time: prefs.wakeUpTime,
                                     onChanged: (t) async {
                                       final str =
@@ -144,8 +147,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '☀️',
-                                  label: 'أذكار الصباح',
-                                  sublabel: 'تذكير يومي الساعة ٦:٣٠ ص',
+                                  label: l10n.settingsMorningAdhkarLabel,
+                                  sublabel: l10n.settingsMorningAdhkarSublabel,
                                   value: prefs.morningAdhkarReminder,
                                   onChanged: (v) =>
                                       _updatePref('morning_adhkar_reminder', v),
@@ -153,8 +156,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '🌆',
-                                  label: 'أذكار المساء',
-                                  sublabel: 'تذكير يومي الساعة ٥:٠٠ م',
+                                  label: l10n.settingsEveningAdhkarLabel,
+                                  sublabel: l10n.settingsEveningAdhkarSublabel,
                                   value: prefs.eveningAdhkarReminder,
                                   onChanged: (v) =>
                                       _updatePref('evening_adhkar_reminder', v),
@@ -162,8 +165,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '📝',
-                                  label: 'محاسبة مسائية',
-                                  sublabel: 'تذكير يومي للمحاسبة',
+                                  label: l10n.settingsMuhasabaLabel,
+                                  sublabel: l10n.settingsMuhasabaSublabel,
                                   value: prefs.muhasabaReminder,
                                   onChanged: (v) =>
                                       _updatePref('muhasaba_reminder', v, category: NotificationCategory.reminders),
@@ -171,8 +174,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '🤲',
-                                  label: 'الأدعية اليومية',
-                                  sublabel: 'نفحات من الأدعية النبوية',
+                                  label: l10n.settingsDailyDuasLabel,
+                                  sublabel: l10n.settingsDailyDuasSublabel,
                                   value: prefs.dailyDuasOn,
                                   onChanged: (v) =>
                                       _updatePref('daily_duas_on', v),
@@ -180,8 +183,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '🕌',
-                                  label: 'سنن الجمعة',
-                                  sublabel: 'تذكير بسورة الكهف والجمعة',
+                                  label: l10n.settingsFridaySunnahLabel,
+                                  sublabel: l10n.settingsFridaySunnahSublabel,
                                   value: prefs.specialRemindersOn,
                                   onChanged: (v) =>
                                       _updatePref('special_reminders_on', v),
@@ -189,8 +192,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 const SettingsDivider(),
                                 ToggleSetting(
                                   icon: '🥘',
-                                  label: 'تنبيهات الصيام',
-                                  sublabel: 'الاثنين والخميس والأيام البيض',
+                                  label: l10n.settingsFastingRemindersLabel,
+                                  sublabel: l10n.settingsFastingRemindersSublabel,
                                   value: prefs.fastingRemindersOn,
                                   onChanged: (v) =>
                                       _updatePref('fasting_reminders_on', v),
@@ -199,7 +202,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   const SettingsDivider(),
                                   TimeSetting(
                                     icon: '⏰',
-                                    label: 'وقت المحاسبة',
+                                    label: l10n.settingsMuhasabaTimeLabel,
                                     time: prefs.muhasabaTime,
                                     onChanged: (t) async {
                                       final str =
@@ -217,17 +220,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const OverlayNotificationSettings(),
 
                             // ── المظهر ──
-                            const SectionHeader(title: 'المظهر', icon: '🎨'),
+                            SectionHeader(
+                              title: l10n.settingsAppearanceSectionTitle,
+                              icon: '🎨',
+                            ),
                             SettingsCard(
                               children: [
                                 SelectSetting(
                                   icon: '🌓',
-                                  label: 'وضع المظهر',
+                                  label: l10n.settingsThemeModeLabel,
                                   value: ref.watch(themeModeProvider).name,
-                                  options: const {
-                                    'system': 'تلقائي (حسب النظام)',
-                                    'light': 'الوضع الفاتح',
-                                    'dark': 'الوضع الداكن',
+                                  options: {
+                                    'system': l10n.themeModeSystem,
+                                    'light': l10n.themeModeLight,
+                                    'dark': l10n.themeModeDark,
                                   },
                                   onChanged: (v) {
                                     final mode = ThemeMode.values.firstWhere(
@@ -238,18 +244,38 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                         .setTheme(mode);
                                   },
                                 ),
+                                const SettingsDivider(),
+                                SelectSetting(
+                                  icon: '🌐',
+                                  label: l10n.settingsLanguageLabel,
+                                  value: ref
+                                      .watch(localeProvider)
+                                      .languageCode,
+                                  options: {
+                                    'ar': l10n.languageArabic,
+                                    'en': l10n.languageEnglish,
+                                  },
+                                  onChanged: (v) {
+                                    ref
+                                        .read(localeProvider.notifier)
+                                        .setLocale(Locale(v));
+                                  },
+                                ),
                               ],
                             ),
                             const SizedBox(height: 16),
 
                             // ── وضع رمضان ──
-                            const SectionHeader(title: 'وضع رمضان', icon: '🌙'),
+                            SectionHeader(
+                              title: l10n.settingsRamadanSectionTitle,
+                              icon: '🌙',
+                            ),
                             SettingsCard(
                               children: [
                                 ToggleSetting(
                                   icon: '🌙',
-                                  label: 'وضع رمضان',
-                                  sublabel: 'تفعيل المميزات الرمضانية',
+                                  label: l10n.settingsRamadanSectionTitle,
+                                  sublabel: l10n.settingsRamadanModeSublabel,
                                   value: prefs.ramadanMode,
                                   onChanged: (v) =>
                                       _updatePref('ramadan_mode', v),
@@ -263,20 +289,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
 
                       // ── معلومات ──
-                      const SectionHeader(title: 'التطبيق', icon: 'ℹ️'),
+                      SectionHeader(title: l10n.settingsAppSectionTitle, icon: 'ℹ️'),
                       SettingsCard(
                         children: [
                           ActionSetting(
                             icon: '🔔',
-                            label: 'اختبار الإشعارات والنافذة',
-                            sublabel: 'تأكد من عمل الإشعارات والنوافذ العائمة',
+                            label: l10n.settingsTestNotifLabel,
+                            sublabel: l10n.settingsTestNotifSublabel,
                             onTap: _showTestMenu,
                           ),
                           const SettingsDivider(),
                           ActionSetting(
                             icon: '💎',
-                            label: 'الاشتراك',
-                            sublabel: 'دعم المشروع والاستمرار',
+                            label: l10n.settingsSubscriptionLabel,
+                            sublabel: l10n.settingsSubscriptionSublabel,
                             onTap: () => Navigator.pushNamed(
                               context,
                               Routes.subscription,
@@ -285,24 +311,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           const SettingsDivider(),
                           ActionSetting(
                             icon: '👨‍💻',
-                            label: 'عن المطور',
-                            sublabel: 'تعرف على مبرمج التطبيق',
+                            label: l10n.settingsAboutDevLabel,
+                            sublabel: l10n.settingsAboutDevSublabel,
                             onTap: () =>
                                 Navigator.pushNamed(context, '/about-me'),
                           ),
                           const SettingsDivider(),
                           ActionSetting(
                             icon: '📜',
-                            label: 'الشروط والخصوصية',
-                            sublabel: 'شروط الدخول والخصوصية',
+                            label: l10n.settingsTermsLabel,
+                            sublabel: l10n.settingsTermsSublabel,
                             onTap: () => Navigator.pushNamed(context, '/terms'),
                           ),
                           if (ref.watch(authStatusProvider) ==
                               AuthStatus.authenticated)
                             ActionSetting(
                               icon: '🚪',
-                              label: 'تسجيل الخروج',
-                              sublabel: 'الخروج من الحساب أو وضع الزائر',
+                              label: l10n.settingsLogoutLabel,
+                              sublabel: l10n.settingsLogoutSublabel,
                               onTap: _handleLogout,
                               isDestructive: true,
                             ),
@@ -315,7 +341,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: Column(
                           children: [
                             Text(
-                              'بسم الله الرحمن الرحيم',
+                              l10n.settingsBismillah,
                               style: TextStyle(
                                 fontFamily: 'Amiri',
                                 fontSize: 14,
@@ -324,7 +350,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'تقوى — v1.0.0',
+                              l10n.settingsAppVersionLabel,
                               style: TextStyle(
                                 fontFamily: 'NotoNaskhArabic',
                                 fontSize: 11,
@@ -347,6 +373,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showTestMenu() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: context.colors.background,
@@ -368,7 +395,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: 14),
             Text(
-              'اختبار الإشعارات',
+              l10n.settingsTestNotifSheetTitle,
               style: TextStyle(
                 fontFamily: 'Amiri',
                 fontSize: 18,
@@ -378,13 +405,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 14),
             ActionSetting(
               icon: '🔔',
-              label: 'إشعار عادي',
-              sublabel: 'إشعار النظام التقليدي',
+              label: l10n.settingsTestNotifPlainLabel,
+              sublabel: l10n.settingsTestNotifPlainSublabel,
               onTap: () {
                 Navigator.pop(context);
                 NotificationsService.showAchievementNotif(
-                  title: 'اختبار الإشعار',
-                  body: 'الإشعارات تعمل بشكل صحيح',
+                  title: l10n.settingsTestNotifTitle,
+                  body: l10n.settingsTestNotifBody,
                   emoji: '✅',
                   points: 0,
                 );
@@ -393,14 +420,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SettingsDivider(),
             ActionSetting(
               icon: '🕌',
-              label: 'أذان الصلاة',
-              sublabel: 'شاشة الأذان الكاملة مع الصوت',
+              label: l10n.settingsTestAdhanLabel,
+              sublabel: l10n.settingsTestAdhanSublabel,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => const AdhanOverlayScreen(
-                      prayerName: 'العصر',
+                    builder: (_) => AdhanOverlayScreen(
+                      prayerName: l10n.prayerAsr,
                       autoPlay: true,
                     ),
                   ),
@@ -414,6 +441,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _resetSettings() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -423,7 +451,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           side: BorderSide(color: context.colors.border),
         ),
         title: Text(
-          'إعادة الضبط',
+          l10n.settingsResetTitle,
           style: TextStyle(
             fontFamily: 'Amiri',
             fontSize: 18,
@@ -431,7 +459,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
         content: Text(
-          'هل تريد حذف جميع الإعدادات؟',
+          l10n.settingsResetConfirm,
           style: TextStyle(
             fontFamily: 'NotoNaskhArabic',
             fontSize: 13,
@@ -442,7 +470,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'إلغاء',
+              l10n.commonCancel,
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
@@ -453,7 +481,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'حذف',
+              l10n.commonDelete,
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
@@ -468,6 +496,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _handleLogout() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -477,7 +506,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           side: BorderSide(color: context.colors.border),
         ),
         title: Text(
-          'تسجيل الخروج',
+          l10n.settingsLogoutLabel,
           style: TextStyle(
             fontFamily: 'Amiri',
             fontSize: 18,
@@ -485,7 +514,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
         content: Text(
-          'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+          l10n.settingsLogoutConfirm,
           style: TextStyle(
             fontFamily: 'NotoNaskhArabic',
             fontSize: 13,
@@ -496,7 +525,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'إلغاء',
+              l10n.commonCancel,
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
@@ -507,7 +536,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              'خروج',
+              l10n.settingsLogoutConfirmButton,
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,

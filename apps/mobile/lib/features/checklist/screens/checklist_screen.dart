@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:hijri/hijri_calendar.dart';
 
+import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/database/app_database.dart';
@@ -86,7 +87,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
 
     final hijri = HijriCalendar.now();
     final hijriStr =
-        '${hijri.hDay} ${_hijriMonth(hijri.hMonth)} ${hijri.hYear}';
+        '${hijri.hDay} ${_hijriMonth(context, hijri.hMonth)} ${hijri.hYear}';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -108,7 +109,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
               ),
               error: (e, _) => Center(
                 child: Text(
-                  'خطأ: $e',
+                  AppLocalizations.of(context)!.checklistErrorPrefix(e.toString()),
                   style: context.typography.bodyMedium.copyWith(
                     color: context.colors.danger,
                   ),
@@ -188,20 +189,23 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
     );
   }
 
-  static String _hijriMonth(int m) => const [
-    'محرم',
-    'صفر',
-    'ربيع الأول',
-    'ربيع الآخر',
-    'جمادى الأولى',
-    'جمادى الآخرة',
-    'رجب',
-    'شعبان',
-    'رمضان',
-    'شوال',
-    'ذو القعدة',
-    'ذو الحجة',
-  ][m - 1];
+  static String _hijriMonth(BuildContext context, int m) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.hijriMuharram,
+      l10n.hijriSafar,
+      l10n.hijriRabiAlAwwal,
+      l10n.hijriRabiAlThani,
+      l10n.hijriJumadaAlAwwal,
+      l10n.hijriJumadaAlThani,
+      l10n.hijriRajab,
+      l10n.hijriShaban,
+      l10n.hijriRamadan,
+      l10n.hijriShawwal,
+      l10n.hijriDhulQadah,
+      l10n.hijriDhulHijjah,
+    ][m - 1];
+  }
 }
 
 class _TopBar extends StatelessWidget {
@@ -236,7 +240,7 @@ class _TopBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'محاسبة اليوم',
+                  AppLocalizations.of(context)!.checklistTitle,
                   style: context.typography.headingMedium.copyWith(
                     fontSize: 22,
                     color: context.colors.gold,
@@ -257,7 +261,7 @@ class _TopBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               _PointsPill(
-                label: 'الصافي',
+                label: AppLocalizations.of(context)!.checklistNetPointsLabel,
                 value: netPoints,
                 color: netPoints >= 0
                     ? context.colors.gold
@@ -314,7 +318,7 @@ class _PointsPill extends StatelessWidget {
         border: Border.all(color: color.withOpacity(0.25)),
       ),
       child: Text(
-        '$label$value نقطة',
+        '$label$value${AppLocalizations.of(context)!.checklistPointsSuffix}',
         style: context.typography.bodySmall.copyWith(
           fontSize: small ? 10 : 12,
           color: color,
@@ -361,7 +365,7 @@ class _DayProgressBar extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'إنجاز اليوم',
+                AppLocalizations.of(context)!.checklistTodayProgress,
                 style: context.typography.bodySmall.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -382,7 +386,7 @@ class _DayProgressBar extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _motivate(pct),
+                _motivate(context, pct),
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
                 ),
@@ -402,11 +406,12 @@ class _DayProgressBar extends ConsumerWidget {
     );
   }
 
-  String _motivate(double p) {
-    if (p >= 1.0) return 'يوم مكتمل الحمد لله ✨';
-    if (p >= 0.7) return 'رائع، أنت على الطريق 💪';
-    if (p >= 0.4) return 'استمر، لا تتوقف 🌿';
-    return 'البداية الآن 🤲';
+  String _motivate(BuildContext context, double p) {
+    final l10n = AppLocalizations.of(context)!;
+    if (p >= 1.0) return l10n.checklistMotivationComplete;
+    if (p >= 0.7) return l10n.checklistMotivationGreat;
+    if (p >= 0.4) return l10n.checklistMotivationKeepGoing;
+    return l10n.checklistMotivationStart;
   }
 }
 
@@ -498,13 +503,21 @@ class _PrayersGroup extends ConsumerWidget {
   final DailyRecord? record;
   const _PrayersGroup({required this.record});
 
-  static const _prayers = [
-    ('الفجر', '🌅', 'fajr'),
-    ('الظهر', '☀️', 'dhuhr'),
-    ('العصر', '🌤', 'asr'),
-    ('المغرب', '🌆', 'maghrib'),
-    ('العشاء', '🌃', 'isha'),
+  static const _prayerKeys = [
+    ('🌅', 'fajr'),
+    ('☀️', 'dhuhr'),
+    ('🌤', 'asr'),
+    ('🌆', 'maghrib'),
+    ('🌃', 'isha'),
   ];
+
+  static String _prayerName(AppLocalizations l10n, String key) => switch (key) {
+    'fajr' => l10n.prayerFajr,
+    'dhuhr' => l10n.prayerDhuhr,
+    'asr' => l10n.prayerAsr,
+    'maghrib' => l10n.prayerMaghrib,
+    _ => l10n.prayerIsha,
+  };
 
   PrayerStatus _statusOf(String key) {
     if (record == null) return PrayerStatus.pending;
@@ -518,21 +531,23 @@ class _PrayersGroup extends ConsumerWidget {
     };
   }
 
-  int get _countPerformed =>
-      _prayers.where((p) => _statusOf(p.$3) == PrayerStatus.performed).length;
+  int get _countPerformed => _prayerKeys
+      .where((p) => _statusOf(p.$2) == PrayerStatus.performed)
+      .length;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return _GroupCard(
       icon: '🕌',
-      title: 'الصلوات الخمس',
+      title: l10n.checklistFivePrayersTitle,
       trailing: '$_countPerformed / ٥',
       trailingColor: context.colors.gold,
-      children: _prayers.map((p) {
-        final status = _statusOf(p.$3);
+      children: _prayerKeys.map((p) {
+        final status = _statusOf(p.$2);
         return _PrayerRow(
-          emoji: p.$2,
-          name: p.$1,
+          emoji: p.$1,
+          name: _prayerName(l10n, p.$2),
           status: status,
           onStatusChange: (newStatus) async {
             HapticFeedback.selectionClick();
@@ -543,7 +558,7 @@ class _PrayersGroup extends ConsumerWidget {
                 .read(dailyRecordDaoProvider)
                 .updatePrayerStatus(
                   recordId: rec.id,
-                  prayerName: p.$3,
+                  prayerName: p.$2,
                   status: newStatus,
                 );
             // Sync to Supabase
@@ -577,13 +592,16 @@ class _PrayerRow extends StatelessWidget {
     _ => context.colors.textDim,
   };
 
-  String get _statusLabel => switch (status) {
-    PrayerStatus.performed => 'في وقتها ✓',
-    PrayerStatus.qadaa => 'قضاء',
-    PrayerStatus.missed => 'فاتت',
-    PrayerStatus.pending => 'لم تُؤدَّ بعد',
-    _ => 'لم يحن وقتها',
-  };
+  String _statusLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return switch (status) {
+      PrayerStatus.performed => l10n.prayerStatusOnTimeShort,
+      PrayerStatus.qadaa => l10n.prayerStatusQadaaShort,
+      PrayerStatus.missed => l10n.prayerStatusMissedShort,
+      PrayerStatus.pending => l10n.prayerStatusPendingShort,
+      _ => l10n.prayerStatusNotDueShort,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -596,7 +614,8 @@ class _PrayerRow extends StatelessWidget {
     // uncoordinated stop for a screen reader — see the audit's "i18n &
     // Accessibility" section.
     return Semantics(
-      label: '$name، $_statusLabel',
+      label:
+          '$name${AppLocalizations.of(context)!.semanticsSeparator}${_statusLabel(context)}',
       button: true,
       onTap: () => _showStatusPicker(context),
       excludeSemantics: true,
@@ -664,7 +683,7 @@ class _PrayerRow extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    _statusLabel,
+                    _statusLabel(context),
                     style: context.typography.caption.copyWith(
                       fontSize: 10,
                       color: _rowColor(context),
@@ -719,13 +738,35 @@ class _PrayerStatusSheet extends StatelessWidget {
     required this.onSelect,
   });
 
-  List<(PrayerStatus, String, String, Color)> _options(BuildContext context) =>
-      [
-        (PrayerStatus.performed, 'أُديت في وقتها', '✅', context.colors.success),
-        (PrayerStatus.qadaa, 'قُضيت خارج الوقت', '🔄', context.colors.warning),
-        (PrayerStatus.missed, 'فاتت (استغفر الله)', '❌', context.colors.danger),
-        (PrayerStatus.pending, 'لم تُؤدَّ بعد', '⏳', context.colors.textDim),
-      ];
+  List<(PrayerStatus, String, String, Color)> _options(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      (
+        PrayerStatus.performed,
+        l10n.prayerStatusPerformedFull,
+        '✅',
+        context.colors.success,
+      ),
+      (
+        PrayerStatus.qadaa,
+        l10n.prayerStatusQadaaFull,
+        '🔄',
+        context.colors.warning,
+      ),
+      (
+        PrayerStatus.missed,
+        l10n.prayerStatusMissedFull,
+        '❌',
+        context.colors.danger,
+      ),
+      (
+        PrayerStatus.pending,
+        l10n.prayerStatusPendingShort,
+        '⏳',
+        context.colors.textDim,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -735,7 +776,7 @@ class _PrayerStatusSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'صلاة $prayerName',
+            AppLocalizations.of(context)!.checklistPrayerSheetTitle(prayerName),
             style: context.typography.headingMedium.copyWith(
               fontSize: 18,
               color: context.colors.gold,
@@ -827,17 +868,18 @@ class _IbadahGroup extends ConsumerWidget {
       quranCtrl.text = record!.quranPages.toString();
     }
 
+    final l10n = AppLocalizations.of(context)!;
     return _GroupCard(
       icon: '📖',
-      title: 'القرآن والأذكار',
+      title: l10n.checklistQuranAdhkarTitle,
       children: [
         _QuranInput(record: record, ctrl: quranCtrl),
         const SizedBox(height: 8),
 
         _ToggleRow(
           emoji: '🌅',
-          label: 'أذكار الصباح',
-          sublabel: 'بعد صلاة الفجر',
+          label: l10n.ibadahMorningAdhkarLabel,
+          sublabel: l10n.ibadahMorningAdhkarSublabel,
           points: '+٥',
           value: record?.morningAdhkar ?? false,
           onChanged: (v) async {
@@ -857,8 +899,8 @@ class _IbadahGroup extends ConsumerWidget {
 
         _ToggleRow(
           emoji: '🌆',
-          label: 'أذكار المساء',
-          sublabel: 'بعد صلاة العصر',
+          label: l10n.ibadahEveningAdhkarLabel,
+          sublabel: l10n.ibadahEveningAdhkarSublabel,
           points: '+٥',
           value: record?.eveningAdhkar ?? false,
           onChanged: (v) async {
@@ -878,8 +920,8 @@ class _IbadahGroup extends ConsumerWidget {
 
         _ToggleRow(
           emoji: '🌌',
-          label: 'قيام الليل',
-          sublabel: 'الثلث الأخير من الليل',
+          label: l10n.ibadahQiyamLabel,
+          sublabel: l10n.ibadahQiyamSublabel,
           points: '+١٥',
           value: record?.nightPrayer ?? false,
           onChanged: (v) async {
@@ -899,8 +941,8 @@ class _IbadahGroup extends ConsumerWidget {
 
         _ToggleRow(
           emoji: '💧',
-          label: 'الصدقة',
-          sublabel: 'ولو بكلمة طيبة',
+          label: l10n.ibadahSadaqahLabel,
+          sublabel: l10n.ibadahSadaqahSublabel,
           points: '+١٠',
           value: record?.sadaqah ?? false,
           onChanged: (v) async {
@@ -917,8 +959,8 @@ class _IbadahGroup extends ConsumerWidget {
         ),
         _ToggleRow(
           emoji: '👁️',
-          label: 'غضّ البصر',
-          sublabel: 'حفظ النظر عن الحرام',
+          label: l10n.ibadahGhadhBasarLabel,
+          sublabel: l10n.ibadahGhadhBasarSublabel,
           points: '+١٠',
           value: record?.ghadhBasar ?? false,
           onChanged: (v) async {
@@ -969,14 +1011,14 @@ class _QuranInput extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'تلاوة القرآن الكريم',
+                  AppLocalizations.of(context)!.checklistQuranInputLabel,
                   style: context.typography.bodyMedium.copyWith(
                     fontSize: 13,
                     color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
-                  'أدخل عدد الصفحات التي قرأتها',
+                  AppLocalizations.of(context)!.checklistQuranPagesHint,
                   style: context.typography.caption.copyWith(
                     fontSize: 10,
                     color: context.colors.textSecondary,
@@ -1049,7 +1091,7 @@ class _QuranInput extends ConsumerWidget {
             ),
           ),
           Text(
-            '/صفحة',
+            AppLocalizations.of(context)!.checklistQuranPageSuffix,
             style: context.typography.caption.copyWith(
               fontSize: 9,
               color: context.colors.textDim,
@@ -1081,7 +1123,7 @@ class _ToggleRow extends StatelessWidget {
     // One "$label, on/off" toggle node instead of the checkmark circle,
     // emoji, label, sublabel and points chip each being a separate stop.
     return Semantics(
-      label: '$label، $sublabel',
+      label: '$label${AppLocalizations.of(context)!.semanticsSeparator}$sublabel',
       toggled: value,
       onTap: () {
         HapticFeedback.selectionClick();
@@ -1175,6 +1217,7 @@ class _FastingSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final current = record?.fastingType ?? FastingType.none;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 7),
@@ -1198,7 +1241,7 @@ class _FastingSelector extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'الصيام',
+                  l10n.checklistFastingLabel,
                   style: context.typography.bodyMedium.copyWith(
                     fontSize: 13,
                     color: context.colors.textPrimary,
@@ -1216,7 +1259,7 @@ class _FastingSelector extends ConsumerWidget {
           Row(
             children: [
               _fastChip(
-                'فريضة',
+                l10n.fastingTypeFard,
                 FastingType.fard,
                 current,
                 context.colors.gold,
@@ -1225,7 +1268,7 @@ class _FastingSelector extends ConsumerWidget {
               ),
               const SizedBox(width: 6),
               _fastChip(
-                'نافلة',
+                l10n.fastingTypeNafl,
                 FastingType.nafl,
                 current,
                 context.colors.teal,
@@ -1234,7 +1277,7 @@ class _FastingSelector extends ConsumerWidget {
               ),
               const SizedBox(width: 6),
               _fastChip(
-                'لم أصم',
+                l10n.fastingTypeNone,
                 FastingType.none,
                 current,
                 context.colors.textDim,
@@ -1301,23 +1344,37 @@ class _ProhibitionsGroup extends ConsumerWidget {
   const _ProhibitionsGroup({required this.record});
 
   static const _items = [
-    (ProhibitionCategory.gheeba, '🗣️', 'الغيبة', 'ذكر الناس بما يكرهون'),
-    (ProhibitionCategory.nameema, '👂', 'النميمة', 'نقل الكلام بقصد الإفساد'),
-    (ProhibitionCategory.kadhb, '🚫', 'الكذب', 'قول غير الحق'),
-    (ProhibitionCategory.ghaDab, '😠', 'الغضب', 'إن غضبت فاسكت'),
-    (
-      ProhibitionCategory.idaatWaqt,
-      '📱',
-      'إضاعة الوقت',
-      'التقصير في استثمار الوقت',
-    ),
+    (ProhibitionCategory.gheeba, '🗣️'),
+    (ProhibitionCategory.nameema, '👂'),
+    (ProhibitionCategory.kadhb, '🚫'),
+    (ProhibitionCategory.ghaDab, '😠'),
+    (ProhibitionCategory.idaatWaqt, '📱'),
   ];
+
+  static (String, String) _text(AppLocalizations l10n, ProhibitionCategory c) {
+    switch (c) {
+      case ProhibitionCategory.gheeba:
+        return (l10n.prohibitionGheebaName, l10n.prohibitionGheebaDesc);
+      case ProhibitionCategory.nameema:
+        return (l10n.prohibitionNameemaName, l10n.prohibitionNameemaDesc);
+      case ProhibitionCategory.kadhb:
+        return (l10n.prohibitionKadhbName, l10n.prohibitionKadhbDesc);
+      case ProhibitionCategory.ghaDab:
+        return (l10n.prohibitionGhadabName, l10n.prohibitionGhadabDesc);
+      case ProhibitionCategory.idaatWaqt:
+        return (l10n.prohibitionIdaatWaqtName, l10n.prohibitionIdaatWaqtDesc);
+      case ProhibitionCategory.ghadhBasar:
+      case ProhibitionCategory.custom:
+        throw StateError('Not a checklist prohibition category: $c');
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return _GroupCard(
       icon: '⚠️',
-      title: 'المحظورات والمهلكات',
+      title: l10n.checklistProhibitionsTitle,
       titleColor: context.colors.danger,
       children: [
         Container(
@@ -1334,7 +1391,7 @@ class _ProhibitionsGroup extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'حدد ما وقعت فيه اليوم بصدق مع نفسك',
+                  l10n.checklistProhibitionsSubtitle,
                   style: context.typography.caption.copyWith(
                     fontSize: 11,
                     color: context.colors.danger.withOpacity(0.8),
@@ -1344,15 +1401,16 @@ class _ProhibitionsGroup extends ConsumerWidget {
             ],
           ),
         ),
-        ..._items.map(
-          (item) => _ProhibitionRow(
+        ..._items.map((item) {
+          final (name, desc) = _text(l10n, item.$1);
+          return _ProhibitionRow(
             category: item.$1,
             emoji: item.$2,
-            name: item.$3,
-            desc: item.$4,
+            name: name,
+            desc: desc,
             recordId: record?.id,
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
@@ -1444,7 +1502,8 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           // One "$name, committed/not committed" toggle node instead of
           // the checkmark box being an unlabeled stop on its own.
           Semantics(
-            label: '${widget.name}، ${widget.desc}',
+            label:
+                '${widget.name}${AppLocalizations.of(context)!.semanticsSeparator}${widget.desc}',
             toggled: _committed,
             onTap: _toggle,
             excludeSemantics: true,
@@ -1506,7 +1565,9 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           ),
           if (_committed) ...[
             Semantics(
-              label: 'زد عدد مرات ${widget.name}، حدث $_count مرة',
+              label: AppLocalizations.of(
+                context,
+              )!.checklistIncrementSemanticLabel(widget.name, _count),
               button: true,
               onTap: _increment,
               excludeSemantics: true,
@@ -1581,9 +1642,10 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return _GroupCard(
       icon: '📝',
-      title: 'ملاحظة اليوم',
+      title: l10n.checklistNoteTitle,
       children: [
         TextFormField(
           controller: _ctrl,
@@ -1595,7 +1657,7 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
             height: 1.8,
           ),
           decoration: InputDecoration(
-            hintText: 'اكتب ملاحظتك أو دعاءك لهذا اليوم...',
+            hintText: l10n.checklistNoteHint,
             hintStyle: context.typography.caption.copyWith(
               fontSize: 12,
               color: context.colors.textDim,
@@ -1624,7 +1686,7 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
         const SizedBox(height: 8),
         PrimaryButton(
           onTap: _saving ? null : () async => _save(),
-          label: 'حفظ الملاحظة',
+          label: l10n.checklistNoteSaveButton,
           isLoading: _saving,
         ),
       ],
@@ -1652,7 +1714,7 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تم الحفظ ✓',
+            AppLocalizations.of(context)!.checklistNoteSaved,
             style: context.typography.bodySmall.copyWith(fontSize: 13),
           ),
           backgroundColor: context.colors.success,

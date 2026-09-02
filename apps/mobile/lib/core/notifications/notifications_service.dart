@@ -15,6 +15,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/app/main_shell.dart' show currentTabProvider;
 
 // ─────────────────────────────────────────
 //  NOTIFICATION IDs
@@ -1139,7 +1140,7 @@ class NotificationRouter {
         Navigator.pushNamed(ctx, Routes.prayer);
         break;
       case 'muhasaba':
-        Navigator.pushNamed(ctx, Routes.checklist);
+        _goToShellTab(ctx, 2); // المحاسبة
         break;
       case 'adhkar':
         Navigator.pushNamed(ctx, Routes.adhkar);
@@ -1148,14 +1149,39 @@ class NotificationRouter {
         Navigator.pushNamed(ctx, Routes.duas);
         break;
       case 'achievement':
-        Navigator.pushNamed(ctx, Routes.statistics);
+        _goToShellTab(ctx, 3); // إحصائيات
         break;
       case 'reminder':
-        Navigator.pushNamed(ctx, Routes.home);
+        _goToShellTab(ctx, 0); // الرئيسية
         break;
       case 'ramadan':
         Navigator.pushNamed(ctx, Routes.prayer);
         break;
+    }
+  }
+
+  /// Switches to a tab on the already-mounted [MainShell] instead of
+  /// pushing a brand-new one on top of it. `Routes.checklist` /
+  /// `.statistics` / `.home` all resolve to `MainShell(initialIndex: ...)`,
+  /// so pushing them by name (as this used to do) stacked a second, fully
+  /// independent shell — with its own bottom nav — on every notification
+  /// tap while the app was already open, leaving the back button landing
+  /// on a confusing duplicate screen instead of just switching tabs.
+  static void _goToShellTab(BuildContext ctx, int tabIndex) {
+    final navigator = Navigator.of(ctx);
+    try {
+      ProviderScope.containerOf(
+        ctx,
+        listen: false,
+      ).read(currentTabProvider.notifier).state = tabIndex;
+    } catch (_) {
+      // No ProviderScope above this context (shouldn't happen once the
+      // shell is mounted) — fall back to a plain named push below.
+    }
+    if (navigator.canPop()) {
+      navigator.popUntil((route) => route.isFirst);
+    } else {
+      Navigator.pushNamed(ctx, Routes.home);
     }
   }
 

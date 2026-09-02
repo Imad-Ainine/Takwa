@@ -1,6 +1,6 @@
 name: takwa
-description: 'تطبيق تقوى - تطبيق إسلامي يومي للمحاسبة والمتابعة'
-publish_to: 'none'
+description: "تطبيق تقوى - تطبيق إسلامي يومي للمحاسبة والمتابعة"
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -106,7 +106,6 @@ flutter:
     - assets/sounds/
     - assets/images/
     - assets/
-    - .env
   fonts:
     - family: Amiri
       fonts:
