@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:takwa/core/providers/database_providers.dart';
-import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
@@ -23,13 +21,44 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
   final _confirmPassCtrl = TextEditingController();
   bool _loading = false;
   String? _error;
+  double _passStrength = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _passCtrl.addListener(_updatePassStrength);
+  }
+
+  void _updatePassStrength() {
+    final p = _passCtrl.text;
+    double s = 0;
+    if (p.length >= 6) s += 0.25;
+    if (p.length >= 10) s += 0.25;
+    if (p.contains(RegExp(r'[A-Z]'))) s += 0.25;
+    if (p.contains(RegExp(r'[0-9!@#\$%^&*]'))) s += 0.25;
+    setState(() => _passStrength = s);
+  }
+
+  @override
+  void dispose() {
+    _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _updatePassword() async {
-    if (_passCtrl.text.isEmpty) {
+    final password = _passCtrl.text;
+    final confirmPassword = _confirmPassCtrl.text;
+
+    if (password.isEmpty) {
       setState(() => _error = 'أدخل كلمة المرور الجديدة');
       return;
     }
-    if (_passCtrl.text != _confirmPassCtrl.text) {
+    if (password.length < 6) {
+      setState(() => _error = 'كلمة المرور يجب أن تتكون من 6 خانات على الأقل');
+      return;
+    }
+    if (password != confirmPassword) {
       setState(() => _error = 'كلمات المرور غير متطابقة');
       return;
     }
@@ -41,29 +70,66 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
 
     try {
       await Supabase.instance.client.auth.updateUser(
-        UserAttributes(password: _passCtrl.text),
+        UserAttributes(password: password),
       );
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم تحديث كلمة المرور بنجاح ✓')),
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle_rounded, color: Colors.white),
+                SizedBox(width: 8),
+                Text('تم تعيين كلمة المرور الجديدة بنجاح ✓'),
+              ],
+            ),
+            backgroundColor: const Color(0xFF10B981),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
         );
-        Navigator.pushReplacementNamed(context, Routes.auth);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.auth,
+          (route) => false,
+        );
       }
     } on AuthException catch (e) {
-      setState(() => _error = e.message);
+      if (mounted) {
+        setState(() => _error = _mapAuthError(e.message));
+      }
     } catch (_) {
-      setState(() => _error = 'حدث خطأ غير متوقع');
+      if (mounted) {
+        setState(() => _error = 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً');
+      }
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
+  }
+
+  String _mapAuthError(String message) {
+    final msg = message.toLowerCase();
+    if (msg.contains('same password')) {
+      return 'كلمة المرور الجديدة مطابقة لكلمة المرور الحالية';
+    }
+    if (msg.contains('password should')) {
+      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+    }
+    if (msg.contains('session')) {
+      return 'انتهت صلاحية الجلسة، يرجى طلب رمز استعادة جديد';
+    }
+    return 'تعذر تحديث كلمة المرور، حاول مجدداً';
   }
 
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
-    // Assuming AdaptiveStyle is available in the project as seen in auth_screen.dart
-    // For now using basic context.colors
+
     return Scaffold(
       body: Stack(
         children: [
@@ -75,50 +141,134 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'تحديث كلمة المرور',
-                      style: context.typography.headingLarge.copyWith(
-                        color: context.colors.gold,
+                    // Icon
+                    Container(
+                      width: 84,
+                      height: 84,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [s.card, s.bg],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        border: Border.all(
+                          color: s.gold.withOpacity(0.5),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: s.gold.withOpacity(0.2),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ],
                       ),
+                      child: Center(
+                        child: Icon(
+                          Icons.lock_reset_rounded,
+                          color: s.gold,
+                          size: 40,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Title
+                    Text(
+                      'تعيين كلمة مرور جديدة',
+                      style: s.amiri(32, weight: FontWeight.w700),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
+
+                    // Subtitle
                     Text(
-                      'قم بإدخال كلمة المرور الجديدة لحسابك',
-                      style: context.typography.bodyMedium.copyWith(
-                        color: context.colors.textSecondary,
-                      ),
+                      'قم بإدخال كلمة المرور الجديدة لحسابك لتسجيل الدخول بأمان',
+                      style: s.naskh(13, color: s.textSec),
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
+
+                    // Password Field
                     AuthField(
                       ctrl: _passCtrl,
                       hint: 'كلمة المرور الجديدة',
                       icon: Icons.lock_outline_rounded,
                       isPassword: true,
                       style: s,
+                      onChanged: (_) {
+                        if (_error != null) setState(() => _error = null);
+                      },
                     ),
-                    const SizedBox(height: 16),
-                    AuthField(
-                      ctrl: _confirmPassCtrl,
-                      hint: 'تأكيد كلمة المرور',
-                      icon: Icons.lock_reset_rounded,
-                      isPassword: true,
-                      style: s,
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        _error!,
-                        style: const TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 13,
+
+                    // Strength bar
+                    if (_passCtrl.text.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: PasswordStrengthBar(
+                          strength: _passStrength,
+                          style: s,
                         ),
                       ),
                     ],
+
+                    const SizedBox(height: 16),
+
+                    // Confirm Password Field
+                    AuthField(
+                      ctrl: _confirmPassCtrl,
+                      hint: 'تأكيد كلمة المرور الجديدة',
+                      icon: Icons.lock_clock_outlined,
+                      isPassword: true,
+                      style: s,
+                      onChanged: (_) {
+                        if (_error != null) setState(() => _error = null);
+                      },
+                    ),
+
+                    // Error banner
+                    if (_error != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.redAccent.withOpacity(0.4),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.redAccent,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _error!,
+                                style: s.naskh(12, color: Colors.redAccent),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+
                     const SizedBox(height: 32),
+
+                    // Submit Button
                     PrimaryButton(
                       onTap: _loading ? null : _updatePassword,
-                      label: _loading ? 'جاري التحديث...' : 'تحديث كلمة المرور',
+                      label: _loading
+                          ? 'جاري الحفظ...'
+                          : 'حفظ كلمة المرور والدخول',
                     ),
                   ],
                 ),

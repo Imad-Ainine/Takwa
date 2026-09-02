@@ -48,6 +48,7 @@ import 'package:takwa/features/qiyam/presentation/screens/qiyam_beginner_guide_s
 import 'package:takwa/features/qiyam/presentation/screens/qiyam_sunnah_guide_screen.dart';
 import 'package:takwa/features/auth/presentation/screens/email_confirmation_screen.dart';
 import 'package:takwa/features/auth/presentation/screens/update_password_screen.dart';
+import 'package:takwa/features/auth/presentation/screens/forgot_password_screen.dart';
 
 /// Defines all the route names used in the application.
 class Routes {
@@ -100,6 +101,7 @@ class Routes {
   static const String qiyamBeginnerGuide = '/qiyam-beginner-guide';
   static const String qiyamSunnahGuide = '/qiyam-sunnah-guide';
   static const String emailConfirmation = '/email-confirmation';
+  static const String forgotPassword = '/forgot-password';
   static const String updatePassword = '/update-password';
   static const String books = '/books';
   static const String booksChapter = '/books/chapter';
@@ -243,6 +245,11 @@ class AppRoutes {
         final email = settings.arguments as String? ?? '';
         return MaterialPageRoute(
           builder: (_) => EmailConfirmationScreen(email: email),
+        );
+      case Routes.forgotPassword:
+        final email = settings.arguments as String?;
+        return MaterialPageRoute(
+          builder: (_) => ForgotPasswordScreen(initialEmail: email),
         );
       case Routes.updatePassword:
         return MaterialPageRoute(builder: (_) => const UpdatePasswordScreen());

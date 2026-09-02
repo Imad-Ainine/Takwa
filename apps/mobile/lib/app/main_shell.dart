@@ -263,10 +263,19 @@ class _BottomNav extends StatelessWidget {
                   final tab = tabs[i];
                   final isActive = currentIndex == i;
                   return Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
+                    // One coherent "button, label, selected" stop for a
+                    // screen reader instead of the animated indicator,
+                    // emoji, and label each being a separate stop.
+                    child: Semantics(
+                      label: tab.label,
+                      button: true,
+                      selected: isActive,
                       onTap: () => onTap(i),
-                      child: AnimatedBuilder(
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onTap(i),
+                        child: AnimatedBuilder(
                         animation: tabAnims[i],
                         builder: (_, _) {
                           final t = tabAnims[i].value;
@@ -338,6 +347,7 @@ class _BottomNav extends StatelessWidget {
                             ],
                           );
                         },
+                        ),
                       ),
                     ),
                   );

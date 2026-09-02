@@ -1,5 +1,7 @@
 
 import 'package:drift/drift.dart';
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:takwa/l10n/app_localizations.dart';
 import 'app_database.dart';
 part 'daos.g.dart';
 
@@ -717,6 +719,17 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     ).watch().asyncMap((_) => getPerPrayerRates(from, to));
   }
 
+  /// Marks an earned achievement as seen, so its unlock animation only
+  /// plays once (the achievements screen checks `seen` to decide whether
+  /// to celebrate a card or just render it normally).
+  Future<void> markAchievementSeen(String type) async {
+    await (update(
+      achievements,
+    )..where((a) => a.type.equals(type))).write(
+      const AchievementsCompanion(seen: Value(true)),
+    );
+  }
+
   Future<void> addAchievement({
     required String type,
     required String titleAr,
@@ -747,12 +760,22 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     final streak = await getCurrentStreak();
     final now = DateTime.now();
 
+    // Achievement copy lives in lib/l10n/app_ar.arb (+ app_en.arb), not as
+    // literals here — see the audit's "i18n & Accessibility" section. The
+    // app is Arabic-only at runtime today (no locale switcher yet), so
+    // this locks in the same 'ar' text as before; once real language
+    // switching exists, resolve this from the user's chosen locale
+    // instead. Note this only affects the string baked into a NEW
+    // achievement's title_ar/desc_ar columns at grant time — already
+    // earned achievements keep whatever text was stored when granted.
+    final l10n = lookupAppLocalizations(const Locale('ar'));
+
     // 1. Streaks
     if (streak >= 3) {
       final a = await _tryGrant(
         'streak_3',
-        'البداية الطيبة',
-        'حافظت على المحاسبة لثلاثة أيام متواصلة',
+        l10n.achievementStreak3Title,
+        l10n.achievementStreak3Desc,
         '🌱',
         20,
       );
@@ -761,8 +784,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (streak >= 7) {
       final a = await _tryGrant(
         'streak_7',
-        'الأسبوع المثالي',
-        'سبعة أيام من الالتزام والمحاسبة',
+        l10n.achievementStreak7Title,
+        l10n.achievementStreak7Desc,
         '🌿',
         50,
       );
@@ -771,8 +794,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (streak >= 30) {
       final a = await _tryGrant(
         'streak_30',
-        'المجاهد المثابر',
-        'ثلاثون يوماً من مراقبة النفس والتقوى',
+        l10n.achievementStreak30Title,
+        l10n.achievementStreak30Desc,
         '⚔️',
         200,
       );
@@ -784,8 +807,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (quranPages >= 30) {
       final a = await _tryGrant(
         'quran_juz',
-        'أهل القرآن',
-        'ختمت جزءاً كاملاً من كتاب الله',
+        l10n.achievementQuranJuzTitle,
+        l10n.achievementQuranJuzDesc,
         '📖',
         100,
       );
@@ -802,8 +825,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (today.netPoints > 0) {
         final a = await _tryGrant(
           'daily_muhasaba',
-          'المحاسب المجتهد',
-          'أكملت محاسبة النفس لهذا اليوم',
+          l10n.achievementDailyMuhasabaTitle,
+          l10n.achievementDailyMuhasabaDesc,
           '📝',
           10,
         );
@@ -812,8 +835,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (today.morningAdhkar) {
         final a = await _tryGrant(
           'morning_adhkar',
-          'نور الصباح',
-          'أكملت أذكار الصباح بالكامل',
+          l10n.achievementMorningAdhkarTitle,
+          l10n.achievementMorningAdhkarDesc,
           '🌅',
           5,
         );
@@ -822,8 +845,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (today.eveningAdhkar) {
         final a = await _tryGrant(
           'evening_adhkar',
-          'تحصين المساء',
-          'أكملت أذكار المساء بالكامل',
+          l10n.achievementEveningAdhkarTitle,
+          l10n.achievementEveningAdhkarDesc,
           '🌙',
           5,
         );
@@ -832,8 +855,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (today.sadaqah) {
         final a = await _tryGrant(
           'first_sadaqah',
-          'اليد المعطية',
-          'أخرجت أول صدقة لك عبر التطبيق',
+          l10n.achievementFirstSadaqahTitle,
+          l10n.achievementFirstSadaqahDesc,
           '💰',
           30,
         );
@@ -842,8 +865,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (today.tasbeehCount >= 100) {
         final a = await _tryGrant(
           'tasbeeh_100',
-          'الذاكر الشاكر',
-          'سبحت الله 100 مرة في يوم واحد',
+          l10n.achievementTasbeeh100Title,
+          l10n.achievementTasbeeh100Desc,
           '📿',
           20,
         );
@@ -863,8 +886,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (last3.every((r) => r.fajrStatus == PrayerStatus.performed)) {
         final a = await _tryGrant(
           'fajr_on_time',
-          'في ذمة الله',
-          'صليت الفجر في وقته لثلاثة أيام متتالية',
+          l10n.achievementFajrOnTimeTitle,
+          l10n.achievementFajrOnTimeDesc,
           '🕌',
           30,
         );
@@ -873,8 +896,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       if (last3.every((r) => r.quranPages > 0)) {
         final a = await _tryGrant(
           'constant_reader',
-          'القارئ المداوم',
-          'قرأت القرآن لثلاثة أيام متتالية',
+          l10n.achievementConstantReaderTitle,
+          l10n.achievementConstantReaderDesc,
           '📚',
           40,
         );
@@ -893,8 +916,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       )) {
         final a = await _tryGrant(
           'perfect_week_prayer',
-          'الصلاة نور',
-          'أديت جميع الصلوات في وقتها لسبعة أيام',
+          l10n.achievementPerfectWeekPrayerTitle,
+          l10n.achievementPerfectWeekPrayerDesc,
           '🕌',
           150,
         );
@@ -918,8 +941,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (naflCount > 0) {
       final a = await _tryGrant(
         'fasting_nafl',
-        'باب الريان',
-        'أكملت صيام النفل الأول لك',
+        l10n.achievementFastingNaflTitle,
+        l10n.achievementFastingNaflDesc,
         '🌙',
         40,
       );
@@ -936,8 +959,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (ramadanDays >= 10) {
       final a = await _tryGrant(
         'ramadan_knight',
-        'فارس رمضان',
-        'أكملت 10 أيام من رمضان في المحاسبة',
+        l10n.achievementRamadanKnightTitle,
+        l10n.achievementRamadanKnightDesc,
         '✨',
         100,
       );
@@ -952,8 +975,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (totalPoints >= 100) {
       final a = await _tryGrant(
         'points_100',
-        'مئة خطوة',
-        'جمعت أول 100 نقطة تقوى',
+        l10n.achievementPoints100Title,
+        l10n.achievementPoints100Desc,
         '🎖️',
         50,
       );
@@ -962,8 +985,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     if (totalPoints >= 1000) {
       final a = await _tryGrant(
         'points_1000',
-        'فارس التقوى',
-        'بلغت 1000 نقطة في مسيرتك',
+        l10n.achievementPoints1000Title,
+        l10n.achievementPoints1000Desc,
         '🏆',
         500,
       );

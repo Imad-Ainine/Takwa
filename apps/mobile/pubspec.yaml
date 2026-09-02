@@ -13,9 +13,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   meta: ^1.15.0
 
-  # ── Shared domain logic (workspace package) ──
+  # ── Shared domain logic & design system (workspace packages) ──
   takwa_core:
     path: ../../packages/takwa_core
+  takwa_ui:
+    path: ../../packages/takwa_ui
 
   # ── State Management ──
   flutter_riverpod: ^2.5.1
@@ -80,12 +82,11 @@ dependencies:
   wakelock_plus: ^1.2.10
   flutter_windowmanager_plus: ^1.0.1
   flutter_overlay_window: ^0.5.0
-  system_alert_window: ^2.0.8
   http: ^1.6.0
   speech_to_text: ^7.3.0
   flutter_tts: ^3.8.5
 
-  share_plus: 7.2.2
+  share_plus: ^7.2.2
   sound_mode: ^3.0.1
   custom_refresh_indicator: ^4.0.1
   sensors_plus: ^7.0.0
@@ -100,6 +101,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/sounds/
     - assets/images/

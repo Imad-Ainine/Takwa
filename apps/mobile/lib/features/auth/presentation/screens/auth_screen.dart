@@ -157,44 +157,76 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       }
     } catch (e) {
       debugPrint('Google Sign-In Error: $e');
-      if (mounted) setState(() => _error = 'حدث خطأ أثناء تسجيل الدخول بجوجل: $e');
+      final errStr = e.toString();
+      if (errStr.contains('ApiException: 10') ||
+          errStr.contains('DEVELOPER_ERROR')) {
+        if (mounted) {
+          setState(
+            () => _error =
+                'إعدادات Google غير مكتملة: تأكد من إضافة بصمة SHA-1 ومعرف الويب في Google Cloud Console.',
+          );
+        }
+      } else if (errStr.contains('network') ||
+          errStr.contains('SocketException')) {
+        if (mounted) {
+          setState(
+            () =>
+                _error = 'تعذر الاتصال بخوادم Google، تحقق من اتصالك بالإنترنت',
+          );
+        }
+      } else if (errStr.contains('canceled') ||
+          errStr.contains('cancelled') ||
+          errStr.contains('user_cancelled')) {
+        // Canceled by user - do not display error
+      } else {
+        if (mounted) {
+          setState(
+            () => _error = 'تعذر تسجيل الدخول عبر Google، يرجى المحاولة لاحقاً',
+          );
+        }
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _forgotPassword() async {
-    if (_emailCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'أدخل بريدك الإلكتروني أولاً');
-      return;
-    }
-    try {
-      await Supabase.instance.client.auth.resetPasswordForEmail(
-        _emailCtrl.text.trim(),
-      );
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('تم إرسال رابط إعادة تعيين كلمة المرور ✓'),
-            backgroundColor: const Color(0xFF2DD4BF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (_) {
-      if (mounted) setState(() => _error = 'تعذّر إرسال الرابط');
-    }
+  void _openForgotPassword() {
+    Navigator.pushNamed(
+      context,
+      Routes.forgotPassword,
+      arguments: _emailCtrl.text.trim(),
+    );
   }
 
   String _authError(String msg) {
-    if (msg.contains('Invalid login')) return 'البريد أو كلمة المرور خاطئة';
-    if (msg.contains('already registered')) return 'البريد مسجّل مسبقاً';
-    if (msg.contains('unique constraint')) return 'اسم المستخدم مأخوذ';
-    if (msg.contains('Password should')) return 'كلمة المرور ٦ أحرف على الأقل';
-    return 'خطأ في الاتصال، حاول لاحقاً';
+    final lower = msg.toLowerCase();
+    if (lower.contains('invalid login') ||
+        lower.contains('invalid credentials') ||
+        lower.contains('invalid_grant')) {
+      return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    }
+    if (lower.contains('email not confirmed')) {
+      return 'يرجى تأكيد بريدك الإلكتروني عبر الرابط المرسل إليك أولاً';
+    }
+    if (lower.contains('already registered') ||
+        lower.contains('user already exists')) {
+      return 'هذا البريد الإلكتروني مسجل مسبقاً، يرجى تسجيل الدخول';
+    }
+    if (lower.contains('unique constraint') || lower.contains('username')) {
+      return 'اسم المستخدم مستخدم بالفعل، اختر اسماً آخر';
+    }
+    if (lower.contains('password should')) {
+      return 'كلمة المرور يجب أن تتكون من 6 خانات على الأقل';
+    }
+    if (lower.contains('rate limit') || lower.contains('too many requests')) {
+      return 'تجاوزت عدد المحاولات المسموح بها، يرجى الانتظار قليلاً';
+    }
+    if (lower.contains('network') ||
+        lower.contains('socket') ||
+        lower.contains('connection')) {
+      return 'فشل الاتصال، تحقق من اتصالك بالإنترنت';
+    }
+    return 'حدث خطأ في عملية التسجيل، يرجى المحاولة لاحقاً';
   }
 
   // ── Build ─────────────────────────────────────────────
@@ -414,7 +446,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: TextButton(
-                    onPressed: _forgotPassword,
+                    onPressed: _openForgotPassword,
                     child: Text(
                       'نسيت كلمة المرور؟',
                       style: s.naskh(12, color: s.gold),

@@ -591,7 +591,16 @@ class _PrayerRow extends StatelessWidget {
     final isQadaa = status == PrayerStatus.qadaa;
     final isMissed = status == PrayerStatus.missed;
 
-    return GestureDetector(
+    // One "$name, $status, button" node instead of the checkmark circle,
+    // emoji, name, status and points chip each being a separate,
+    // uncoordinated stop for a screen reader — see the audit's "i18n &
+    // Accessibility" section.
+    return Semantics(
+      label: '$name، $_statusLabel',
+      button: true,
+      onTap: () => _showStatusPicker(context),
+      excludeSemantics: true,
+      child: GestureDetector(
       onTap: () => _showStatusPicker(context),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
@@ -676,6 +685,7 @@ class _PrayerRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -1068,76 +1078,89 @@ class _ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    // One "$label, on/off" toggle node instead of the checkmark circle,
+    // emoji, label, sublabel and points chip each being a separate stop.
+    return Semantics(
+      label: '$label، $sublabel',
+      toggled: value,
       onTap: () {
         HapticFeedback.selectionClick();
         onChanged(!value);
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(bottom: 7),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        decoration: BoxDecoration(
-          color: value
-              ? context.colors.success.withOpacity(0.08)
-              : context.colors.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onChanged(!value);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.only(bottom: 7),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          decoration: BoxDecoration(
             color: value
-                ? context.colors.success.withOpacity(0.25)
-                : context.colors.border,
+                ? context.colors.success.withOpacity(0.08)
+                : context.colors.card,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: value
+                  ? context.colors.success.withOpacity(0.25)
+                  : context.colors.border,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: value ? context.colors.success : Colors.transparent,
-                border: Border.all(
-                  color: value ? context.colors.success : context.colors.border,
-                  width: 1.8,
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: value ? context.colors.success : Colors.transparent,
+                  border: Border.all(
+                    color: value
+                        ? context.colors.success
+                        : context.colors.border,
+                    width: 1.8,
+                  ),
+                ),
+                child: value
+                    ? const Center(
+                        child: Text(
+                          '✓',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Text(emoji, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: context.typography.bodyMedium.copyWith(
+                        fontSize: 13,
+                        color: context.colors.textPrimary,
+                        fontWeight: value ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      sublabel,
+                      style: context.typography.caption.copyWith(
+                        fontSize: 10,
+                        color: context.colors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: value
-                  ? const Center(
-                      child: Text(
-                        '✓',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 10),
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
-                      color: context.colors.textPrimary,
-                      fontWeight: value ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    sublabel,
-                    style: context.typography.caption.copyWith(
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (value) _MiniPts(points, context.colors.success),
-          ],
+              if (value) _MiniPts(points, context.colors.success),
+            ],
+          ),
         ),
       ),
     );
@@ -1418,30 +1441,40 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
       ),
       child: Row(
         children: [
-          GestureDetector(
+          // One "$name, committed/not committed" toggle node instead of
+          // the checkmark box being an unlabeled stop on its own.
+          Semantics(
+            label: '${widget.name}، ${widget.desc}',
+            toggled: _committed,
             onTap: _toggle,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: _committed ? context.colors.danger : Colors.transparent,
-                border: Border.all(
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: _toggle,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(6),
                   color: _committed
                       ? context.colors.danger
-                      : context.colors.border,
-                  width: 1.8,
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: _committed
+                        ? context.colors.danger
+                        : context.colors.border,
+                    width: 1.8,
+                  ),
                 ),
+                child: _committed
+                    ? const Center(
+                        child: Text(
+                          '✗',
+                          style: TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+                      )
+                    : null,
               ),
-              child: _committed
-                  ? const Center(
-                      child: Text(
-                        '✗',
-                        style: TextStyle(color: Colors.white, fontSize: 13),
-                      ),
-                    )
-                  : null,
             ),
           ),
           const SizedBox(width: 10),
@@ -1472,38 +1505,44 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
             ),
           ),
           if (_committed) ...[
-            GestureDetector(
+            Semantics(
+              label: 'زد عدد مرات ${widget.name}، حدث $_count مرة',
+              button: true,
               onTap: _increment,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colors.danger.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: context.colors.danger.withOpacity(0.3),
+              excludeSemantics: true,
+              child: GestureDetector(
+                onTap: _increment,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$_count×',
-                      style: context.typography.bodySmall.copyWith(
-                        fontSize: 12,
-                        color: context.colors.danger,
-                        fontWeight: FontWeight.w600,
+                  decoration: BoxDecoration(
+                    color: context.colors.danger.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: context.colors.danger.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$_count×',
+                        style: context.typography.bodySmall.copyWith(
+                          fontSize: 12,
+                          color: context.colors.danger,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.add_rounded,
-                      size: 14,
-                      color: context.colors.danger,
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.add_rounded,
+                        size: 14,
+                        color: context.colors.danger,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

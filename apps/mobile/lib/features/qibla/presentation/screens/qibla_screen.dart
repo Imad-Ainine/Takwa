@@ -185,6 +185,15 @@ class _QiblaContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Matches _QiblaInfoRow's own dir/deg math so the semantic label says
+    // the same thing the visible info cards do.
+    final diff = ((qiblaDir - heading) % 360 + 360) % 360;
+    final turnDir = diff < 180 ? 'اليمين' : 'اليسار';
+    final turnDeg = (diff < 180 ? diff : 360 - diff).round();
+    final compassLabel = isAligned
+        ? 'بوصلة القبلة، أنت متجه إلى القبلة الآن'
+        : 'بوصلة القبلة، أدر جهازك $turnDeg درجة إلى $turnDir لمواجهة القبلة';
+
     return FadeTransition(
       opacity: CurvedAnimation(parent: entryCtrl, curve: Curves.easeOut),
       child: Column(
@@ -193,23 +202,35 @@ class _QiblaContent extends StatelessWidget {
           // ── الدائرة الرئيسية ──
           ScaleTransition(
             scale: isAligned ? pulseAnim : const AlwaysStoppedAnimation(1.0),
-            child: SizedBox(
-              width: 300,
-              height: 300,
-              child: CustomPaint(
-                painter: _QiblaCompassPainter(
-                  needleAngle: needleAngle,
-                  heading: heading,
-                  isAligned: isAligned,
-                  primaryColor: style.gold,
-                  tealColor: style.teal,
-                  isRamadan: style.isRamadan,
-                ),
-                child: Center(
-                  child: _CompassCenter(
-                    style: style,
+            // One clear "compass, currently pointing X" node instead of a
+            // silent CustomPaint plus the center's emoji/degree text read
+            // as disconnected fragments — see the audit's "i18n &
+            // Accessibility" section. No liveRegion: the heading changes
+            // continuously from the compass sensor, and re-announcing on
+            // every micro-degree update would be unusable; a screen
+            // reader user re-focuses this node to get a fresh reading,
+            // same as the visible _QiblaInfoRow cards below it.
+            child: Semantics(
+              label: compassLabel,
+              excludeSemantics: true,
+              child: SizedBox(
+                width: 300,
+                height: 300,
+                child: CustomPaint(
+                  painter: _QiblaCompassPainter(
+                    needleAngle: needleAngle,
+                    heading: heading,
                     isAligned: isAligned,
-                    qiblaDir: qiblaDir,
+                    primaryColor: style.gold,
+                    tealColor: style.teal,
+                    isRamadan: style.isRamadan,
+                  ),
+                  child: Center(
+                    child: _CompassCenter(
+                      style: style,
+                      isAligned: isAligned,
+                      qiblaDir: qiblaDir,
+                    ),
                   ),
                 ),
               ),

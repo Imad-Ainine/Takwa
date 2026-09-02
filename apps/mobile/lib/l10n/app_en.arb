@@ -1,0 +1,51 @@
+{
+  "@@locale": "en",
+
+  "achievementStreak3Title": "A Good Start",
+  "achievementStreak3Desc": "You've kept up your accountability for three days straight",
+
+  "achievementStreak7Title": "The Perfect Week",
+  "achievementStreak7Desc": "Seven days of commitment and accountability",
+
+  "achievementStreak30Title": "The Steadfast Strider",
+  "achievementStreak30Desc": "Thirty days of self-watchfulness and taqwa",
+
+  "achievementQuranJuzTitle": "People of the Quran",
+  "achievementQuranJuzDesc": "You completed a full juz of the Book of Allah",
+
+  "achievementDailyMuhasabaTitle": "The Diligent Reckoner",
+  "achievementDailyMuhasabaDesc": "You completed today's self-accountability",
+
+  "achievementMorningAdhkarTitle": "Morning Light",
+  "achievementMorningAdhkarDesc": "You completed your morning adhkar in full",
+
+  "achievementEveningAdhkarTitle": "Evening Fortification",
+  "achievementEveningAdhkarDesc": "You completed your evening adhkar in full",
+
+  "achievementFirstSadaqahTitle": "The Giving Hand",
+  "achievementFirstSadaqahDesc": "You gave your first sadaqah through the app",
+
+  "achievementTasbeeh100Title": "The Grateful Rememberer",
+  "achievementTasbeeh100Desc": "You glorified Allah 100 times in a single day",
+
+  "achievementFajrOnTimeTitle": "In Allah's Care",
+  "achievementFajrOnTimeDesc": "You prayed Fajr on time for three consecutive days",
+
+  "achievementConstantReaderTitle": "The Steady Reader",
+  "achievementConstantReaderDesc": "You read Quran for three consecutive days",
+
+  "achievementPerfectWeekPrayerTitle": "Prayer Is Light",
+  "achievementPerfectWeekPrayerDesc": "You prayed all five prayers on time for seven days",
+
+  "achievementFastingNaflTitle": "The Gate of Ar-Rayyan",
+  "achievementFastingNaflDesc": "You completed your first voluntary fast",
+
+  "achievementRamadanKnightTitle": "Knight of Ramadan",
+  "achievementRamadanKnightDesc": "You logged 10 days of Ramadan accountability",
+
+  "achievementPoints100Title": "A Hundred Steps",
+  "achievementPoints100Desc": "You earned your first 100 Taqwa points",
+
+  "achievementPoints1000Title": "Knight of Taqwa",
+  "achievementPoints1000Desc": "You reached 1000 points on your journey"
+}

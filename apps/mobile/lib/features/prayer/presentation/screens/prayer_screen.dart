@@ -341,7 +341,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
 
             // ── Content ──
             state.loading
-                ? const _LoadingOverlay()
+                ? _LoadingOverlay(style: style)
                 : state.error != null
                 ? _ErrorView(
                     onRetry: () =>
@@ -1805,8 +1805,15 @@ class _SunChip extends StatelessWidget {
   }
 }
 
+/// Shape-matched skeleton for the prayer screen's loading state — mirrors
+/// _MainPrayerCard (badge + countdown ring + adhan/iqama row),
+/// _SunPhaseRow (3 chips) and _DailyPrayersTable (header + 5 rows) so the
+/// layout doesn't visibly jump once real data arrives. Previously this
+/// was a bare spinner + "جارٍ تحديد موقعك..." text — see the audit's
+/// "UI/UX Polish" section.
 class _LoadingOverlay extends StatefulWidget {
-  const _LoadingOverlay();
+  final AdaptiveStyle style;
+  const _LoadingOverlay({required this.style});
 
   @override
   State<_LoadingOverlay> createState() => _LoadingOverlayState();
@@ -1815,14 +1822,19 @@ class _LoadingOverlay extends StatefulWidget {
 class _LoadingOverlayState extends State<_LoadingOverlay>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
+  late final Animation<double> _pulse;
 
   @override
   void initState() {
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat();
+      duration: const Duration(milliseconds: 1100),
+    )..repeat(reverse: true);
+    _pulse = Tween<double>(
+      begin: 0.35,
+      end: 0.75,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -1831,78 +1843,134 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: _ctrl,
-            builder: (_, _) => Transform.rotate(
-              angle: _ctrl.value * 2 * math.pi,
-              child: SizedBox(
-                width: 60,
-                height: 60,
-                child: CustomPaint(
-                  painter: _LoadingRingPainter(
-                    _ctrl.value,
-                    context.colors.gold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'جارٍ تحديد موقعك...',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 13,
-              color: context.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'لحساب أوقات الصلاة',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
-              fontSize: 11,
-              color: context.colors.textDim,
-            ),
-          ),
-        ],
+  Widget _bone({
+    double? width,
+    required double height,
+    double radius = 12,
+  }) {
+    final style = widget.style;
+    return AnimatedBuilder(
+      animation: _pulse,
+      builder: (context, child) => Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: style.gold.withOpacity(_pulse.value * 0.12),
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(color: style.border.withOpacity(0.5)),
+        ),
       ),
     );
   }
-}
-
-class _LoadingRingPainter extends CustomPainter {
-  final double t;
-  final Color color;
-  _LoadingRingPainter(this.t, this.color);
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2 - 4;
-    canvas.drawArc(
-      Rect.fromCircle(center: c, radius: r),
-      0,
-      math.pi * 1.5,
-      false,
-      Paint()
-        ..shader = SweepGradient(
-          colors: [color, Colors.transparent],
-        ).createShader(Rect.fromCircle(center: c, radius: r))
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeCap = StrokeCap.round,
+  Widget build(BuildContext context) {
+    final style = widget.style;
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            // ── Header placeholder ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  _bone(width: 40, height: 40, radius: 20),
+                  const SizedBox(width: 12),
+                  _bone(width: 120, height: 16),
+                  const Spacer(),
+                  _bone(width: 40, height: 40, radius: 20),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // ── Main card placeholder (badge + ring + adhan/iqama row) ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: style.bg,
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: Column(
+                  children: [
+                    _bone(width: 140, height: 28, radius: 14),
+                    const SizedBox(height: 32),
+                    Center(child: _bone(width: 200, height: 200, radius: 100)),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _bone(width: 90, height: 44),
+                        _bone(width: 90, height: 44),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── Sun phase row placeholder ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(child: _bone(height: 77, radius: 18)),
+                  const SizedBox(width: 8),
+                  Expanded(child: _bone(height: 77, radius: 18)),
+                  const SizedBox(width: 8),
+                  Expanded(child: _bone(height: 77, radius: 18)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── Daily prayers table placeholder ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: style.bg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        _bone(width: 3, height: 16, radius: 2),
+                        const SizedBox(width: 10),
+                        _bone(width: 100, height: 14),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    for (int i = 0; i < 5; i++) ...[
+                      Row(
+                        children: [
+                          _bone(width: 28, height: 28, radius: 14),
+                          const SizedBox(width: 12),
+                          _bone(width: 70, height: 14),
+                          const Spacer(),
+                          _bone(width: 60, height: 14),
+                        ],
+                      ),
+                      if (i < 4) const SizedBox(height: 18),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
     );
   }
-
-  @override
-  bool shouldRepaint(_LoadingRingPainter old) => old.t != t;
 }
 
 class _ErrorView extends StatelessWidget {

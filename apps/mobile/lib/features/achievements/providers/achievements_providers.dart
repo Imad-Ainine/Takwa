@@ -9,11 +9,21 @@ class AchievementView {
   final bool isEarned;
   final DateTime? earnedAt;
 
+  /// Whether the user has already seen this achievement's unlock
+  /// animation. Meaningless (and left `true`, i.e. "nothing to
+  /// celebrate") for achievements that haven't been earned yet.
+  final bool seen;
+
   const AchievementView({
     required this.definition,
     required this.isEarned,
     this.earnedAt,
+    this.seen = true,
   });
+
+  /// True only for a freshly-earned achievement whose unlock animation
+  /// hasn't played yet.
+  bool get isNewlyUnlocked => isEarned && !seen;
 }
 
 final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
@@ -42,6 +52,7 @@ final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
       definition: def,
       isEarned: earned != null,
       earnedAt: earned?.earnedAt,
+      seen: earned?.seen ?? true,
     );
   }).toList();
 });

@@ -1,0 +1,147 @@
+{
+  "@@locale": "ar",
+
+  "achievementStreak3Title": "البداية الطيبة",
+  "@achievementStreak3Title": {
+    "description": "Achievement title: 3-day accountability streak"
+  },
+  "achievementStreak3Desc": "حافظت على المحاسبة لثلاثة أيام متواصلة",
+  "@achievementStreak3Desc": {
+    "description": "Achievement description: 3-day accountability streak"
+  },
+
+  "achievementStreak7Title": "الأسبوع المثالي",
+  "@achievementStreak7Title": {
+    "description": "Achievement title: 7-day accountability streak"
+  },
+  "achievementStreak7Desc": "سبعة أيام من الالتزام والمحاسبة",
+  "@achievementStreak7Desc": {
+    "description": "Achievement description: 7-day accountability streak"
+  },
+
+  "achievementStreak30Title": "المجاهد المثابر",
+  "@achievementStreak30Title": {
+    "description": "Achievement title: 30-day accountability streak"
+  },
+  "achievementStreak30Desc": "ثلاثون يوماً من مراقبة النفس والتقوى",
+  "@achievementStreak30Desc": {
+    "description": "Achievement description: 30-day accountability streak"
+  },
+
+  "achievementQuranJuzTitle": "أهل القرآن",
+  "@achievementQuranJuzTitle": {
+    "description": "Achievement title: read a full juz of Quran in a month"
+  },
+  "achievementQuranJuzDesc": "ختمت جزءاً كاملاً من كتاب الله",
+  "@achievementQuranJuzDesc": {
+    "description": "Achievement description: read a full juz of Quran in a month"
+  },
+
+  "achievementDailyMuhasabaTitle": "المحاسب المجتهد",
+  "@achievementDailyMuhasabaTitle": {
+    "description": "Achievement title: completed today's self-accountability"
+  },
+  "achievementDailyMuhasabaDesc": "أكملت محاسبة النفس لهذا اليوم",
+  "@achievementDailyMuhasabaDesc": {
+    "description": "Achievement description: completed today's self-accountability"
+  },
+
+  "achievementMorningAdhkarTitle": "نور الصباح",
+  "@achievementMorningAdhkarTitle": {
+    "description": "Achievement title: completed morning adhkar"
+  },
+  "achievementMorningAdhkarDesc": "أكملت أذكار الصباح بالكامل",
+  "@achievementMorningAdhkarDesc": {
+    "description": "Achievement description: completed morning adhkar"
+  },
+
+  "achievementEveningAdhkarTitle": "تحصين المساء",
+  "@achievementEveningAdhkarTitle": {
+    "description": "Achievement title: completed evening adhkar"
+  },
+  "achievementEveningAdhkarDesc": "أكملت أذكار المساء بالكامل",
+  "@achievementEveningAdhkarDesc": {
+    "description": "Achievement description: completed evening adhkar"
+  },
+
+  "achievementFirstSadaqahTitle": "اليد المعطية",
+  "@achievementFirstSadaqahTitle": {
+    "description": "Achievement title: first sadaqah logged through the app"
+  },
+  "achievementFirstSadaqahDesc": "أخرجت أول صدقة لك عبر التطبيق",
+  "@achievementFirstSadaqahDesc": {
+    "description": "Achievement description: first sadaqah logged through the app"
+  },
+
+  "achievementTasbeeh100Title": "الذاكر الشاكر",
+  "@achievementTasbeeh100Title": {
+    "description": "Achievement title: 100 tasbeeh in one day"
+  },
+  "achievementTasbeeh100Desc": "سبحت الله 100 مرة في يوم واحد",
+  "@achievementTasbeeh100Desc": {
+    "description": "Achievement description: 100 tasbeeh in one day"
+  },
+
+  "achievementFajrOnTimeTitle": "في ذمة الله",
+  "@achievementFajrOnTimeTitle": {
+    "description": "Achievement title: Fajr on time for 3 consecutive days"
+  },
+  "achievementFajrOnTimeDesc": "صليت الفجر في وقته لثلاثة أيام متتالية",
+  "@achievementFajrOnTimeDesc": {
+    "description": "Achievement description: Fajr on time for 3 consecutive days"
+  },
+
+  "achievementConstantReaderTitle": "القارئ المداوم",
+  "@achievementConstantReaderTitle": {
+    "description": "Achievement title: read Quran 3 consecutive days"
+  },
+  "achievementConstantReaderDesc": "قرأت القرآن لثلاثة أيام متتالية",
+  "@achievementConstantReaderDesc": {
+    "description": "Achievement description: read Quran 3 consecutive days"
+  },
+
+  "achievementPerfectWeekPrayerTitle": "الصلاة نور",
+  "@achievementPerfectWeekPrayerTitle": {
+    "description": "Achievement title: all 5 prayers on time for 7 days"
+  },
+  "achievementPerfectWeekPrayerDesc": "أديت جميع الصلوات في وقتها لسبعة أيام",
+  "@achievementPerfectWeekPrayerDesc": {
+    "description": "Achievement description: all 5 prayers on time for 7 days"
+  },
+
+  "achievementFastingNaflTitle": "باب الريان",
+  "@achievementFastingNaflTitle": {
+    "description": "Achievement title: first voluntary (nafl) fast"
+  },
+  "achievementFastingNaflDesc": "أكملت صيام النفل الأول لك",
+  "@achievementFastingNaflDesc": {
+    "description": "Achievement description: first voluntary (nafl) fast"
+  },
+
+  "achievementRamadanKnightTitle": "فارس رمضان",
+  "@achievementRamadanKnightTitle": {
+    "description": "Achievement title: 10 days of Ramadan fasting logged"
+  },
+  "achievementRamadanKnightDesc": "أكملت 10 أيام من رمضان في المحاسبة",
+  "@achievementRamadanKnightDesc": {
+    "description": "Achievement description: 10 days of Ramadan fasting logged"
+  },
+
+  "achievementPoints100Title": "مئة خطوة",
+  "@achievementPoints100Title": {
+    "description": "Achievement title: reached 100 lifetime Taqwa points"
+  },
+  "achievementPoints100Desc": "جمعت أول 100 نقطة تقوى",
+  "@achievementPoints100Desc": {
+    "description": "Achievement description: reached 100 lifetime Taqwa points"
+  },
+
+  "achievementPoints1000Title": "فارس التقوى",
+  "@achievementPoints1000Title": {
+    "description": "Achievement title: reached 1000 lifetime Taqwa points"
+  },
+  "achievementPoints1000Desc": "بلغت 1000 نقطة في مسيرتك",
+  "@achievementPoints1000Desc": {
+    "description": "Achievement description: reached 1000 lifetime Taqwa points"
+  }
+}

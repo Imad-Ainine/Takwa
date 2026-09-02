@@ -43,7 +43,8 @@ export async function generateMetadata({
 					alt: 'Takwa Logo',
 				},
 			],
-			locale: locale === 'ar' ? 'ar_SA' : 'en_US',
+			locale:
+				locale === 'ar' ? 'ar_SA' : locale === 'fr' ? 'fr_FR' : 'en_US',
 			type: 'website',
 		},
 		twitter: {
@@ -91,8 +92,12 @@ export default async function RootLayout({
 	const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
 	return (
-		<html lang={locale} dir={direction} data-scroll-behavior='smooth'>
-			<body className='amiri'>
+		<html
+			lang={locale}
+			dir={direction}
+			data-scroll-behavior='smooth'
+			suppressHydrationWarning>
+			<body className={locale === 'ar' ? 'amiri' : ''} suppressHydrationWarning>
 				<NextIntlClientProvider messages={messages}>
 					<Navbar />
 					<main>{children}</main>

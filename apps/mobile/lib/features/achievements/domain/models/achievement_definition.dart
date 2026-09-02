@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart' show Locale;
+import 'package:takwa/l10n/app_localizations.dart';
 
 enum AchievementCategory { daily, milestone, ibadah, special }
 
@@ -18,141 +20,152 @@ class AchievementDefinition {
     required this.category,
   });
 
-  static const List<AchievementDefinition> all = [
-    // --- Daily Achievements ---
-    AchievementDefinition(
-      id: 'daily_muhasaba',
-      titleAr: 'المحاسب المجتهد',
-      descAr: 'أكملت محاسبة النفس لهذا اليوم',
-      emoji: '📝',
-      pointsReward: 10,
-      category: AchievementCategory.daily,
-    ),
-    AchievementDefinition(
-      id: 'morning_adhkar',
-      titleAr: 'نور الصباح',
-      descAr: 'أكملت أذكار الصباح بالكامل',
-      emoji: '🌅',
-      pointsReward: 5,
-      category: AchievementCategory.daily,
-    ),
-    AchievementDefinition(
-      id: 'evening_adhkar',
-      titleAr: 'تحصين المساء',
-      descAr: 'أكملت أذكار المساء بالكامل',
-      emoji: '🌙',
-      pointsReward: 5,
-      category: AchievementCategory.daily,
-    ),
+  /// The full achievement catalog — this is the actual source of truth the
+  /// UI renders from (the `achievements` table's own title_ar/desc_ar
+  /// columns are only ever written at grant time and never read back for
+  /// display; see the audit's "i18n & Accessibility" section). Copy comes
+  /// from lib/l10n/app_ar.arb, same as the grant-time text in
+  /// DailyRecordDao.checkAndGrantAchievements() — the app is Arabic-only
+  /// at runtime today, so this is a straight port of what was previously
+  /// hardcoded here, not a behavior change.
+  static List<AchievementDefinition> get all {
+    final l10n = lookupAppLocalizations(const Locale('ar'));
+    return [
+      // --- Daily Achievements ---
+      AchievementDefinition(
+        id: 'daily_muhasaba',
+        titleAr: l10n.achievementDailyMuhasabaTitle,
+        descAr: l10n.achievementDailyMuhasabaDesc,
+        emoji: '📝',
+        pointsReward: 10,
+        category: AchievementCategory.daily,
+      ),
+      AchievementDefinition(
+        id: 'morning_adhkar',
+        titleAr: l10n.achievementMorningAdhkarTitle,
+        descAr: l10n.achievementMorningAdhkarDesc,
+        emoji: '🌅',
+        pointsReward: 5,
+        category: AchievementCategory.daily,
+      ),
+      AchievementDefinition(
+        id: 'evening_adhkar',
+        titleAr: l10n.achievementEveningAdhkarTitle,
+        descAr: l10n.achievementEveningAdhkarDesc,
+        emoji: '🌙',
+        pointsReward: 5,
+        category: AchievementCategory.daily,
+      ),
 
-    // --- Milestones ---
-    AchievementDefinition(
-      id: 'streak_3',
-      titleAr: 'البداية الطيبة',
-      descAr: 'حافظت على المحاسبة لثلاثة أيام متواصلة',
-      emoji: '🌱',
-      pointsReward: 20,
-      category: AchievementCategory.milestone,
-    ),
-    AchievementDefinition(
-      id: 'streak_7',
-      titleAr: 'الأسبوع المثالي',
-      descAr: 'سبعة أيام من الالتزام والمحاسبة',
-      emoji: '🌿',
-      pointsReward: 50,
-      category: AchievementCategory.milestone,
-    ),
-    AchievementDefinition(
-      id: 'streak_30',
-      titleAr: 'المجاهد المثابر',
-      descAr: 'ثلاثون يوماً من مراقبة النفس والتقوى',
-      emoji: '⚔️',
-      pointsReward: 200,
-      category: AchievementCategory.milestone,
-    ),
-    AchievementDefinition(
-      id: 'points_100',
-      titleAr: 'مئة خطوة',
-      descAr: 'جمعت أول 100 نقطة تقوى',
-      emoji: '🎖️',
-      pointsReward: 50,
-      category: AchievementCategory.milestone,
-    ),
-    AchievementDefinition(
-      id: 'points_1000',
-      titleAr: 'فارس التقوى',
-      descAr: 'بلغت 1000 نقطة في مسيرتك',
-      emoji: '🏆',
-      pointsReward: 500,
-      category: AchievementCategory.milestone,
-    ),
+      // --- Milestones ---
+      AchievementDefinition(
+        id: 'streak_3',
+        titleAr: l10n.achievementStreak3Title,
+        descAr: l10n.achievementStreak3Desc,
+        emoji: '🌱',
+        pointsReward: 20,
+        category: AchievementCategory.milestone,
+      ),
+      AchievementDefinition(
+        id: 'streak_7',
+        titleAr: l10n.achievementStreak7Title,
+        descAr: l10n.achievementStreak7Desc,
+        emoji: '🌿',
+        pointsReward: 50,
+        category: AchievementCategory.milestone,
+      ),
+      AchievementDefinition(
+        id: 'streak_30',
+        titleAr: l10n.achievementStreak30Title,
+        descAr: l10n.achievementStreak30Desc,
+        emoji: '⚔️',
+        pointsReward: 200,
+        category: AchievementCategory.milestone,
+      ),
+      AchievementDefinition(
+        id: 'points_100',
+        titleAr: l10n.achievementPoints100Title,
+        descAr: l10n.achievementPoints100Desc,
+        emoji: '🎖️',
+        pointsReward: 50,
+        category: AchievementCategory.milestone,
+      ),
+      AchievementDefinition(
+        id: 'points_1000',
+        titleAr: l10n.achievementPoints1000Title,
+        descAr: l10n.achievementPoints1000Desc,
+        emoji: '🏆',
+        pointsReward: 500,
+        category: AchievementCategory.milestone,
+      ),
 
-    // --- Ibadah ---
-    AchievementDefinition(
-      id: 'quran_juz',
-      titleAr: 'أهل القرآن',
-      descAr: 'ختمت جزءاً كاملاً من كتاب الله',
-      emoji: '📖',
-      pointsReward: 100,
-      category: AchievementCategory.ibadah,
-    ),
-    AchievementDefinition(
-      id: 'fajr_on_time',
-      titleAr: 'في ذمة الله',
-      descAr: 'صليت الفجر في وقته لثلاثة أيام متتالية',
-      emoji: '🕌',
-      pointsReward: 30,
-      category: AchievementCategory.ibadah,
-    ),
-    AchievementDefinition(
-      id: 'fasting_nafl',
-      titleAr: 'باب الريان',
-      descAr: 'أكملت صيام النفل الأول لك',
-      emoji: '🌙',
-      pointsReward: 40,
-      category: AchievementCategory.ibadah,
-    ),
-    AchievementDefinition(
-      id: 'tasbeeh_100',
-      titleAr: 'الذاكر الشاكر',
-      descAr: 'سبحت الله 100 مرة في يوم واحد',
-      emoji: '📿',
-      pointsReward: 20,
-      category: AchievementCategory.ibadah,
-    ),
+      // --- Ibadah ---
+      AchievementDefinition(
+        id: 'quran_juz',
+        titleAr: l10n.achievementQuranJuzTitle,
+        descAr: l10n.achievementQuranJuzDesc,
+        emoji: '📖',
+        pointsReward: 100,
+        category: AchievementCategory.ibadah,
+      ),
+      AchievementDefinition(
+        id: 'fajr_on_time',
+        titleAr: l10n.achievementFajrOnTimeTitle,
+        descAr: l10n.achievementFajrOnTimeDesc,
+        emoji: '🕌',
+        pointsReward: 30,
+        category: AchievementCategory.ibadah,
+      ),
+      AchievementDefinition(
+        id: 'fasting_nafl',
+        titleAr: l10n.achievementFastingNaflTitle,
+        descAr: l10n.achievementFastingNaflDesc,
+        emoji: '🌙',
+        pointsReward: 40,
+        category: AchievementCategory.ibadah,
+      ),
+      AchievementDefinition(
+        id: 'tasbeeh_100',
+        titleAr: l10n.achievementTasbeeh100Title,
+        descAr: l10n.achievementTasbeeh100Desc,
+        emoji: '📿',
+        pointsReward: 20,
+        category: AchievementCategory.ibadah,
+      ),
 
-    // --- Special ---
-    AchievementDefinition(
-      id: 'first_sadaqah',
-      titleAr: 'اليد المعطية',
-      descAr: 'أخرجت أول صدقة لك عبر التطبيق',
-      emoji: '💰',
-      pointsReward: 30,
-      category: AchievementCategory.special,
-    ),
-    AchievementDefinition(
-      id: 'ramadan_knight',
-      titleAr: 'فارس رمضان',
-      descAr: 'أكملت 10 أيام من رمضان في المحاسبة',
-      emoji: '✨',
-      pointsReward: 100,
-      category: AchievementCategory.special,
-    ),
-    AchievementDefinition(
-      id: 'perfect_week_prayer',
-      titleAr: 'الصلاة نور',
-      descAr: 'أديت جميع الصلوات في وقتها لسبعة أيام',
-      emoji: '🕌',
-      pointsReward: 150,
-      category: AchievementCategory.special,
-    ),
-    AchievementDefinition(
-      id: 'constant_reader',
-      titleAr: 'القارئ المداوم',
-      descAr: 'قرأت القرآن لثلاثة أيام متتالية',
-      emoji: '📚',
-      pointsReward: 40,
-      category: AchievementCategory.special,
-    ),
-  ];
+      // --- Special ---
+      AchievementDefinition(
+        id: 'first_sadaqah',
+        titleAr: l10n.achievementFirstSadaqahTitle,
+        descAr: l10n.achievementFirstSadaqahDesc,
+        emoji: '💰',
+        pointsReward: 30,
+        category: AchievementCategory.special,
+      ),
+      AchievementDefinition(
+        id: 'ramadan_knight',
+        titleAr: l10n.achievementRamadanKnightTitle,
+        descAr: l10n.achievementRamadanKnightDesc,
+        emoji: '✨',
+        pointsReward: 100,
+        category: AchievementCategory.special,
+      ),
+      AchievementDefinition(
+        id: 'perfect_week_prayer',
+        titleAr: l10n.achievementPerfectWeekPrayerTitle,
+        descAr: l10n.achievementPerfectWeekPrayerDesc,
+        emoji: '🕌',
+        pointsReward: 150,
+        category: AchievementCategory.special,
+      ),
+      AchievementDefinition(
+        id: 'constant_reader',
+        titleAr: l10n.achievementConstantReaderTitle,
+        descAr: l10n.achievementConstantReaderDesc,
+        emoji: '📚',
+        pointsReward: 40,
+        category: AchievementCategory.special,
+      ),
+    ];
+  }
 }

@@ -8,6 +8,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/adhan_foreground_service.dart';
@@ -172,15 +173,25 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
         themeMode: ref.watch(themeModeProvider),
         theme: isRamadan ? RamadanTheme.light : AppTheme.light,
         darkTheme: isRamadan ? RamadanTheme.dark : AppTheme.dark,
-        locale: const Locale('ar', 'SA'),
+        locale: const Locale('ar'),
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [Locale('ar', 'SA'), Locale('ar')],
-        builder: (context, child) =>
-            Directionality(textDirection: TextDirection.rtl, child: child!),
+        // 'en' added so the ARB-backed strings resolve correctly if this
+        // app is ever driven by device locale instead of the hardcoded
+        // `locale:` above — doesn't change today's all-Arabic behavior.
+        supportedLocales: const [
+          Locale('ar'),
+          Locale('en'),
+        ],
+        // No manual Directionality override — MaterialApp's own
+        // Localizations widget already derives it from `locale:` above
+        // (WidgetsLocalizationAr resolves to TextDirection.rtl for 'ar'),
+        // so this now follows the active locale instead of being pinned
+        // to RTL, without changing today's behavior at all.
         initialRoute: Routes.splash,
         onGenerateRoute: AppRoutes.onGenerateRoute,
       ),
