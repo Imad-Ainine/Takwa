@@ -70,9 +70,9 @@ class CustomIbadahGroup extends ConsumerWidget {
       title: 'عاداتي وإضافاتي',
       trailingWidget: InkWell(
         onTap: () => _manageCustomIbadah(context),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(AppSpacing.xs),
           child: Icon(Icons.settings, size: 18, color: context.colors.textDim),
         ),
       ),
@@ -140,7 +140,7 @@ class CustomIbadahGroup extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -149,14 +149,14 @@ class CustomIbadahGroup extends ConsumerWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Text(icon, style: const TextStyle(fontSize: 18)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   title,
@@ -168,7 +168,7 @@ class CustomIbadahGroup extends ConsumerWidget {
               if (trailingWidget != null) trailingWidget,
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           ...children,
         ],
       ),
@@ -277,10 +277,13 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.only(bottom: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 11,
+      ),
       decoration: BoxDecoration(
         color: _committed ? color.withOpacity(0.07) : context.colors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: _committed ? color.withOpacity(0.25) : context.colors.border,
         ),
@@ -294,7 +297,7 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.xs),
                 color: _committed ? color : Colors.transparent,
                 border: Border.all(
                   color: _committed ? color : context.colors.border,
@@ -316,7 +319,7 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
           ),
           const SizedBox(width: 10),
           Text(widget.ibadah.emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,11 +341,11 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
+                  vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                   border: Border.all(color: color.withOpacity(0.3)),
                 ),
                 child: Row(
@@ -351,7 +354,7 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
                     if (!isPos) ...[
                       const SizedBox(width: 2),
                       Icon(Icons.add, size: 10, color: color),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                     ],
                     Text(
                       '$_count',

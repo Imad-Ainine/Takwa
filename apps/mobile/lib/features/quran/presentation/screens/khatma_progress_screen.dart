@@ -58,7 +58,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
                   style: style,
                   color: style.gold,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   l.khatmaProgressPercent((progress * 100).toStringAsFixed(1)),
                   style: style.naskh(
@@ -112,7 +112,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
             value: ar(completedCount),
             color: style.gold,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           _StatCard(
             style: style,
             icon: Icons.local_fire_department_rounded,
@@ -120,7 +120,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
             value: ar(daysSinceStart),
             color: Colors.orangeAccent,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           _StatCard(
             style: style,
             icon: Icons.speed_rounded,
@@ -162,10 +162,10 @@ class KhatmaProgressScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: style.card,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: style.border),
             ),
             child: Row(
@@ -179,7 +179,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
                         ar(values[i].toInt()),
                         style: style.naskh(10, color: style.textDim),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       AnimatedContainer(
                         duration: Duration(milliseconds: 600 + i * 80),
                         width: 16,
@@ -188,7 +188,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
                           color: i == 3
                               ? style.gold
                               : style.gold.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -225,16 +225,16 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: style.card,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: style.border),
         ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               value,
               style: style.amiri(
@@ -243,7 +243,7 @@ class _StatCard extends StatelessWidget {
                 weight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               label,
               style: style.naskh(10, color: style.textSec),

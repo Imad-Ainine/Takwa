@@ -26,7 +26,7 @@ class GuestModeGuard extends ConsumerWidget {
         // Restricted access overlay
         Center(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppSpacing.xxl),
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
@@ -46,7 +46,7 @@ class GuestModeGuard extends ConsumerWidget {
                 children: [
                   // Icon with pulse effect decoration
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: context.colors.gold.withOpacity(0.1),
@@ -61,7 +61,7 @@ class GuestModeGuard extends ConsumerWidget {
                       size: 48,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                   Text(
                     'ميزة سحابية',
                     style: context.typography.headingLarge.copyWith(
@@ -69,7 +69,7 @@ class GuestModeGuard extends ConsumerWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.',
                     textAlign: TextAlign.center,
@@ -78,7 +78,7 @@ class GuestModeGuard extends ConsumerWidget {
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppSpacing.xxxl),
                   PrimaryButton(
                     label: 'تسجيل دخول / إنشاء حساب',
                     icon: Icons.login_rounded,
@@ -87,7 +87,7 @@ class GuestModeGuard extends ConsumerWidget {
                       Navigator.pushNamed(context, Routes.auth);
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(

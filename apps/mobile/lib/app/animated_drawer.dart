@@ -200,9 +200,9 @@ class _DrawerContent extends ConsumerWidget {
                   streakAsync: streakAsync,
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Container(height: 1, color: context.colors.border),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
 
                 // ── قائمة التنقل ──
                 Expanded(child: _DrawerNav(onClose: onClose)),
@@ -298,7 +298,7 @@ class _DrawerHeader extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,7 +319,7 @@ class _DrawerHeader extends ConsumerWidget {
                                 ),
                               ),
                               if (profile?['gender'] != null) ...[
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppSpacing.sm),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 6,
@@ -360,7 +360,7 @@ class _DrawerHeader extends ConsumerWidget {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: AppSpacing.xs),
                                 Icon(
                                   Icons.arrow_forward_ios_rounded,
                                   size: 8,
@@ -379,11 +379,14 @@ class _DrawerHeader extends ConsumerWidget {
             error: (_, _) => const SizedBox(height: 52),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
 
           // التاريخ الهجري
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
             decoration: BoxDecoration(
               color: context.colors.goldDim,
               borderRadius: BorderRadius.circular(10),
@@ -392,7 +395,7 @@ class _DrawerHeader extends ConsumerWidget {
             child: Row(
               children: [
                 const Text('📅', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   '${hijri.hDay} ${_hijriMonth(hijri.hMonth)} ${hijri.hYear}',
                   style: context.typography.headingMedium.copyWith(
@@ -420,7 +423,7 @@ class _DrawerHeader extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: streakAsync.when(
                   loading: () => const SizedBox(height: 48),
@@ -435,7 +438,7 @@ class _DrawerHeader extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           // Level & Progress
           statsAsync.when(
@@ -495,7 +498,10 @@ class _MiniStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+    padding: const EdgeInsets.symmetric(
+      vertical: AppSpacing.sm,
+      horizontal: 10,
+    ),
     decoration: BoxDecoration(
       color: color.withOpacity(0.08),
       borderRadius: BorderRadius.circular(10),
@@ -587,7 +593,10 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     }).toList();
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
       itemCount: visibleItems.length,
       itemBuilder: (_, i) {
         final item = visibleItems[i];
@@ -703,7 +712,10 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             margin: const EdgeInsets.only(bottom: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 11,
+            ),
             decoration: BoxDecoration(
               gradient: widget.isActive
                   ? LinearGradient(
@@ -753,7 +765,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                         : null,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     widget.item.label,
@@ -789,14 +801,14 @@ class _DrawerFooter extends StatelessWidget {
       child: Column(
         children: [
           Container(height: 1, color: context.colors.border),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: [
               Text(
                 '❁',
                 style: TextStyle(color: context.colors.gold, fontSize: 12),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.drawerFooterQuote,
@@ -807,14 +819,14 @@ class _DrawerFooter extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 '❁',
                 style: TextStyle(color: context.colors.gold, fontSize: 12),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             AppLocalizations.of(context)!.drawerFooterVersion,
             style: context.typography.caption.copyWith(
@@ -846,7 +858,7 @@ class DrawerMenuButton extends ConsumerWidget {
           color: isOpen
               ? context.colors.goldDim
               : Colors.white.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isOpen
                 ? context.colors.gold.withOpacity(0.3)
@@ -885,9 +897,9 @@ class _HamburgerIcon extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _HLine(color: color, width: 16),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         _HLine(color: color, width: 11),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         _HLine(color: color, width: 14),
       ],
     );
@@ -967,12 +979,15 @@ class _LogoutButton extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: InkWell(
         onTap: () => _handleLogout(context, ref, onClose),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 10,
+          ),
           decoration: BoxDecoration(
             color: context.colors.danger.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: context.colors.danger.withOpacity(0.2)),
           ),
           child: Row(
@@ -981,7 +996,7 @@ class _LogoutButton extends ConsumerWidget {
                 '🚪',
                 style: TextStyle(fontSize: 18, color: context.colors.danger),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 AppLocalizations.of(context)!.drawerLogoutButton,
                 style: context.typography.bodyMedium.copyWith(
@@ -1007,7 +1022,7 @@ class _LogoutButton extends ConsumerWidget {
       builder: (dCtx) => AlertDialog(
         backgroundColor: dCtx.colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           side: BorderSide(color: dCtx.colors.border),
         ),
         title: Text(

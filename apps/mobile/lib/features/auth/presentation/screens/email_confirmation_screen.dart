@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -19,7 +18,7 @@ class EmailConfirmationScreen extends StatelessWidget {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(AppSpacing.xxl),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -37,7 +36,7 @@ class EmailConfirmationScreen extends StatelessWidget {
                       color: context.colors.gold,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppSpacing.xxxl),
                   Text(
                     'تأكيد البريد الإلكتروني',
                     style: context.typography.headingLarge.copyWith(
@@ -45,13 +44,13 @@ class EmailConfirmationScreen extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   Text(
                     'تم إرسال رابط التأكيد إلى:\n$email',
                     style: context.typography.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                   Text(
                     'يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.',
                     style: context.typography.bodyMedium.copyWith(
@@ -61,7 +60,8 @@ class EmailConfirmationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 48),
                   PrimaryButton(
-                    onTap: () => Navigator.pushReplacementNamed(context, '/auth'),
+                    onTap: () =>
+                        Navigator.pushReplacementNamed(context, '/auth'),
                     label: 'العودة لتسجيل الدخول',
                   ),
                 ],

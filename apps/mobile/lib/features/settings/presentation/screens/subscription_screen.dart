@@ -24,8 +24,8 @@ class SubscriptionScreen extends ConsumerWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 20,
+                      horizontal: AppSpacing.xxl,
+                      vertical: AppSpacing.xl,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,7 +50,10 @@ class SubscriptionScreen extends ConsumerWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: [
           CustomLeadingButton(onPressed: () => Navigator.pop(context)),
@@ -70,7 +73,7 @@ class SubscriptionScreen extends ConsumerWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Container(
           width: 60,
           height: 3,
@@ -94,7 +97,7 @@ class SubscriptionScreen extends ConsumerWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         Text(
           'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.',
           textAlign: TextAlign.center,
@@ -103,7 +106,7 @@ class SubscriptionScreen extends ConsumerWidget {
             height: 1.6,
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppSpacing.xxxl),
         Text(
           'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.',
           textAlign: TextAlign.center,
@@ -126,7 +129,7 @@ class SubscriptionScreen extends ConsumerWidget {
             label: 'بإمكاني الدفع شهرياً',
             onTap: () => Navigator.pushNamed(context, Routes.paymentMethods),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           PrimaryButton(
             label: 'أريد استخدام التطبيق مجاناً',
             isOutline: true,

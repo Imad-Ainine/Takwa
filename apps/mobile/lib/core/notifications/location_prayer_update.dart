@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -405,7 +404,10 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
     return GestureDetector(
       onTap: _loading ? null : _update,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           children: [
             Container(
@@ -429,7 +431,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                     : const Text('📍', style: TextStyle(fontSize: 18)),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

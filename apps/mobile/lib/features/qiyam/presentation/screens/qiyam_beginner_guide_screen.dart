@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamBeginnerGuideScreen extends StatelessWidget {
   const QiyamBeginnerGuideScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -18,44 +20,40 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                _buildAppBar(context),
+                _buildAppBar(context, l10n),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     children: [
-                      _buildIntroHeader(context),
-                      const SizedBox(height: 24),
+                      _buildIntroHeader(context, l10n),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildTipSection(
                         context,
-                        title: 'ابدأ بالقليل',
-                        content:
-                            'لا تشق على نفسك في البداية، ابدأ بركعتين فقط بعد صلاة العشاء، ثم زد تدريجياً.',
+                        title: l10n.qiyamGuideTip1Title,
+                        content: l10n.qiyamGuideTip1Content,
                         icon: Icons.lightbulb_outline,
                       ),
                       _buildTipSection(
                         context,
-                        title: 'التبكير في النوم',
-                        content:
-                            'النوم مبكراً هو المفتاح الذهبي للاستيقاظ بنشاط في وقت السحر.',
+                        title: l10n.qiyamGuideTip2Title,
+                        content: l10n.qiyamGuideTip2Content,
                         icon: Icons.bedtime_outlined,
                       ),
                       _buildTipSection(
                         context,
-                        title: 'وضوء وبسملة',
-                        content:
-                            'توضأ قبل النوم واقرأ الأذكار، فذلك يعين الروح على القيام.',
+                        title: l10n.qiyamGuideTip3Title,
+                        content: l10n.qiyamGuideTip3Content,
                         icon: Icons.water_drop_outlined,
                       ),
                       _buildTipSection(
                         context,
-                        title: 'اجعلها عادة',
-                        content:
-                            'الاستمرارية أهم من الكثرة، "أحب الأعمال إلى الله أدومها وإن قل".',
+                        title: l10n.qiyamGuideTip4Title,
+                        content: l10n.qiyamGuideTip4Content,
                         icon: Icons.repeat,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       _buildQASection(context),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                     ],
                   ),
                 ),
@@ -67,15 +65,18 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'دليل المبتدئين',
+            l10n.qiyamDashboardBeginnerGuideTool,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
@@ -89,13 +90,13 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIntroHeader(BuildContext context) {
+  Widget _buildIntroHeader(BuildContext context, AppLocalizations l10n) {
     return Column(
       children: [
         Icon(Icons.rocket_launch, size: 60, color: context.colors.gold),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
-          'خطوتك الأولى في قيام الليل',
+          l10n.qiyamGuideIntroTitle,
           style: context.typography.displayMedium.copyWith(
             fontSize: 24,
             color: context.colors.gold,
@@ -103,9 +104,9 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text(
-          'لا تقلق إذا كنت في البداية، فكل قائم لليل بدأ بخطوة بسيطة. إليك خارطة الطريق.',
+          l10n.qiyamGuideIntroSubtitle,
           style: context.typography.bodyLarge.copyWith(
             color: context.colors.textSecondary,
             height: 1.5,
@@ -126,29 +127,29 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: context.colors.border),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: context.colors.gold),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.lg),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +161,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                             color: context.colors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           content,
                           style: context.typography.caption.copyWith(
@@ -181,36 +182,31 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
   }
 
   Widget _buildQASection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final questions = [
-      {
-        'q': 'هل يجب النوم قبل القيام؟',
-        'a': 'لا يشترط، ولكن ما كان بعد نوم يسمى "تهجداً".',
-      },
-      {
-        'q': 'ما هو أقل عدد للركعات؟',
-        'a': 'ركعة واحدة (الوتر)، وأفضلها إحدى عشرة ركعة.',
-      },
-      {'q': 'متى يبدأ وقت القيام؟', 'a': 'من بعد صلاة العشاء وحتى أذان الفجر.'},
+      {'q': l10n.qiyamGuideFaqQ1, 'a': l10n.qiyamGuideFaqA1},
+      {'q': l10n.qiyamGuideFaqQ2, 'a': l10n.qiyamGuideFaqA2},
+      {'q': l10n.qiyamGuideFaqQ3, 'a': l10n.qiyamGuideFaqA3},
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'أسئلة شائعة',
+          l10n.qiyamGuideFaqTitle,
           style: context.typography.displayMedium.copyWith(
             fontSize: 20,
             color: context.colors.gold,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         ...questions.map(
           (qa) => Container(
             margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: context.colors.gold.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(color: context.colors.gold.withOpacity(0.1)),
             ),
             child: Column(
@@ -223,7 +219,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                     color: context.colors.gold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   qa['a']!,
                   style: context.typography.bodyLarge.copyWith(

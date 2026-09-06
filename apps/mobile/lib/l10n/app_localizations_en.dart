@@ -1324,7 +1324,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get khatmaStatStreakLabel => 'Consecutive Days';
 
   @override
-  String get khatmaStatPagesPerDayLabel => 'pages/day';
+  String get khatmaStatPagesPerDayLabel => 'Pages/Day';
 
   @override
   String get khatmaWeeklyChartTitle => 'Weekly Reading';
@@ -2365,4 +2365,852 @@ class AppLocalizationsEn extends AppLocalizations {
   String overlaySettingDailyCount(int count) {
     return 'Popups will appear ~$count times daily';
   }
+
+  @override
+  String get adhkarTabMorning => 'Morning';
+
+  @override
+  String get adhkarTabEvening => 'Evening';
+
+  @override
+  String get adhkarTabAfterPrayer => 'After Prayer';
+
+  @override
+  String get adhkarTabSleep => 'Sleep';
+
+  @override
+  String get adhkarTabWakingUp => 'Waking Up';
+
+  @override
+  String get adhkarTabFood => 'Food';
+
+  @override
+  String get adhkarTabMisc => 'Misc';
+
+  @override
+  String get adhkarTabMine => 'My Adhkar';
+
+  @override
+  String get adhkarTabCommunity => 'Community';
+
+  @override
+  String get adhkarScreenTitle => 'Adhkar & Duas';
+
+  @override
+  String get adhkarScreenSubtitle => 'Fortress of the Muslim';
+
+  @override
+  String get adhkarProgressComplete => '✅ Completed, alhamdulillah!';
+
+  @override
+  String adhkarProgressCount(String done, String total) {
+    return '$done / $total dhikr';
+  }
+
+  @override
+  String get adhkarResetButton => 'Reset';
+
+  @override
+  String adhkarRemainingCount(String remaining) {
+    return '$remaining remaining';
+  }
+
+  @override
+  String adhkarCompletedCount(String count) {
+    return 'Completed $count×';
+  }
+
+  @override
+  String get adhkarHideFadl => 'Hide';
+
+  @override
+  String get adhkarShowFadl => 'Virtue';
+
+  @override
+  String get adhkarNotifSettingsTitle => 'Adhkar Notifications';
+
+  @override
+  String get adhkarNotifDisabled => 'Notifications are off';
+
+  @override
+  String get adhkarNotifMorningLabel => 'Morning Adhkar';
+
+  @override
+  String get adhkarNotifEveningLabel => 'Evening Adhkar';
+
+  @override
+  String get adhkarNotifSleepLabel => 'Sleep Adhkar';
+
+  @override
+  String get adhkarNotifAfterFajrLabel => 'After Fajr Prayer';
+
+  @override
+  String get adhkarNotifAfterAsrLabel => 'After Asr Prayer';
+
+  @override
+  String get qiblaScreenTitle => 'Qibla Direction';
+
+  @override
+  String get qiblaScreenSubtitle => 'Towards the Holy Kaaba 🕋';
+
+  @override
+  String get qiblaCompassLabelAligned =>
+      'Qibla compass, you are now facing the Qibla';
+
+  @override
+  String qiblaCompassLabelUnaligned(String deg, String dir) {
+    return 'Qibla compass, turn your device $deg degrees to the $dir to face the Qibla';
+  }
+
+  @override
+  String get qiblaDirRight => 'right';
+
+  @override
+  String get qiblaDirLeft => 'left';
+
+  @override
+  String get qiblaTurnRightShort => 'right';
+
+  @override
+  String get qiblaTurnLeftShort => 'left';
+
+  @override
+  String get qiblaCurrentDirectionLabel => 'Your Current Direction';
+
+  @override
+  String get qiblaAlignedLabel => 'Aligned ✓';
+
+  @override
+  String qiblaTurnLabel(String dir) {
+    return 'Turn $dir';
+  }
+
+  @override
+  String get qiblaCorrectValue => 'Correct';
+
+  @override
+  String get qiblaFacingNowHint => 'You are facing the Qibla now';
+
+  @override
+  String get qiblaHoldPhoneHint =>
+      'Hold your phone flat and stay away from metal';
+
+  @override
+  String get qiblaLocationRequiredTitle => 'Location Access Required';
+
+  @override
+  String get qiblaLocationRequiredSubtitle =>
+      'To calculate the Qibla direction';
+
+  @override
+  String get qiblaCompassUnavailableTitle => 'Compass Unavailable';
+
+  @override
+  String get qiblaCompassUnavailableSubtitle =>
+      'Make sure your device supports a compass';
+
+  @override
+  String get qiblaCompassNorth => 'N';
+
+  @override
+  String get qiblaCompassEast => 'E';
+
+  @override
+  String get qiblaCompassSouth => 'S';
+
+  @override
+  String get qiblaCompassWest => 'W';
+
+  @override
+  String get khatmaProgressScreenTitle => 'Khatma Progress';
+
+  @override
+  String khatmaProgressPercentComplete(String percent) {
+    return '$percent% complete';
+  }
+
+  @override
+  String get khatmaStatDaysLabel => 'Days';
+
+  @override
+  String get khatmaStatPagesReadLabel => 'Pages Read';
+
+  @override
+  String get khatmaWeeklyReadingTitle => 'Weekly Reading';
+
+  @override
+  String get khatmaReadingAppearanceLabel => 'Reading Appearance';
+
+  @override
+  String get khatmaSettingsSectionTitle => 'Khatma Settings';
+
+  @override
+  String get khatmaReciterLabel => 'Reciter';
+
+  @override
+  String get khatmaReciterDefaultValue => 'Sheikh Al-Minshawi';
+
+  @override
+  String get khatmaDailyReminderLabel => 'Daily Reminder';
+
+  @override
+  String get overlayAdhkarMorning => 'Morning Adhkar';
+
+  @override
+  String get overlayAdhkarEvening => 'Evening Adhkar';
+
+  @override
+  String get overlayAdhkarAfterPrayer => 'After-Prayer Adhkar';
+
+  @override
+  String get overlayAdhkarSleep => 'Sleep Adhkar';
+
+  @override
+  String get overlayAdhkarMisc => 'Miscellaneous Adhkar';
+
+  @override
+  String get overlayAdhkarWakingUp => 'Waking Up';
+
+  @override
+  String get overlayAdhkarFood => 'Food Adhkar';
+
+  @override
+  String get overlayDuaMorning => 'Morning Dua';
+
+  @override
+  String get overlayDuaDistress => 'Dua for Distress';
+
+  @override
+  String get overlayDuaGuidance => 'Dua for Guidance';
+
+  @override
+  String get overlayDuaForgiveness => 'Dua for Forgiveness';
+
+  @override
+  String get overlayDuaRizq => 'Dua for Provision';
+
+  @override
+  String get overlayDuaHealth => 'Dua for Health';
+
+  @override
+  String get overlayDuaParents => 'Dua for Parents';
+
+  @override
+  String get overlayDuaTravel => 'Dua for Travel';
+
+  @override
+  String get overlayDuaRain => 'Dua for Rain';
+
+  @override
+  String get overlayDuaGeneral => 'General Dua';
+
+  @override
+  String get overlayTypeDua => 'Dua';
+
+  @override
+  String get overlayTypeDhikr => 'Dhikr';
+
+  @override
+  String get overlayTapOutsideToClose => 'Tap outside to close';
+
+  @override
+  String get forgotPasswordEnterEmail => 'Please enter your email';
+
+  @override
+  String get forgotPasswordInvalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get forgotPasswordCodeSentMessage =>
+      'A verification code and reset link have been sent to your email.';
+
+  @override
+  String get forgotPasswordSendCodeFailed =>
+      'Couldn\'t send the code — check your internet connection.';
+
+  @override
+  String get forgotPasswordEnterOtp =>
+      'Please enter the 6-digit verification code';
+
+  @override
+  String get forgotPasswordInvalidOtp =>
+      'The verification code is invalid or expired';
+
+  @override
+  String get forgotPasswordVerifyFailed =>
+      'Couldn\'t verify the code, please try again';
+
+  @override
+  String get forgotPasswordRateLimited =>
+      'You\'ve exceeded the allowed attempts — please wait a moment';
+
+  @override
+  String get forgotPasswordTokenInvalidOrExpired =>
+      'The verification code is invalid or has expired';
+
+  @override
+  String get forgotPasswordNoAccountFound =>
+      'No account is associated with this email';
+
+  @override
+  String get forgotPasswordGenericError =>
+      'An error occurred while processing, please try again later';
+
+  @override
+  String get forgotPasswordEnterCodeTitle => 'Enter Verification Code';
+
+  @override
+  String get forgotPasswordRecoverTitle => 'Recover Password';
+
+  @override
+  String get forgotPasswordEnterCodeSubtitle =>
+      'Enter the 6-digit code sent to your email, or tap the link in the message';
+
+  @override
+  String get forgotPasswordRecoverSubtitle =>
+      'Enter your registered email and we\'ll send you a password reset code';
+
+  @override
+  String get forgotPasswordOtpHint => 'Verification code (6 digits)';
+
+  @override
+  String get forgotPasswordProcessing => 'Processing...';
+
+  @override
+  String get forgotPasswordVerifyAndContinue => 'Verify & Continue';
+
+  @override
+  String get forgotPasswordSendCode => 'Send Code';
+
+  @override
+  String forgotPasswordResendCountdown(String seconds) {
+    return 'Resend in $seconds seconds';
+  }
+
+  @override
+  String get forgotPasswordResendCode => 'Resend Code';
+
+  @override
+  String get timePeriodAm => 'AM';
+
+  @override
+  String get timePeriodPm => 'PM';
+
+  @override
+  String get wakeUpOverlayTitle => 'It\'s time to wake up';
+
+  @override
+  String get wakeUpSnoozeButton => 'Snooze 10m';
+
+  @override
+  String get wakeUpStopAlarmButton => 'Stop Alarm';
+
+  @override
+  String get booksLibraryTitle => 'Islamic Library';
+
+  @override
+  String get booksListViewTooltip => 'List View';
+
+  @override
+  String get booksGridViewTooltip => 'Grid View';
+
+  @override
+  String get booksNoResultsFound => 'No books found';
+
+  @override
+  String get booksServerConnectionError => 'Couldn\'t connect to the server';
+
+  @override
+  String get booksConnectionErrorHint =>
+      'Please check your internet connection and try again\nor pull down to refresh';
+
+  @override
+  String get booksSearchHint => 'Search for a book or author...';
+
+  @override
+  String get booksCategoryAll => 'All';
+
+  @override
+  String get booksCategoryHadith => 'Hadith';
+
+  @override
+  String get booksCategoryFiqh => 'Fiqh';
+
+  @override
+  String get booksCategorySeerah => 'Seerah';
+
+  @override
+  String get booksCategoryAqeedah => 'Aqeedah';
+
+  @override
+  String get booksCategoryAdab => 'Adab';
+
+  @override
+  String get booksCategoryTazkiyah => 'Tazkiyah';
+
+  @override
+  String get booksCategoryQuranicSciences => 'Quranic Sciences';
+
+  @override
+  String get booksVolumeLabel => 'Volume';
+
+  @override
+  String get booksBookletLabel => 'Booklet';
+
+  @override
+  String get booksLoadingMessage => 'Loading books...';
+
+  @override
+  String get khatmaDailyGoalLabel => 'Daily Goal';
+
+  @override
+  String khatmaDailyGoalPages(String n) {
+    return '$n pages';
+  }
+
+  @override
+  String get khatmaAppInfoSectionTitle => 'App Info';
+
+  @override
+  String get khatmaVersionLabel => 'Version';
+
+  @override
+  String get khatmaRateAppLabel => 'Rate the App';
+
+  @override
+  String get khatmaHistoryTitle => 'Khatma History';
+
+  @override
+  String khatmaHistoryCompletedTab(String count) {
+    return 'Completed ($count)';
+  }
+
+  @override
+  String khatmaHistoryCancelledTab(String count) {
+    return 'Cancelled ($count)';
+  }
+
+  @override
+  String get khatmaHistoryError => 'Error';
+
+  @override
+  String get khatmaHistoryEmptyCompletedTitle =>
+      'No completed or finished khatmas';
+
+  @override
+  String get khatmaHistoryEmptyCompletedSubtitle =>
+      'Start a new khatma to see it here once completed or finished';
+
+  @override
+  String get khatmaHistoryEmptyCancelledTitle => 'No cancelled khatmas';
+
+  @override
+  String get khatmaHistoryEmptyCancelledSubtitle =>
+      'Cancelled khatmas will appear here';
+
+  @override
+  String get khatmaHistoryDeleteTitle => 'Delete Khatma';
+
+  @override
+  String get khatmaHistoryDeleteConfirm =>
+      'Do you want to permanently delete this khatma?';
+
+  @override
+  String get khatmaHistoryDeletedToast => 'Khatma deleted successfully';
+
+  @override
+  String get khatmaHistoryStatusCompleted => 'Completed';
+
+  @override
+  String get khatmaHistoryStatusCancelled => 'Cancelled';
+
+  @override
+  String khatmaHistoryDaysLabel(String n) {
+    return '$n days';
+  }
+
+  @override
+  String khatmaHistoryPagesProgress(String read, String total) {
+    return '$read / $total pages';
+  }
+
+  @override
+  String get qiyamWirdTitle => 'Qiyam Wird';
+
+  @override
+  String get qiyamWirdBeforeQiyamHeader => 'Adhkar Before Qiyam';
+
+  @override
+  String get qiyamWirdIstighfarTitle => 'Istighfar';
+
+  @override
+  String get qiyamWirdTasbihTitle => 'Tasbih';
+
+  @override
+  String get qiyamWirdLastThirdHeader =>
+      'Duas from the Last Third of the Night';
+
+  @override
+  String get qiyamWirdProphetDuaTitle => 'Dua of the Prophet ﷺ';
+
+  @override
+  String get qiyamWirdSayyidIstighfarTitle => 'Sayyid al-Istighfar';
+
+  @override
+  String get qiyamWirdMulkHeader => 'Surah Al-Mulk (The Protector)';
+
+  @override
+  String get qiyamWirdReadMulkTitle => 'Read Surah Al-Mulk';
+
+  @override
+  String get qiyamWirdMulkSubtitle =>
+      'Intercedes for its reader and saves from the punishment of the grave';
+
+  @override
+  String get qiyamWirdCompletedButton => 'Wird completed successfully';
+
+  @override
+  String get qiyamWirdTapToCountButton => 'Tap to count';
+
+  @override
+  String get qiyamDashboardTitle => 'Qiyam Al-Layl';
+
+  @override
+  String qiyamDashboardStageProgress(String current, String total) {
+    return 'Stage $current of $total';
+  }
+
+  @override
+  String get qiyamDashboardChooseStageDuration => 'Choose stage duration';
+
+  @override
+  String qiyamDashboardMinutesLabel(num mins) {
+    String _temp0 = intl.Intl.pluralLogic(
+      mins,
+      locale: localeName,
+      other: '$mins minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get qiyamDashboardTimeRemainingLabel => 'Time Remaining';
+
+  @override
+  String get qiyamDashboardStoriesTitle => 'Wonders and Stories of Qiyam';
+
+  @override
+  String get qiyamDashboardStoriesSubtitle =>
+      'Inspiring true stories about the impact of night prayer';
+
+  @override
+  String get qiyamDashboardToolsSectionTitle => 'Tools & Faith Guide';
+
+  @override
+  String get qiyamDashboardVirtuesTool => 'Virtues of Qiyam';
+
+  @override
+  String get qiyamDashboardSleepCalcTool => 'Sleep Calculator';
+
+  @override
+  String get qiyamDashboardSunnahTool => 'The Prophetic Sunnah';
+
+  @override
+  String get qiyamDashboardBeginnerGuideTool => 'Beginner\'s Guide';
+
+  @override
+  String get qiyamDashboardHourCalcTool => 'Hour Calculator';
+
+  @override
+  String get qiyamDashboardBannerLabel => 'Notice';
+
+  @override
+  String get qiyamDashboardBannerDesc =>
+      'A complete program for night prayer... a step closer to Allah.';
+
+  @override
+  String get qiyamGuideIntroTitle => 'Your First Step into Qiyam Al-Layl';
+
+  @override
+  String get qiyamGuideIntroSubtitle =>
+      'Don\'t worry if you\'re just starting — everyone who prays qiyam began with a simple step. Here\'s your roadmap.';
+
+  @override
+  String get qiyamGuideTip1Title => 'Start Small';
+
+  @override
+  String get qiyamGuideTip1Content =>
+      'Don\'t overburden yourself at first — start with just two rak\'ahs after Isha prayer, then gradually increase.';
+
+  @override
+  String get qiyamGuideTip2Title => 'Sleep Early';
+
+  @override
+  String get qiyamGuideTip2Content =>
+      'Sleeping early is the golden key to waking up energized in the last third of the night.';
+
+  @override
+  String get qiyamGuideTip3Title => 'Wudu and Bismillah';
+
+  @override
+  String get qiyamGuideTip3Content =>
+      'Perform wudu before sleeping and recite the adhkar — this helps the soul rise for qiyam.';
+
+  @override
+  String get qiyamGuideTip4Title => 'Make It a Habit';
+
+  @override
+  String get qiyamGuideTip4Content =>
+      'Consistency matters more than quantity — \"The most beloved deeds to Allah are the most consistent, even if small.\"';
+
+  @override
+  String get qiyamGuideFaqTitle => 'Frequently Asked Questions';
+
+  @override
+  String get qiyamGuideFaqQ1 => 'Is it required to sleep before Qiyam?';
+
+  @override
+  String get qiyamGuideFaqA1 =>
+      'It is not required, but prayer performed after sleeping is called \"Tahajjud\".';
+
+  @override
+  String get qiyamGuideFaqQ2 => 'What is the minimum number of rak\'ahs?';
+
+  @override
+  String get qiyamGuideFaqA2 =>
+      'One rak\'ah (Witr), though eleven rak\'ahs is best.';
+
+  @override
+  String get qiyamGuideFaqQ3 => 'When does the time for Qiyam begin?';
+
+  @override
+  String get qiyamGuideFaqA3 => 'From after Isha prayer until the Fajr adhan.';
+
+  @override
+  String get mosquesCannotOpenMaps => 'Couldn\'t open Maps';
+
+  @override
+  String get mosquesCannotMakeCall => 'Couldn\'t make the call';
+
+  @override
+  String get mosquesNearbyTitle => 'Nearby Mosques';
+
+  @override
+  String mosquesCurrentLocationLabel(String city) {
+    return 'Current location: $city';
+  }
+
+  @override
+  String get mosquesViewOnMapButton => 'View on Map';
+
+  @override
+  String mosquesDistanceMeters(String n) {
+    return '$n m';
+  }
+
+  @override
+  String mosquesDistanceKm(String n) {
+    return '$n km';
+  }
+
+  @override
+  String mosquesNextPrayerLabel(String time) {
+    return 'Next prayer: $time';
+  }
+
+  @override
+  String get mosquesDirectionsButton => 'Directions';
+
+  @override
+  String get mosquesCallButton => 'Call';
+
+  @override
+  String get mosquesHadithSectionTitle => 'The Virtue of Going to the Mosque';
+
+  @override
+  String get mosquesEmptyState =>
+      'No nearby mosques found within a 5 km radius';
+
+  @override
+  String get quranScreenKhatmaLabel => 'Khatma';
+
+  @override
+  String get quranScreenTitle => 'The Noble Quran';
+
+  @override
+  String quranScreenAyahLabel(String n) {
+    return 'Verse $n';
+  }
+
+  @override
+  String get quranScreenContinueKhatma => 'Continue Khatma';
+
+  @override
+  String get quranScreenStartNewKhatma => 'Start New Khatma';
+
+  @override
+  String quranScreenContinueFromPage(String page) {
+    return 'Continue reading from page $page';
+  }
+
+  @override
+  String get quranScreenChooseKhatmaOptions =>
+      'Choose the khatma options that suit you';
+
+  @override
+  String get quranScreenFreeReadingTitle => 'Free Reading';
+
+  @override
+  String get quranScreenFreeReadingSubtitle => 'Read the Noble Quran freely';
+
+  @override
+  String get quranScreenHistoryGridSubtitle => 'Completed Khatmas';
+
+  @override
+  String get quranScreenProgressGridSubtitle => 'Reading Statistics';
+
+  @override
+  String get quranScreenSettingsGridSubtitle => 'Customize the App';
+
+  @override
+  String get quranScreenAiMemorizeTitle => 'Smart Memorization';
+
+  @override
+  String get quranScreenAiMemorizeSubtitle => 'Memorize the Quran with AI';
+
+  @override
+  String get remindersAdviceTitle => 'Advice';
+
+  @override
+  String get remindersAdviceDesc =>
+      'Maintaining daily adhkar brings peace and tranquility to the heart. Make sure to enable reminders to stay in constant connection with Allah.';
+
+  @override
+  String get remindersScreenTitle => 'Reminders';
+
+  @override
+  String get remindersAddButtonTitle => 'Add New Reminder';
+
+  @override
+  String get remindersAddButtonSubtitle =>
+      'Tap here to create a custom reminder';
+
+  @override
+  String get remindersEmptyTitle => 'No reminders yet';
+
+  @override
+  String get remindersEmptySubtitle =>
+      'Add your first reminder by tapping the button above';
+
+  @override
+  String get remindersMyRemindersTitle => 'My Reminders';
+
+  @override
+  String remindersCountBadge(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reminders',
+      one: '1 reminder',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get remindersDeleteDialogTitle => 'Delete Reminder';
+
+  @override
+  String remindersDeleteDialogConfirm(String title) {
+    return 'Do you want to delete \"$title\"?';
+  }
+
+  @override
+  String get profileScreenTitle => 'Profile';
+
+  @override
+  String get profileLoadError => 'Error loading data';
+
+  @override
+  String get profileDefaultUsername => 'Takwa User';
+
+  @override
+  String get profileGenderMale => 'Male';
+
+  @override
+  String get profileGenderFemale => 'Female';
+
+  @override
+  String get profileMemberBadge => 'Dedicated Member';
+
+  @override
+  String get profileTaqwaPointsLabel => 'Taqwa Points';
+
+  @override
+  String get profileStreakDaysLabel => 'Consecutive Days';
+
+  @override
+  String get profileAchievementsMenuTitle => 'Achievements';
+
+  @override
+  String get profileAccountingLogMenuTitle => 'Accountability Log';
+
+  @override
+  String get profileAccountSettingsMenuTitle => 'Account Settings';
+
+  @override
+  String get profileLogoutDialogTitle => 'Log Out';
+
+  @override
+  String get profileLogoutDialogConfirm => 'Are you sure you want to log out?';
+
+  @override
+  String get profileLogoutConfirmButton => 'Exit';
+
+  @override
+  String get updatePasswordEnterNew => 'Enter your new password';
+
+  @override
+  String get updatePasswordMismatch => 'Passwords don\'t match';
+
+  @override
+  String get updatePasswordSuccessMessage => 'New password set successfully ✓';
+
+  @override
+  String get updatePasswordUnexpectedError =>
+      'An unexpected error occurred, please try again later';
+
+  @override
+  String get updatePasswordSameAsOld =>
+      'The new password matches your current password';
+
+  @override
+  String get updatePasswordMinLength =>
+      'Password must be at least 6 characters';
+
+  @override
+  String get updatePasswordSessionExpired =>
+      'Your session has expired, please request a new recovery code';
+
+  @override
+  String get updatePasswordGenericFailure =>
+      'Couldn\'t update the password, please try again';
+
+  @override
+  String get updatePasswordTitle => 'Set New Password';
+
+  @override
+  String get updatePasswordSubtitle =>
+      'Enter your account\'s new password to sign in securely';
+
+  @override
+  String get updatePasswordNewHint => 'New Password';
+
+  @override
+  String get updatePasswordConfirmHint => 'Confirm New Password';
+
+  @override
+  String get updatePasswordSavingButton => 'Saving...';
+
+  @override
+  String get updatePasswordSaveAndSignInButton => 'Save Password & Sign In';
 }

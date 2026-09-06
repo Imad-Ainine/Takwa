@@ -287,8 +287,8 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               // Header
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
+                  horizontal: AppSpacing.xxl,
+                  vertical: AppSpacing.sm,
                 ),
                 child: Row(
                   children: [
@@ -306,7 +306,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         child: Text('🌍', style: TextStyle(fontSize: 18)),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +345,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
 
               Expanded(
                 child: ListView(
@@ -358,7 +358,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       onTap: _autoDetectLocation,
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xxl),
 
                     // Divider
                     Row(
@@ -369,7 +369,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
                           child: Text(
                             l10n.locationPickerOrChooseCity,
                             style: TextStyle(
@@ -387,7 +389,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Curated Cities Grid / List
                     ..._cities.map(
@@ -483,14 +485,17 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
         builder: (context, child) => Transform.scale(
           scale: 1.0 - (_hoverCtrl.value * 0.02),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.lg,
+            ),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF2A5A58), Color(0xFF1E3C3A)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: context.colors.teal.withOpacity(0.5)),
               boxShadow: [
                 BoxShadow(
@@ -523,7 +528,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                           ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.lg),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,16 +582,19 @@ class _CityCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         decoration: BoxDecoration(
           color: context.colors.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: context.colors.border),
         ),
         child: Row(
           children: [
             Text(cityData['emoji'], style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -612,10 +620,13 @@ class _CityCard extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: AppSpacing.xs,
+              ),
               decoration: BoxDecoration(
                 color: context.colors.textDim.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Text(
                 l10n.locationPickerSelectButton,

@@ -7,6 +7,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/auth_field.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class UpdatePasswordScreen extends ConsumerStatefulWidget {
   const UpdatePasswordScreen({super.key});
@@ -47,19 +48,20 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
   }
 
   Future<void> _updatePassword() async {
+    final l10n = AppLocalizations.of(context)!;
     final password = _passCtrl.text;
     final confirmPassword = _confirmPassCtrl.text;
 
     if (password.isEmpty) {
-      setState(() => _error = 'أدخل كلمة المرور الجديدة');
+      setState(() => _error = l10n.updatePasswordEnterNew);
       return;
     }
     if (password.length < 6) {
-      setState(() => _error = 'كلمة المرور يجب أن تتكون من 6 خانات على الأقل');
+      setState(() => _error = l10n.authErrorPasswordTooShort);
       return;
     }
     if (password != confirmPassword) {
-      setState(() => _error = 'كلمات المرور غير متطابقة');
+      setState(() => _error = l10n.updatePasswordMismatch);
       return;
     }
 
@@ -76,17 +78,17 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.check_circle_rounded, color: Colors.white),
-                SizedBox(width: 8),
-                Text('تم تعيين كلمة المرور الجديدة بنجاح ✓'),
+                const Icon(Icons.check_circle_rounded, color: Colors.white),
+                const SizedBox(width: AppSpacing.sm),
+                Text(l10n.updatePasswordSuccessMessage),
               ],
             ),
             backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
           ),
         );
@@ -98,11 +100,11 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
       }
     } on AuthException catch (e) {
       if (mounted) {
-        setState(() => _error = _mapAuthError(e.message));
+        setState(() => _error = _mapAuthError(l10n, e.message));
       }
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً');
+        setState(() => _error = l10n.updatePasswordUnexpectedError);
       }
     } finally {
       if (mounted) {
@@ -111,22 +113,23 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
     }
   }
 
-  String _mapAuthError(String message) {
+  String _mapAuthError(AppLocalizations l10n, String message) {
     final msg = message.toLowerCase();
     if (msg.contains('same password')) {
-      return 'كلمة المرور الجديدة مطابقة لكلمة المرور الحالية';
+      return l10n.updatePasswordSameAsOld;
     }
     if (msg.contains('password should')) {
-      return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+      return l10n.updatePasswordMinLength;
     }
     if (msg.contains('session')) {
-      return 'انتهت صلاحية الجلسة، يرجى طلب رمز استعادة جديد';
+      return l10n.updatePasswordSessionExpired;
     }
-    return 'تعذر تحديث كلمة المرور، حاول مجدداً';
+    return l10n.updatePasswordGenericFailure;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
 
@@ -139,7 +142,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -174,28 +177,28 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xxl),
 
                     // Title
                     Text(
-                      'تعيين كلمة مرور جديدة',
+                      l10n.updatePasswordTitle,
                       style: s.amiri(32, weight: FontWeight.w700),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
 
                     // Subtitle
                     Text(
-                      'قم بإدخال كلمة المرور الجديدة لحسابك لتسجيل الدخول بأمان',
+                      l10n.updatePasswordSubtitle,
                       style: s.naskh(13, color: s.textSec),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     // Password Field
                     AuthField(
                       ctrl: _passCtrl,
-                      hint: 'كلمة المرور الجديدة',
+                      hint: l10n.updatePasswordNewHint,
                       icon: Icons.lock_outline_rounded,
                       isPassword: true,
                       style: s,
@@ -206,9 +209,11 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
 
                     // Strength bar
                     if (_passCtrl.text.isNotEmpty) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
                         child: PasswordStrengthBar(
                           strength: _passStrength,
                           style: s,
@@ -216,12 +221,12 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Confirm Password Field
                     AuthField(
                       ctrl: _confirmPassCtrl,
-                      hint: 'تأكيد كلمة المرور الجديدة',
+                      hint: l10n.updatePasswordConfirmHint,
                       icon: Icons.lock_clock_outlined,
                       isPassword: true,
                       style: s,
@@ -232,12 +237,12 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
 
                     // Error banner
                     if (_error != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
                             color: Colors.redAccent.withOpacity(0.4),
                           ),
@@ -261,14 +266,14 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     // Submit Button
                     PrimaryButton(
                       onTap: _loading ? null : _updatePassword,
                       label: _loading
-                          ? 'جاري الحفظ...'
-                          : 'حفظ كلمة المرور والدخول',
+                          ? l10n.updatePasswordSavingButton
+                          : l10n.updatePasswordSaveAndSignInButton,
                     ),
                   ],
                 ),

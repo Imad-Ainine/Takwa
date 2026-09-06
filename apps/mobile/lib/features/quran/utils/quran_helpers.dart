@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -158,7 +157,9 @@ String localizedNumeral(BuildContext context, int n) =>
 /// Hijri month names (e.g. "ربيع الأول") contain a space themselves.
 String hijriMonthYearLabel() {
   final h = HijriCalendar.now();
-  final year = HijriCalendar.language == 'ar' ? ar(h.hYear) : h.hYear.toString();
+  final year = HijriCalendar.language == 'ar'
+      ? ar(h.hYear)
+      : h.hYear.toString();
   return '${h.getLongMonthName()} $year';
 }
 

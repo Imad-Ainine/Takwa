@@ -1,4 +1,3 @@
-
 // ─────────────────────────────────────────
 //  MODELS
 // ─────────────────────────────────────────
@@ -196,8 +195,12 @@ const _arbaounNawawiyya = IslamicBook(
   coverColor2: '0xFF3AAFA9',
   coverUrl:
       'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1381021768i/6740315.jpg', // Sample real cover
+  // Hosted in the `book-pdfs` Supabase Storage bucket — see the Security &
+  // Privacy audit (2026-09-06): this used to point at islamhouse.com and
+  // needed a spoofed desktop User-Agent to get past its anti-bot checks.
+  // Same PDF, verified byte-identical before the move.
   pdfUrl:
-      'https://d1.islamhouse.com/data/ar/ih_books/parts/Forty_Nawawi_Hadith/ar_Forty_Nawawi_Hadith_Dar_Alsalam.pdf', // Direct PDF url to Arbaoun Nawawiyya
+      'https://fmmgiykwebwruhxeztvs.supabase.co/storage/v1/object/public/book-pdfs/arboun_nawawi.pdf',
 );
 
 // ─────────────────────────────────────────
@@ -218,8 +221,9 @@ const _riyadhSalihin = IslamicBook(
   coverColor2: '0xFFC8A96E',
   coverUrl:
       'https://www.noor-book.com/publice/covers_cache_webp/3/b/6/2/277b87d65ab623e3b228d355b7322ae6.jpg.webp',
+  // See the note on _arbaounNawawiyya above — same Storage-hosted change.
   pdfUrl:
-      'https://d1.islamhouse.com/data/ar/ih_books/single_01/ar_Riyad_usSaliheen.pdf',
+      'https://fmmgiykwebwruhxeztvs.supabase.co/storage/v1/object/public/book-pdfs/riyad_salihin.pdf',
 );
 
 // ─────────────────────────────────────────
@@ -240,8 +244,9 @@ const _zadAlMaad = IslamicBook(
   coverColor2: '0xFFC8A96E',
   coverUrl:
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSZge4_YviGc-FhpZ5O4YRV1t_9Nmuqw16gQ&s',
+  // See the note on _arbaounNawawiyya above — same Storage-hosted change.
   pdfUrl:
-      'https://d1.islamhouse.com/data/ar/ih_books/single-03/ar-Zaad-Almaad4.pdf',
+      'https://fmmgiykwebwruhxeztvs.supabase.co/storage/v1/object/public/book-pdfs/zad_al_maad_4.pdf',
 );
 
 // ─────────────────────────────────────────

@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 
@@ -7,8 +6,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 /// Converts a URL into a safe flat filename,
-/// e.g. "https://d1.islamhouse.com/data/ar/…/file.pdf"
-/// → "d1.islamhouse.com_data_ar_file.pdf"
+/// e.g. "https://…supabase.co/storage/v1/object/public/book-pdfs/file.pdf"
+/// → "…supabase.co_storage_v1_object_public_book-pdfs_file.pdf"
 String _urlToFilename(String url) {
   try {
     final uri = Uri.parse(url);
@@ -32,16 +31,12 @@ const _kCacheMaxAge = Duration(days: 7);
 /// Number of download attempts before surfacing an error.
 const _kMaxRetries = 3;
 
-/// Custom HTTP headers that bypass islamhouse.com SSL/referer restrictions.
-const _kHeaders = <String, String>{
-  'User-Agent':
-      'Mozilla/5.0 (Linux; Android 11; Mobile) AppleWebKit/537.36 '
-      '(KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-  'Accept': 'application/pdf,*/*;q=0.8',
-  'Accept-Language': 'ar,en;q=0.9',
-  'Referer': 'https://islamhouse.com/',
-  'Connection': 'keep-alive',
-};
+/// Book PDFs are now served from the app's own Supabase Storage bucket
+/// (see the Security & Privacy audit, 2026-09-06) instead of scraped from
+/// islamhouse.com, so the spoofed desktop User-Agent/Referer that bypass
+/// once needed to get past its anti-bot checks are gone — a plain request
+/// is all a public Storage object needs.
+const _kHeaders = <String, String>{'Accept': 'application/pdf,*/*;q=0.8'};
 
 /// A singleton-style service that downloads a PDF, caches it on disk, and
 /// exposes download progress via an optional [StreamController<double>].
@@ -124,9 +119,7 @@ class PdfDownloadService {
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
-        throw HttpException(
-          'HTTP ${response.statusCode} for $url',
-        );
+        throw HttpException('HTTP ${response.statusCode} for $url');
       }
 
       final total = response.contentLength ?? -1;

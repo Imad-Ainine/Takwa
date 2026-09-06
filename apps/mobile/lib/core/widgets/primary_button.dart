@@ -137,7 +137,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                     ),
                   ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 child: _loading
                     ? Center(
                         child: TakwaLoadingIndicator(
@@ -158,7 +158,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                                   size: 18,
                                   color: contentColor,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppSpacing.sm),
                               ],
                               Text(
                                 widget.label,

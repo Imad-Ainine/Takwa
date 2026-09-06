@@ -9,7 +9,11 @@ class CustomCurvedEdges extends CustomClipper<Path> {
     final firstCurve = Offset(0, size.height - 20);
     final lastCurve = Offset(30, size.height - 20);
     path.quadraticBezierTo(
-        firstCurve.dx, firstCurve.dy, lastCurve.dx, lastCurve.dy);
+      firstCurve.dx,
+      firstCurve.dy,
+      lastCurve.dx,
+      lastCurve.dy,
+    );
 
     final secondFirstCurve = Offset(0, size.height - 20);
     final secondLastCurve = Offset(size.width - 30, size.height - 20);
@@ -18,7 +22,11 @@ class CustomCurvedEdges extends CustomClipper<Path> {
     final thirdFirstCurve = Offset(size.width, size.height - 20);
     final thirdLastCurve = Offset(size.width, size.height);
     path.quadraticBezierTo(
-        thirdFirstCurve.dx, thirdFirstCurve.dy, thirdLastCurve.dx, thirdLastCurve.dy);
+      thirdFirstCurve.dx,
+      thirdFirstCurve.dy,
+      thirdLastCurve.dx,
+      thirdLastCurve.dy,
+    );
 
     path.lineTo(size.width, 0);
     path.close();
@@ -37,10 +45,7 @@ class TCurvedEdgeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isCurved) return child ?? const SizedBox();
-    return ClipPath(
-      clipper: CustomCurvedEdges(),
-      child: child,
-    );
+    return ClipPath(clipper: CustomCurvedEdges(), child: child);
   }
 }
 

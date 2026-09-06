@@ -117,7 +117,7 @@ class _AddReminderBottomSheetState
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.xl),
 
                 // Title
                 Row(
@@ -134,7 +134,7 @@ class _AddReminderBottomSheetState
                         size: 22,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.md),
                     Text(
                       'إضافة تذكير جديد',
                       style: context.typography.headingMedium,
@@ -145,7 +145,7 @@ class _AddReminderBottomSheetState
 
                 // ── عنوان التذكير ──
                 Text('عنوان التذكير', style: context.typography.labelLarge),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 TextFormField(
                   controller: _titleController,
                   style: context.typography.bodyMedium,
@@ -168,17 +168,17 @@ class _AddReminderBottomSheetState
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
 
                 // ── وقت التذكير ──
                 Text('وقت التذكير', style: context.typography.labelLarge),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 InkWell(
                   onTap: () => _selectTime(context),
                   borderRadius: AppRadius.input,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: AppSpacing.lg,
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
@@ -193,7 +193,7 @@ class _AddReminderBottomSheetState
                           color: context.colors.gold,
                           size: 20,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Text(
                           _selectedTime.format(context),
                           style: context.typography.bodyLarge.copyWith(
@@ -210,11 +210,11 @@ class _AddReminderBottomSheetState
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
 
                 // ── اختر الأيقونة ──
                 Text('أيقونة التذكير', style: context.typography.labelLarge),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -231,7 +231,7 @@ class _AddReminderBottomSheetState
                           gradient: isSelected
                               ? context.colors.tealGoldGradient
                               : null,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: isSelected
                               ? null
                               : Border.all(color: context.colors.border),
@@ -270,7 +270,7 @@ class _AddReminderBottomSheetState
                         onTap: () async => Navigator.pop(context),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: PrimaryButton(label: 'إضافة', onTap: _save),
                     ),

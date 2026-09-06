@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -76,7 +75,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     try {
       final gender = await ref.read(settingsDaoProvider).get('gender');
       if (gender != null) {
-        await ref.read(supabaseServiceProvider).updateProfile({'gender': gender});
+        await ref.read(supabaseServiceProvider).updateProfile({
+          'gender': gender,
+        });
       }
     } catch (e) {
       debugPrint('Error syncing gender: $e');
@@ -95,10 +96,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _error = null;
     });
     try {
-      await ref.read(supabaseServiceProvider).signIn(
-        email: _emailCtrl.text.trim(),
-        password: _passCtrl.text,
-      );
+      await ref
+          .read(supabaseServiceProvider)
+          .signIn(email: _emailCtrl.text.trim(), password: _passCtrl.text);
       await _syncGender();
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
@@ -125,11 +125,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       _error = null;
     });
     try {
-      await ref.read(supabaseServiceProvider).signUp(
-        email: _emailCtrl.text.trim(),
-        password: _passCtrl.text,
-        username: _userCtrl.text.trim(),
-      );
+      await ref
+          .read(supabaseServiceProvider)
+          .signUp(
+            email: _emailCtrl.text.trim(),
+            password: _passCtrl.text,
+            username: _userCtrl.text.trim(),
+          );
       await _syncGender();
       if (mounted) {
         Navigator.pushReplacementNamed(
@@ -228,6 +230,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   // ── Build ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
 
@@ -261,9 +264,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     child: Column(
                       children: [
                         _anim(0, _buildGlassCard(s)),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                         _anim(1, _buildSeparator(s)),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         _anim(2, _buildGoogleBtn(s)),
                         const SizedBox(height: 28),
                         _anim(
@@ -272,7 +275,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                             onTap: () =>
                                 Navigator.pushReplacementNamed(context, '/'),
                             child: Text(
-                              'متابعة كضيف — استكشف التطبيق ➜',
+                              l10n.authContinueAsGuest,
                               style: s.naskh(
                                 13,
                                 color: s.textSec,
@@ -328,6 +331,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   // ── Glassmorphism Form Card ────────────────────────────
   Widget _buildGlassCard(AdaptiveStyle s) {
+    final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
@@ -351,7 +355,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               // ── Tab bar ──
               Container(
                 height: 50,
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppSpacing.xs),
                 decoration: BoxDecoration(
                   color: s.bg,
                   borderRadius: BorderRadius.circular(24),
@@ -377,13 +381,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   unselectedLabelColor: s.textSec,
                   dividerColor: Colors.transparent,
                   labelStyle: s.naskh(13, weight: FontWeight.bold),
-                  tabs: const [
-                    Tab(text: 'تسجيل الدخول'),
-                    Tab(text: 'حساب جديد'),
+                  tabs: [
+                    Tab(text: l10n.authSignInTab),
+                    Tab(text: l10n.authSignUpTab),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
 
               // ── Username field (sign-up only) ──
               AnimatedCrossFade(
@@ -396,7 +400,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   children: [
                     AuthField(
                       ctrl: _userCtrl,
-                      hint: 'اسم المستخدم',
+                      hint: l10n.authUsernameHint,
                       icon: Icons.person_outline_rounded,
                       style: s,
                     ),
@@ -408,7 +412,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               // ── Email ──
               AuthField(
                 ctrl: _emailCtrl,
-                hint: 'البريد الإلكتروني',
+                hint: l10n.authEmailHint,
                 icon: Icons.alternate_email_rounded,
                 style: s,
                 keyboardType: TextInputType.emailAddress,
@@ -418,7 +422,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               // ── Password ──
               AuthField(
                 ctrl: _passCtrl,
-                hint: 'كلمة المرور',
+                hint: l10n.authPasswordHint,
                 icon: Icons.lock_outline_rounded,
                 style: s,
                 isPassword: true,
@@ -444,14 +448,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                   child: TextButton(
                     onPressed: _openForgotPassword,
                     child: Text(
-                      'نسيت كلمة المرور؟',
+                      l10n.authForgotPassword,
                       style: s.naskh(12, color: s.gold),
                     ),
                   ),
                 ),
 
               if (_error != null) _buildError(s),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
 
               // ── Submit ──
               PrimaryButton(
@@ -464,7 +468,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                           await _signUp();
                         }
                       },
-                label: _tabs.index == 0 ? 'دخول آمن' : 'إنشاء حساب',
+                label: _tabs.index == 0
+                    ? l10n.authSecureSignInButton
+                    : l10n.authCreateAccountButton,
               ),
             ],
           ),
@@ -481,7 +487,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.red.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
         ),
         child: Row(
@@ -502,12 +508,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Widget _buildSeparator(AdaptiveStyle s) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(child: Divider(color: s.border.withOpacity(0.5))),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text('أو', style: s.naskh(12, color: s.textDim)),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Text(
+            l10n.authOrSeparator,
+            style: s.naskh(12, color: s.textDim),
+          ),
         ),
         Expanded(child: Divider(color: s.border.withOpacity(0.5))),
       ],
@@ -515,15 +525,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   }
 
   Widget _buildGoogleBtn(AdaptiveStyle s) {
+    final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: InkWell(
           onTap: _loading ? null : _signInGoogle,
           borderRadius: BorderRadius.circular(24),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.xxl,
+            ),
             decoration: BoxDecoration(
               color: s.bg.withOpacity(0.65),
               borderRadius: BorderRadius.circular(24),
@@ -533,7 +547,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'الدخول عبر Google',
+                  l10n.authGoogleSignInButton,
                   style: s.naskh(14, weight: FontWeight.w600),
                 ),
               ],
@@ -621,6 +635,7 @@ class _AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -634,7 +649,7 @@ class _AuthHeader extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               // Glowing logo
               Hero(
                 tag: 'app_logo',
@@ -669,13 +684,13 @@ class _AuthHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               ShaderMask(
                 shaderCallback: (bounds) => LinearGradient(
                   colors: [style.gold, style.gold],
                 ).createShader(bounds),
                 child: Text(
-                  'تقوى',
+                  l10n.appName,
                   style: style
                       .amiri(48, weight: FontWeight.w800)
                       .copyWith(color: Colors.white),
@@ -683,7 +698,7 @@ class _AuthHeader extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                'رفيقك في محاسبة النفس والطاعات',
+                l10n.authTagline,
                 style: context.typography.bodyLarge.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -730,7 +745,7 @@ class _GlowPulseState extends State<_GlowPulse>
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, child) => Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [

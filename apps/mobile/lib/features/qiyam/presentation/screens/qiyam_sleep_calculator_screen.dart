@@ -31,14 +31,14 @@ class _QiyamSleepCalculatorScreenState
                 _buildAppBar(context),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildHeader(context),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xxxl),
                         _buildWakeupSelector(context),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xxxl),
                         Text(
                           'أفضل أوقات النوم:',
                           style: context.typography.displayMedium.copyWith(
@@ -46,9 +46,9 @@ class _QiyamSleepCalculatorScreenState
                             color: context.colors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         ..._buildCycleCards(context),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.xxxl),
                       ],
                     ),
                   ),
@@ -63,7 +63,10 @@ class _QiyamSleepCalculatorScreenState
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
@@ -96,7 +99,7 @@ class _QiyamSleepCalculatorScreenState
             textAlign: TextAlign.center,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Center(
           child: Text(
             'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.',
@@ -114,7 +117,7 @@ class _QiyamSleepCalculatorScreenState
   Widget _buildWakeupSelector(BuildContext context) {
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         decoration: BoxDecoration(
           color: context.colors.card,
           borderRadius: BorderRadius.circular(24),
@@ -136,7 +139,7 @@ class _QiyamSleepCalculatorScreenState
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             GestureDetector(
               onTap: () async {
                 final picked = await showCustomTimePicker(
@@ -160,11 +163,11 @@ class _QiyamSleepCalculatorScreenState
                   }
                 },
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   child: Container(
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       border: Border.all(
                         color: context.colors.gold.withOpacity(0.5),
                       ),
@@ -180,7 +183,7 @@ class _QiyamSleepCalculatorScreenState
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 40,
-                            vertical: 16,
+                            vertical: AppSpacing.lg,
                           ),
                           child: Text(
                             '${_wakeupTime.hour.toString().padLeft(2, '0')}:${_wakeupTime.minute.toString().padLeft(2, '0')}',
@@ -221,11 +224,11 @@ class _QiyamSleepCalculatorScreenState
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           child: Container(
             decoration: BoxDecoration(
               color: context.colors.card,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               border: Border.all(color: color.withOpacity(0.3)),
             ),
             child: Stack(
@@ -236,17 +239,17 @@ class _QiyamSleepCalculatorScreenState
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
+                          horizontal: AppSpacing.md,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: color.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(
                           cycle['label'] as String,

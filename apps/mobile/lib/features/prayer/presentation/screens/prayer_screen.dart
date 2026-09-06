@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -374,11 +373,11 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   // ── ساعة حية ──
                   _LiveClockBanner(style: style, entryCtrl: _entryCtrl),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   // ── البطاقة الرئيسية ──
                   _MainPrayerCard(
@@ -392,7 +391,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
 
                   // ── مراحل الشمس ──
                   _SunPhaseRow(prayers: state.prayers, style: style),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // ── جدول الصلوات اليومي ──
                   _DailyPrayersTable(
@@ -402,7 +401,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                     entryCtrl: _entryCtrl,
                     style: style,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                 ],
               ),
             ),
@@ -613,7 +612,7 @@ class _PrayerHeader extends StatelessWidget {
                     child: Row(
                       children: [
                         const CustomLeadingButton(),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,9 +741,9 @@ class _MainPrayerCard extends StatelessWidget {
               ),
             ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppSpacing.xxl),
             decoration: BoxDecoration(
               color: style.bg,
               borderRadius: BorderRadius.circular(32),
@@ -765,7 +764,7 @@ class _MainPrayerCard extends StatelessWidget {
                   isIqama: isIqama,
                   style: style,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xxxl),
 
                 // ── Countdown Ring ──
                 _CountdownRing(
@@ -775,7 +774,7 @@ class _MainPrayerCard extends StatelessWidget {
                   pulseAnim: pulseAnim,
                   style: style,
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacing.xxxl),
 
                 // ── Adhan & Iqama Info ──
                 _AdhanIqamaRow(
@@ -834,14 +833,14 @@ class _PrayerNameBadge extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           isIqama
               ? l10n.prayerScreenIqamaTimeFor(name)
               : l10n.prayerScreenPrayerFor(name),
           style: style.amiri(28, color: Colors.white, weight: FontWeight.w700),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           isIqama
               ? l10n.prayerScreenEstablishPrayer
@@ -952,7 +951,7 @@ class _CountdownRing extends StatelessWidget {
                       color: Colors.white.withOpacity(0.55),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _timeStr,
                     style: TextStyle(
@@ -971,12 +970,12 @@ class _CountdownRing extends StatelessWidget {
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(color: Colors.white.withOpacity(0.12)),
                     ),
                     child: Text(
@@ -1133,7 +1132,7 @@ class _AdhanIqamaRow extends StatelessWidget {
             subtitle: l10n.prayerScreenSalvationSlogan,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: _TimeCard(
             label: l10n.prayerScreenIqamaTimeLabel,
@@ -1170,12 +1169,15 @@ class _TimeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      padding: const EdgeInsets.symmetric(
+        vertical: 14,
+        horizontal: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: isActive
             ? color.withOpacity(0.15)
             : Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: isActive
               ? color.withOpacity(0.4)
@@ -1198,7 +1200,7 @@ class _TimeCard extends StatelessWidget {
               color: Colors.white.withOpacity(0.55),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
@@ -1280,11 +1282,11 @@ class _DailyPrayersTable extends StatelessWidget {
         curve: const Interval(0.4, 1.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Container(
           decoration: BoxDecoration(
             color: style.bg,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: style.bg),
             boxShadow: [
               BoxShadow(color: style.bg.withOpacity(0.3), blurRadius: 20),
@@ -1318,11 +1320,11 @@ class _DailyPrayersTable extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 4,
+                        vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.07),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.1),
                         ),
@@ -1474,7 +1476,9 @@ class _PrayerTableRow extends StatelessWidget {
                   Container(
                     width: 1,
                     height: 28,
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     color: Colors.white.withOpacity(0.08),
                   ),
 
@@ -1510,7 +1514,7 @@ class _PrayerTableRow extends StatelessWidget {
 
                 // علامة ✓ للماضي
                 if (isPast && !isNext && prayer.name != 'sunrise') ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Icon(
                     Icons.check_circle_rounded,
                     size: 16,
@@ -1604,9 +1608,12 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
         curve: const Interval(0.0, 0.55),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: 14,
+          ),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.06),
             borderRadius: BorderRadius.circular(22),
@@ -1727,7 +1734,7 @@ class _SunPhaseRow extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Row(
         children: [
           if (fajrP != null)
@@ -1739,7 +1746,8 @@ class _SunPhaseRow extends StatelessWidget {
                 color: const Color(0xFF7B8FA6),
               ),
             ),
-          if (fajrP != null && sunriseP != null) const SizedBox(width: 8),
+          if (fajrP != null && sunriseP != null)
+            const SizedBox(width: AppSpacing.sm),
           if (sunriseP != null)
             Expanded(
               child: _SunChip(
@@ -1749,7 +1757,8 @@ class _SunPhaseRow extends StatelessWidget {
                 color: const Color(0xFFE8945A),
               ),
             ),
-          if (sunriseP != null && maghribP != null) const SizedBox(width: 8),
+          if (sunriseP != null && maghribP != null)
+            const SizedBox(width: AppSpacing.sm),
           if (maghribP != null)
             Expanded(
               child: _SunChip(
@@ -1778,7 +1787,10 @@ class _SunChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+      padding: const EdgeInsets.symmetric(
+        vertical: 11,
+        horizontal: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(18),
@@ -1788,7 +1800,7 @@ class _SunChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(icon, style: const TextStyle(fontSize: 20)),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             label,
             style: TextStyle(
@@ -1867,11 +1879,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
     super.dispose();
   }
 
-  Widget _bone({
-    double? width,
-    required double height,
-    double radius = 12,
-  }) {
+  Widget _bone({double? width, required double height, double radius = 12}) {
     final style = widget.style;
     return AnimatedBuilder(
       animation: _pulse,
@@ -1895,27 +1903,27 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
         physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             // ── Header placeholder ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Row(
                 children: [
                   _bone(width: 40, height: 40, radius: 20),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   _bone(width: 120, height: 16),
                   const Spacer(),
                   _bone(width: 40, height: 40, radius: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
 
             // ── Main card placeholder (badge + ring + adhan/iqama row) ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 decoration: BoxDecoration(
                   color: style.bg,
                   borderRadius: BorderRadius.circular(32),
@@ -1923,9 +1931,9 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
                 child: Column(
                   children: [
                     _bone(width: 140, height: 28, radius: 14),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
                     Center(child: _bone(width: 200, height: 200, radius: 100)),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -1937,31 +1945,31 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
 
             // ── Sun phase row placeholder ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Row(
                 children: [
                   Expanded(child: _bone(height: 77, radius: 18)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(child: _bone(height: 77, radius: 18)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(child: _bone(height: 77, radius: 18)),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
 
             // ── Daily prayers table placeholder ──
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: style.bg,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Column(
                   children: [
@@ -1972,12 +1980,12 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
                         _bone(width: 100, height: 14),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     for (int i = 0; i < 5; i++) ...[
                       Row(
                         children: [
                           _bone(width: 28, height: 28, radius: 14),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.md),
                           _bone(width: 70, height: 14),
                           const Spacer(),
                           _bone(width: 60, height: 14),
@@ -1989,7 +1997,7 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
           ],
         ),
       ),
@@ -2009,7 +2017,7 @@ class _ErrorView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text('📍', style: TextStyle(fontSize: 40)),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             l10n.prayerScreenLocationErrorTitle,
             style: TextStyle(
@@ -2027,7 +2035,7 @@ class _ErrorView extends StatelessWidget {
               color: context.colors.textSecondary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SizedBox(
             width: 200,
             child: PrimaryButton(

@@ -165,7 +165,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
       onTap: () => _showDhikrListModal(style, context),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        margin: const EdgeInsets.symmetric(horizontal: 24),
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
         decoration: BoxDecoration(
           color: style.bg,
           borderRadius: BorderRadius.circular(28),
@@ -200,14 +200,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
               ),
 
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(AppSpacing.sm),
                         decoration: BoxDecoration(
                           color: style.gold.withOpacity(0.1),
                           shape: BoxShape.circle,
@@ -220,7 +220,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           size: 16,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Text(
                         hasDhikr ? 'الذكر المختار' : 'اختر ذكراً للتسبيح',
                         style: style.naskh(
@@ -237,7 +237,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                             ref.read(misbahaProvider.notifier).clearDhikr();
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(4),
+                            padding: const EdgeInsets.all(AppSpacing.xs),
                             decoration: BoxDecoration(
                               color: style.textDim.withOpacity(0.1),
                               shape: BoxShape.circle,
@@ -258,7 +258,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     ],
                   ),
                   if (hasDhikr) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 140),
                       child: SingleChildScrollView(
@@ -286,7 +286,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     if (state.selectedDhikr!.arabic.length > 50)
                       Icon(
                         Icons.keyboard_arrow_down_rounded,
@@ -295,7 +295,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       ),
                   ] else
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                      ),
                       child: Text(
                         'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك',
                         style: style.naskh(12, color: style.textDim),
@@ -491,14 +493,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             label,
             style: TextStyle(
@@ -537,7 +539,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                   .toList();
               return Column(
                 children: [
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Container(
                     width: 40,
                     height: 4,
@@ -546,18 +548,19 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   Text('اختر ذكراً', style: style.amiri(24, color: style.gold)),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   Expanded(
                     child: ListView.separated(
                       controller: controller,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
+                        horizontal: AppSpacing.xl,
                         vertical: 10,
                       ),
                       itemCount: allItems.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppSpacing.md),
                       itemBuilder: (ctx, i) {
                         final dhikr = allItems[i];
                         return _buildDhikrItem(dhikr, style, ctx);
@@ -585,10 +588,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
         Navigator.pop(context);
       },
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
           color: style.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: style.border),
           boxShadow: [
             BoxShadow(
@@ -606,12 +609,15 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 style: style.amiri(18, color: style.text, height: 1.4),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: 6,
+              ),
               decoration: BoxDecoration(
                 color: style.gold.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
                 '${dhikr.count}',

@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamWirdScreen extends StatelessWidget {
   const QiyamWirdScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -19,43 +21,43 @@ class QiyamWirdScreen extends StatelessWidget {
           SafeArea(
             child: Column(
               children: [
-                _buildAppBar(context),
+                _buildAppBar(context, l10n),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     children: [
-                      _buildSectionHeader(context, 'أذكار ما قبل القيام'),
-                      const WirdCardWidget(
-                        title: 'الاستغفار',
+                      _buildSectionHeader(context, l10n.qiyamWirdBeforeQiyamHeader),
+                      WirdCardWidget(
+                        title: l10n.qiyamWirdIstighfarTitle,
                         content:
                             'أستغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه',
                         count: 100,
                       ),
-                      const WirdCardWidget(
-                        title: 'التسبيح',
+                      WirdCardWidget(
+                        title: l10n.qiyamWirdTasbihTitle,
                         content: 'سبحان الله وبحمده، سبحان الله العظيم',
                         count: 100,
                       ),
-                      const SizedBox(height: 16),
-                      _buildSectionHeader(context, 'أدعية مأثورة في السحر'),
-                      const WirdCardWidget(
-                        title: 'دعاء النبي ﷺ',
+                      const SizedBox(height: AppSpacing.lg),
+                      _buildSectionHeader(context, l10n.qiyamWirdLastThirdHeader),
+                      WirdCardWidget(
+                        title: l10n.qiyamWirdProphetDuaTitle,
                         content:
                             'اللهم لك الحمد، أنت نور السماوات والأرض ومن فيهن، ولك الحمد، أنت قيم السماوات والأرض ومن فيهن، ولك الحمد، أنت ملك السماوات والأرض ومن فيهن، ولك الحمد، أنت الحق، ووعدك حق، ولقاؤك حق، وقولك حق، والجنة حق، والنار حق، والنبيون حق، ومحمد ﷺ حق، والساعة حق.',
                         count: 1,
                       ),
-                      const WirdCardWidget(
-                        title: 'سيد الاستغفار',
+                      WirdCardWidget(
+                        title: l10n.qiyamWirdSayyidIstighfarTitle,
                         content:
                             'اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك علي، وأبوء بذنبي فاغفر لي فإنه لا يغفر الذنوب إلا أنت.',
                         count: 1,
                       ),
-                      const SizedBox(height: 16),
-                      _buildSectionHeader(context, 'سورة الملك (المنجية)'),
+                      const SizedBox(height: AppSpacing.lg),
+                      _buildSectionHeader(context, l10n.qiyamWirdMulkHeader),
                       _buildActionCard(
                         context,
-                        title: 'قراءة سورة الملك',
-                        subtitle: 'تشفع لصاحبها وتنجي من عذاب القبر',
+                        title: l10n.qiyamWirdReadMulkTitle,
+                        subtitle: l10n.qiyamWirdMulkSubtitle,
                         icon: Icons.menu_book,
                         onTap: () {
                           // Navigate to Quran reader for Surah Al-Mulk (67)
@@ -72,15 +74,18 @@ class QiyamWirdScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, AppLocalizations l10n) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'ورد القيام',
+            l10n.qiyamWirdTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
@@ -96,7 +101,7 @@ class QiyamWirdScreen extends StatelessWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Row(
         children: [
           Container(
@@ -107,7 +112,7 @@ class QiyamWirdScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Text(
             title,
             style: context.typography.displayMedium.copyWith(
@@ -129,13 +134,13 @@ class QiyamWirdScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Container(
           decoration: BoxDecoration(
             color: context.colors.gold.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: context.colors.gold.withOpacity(0.2)),
           ),
           child: Stack(
@@ -146,18 +151,18 @@ class QiyamWirdScreen extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: context.colors.gold.withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(icon, color: context.colors.gold),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,13 +227,14 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isCompleted = _currentCount >= widget.count;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: isCompleted
               ? context.colors.gold.withOpacity(0.5)
@@ -237,14 +243,14 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
         ),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -262,14 +268,14 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 4,
+                            vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: context.colors.gold.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            '${widget.count} مرة',
+                            l10n.adhkarCountTimesLabel(widget.count),
                             style: context.typography.caption.copyWith(
                               color: context.colors.gold,
                               fontWeight: FontWeight.bold,
@@ -278,7 +284,7 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   Text(
                     widget.content,
                     style: context.typography.quranicVerse.copyWith(
@@ -288,7 +294,7 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   ElevatedButton(
                     onPressed: _increment,
                     style: ElevatedButton.styleFrom(
@@ -298,14 +304,16 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                       foregroundColor: context.colors.gold,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         side: BorderSide(
                           color: isCompleted
                               ? context.colors.gold
                               : context.colors.gold.withOpacity(0.3),
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -314,12 +322,12 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                           isCompleted ? Icons.check_circle : Icons.touch_app,
                           size: 20,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         Text(
                           isCompleted
-                              ? 'تم الورد بنجاح'
+                              ? l10n.qiyamWirdCompletedButton
                               : (_currentCount == 0
-                                    ? 'اضغط للعد'
+                                    ? l10n.qiyamWirdTapToCountButton
                                     : '$_currentCount / ${widget.count}'),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),

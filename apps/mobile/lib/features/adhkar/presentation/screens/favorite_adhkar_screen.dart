@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +38,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                     child: Row(
                       children: [
                         const CustomLeadingButton(),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +70,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                   height: 1,
                   color: context.colors.border.withOpacity(0.5),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
 
                 // ── Content ──
                 Expanded(
@@ -102,7 +101,7 @@ class _EmptyFavs extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text('🤍', style: TextStyle(fontSize: 52)),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'لا توجد أذكار مفضلة بعد',
             style: context.typography.headingMedium.copyWith(
@@ -110,7 +109,7 @@ class _EmptyFavs extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             'اضغط على ❤️ في أي ذكر لحفظه هنا',
             style: context.typography.caption.copyWith(
@@ -211,12 +210,12 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                   // count badge
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppSpacing.sm,
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: context.colors.gold.withOpacity(0.2),
                       ),
@@ -229,7 +228,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   // Un-favorite
                   GestureDetector(
                     onTap: () {
@@ -252,7 +251,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   // Copy
                   GestureDetector(
                     onTap: () {
@@ -304,13 +303,15 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                 secondChild: Column(
                   children: [
                     if (widget.item.transliteration != null) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Container(
                         height: 1,
                         color: context.colors.border,
-                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                        ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         widget.item.transliteration!,
                         textAlign: TextAlign.center,
@@ -321,7 +322,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       ),
                     ],
                     if (widget.item.fadl != null) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,

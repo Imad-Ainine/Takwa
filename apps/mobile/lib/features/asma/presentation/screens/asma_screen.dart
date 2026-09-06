@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -120,7 +119,7 @@ class _AsmaTopBar extends StatelessWidget {
             Row(
               children: [
                 const CustomLeadingButton(),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,7 +161,7 @@ class _AsmaTopBar extends StatelessWidget {
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 12,
+                    vertical: AppSpacing.md,
                   ),
                 ),
               ),
@@ -349,9 +348,9 @@ class _AsmaCard extends StatelessWidget {
                 firstChild: const SizedBox.shrink(),
                 secondChild: Column(
                   children: [
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Container(height: 1, color: s.border),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Text(
                       item.explanation,
                       textAlign: TextAlign.center,
@@ -359,19 +358,19 @@ class _AsmaCard extends StatelessWidget {
                           .naskh(13, color: s.textSec)
                           .copyWith(height: 1.8),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Flexible(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
+                              horizontal: AppSpacing.md,
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color: s.goldDim,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               border: Border.all(
                                 color: s.gold.withOpacity(0.2),
                               ),
@@ -461,7 +460,10 @@ class _AsmaDetailSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = style;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xxl,
+        vertical: AppSpacing.xxxl,
+      ),
       decoration: BoxDecoration(
         color: s.bg,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
@@ -479,33 +481,33 @@ class _AsmaDetailSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             Text(
               item.name,
               style: s.amiri(42, weight: FontWeight.w700, color: s.gold),
             ),
             Text(item.meaning, style: s.naskh(16, color: s.textDim)),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             _DetailSection(
               title: 'الشرح والبيان',
               content: item.explanation,
               style: s,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             _DetailSection(
               title: 'من القرآن الكريم',
               content: item.quranRef,
               style: s,
               isVerse: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             _DetailSection(
               title: 'الدعاء بهذا الاسم',
               content: item.dua,
               style: s,
               isDua: true,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             PrimaryButton(
               onTap: () async => Navigator.pop(context),
               label: 'إغلاق',
@@ -544,7 +546,7 @@ class _DetailSection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               title,
               style: style.naskh(
@@ -558,10 +560,10 @@ class _DetailSection extends StatelessWidget {
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: style.card,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: style.border),
           ),
           child: Text(

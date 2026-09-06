@@ -259,7 +259,7 @@ class _BottomNav extends StatelessWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               child: Row(
                 children: List.generate(tabs.length, (i) {
                   final tab = tabs[i];
@@ -444,7 +444,7 @@ class _SplashScreenState extends State<_SplashScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
                 Text(
                   'تقوى',
                   style: context.typography.displayMedium.copyWith(
@@ -453,7 +453,7 @@ class _SplashScreenState extends State<_SplashScreen>
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
                   style: context.typography.quranicVerse.copyWith(

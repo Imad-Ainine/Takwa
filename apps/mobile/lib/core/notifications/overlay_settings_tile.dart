@@ -76,7 +76,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 8,
+                    vertical: AppSpacing.sm,
                   ),
                   child: Column(
                     children: [
@@ -91,16 +91,16 @@ class OverlayNotificationSettings extends ConsumerWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       // إحصاء: عدد المرات في اليوم
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
+                          horizontal: AppSpacing.md,
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
                           color: context.colors.teal.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
                             color: context.colors.teal.withOpacity(0.15),
                           ),
@@ -172,7 +172,7 @@ class _IntervalSelector extends StatelessWidget {
         Row(
           children: [
             const Text('⏱️', style: TextStyle(fontSize: 16)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               l10n.overlaySettingIntervalHeader,
               style: context.typography.bodySmall.copyWith(
@@ -183,7 +183,7 @@ class _IntervalSelector extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -194,14 +194,14 @@ class _IntervalSelector extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? context.colors.gold.withOpacity(0.12)
                       : context.colors.card.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(
                     color: isSelected
                         ? context.colors.gold

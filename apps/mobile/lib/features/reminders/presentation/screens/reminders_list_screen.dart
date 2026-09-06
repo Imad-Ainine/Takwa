@@ -10,6 +10,7 @@ import 'package:takwa/features/reminders/presentation/widgets/advice_card.dart';
 import 'package:takwa/features/reminders/presentation/widgets/reminder_card.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/reminders/presentation/widgets/add_reminder_bottom_sheet.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class RemindersListScreen extends ConsumerWidget {
   const RemindersListScreen({super.key});
@@ -25,6 +26,7 @@ class RemindersListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final remindersAsync = ref.watch(remindersProvider);
 
     return Scaffold(
@@ -39,7 +41,7 @@ class RemindersListScreen extends ConsumerWidget {
             slivers: [
               _buildAppBar(context),
               SliverPadding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _buildAddReminderButton(context),
@@ -47,13 +49,13 @@ class RemindersListScreen extends ConsumerWidget {
                     remindersAsync.when(
                       loading: () => const Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32.0),
+                          padding: EdgeInsets.all(AppSpacing.xxxl),
                           child: TakwaLoadingIndicator(size: 32),
                         ),
                       ),
                       error: (e, _) => Center(
                         child: Text(
-                          'حدث خطأ: $e',
+                          l10n.adhkarGenericError(e.toString()),
                           style: context.typography.bodySmall,
                         ),
                       ),
@@ -61,11 +63,10 @@ class RemindersListScreen extends ConsumerWidget {
                           ? _buildEmptyState(context)
                           : _buildRemindersList(context, ref, reminders),
                     ),
-                    const SizedBox(height: 32),
-                    const AdviceCard(
-                      title: 'نصيحة',
-                      description:
-                          'المداومة على الأذكار اليومية تجلب السكينة والطمأنينة للقلب. احرص على تفعيل التذكيرات لتبقى على اتصال دائم بالله.',
+                    const SizedBox(height: AppSpacing.xxxl),
+                    AdviceCard(
+                      title: l10n.remindersAdviceTitle,
+                      description: l10n.remindersAdviceDesc,
                     ),
                     const SizedBox(height: 48),
                   ]),
@@ -79,13 +80,14 @@ class RemindersListScreen extends ConsumerWidget {
   }
 
   SliverAppBar _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
       leading: const CustomLeadingButton(),
       title: Text(
-        'التذكيرات',
+        l10n.remindersScreenTitle,
         style: context.typography.headingMedium.copyWith(
           color: context.colors.gold,
         ),
@@ -95,12 +97,16 @@ class RemindersListScreen extends ConsumerWidget {
   }
 
   Widget _buildAddReminderButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return InkWell(
       onTap: () => _showAddReminderSheet(context),
       borderRadius: AppRadius.card,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.xxl,
+          horizontal: AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
           color: context.colors.card.withOpacity(0.85),
           borderRadius: AppRadius.card,
@@ -112,7 +118,7 @@ class RemindersListScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: context.colors.tealDim,
                 shape: BoxShape.circle,
@@ -123,16 +129,16 @@ class RemindersListScreen extends ConsumerWidget {
                 size: 32,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
-              'إضافة تذكير جديد',
+              l10n.remindersAddButtonTitle,
               style: context.typography.headingMedium.copyWith(
                 color: context.colors.teal,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
-              'اضغط هنا لإنشاء تذكير مخصص',
+              l10n.remindersAddButtonSubtitle,
               style: context.typography.bodySmall,
             ),
           ],
@@ -142,8 +148,9 @@ class RemindersListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
       child: Column(
         children: [
           Icon(
@@ -151,16 +158,16 @@ class RemindersListScreen extends ConsumerWidget {
             size: 64,
             color: context.colors.textDim,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
-            'لا يوجد تذكيرات بعد',
+            l10n.remindersEmptyTitle,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
-            'أضف أول تذكير لك بالضغط على الزر أعلاه',
+            l10n.remindersEmptySubtitle,
             style: context.typography.bodySmall,
             textAlign: TextAlign.center,
           ),
@@ -174,21 +181,22 @@ class RemindersListScreen extends ConsumerWidget {
     WidgetRef ref,
     List<Reminder> reminders,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('تذكيراتي', style: context.typography.headingMedium),
+            Text(l10n.remindersMyRemindersTitle, style: context.typography.headingMedium),
             const Spacer(),
             TaqwaBadge(
-              label: '${reminders.length} تذكير',
+              label: l10n.remindersCountBadge(reminders.length),
               color: context.colors.teal,
               bgColor: context.colors.tealDim,
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         ...reminders.map(
           (reminder) => Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
@@ -214,17 +222,19 @@ class RemindersListScreen extends ConsumerWidget {
                 return await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('حذف التذكير'),
-                    content: Text('هل تريد حذف "${reminder.title}"؟'),
+                    title: Text(l10n.remindersDeleteDialogTitle),
+                    content: Text(
+                      l10n.remindersDeleteDialogConfirm(reminder.title),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('إلغاء'),
+                        child: Text(l10n.adhkarCancelButton),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, true),
                         child: Text(
-                          'حذف',
+                          l10n.adhkarDeleteTooltip,
                           style: TextStyle(color: context.colors.danger),
                         ),
                       ),
@@ -238,7 +248,7 @@ class RemindersListScreen extends ConsumerWidget {
               },
               child: ReminderCard(
                 title: reminder.title,
-                time: _formatTime(reminder.time),
+                time: _formatTime(context, reminder.time),
                 iconKey: reminder.iconName,
                 isEnabled: reminder.isEnabled,
                 onToggle: (val) {
@@ -259,12 +269,13 @@ class RemindersListScreen extends ConsumerWidget {
   }
 
   /// Convert 24h "HH:mm" stored time to a localized display string
-  String _formatTime(String time24) {
+  String _formatTime(BuildContext context, String time24) {
     try {
+      final l10n = AppLocalizations.of(context)!;
       final parts = time24.split(':');
       final h = int.parse(parts[0]);
       final m = int.parse(parts[1]);
-      final period = h >= 12 ? 'م' : 'ص';
+      final period = h >= 12 ? l10n.timePeriodPm : l10n.timePeriodAm;
       final displayH = h % 12 == 0 ? 12 : h % 12;
       return '$displayH:${m.toString().padLeft(2, '0')} $period';
     } catch (_) {

@@ -136,7 +136,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   elevation: 0,
                   surfaceTintColor: Colors.transparent,
                   leading: const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(AppSpacing.sm),
                     child: DrawerMenuButton(),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
@@ -163,10 +163,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
 
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
 
                       // ① Ramadan Banner
                       if (hijri.hMonth == 9 || isRamadan)
@@ -345,12 +347,12 @@ class _HomeHeader extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: style.goldDim,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                   border: Border.all(color: style.gold.withOpacity(0.2)),
                 ),
                 child: Text(g, style: style.naskh(11, color: style.goldLight)),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               const RamadanToggle(),
             ],
           ),
@@ -403,7 +405,10 @@ class _RamadanBannerState extends State<_RamadanBanner>
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, _) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 14,
+        ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
@@ -428,7 +433,7 @@ class _RamadanBannerState extends State<_RamadanBanner>
         child: Row(
           children: [
             Text('🌙', style: TextStyle(fontSize: 28, color: s.goldLight)),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,7 +564,7 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,12 +590,12 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
               onTap: () => Navigator.pushNamed(context, '/prayer'),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
                 ),
                 decoration: BoxDecoration(
                   color: s.gold.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                   border: Border.all(color: s.gold.withOpacity(0.25)),
                 ),
                 child: Text(
@@ -638,7 +643,7 @@ class _MosquePrayerSection extends StatelessWidget {
                 AppLocalizations.of(context)!.homePrayerTimesTitle,
                 style: style.amiri(15, color: style.gold),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(height: 1, color: style.gold.withOpacity(0.2)),
               ),
@@ -781,7 +786,7 @@ class _MihrabPrayerChip extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             AnimatedScale(
               scale: isActive ? 1.2 : 1.0,
               duration: const Duration(milliseconds: 300),
@@ -806,7 +811,7 @@ class _MihrabPrayerChip extends StatelessWidget {
                     : style.textSec.withOpacity(0.8),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
           ],
         ),
       ),
@@ -873,7 +878,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
     final pct = (net / 100.0).clamp(0.0, 1.0);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: s.cardDeco,
       child: Row(
         children: [
@@ -889,18 +894,18 @@ class _TaqwaSectionMerged extends StatelessWidget {
                   l10n.homeIbadahProgressLabel((pct * 10).round()),
                   style: s.naskh(11, color: s.textSec),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 4,
+                        vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
                         color: s.goldDim,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                         border: Border.all(color: s.gold.withOpacity(0.2)),
                       ),
                       child: Text(
@@ -908,11 +913,11 @@ class _TaqwaSectionMerged extends StatelessWidget {
                         style: s.naskh(11, color: s.gold),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     InkWell(
                       onTap: () =>
                           Navigator.pushNamed(context, '/achievements'),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
@@ -936,11 +941,11 @@ class _TaqwaSectionMerged extends StatelessWidget {
                       ? Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 4,
+                            vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: s.success.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                               color: s.success.withOpacity(0.3),
                             ),
@@ -949,7 +954,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Text('🔥', style: TextStyle(fontSize: 12)),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppSpacing.xs),
                               Text(
                                 l10n.homeStreakDaysLabel(n),
                                 style: s.naskh(11, color: s.success),
@@ -1159,11 +1164,11 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
         Row(
           children: [
             Text(l10n.homeTodayIbadahTitle, style: s.amiri(15)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Container(height: 1, color: s.border.withOpacity(0.3)),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             GestureDetector(
               onTap: () {
                 Navigator.popUntil(context, (route) => route.isFirst);
@@ -1321,13 +1326,13 @@ class _FeatureRow extends StatelessWidget {
         Row(
           children: [
             Text(l10n.homeFeaturesTitle, style: s.amiri(15, color: s.gold)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Container(height: 1, color: s.gold.withOpacity(0.2)),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         GridView.count(
           crossAxisCount: 5,
           shrinkWrap: true,
@@ -1365,7 +1370,7 @@ class _FeatureItem extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [s.gold.withOpacity(0.12), s.teal.withOpacity(0.05)],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: s.gold.withOpacity(0.25), width: 1.2),
           boxShadow: [
             BoxShadow(
@@ -1379,14 +1384,14 @@ class _FeatureItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: s.gold.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               child: Text(f.$1, style: const TextStyle(fontSize: 22)),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Text(
@@ -1436,7 +1441,10 @@ class _VerseCardMerged extends StatelessWidget {
     final verse = _verses[isRamadan ? 3 : idx];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 18,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
@@ -1446,7 +1454,7 @@ class _VerseCardMerged extends StatelessWidget {
             s.teal.withOpacity(isRamadan ? 0.1 : 0.05),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: s.gold.withOpacity(isRamadan ? 0.3 : 0.18)),
         boxShadow: isRamadan
             ? [BoxShadow(color: s.gold.withOpacity(0.08), blurRadius: 16)]
@@ -1458,13 +1466,13 @@ class _VerseCardMerged extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(width: 24, height: 1, color: s.gold.withOpacity(0.3)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text('❁', style: TextStyle(color: s.gold, fontSize: 14)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(width: 24, height: 1, color: s.gold.withOpacity(0.3)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             verse.$1,
             textAlign: TextAlign.center,
@@ -1476,7 +1484,7 @@ class _VerseCardMerged extends StatelessWidget {
                 )
                 .copyWith(height: 2.0),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             isRamadan
                 ? verse.$2
@@ -1553,7 +1561,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
                 l10n.homeRamadanTimesTitle,
                 style: s.amiri(15, color: s.gold),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(height: 1, color: s.gold.withOpacity(0.2)),
               ),
@@ -1571,7 +1579,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
                 style: s,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: _IftarCard(
                 label: l10n.homeSuhoorLabel,
@@ -1603,12 +1611,15 @@ class _IftarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+    padding: const EdgeInsets.symmetric(
+      vertical: 14,
+      horizontal: AppSpacing.md,
+    ),
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [color.withOpacity(0.12), color.withOpacity(0.05)],
       ),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       border: Border.all(color: color.withOpacity(0.3)),
       boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 8)],
     ),
@@ -1617,7 +1628,7 @@ class _IftarCard extends StatelessWidget {
         Text(icon, style: const TextStyle(fontSize: 24)),
         const SizedBox(height: 6),
         Text(label, style: style.naskh(11, color: style.textSec)),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           countdown,
           style: style.naskh(16, color: color, weight: FontWeight.w700),
@@ -1662,7 +1673,7 @@ class _DailyDhikrCard extends StatelessWidget {
                     AppLocalizations.of(context)!.homeDailyDhikrLabel,
                     style: s.naskh(10, color: s.textSec),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _dhikrs[idx],
                     style: s
@@ -1695,7 +1706,7 @@ class _Skeleton extends StatelessWidget {
     height: height,
     decoration: BoxDecoration(
       color: style.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       border: Border.all(color: style.border),
     ),
     child: const Center(child: TakwaLoadingIndicator(size: 24)),
@@ -1745,18 +1756,18 @@ class _BooksSection extends ConsumerWidget {
           child: booksAsync.when(
             loading: () => ListView.separated(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               itemCount: 3,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
               itemBuilder: (_, __) => _Skeleton(style: s, height: 180),
             ),
             error: (_, __) => const SizedBox(),
             data: (books) => ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               itemCount: books.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
               itemBuilder: (_, i) => _BookCard(book: books[i], style: s),
             ),
           ),
@@ -1783,7 +1794,7 @@ class _BookCard extends StatelessWidget {
         width: 130,
         decoration: BoxDecoration(
           color: s.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.15),
@@ -1846,7 +1857,7 @@ class _BookCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
                         child: Text(
                           book.categoryLabel,
@@ -1890,7 +1901,7 @@ class _BookCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(Icons.access_time, size: 10, color: s.gold),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.xs),
                         Text(
                           AppLocalizations.of(
                             context,

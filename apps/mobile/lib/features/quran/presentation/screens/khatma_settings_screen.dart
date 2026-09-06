@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/quran_models.dart';
@@ -7,12 +6,14 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class KhatmaSettingsScreen extends ConsumerWidget {
   const KhatmaSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final state = ref.watch(quranStateProvider);
@@ -23,13 +24,19 @@ class KhatmaSettingsScreen extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: style.isRamadan ? style.bg : const Color.fromARGB(46, 4, 1, 35),
+            backgroundColor: style.isRamadan
+                ? style.bg
+                : const Color.fromARGB(46, 4, 1, 35),
             foregroundColor: style.text,
             pinned: true,
             leading: const CustomLeadingButton(),
             title: Text(
-              'الإعدادات',
-              style: style.amiri(22, color: style.text, weight: FontWeight.bold),
+              l10n.settingsScreenTitle,
+              style: style.amiri(
+                22,
+                color: style.text,
+                weight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
           ),
@@ -40,7 +47,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  _sectionHeader(style, 'إعدادات القراءة'),
+                  _sectionHeader(style, l10n.quranReaderSettingsTitle),
                   const SizedBox(height: 14),
 
                   // Font size
@@ -58,13 +65,21 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'حجم الخط',
-                              style: style.amiri(17, color: style.text, weight: FontWeight.bold),
+                              l10n.quranReaderFontSizeLabel,
+                              style: style.amiri(
+                                17,
+                                color: style.text,
+                                weight: FontWeight.bold,
+                              ),
                             ),
                             const Spacer(),
                             Text(
-                              ar(state.fontSize.toInt()),
-                              style: style.naskh(15, color: style.gold, weight: FontWeight.bold),
+                              localizedNumeral(context, state.fontSize.toInt()),
+                              style: style.naskh(
+                                15,
+                                color: style.gold,
+                                weight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -80,7 +95,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                         ),
                         // Preview
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
                             color: style.card,
                             borderRadius: BorderRadius.circular(10),
@@ -88,7 +103,10 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           child: Center(
                             child: Text(
                               'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-                              style: style.amiri(state.fontSize, color: style.text),
+                              style: style.amiri(
+                                state.fontSize,
+                                color: style.text,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -113,8 +131,12 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              'مظهر القراءة',
-                              style: style.amiri(17, color: style.text, weight: FontWeight.bold),
+                              l10n.khatmaReadingAppearanceLabel,
+                              style: style.amiri(
+                                17,
+                                color: style.text,
+                                weight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -123,9 +145,9 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           children: ReaderTheme.values.map((t) {
                             final lbl =
                                 {
-                                  'night': 'ليلي',
-                                  'sepia': 'عاجي',
-                                  'white': 'فاتح',
+                                  'night': l10n.quranReaderThemeNight,
+                                  'sepia': l10n.quranReaderThemeSepia,
+                                  'white': l10n.quranReaderThemeWhite,
                                 }[t.name] ??
                                 t.name;
                             final bg = {
@@ -142,12 +164,14 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
                                   margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
+                                    horizontal: AppSpacing.xs,
                                   ),
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(AppSpacing.md),
                                   decoration: BoxDecoration(
                                     color: bg,
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadius.md,
+                                    ),
                                     border: Border.all(
                                       color: selected
                                           ? style.gold
@@ -166,7 +190,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                                           'white': Colors.blueGrey,
                                         }[t.name],
                                       ),
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: AppSpacing.xs),
                                       Text(
                                         lbl,
                                         style: TextStyle(
@@ -189,8 +213,8 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  _sectionHeader(style, 'إعدادات الختمة'),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _sectionHeader(style, l10n.khatmaSettingsSectionTitle),
                   const SizedBox(height: 14),
 
                   // Daily target
@@ -201,14 +225,19 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                         _tileRow(
                           style,
                           Icons.today_rounded,
-                          'الهدف اليومي',
-                          '${ar(5)} صفحات',
+                          l10n.khatmaDailyGoalLabel,
+                          l10n.khatmaDailyGoalPages(
+                            localizedNumeral(context, 5),
+                          ),
                         ),
-                        Divider(color: style.gold.withOpacity(0.05), height: 20),
+                        Divider(
+                          color: style.gold.withOpacity(0.05),
+                          height: 20,
+                        ),
                         _tileRow(
                           style,
                           Icons.notifications_rounded,
-                          'تذكير يومي',
+                          l10n.khatmaDailyReminderLabel,
                           '',
                           trailing: Switch(
                             value: true,
@@ -216,25 +245,41 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                             onChanged: (_) {},
                           ),
                         ),
-                        Divider(color: style.gold.withOpacity(0.05), height: 20),
-                        _tileRow(style, Icons.mic_rounded, 'القارئ', 'الشيخ المنشاوي'),
+                        Divider(
+                          color: style.gold.withOpacity(0.05),
+                          height: 20,
+                        ),
+                        _tileRow(
+                          style,
+                          Icons.mic_rounded,
+                          l10n.khatmaReciterLabel,
+                          l10n.khatmaReciterDefaultValue,
+                        ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
-                  _sectionHeader(style, 'معلومات التطبيق'),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _sectionHeader(style, l10n.khatmaAppInfoSectionTitle),
                   const SizedBox(height: 14),
                   _settingsCard(
                     style: style,
                     child: Column(
                       children: [
-                        _tileRow(style, Icons.info_outline, 'الإصدار', '١.٠.٠'),
-                        Divider(color: style.gold.withOpacity(0.05), height: 20),
+                        _tileRow(
+                          style,
+                          Icons.info_outline,
+                          l10n.khatmaVersionLabel,
+                          '1.0.0',
+                        ),
+                        Divider(
+                          color: style.gold.withOpacity(0.05),
+                          height: 20,
+                        ),
                         _tileRow(
                           style,
                           Icons.star_outline_rounded,
-                          'تقييم التطبيق',
+                          l10n.khatmaRateAppLabel,
                           '',
                         ),
                       ],
@@ -262,15 +307,16 @@ class KhatmaSettingsScreen extends ConsumerWidget {
     ),
   );
 
-  Widget _settingsCard({required AdaptiveStyle style, required Widget child}) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: style.card,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: style.gold.withOpacity(0.1)),
-    ),
-    child: child,
-  );
+  Widget _settingsCard({required AdaptiveStyle style, required Widget child}) =>
+      Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: style.card,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: style.gold.withOpacity(0.1)),
+        ),
+        child: child,
+      );
 
   Widget _tileRow(
     AdaptiveStyle style,
@@ -281,19 +327,13 @@ class KhatmaSettingsScreen extends ConsumerWidget {
   }) => Row(
     children: [
       Icon(icon, color: style.gold, size: 20),
-      const SizedBox(width: 12),
-      Text(
-        label,
-        style: style.naskh(14, color: style.text.withOpacity(0.7)),
-      ),
+      const SizedBox(width: AppSpacing.md),
+      Text(label, style: style.naskh(14, color: style.text.withOpacity(0.7))),
       const Spacer(),
       if (trailing != null)
         trailing
       else
-        Text(
-          value,
-          style: style.naskh(13, color: style.text.withOpacity(0.4)),
-        ),
+        Text(value, style: style.naskh(13, color: style.text.withOpacity(0.4))),
     ],
   );
 }

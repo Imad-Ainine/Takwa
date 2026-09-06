@@ -84,7 +84,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           Text(
             'اختيار الوقت',
             style: TextStyle(
@@ -94,7 +94,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
               color: colors.gold,
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
           SizedBox(
             height: 180,
             child: Stack(
@@ -103,10 +103,10 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                 // Highlight Selection background
                 Container(
                   height: 48,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: colors.teal.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(color: colors.teal.withOpacity(0.25)),
                   ),
                 ),
@@ -140,7 +140,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                         selectedIndex: _selectedMinute,
                         colors: colors,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       _buildWheel(
                         controller: _ampmController,
                         itemCount: 2,
@@ -156,14 +156,16 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
               ],
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
           Row(
             children: [
               Expanded(
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.lg,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                       side: BorderSide(color: colors.border),
@@ -179,7 +181,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.lg),
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
@@ -193,7 +195,9 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colors.teal,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.lg,
+                    ),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +38,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
                     child: Row(
                       children: [
                         const CustomLeadingButton(),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +71,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
                   height: 1,
                   color: context.colors.border.withOpacity(0.5),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
 
                 // ── Content ──
                 Expanded(
@@ -103,7 +102,7 @@ class _EmptyFavs extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text('🤍', style: TextStyle(fontSize: 52)),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'لا توجد أدعية مفضلة بعد',
             style: context.typography.headingMedium.copyWith(
@@ -111,7 +110,7 @@ class _EmptyFavs extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             'اضغط على ❤️ داخل أي دعاء لحفظه هنا',
             style: context.typography.caption.copyWith(
@@ -201,7 +200,7 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
               Row(
                 children: [
                   Text(widget.dua.emoji, style: const TextStyle(fontSize: 22)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       widget.dua.occasion,
@@ -232,7 +231,7 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: widget.dua.arabic));
@@ -292,18 +291,18 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                         height: 1.8,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: context.colors.gold.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
                               color: context.colors.gold.withOpacity(0.2),
                             ),

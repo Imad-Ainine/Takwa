@@ -154,10 +154,10 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                         const SizedBox(height: 40),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.xxl),
 
                         const Padding(
-                          padding: EdgeInsets.all(16.0),
+                          padding: EdgeInsets.all(AppSpacing.lg),
                           child: _VerseCard(
                             verse: '﴿ حاسبوا أنفسكم قبل أن تُحاسبوا﴾',
                           ),
@@ -182,7 +182,10 @@ class _VerseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 18,
+      ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topRight,
@@ -202,12 +205,12 @@ class _VerseCard extends StatelessWidget {
                 height: 1,
                 color: context.colors.gold.withOpacity(0.3),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 '❁',
                 style: TextStyle(color: context.colors.gold, fontSize: 14),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Container(
                 width: 28,
                 height: 1,
@@ -215,7 +218,7 @@ class _VerseCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             verse,
             textAlign: TextAlign.center,

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../theme/ramadan_theme.dart';
 
@@ -42,7 +41,7 @@ class _AuthFieldState extends State<AuthField> {
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
           color: _focused ? s.card.withOpacity(0.6) : s.bg.withOpacity(0.55),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
             color: _focused ? s.gold : s.border.withOpacity(0.5),
             width: _focused ? 2 : 1.5,
@@ -92,8 +91,8 @@ class _AuthFieldState extends State<AuthField> {
                   )
                 : null,
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.lg,
             ),
           ),
         ),
@@ -154,7 +153,7 @@ class PasswordStrengthBar extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text('قوة كلمة المرور: $label', style: style.naskh(11, color: color)),
       ],
     );

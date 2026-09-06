@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -98,7 +97,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: isEarned ? colors.card : colors.card.withOpacity(0.5),
             gradient: isEarned ? colors.cardGradient : null,
@@ -164,7 +163,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 4,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: colors.gold.withOpacity(0.1),

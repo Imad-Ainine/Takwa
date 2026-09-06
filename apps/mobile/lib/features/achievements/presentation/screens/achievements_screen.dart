@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
@@ -147,10 +146,10 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 0,
                 Container(
                   margin: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 20,
+                    horizontal: AppSpacing.xl,
+                    vertical: AppSpacing.xl,
                   ),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
                     gradient: colors.cardGradient,
                     borderRadius: BorderRadius.circular(24),
@@ -161,7 +160,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     children: [
                       // Level Icon
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           gradient: colors.goldGradient,
                           shape: BoxShape.circle,
@@ -173,7 +172,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                           size: 28,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSpacing.lg),
                       // Progress Info
                       Expanded(
                         child: Column(
@@ -272,7 +271,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               ),
               GridView.builder(
                 shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -336,9 +335,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppSpacing.xxl),
               decoration: BoxDecoration(
                 color: colors.goldDim,
                 shape: BoxShape.circle,
@@ -346,7 +345,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               ),
               child: Text(def.emoji, style: const TextStyle(fontSize: 64)),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             Text(
               def.titleAr,
               textAlign: TextAlign.center,
@@ -355,7 +354,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 fontSize: 26,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               def.descAr,
               textAlign: TextAlign.center,
@@ -363,16 +362,16 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 color: colors.textSecondary,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxxl),
             if (a.isEarned) ...[
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.lg,
                 ),
                 decoration: BoxDecoration(
                   color: colors.success.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                   border: Border.all(color: colors.success.withOpacity(0.2)),
                 ),
                 child: Row(
@@ -393,12 +392,12 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
             ] else ...[
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.lg,
                 ),
                 decoration: BoxDecoration(
                   color: colors.gold.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                   border: Border.all(color: colors.gold.withOpacity(0.2)),
                 ),
                 child: Text(
@@ -410,7 +409,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 ),
               ),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             PrimaryButton(
               label: 'فهمت',
               onTap: () async => Navigator.pop(context),

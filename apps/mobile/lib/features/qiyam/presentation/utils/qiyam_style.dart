@@ -5,19 +5,19 @@ class QiyamStyle {
   static BoxDecoration cardDecoration(BuildContext context) {
     return BoxDecoration(
       color: context.colors.card,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       border: Border.all(color: context.colors.border),
     );
   }
 
-  static BoxDecoration highlightedCardDecoration(BuildContext context, Color highlightColor) {
+  static BoxDecoration highlightedCardDecoration(
+    BuildContext context,
+    Color highlightColor,
+  ) {
     return BoxDecoration(
       color: context.colors.card,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: highlightColor.withOpacity(0.5),
-        width: 2,
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      border: Border.all(color: highlightColor.withOpacity(0.5), width: 2),
       boxShadow: [
         BoxShadow(
           color: highlightColor.withOpacity(0.1),
@@ -29,8 +29,6 @@ class QiyamStyle {
   }
 
   static LinearGradient qiyamActionGradient(BuildContext context) {
-    return LinearGradient(
-      colors: [context.colors.gold, context.colors.teal],
-    );
+    return LinearGradient(colors: [context.colors.gold, context.colors.teal]);
   }
 }

@@ -107,13 +107,17 @@ class OverlayBackgroundService {
     if (perm != NotificationPermission.granted) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final cityName = prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
+    final cityName =
+        prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
 
     await FlutterForegroundTask.startService(
       notificationTitle: '$cityName | ${_l10n.appName} 🌙',
       notificationText: _l10n.overlayServiceLoadingPrayerTimes,
       notificationButtons: [
-        NotificationButton(id: 'open_app', text: _l10n.overlayServiceOpenAppButton),
+        NotificationButton(
+          id: 'open_app',
+          text: _l10n.overlayServiceOpenAppButton,
+        ),
         NotificationButton(
           id: 'update_location',
           text: _l10n.overlayServiceUpdateLocationButton,
@@ -326,7 +330,8 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _updateForegroundNotification() async {
     final now = DateTime.now();
     final prefs = await SharedPreferences.getInstance();
-    final city = prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
+    final city =
+        prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
     final hijri = HijriCalendar.now();
     final hStr = '${hijri.hDay} ${_hijriMonthAr(hijri.hMonth)} ${hijri.hYear}';
 
@@ -344,7 +349,10 @@ class _OverlayTaskHandler extends TaskHandler {
       notificationTitle: '$city  |  $hStr',
       notificationText: text,
       notificationButtons: [
-        NotificationButton(id: 'open_app', text: _l10n.overlayServiceOpenAppButton),
+        NotificationButton(
+          id: 'open_app',
+          text: _l10n.overlayServiceOpenAppButton,
+        ),
         NotificationButton(
           id: 'update_location',
           text: _l10n.overlayServiceUpdateLocationButton,
@@ -389,7 +397,8 @@ class _OverlayTaskHandler extends TaskHandler {
         }
 
         // فتح الـ Overlay تلقائياً عند وقت الصلاة
-        final hasOverlayPerm = await ow.FlutterOverlayWindow.isPermissionGranted();
+        final hasOverlayPerm =
+            await ow.FlutterOverlayWindow.isPermissionGranted();
         if (hasOverlayPerm) {
           await ow.FlutterOverlayWindow.showOverlay(
             enableDrag: true,

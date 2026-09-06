@@ -1,70 +1,67 @@
 # RLS table checklist
 
-Derived from [`apps/mobile/docs/schema.sql`](../../docs/schema.sql) (a column
-listing only — it does not record RLS status, so every row below is
-"unverified" until checked against the output of
-[`check_rls_status.sql`](./check_rls_status.sql) in the Supabase dashboard).
-
-How to use this: run `check_rls_status.sql` in the SQL editor, then go row by
-row below and fill in the ✅/❌/⚠️ column. Anything not ✅ by the time you're
-done is a real gap — an anon-key request can read or write that table more
-broadly than intended.
+**Verified live against the `Takwa` Supabase project (`fmmgiykwebwruhxeztvs`).**
+Initial audit and the community-content fix landed 2026-09-06; the
+nullable-owner columns were closed the same day in a follow-up pass. All
+four migrations below are applied and `supabase db push --dry-run --linked`
+reports the remote fully in sync with this repo's `migrations/`. Findings
+below reflect that live state — re-run `check_rls_status.sql` after any
+future schema/policy change instead of trusting this file to stay current.
 
 ## Per-user tables (should be scoped to `auth.uid()`)
 
 | Table | Owner column | Column shape | RLS verified? |
 |---|---|---|---|
-| `daily_records` | `user_id` | part of primary key (not nullable) | ☐ |
-| `custom_ibadah` | `user_id` | part of primary key (not nullable) | ☐ |
-| `user_settings` | `user_id` | part of primary key (not nullable) | ☐ |
-| `achievements` | `user_id` | **nullable**, not a key column | ☐ |
-| `custom_ibadah_log` | `user_id` | **nullable**, not a key column | ☐ |
-| `prohibitions_log` | `user_id` | **nullable**, not a key column | ☐ |
-| `user_adhkar` | `user_id` | **nullable**, not a key column | ☐ |
-| `user_duas` | `user_id` | **nullable**, not a key column | ☐ |
-| `book_reading_progress` | `user_id` | not marked nullable or primary in docs (likely `NOT NULL`) — verify | ☐ |
-| `reminders` | `user_id` | not marked nullable or primary in docs (likely `NOT NULL`) — verify | ☐ |
-| `profiles` | `id` (is the user id) | primary key | ☐ |
+| `daily_records` | `user_id` | `NOT NULL` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `custom_ibadah` | `user_id` | `NOT NULL` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `user_settings` | `user_id` | `NOT NULL` | ✅ RLS on; scoped (two overlapping policies — see note below) |
+| `achievements` | `user_id` | `NOT NULL DEFAULT auth.uid()` | ✅ RLS on; scoped (two overlapping policies — see note below) |
+| `custom_ibadah_log` | `user_id` | `NOT NULL DEFAULT auth.uid()` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `prohibitions_log` | `user_id` | `NOT NULL DEFAULT auth.uid()` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `user_adhkar` | `user_id` | `NOT NULL DEFAULT auth.uid()` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `user_duas` | `user_id` | `NOT NULL DEFAULT auth.uid()` | ✅ RLS on; `ALL` scoped to `auth.uid() = user_id` |
+| `book_reading_progress` | `user_id` | `NOT NULL` | ✅ RLS on; scoped to `{authenticated}` + `auth.uid() = user_id` |
+| `reminders` | `user_id` | `NOT NULL` | ✅ RLS on; scoped to `{authenticated}` + `auth.uid() = user_id` |
+| `profiles` | `id` | primary key | ✅ RLS on; `ALL` scoped to `auth.uid() = id` |
 
-**The five bolded rows are the priority.** A nullable, non-key `user_id`
-means a row can exist with no owner at all, and a policy written as
-`user_id = auth.uid()` treats that NULL row inconsistently depending on
-exactly how the policy is phrased (Postgres's three-valued NULL logic — the
-comparison itself evaluates to NULL, which reads as "deny" under `USING`,
-but a `NOT (user_id = auth.uid())` NOT-based policy would flip that). Prefer
-migrating these to `user_id uuid NOT NULL REFERENCES auth.users(id)` going
-forward; in the meantime, a policy needs to explicitly decide what a NULL
-owner means (most likely: nobody but the row's creator, verified at insert
-time) rather than leaving Postgres's default NULL comparison behavior to
-decide by accident.
+**Nullable-owner gap: closed** ([`../migrations/20260906201631_close_nullable_owner_gap.sql`](../migrations/20260906201631_close_nullable_owner_gap.sql), applied). Before writing that migration, this was confirmed *not* an active leak either way — every policy above uses `auth.uid() = user_id`, which Postgres evaluates to `NULL` (deny) rather than `true` for a `NULL`-owner row, so such a row was already unreadable and unwritable by everyone, not exposed to everyone. It was a data-hygiene gap, not a security one. Before applying the `NOT NULL` constraint, all five tables were queried directly and confirmed to have **zero** existing `NULL`-owner rows, so this was a pure schema tightening — no data to clean up or delete. The app's own insert/upsert calls (`supabase_service.dart`) already set `user_id` explicitly on every write and guard against a missing session before writing, so nothing in the client depended on the old nullable behavior; `DEFAULT auth.uid()` is a safety net for any insert path that isn't the app itself (an edge function, a future admin script), not something the app relies on today.
+
+**Duplicate policies (cosmetic, not a security issue):** `achievements` and
+`user_settings` each carry two overlapping policies with the same
+`auth.uid() = user_id` condition (one on `{public}`, one on
+`{authenticated}`, or two identically-scoped policies with different
+names) — harmless since Postgres OR's permissive policies together and
+both enforce the same condition, but worth consolidating to one policy per
+table the next time either is touched, so the intent is unambiguous to the
+next person reading it. Not fixed — cosmetic, no urgency.
 
 ## Public / reference tables (should be public-read, no write from the app)
 
-| Table | Notes |
-|---|---|
-| `adhkar` | Static content bundled with the app — verify writes are blocked for the anon/authenticated role, not just reads allowed |
-| `adhkar_categories` | Same |
-| `asma_allah` | Same |
-| `books` | Same |
-| `douaa_categories` | Same |
-| `douaa_content` | Same |
+| Table | Notes | Verified? |
+|---|---|---|
+| `adhkar` | Static content | ✅ RLS on, `SELECT`-only policy (two duplicate-named ones), no write policy exists → writes denied by default |
+| `adhkar_categories` | Same | ✅ Same shape |
+| `asma_allah` | Same | ✅ Same shape |
+| `books` | Static content — `pdf_url` now points at the app's own `book-pdfs` Storage bucket for all 9 rows instead of islamhouse.com ([`../migrations/20260906195445_point_books_at_storage.sql`](../migrations/20260906195445_point_books_at_storage.sql)) | ✅ RLS on, single `SELECT`-only policy, no write policy |
+| `douaa_categories` | Same | ✅ Same shape as adhkar |
+| `douaa_content` | Same | ✅ Same shape as adhkar |
 
 ## Community / moderated tables (mixed: public read, scoped write)
 
-| Table | Notes |
-|---|---|
-| `community_adhkar` | [supabase_service.dart](../../lib/core/supabase/supabase_service.dart) reads `.eq('approved', true)` client-side — that's a UI filter, **not** a security boundary. Confirm a policy actually blocks reading `approved = false` rows for anyone but the row's own `shared_by` (and blocks writing `approved` at all from the client — approval should only ever be settable server-side). Also confirm `likes` can't be set to an arbitrary value by the client (the app increments it via read-then-write; a malicious client could `update` it directly if the policy allows any authenticated write). |
-| `community_duas` | Same shape as `community_adhkar`, same checks apply |
+| Table | Notes | Verified? |
+|---|---|---|
+| `community_adhkar` | `SELECT` correctly scoped to `approved = true` — the app's client-side `.eq('approved', true)` filter genuinely is backed by a server-side policy, not just a UX convenience. | ✅ **Fixed and live** ([`../migrations/20260906190603_fix_community_content_policies.sql`](../migrations/20260906190603_fix_community_content_policies.sql)). The old `UPDATE` "like" policy (`USING (auth.uid() IS NOT NULL)`, no ownership check, no column restriction — any signed-in user could overwrite *any* column on *any* row, including self-approving unapproved content) is dropped; liking now goes through a `SECURITY DEFINER` function that only touches `likes` on approved rows, granted to `authenticated` only (a follow-up check caught it also being callable by `anon` via Supabase's default grants — revoked). `INSERT` now requires `shared_by = auth.uid()`. |
+| `community_duas` | Same shape as `community_adhkar` | ✅ Same fix, same migration, same verification. |
 
-## Once you've filled this in
+## Storage
 
-1. Fix whatever `check_rls_status.sql` shows as missing/wrong, directly in
-   the Supabase dashboard.
-2. Export the *resulting* schema so it's no longer only visible in the
-   dashboard: `supabase login`, `supabase link --project-ref <your-ref>`,
-   then `supabase db pull` from `apps/mobile/` — this writes a timestamped
-   migration file into `apps/mobile/supabase/migrations/` capturing the
-   live schema (including RLS policies) as SQL.
-3. Commit that migration file. From here on, policy changes should go
-   through a new migration (`supabase migration new <name>`) and a PR,
-   not a one-off dashboard edit — see the root [README](../README.md).
+| Bucket | Notes | Verified? |
+|---|---|---|
+| `book-pdfs` | Public, read-only (`SELECT` policy only, no client write policy), 50MB/file limit, `application/pdf` only ([`../migrations/20260906194628_create_book_pdfs_bucket.sql`](../migrations/20260906194628_create_book_pdfs_bucket.sql)) | ✅ All 9 books' PDFs uploaded, verified byte-identical to the islamhouse.com originals and reachable at their public URLs before `books.pdf_url` was repointed at them. |
+
+## What's left
+
+Nothing security-relevant. The only open item from the original audit is
+consolidating the duplicate policies on `achievements`/`user_settings`
+noted above — cosmetic, do it the next time either table is touched, no
+need for a dedicated pass.

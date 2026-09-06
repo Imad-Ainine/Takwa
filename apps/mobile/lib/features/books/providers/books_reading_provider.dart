@@ -109,12 +109,9 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
       print('Failed to write pdf session to local DB: $e');
     }
     try {
-      await _ref.read(supabaseServiceProvider).upsertPdfSession(
-        bookId,
-        pdfPage,
-        totalPdfPages,
-        readingSeconds,
-      );
+      await _ref
+          .read(supabaseServiceProvider)
+          .upsertPdfSession(bookId, pdfPage, totalPdfPages, readingSeconds);
     } catch (e) {
       print('Offline pdf session sync skipped: $e');
     }
@@ -123,7 +120,9 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
   /// Pull remote progress from Supabase and merge into local Drift DB.
   Future<void> syncFromRemote() async {
     try {
-      final remoteData = await _ref.read(supabaseServiceProvider).getAllBookProgress();
+      final remoteData = await _ref
+          .read(supabaseServiceProvider)
+          .getAllBookProgress();
       if (remoteData.isEmpty) return;
       for (final item in remoteData) {
         await _dao.upsertFromRemote(item);

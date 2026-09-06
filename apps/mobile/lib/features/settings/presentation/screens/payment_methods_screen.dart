@@ -31,22 +31,22 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 24,
+                      horizontal: AppSpacing.xl,
+                      vertical: AppSpacing.xxl,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
                         _buildSupportMessage(context),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.xxl),
                         _buildMethodCard(
                           index: 0,
                           title: 'الذهبية / CIB',
                           subtitle: '100.00 DZD',
                           icon: '💳',
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         _buildMethodCard(
                           index: 1,
                           title: 'فيزا / ماستركارد',
@@ -68,11 +68,14 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         children: [
           CustomLeadingButton(onPressed: () => Navigator.pop(context)),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Text(
             'طريقة الدفع',
             style: context.typography.headingMedium.copyWith(
@@ -95,12 +98,12 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
       onTap: () => setState(() => _selectedMethod = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: isSelected
               ? context.colors.gold.withOpacity(0.08)
               : context.colors.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
             color: isSelected ? context.colors.gold : context.colors.border,
             width: isSelected ? 2 : 1,
@@ -118,7 +121,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
         child: Row(
           children: [
             _buildRadioIndicator(isSelected),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +136,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                       fontSize: 17,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     subtitle,
                     style: context.typography.caption.copyWith(
@@ -152,7 +155,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
               height: 54,
               decoration: BoxDecoration(
                 color: context.colors.background.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
                   color: context.colors.border.withOpacity(0.5),
                 ),
@@ -169,7 +172,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
 
   Widget _buildSupportMessage(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -190,7 +193,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
                   color: context.colors.gold.withOpacity(0.15),
                   shape: BoxShape.circle,
@@ -201,7 +204,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 'صدقة جارية',
                 style: context.typography.labelLarge.copyWith(
@@ -212,7 +215,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'بمساهمتك البسيطة، تجعل "تقوى" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.',
             style: context.typography.bodyMedium.copyWith(

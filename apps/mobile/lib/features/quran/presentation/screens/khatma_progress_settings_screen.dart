@@ -7,15 +7,17 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import '../widgets/quran_widgets.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class KhatmaProgressSettingsScreen extends ConsumerWidget {
   const KhatmaProgressSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
-    
+
     final khatma = ref.watch(khatmaExProvider);
     final pagesRead = khatma?.pagesRead ?? 0;
     final progress = khatma?.progress ?? 0.0;
@@ -26,20 +28,26 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: style.isRamadan ? style.bg : const Color.fromARGB(46, 4, 1, 35),
+            backgroundColor: style.isRamadan
+                ? style.bg
+                : const Color.fromARGB(46, 4, 1, 35),
             foregroundColor: style.text,
             pinned: true,
             leading: const CustomLeadingButton(),
             title: Text(
-              'تقدم الختمة',
-              style: style.amiri(22, color: style.text, weight: FontWeight.bold),
+              l10n.khatmaProgressScreenTitle,
+              style: style.amiri(
+                22,
+                color: style.text,
+                weight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
           ),
           SliverToBoxAdapter(
             child: Column(
               children: [
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
                 KhatmaProgressRing(
                   progress: progress,
                   pagesRead: pagesRead,
@@ -47,15 +55,21 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
                   style: style,
                   color: style.gold,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
-                  '${(progress * 100).toStringAsFixed(1)}٪ مكتملة',
-                  style: style.naskh(16, color: style.gold, weight: FontWeight.bold),
+                  l10n.khatmaProgressPercentComplete(
+                    (progress * 100).toStringAsFixed(1),
+                  ),
+                  style: style.naskh(
+                    16,
+                    color: style.gold,
+                    weight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 24),
-                _buildStatsRow(style, khatma),
-                const SizedBox(height: 24),
-                _buildChart(style),
+                const SizedBox(height: AppSpacing.xxl),
+                _buildStatsRow(context, style, khatma, l10n),
+                const SizedBox(height: AppSpacing.xxl),
+                _buildChart(context, style, l10n),
                 const SizedBox(height: 40),
               ],
             ),
@@ -65,7 +79,12 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(AdaptiveStyle style, KhatmaSessionEx? khatma) {
+  Widget _buildStatsRow(
+    BuildContext context,
+    AdaptiveStyle style,
+    KhatmaSessionEx? khatma,
+    AppLocalizations l10n,
+  ) {
     final days = khatma != null
         ? DateTime.now().difference(khatma.startDate).inDays + 1
         : 0;
@@ -80,23 +99,23 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
           _StatsCard(
             style: style,
             icon: Icons.timer_rounded,
-            label: 'أيام',
-            value: ar(days),
+            label: l10n.khatmaStatDaysLabel,
+            value: localizedNumeral(context, days),
             color: style.gold,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           _StatsCard(
             style: style,
             icon: Icons.auto_stories_rounded,
-            label: 'صفحة مقروءة',
-            value: ar(khatma?.pagesRead ?? 0),
+            label: l10n.khatmaStatPagesReadLabel,
+            value: localizedNumeral(context, khatma?.pagesRead ?? 0),
             color: const Color(0xFF3AAFA9),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           _StatsCard(
             style: style,
             icon: Icons.speed_rounded,
-            label: 'صفحة/يوم',
+            label: l10n.khatmaStatPagesPerDayLabel,
             value: avgPerDay,
             color: const Color(0xFF4CAF7D),
           ),
@@ -105,9 +124,21 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildChart(AdaptiveStyle style) {
+  Widget _buildChart(
+    BuildContext context,
+    AdaptiveStyle style,
+    AppLocalizations l10n,
+  ) {
     final values = [3.0, 5.0, 2.0, 7.0, 4.0, 6.0, 3.0];
-    final days = ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'];
+    final days = [
+      l10n.weekdayShortSunday,
+      l10n.weekdayShortMonday,
+      l10n.weekdayShortTuesday,
+      l10n.weekdayShortWednesday,
+      l10n.weekdayShortThursday,
+      l10n.weekdayShortFriday,
+      l10n.weekdayShortSaturday,
+    ];
     final maxVal = values.reduce((a, b) => a > b ? a : b);
 
     return Padding(
@@ -116,15 +147,15 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            'القراءة الأسبوعية',
+            l10n.khatmaWeeklyReadingTitle,
             style: style.amiri(18, color: style.text, weight: FontWeight.bold),
           ),
           const SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: style.card,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: style.gold.withOpacity(0.1)),
             ),
             child: Row(
@@ -135,23 +166,31 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       Text(
-                        ar(values[i].toInt()),
-                        style: style.naskh(10, color: style.text.withOpacity(0.3)),
+                        localizedNumeral(context, values[i].toInt()),
+                        style: style.naskh(
+                          10,
+                          color: style.text.withOpacity(0.3),
+                        ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       AnimatedContainer(
                         duration: Duration(milliseconds: 500 + i * 80),
                         width: 14,
                         height: h,
                         decoration: BoxDecoration(
-                          color: i == 3 ? style.gold : style.gold.withOpacity(0.3),
-                          borderRadius: BorderRadius.circular(6),
+                          color: i == 3
+                              ? style.gold
+                              : style.gold.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         days[i],
-                        style: style.naskh(10, color: style.text.withOpacity(0.3)),
+                        style: style.naskh(
+                          10,
+                          color: style.text.withOpacity(0.3),
+                        ),
                       ),
                     ],
                   ),
@@ -190,12 +229,12 @@ class _StatsCard extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: color, size: 22),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             value,
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             label,
             style: style.naskh(10, color: style.text.withOpacity(0.5)),
@@ -215,6 +254,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final state = ref.watch(quranStateProvider);
@@ -225,13 +265,19 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: style.isRamadan ? style.bg : const Color.fromARGB(46, 4, 1, 35),
+            backgroundColor: style.isRamadan
+                ? style.bg
+                : const Color.fromARGB(46, 4, 1, 35),
             foregroundColor: style.text,
             pinned: true,
             leading: const CustomLeadingButton(),
             title: Text(
-              'الإعدادات',
-              style: style.amiri(22, color: style.text, weight: FontWeight.bold),
+              l10n.settingsScreenTitle,
+              style: style.amiri(
+                22,
+                color: style.text,
+                weight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
           ),
@@ -241,7 +287,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _sectionLabel(style, 'إعدادات القراءة'),
+                  _sectionLabel(style, l10n.quranReaderSettingsTitle),
                   const SizedBox(height: 14),
                   _card(
                     style: style,
@@ -249,8 +295,12 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'حجم الخط',
-                          style: style.amiri(17, color: style.text, weight: FontWeight.bold),
+                          l10n.quranReaderFontSizeLabel,
+                          style: style.amiri(
+                            17,
+                            color: style.text,
+                            weight: FontWeight.bold,
+                          ),
                         ),
                         Slider(
                           value: state.fontSize,
@@ -271,7 +321,10 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                           child: Center(
                             child: Text(
                               'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-                              style: style.amiri(state.fontSize, color: style.text),
+                              style: style.amiri(
+                                state.fontSize,
+                                color: style.text,
+                              ),
                             ),
                           ),
                         ),
@@ -285,16 +338,20 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'مظهر القراءة',
-                          style: style.amiri(17, color: style.text, weight: FontWeight.bold),
+                          l10n.khatmaReadingAppearanceLabel,
+                          style: style.amiri(
+                            17,
+                            color: style.text,
+                            weight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: AppSpacing.md),
                         Row(
                           children: [
                             for (final theme in [
-                              ('ليلي', ReaderTheme.night),
-                              ('عاجي', ReaderTheme.sepia),
-                              ('فاتح', ReaderTheme.white),
+                              (l10n.quranReaderThemeNight, ReaderTheme.night),
+                              (l10n.quranReaderThemeSepia, ReaderTheme.sepia),
+                              (l10n.quranReaderThemeWhite, ReaderTheme.white),
                             ])
                               Expanded(
                                 child: GestureDetector(
@@ -304,7 +361,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(
-                                      horizontal: 4,
+                                      horizontal: AppSpacing.xs,
                                     ),
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 10,
@@ -339,8 +396,8 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  _sectionLabel(style, 'إعدادات الختمة'),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _sectionLabel(style, l10n.khatmaSettingsSectionTitle),
                   const SizedBox(height: 14),
                   _card(
                     style: style,
@@ -349,14 +406,14 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                         _settingRow(
                           style,
                           Icons.mic_rounded,
-                          'القارئ',
-                          'الشيخ المنشاوي',
+                          l10n.khatmaReciterLabel,
+                          l10n.khatmaReciterDefaultValue,
                         ),
                         Divider(color: style.gold.withOpacity(0.1), height: 20),
                         _settingRow(
                           style,
                           Icons.notifications_rounded,
-                          'تذكير يومي',
+                          l10n.khatmaDailyReminderLabel,
                           '',
                           trailing: Switch(
                             value: false,
@@ -385,15 +442,16 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
     ),
   );
 
-  Widget _card({required AdaptiveStyle style, required Widget child}) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: style.card,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: style.gold.withOpacity(0.1)),
-    ),
-    child: child,
-  );
+  Widget _card({required AdaptiveStyle style, required Widget child}) =>
+      Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: style.card,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: style.gold.withOpacity(0.1)),
+        ),
+        child: child,
+      );
 
   Widget _settingRow(
     AdaptiveStyle style,
@@ -405,18 +463,12 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
     children: [
       if (trailing != null) trailing,
       const Spacer(),
-      Text(
-        label,
-        style: style.naskh(14, color: style.text.withOpacity(0.7)),
-      ),
-      const SizedBox(width: 8),
+      Text(label, style: style.naskh(14, color: style.text.withOpacity(0.7))),
+      const SizedBox(width: AppSpacing.sm),
       Icon(icon, color: style.gold, size: 18),
-      const SizedBox(width: 8),
+      const SizedBox(width: AppSpacing.sm),
       if (value.isNotEmpty)
-        Text(
-          value,
-          style: style.naskh(13, color: style.text.withOpacity(0.4)),
-        ),
+        Text(value, style: style.naskh(13, color: style.text.withOpacity(0.4))),
     ],
   );
 }

@@ -13,8 +13,8 @@ enum NotificationCategory { prayer, adhkar, reminders, all, none }
 
 final userPreferencesProvider =
     AsyncNotifierProvider<UserPreferencesNotifier, UserPreferences>(() {
-  return UserPreferencesNotifier();
-});
+      return UserPreferencesNotifier();
+    });
 
 class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
   late SettingsDao _dao;
@@ -86,5 +86,4 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
       unawaited(_prefsBridge.mirror(entry.key, entry.value));
     }
   }
-
 }

@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'quran_helpers.dart';
@@ -87,7 +86,7 @@ class SurahBadgePainter extends CustomPainter {
       text: TextSpan(
         text: ar(n),
         style: TextStyle(
-                    fontFamily: 'Amiri',
+          fontFamily: 'Amiri',
           fontSize: n > 99 ? 8 : 11,
           color: c,
           fontWeight: FontWeight.w700,
@@ -162,7 +161,7 @@ class VerseMarkerPaint extends CustomPainter {
       text: TextSpan(
         text: ar(n),
         style: TextStyle(
-                    fontFamily: 'Amiri',
+          fontFamily: 'Amiri',
           fontSize: n > 9 ? 7 : 9,
           color: c,
           fontWeight: FontWeight.w700,

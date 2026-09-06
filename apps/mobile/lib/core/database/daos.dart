@@ -578,17 +578,17 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Stream<MonthStats> watchMonthStats(int year, int month) {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getMonthStats(year, month))
-        .distinct();
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getMonthStats(year, month)).distinct();
   }
 
   Stream<int> watchCurrentStreak() {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getCurrentStreak())
-        .distinct();
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getCurrentStreak()).distinct();
   }
 
   Stream<List<WeeklyPoint>> watchWeeklyPoints() {
@@ -637,11 +637,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       PrayerRateData(name: l10n.prayerFajr, emoji: '🌅', rate: fajr / n),
       PrayerRateData(name: l10n.prayerDhuhr, emoji: '☀️', rate: dhuhr / n),
       PrayerRateData(name: l10n.prayerAsr, emoji: '🌤', rate: asr / n),
-      PrayerRateData(
-        name: l10n.prayerMaghrib,
-        emoji: '🌆',
-        rate: maghrib / n,
-      ),
+      PrayerRateData(name: l10n.prayerMaghrib, emoji: '🌆', rate: maghrib / n),
       PrayerRateData(name: l10n.prayerIsha, emoji: '🌃', rate: isha / n),
     ];
   }
@@ -706,10 +702,10 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   // ── Stream watchers for range queries ──
 
   Stream<MonthStats> watchStatsForRange(DateTime from, DateTime to) {
-    return customSelect('SELECT 1', readsFrom: {dailyRecords})
-        .watch()
-        .asyncMap((_) => getStatsForRange(from, to))
-        .distinct();
+    return customSelect(
+      'SELECT 1',
+      readsFrom: {dailyRecords},
+    ).watch().asyncMap((_) => getStatsForRange(from, to)).distinct();
   }
 
   Stream<List<WeeklyPoint>> watchPointsPerDay(DateTime from, DateTime to) {

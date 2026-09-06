@@ -121,7 +121,7 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
               const SizedBox(width: 40), // Spacer for centering
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.6,
@@ -141,18 +141,18 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: InkWell(
                       onTap: () => _togglePrayer(key),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
+                          horizontal: AppSpacing.lg,
                           vertical: 14,
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.gold.withOpacity(0.08)
                               : context.colors.card.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.gold.withOpacity(0.3)

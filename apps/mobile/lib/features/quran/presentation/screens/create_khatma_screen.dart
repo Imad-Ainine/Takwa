@@ -171,7 +171,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   // ──────────────────── STEP 0: Name & Type ────────────────────
   Widget _buildStep0(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         children: [
           _card(
@@ -212,21 +212,21 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     filled: true,
                     fillColor: style.bg,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       borderSide: BorderSide(color: style.border),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       borderSide: BorderSide(color: style.border),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       borderSide: BorderSide(
                         color: style.isRamadan ? style.gold : style.teal,
                       ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                      horizontal: AppSpacing.lg,
                       vertical: 14,
                     ),
                   ),
@@ -251,7 +251,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         weight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Icon(
                       Icons.account_tree_rounded,
                       color: style.gold,
@@ -259,7 +259,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
@@ -267,7 +267,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     style: style.naskh(12, color: style.textDim),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.lg),
                 _typeOption(
                   KhatmaType.muyassara,
                   l10n.createKhatmaTypeMuyassaraTitle,
@@ -316,7 +316,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   title,
                   style: style.amiri(
@@ -342,7 +342,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   // ──────────────────── STEP 1: Settings ────────────────────
   Widget _buildStep1(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         children: [
           // Start Date
@@ -362,7 +362,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         weight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Icon(
                       Icons.calendar_month_rounded,
                       color: style.gold,
@@ -370,14 +370,14 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 GestureDetector(
                   onTap: () => _pickDate(style),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: style.bg,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(color: style.border),
                     ),
                     child: Row(
@@ -399,7 +399,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           // Start Page
           _card(
             style,
@@ -417,7 +417,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         weight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Icon(
                       Icons.auto_stories_rounded,
                       color: style.gold,
@@ -425,15 +425,15 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 4,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: style.bg,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(color: style.border),
                   ),
                   child: DropdownButtonHideUnderline(
@@ -466,7 +466,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           // Notifications
           _card(
             style,
@@ -497,7 +497,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                             weight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         Icon(
                           Icons.notifications_rounded,
                           color: style.gold,
@@ -511,8 +511,8 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
                       color: style.danger.withOpacity(0.1),
@@ -569,7 +569,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   // ──────────────────── STEP 2: Summary ────────────────────
   Widget _buildStep2(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: _card(
         style,
         child: Column(
@@ -597,7 +597,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             // Type pill
             Container(
               padding: const EdgeInsets.all(14),
@@ -605,7 +605,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 color: style.isRamadan
                     ? style.gold.withOpacity(0.1)
                     : style.teal.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
                   color: (style.isRamadan ? style.gold : style.teal)
                       .withOpacity(0.3),
@@ -633,7 +633,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         color: style.isRamadan ? style.gold : style.teal,
                         size: 16,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         l10n.createKhatmaTypeFieldLabel,
                         style: style.naskh(
@@ -643,7 +643,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     _type == KhatmaType.muyassara
                         ? l10n.createKhatmaTypeMuyassaraDesc
@@ -658,7 +658,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             _summaryRow(l10n.createKhatmaNameFieldLabel, _nameCtrl.text, style),
             _summaryRow(
               l10n.createKhatmaStartDateFieldLabel,
@@ -667,7 +667,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             ),
             _summaryRow(
               l10n.createKhatmaFirstPageFieldLabel,
-              l10n.createKhatmaPageOption(localizedNumeral(context, _startPage)),
+              l10n.createKhatmaPageOption(
+                localizedNumeral(context, _startPage),
+              ),
               style,
             ),
             _summaryRow(
@@ -677,9 +679,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   : l10n.createKhatmaNotificationsDisabledValue,
               style,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: (style.isRamadan ? style.gold : style.teal).withOpacity(
                   0.15,
@@ -834,7 +836,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           backgroundColor: style.isRamadan ? style.gold : style.teal,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
           ),
         ),
       );
@@ -843,10 +845,10 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
 
   Widget _card(AdaptiveStyle style, {required Widget child}) => Container(
     width: double.infinity,
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(AppSpacing.lg),
     decoration: BoxDecoration(
       color: style.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       border: Border.all(color: style.border),
     ),
     child: child,

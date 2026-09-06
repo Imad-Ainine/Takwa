@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +33,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     dynamic value, {
     NotificationCategory category = NotificationCategory.all,
   }) async {
-    await ref.read(userPreferencesProvider.notifier).updatePref(key, value, category: category);
+    await ref
+        .read(userPreferencesProvider.notifier)
+        .updatePref(key, value, category: category);
   }
 
   @override
@@ -72,7 +73,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   actions: [
                     Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                        ),
                         child: SyncStatusIndicator(isSyncing: isSyncing),
                       ),
                     ),
@@ -82,20 +85,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   surfaceTintColor: Colors.transparent,
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       prefsAsync.when(
                         loading: () => const Center(
                           child: Padding(
-                            padding: EdgeInsets.all(32.0),
+                            padding: EdgeInsets.all(AppSpacing.xxxl),
                             child: TakwaLoadingIndicator(size: 32),
                           ),
                         ),
                         error: (err, st) => Center(
                           child: Padding(
-                            padding: const EdgeInsets.all(32.0),
+                            padding: const EdgeInsets.all(AppSpacing.xxxl),
                             child: Text('Error loading settings: $err'),
                           ),
                         ),
@@ -127,8 +132,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   label: l10n.settingsWakeBeforeFajrLabel,
                                   sublabel: l10n.settingsWakeBeforeFajrSublabel,
                                   value: prefs.wakeUpBeforeFajr,
-                                  onChanged: (v) =>
-                                      _updatePref('wake_up_before_fajr', v, category: NotificationCategory.prayer),
+                                  onChanged: (v) => _updatePref(
+                                    'wake_up_before_fajr',
+                                    v,
+                                    category: NotificationCategory.prayer,
+                                  ),
                                 ),
                                 if (prefs.wakeUpBeforeFajr) ...[
                                   const SettingsDivider(),
@@ -139,7 +147,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     onChanged: (t) async {
                                       final str =
                                           '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                      await _updatePref('wake_up_time', str, category: NotificationCategory.prayer);
+                                      await _updatePref(
+                                        'wake_up_time',
+                                        str,
+                                        category: NotificationCategory.prayer,
+                                      );
                                     },
                                   ),
                                 ],
@@ -167,8 +179,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   label: l10n.settingsMuhasabaLabel,
                                   sublabel: l10n.settingsMuhasabaSublabel,
                                   value: prefs.muhasabaReminder,
-                                  onChanged: (v) =>
-                                      _updatePref('muhasaba_reminder', v, category: NotificationCategory.reminders),
+                                  onChanged: (v) => _updatePref(
+                                    'muhasaba_reminder',
+                                    v,
+                                    category: NotificationCategory.reminders,
+                                  ),
                                 ),
                                 const SettingsDivider(),
                                 ToggleSetting(
@@ -192,7 +207,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ToggleSetting(
                                   icon: '🥘',
                                   label: l10n.settingsFastingRemindersLabel,
-                                  sublabel: l10n.settingsFastingRemindersSublabel,
+                                  sublabel:
+                                      l10n.settingsFastingRemindersSublabel,
                                   value: prefs.fastingRemindersOn,
                                   onChanged: (v) =>
                                       _updatePref('fasting_reminders_on', v),
@@ -209,7 +225,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       await _updatePref(
                                         'evening_reminder_time',
                                         str,
-                                        category: NotificationCategory.reminders,
+                                        category:
+                                            NotificationCategory.reminders,
                                       );
                                     },
                                   ),
@@ -247,9 +264,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 SelectSetting(
                                   icon: '🌐',
                                   label: l10n.settingsLanguageLabel,
-                                  value: ref
-                                      .watch(localeProvider)
-                                      .languageCode,
+                                  value: ref.watch(localeProvider).languageCode,
                                   options: {
                                     'ar': l10n.languageArabic,
                                     'en': l10n.languageEnglish,
@@ -262,7 +277,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
 
                             // ── وضع رمضان ──
                             SectionHeader(
@@ -282,13 +297,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: AppSpacing.xxxl),
                           ],
                         ),
                       ),
 
                       // ── معلومات ──
-                      SectionHeader(title: l10n.settingsAppSectionTitle, icon: 'ℹ️'),
+                      SectionHeader(
+                        title: l10n.settingsAppSectionTitle,
+                        icon: 'ℹ️',
+                      ),
                       SettingsCard(
                         children: [
                           ActionSetting(
@@ -333,7 +351,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
 
                       // App version
                       Center(
@@ -346,7 +364,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 color: context.colors.gold,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.xs),
                             Text(
                               l10n.settingsAppVersionLabel,
                               style: context.typography.caption.copyWith(
@@ -443,7 +461,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           side: BorderSide(color: context.colors.border),
         ),
         title: Text(
@@ -494,7 +512,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           side: BorderSide(color: context.colors.border),
         ),
         title: Text(

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_library/quran_library.dart' as ql;
@@ -248,7 +247,7 @@ class _SurahRow extends StatelessWidget {
           children: [
             // Arrow
             Icon(Icons.chevron_left, color: style.textDim, size: 20),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             // Arabic calligraphic name (left side)
             Expanded(
               child: Text(
@@ -281,7 +280,7 @@ class _SurahRow extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             // Number badge
             Container(
               width: 36,
@@ -352,7 +351,7 @@ class _ReviewTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.chevron_left, color: style.textDim, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -365,7 +364,7 @@ class _ReviewTab extends StatelessWidget {
                           weight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         previewText,
                         textDirection: TextDirection.rtl,
@@ -430,7 +429,7 @@ class _IndexTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
               color: style.isRamadan ? style.gold : const Color(0xFFD07010),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Center(
               child: Text(
@@ -541,7 +540,7 @@ class _JuzTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Icon(Icons.chevron_left, color: Colors.white30, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -554,7 +553,7 @@ class _JuzTab extends StatelessWidget {
                           weight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         preview,
                         textDirection: TextDirection.rtl,
@@ -647,7 +646,7 @@ class _RubTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               child: Text(
                 'حزب $hizb',
                 style: style.amiri(
@@ -665,10 +664,10 @@ class _RubTab extends StatelessWidget {
                 onTap: () => onTap(q['page'] as int),
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 6),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     color: style.card,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(color: style.border),
                   ),
                   child: Row(
@@ -687,10 +686,10 @@ class _RubTab extends StatelessWidget {
                               color: idx == 0
                                   ? style.textDim
                                   : idx == 1
-                                      ? style.gold
-                                      : idx == 2
-                                          ? style.textSec
-                                          : style.text,
+                                  ? style.gold
+                                  : idx == 2
+                                  ? style.textSec
+                                  : style.text,
                             ),
                             Text(
                               idx == 0
