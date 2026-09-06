@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamSunnahGuideScreen extends StatelessWidget {
   const QiyamSunnahGuideScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -28,37 +30,32 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
                       _buildStepCard(
                         context,
                         number: '1',
-                        title: 'النية والإخلاص',
-                        content:
-                            'أن ينوي العبد قيام الليل تقرباً لله عز وجل، ويفضل أن ينام على طهارة.',
+                        title: l10n.qiyamSunnahStep1Title,
+                        content: l10n.qiyamSunnahStep1Content,
                       ),
                       _buildStepCard(
                         context,
                         number: '2',
-                        title: 'الاستفتاح بركعتين خفيفتين',
-                        content:
-                            'كان النبي ﷺ إذا قام من الليل افتتح صلاته بركعتين خفيفتين، لتنشيط الجسد.',
+                        title: l10n.qiyamSunnahStep2Title,
+                        content: l10n.qiyamSunnahStep2Content,
                       ),
                       _buildStepCard(
                         context,
                         number: '3',
-                        title: 'كيفية الصلاة (مثنى مثنى)',
-                        content:
-                            'صلاة الليل مثنى مثنى، أي يسلم بعد كل ركعتين، ويطيل الركوع والسجود حسب الاستطاعة.',
+                        title: l10n.qiyamSunnahStep3Title,
+                        content: l10n.qiyamSunnahStep3Content,
                       ),
                       _buildStepCard(
                         context,
                         number: '4',
-                        title: 'القراءة بتدبر',
-                        content:
-                            'يستحب أن تكون القراءة بترتيل وتدبر، ويسأل الله عند آية الرحمة، ويتعوذ عند آية العذاب.',
+                        title: l10n.qiyamSunnahStep4Title,
+                        content: l10n.qiyamSunnahStep4Content,
                       ),
                       _buildStepCard(
                         context,
                         number: '5',
-                        title: 'ختم القيام بالوتر',
-                        content:
-                            'يختم المصلي قيامه بركعة واحدة توتر له ما صلى، لقوله ﷺ: "اجعلوا آخر صلاتكم بالليل وتراً".',
+                        title: l10n.qiyamSunnahStep5Title,
+                        content: l10n.qiyamSunnahStep5Content,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
                       _buildQuoteSection(context),
@@ -74,6 +71,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -84,7 +82,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'طريقة القيام والتهجد',
+            l10n.qiyamSunnahGuideTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
@@ -99,6 +97,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
   }
 
   Widget _buildGuideHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
@@ -111,7 +110,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
           const Icon(Icons.star, color: Colors.amber, size: 40),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'هدي النبي ﷺ في قيام الليل',
+            l10n.qiyamSunnahGuideHeaderTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 20,
               color: context.colors.gold,
@@ -121,7 +120,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'دليل شامل لتعلم كيفية صلاة التهجد كما وردت عن الرسول ﷺ والصحابة الكرام.',
+            l10n.qiyamSunnahGuideHeaderSubtitle,
             style: context.typography.bodyLarge.copyWith(
               color: context.colors.textPrimary,
               height: 1.5,

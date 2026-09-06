@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamStoriesScreen extends StatelessWidget {
   const QiyamStoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final stories = _stories(l10n);
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -22,11 +25,11 @@ class QiyamStoriesScreen extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.all(AppSpacing.xl),
-                    itemCount: _stories.length,
+                    itemCount: stories.length,
                     separatorBuilder: (_, __) =>
                         const SizedBox(height: AppSpacing.lg),
                     itemBuilder: (context, index) =>
-                        _buildStoryCard(context, _stories[index]),
+                        _buildStoryCard(context, stories[index]),
                   ),
                 ),
               ],
@@ -38,6 +41,7 @@ class QiyamStoriesScreen extends StatelessWidget {
   }
 
   Widget _buildAppTopBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -48,7 +52,7 @@ class QiyamStoriesScreen extends StatelessWidget {
           const CustomLeadingButton(),
           const SizedBox(width: AppSpacing.md),
           Text(
-            'قصص وعجائب القيام',
+            l10n.qiyamStoriesScreenTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
@@ -135,30 +139,30 @@ class _Story {
   });
 }
 
-const _stories = [
+List<_Story> _stories(AppLocalizations l10n) => [
   _Story(
-    title: 'شرف المؤمن',
+    title: l10n.qiyamStoryTitle1,
     icon: '✨',
     content:
         'قال جبريل عليه السلام للنبي ﷺ: "يا محمد، عش ما شئت فإنك ميت، وأحبب من شئت فإنك مفارقه، واعمل ما شئت فإنك مجزي به، واعلم أن شرف المؤمن قيامه بالليل، وعزه استغناؤه عن الناس".',
     reference: 'رواه الحاكم',
   ),
   _Story(
-    title: 'سيد التابعين والقيام',
+    title: l10n.qiyamStoryTitle2,
     icon: '🌟',
     content:
         'كان أويس القرني رضي الله عنه إذا أمسى يقول: هذه ليلة الركوع، فيركع حتى يصبح، وكان يقول في ليلة أخرى: هذه ليلة السجود، فيسجد حتى يصبح. قيل له: يا أويس، كيف تطيق هذا؟ قال: إنما هي ليلة واحدة، والجنة تستحق أكثر من ذلك.',
     reference: 'صفة الصفوة',
   ),
   _Story(
-    title: 'سهام الليل لا تخطئ',
+    title: l10n.qiyamStoryTitle3,
     icon: '🏹',
     content:
         'كان الإمام الشافعي يقول: "سهام الليل لا تخطئ، ولكن لها أمد وللأمد انقضاء". ويقصد بها دعاء المستيقظ في جوف الليل الموقن بالإجابة.',
     reference: 'ديوان الشافعي',
   ),
   _Story(
-    title: 'نور الوجه من القيام',
+    title: l10n.qiyamStoryTitle4,
     icon: '🌙',
     content:
         'سُئل الحسن البصري: ما بال المتهجدين من أحسن الناس وجوهاً؟ فقال: "لأنهم خلوا بالرحمن فألبسهم نوراً من نوره".',

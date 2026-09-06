@@ -7,6 +7,7 @@ import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/supabase/supabase_providers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -45,6 +46,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() => _isSaving = true);
 
@@ -54,8 +56,8 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              'تم حفظ التغييرات بنجاح',
+            content: Text(
+              l10n.accountSettingsSavedSuccess,
               textAlign: TextAlign.center,
             ),
             backgroundColor: context.colors.success,
@@ -67,9 +69,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'حدث خطأ أثناء حفظ التغييرات',
+              l10n.accountSettingsSaveError,
               textAlign: TextAlign.center,
             ),
             backgroundColor: Colors.redAccent,
@@ -84,6 +86,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
@@ -102,7 +105,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                 pinned: true,
                 leading: const CustomLeadingButton(),
                 title: Text(
-                  'إعدادات الحساب',
+                  l10n.profileAccountSettingsMenuTitle,
                   style: context.typography.headingMedium.copyWith(
                     color: context.colors.gold,
                   ),
@@ -117,7 +120,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   ),
                   error: (e, _) => Center(
                     child: Text(
-                      'خطأ في تحميل البيانات',
+                      l10n.profileLoadError,
                       style: context.typography.bodyMedium.copyWith(
                         color: Colors.red,
                       ),
@@ -134,7 +137,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'المعلومات الشخصية',
+                              l10n.accountSettingsPersonalInfoSection,
                               style: context.typography.labelLarge.copyWith(
                                 color: context.colors.textDim,
                               ),

@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamVirtuesScreen extends StatelessWidget {
   const QiyamVirtuesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -25,7 +27,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                     children: [
                       _buildVirtueSection(
                         context,
-                        title: 'من القرآن الكريم',
+                        title: l10n.qiyamVirtuesFromQuran,
                         icon: Icons.menu_book,
                         color: context.colors.teal,
                         items: [
@@ -37,7 +39,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xxl),
                       _buildVirtueSection(
                         context,
-                        title: 'من السنة النبوية',
+                        title: l10n.qiyamVirtuesFromSunnah,
                         icon: Icons.auto_awesome,
                         color: context.colors.gold,
                         items: [
@@ -49,7 +51,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xxl),
                       _buildVirtueSection(
                         context,
-                        title: 'من أقوال السلف',
+                        title: l10n.qiyamVirtuesFromSalaf,
                         icon: Icons.format_quote,
                         color: context.colors.teal,
                         items: [
@@ -69,6 +71,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -79,7 +82,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'فضائل قيام الليل',
+            l10n.qiyamVirtuesScreenTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
