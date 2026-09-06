@@ -3334,4 +3334,38 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get favoriteAdhkarCopiedToast => 'تم النسخ ✓';
+
+  @override
+  String get qiyamSleepCalcTitle => 'حاسبة النوم الذكية';
+
+  @override
+  String get qiyamSleepCalcHeaderTitle => 'استيقظ نشيطاً لقيام الليل';
+
+  @override
+  String get qiyamSleepCalcHeaderSubtitle =>
+      'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.';
+
+  @override
+  String get qiyamSleepCalcWakeupQuestion => 'متى تريد الاستيقاظ؟';
+
+  @override
+  String get qiyamSleepCalcBestTimesLabel => 'أفضل أوقات النوم:';
+
+  @override
+  String get qiyamSleepCycle9h => '9 ساعات (مثالي)';
+
+  @override
+  String get qiyamSleepCycle75h => '7.5 ساعات (ممتاز)';
+
+  @override
+  String get qiyamSleepCycle6h => '6 ساعات (جيد)';
+
+  @override
+  String get qiyamSleepCycle45h => '4.5 ساعات (كافٍ)';
+
+  @override
+  String get qiyamSleepCycle15h => '1.5 ساعة (غفوة)';
+
+  @override
+  String get qiyamSleepCalcSleepAtLabel => 'يجب أن تنام الساعة';
 }

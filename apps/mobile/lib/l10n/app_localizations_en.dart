@@ -3368,4 +3368,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteAdhkarCopiedToast => 'Copied ✓';
+
+  @override
+  String get qiyamSleepCalcTitle => 'Smart Sleep Calculator';
+
+  @override
+  String get qiyamSleepCalcHeaderTitle => 'Wake up energized for Qiyam';
+
+  @override
+  String get qiyamSleepCalcHeaderSubtitle =>
+      'The calculator uses sleep cycles (90 minutes) to find the best time to sleep so you wake up at your most refreshed.';
+
+  @override
+  String get qiyamSleepCalcWakeupQuestion => 'When do you want to wake up?';
+
+  @override
+  String get qiyamSleepCalcBestTimesLabel => 'Best times to sleep:';
+
+  @override
+  String get qiyamSleepCycle9h => '9 hours (ideal)';
+
+  @override
+  String get qiyamSleepCycle75h => '7.5 hours (excellent)';
+
+  @override
+  String get qiyamSleepCycle6h => '6 hours (good)';
+
+  @override
+  String get qiyamSleepCycle45h => '4.5 hours (sufficient)';
+
+  @override
+  String get qiyamSleepCycle15h => '1.5 hours (nap)';
+
+  @override
+  String get qiyamSleepCalcSleepAtLabel => 'You should sleep at';
 }

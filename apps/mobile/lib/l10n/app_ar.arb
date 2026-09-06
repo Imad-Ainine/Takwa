@@ -1849,5 +1849,16 @@
   },
   "favoriteAdhkarEmptyTitle": "لا توجد أذكار مفضلة بعد",
   "favoriteAdhkarEmptySubtitle": "اضغط على ❤️ في أي ذكر لحفظه هنا",
-  "favoriteAdhkarCopiedToast": "تم النسخ ✓"
+  "favoriteAdhkarCopiedToast": "تم النسخ ✓",
+  "qiyamSleepCalcTitle": "حاسبة النوم الذكية",
+  "qiyamSleepCalcHeaderTitle": "استيقظ نشيطاً لقيام الليل",
+  "qiyamSleepCalcHeaderSubtitle": "تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.",
+  "qiyamSleepCalcWakeupQuestion": "متى تريد الاستيقاظ؟",
+  "qiyamSleepCalcBestTimesLabel": "أفضل أوقات النوم:",
+  "qiyamSleepCycle9h": "9 ساعات (مثالي)",
+  "qiyamSleepCycle75h": "7.5 ساعات (ممتاز)",
+  "qiyamSleepCycle6h": "6 ساعات (جيد)",
+  "qiyamSleepCycle45h": "4.5 ساعات (كافٍ)",
+  "qiyamSleepCycle15h": "1.5 ساعة (غفوة)",
+  "qiyamSleepCalcSleepAtLabel": "يجب أن تنام الساعة"
 }

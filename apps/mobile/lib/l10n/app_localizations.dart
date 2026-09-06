@@ -6169,6 +6169,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم النسخ ✓'**
   String get favoriteAdhkarCopiedToast;
+
+  /// No description provided for @qiyamSleepCalcTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة النوم الذكية'**
+  String get qiyamSleepCalcTitle;
+
+  /// No description provided for @qiyamSleepCalcHeaderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'استيقظ نشيطاً لقيام الليل'**
+  String get qiyamSleepCalcHeaderTitle;
+
+  /// No description provided for @qiyamSleepCalcHeaderSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.'**
+  String get qiyamSleepCalcHeaderSubtitle;
+
+  /// No description provided for @qiyamSleepCalcWakeupQuestion.
+  ///
+  /// In ar, this message translates to:
+  /// **'متى تريد الاستيقاظ؟'**
+  String get qiyamSleepCalcWakeupQuestion;
+
+  /// No description provided for @qiyamSleepCalcBestTimesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أفضل أوقات النوم:'**
+  String get qiyamSleepCalcBestTimesLabel;
+
+  /// No description provided for @qiyamSleepCycle9h.
+  ///
+  /// In ar, this message translates to:
+  /// **'9 ساعات (مثالي)'**
+  String get qiyamSleepCycle9h;
+
+  /// No description provided for @qiyamSleepCycle75h.
+  ///
+  /// In ar, this message translates to:
+  /// **'7.5 ساعات (ممتاز)'**
+  String get qiyamSleepCycle75h;
+
+  /// No description provided for @qiyamSleepCycle6h.
+  ///
+  /// In ar, this message translates to:
+  /// **'6 ساعات (جيد)'**
+  String get qiyamSleepCycle6h;
+
+  /// No description provided for @qiyamSleepCycle45h.
+  ///
+  /// In ar, this message translates to:
+  /// **'4.5 ساعات (كافٍ)'**
+  String get qiyamSleepCycle45h;
+
+  /// No description provided for @qiyamSleepCycle15h.
+  ///
+  /// In ar, this message translates to:
+  /// **'1.5 ساعة (غفوة)'**
+  String get qiyamSleepCycle15h;
+
+  /// No description provided for @qiyamSleepCalcSleepAtLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب أن تنام الساعة'**
+  String get qiyamSleepCalcSleepAtLabel;
 }
 
 class _AppLocalizationsDelegate
