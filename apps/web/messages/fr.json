@@ -1,0 +1,163 @@
+{
+  "HomePage": {
+    "title": "Élevez Votre Voyage Spirituel",
+    "description": "Takwa est votre compagnon complet pour une vie islamique éclairée, conçu avec élégance et précision pour vous garder profondément connecté à votre foi.",
+    "download": "Télécharger",
+    "learnMore": "En Savoir Plus",
+    "featuresTitle": "Tout l'Essentiel Pour Votre Vie Spirituelle",
+    "featuresSubtitle": "Une interface haut de gamme qui allie harmonieusement l'art islamique à la technologie moderne.",
+    "features": {
+      "prayerTimes": {
+        "title": "Horaires de Prière Précis",
+        "description": "Calculs précis des heures de prière selon votre position, avec des alertes d'Adhan élégantes et personnalisables."
+      },
+      "quran": {
+        "title": "Le Saint Coran",
+        "description": "Plongez dans la Parole de Dieu grâce à des modes de lecture élégants, des traductions et des récitations de haute qualité."
+      },
+      "qibla": {
+        "title": "Direction de la Qibla",
+        "description": "Trouvez la Qibla avec une précision absolue partout dans le monde, pour être toujours orienté vers la Kaaba."
+      },
+      "azkar": {
+        "title": "Azkar & Adhkar",
+        "description": "Une collection soigneusement choisie d'invocations quotidiennes et de supplications authentiques pour apaiser votre cœur."
+      },
+      "ramadan": {
+        "title": "Compagnon du Ramadan",
+        "description": "Des fonctionnalités spécialisées pour le mois sacré, avec des horaires précis d'Imsak, d'Iftar et de Tarawih."
+      },
+      "notifications": {
+        "title": "Alertes Spirituelles Premium",
+        "description": "Des notifications pensées avec soin, respectueuses du caractère sacré et serein de vos rituels quotidiens."
+      }
+    },
+    "showcase": {
+      "title": "Art Contemporain, Foi Intemporelle",
+      "description": "Nous pensons que les outils spirituels doivent être aussi beaux que fonctionnels. Takwa propose une esthétique en mode sombre soignée, des dégradés dorés raffinés et des transitions fluides.",
+      "list": [
+        "Expérience Premium en Mode Sombre",
+        "Motifs Géométriques Islamiques Authentiques",
+        "Interactions Fluides et Réactives",
+        "Design Adaptatif Pour Tous les Appareils"
+      ]
+    }
+  },
+  "Metadata": {
+    "title": "Takwa - Votre Compagnon Islamique Ultime Pour une Vie Consciente",
+    "description": "Découvrez la beauté de l'Islam avec Takwa. Horaires de prière précis, Saint Coran, boussole Qibla et Azkar quotidiens dans un environnement premium."
+  },
+  "Navigation": {
+    "home": "Accueil",
+    "features": "Fonctionnalités",
+    "download": "Télécharger",
+    "support": "Support",
+    "legal": "Mentions Légales",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation"
+  },
+  "Privacy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour : 24 avril 2026",
+    "sections": {
+      "intro": {
+        "title": "1. Introduction",
+        "content": "Bienvenue sur Takwa. Nous nous engageons pleinement à protéger votre vie privée et à garantir une expérience sécurisée. Cette politique explique comment nous protégeons et gérons vos informations avec la plus grande attention."
+      },
+      "collect": {
+        "title": "2. Informations Que Nous Collectons",
+        "content": "Nous ne collectons que les informations essentielles à la fourniture de nos services, telles que vos identifiants d'authentification et votre position géographique pour la précision spirituelle.",
+        "items": [
+          "Données personnelles : inscription sécurisée via Supabase ou l'authentification Google.",
+          "Données de localisation : nécessaires pour calculer avec précision les horaires de prière et la direction de la Qibla.",
+          "Données d'utilisation : informations techniques anonymisées pour améliorer les performances de l'application."
+        ]
+      },
+      "use": {
+        "title": "3. Comment Nous Utilisons Vos Informations",
+        "content": "Vos données sont utilisées exclusivement pour faciliter vos pratiques spirituelles et améliorer nos offres.",
+        "items": [
+          "Fournir et améliorer nos services principaux.",
+          "Garantir la plus grande précision des horaires de prière.",
+          "Envoyer des notifications spirituelles en temps voulu.",
+          "Améliorer l'expérience utilisateur globale."
+        ]
+      },
+      "thirdParty": {
+        "title": "4. Services Tiers",
+        "content": "Nous collaborons avec des services de premier plan tels que Supabase et Google pour garantir une sécurité et une fiabilité robustes. Ces partenaires appliquent leurs propres normes strictes de confidentialité."
+      },
+      "security": {
+        "title": "5. Sécurité des Données",
+        "content": "Nous mettons en œuvre des mesures de sécurité à la pointe de la technologie, honorant la confiance que vous nous accordez pour préserver la confidentialité de votre parcours spirituel."
+      },
+      "contact": {
+        "title": "6. Nous Contacter",
+        "content": "Pour toute question relative à la confidentialité, veuillez contacter notre équipe de support dédiée à :"
+      }
+    }
+  },
+  "Terms": {
+    "title": "Conditions d'Utilisation",
+    "lastUpdated": "Dernière mise à jour : 24 avril 2026",
+    "sections": {
+      "agree": {
+        "title": "1. Acceptation des Conditions",
+        "content": "En intégrant l'écosystème Takwa, vous acceptez d'être lié par ces Conditions d'Utilisation. Merci de les consulter attentivement pour une expérience harmonieuse."
+      },
+      "use": {
+        "title": "2. Utilisation des Services",
+        "content": "Vous vous engagez à utiliser Takwa à des fins licites et spirituelles, dans le respect de la communauté et du caractère sacré des services proposés."
+      },
+      "ip": {
+        "title": "3. Propriété Intellectuelle",
+        "content": "Tous les designs, contenus et fonctionnalités sont la propriété exclusive de Takwa et sont protégés par les normes internationales de propriété intellectuelle."
+      },
+      "disclaimer": {
+        "title": "4. Avertissement",
+        "content": "Bien que nous visions une précision absolue dans les calculs de prière et les textes coraniques, nous encourageons les utilisateurs à tenir compte des variations locales."
+      },
+      "liability": {
+        "title": "5. Limitation de Responsabilité",
+        "content": "Takwa ne saurait être tenu responsable de toute expérience indirecte résultant de l'utilisation de nos plateformes numériques."
+      },
+      "changes": {
+        "title": "6. Modifications",
+        "content": "Nous nous réservons le droit de faire évoluer ces conditions à mesure que nos services se développent. Toute utilisation continue implique votre acceptation de ces évolutions."
+      },
+      "contact": {
+        "title": "7. Coordonnées",
+        "content": "Pour toute question d'ordre légal ou officiel, veuillez nous contacter à :"
+      }
+    }
+  },
+  "Support": {
+    "title": "Comment Pouvons-Nous Vous Aider ?",
+    "subtitle": "L'équipe Takwa est présente pour vous accompagner à chaque étape de votre parcours spirituel.",
+    "cards": {
+      "email": {
+        "title": "Assistance par E-mail",
+        "content": "Contactez-nous par e-mail pour une assistance personnalisée."
+      },
+      "social": {
+        "title": "Communauté",
+        "content": "Rejoignez-nous sur nos réseaux sociaux pour des conseils et des actualités."
+      },
+      "faq": {
+        "title": "Base de Connaissances",
+        "content": "Consultez notre FAQ détaillée pour des réponses immédiates aux questions courantes.",
+        "button": "Voir la FAQ"
+      }
+    },
+    "form": {
+      "title": "Contactez Notre Équipe",
+      "name": "Nom Complet",
+      "email": "Adresse E-mail",
+      "message": "Votre Message",
+      "placeholderName": "Comment devons-nous vous appeler ?",
+      "placeholderEmail": "Où pouvons-nous vous joindre ?",
+      "placeholderMessage": "Dites-nous comment nous pouvons vous aider...",
+      "submit": "Envoyer le Message"
+    }
+  }
+}
