@@ -1,51 +1,53 @@
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:quran_library/quran_library.dart' as ql;
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/providers/shared_preferences_provider.dart';
 import '../data/quran_models.dart';
+import '../data/quran_prefs_repository.dart';
+
+// ─────────────────────────────────────────────────────────────
+// Repository
+// ─────────────────────────────────────────────────────────────
+final quranPrefsRepositoryProvider = Provider<QuranPrefsRepository>((ref) {
+  return QuranPrefsRepository(ref.watch(sharedPreferencesProvider));
+});
 
 // ─────────────────────────────────────────────────────────────
 // Reader State
 // ─────────────────────────────────────────────────────────────
 final quranStateProvider =
     StateNotifierProvider<QuranStateNotifier, QuranReadingState>(
-      (ref) => QuranStateNotifier(),
+      (ref) => QuranStateNotifier(ref.watch(quranPrefsRepositoryProvider)),
     );
 
 class QuranStateNotifier extends StateNotifier<QuranReadingState> {
-  QuranStateNotifier() : super(const QuranReadingState()) {
-    _loadPrefs();
-  }
+  QuranStateNotifier(this._repo)
+    : super(
+        QuranReadingState(
+          theme: _repo.getReaderTheme(),
+          fontSize: _repo.getFontSize(),
+          currentPage: _repo.getLastPage(),
+        ),
+      );
 
-  Future<void> _loadPrefs() async {
-    final p = await SharedPreferences.getInstance();
-    state = state.copyWith(
-      theme: ReaderTheme.values[p.getInt('q_theme') ?? 0],
-      fontSize: p.getDouble('q_fontsize') ?? 22.0,
-      currentPage: p.getInt('q_last_page') ?? 1,
-    );
-  }
+  final QuranPrefsRepository _repo;
 
   Future<void> setTheme(ReaderTheme t) async {
     state = state.copyWith(theme: t);
-    final p = await SharedPreferences.getInstance();
-    await p.setInt('q_theme', t.index);
+    await _repo.setReaderTheme(t);
   }
 
   Future<void> setFontSize(double s) async {
     state = state.copyWith(fontSize: s.clamp(16, 36));
-    final p = await SharedPreferences.getInstance();
-    await p.setDouble('q_fontsize', s);
+    await _repo.setFontSize(s);
   }
 
   Future<void> setPage(int page) async {
     state = state.copyWith(currentPage: page);
-    final p = await SharedPreferences.getInstance();
-    await p.setInt('q_last_page', page);
+    await _repo.setLastPage(page);
   }
 
   void setMode(ReaderMode m) => state = state.copyWith(mode: m);
@@ -131,175 +133,49 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
 // ─────────────────────────────────────────────────────────────
 final quranLastReadProvider =
     StateNotifierProvider<_LastReadNotifier, QuranBookmark?>(
-      (ref) => _LastReadNotifier(),
+      (ref) => _LastReadNotifier(ref.watch(quranPrefsRepositoryProvider)),
     );
 
 class _LastReadNotifier extends StateNotifier<QuranBookmark?> {
-  _LastReadNotifier() : super(null) {
-    _load();
-  }
+  _LastReadNotifier(this._repo) : super(_repo.getLastRead());
 
-  Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
-    final r = p.getString('q_last_read');
-    if (r != null) state = QuranBookmark.fromJson(jsonDecode(r));
-  }
+  final QuranPrefsRepository _repo;
 
   Future<void> save(QuranBookmark b) async {
     state = b;
-    final p = await SharedPreferences.getInstance();
-    await p.setString('q_last_read', jsonEncode(b.toJson()));
+    await _repo.setLastRead(b);
   }
 
   Future<void> clear() async {
     state = null;
-    final p = await SharedPreferences.getInstance();
-    await p.remove('q_last_read');
+    await _repo.clearLastRead();
   }
 }
 
 final quranBookmarksProvider =
     StateNotifierProvider<_BookmarksNotifier, List<QuranBookmark>>(
-      (ref) => _BookmarksNotifier(),
+      (ref) => _BookmarksNotifier(ref.watch(quranPrefsRepositoryProvider)),
     );
 
 class _BookmarksNotifier extends StateNotifier<List<QuranBookmark>> {
-  _BookmarksNotifier() : super([]) {
-    _load();
-  }
+  _BookmarksNotifier(this._repo) : super(_repo.getBookmarks());
 
-  Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
-    final l = p.getStringList('q_bookmarks') ?? [];
-    state = l.map((s) => QuranBookmark.fromJson(jsonDecode(s))).toList();
-  }
+  final QuranPrefsRepository _repo;
 
   Future<void> add(QuranBookmark b) async {
     if (state.any((x) => x.surahNum == b.surahNum && x.ayahNum == b.ayahNum)) {
       return;
     }
     state = [...state, b];
-    await _persist();
+    await _repo.setBookmarks(state);
   }
 
   Future<void> remove(int surah, int ayah) async {
     state = state
         .where((x) => !(x.surahNum == surah && x.ayahNum == ayah))
         .toList();
-    await _persist();
+    await _repo.setBookmarks(state);
   }
-
-  Future<void> _persist() async {
-    final p = await SharedPreferences.getInstance();
-    await p.setStringList(
-      'q_bookmarks',
-      state.map((b) => jsonEncode(b.toJson())).toList(),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Khatma Type
-// ─────────────────────────────────────────────────────────────
-enum KhatmaType { muyassara, multazima }
-
-// ─────────────────────────────────────────────────────────────
-// Extended KhatmaSession with type
-// ─────────────────────────────────────────────────────────────
-class KhatmaSessionEx {
-  final String id;
-  final String label;
-  final KhatmaType type;
-  final DateTime startDate;
-  final DateTime? endDate; // target end date for multazima
-  final DateTime? completedDate;
-  final DateTime? cancelledDate;
-  final int startPage;
-  final int currentPage;
-  final int pagesRead;
-  final bool notificationsEnabled;
-  final int? dailyPages; // for multazima
-  static const int totalPages = 604;
-
-  const KhatmaSessionEx({
-    required this.id,
-    required this.label,
-    required this.type,
-    required this.startDate,
-    this.endDate,
-    this.completedDate,
-    this.cancelledDate,
-    this.startPage = 1,
-    this.currentPage = 1,
-    this.pagesRead = 0,
-    this.notificationsEnabled = false,
-    this.dailyPages,
-  });
-
-  double get progress => pagesRead / totalPages;
-  bool get isCompleted => completedDate != null || pagesRead >= totalPages;
-  bool get isCancelled => cancelledDate != null;
-  bool get isActive => !isCompleted && !isCancelled;
-
-  KhatmaSessionEx copyWith({
-    int? currentPage,
-    int? pagesRead,
-    DateTime? completedDate,
-    DateTime? cancelledDate,
-    String? label,
-  }) => KhatmaSessionEx(
-    id: id,
-    label: label ?? this.label,
-    type: type,
-    startDate: startDate,
-    endDate: endDate,
-    completedDate: completedDate ?? this.completedDate,
-    cancelledDate: cancelledDate ?? this.cancelledDate,
-    startPage: startPage,
-    currentPage: currentPage ?? this.currentPage,
-    pagesRead: pagesRead ?? this.pagesRead,
-    notificationsEnabled: notificationsEnabled,
-    dailyPages: dailyPages,
-  );
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'label': label,
-    'type': type.name,
-    'startDate': startDate.toIso8601String(),
-    'endDate': endDate?.toIso8601String(),
-    'completedDate': completedDate?.toIso8601String(),
-    'cancelledDate': cancelledDate?.toIso8601String(),
-    'startPage': startPage,
-    'currentPage': currentPage,
-    'pagesRead': pagesRead,
-    'notificationsEnabled': notificationsEnabled,
-    'dailyPages': dailyPages,
-  };
-
-  factory KhatmaSessionEx.fromJson(Map<String, dynamic> j) => KhatmaSessionEx(
-    id: j['id'] as String,
-    label: j['label'] as String? ?? 'ختمة',
-    type: KhatmaType.values.firstWhere(
-      (t) => t.name == j['type'],
-      orElse: () => KhatmaType.muyassara,
-    ),
-    startDate: DateTime.parse(j['startDate'].toString()),
-    endDate: j['endDate'] != null
-        ? DateTime.tryParse(j['endDate'].toString())
-        : null,
-    completedDate: j['completedDate'] != null
-        ? DateTime.tryParse(j['completedDate'].toString())
-        : null,
-    cancelledDate: j['cancelledDate'] != null
-        ? DateTime.tryParse(j['cancelledDate'].toString())
-        : null,
-    startPage: j['startPage'] as int? ?? 1,
-    currentPage: j['currentPage'] as int? ?? 1,
-    pagesRead: j['pagesRead'] as int? ?? 0,
-    notificationsEnabled: j['notificationsEnabled'] as bool? ?? false,
-    dailyPages: j['dailyPages'] as int?,
-  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -307,26 +183,13 @@ class KhatmaSessionEx {
 // ─────────────────────────────────────────────────────────────
 final khatmaExProvider =
     StateNotifierProvider<KhatmaExNotifier, KhatmaSessionEx?>(
-      (ref) => KhatmaExNotifier(),
+      (ref) => KhatmaExNotifier(ref.watch(quranPrefsRepositoryProvider)),
     );
 
 class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
-  KhatmaExNotifier() : super(null) {
-    _load();
-  }
+  KhatmaExNotifier(this._repo) : super(_repo.getActiveKhatma());
 
-  static const _activeKey = 'khatma_ex_active';
-  static const _historyKey = 'khatma_ex_history';
-
-  Future<void> _load() async {
-    final p = await SharedPreferences.getInstance();
-    final raw = p.getString(_activeKey);
-    if (raw != null) {
-      try {
-        state = KhatmaSessionEx.fromJson(jsonDecode(raw));
-      } catch (_) {}
-    }
-  }
+  final QuranPrefsRepository _repo;
 
   Future<void> createNew({
     required String label,
@@ -336,7 +199,7 @@ class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
     int? dailyPages,
     DateTime? endDate,
   }) async {
-    if (state != null && state!.isActive) await _archive(state!);
+    if (state != null && state!.isActive) await _repo.archiveKhatma(state!);
     final session = KhatmaSessionEx(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       label: label,
@@ -349,7 +212,7 @@ class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
       dailyPages: dailyPages,
     );
     state = session;
-    await _persist();
+    await _repo.setActiveKhatma(session);
   }
 
   Future<void> advancePage(int page) async {
@@ -365,38 +228,16 @@ class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
           : null,
     );
     state = updated;
-    await _persist();
-    if (updated.isCompleted) await _archive(updated);
+    await _repo.setActiveKhatma(updated);
+    if (updated.isCompleted) await _repo.archiveKhatma(updated);
   }
 
   Future<void> cancel() async {
     if (state == null) return;
     final cancelled = state!.copyWith(cancelledDate: DateTime.now());
-    await _archive(cancelled);
+    await _repo.archiveKhatma(cancelled);
     state = null;
-    final p = await SharedPreferences.getInstance();
-    await p.remove(_activeKey);
-  }
-
-  Future<void> _persist() async {
-    if (state == null) return;
-    final p = await SharedPreferences.getInstance();
-    await p.setString(_activeKey, jsonEncode(state!.toJson()));
-  }
-
-  Future<void> _archive(KhatmaSessionEx s) async {
-    final p = await SharedPreferences.getInstance();
-    final list = p.getStringList(_historyKey) ?? [];
-    list.removeWhere((item) {
-      try {
-        final m = jsonDecode(item) as Map;
-        return m['id'] == s.id;
-      } catch (_) {
-        return false;
-      }
-    });
-    list.add(jsonEncode(s.toJson()));
-    await p.setStringList(_historyKey, list);
+    await _repo.clearActiveKhatma();
   }
 }
 
@@ -404,27 +245,15 @@ class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
 final khatmaCompletedProvider = FutureProvider<List<KhatmaSessionEx>>((
   ref,
 ) async {
-  final p = await SharedPreferences.getInstance();
-  final list = p.getStringList('khatma_ex_history') ?? [];
-  return list
-      .map((s) => KhatmaSessionEx.fromJson(jsonDecode(s)))
-      .where((s) => s.isCompleted)
-      .toList()
-      .reversed
-      .toList();
+  final history = ref.watch(quranPrefsRepositoryProvider).getKhatmaHistory();
+  return history.where((s) => s.isCompleted).toList().reversed.toList();
 });
 
 final khatmaCancelledProvider = FutureProvider<List<KhatmaSessionEx>>((
   ref,
 ) async {
-  final p = await SharedPreferences.getInstance();
-  final list = p.getStringList('khatma_ex_history') ?? [];
-  return list
-      .map((s) => KhatmaSessionEx.fromJson(jsonDecode(s)))
-      .where((s) => s.isCancelled)
-      .toList()
-      .reversed
-      .toList();
+  final history = ref.watch(quranPrefsRepositoryProvider).getKhatmaHistory();
+  return history.where((s) => s.isCancelled).toList().reversed.toList();
 });
 
 // ─────────────────────────────────────────────────────────────

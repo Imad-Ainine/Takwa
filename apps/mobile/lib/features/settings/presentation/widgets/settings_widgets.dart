@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/widgets/custom_time_picker.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class SectionHeader extends StatelessWidget {
   final String title;
@@ -19,10 +20,10 @@ class SectionHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             title,
-            style: TextStyle(
-              fontFamily: 'Amiri',
+            style: context.typography.headingMedium.copyWith(
               fontSize: 15,
               color: context.colors.textSecondary,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -155,19 +156,19 @@ class ToggleSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
                       fontWeight: value ? FontWeight.w600 : FontWeight.w400,
                       color: context.colors.textPrimary,
+                      height: 1.3,
                     ),
                   ),
                   Text(
                     sublabel,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
+                    style: context.typography.caption.copyWith(
+                      fontSize: 10.5,
                       color: context.colors.textSecondary,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -178,10 +179,12 @@ class ToggleSetting extends StatelessWidget {
               children: [
                 PrimarySwitch(value: value, onChanged: onChanged),
                 Text(
-                  value ? 'مفعل' : 'معطل',
+                  value
+                      ? (AppLocalizations.of(context)?.settingEnabled ?? 'مفعل')
+                      : (AppLocalizations.of(context)?.settingDisabled ?? 'معطل'),
                   style: context.typography.caption.copyWith(
                     color: value ? context.colors.teal : context.colors.textDim,
-                    fontSize: 8,
+                    fontSize: 8.5,
                   ),
                 ),
               ],
@@ -244,18 +247,18 @@ class ActionSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
                       color: color,
+                      height: 1.3,
                     ),
                   ),
                   Text(
                     sublabel,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
+                    style: context.typography.caption.copyWith(
+                      fontSize: 10.5,
                       color: context.colors.textSecondary,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -318,18 +321,18 @@ class SelectSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
                       color: context.colors.textPrimary,
+                      height: 1.3,
                     ),
                   ),
                   Text(
                     options[value] ?? value,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
+                    style: context.typography.caption.copyWith(
+                      fontSize: 10.5,
                       color: context.colors.textSecondary,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -433,8 +436,7 @@ class SelectSetting extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   e.value,
-                                  style: TextStyle(
-                                    fontFamily: 'NotoNaskhArabic',
+                                  style: context.typography.bodyMedium.copyWith(
                                     fontSize: 14,
                                     color: isSelected
                                         ? context.colors.textPrimary
@@ -511,18 +513,18 @@ class CheckboxSetting extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
+                    style: context.typography.bodyMedium.copyWith(
                       fontSize: 13,
                       color: context.colors.textPrimary,
+                      height: 1.3,
                     ),
                   ),
                   Text(
                     sublabel,
-                    style: TextStyle(
-                      fontFamily: 'NotoNaskhArabic',
-                      fontSize: 10,
+                    style: context.typography.caption.copyWith(
+                      fontSize: 10.5,
                       color: context.colors.textSecondary,
+                      height: 1.3,
                     ),
                   ),
                 ],
@@ -560,7 +562,9 @@ class SyncStatusIndicator extends StatelessWidget {
           _buildIndicator(context),
           const SizedBox(width: 8),
           Text(
-            isSyncing ? 'جاري المزامنة...' : 'تمت المزامنة بنجاح',
+            isSyncing
+                ? (AppLocalizations.of(context)?.syncStatusSyncing ?? 'جاري المزامنة...')
+                : (AppLocalizations.of(context)?.syncStatusSuccess ?? 'تمت المزامنة بنجاح'),
             style: context.typography.caption.copyWith(
               color: context.colors.textSecondary,
               fontSize: 10,
@@ -637,8 +641,7 @@ class TimeSetting extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
+                style: context.typography.bodyMedium.copyWith(
                   fontSize: 13,
                   color: context.colors.textPrimary,
                 ),
@@ -655,8 +658,7 @@ class TimeSetting extends StatelessWidget {
               ),
               child: Text(
                 '$h:$m',
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
+                style: context.typography.bodyMedium.copyWith(
                   fontSize: 14,
                   color: context.colors.gold,
                   fontWeight: FontWeight.w600,
@@ -703,8 +705,7 @@ class SliderSetting extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 label,
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
+                style: context.typography.bodyMedium.copyWith(
                   fontSize: 13,
                   color: context.colors.textPrimary,
                 ),

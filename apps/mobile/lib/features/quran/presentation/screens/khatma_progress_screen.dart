@@ -1,18 +1,20 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 import '../widgets/quran_widgets.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class KhatmaProgressScreen extends ConsumerWidget {
   const KhatmaProgressScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
@@ -28,13 +30,19 @@ class KhatmaProgressScreen extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            backgroundColor: style.isRamadan ? style.bg : const Color.fromARGB(46, 4, 1, 35),
+            backgroundColor: style.isRamadan
+                ? style.bg
+                : const Color.fromARGB(46, 4, 1, 35),
             foregroundColor: style.text,
             pinned: true,
             leading: const CustomLeadingButton(),
             title: Text(
-              'تقدم الختمة',
-              style: style.amiri(22, color: style.text, weight: FontWeight.bold),
+              l.khatmaScreenTitle,
+              style: style.amiri(
+                22,
+                color: style.text,
+                weight: FontWeight.bold,
+              ),
             ),
             centerTitle: true,
           ),
@@ -52,15 +60,19 @@ class KhatmaProgressScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${(progress * 100).toStringAsFixed(1)}٪ مكتملة',
-                  style: style.naskh(16, color: style.gold, weight: FontWeight.bold),
+                  l.khatmaProgressPercent((progress * 100).toStringAsFixed(1)),
+                  style: style.naskh(
+                    16,
+                    color: style.gold,
+                    weight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 30),
                 // Stats row
-                _buildStatsRow(style, khatma, historyAsync),
+                _buildStatsRow(context, l, style, khatma, historyAsync),
                 const SizedBox(height: 30),
                 // Weekly chart
-                _buildWeeklyChart(style),
+                _buildWeeklyChart(context, l, style),
                 const SizedBox(height: 30),
               ],
             ),
@@ -70,7 +82,13 @@ class KhatmaProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(AdaptiveStyle style, KhatmaSessionEx? khatma, AsyncValue historyAsync) {
+  Widget _buildStatsRow(
+    BuildContext context,
+    AppLocalizations l,
+    AdaptiveStyle style,
+    KhatmaSessionEx? khatma,
+    AsyncValue historyAsync,
+  ) {
     final completedCount = historyAsync.maybeWhen(
       data: (list) =>
           (list as List<KhatmaSessionEx>).where((s) => s.isCompleted).length,
@@ -90,7 +108,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
           _StatCard(
             style: style,
             icon: Icons.check_circle_outline,
-            label: 'ختمات مكتملة',
+            label: l.khatmaStatCompletedLabel,
             value: ar(completedCount),
             color: style.gold,
           ),
@@ -98,7 +116,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
           _StatCard(
             style: style,
             icon: Icons.local_fire_department_rounded,
-            label: 'أيام متواصلة',
+            label: l.khatmaStatStreakLabel,
             value: ar(daysSinceStart),
             color: Colors.orangeAccent,
           ),
@@ -106,7 +124,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
           _StatCard(
             style: style,
             icon: Icons.speed_rounded,
-            label: 'صفحة/يوم',
+            label: l.khatmaStatPagesPerDayLabel,
             value: avgPerDay.toStringAsFixed(1),
             color: Colors.lightBlueAccent,
           ),
@@ -115,17 +133,21 @@ class KhatmaProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildWeeklyChart(AdaptiveStyle style) {
+  Widget _buildWeeklyChart(
+    BuildContext context,
+    AppLocalizations l,
+    AdaptiveStyle style,
+  ) {
     // Simulated 7-day chart
     final values = [3.0, 5.0, 2.0, 7.0, 4.0, 6.0, 3.0];
     final days = [
-      'الأحد',
-      'الاثنين',
-      'الثلاثاء',
-      'الأربعاء',
-      'الخميس',
-      'الجمعة',
-      'السبت',
+      l.khatmaDaySun,
+      l.khatmaDayMon,
+      l.khatmaDayTue,
+      l.khatmaDayWed,
+      l.khatmaDayThu,
+      l.khatmaDayFri,
+      l.khatmaDaySat,
     ];
     final max = values.reduce((a, b) => a > b ? a : b);
 
@@ -135,7 +157,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'القراءة الأسبوعية',
+            l.khatmaWeeklyChartTitle,
             style: style.amiri(18, color: style.text, weight: FontWeight.bold),
           ),
           const SizedBox(height: 14),
@@ -163,7 +185,9 @@ class KhatmaProgressScreen extends ConsumerWidget {
                         width: 16,
                         height: h,
                         decoration: BoxDecoration(
-                          color: i == 3 ? style.gold : style.gold.withOpacity(0.4),
+                          color: i == 3
+                              ? style.gold
+                              : style.gold.withOpacity(0.4),
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
@@ -213,7 +237,11 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               value,
-              style: style.amiri(20, color: style.text, weight: FontWeight.bold),
+              style: style.amiri(
+                20,
+                color: style.text,
+                weight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             Text(

@@ -8,6 +8,7 @@ import 'package:takwa/core/providers/user_content_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 
 class UserAdhkarTabView extends ConsumerWidget {
@@ -16,6 +17,7 @@ class UserAdhkarTabView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(userAdhkarProvider);
 
     return Scaffold(
@@ -23,9 +25,9 @@ class UserAdhkarTabView extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: context.colors.gold,
         foregroundColor: context.colors.night,
-        label: const Text(
-          'إضافة ذكر',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        label: Text(
+          l10n.userAdhkarAddButton,
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         icon: const Icon(Icons.add_rounded),
         onPressed: () => showModalBottomSheet(
@@ -47,14 +49,14 @@ class UserAdhkarTabView extends ConsumerWidget {
                     const Text('✨', style: TextStyle(fontSize: 64)),
                     const SizedBox(height: 16),
                     Text(
-                      'أذكاري الخاصة',
+                      l10n.userAdhkarEmptyTitle,
                       style: context.typography.bodySmall.copyWith(
                         color: context.colors.gold,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'لا يوجد أذكار مضافة حالياً.\nاضغط على الزر لإضافة ذكرك الأول.',
+                      l10n.userAdhkarEmptyBody,
                       style: context.typography.bodyMedium.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -78,7 +80,7 @@ class UserAdhkarTabView extends ConsumerWidget {
         loading: () => const Center(child: TakwaLoadingIndicator()),
         error: (e, s) => Center(
           child: Text(
-            'حدث خطأ: $e',
+            l10n.adhkarGenericError(e.toString()),
             style: const TextStyle(color: Colors.redAccent),
           ),
         ),
@@ -130,6 +132,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final d = widget.item;
 
     return ScaleTransition(
@@ -223,15 +226,15 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                   // Copy button
                   _IconActionButton(
                     icon: Icons.copy_rounded,
-                    tooltip: 'نسخ',
+                    tooltip: l10n.adhkarCopyTooltip,
                     color: context.colors.textDim,
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: d.textAr));
                       HapticFeedback.lightImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('تم النسخ'),
-                          duration: Duration(seconds: 1),
+                        SnackBar(
+                          content: Text(l10n.adhkarCopiedSnackbar),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                     },
@@ -241,7 +244,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                   // Share to community button
                   _IconActionButton(
                     icon: Icons.people_alt_rounded,
-                    tooltip: 'شارك مع المجتمع',
+                    tooltip: l10n.adhkarShareWithCommunity,
                     color: context.colors.teal,
                     onTap: () => _onShare(context),
                   ),
@@ -250,7 +253,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                   // Delete button
                   _IconActionButton(
                     icon: Icons.delete_outline_rounded,
-                    tooltip: 'حذف',
+                    tooltip: l10n.adhkarDeleteTooltip,
                     color: Colors.redAccent,
                     onTap: () async {
                       final confirm = await showDialog<bool>(
@@ -260,24 +263,24 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          title: const Text(
-                            'حذف الذكر؟',
+                          title: Text(
+                            l10n.adhkarDeleteConfirmTitle,
                             textAlign: TextAlign.right,
                           ),
-                          content: const Text(
-                            'هل تريد حذف هذا الذكر نهائياً؟',
+                          content: Text(
+                            l10n.adhkarDeleteConfirmBody,
                             textAlign: TextAlign.right,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, false),
-                              child: const Text('إلغاء'),
+                              child: Text(l10n.adhkarCancelButton),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text(
-                                'حذف',
-                                style: TextStyle(color: Colors.redAccent),
+                              child: Text(
+                                l10n.adhkarDeleteTooltip,
+                                style: const TextStyle(color: Colors.redAccent),
                               ),
                             ),
                           ],
@@ -323,15 +326,16 @@ class _ShareToCommunitySheetState
     } catch (e) {
       if (mounted) {
         setState(() => _loading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.adhkarGenericError(e.toString()))),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         left: 20,
@@ -378,7 +382,7 @@ class _ShareToCommunitySheetState
           ),
           const SizedBox(height: 12),
           Text(
-            'مشاركة مع المجتمع',
+            l10n.adhkarShareToCommunityTitle,
             style: context.typography.headingMedium.copyWith(
               fontSize: 18,
               color: context.colors.gold,
@@ -387,7 +391,7 @@ class _ShareToCommunitySheetState
           ),
           const SizedBox(height: 4),
           Text(
-            'سيُضاف الذكر للمراجعة ثم يظهر في تبويب المجتمع',
+            l10n.adhkarShareToCommunityDesc,
             style: context.typography.caption.copyWith(
               color: context.colors.textSecondary,
             ),
@@ -426,7 +430,7 @@ class _ShareToCommunitySheetState
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${widget.item.count} مرة',
+                      l10n.adhkarCountTimesLabel(widget.item.count),
                       style: context.typography.caption.copyWith(
                         color: context.colors.gold,
                       ),
@@ -450,7 +454,7 @@ class _ShareToCommunitySheetState
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'تمت المشاركة بنجاح!',
+                  l10n.adhkarSharedSuccessMessage,
                   style: context.typography.bodyMedium.copyWith(
                     color: context.colors.success,
                     fontWeight: FontWeight.w700,
@@ -463,7 +467,7 @@ class _ShareToCommunitySheetState
               children: [
                 Expanded(
                   child: PrimaryButton(
-                    label: 'إلغاء',
+                    label: l10n.adhkarCancelButton,
                     onTap: _loading ? null : () => Navigator.pop(context),
                     isOutline: true,
                   ),
@@ -472,7 +476,7 @@ class _ShareToCommunitySheetState
                 Expanded(
                   flex: 2,
                   child: PrimaryButton(
-                    label: 'شارك مع المجتمع',
+                    label: l10n.adhkarShareWithCommunity,
                     onTap: _loading ? null : _share,
                     isLoading: _loading,
                     icon: Icons.people_alt_rounded,
@@ -494,6 +498,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(communityAdhkarProvider);
 
     return state.when(
@@ -512,7 +517,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
                     const Text('🌍', style: TextStyle(fontSize: 64)),
                     const SizedBox(height: 16),
                     Text(
-                      'مجتمع الأذكار',
+                      l10n.communityAdhkarEmptyTitle,
                       style: context.typography.bodySmall.copyWith(
                         color: context.colors.gold,
                       ),
@@ -521,7 +526,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32),
                       child: Text(
-                        'لا توجد مشاركات من المجتمع حالياً.\nشارك أذكارك من تبويب "أذكاري".',
+                        l10n.communityAdhkarEmptyBody,
                         style: context.typography.bodyMedium.copyWith(
                           color: context.colors.textSecondary,
                         ),
@@ -569,7 +574,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
             const Text('⚠️', style: TextStyle(fontSize: 48)),
             const SizedBox(height: 12),
             Text(
-              'حدث خطأ: $e',
+              l10n.adhkarGenericError(e.toString()),
               style: const TextStyle(color: Colors.redAccent),
               textAlign: TextAlign.center,
             ),
@@ -579,7 +584,7 @@ class CommunityAdhkarTabView extends ConsumerWidget {
               child: PrimaryButton(
                 onTap: () async =>
                     ref.read(communityAdhkarProvider.notifier).refresh(),
-                label: 'إعادة المحاولة',
+                label: l10n.communityAdhkarRetryButton,
               ),
             ),
           ],
@@ -598,6 +603,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -684,15 +690,15 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                 // Copy
                 _IconActionButton(
                   icon: Icons.copy_rounded,
-                  tooltip: 'نسخ',
+                  tooltip: l10n.adhkarCopyTooltip,
                   color: context.colors.textDim,
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: item.textAr));
                     HapticFeedback.lightImpact();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('تم النسخ'),
-                        duration: Duration(seconds: 1),
+                      SnackBar(
+                        content: Text(l10n.adhkarCopiedSnackbar),
+                        duration: const Duration(seconds: 1),
                       ),
                     );
                   },
@@ -801,15 +807,20 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('خطأ: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.adhkarGenericError(e.toString()),
+            ),
+          ),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         left: 20,
@@ -842,7 +853,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'إضافة ذكر جديد',
+                l10n.addAdhkarSheetTitle,
                 style: context.typography.bodySmall.copyWith(
                   color: context.colors.gold,
                   fontWeight: FontWeight.w700,
@@ -862,7 +873,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
             textDirection: TextDirection.rtl,
             style: const TextStyle(fontFamily: 'Amiri', fontSize: 18),
             decoration: InputDecoration(
-              hintText: 'اكتب الذكر هنا بحروف عربية واضحة...',
+              hintText: l10n.addAdhkarTextHint,
               hintStyle: TextStyle(
                 fontFamily: 'Amiri',
                 color: const Color(0xFF9E9E9E).withOpacity(0.7),
@@ -888,7 +899,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
           // Count picker
           Row(
             children: [
-              Text('عدد التكرار:', style: context.typography.bodyMedium),
+              Text(l10n.addAdhkarRepeatCountLabel, style: context.typography.bodyMedium),
               const Spacer(),
               IconButton(
                 onPressed: () =>
@@ -942,7 +953,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'مشاركة مع المجتمع',
+                          l10n.adhkarShareToCommunityTitle,
                           style: context.typography.bodyMedium.copyWith(
                             color: _shareWithCommunity
                                 ? context.colors.teal
@@ -951,7 +962,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                           ),
                         ),
                         Text(
-                          'يُضاف الذكر للمراجعة ثم يظهر للجميع',
+                          l10n.addAdhkarShareToggleDesc,
                           style: context.typography.caption.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -976,8 +987,8 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
           PrimaryButton(
             onTap: _isLoading ? null : () async => _save(),
             label: _shareWithCommunity
-                ? 'إضافة ومشاركة مع المجتمع'
-                : 'إضافة الذكر',
+                ? l10n.addAdhkarAndShareButton
+                : l10n.addAdhkarButton,
             isLoading: _isLoading,
           ),
         ],

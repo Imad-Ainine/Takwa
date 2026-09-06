@@ -1,5 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:hijri/hijri_calendar.dart';
+import 'package:takwa/l10n/app_localizations.dart';
+import '../data/quran_data.dart';
 
 // ─── Color Palette ────────────────────────────────────────────
 const kGold = Color(0xFFC8A96E);
@@ -118,90 +121,45 @@ String ar(int n) {
   return n.toString().split('').map((c) => d[int.parse(c)]).join();
 }
 
-const arWords = [
-  'الأول',
-  'الثاني',
-  'الثالث',
-  'الرابع',
-  'الخامس',
-  'السادس',
-  'السابع',
-  'الثامن',
-  'التاسع',
-  'العاشر',
-  'الحادي عشر',
-  'الثاني عشر',
-  'الثالث عشر',
-  'الرابع عشر',
-  'الخامس عشر',
-  'السادس عشر',
-  'السابع عشر',
-  'الثامن عشر',
-  'التاسع عشر',
-  'العشرون',
-  'الحادي والعشرون',
-  'الثاني والعشرون',
-  'الثالث والعشرون',
-  'الرابع والعشرون',
-  'الخامس والعشرون',
-  'السادس والعشرون',
-  'السابع والعشرون',
-  'الثامن والعشرون',
-  'التاسع والعشرون',
-  'الثلاثون',
-];
-
-String arWord(int n) => n >= 1 && n <= 30 ? arWords[n - 1] : ar(n);
-
 // ─── Hijri Date Helper ────────────────────────────────────────
-/// Simple Gregorian → Hijri approximation (±1 day accuracy)
+/// Today's Hijri date as "<weekday> <day> <month> <year>", using the same
+/// `HijriCalendar` conversion (and active `HijriCalendar.language`) as the
+/// rest of the app, rather than a hand-rolled ±1-day approximation.
 String hijriDateString() {
-  final now = DateTime.now();
-  // Approximate Hijri using epoch offset
-  // Base: 1 Muharram 1444 H = July 30, 2022 G
-  final base = DateTime(2022, 7, 30);
-  final diff = now.difference(base).inDays;
-  int hijriDay = diff % 354;
-  int hijriYear = 1444 + (diff ~/ 354);
+  final h = HijriCalendar.now();
+  final isArabic = HijriCalendar.language == 'ar';
+  final dayNum = isArabic ? ar(h.hDay) : h.hDay.toString();
+  final year = isArabic ? ar(h.hYear) : h.hYear.toString();
+  return '${h.getDayName()} $dayNum ${h.getLongMonthName()} $year';
+}
 
-  const months = [
-    (30, 'محرم'),
-    (29, 'صفر'),
-    (30, 'ربيع الأول'),
-    (29, 'ربيع الثاني'),
-    (30, 'جمادى الأولى'),
-    (29, 'جمادى الثانية'),
-    (30, 'رجب'),
-    (29, 'شعبان'),
-    (30, 'رمضان'),
-    (29, 'شوال'),
-    (30, 'ذو القعدة'),
-    (30, 'ذو الحجة'),
-  ];
-
-  int d = hijriDay;
-  String monthName = 'محرم';
-  int dayNum = 1;
-  for (final (days, name) in months) {
-    if (d < days) {
-      monthName = name;
-      dayNum = d + 1;
-      break;
-    }
-    d -= days;
+/// Localized display name for a surah, using the `nameEn`/`nameAr` already
+/// carried by [kSurahData] — no translation needed, just picking the field
+/// that matches the active locale. Falls back to a generic "Quran"
+/// placeholder if [surahNum] is out of range.
+String localizedSurahName(BuildContext context, int surahNum) {
+  if (surahNum < 1 || surahNum > kSurahData.length) {
+    return AppLocalizations.of(context)!.quranReaderFallbackName;
   }
+  final meta = kSurahData[surahNum - 1];
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  return isArabic ? meta.nameAr : meta.nameEn;
+}
 
-  const weekdays = [
-    'الاثنين',
-    'الثلاثاء',
-    'الأربعاء',
-    'الخميس',
-    'الجمعة',
-    'السبت',
-    'الأحد',
-  ];
-  final weekday = weekdays[now.weekday - 1];
-  return '$weekday ${ar(dayNum)} $monthName ${ar(hijriYear)}';
+/// Renders [n] using Arabic-Indic digits when the active locale is Arabic,
+/// or plain Latin digits otherwise — for interpolating numbers into ARB
+/// messages that were previously built with a hardcoded [ar] call.
+String localizedNumeral(BuildContext context, int n) =>
+    Localizations.localeOf(context).languageCode == 'ar' ? ar(n) : n.toString();
+
+/// "<month> <year>" in the active Hijri calendar language, e.g. for
+/// prefilling a default label like "Khatma <month> <year>". Callers should
+/// not derive this by splitting [hijriDateString] on spaces — several
+/// Hijri month names (e.g. "ربيع الأول") contain a space themselves.
+String hijriMonthYearLabel() {
+  final h = HijriCalendar.now();
+  final year = HijriCalendar.language == 'ar' ? ar(h.hYear) : h.hYear.toString();
+  return '${h.getLongMonthName()} $year';
 }
 
 // ─── Page Routes ──────────────────────────────────────────────

@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // Styles are managed via AdaptiveStyle for consistent theming (including Ramadan mode).
 
@@ -27,14 +29,18 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   int _startPage = 1;
   bool _notificationsEnabled = false;
 
+  bool _defaultNameSet = false;
+
   @override
-  void initState() {
-    super.initState();
-    // Default name
-    final now = DateTime.now();
-    final hijri = hijriDateString().split(' ');
-    _nameCtrl.text =
-        'ختمة ${hijri.length > 2 ? hijri[2] : ''} ${hijri.length > 3 ? hijri[3] : ''}';
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Default name — set once, so it doesn't clobber what the user typed.
+    if (!_defaultNameSet) {
+      _defaultNameSet = true;
+      _nameCtrl.text = AppLocalizations.of(
+        context,
+      )!.createKhatmaDefaultNamePrefix(hijriMonthYearLabel());
+    }
   }
 
   @override
@@ -45,6 +51,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final khatma = ref.watch(khatmaExProvider);
@@ -54,7 +61,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(style),
+            _buildHeader(style, l10n),
             _buildStepIndicator(style),
             Expanded(
               child: AnimatedSwitcher(
@@ -72,21 +79,21 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 child: KeyedSubtree(
                   key: ValueKey(_step),
                   child: _step == 0
-                      ? _buildStep0(style)
+                      ? _buildStep0(style, l10n)
                       : _step == 1
-                      ? _buildStep1(style)
-                      : _buildStep2(style),
+                      ? _buildStep1(style, l10n)
+                      : _buildStep2(style, l10n),
                 ),
               ),
             ),
-            _buildBottomBar(style),
+            _buildBottomBar(style, l10n),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(AdaptiveStyle style) {
+  Widget _buildHeader(AdaptiveStyle style, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
@@ -94,7 +101,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'إنشاء ختمة جديدة',
+            l10n.createKhatmaTitle,
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
           const Spacer(),
@@ -162,7 +169,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   );
 
   // ──────────────────── STEP 0: Name & Type ────────────────────
-  Widget _buildStep0(AdaptiveStyle style) {
+  Widget _buildStep0(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -186,7 +193,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       ),
                     ),
                     Text(
-                      'اسم الختمة',
+                      l10n.createKhatmaNameLabel,
                       style: style.amiri(
                         18,
                         color: style.text,
@@ -198,8 +205,8 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 const SizedBox(height: 14),
                 TextField(
                   controller: _nameCtrl,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.start,
+                  textDirection: Directionality.of(context),
                   style: style.naskh(15, color: style.text),
                   decoration: InputDecoration(
                     filled: true,
@@ -237,7 +244,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'نوع الختمة',
+                      l10n.createKhatmaTypeLabel,
                       style: style.amiri(
                         18,
                         color: style.text,
@@ -256,22 +263,22 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'اختر نوع الختمة التي تريد إنشاءها',
+                    l10n.createKhatmaTypeSubtitle,
                     style: style.naskh(12, color: style.textDim),
                   ),
                 ),
                 const SizedBox(height: 16),
                 _typeOption(
                   KhatmaType.muyassara,
-                  'ختمة ميسرة',
-                  'قراءة القرآن كاملاً بالترتيب بدون ورد يومي محدد أو وقت ختم محدد',
+                  l10n.createKhatmaTypeMuyassaraTitle,
+                  l10n.createKhatmaTypeMuyassaraDesc,
                   style,
                 ),
                 const SizedBox(height: 10),
                 _typeOption(
                   KhatmaType.multazima,
-                  'ختمة ملتزمة',
-                  'ختمة مع ورد يومي محدد ووقت ختم محدد',
+                  l10n.createKhatmaTypeMultazimaTitle,
+                  l10n.createKhatmaTypeMultazimaDesc,
                   style,
                 ),
               ],
@@ -333,7 +340,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   // ──────────────────── STEP 1: Settings ────────────────────
-  Widget _buildStep1(AdaptiveStyle style) {
+  Widget _buildStep1(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -348,7 +355,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'تاريخ البداية',
+                      l10n.createKhatmaStartDateLabel,
                       style: style.amiri(
                         18,
                         color: style.text,
@@ -403,7 +410,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'صفحة البداية',
+                      l10n.createKhatmaStartPageLabel,
                       style: style.amiri(
                         18,
                         color: style.text,
@@ -443,7 +450,11 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         604,
                         (i) => DropdownMenuItem(
                           value: i + 1,
-                          child: Text('صفحة ${ar(i + 1)}'),
+                          child: Text(
+                            l10n.createKhatmaPageOption(
+                              localizedNumeral(context, i + 1),
+                            ),
+                          ),
                         ),
                       ),
                       onChanged: (v) {
@@ -479,7 +490,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     Row(
                       children: [
                         Text(
-                          'تفعيل الإشعارات',
+                          l10n.createKhatmaEnableNotifications,
                           style: style.amiri(
                             18,
                             color: style.text,
@@ -513,7 +524,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            'الإشعارات معطلة - لن يتم إرسال أي تذكرات',
+                            l10n.createKhatmaNotificationsDisabledWarning,
                             textAlign: TextAlign.right,
                             style: style.naskh(12, color: style.danger),
                           ),
@@ -556,7 +567,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   // ──────────────────── STEP 2: Summary ────────────────────
-  Widget _buildStep2(AdaptiveStyle style) {
+  Widget _buildStep2(AdaptiveStyle style, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: _card(
@@ -577,7 +588,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   child: Icon(Icons.check_rounded, color: style.gold, size: 16),
                 ),
                 Text(
-                  'ملخص الختمة الميسرة',
+                  l10n.createKhatmaSummaryTitle,
                   style: style.amiri(
                     18,
                     color: style.text,
@@ -608,8 +619,8 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     children: [
                       Text(
                         _type == KhatmaType.muyassara
-                            ? 'ختمة ميسرة'
-                            : 'ختمة ملتزمة',
+                            ? l10n.createKhatmaTypeMuyassaraTitle
+                            : l10n.createKhatmaTypeMultazimaTitle,
                         style: style.amiri(
                           15,
                           color: style.isRamadan ? style.gold : style.teal,
@@ -624,7 +635,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'نوع الختمة:',
+                        l10n.createKhatmaTypeFieldLabel,
                         style: style.naskh(
                           12,
                           color: style.isRamadan ? style.gold : style.teal,
@@ -635,8 +646,8 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   const SizedBox(height: 4),
                   Text(
                     _type == KhatmaType.muyassara
-                        ? 'قراءة القرآن كاملاً بالترتيب بدون ورد يومي محدد أو وقت ختم محدد'
-                        : 'ختمة مع ورد يومي محدد ووقت ختم محدد',
+                        ? l10n.createKhatmaTypeMuyassaraDesc
+                        : l10n.createKhatmaTypeMultazimaDesc,
                     textAlign: TextAlign.right,
                     style: style.naskh(
                       11,
@@ -648,16 +659,22 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _summaryRow('اسم الختمة:', _nameCtrl.text, style),
+            _summaryRow(l10n.createKhatmaNameFieldLabel, _nameCtrl.text, style),
             _summaryRow(
-              'تاريخ البداية:',
+              l10n.createKhatmaStartDateFieldLabel,
               '${_startDate.day}/${_startDate.month}/${_startDate.year}',
               style,
             ),
-            _summaryRow('الصفحة الأولى:', 'صفحة ${ar(_startPage)}', style),
             _summaryRow(
-              'الإشعارات:',
-              _notificationsEnabled ? 'مفعّلة' : 'معطلة',
+              l10n.createKhatmaFirstPageFieldLabel,
+              l10n.createKhatmaPageOption(localizedNumeral(context, _startPage)),
+              style,
+            ),
+            _summaryRow(
+              l10n.createKhatmaNotificationsFieldLabel,
+              _notificationsEnabled
+                  ? l10n.createKhatmaNotificationsEnabledValue
+                  : l10n.createKhatmaNotificationsDisabledValue,
               style,
             ),
             const SizedBox(height: 16),
@@ -678,7 +695,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'يمكنك البدء في القراءة فوراً بعد إنشاء الختمة',
+                      l10n.createKhatmaStartReadingHint,
                       textAlign: TextAlign.right,
                       style: style.naskh(
                         12,
@@ -715,7 +732,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   }
 
   // ──────────────────── Bottom Bar ────────────────────
-  Widget _buildBottomBar(AdaptiveStyle style) {
+  Widget _buildBottomBar(AdaptiveStyle style, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
       decoration: BoxDecoration(
@@ -736,7 +753,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   ),
                   child: Center(
                     child: Text(
-                      'السابق',
+                      l10n.createKhatmaPreviousButton,
                       style: style.amiri(16, color: style.textSec),
                     ),
                   ),
@@ -764,7 +781,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    _step == 2 ? 'إنشاء الختمة' : 'التالي',
+                    _step == 2
+                        ? l10n.createKhatmaCreateButton
+                        : l10n.createKhatmaNextButton,
                     style: const TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 17,
@@ -792,12 +811,13 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   Future<void> _createKhatma() async {
     final isRamadan = ref.read(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
+    final l10n = AppLocalizations.of(context)!;
 
     await ref
         .read(khatmaExProvider.notifier)
         .createNew(
           label: _nameCtrl.text.trim().isEmpty
-              ? 'ختمة جديدة'
+              ? l10n.createKhatmaDefaultLabelFallback
               : _nameCtrl.text.trim(),
           type: _type,
           startPage: _startPage,
@@ -807,9 +827,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'تم إنشاء الختمة بنجاح',
-            style: TextStyle(fontFamily: 'NotoNaskhArabic'),
+          content: Text(
+            l10n.createKhatmaSuccessMessage,
+            style: const TextStyle(fontFamily: 'NotoNaskhArabic'),
           ),
           backgroundColor: style.isRamadan ? style.gold : style.teal,
           behavior: SnackBarBehavior.floating,

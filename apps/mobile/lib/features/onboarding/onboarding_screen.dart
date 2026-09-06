@@ -12,6 +12,7 @@ import '../../core/providers/database_providers.dart';
 import '../../core/notifications/notifications_service.dart';
 import '../../core/notifications/overlay_background_service.dart';
 import '../../core/supabase/supabase_config.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ── Enum for current step ──
 enum OnboardStep {
@@ -134,17 +135,18 @@ class OnboardingScreen extends ConsumerWidget {
               if (!serviceEnabled) {
                 // If service is disabled, prompt user to enable it
                 if (!context.mounted) return;
+                final l10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text(
-                      'GPS غير مفعّل، يرجى تفعيله للمتابعة.',
-                      style: TextStyle(
+                    content: Text(
+                      l10n.onboardingGpsDisabledMessage,
+                      style: const TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 13,
                       ),
                     ),
                     action: SnackBarAction(
-                      label: 'إعدادات',
+                      label: l10n.onboardingSettingsAction,
                       textColor: Colors.white,
                       onPressed: () {
                         Geolocator.openLocationSettings();
@@ -167,17 +169,18 @@ class OnboardingScreen extends ConsumerWidget {
 
               if (p == LocationPermission.deniedForever) {
                 if (!context.mounted) return;
+                final l10n = AppLocalizations.of(context)!;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text(
-                      'يرجى تفعيل إذن الموقع من الإعدادات.',
-                      style: TextStyle(
+                    content: Text(
+                      l10n.onboardingLocationPermissionDeniedMessage,
+                      style: const TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 13,
                       ),
                     ),
                     action: SnackBarAction(
-                      label: 'إعدادات',
+                      label: l10n.onboardingSettingsAction,
                       textColor: Colors.white,
                       onPressed: () {
                         Geolocator.openAppSettings();
@@ -334,6 +337,7 @@ class _IntroStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Column(
         children: [
@@ -344,11 +348,11 @@ class _IntroStep extends StatelessWidget {
             ),
           ),
           _InfoCard(
-            title: data.title,
+            title: data.title(l10n),
             titleColor: AppColors.gold,
-            subtitle: data.subtitle,
-            hint: 'يمكنك التعديل لاحقًا',
-            primaryLabel: 'استمرار',
+            subtitle: data.subtitle(l10n),
+            hint: l10n.onboardingEditLaterHint,
+            primaryLabel: l10n.onboardingContinueButton,
             onPrimary: () async => onNext(),
           ),
         ],
@@ -358,24 +362,25 @@ class _IntroStep extends StatelessWidget {
 }
 
 class _OnboardingPage {
-  final String title, subtitle, emoji;
+  final String Function(AppLocalizations) title, subtitle;
+  final String emoji;
   const _OnboardingPage(this.title, this.subtitle, this.emoji);
 }
 
 final _onboardPages = [
-  const _OnboardingPage(
-    'أهلاً بك في تقوى',
-    'رفيقك في رحلة التزكية والقرب من الله عز وجل، من خلال أدوات ذكية ومميزة.',
+  _OnboardingPage(
+    (l10n) => l10n.onboardingIntro1Title,
+    (l10n) => l10n.onboardingIntro1Subtitle,
     '🌙',
   ),
-  const _OnboardingPage(
-    'نظام المحاسبة الدقيق',
-    'سجل صلواتك، أذكارك، وطاعاتك يومياً لترى تطورك وتثبّت عزيمتك.',
+  _OnboardingPage(
+    (l10n) => l10n.onboardingIntro2Title,
+    (l10n) => l10n.onboardingIntro2Subtitle,
     '✅',
   ),
-  const _OnboardingPage(
-    'إحصائيات وتقدم',
-    'تابِع نتائج محاسبتك عبر رسوم بيانية وتقارير مفصلة تعينك على الثبات.',
+  _OnboardingPage(
+    (l10n) => l10n.onboardingIntro3Title,
+    (l10n) => l10n.onboardingIntro3Subtitle,
     '📊',
   ),
 ];
@@ -389,6 +394,7 @@ class _LocationStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Column(
         children: [
@@ -403,14 +409,13 @@ class _LocationStep extends StatelessWidget {
             ),
           ),
           _InfoCard(
-            title: 'تحديد الموقع',
+            title: l10n.onboardingLocationTitle,
             titleColor: AppColors.gold,
-            subtitle:
-                'نحتاج لموقعك لنحدد لك أوقات الصلاة واتجاه القبلة بدقة متناهية',
-            hint: 'بيانات موقعك تبقى في جهازك ولا نطلع عليها أبداً',
-            primaryLabel: 'تفعيل الموقع 📍',
+            subtitle: l10n.onboardingLocationSubtitle,
+            hint: l10n.onboardingLocationHint,
+            primaryLabel: l10n.onboardingLocationAllowButton,
             onPrimary: onAllow,
-            skipLabel: 'تخطى',
+            skipLabel: l10n.onboardingSkipButton,
             onSkip: onSkip,
           ),
         ],
@@ -450,6 +455,7 @@ class _NotificationsStepState extends State<_NotificationsStep>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Column(
         children: [
@@ -470,15 +476,14 @@ class _NotificationsStepState extends State<_NotificationsStep>
             ),
           ),
           _InfoCard(
-            title: 'السماح بإرسال التنبيهات',
+            title: l10n.onboardingNotificationsTitle,
             titleColor: AppColors.gold,
-            subtitle:
-                'يمكننا من تذكيرك بالصلاة والأذكار والمحاسبة المسائية والمزيد',
-            hint: 'يمكنك تغيير هذا لاحقًا من الإعدادات',
-            primaryLabel: 'السماح بالتنبيهات 🔔',
+            subtitle: l10n.onboardingNotificationsSubtitle,
+            hint: l10n.onboardingNotificationsHint,
+            primaryLabel: l10n.onboardingNotificationsAllowButton,
             primaryIcon: Icons.notifications_active_rounded,
             onPrimary: widget.onAllow,
-            skipLabel: 'تخطى',
+            skipLabel: l10n.onboardingSkipButton,
             onSkip: widget.onSkip,
           ),
         ],
@@ -503,6 +508,7 @@ class _GenderStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Column(
         children: [
@@ -511,9 +517,9 @@ class _GenderStep extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'حدد الجنس',
-                  style: TextStyle(
+                Text(
+                  l10n.onboardingGenderTitle,
+                  style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 26,
                     color: AppColors.gold,
@@ -525,7 +531,7 @@ class _GenderStep extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _GenderCard(
-                      label: 'مسلم',
+                      label: l10n.onboardingGenderMale,
                       value: 'male',
                       emoji: '👳',
                       selected: selected == 'male',
@@ -533,7 +539,7 @@ class _GenderStep extends StatelessWidget {
                     ),
                     const SizedBox(width: 20),
                     _GenderCard(
-                      label: 'مسلمة',
+                      label: l10n.onboardingGenderFemale,
                       value: 'female',
                       emoji: '🧕',
                       selected: selected == 'female',
@@ -556,14 +562,14 @@ class _GenderStep extends StatelessWidget {
                         color: AppColors.gold.withOpacity(0.2),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Text('ℹ️', style: TextStyle(fontSize: 14)),
-                        SizedBox(width: 8),
+                        const Text('ℹ️', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'تجربة استخدام مناسبة، وختمات عامة للرجال وأخرى للنساء',
-                            style: TextStyle(
+                            l10n.onboardingGenderInfoHint,
+                            style: const TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 11,
                               color: AppColors.textSecondary,
@@ -579,9 +585,9 @@ class _GenderStep extends StatelessWidget {
             ),
           ),
           _BottomActions(
-            primaryLabel: 'التالي',
+            primaryLabel: l10n.onboardingNextButton,
             onPrimary: selected != null ? onNext : null,
-            skipLabel: 'تخطى',
+            skipLabel: l10n.onboardingSkipButton,
             onSkip: onSkip,
           ),
         ],
@@ -815,6 +821,7 @@ class _AuthStepState extends State<_AuthStep>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -852,22 +859,22 @@ class _AuthStepState extends State<_AuthStep>
             const SizedBox(height: 20),
             _anim(
               1,
-              const Column(
+              Column(
                 children: [
                   Text(
-                    'تقوى',
-                    style: TextStyle(
+                    l10n.appName,
+                    style: const TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 28,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'سجّل دخولك لحفظ بياناتك ومزامنتها',
+                    l10n.onboardingSignInSubtitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -886,15 +893,15 @@ class _AuthStepState extends State<_AuthStep>
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
-                    _BenefitRow('💾', 'حفظ بياناتك وتقدمك'),
-                    SizedBox(height: 8),
-                    _BenefitRow('🏆', 'التنافس مع المسلمين حول العالم'),
-                    SizedBox(height: 8),
-                    _BenefitRow('📊', 'إحصائيات مفصلة ومتقدمة'),
-                    SizedBox(height: 8),
-                    _BenefitRow('🌙', 'مزامنة تلقائية بين أجهزتك'),
+                    _BenefitRow('💾', l10n.onboardingBenefitSaveProgress),
+                    const SizedBox(height: 8),
+                    _BenefitRow('🏆', l10n.onboardingBenefitCompete),
+                    const SizedBox(height: 8),
+                    _BenefitRow('📊', l10n.onboardingBenefitStats),
+                    const SizedBox(height: 8),
+                    _BenefitRow('🌙', l10n.onboardingBenefitSync),
                   ],
                 ),
               ),
@@ -906,9 +913,9 @@ class _AuthStepState extends State<_AuthStep>
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: GestureDetector(
                   onTap: widget.onSkip,
-                  child: const Text(
-                    'متابعة بدون حساب',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.onboardingContinueWithoutAccount,
+                    style: const TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textDim,
@@ -982,6 +989,7 @@ class _PlanStepState extends State<_PlanStep>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1007,21 +1015,21 @@ class _PlanStepState extends State<_PlanStep>
                 parent: _ctrl,
                 curve: const Interval(0.2, 0.7),
               ),
-              child: const Column(
+              child: Column(
                 children: [
                   Text(
-                    'اختر خطتك',
-                    style: TextStyle(
+                    l10n.onboardingChoosePlanTitle,
+                    style: const TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 26,
                       color: AppColors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'انضم إلى عائلة تقوى',
-                    style: TextStyle(
+                    l10n.onboardingChoosePlanSubtitle,
+                    style: const TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
                       color: AppColors.textSecondary,
@@ -1041,18 +1049,17 @@ class _PlanStepState extends State<_PlanStep>
                   children: [
                     _PlanCard(
                       id: 'premium',
-                      title: 'تقوى ⭐ Premium',
-                      desc:
-                          'بلا إعلانات + إحصائيات متقدمة + مزامنة سحابية + دعم أولوي',
-                      badge: 'الأفضل',
+                      title: l10n.onboardingPremiumTitle,
+                      desc: l10n.onboardingPremiumDesc,
+                      badge: l10n.onboardingPremiumBadge,
                       badgeColor: AppColors.gold,
-                      price: '99 دج / شهر',
-                      features: const [
-                        'بلا إعلانات نهائياً',
-                        'إحصائيات متقدمة ورسوم بيانية',
-                        'مزامنة سحابية تلقائية',
-                        'تذكيرات مخصصة لا نهاية لها',
-                        'أولوية في الدعم الفني',
+                      price: l10n.onboardingPremiumPrice,
+                      features: [
+                        l10n.onboardingPremiumFeature1,
+                        l10n.onboardingPremiumFeature2,
+                        l10n.onboardingPremiumFeature3,
+                        l10n.onboardingPremiumFeature4,
+                        l10n.onboardingPremiumFeature5,
                       ],
                       selected: _selected == 'premium',
                       onTap: () => setState(() => _selected = 'premium'),
@@ -1060,14 +1067,13 @@ class _PlanStepState extends State<_PlanStep>
                     const SizedBox(height: 10),
                     _PlanCard(
                       id: 'free',
-                      title: 'تقوى 🌙 مجاني',
-                      desc:
-                          'جميع الميزات الأساسية مع إعلانات بسيطة للإبقاء على الخدمة',
-                      features: const [
-                        'جميع ميزات المحاسبة',
-                        'أوقات الصلاة والقبلة',
-                        'الأذكار والأدعية',
-                        'إعلانات بسيطة',
+                      title: l10n.onboardingFreeTitle,
+                      desc: l10n.onboardingFreeDesc,
+                      features: [
+                        l10n.onboardingFreeFeature1,
+                        l10n.onboardingFreeFeature2,
+                        l10n.onboardingFreeFeature3,
+                        l10n.onboardingFreeFeature4,
                       ],
                       selected: _selected == 'free',
                       onTap: () => setState(() => _selected = 'free'),
@@ -1083,8 +1089,8 @@ class _PlanStepState extends State<_PlanStep>
               ),
               child: PrimaryButton(
                 label: _selected == 'premium'
-                    ? 'ابدأ Premium 🌟'
-                    : 'ابدأ مجاناً 🤲',
+                    ? l10n.onboardingStartPremiumCta
+                    : l10n.onboardingStartFreeCta,
                 onTap: widget.onStart,
               ),
             ),
@@ -1725,15 +1731,16 @@ class _OverlayStepState extends State<_OverlayStep>
             ),
           ),
           _InfoCard(
-            title: 'نافذة الأذكار 🪟',
+            title: AppLocalizations.of(context)!.onboardingOverlayTitle,
             titleColor: AppColors.teal,
-            subtitle:
-                'تسمح بعرض الأذكار والتنبيهات فوق التطبيقات الأخرى لتذكيرك الدائم',
-            hint: 'يتطلب إذن "الظهور فوق التطبيقات" على أندرويد',
-            primaryLabel: 'تفعيل النافذة',
+            subtitle: AppLocalizations.of(context)!.onboardingOverlaySubtitle,
+            hint: AppLocalizations.of(context)!.onboardingOverlayHint,
+            primaryLabel: AppLocalizations.of(
+              context,
+            )!.onboardingOverlayAllowButton,
             primaryIcon: Icons.layers_outlined,
             onPrimary: widget.onAllow,
-            skipLabel: 'تخطى',
+            skipLabel: AppLocalizations.of(context)!.onboardingSkipButton,
             onSkip: widget.onSkip,
           ),
         ],
@@ -1799,10 +1806,11 @@ class _OverlayIllustration extends CustomPainter {
     );
 
     // Text in overlay
+    final l10n = lookupAppLocalizations(const Locale('ar'));
     final tp = TextPainter(
-      text: const TextSpan(
-        text: 'سبحان الله',
-        style: TextStyle(
+      text: TextSpan(
+        text: l10n.onboardingDemoTasbeehText,
+        style: const TextStyle(
           color: AppColors.gold,
           fontSize: 12,
           fontWeight: FontWeight.bold,
@@ -1870,15 +1878,18 @@ class _BackgroundStepState extends State<_BackgroundStep>
             ),
           ),
           _InfoCard(
-            title: 'التشغيل في الخلفية',
+            title: AppLocalizations.of(context)!.onboardingBackgroundTitle,
             titleColor: AppColors.gold,
-            subtitle:
-                'لضمان وصول تنبيهات الأذان والأذكار في وقتها بدقة دون توقف التطبيق',
-            hint: 'يطلب النظام استثناء التطبيق من تحسين البطارية',
-            primaryLabel: 'السماح بالتشغيل 🔋',
+            subtitle: AppLocalizations.of(
+              context,
+            )!.onboardingBackgroundSubtitle,
+            hint: AppLocalizations.of(context)!.onboardingBackgroundHint,
+            primaryLabel: AppLocalizations.of(
+              context,
+            )!.onboardingBackgroundAllowButton,
             primaryIcon: Icons.battery_saver_rounded,
             onPrimary: widget.onAllow,
-            skipLabel: 'تخطى',
+            skipLabel: AppLocalizations.of(context)!.onboardingSkipButton,
             onSkip: widget.onSkip,
           ),
         ],

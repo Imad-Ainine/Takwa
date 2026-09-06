@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/features/checklist/screens/checklist_screen.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 import '../core/theme/app_theme.dart';
 import '../core/providers/database_providers.dart';
@@ -39,13 +40,13 @@ class _MainShellState extends ConsumerState<MainShell>
   late final PageController _pageCtrl;
   late List<AnimationController> _tabAnims;
 
-  static const _tabs = [
-    _TabInfo('🏠', 'الرئيسية', 0),
-    _TabInfo('🌙', 'قيام', 1),
-    _TabInfo('✅', 'المحاسبة', 2),
-    _TabInfo('📊', 'إحصائيات', 3),
-    _TabInfo('✨', 'أسماء الله', 4),
-    _TabInfo('⚙️', 'الإعدادات', 5),
+  static List<_TabInfo> _getTabs(AppLocalizations l10n) => [
+    _TabInfo('🏠', l10n.bottomNavHome, 0),
+    _TabInfo('🌙', l10n.bottomNavQiyam, 1),
+    _TabInfo('✅', l10n.bottomNavMuhasaba, 2),
+    _TabInfo('📊', l10n.bottomNavStatistics, 3),
+    _TabInfo('✨', l10n.bottomNavAsma, 4),
+    _TabInfo('⚙️', l10n.bottomNavSettings, 5),
   ];
 
   @override
@@ -54,7 +55,7 @@ class _MainShellState extends ConsumerState<MainShell>
     _pageCtrl = PageController(initialPage: widget.initialIndex);
 
     _tabAnims = List.generate(
-      _tabs.length,
+      6,
       (i) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
@@ -158,12 +159,13 @@ class _MainShellState extends ConsumerState<MainShell>
 
   Widget _buildShell() {
     // Robustness check: If tabs were added/removed during hot reload, re-initialize controllers
-    if (_tabAnims.length != _tabs.length) {
+    const tabCount = 6;
+    if (_tabAnims.length != tabCount) {
       for (final a in _tabAnims) {
         a.dispose();
       }
       _tabAnims = List.generate(
-        _tabs.length,
+        tabCount,
         (i) => AnimationController(
           vsync: this,
           duration: const Duration(milliseconds: 300),
@@ -171,7 +173,7 @@ class _MainShellState extends ConsumerState<MainShell>
       );
       // Ensure current index is still valid
       final currentIdx = ref.read(currentTabProvider);
-      if (currentIdx >= _tabs.length) {
+      if (currentIdx >= tabCount) {
         ref.read(currentTabProvider.notifier).state = 0;
       }
       _tabAnims[ref.read(currentTabProvider)].forward();
@@ -204,7 +206,7 @@ class _MainShellState extends ConsumerState<MainShell>
         ),
         bottomNavigationBar: _BottomNav(
           currentIndex: currentIdx,
-          tabs: _tabs,
+          tabs: _getTabs(AppLocalizations.of(context)!),
           onTap: _switchTab,
           tabAnims: _tabAnims,
         ),
@@ -276,77 +278,82 @@ class _BottomNav extends StatelessWidget {
                         behavior: HitTestBehavior.opaque,
                         onTap: () => onTap(i),
                         child: AnimatedBuilder(
-                        animation: tabAnims[i],
-                        builder: (_, _) {
-                          final t = tabAnims[i].value;
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Improved Active indicator with glow
-                              AnimatedContainer(
-                                duration: const Duration(milliseconds: 250),
-                                width: isActive ? 24 : 0,
-                                height: 3,
-                                margin: const EdgeInsets.only(bottom: 4),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      context.colors.gold,
-                                      context.colors.teal,
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(1.5),
-                                  boxShadow: isActive
-                                      ? [
-                                          BoxShadow(
-                                            color: context.colors.gold
-                                                .withOpacity(0.3),
-                                            blurRadius: 8,
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                              ),
-
-                              // Icon with scale bounce
-                              Transform.scale(
-                                scale: isActive ? 1.0 + 0.15 * t : 1.0,
-                                child: Text(
-                                  tab.emoji,
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    shadows: isActive
+                          animation: tabAnims[i],
+                          builder: (_, _) {
+                            final t = tabAnims[i].value;
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Improved Active indicator with glow
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 250),
+                                  width: isActive ? 24 : 0,
+                                  height: 3,
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        context.colors.gold,
+                                        context.colors.teal,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(1.5),
+                                    boxShadow: isActive
                                         ? [
-                                            Shadow(
+                                            BoxShadow(
                                               color: context.colors.gold
-                                                  .withOpacity(0.6 * t),
-                                              blurRadius: 10,
+                                                  .withOpacity(0.3),
+                                              blurRadius: 8,
                                             ),
                                           ]
                                         : null,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 2),
 
-                              // Label
-                              AnimatedDefaultTextStyle(
-                                duration: const Duration(milliseconds: 200),
-                                style: context.typography.caption.copyWith(
-                                  fontSize: 10,
-                                  color: isActive
-                                      ? context.colors.gold
-                                      : context.colors.textDim,
-                                  fontWeight: isActive
-                                      ? FontWeight.w700
-                                      : FontWeight.w400,
-                                  letterSpacing: isActive ? 0.2 : 0,
+                                // Icon with scale bounce
+                                Transform.scale(
+                                  scale: isActive ? 1.0 + 0.15 * t : 1.0,
+                                  child: Text(
+                                    tab.emoji,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      shadows: isActive
+                                          ? [
+                                              Shadow(
+                                                color: context.colors.gold
+                                                    .withOpacity(0.6 * t),
+                                                blurRadius: 10,
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                  ),
                                 ),
-                                child: Text(tab.label),
-                              ),
-                            ],
-                          );
-                        },
+                                const SizedBox(height: 2),
+
+                                // Label
+                                AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 200),
+                                  style: context.typography.caption.copyWith(
+                                    fontSize: 9.5,
+                                    color: isActive
+                                        ? context.colors.gold
+                                        : context.colors.textDim,
+                                    fontWeight: isActive
+                                        ? FontWeight.w700
+                                        : FontWeight.w400,
+                                    letterSpacing: isActive ? 0.2 : 0,
+                                  ),
+                                  child: Text(
+                                    tab.label,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),

@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AdhanOverlayScreen extends ConsumerStatefulWidget {
   final String prayerName;
@@ -171,10 +172,11 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final hijri = HijriCalendar.now();
     final hijriStr =
-        '${hijri.hDay} ${_hijriMonthAr(hijri.hMonth)} ${hijri.hYear} هـ';
+        '${hijri.hDay} ${hijri.getLongMonthName()} ${hijri.hYear} ${l10n.hijriEraSuffix}';
 
     return WillPopScope(
       onWillPop: () async {
@@ -342,7 +344,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                           ],
                         ).createShader(bounds),
                         child: Text(
-                          'حان وقت ${widget.prayerName}',
+                          l10n.adhanOverlayPrayerTimeTitle(widget.prayerName),
                           style: const TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 34,
@@ -423,7 +425,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                             child: PrimaryButton(
                               onTap: () async => _close(),
                               icon: Icons.close_rounded,
-                              label: 'إغلاق',
+                              label: l10n.adhanOverlayCloseButton,
                               isOutline: true,
                               baseColor: Colors.white70,
                             ),
@@ -435,7 +437,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                             child: PrimaryButton(
                               onTap: () async => _goToPrayer(),
                               icon: Icons.mosque_rounded,
-                              label: 'الذهاب للصلاة',
+                              label: l10n.adhanOverlayGoToPrayerButton,
                             ),
                           ),
                         ],
@@ -475,7 +477,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'دعاء ما بعد الأذان',
+                                  l10n.adhanOverlayDuaSectionLabel,
                                   style: TextStyle(
                                     fontFamily: 'NotoNaskhArabic',
                                     fontSize: 12,
@@ -513,24 +515,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
         ),
       ),
     );
-  }
-
-  String _hijriMonthAr(int month) {
-    const months = [
-      'محرم',
-      'صفر',
-      'ربيع الأول',
-      'ربيع الآخر',
-      'جمادى الأولى',
-      'جمادى الآخرة',
-      'رجب',
-      'شعبان',
-      'رمضان',
-      'شوال',
-      'ذو القعدة',
-      'ذو الحجة',
-    ];
-    return months[(month - 1).clamp(0, 11)];
   }
 
   /// يُرجع حديثاً أو قولاً مناسباً لكل صلاة

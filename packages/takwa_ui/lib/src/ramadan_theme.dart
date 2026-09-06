@@ -67,10 +67,12 @@ class RamadanColors {
 class RamadanTheme {
   static ThemeData theme(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    return brightness == Brightness.dark ? dark : light;
+    final locale = Localizations.localeOf(context);
+    return brightness == Brightness.dark ? dark(locale) : light(locale);
   }
 
-  static ThemeData get dark {
+  /// [locale] defaults to Arabic, matching this app's default UI language.
+  static ThemeData dark([Locale locale = const Locale('ar')]) {
     final colors = AppColorsExtension(
       background: RamadanColors.deepLapis,
       deep: RamadanColors.lapis,
@@ -98,13 +100,14 @@ class RamadanTheme {
       tealGoldGradient: AppColorsExtension.dark.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors);
+    final typography = AppTypographyExtension.fromColors(colors, locale);
     final shadows = AppShadowsExtension.fromColors(colors);
     final decorations = AppDecorationsExtension.fromColors(colors, shadows);
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: appFontFamily(locale),
       extensions: [colors, typography, shadows, decorations],
       colorScheme: const ColorScheme.dark(
         primary: RamadanColors.goldenAura,
@@ -127,7 +130,11 @@ class RamadanTheme {
           side: const BorderSide(color: RamadanColors.border, width: 1),
         ),
       ),
-      textTheme: _buildTextTheme(RamadanColors.ivory, RamadanColors.goldenAura),
+      textTheme: _buildTextTheme(
+        RamadanColors.ivory,
+        RamadanColors.goldenAura,
+        locale,
+      ),
       elevatedButtonTheme: _buildButtonTheme(
         RamadanColors.goldenAura,
         RamadanColors.deepLapis,
@@ -138,11 +145,11 @@ class RamadanTheme {
         unselectedItemColor: RamadanColors.ivoryDim.withOpacity(0.4),
       ),
       dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenAura),
+      appBarTheme: _buildAppBarTheme(RamadanColors.goldenAura, locale),
     );
   }
 
-  static ThemeData get light {
+  static ThemeData light([Locale locale = const Locale('ar')]) {
     final colors = AppColorsExtension(
       background: RamadanColors.ivoryLight,
       deep: RamadanColors.ivory,
@@ -170,13 +177,14 @@ class RamadanTheme {
       tealGoldGradient: AppColorsExtension.light.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors);
+    final typography = AppTypographyExtension.fromColors(colors, locale);
     final shadows = AppShadowsExtension.fromColors(colors);
     final decorations = AppDecorationsExtension.fromColors(colors, shadows);
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: appFontFamily(locale),
       extensions: [colors, typography, shadows, decorations],
       colorScheme: const ColorScheme.light(
         primary: RamadanColors.goldenAura,
@@ -202,6 +210,7 @@ class RamadanTheme {
       textTheme: _buildTextTheme(
         RamadanColors.deepLapis,
         RamadanColors.goldenDeep,
+        locale,
       ),
       elevatedButtonTheme: _buildButtonTheme(
         RamadanColors.goldenAura,
@@ -213,58 +222,71 @@ class RamadanTheme {
         unselectedItemColor: RamadanColors.deepLapis.withOpacity(0.4),
       ),
       dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenDeep),
+      appBarTheme: _buildAppBarTheme(RamadanColors.goldenDeep, locale),
     );
   }
 
-  static TextTheme _buildTextTheme(Color main, Color accent) => TextTheme(
-    displayLarge: TextStyle(
-      fontFamily: 'Amiri',
-      fontSize: 36,
-      fontWeight: FontWeight.w700,
-      color: accent,
-    ),
-    displayMedium: TextStyle(
-      fontFamily: 'Amiri',
-      fontSize: 28,
-      fontWeight: FontWeight.w700,
-      color: main,
-    ),
-    headlineLarge: TextStyle(
-      fontFamily: 'Amiri',
-      fontSize: 22,
-      fontWeight: FontWeight.w700,
-      color: main,
-    ),
-    headlineMedium: TextStyle(
-      fontFamily: 'Amiri',
-      fontSize: 18,
-      fontWeight: FontWeight.w700,
-      color: main,
-    ),
-    bodyLarge: TextStyle(
-      fontFamily: 'NotoNaskhArabic',
-      fontSize: 16,
-      color: main,
-      height: 1.9,
-    ),
-    bodyMedium: TextStyle(
-      fontFamily: 'NotoNaskhArabic',
-      fontSize: 14,
-      color: main,
-    ),
-    bodySmall: TextStyle(
-      fontFamily: 'NotoNaskhArabic',
-      fontSize: 12,
-      color: main.withOpacity(0.7),
-    ),
-    labelLarge: TextStyle(
-      fontFamily: 'NotoNaskhArabic',
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
-      color: main,
-    ),
-  );
+  static TextTheme _buildTextTheme(Color main, Color accent, Locale locale) {
+    final displayFont = appFontFamily(locale);
+    final bodyFont = appBodyFontFamily(locale);
+    final fallback = appFontFamilyFallback(locale);
+    return TextTheme(
+      displayLarge: TextStyle(
+        fontFamily: displayFont,
+        fontFamilyFallback: fallback,
+        fontSize: 36,
+        fontWeight: FontWeight.w700,
+        color: accent,
+      ),
+      displayMedium: TextStyle(
+        fontFamily: displayFont,
+        fontFamilyFallback: fallback,
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: main,
+      ),
+      headlineLarge: TextStyle(
+        fontFamily: displayFont,
+        fontFamilyFallback: fallback,
+        fontSize: 22,
+        fontWeight: FontWeight.w700,
+        color: main,
+      ),
+      headlineMedium: TextStyle(
+        fontFamily: displayFont,
+        fontFamilyFallback: fallback,
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: main,
+      ),
+      bodyLarge: TextStyle(
+        fontFamily: bodyFont,
+        fontFamilyFallback: fallback,
+        fontSize: 16,
+        color: main,
+        height: 1.9,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: bodyFont,
+        fontFamilyFallback: fallback,
+        fontSize: 14,
+        color: main,
+      ),
+      bodySmall: TextStyle(
+        fontFamily: bodyFont,
+        fontFamilyFallback: fallback,
+        fontSize: 12,
+        color: main.withOpacity(0.7),
+      ),
+      labelLarge: TextStyle(
+        fontFamily: bodyFont,
+        fontFamilyFallback: fallback,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: main,
+      ),
+    );
+  }
 
   static ElevatedButtonThemeData _buildButtonTheme(Color bg, Color fg) =>
       ElevatedButtonThemeData(
@@ -278,21 +300,22 @@ class RamadanTheme {
         ),
       );
 
-  static AppBarTheme _buildAppBarTheme(Color accent) => AppBarTheme(
-    // Removes the shadow/elevation for all AppBars
-    scrolledUnderElevation: 0.0,
-    // Removes the color tint highlight for all AppBars
-    surfaceTintColor: Colors.transparent,
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    titleTextStyle: TextStyle(
-      fontFamily: 'Amiri',
-      fontSize: 20,
-      color: accent,
-      fontWeight: FontWeight.w700,
-    ),
-    iconTheme: IconThemeData(color: accent),
-  );
+  static AppBarTheme _buildAppBarTheme(Color accent, Locale locale) =>
+      AppBarTheme(
+        // Removes the shadow/elevation for all AppBars
+        scrolledUnderElevation: 0.0,
+        // Removes the color tint highlight for all AppBars
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        titleTextStyle: TextStyle(
+          fontFamily: appFontFamily(locale),
+          fontSize: 20,
+          color: accent,
+          fontWeight: FontWeight.w700,
+        ),
+        iconTheme: IconThemeData(color: accent),
+      );
 }
 
 class RamadanDecorations {
@@ -602,13 +625,16 @@ class AdaptiveStyle {
   BoxDecoration get cardDeco => _decorations.card;
   BoxDecoration get heroDeco => _decorations.goldCard;
 
+  /// Display/heading style — Amiri for Arabic (unchanged), Poppins for
+  /// every other locale, with Tajawal fallback for Arabic glyphs.
   TextStyle amiri(
     double size, {
     Color? color,
     FontWeight? weight,
     double? height,
   }) => TextStyle(
-    fontFamily: 'Amiri',
+    fontFamily: appFontFamily(Localizations.localeOf(context)),
+    fontFamilyFallback: appFontFamilyFallback(Localizations.localeOf(context)),
     fontSize: size,
     color: color ?? gold,
     fontWeight: weight ?? FontWeight.w700,
@@ -623,13 +649,31 @@ class AdaptiveStyle {
         : null,
   );
 
+  /// Body style — NotoNaskhArabic for Arabic (unchanged), Poppins for
+  /// every other locale, with Tajawal fallback for Arabic glyphs.
   TextStyle naskh(
     double size, {
     Color? color,
     FontWeight? weight,
     double? height,
   }) => TextStyle(
-    fontFamily: 'NotoNaskhArabic',
+    fontFamily: appBodyFontFamily(Localizations.localeOf(context)),
+    fontFamilyFallback: appFontFamilyFallback(Localizations.localeOf(context)),
+    fontSize: size,
+    color: color ?? (size < 12 ? textSec : text),
+    fontWeight: weight ?? FontWeight.w400,
+    height: height,
+  );
+
+  /// Clean modern Arabic style using Tajawal.
+  TextStyle tajawal(
+    double size, {
+    Color? color,
+    FontWeight? weight,
+    double? height,
+  }) => TextStyle(
+    fontFamily: 'Tajawal',
+    fontFamilyFallback: appFontFamilyFallback(Localizations.localeOf(context)),
     fontSize: size,
     color: color ?? (size < 12 ? textSec : text),
     fontWeight: weight ?? FontWeight.w400,

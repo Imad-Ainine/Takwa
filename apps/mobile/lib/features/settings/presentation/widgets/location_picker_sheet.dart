@@ -9,6 +9,7 @@ import 'package:takwa/core/utils/timezone_resolver.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/notifications/location_prayer_update.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class LocationPickerSheet extends ConsumerStatefulWidget {
   const LocationPickerSheet({super.key});
@@ -33,10 +34,15 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
   // List of professional curated cities with pre-defined coordinates and timezones
   // Used as a fallback and an easy-mode for users who don't want to use GPS.
+  // 'name'/'country' are Arabic; 'nameEn'/'countryEn' are the matching
+  // English display forms — plain proper-noun data (like SurahMeta.nameEn),
+  // not translated sentences, so no ARB entries needed for these.
   static const List<Map<String, dynamic>> _cities = [
     {
       'name': 'الجزائر العاصمة',
+      'nameEn': 'Algiers',
       'country': 'الجزائر',
+      'countryEn': 'Algeria',
       'emoji': '🇩🇿',
       'lat': 36.7525,
       'lng': 3.04197,
@@ -44,7 +50,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'مكة المكرمة',
+      'nameEn': 'Mecca',
       'country': 'السعودية',
+      'countryEn': 'Saudi Arabia',
       'emoji': '🇸🇦',
       'lat': 21.3891,
       'lng': 39.8579,
@@ -52,7 +60,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'المدينة المنورة',
+      'nameEn': 'Medina',
       'country': 'السعودية',
+      'countryEn': 'Saudi Arabia',
       'emoji': '🇸🇦',
       'lat': 24.4672,
       'lng': 39.6112,
@@ -60,7 +70,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'القاهرة',
+      'nameEn': 'Cairo',
       'country': 'مصر',
+      'countryEn': 'Egypt',
       'emoji': '🇪🇬',
       'lat': 30.0444,
       'lng': 31.2357,
@@ -68,7 +80,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'القدس',
+      'nameEn': 'Jerusalem',
       'country': 'فلسطين',
+      'countryEn': 'Palestine',
       'emoji': '🇵🇸',
       'lat': 31.7683,
       'lng': 35.2137,
@@ -76,7 +90,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'دبي',
+      'nameEn': 'Dubai',
       'country': 'الإمارات',
+      'countryEn': 'United Arab Emirates',
       'emoji': '🇦🇪',
       'lat': 25.2048,
       'lng': 55.2708,
@@ -84,7 +100,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'الرباط',
+      'nameEn': 'Rabat',
       'country': 'المغرب',
+      'countryEn': 'Morocco',
       'emoji': '🇲🇦',
       'lat': 34.0209,
       'lng': -6.8416,
@@ -92,7 +110,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'تونس',
+      'nameEn': 'Tunis',
       'country': 'تونس',
+      'countryEn': 'Tunisia',
       'emoji': '🇹🇳',
       'lat': 36.8065,
       'lng': 10.1815,
@@ -100,7 +120,9 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
     {
       'name': 'بغداد',
+      'nameEn': 'Baghdad',
       'country': 'العراق',
+      'countryEn': 'Iraq',
       'emoji': '🇮🇶',
       'lat': 33.3128,
       'lng': 44.3615,
@@ -125,11 +147,16 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
   Future<void> _selectManualLocation(Map<String, dynamic> cityData) async {
     HapticFeedback.selectionClick();
 
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final localizedName = isArabic
+        ? cityData['name'] as String
+        : cityData['nameEn'] as String;
+
     final s = ref.read(settingsDaoProvider);
     await s.set('latitude', cityData['lat'].toString());
     await s.set('longitude', cityData['lng'].toString());
     await s.set('timezone', cityData['tz'].toString());
-    await s.set('cityName', cityData['name'].toString());
+    await s.set('cityName', localizedName);
 
     // Set Timezone
     TimezoneResolver.setLocalTimezone(cityData['tz'] as String);
@@ -140,22 +167,24 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     // Since LocationPrayerManager doesn't expose manual schedule, we just save and rely on the UI/providers refreshing it.
 
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
     Navigator.pop(context);
-    _showSnackBar('تم تحيين الموقع إلى ${cityData['name']} ✓', true);
+    _showSnackBar(l10n.locationPickerLocationSetTo(localizedName), true);
   }
 
   void _showResultSnackBar(LocationResult result) {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          result.messageAr,
+          result.message(l10n),
           style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
         ),
         action:
             result == LocationResult.serviceDisabled ||
                 result == LocationResult.permissionDeniedForever
             ? SnackBarAction(
-                label: 'تفعيل',
+                label: l10n.locationEnableAction,
                 textColor: Colors.white,
                 onPressed: () {
                   if (result == LocationResult.serviceDisabled) {
@@ -201,6 +230,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Premium glassmorphism / dark theme sheet
     return Container(
       constraints: BoxConstraints(
@@ -282,7 +312,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'تحديث الموقع الجغرافي',
+                            l10n.locationPickerTitle,
                             style: TextStyle(
                               fontFamily: 'Amiri',
                               fontSize: 18,
@@ -291,7 +321,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                             ),
                           ),
                           Text(
-                            'اختر موقعك بدقة لحساب أوقات الصلاة',
+                            l10n.locationPickerSubtitle,
                             style: TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
@@ -341,7 +371,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'أو اختر مدينة رئيسية',
+                            l10n.locationPickerOrChooseCity,
                             style: TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
@@ -435,6 +465,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTapDown: (_) {
         if (!widget.isLoading) _hoverCtrl.forward();
@@ -497,9 +528,9 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'تحديد الموقع تلقائياً',
-                        style: TextStyle(
+                      Text(
+                        l10n.locationPickerAutoDetectTitle,
+                        style: const TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 15,
                           color: Colors.white,
@@ -508,7 +539,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'باستخدام GPS',
+                        l10n.locationPickerAutoDetectSubtitle,
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 12,
@@ -539,6 +570,8 @@ class _CityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -559,7 +592,7 @@ class _CityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    cityData['name'],
+                    isArabic ? cityData['name'] : cityData['nameEn'],
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 14,
@@ -568,7 +601,7 @@ class _CityCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    cityData['country'],
+                    isArabic ? cityData['country'] : cityData['countryEn'],
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
@@ -585,7 +618,7 @@ class _CityCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'اختر',
+                l10n.locationPickerSelectButton,
                 style: TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   fontSize: 11,

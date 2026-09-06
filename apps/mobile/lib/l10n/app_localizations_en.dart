@@ -526,4 +526,1843 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsTestNotifBody => 'Notifications are working correctly';
+
+  @override
+  String get prayerSunrise => 'Sunrise';
+
+  @override
+  String get labelQuran => 'Quran';
+
+  @override
+  String get labelAdhkar => 'Adhkar';
+
+  @override
+  String get labelPoints => 'points';
+
+  @override
+  String get homeGreetingMorning => 'Good morning 🌅';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon 🌤';
+
+  @override
+  String get homeGreetingEvening => 'Good evening 🌙';
+
+  @override
+  String get homeRamadanBannerTitle => 'Ramadan Kareem';
+
+  @override
+  String homeRamadanBannerSubtitle(int day) {
+    return 'Day $day of the blessed month of Ramadan';
+  }
+
+  @override
+  String get homeRamadanDaysRemaining => 'days\nleft';
+
+  @override
+  String get homeCountdownNow => 'It\'s time now';
+
+  @override
+  String homeCountdownHoursMinutes(int hours, int minutes) {
+    return 'in ${hours}h ${minutes}m';
+  }
+
+  @override
+  String homeCountdownMinutesOnly(int minutes) {
+    return 'in $minutes min';
+  }
+
+  @override
+  String get homeNextPrayerLabel => 'Next prayer';
+
+  @override
+  String get homePrayerTimesTitle => 'Prayer Times';
+
+  @override
+  String get homeTodayIbadahTitle => 'Today\'s Acts of Worship';
+
+  @override
+  String get homeViewAllLabel => 'View all →';
+
+  @override
+  String homeIbadahProgressLabel(int count) {
+    return '$count of 10 acts of worship';
+  }
+
+  @override
+  String homeStreakDaysLabel(int n) {
+    return '$n-day streak';
+  }
+
+  @override
+  String get homeLevelMubtadi => 'Beginner 🌱';
+
+  @override
+  String get homeLevelSalik => 'Seeker 🌿';
+
+  @override
+  String get homeLevelMujahid => 'Striver ⚔️';
+
+  @override
+  String get homeLevelMutaqi => 'God-conscious ✨';
+
+  @override
+  String get homeProgressMsgComplete => 'Mashallah! 🌟';
+
+  @override
+  String get homeProgressMsgGreat => 'Great, keep going 💪';
+
+  @override
+  String get homeProgressMsgGood => 'A good start 🌿';
+
+  @override
+  String get homeProgressMsgStart => 'In the name of Allah 🤲';
+
+  @override
+  String get homeRingTodayLabel => 'Today';
+
+  @override
+  String get homeFeaturesTitle => 'Features';
+
+  @override
+  String get homeFeaturePrayerTimes => 'Prayer\nTimes';
+
+  @override
+  String get homeFeatureQibla => 'Qibla';
+
+  @override
+  String get homeFeatureDuas => 'Duas';
+
+  @override
+  String get homeFeatureMisbaha => 'Tasbeeh';
+
+  @override
+  String get homeFeatureMosques => 'Mosques';
+
+  @override
+  String get homeFeatureStatistics => 'Statistics';
+
+  @override
+  String get homeFeatureAchievements => 'Achievements';
+
+  @override
+  String get homeFeatureReminders => 'Reminders';
+
+  @override
+  String homeVerseOfDayLabel(String reference) {
+    return 'Verse of the day - $reference';
+  }
+
+  @override
+  String get homeRamadanTimesTitle => 'Ramadan Timings';
+
+  @override
+  String get homeIftarLabel => 'Iftar';
+
+  @override
+  String get homeSuhoorLabel => 'Suhoor';
+
+  @override
+  String get homeCountdownPassed => 'Passed ✓';
+
+  @override
+  String get homeDailyDhikrLabel => 'Dhikr of the day';
+
+  @override
+  String get homeBooksLibraryTitle => 'Islamic Library';
+
+  @override
+  String homeMinutesLabel(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get onboardingGpsDisabledMessage =>
+      'GPS is off — please enable it to continue.';
+
+  @override
+  String get onboardingSettingsAction => 'Settings';
+
+  @override
+  String get onboardingLocationPermissionDeniedMessage =>
+      'Please enable location permission from Settings.';
+
+  @override
+  String get onboardingEditLaterHint => 'You can change this later';
+
+  @override
+  String get onboardingContinueButton => 'Continue';
+
+  @override
+  String get onboardingIntro1Title => 'Welcome to Taqwa';
+
+  @override
+  String get onboardingIntro1Subtitle =>
+      'Your companion on the journey of self-purification and closeness to Allah, through smart, thoughtful tools.';
+
+  @override
+  String get onboardingIntro2Title => 'A Precise Accountability System';
+
+  @override
+  String get onboardingIntro2Subtitle =>
+      'Log your prayers, adhkar, and acts of worship daily to see your progress and strengthen your resolve.';
+
+  @override
+  String get onboardingIntro3Title => 'Statistics & Progress';
+
+  @override
+  String get onboardingIntro3Subtitle =>
+      'Track your accountability results through charts and detailed reports that help you stay consistent.';
+
+  @override
+  String get onboardingLocationTitle => 'Set Your Location';
+
+  @override
+  String get onboardingLocationSubtitle =>
+      'We need your location to give you precise prayer times and Qibla direction';
+
+  @override
+  String get onboardingLocationHint =>
+      'Your location data stays on your device — we never see it';
+
+  @override
+  String get onboardingLocationAllowButton => 'Enable Location 📍';
+
+  @override
+  String get onboardingSkipButton => 'Skip';
+
+  @override
+  String get onboardingNotificationsTitle => 'Allow Notifications';
+
+  @override
+  String get onboardingNotificationsSubtitle =>
+      'Lets us remind you about prayer, adhkar, evening accountability, and more';
+
+  @override
+  String get onboardingNotificationsHint =>
+      'You can change this later from Settings';
+
+  @override
+  String get onboardingNotificationsAllowButton => 'Allow Notifications 🔔';
+
+  @override
+  String get onboardingGenderTitle => 'Select Gender';
+
+  @override
+  String get onboardingGenderMale => 'Male';
+
+  @override
+  String get onboardingGenderFemale => 'Female';
+
+  @override
+  String get onboardingGenderInfoHint =>
+      'A tailored experience, with separate general khatmas for men and women';
+
+  @override
+  String get onboardingNextButton => 'Next';
+
+  @override
+  String get onboardingOverlayTitle => 'Adhkar Overlay 🪟';
+
+  @override
+  String get onboardingOverlaySubtitle =>
+      'Lets adhkar and reminders show over other apps for a constant reminder';
+
+  @override
+  String get onboardingOverlayHint =>
+      'Requires the \"display over other apps\" permission on Android';
+
+  @override
+  String get onboardingOverlayAllowButton => 'Enable Overlay';
+
+  @override
+  String get onboardingBackgroundTitle => 'Run in the Background';
+
+  @override
+  String get onboardingBackgroundSubtitle =>
+      'Ensures adhan and adhkar notifications arrive precisely on time without the app being stopped';
+
+  @override
+  String get onboardingBackgroundHint =>
+      'The system will ask to exclude the app from battery optimization';
+
+  @override
+  String get onboardingBackgroundAllowButton => 'Allow Background Running 🔋';
+
+  @override
+  String get statsPeriodLast7Days => 'Last 7 days';
+
+  @override
+  String get statsPeriodThisMonth => 'This month';
+
+  @override
+  String get statsPeriodRamadan => 'Ramadan';
+
+  @override
+  String get statsPeriodThisWeek => 'This week';
+
+  @override
+  String get statsPeriodRamadanEmoji => 'Ramadan 🌙';
+
+  @override
+  String get statsRamadanReportTitle => 'Ramadan Report 🌙';
+
+  @override
+  String get statsScreenTitle => 'Statistics';
+
+  @override
+  String statsRamadanDayOf30(int day) {
+    return 'Day $day of 30';
+  }
+
+  @override
+  String statsPointsThisMonth(int points) {
+    return '$points points this month';
+  }
+
+  @override
+  String get statsNextLevelLabel => 'Next level';
+
+  @override
+  String statsPointsRemaining(int remaining) {
+    return '$remaining points to go';
+  }
+
+  @override
+  String get statsMaxLevelReached => 'Max level ✨';
+
+  @override
+  String get statsPerformanceTitle => 'Period Performance';
+
+  @override
+  String get statsPreviousDaysLabel => 'Previous days';
+
+  @override
+  String get statsQuranPagesLabel => 'Quran Pages';
+
+  @override
+  String get statsPrayerAttendanceLabel => 'Prayer Attendance';
+
+  @override
+  String get statsLongestStreakLabel => 'Longest Streak';
+
+  @override
+  String statsDaysUnit(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get statsTaqwaPointsLabel => 'Taqwa Points';
+
+  @override
+  String get statsAchievementsSectionTitle => 'Achievements & Badges';
+
+  @override
+  String statsAchievementsCount(int count) {
+    return '$count achievements';
+  }
+
+  @override
+  String statsPointsRewardShort(int points) {
+    return '+$points points';
+  }
+
+  @override
+  String get statsNoAchievementsYet => 'No achievements yet';
+
+  @override
+  String get statsNoAchievementsHint =>
+      'Keep up your acts of worship to earn your first achievement';
+
+  @override
+  String get statsComingSoonLabel => 'Coming soon 🔒';
+
+  @override
+  String get statsLockedStreak30Title => 'The Striver\'s Month';
+
+  @override
+  String get statsLockedStreak30Desc => '30 days straight';
+
+  @override
+  String get statsLockedKhatmaTitle => 'A Full Khatma';
+
+  @override
+  String get statsLockedKhatmaDesc => 'Complete the Quran';
+
+  @override
+  String get statsLockedFullWeekTitle => 'A Perfect Week';
+
+  @override
+  String get statsLockedFullWeekDesc => '7 complete days';
+
+  @override
+  String get statsThanksButtonLabel => 'Thanks be to Allah 🤲';
+
+  @override
+  String statsPointsRewardFull(int points) {
+    return '+$points bonus points 🌟';
+  }
+
+  @override
+  String get statsNewAchievementLabel => 'New achievement! 🎉';
+
+  @override
+  String drawerLevelLabel(String level) {
+    return 'Level: $level';
+  }
+
+  @override
+  String get drawerDefaultUsername => 'Taqwa User';
+
+  @override
+  String get drawerGenderMale => 'Male';
+
+  @override
+  String get drawerGenderFemale => 'Female';
+
+  @override
+  String get drawerViewProfile => 'View profile';
+
+  @override
+  String get drawerNavHome => 'Home';
+
+  @override
+  String get drawerNavChecklist => 'Daily Accountability';
+
+  @override
+  String get drawerNavPrayer => 'Prayer Times';
+
+  @override
+  String get drawerNavBooks => 'Islamic Library';
+
+  @override
+  String get drawerNavStatistics => 'Statistics';
+
+  @override
+  String get drawerNavAchievements => 'Achievements';
+
+  @override
+  String get drawerNavProfile => 'Profile';
+
+  @override
+  String get drawerNavSettings => 'Settings';
+
+  @override
+  String get drawerStatTaqwaPoints => 'Taqwa Points';
+
+  @override
+  String get drawerStatStreakDays => 'day streak';
+
+  @override
+  String get drawerLogoutButton => 'Sign out';
+
+  @override
+  String get drawerLogoutDialogTitle => 'Sign out';
+
+  @override
+  String get drawerLogoutDialogBody => 'Are you sure you want to sign out?';
+
+  @override
+  String get drawerLogoutDialogCancel => 'Cancel';
+
+  @override
+  String get drawerLogoutDialogConfirm => 'Sign out';
+
+  @override
+  String get drawerFooterQuote =>
+      '\"Take account of yourselves before you are taken to account\"';
+
+  @override
+  String get drawerFooterVersion => ' v1.0';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String get duaCategoryMorning => 'Morning';
+
+  @override
+  String get duaCategoryEvening => 'Evening';
+
+  @override
+  String get duaCategorySleep => 'Sleep';
+
+  @override
+  String get duaCategoryWakingUp => 'Waking Up';
+
+  @override
+  String get duaCategoryDistress => 'Distress';
+
+  @override
+  String get duaCategoryGuidance => 'Guidance';
+
+  @override
+  String get duaCategoryForgiveness => 'Forgiveness';
+
+  @override
+  String get duaCategoryRizq => 'Provision';
+
+  @override
+  String get duaCategoryHealth => 'Health';
+
+  @override
+  String get duaCategoryParents => 'Parents';
+
+  @override
+  String get duaCategoryTravel => 'Travel';
+
+  @override
+  String get duaCategoryRain => 'Rain';
+
+  @override
+  String get duaCategoryIstikhara => 'Istikhara';
+
+  @override
+  String get duaCategoryMosque => 'Mosque';
+
+  @override
+  String get duaCategoryKnowledge => 'Seeking Knowledge';
+
+  @override
+  String get duaCategoryAfterPrayer => 'After Prayer';
+
+  @override
+  String get duaCategoryGeneral => 'General';
+
+  @override
+  String get duaCategoryOther => 'Other';
+
+  @override
+  String get duaCategoryAllFilter => '🤲 All';
+
+  @override
+  String get duasScreenTitle => 'Traditional Duas';
+
+  @override
+  String get duasScreenSubtitle => 'From the Quran and Sunnah';
+
+  @override
+  String get duasSearchHint => 'Search the duas...';
+
+  @override
+  String get duasTabTraditional => 'Traditional';
+
+  @override
+  String get duasTabMine => 'Mine';
+
+  @override
+  String get duasTabCommunity => 'Community';
+
+  @override
+  String get duasNoResults => 'No results found';
+
+  @override
+  String get duasCopiedLabel => 'Copied ✓';
+
+  @override
+  String get duasCopyTooltip => 'Copy';
+
+  @override
+  String get duasFetchErrorMessage => 'Something went wrong fetching your duas';
+
+  @override
+  String get duasNoUserDuasYet => 'You haven\'t added any duas yet';
+
+  @override
+  String get duasShareWithCommunityLabel => 'Share with the community';
+
+  @override
+  String get duasDeleteDialogTitle => 'Delete Dua';
+
+  @override
+  String get duasDeleteConfirmMessage => 'Do you want to delete this dua?';
+
+  @override
+  String get duasSharedSuccessLabel => '✅ Shared!';
+
+  @override
+  String get duasShareSheetTitle => '🌍 Share with the community';
+
+  @override
+  String get duasShareThanksMessage =>
+      'Thanks for sharing with the Taqwa community 🤍';
+
+  @override
+  String get duasCommunityLoadError => 'Couldn\'t load community duas';
+
+  @override
+  String get duasCommunityEmptyTitle => 'No shared duas yet';
+
+  @override
+  String get duasPullToRefreshHint => 'Pull down to refresh';
+
+  @override
+  String get duasAddSheetTitle => 'Add a Dua';
+
+  @override
+  String get duasAddTitleFieldLabel => 'Dua title';
+
+  @override
+  String get duasAddTextFieldLabel => 'Dua text (Arabic)';
+
+  @override
+  String get duasAddOccasionFieldLabel => 'Occasion (optional)';
+
+  @override
+  String get duasAddShareToggleLabel =>
+      'Share with the Taqwa community (so others can benefit)';
+
+  @override
+  String get adhanSoundMakkah => 'Adhan of Makkah';
+
+  @override
+  String get adhanSoundMadinah => 'Adhan of Madinah';
+
+  @override
+  String get adhanSoundAlaqsa => 'Adhan of Al-Aqsa Mosque';
+
+  @override
+  String get adhanSoundEgypt => 'Egyptian Adhan';
+
+  @override
+  String get adhanSoundAbdulBasit => 'Abdul Basit Abdul Samad';
+
+  @override
+  String get adhanSoundMinshawi => 'Muhammad Siddiq Al-Minshawi';
+
+  @override
+  String get adhanSoundNaghshbandi => 'Sayyid An-Naqshbandi';
+
+  @override
+  String get adhanSoundSaber => 'Jami\' Saber';
+
+  @override
+  String get adhanSoundAlHussaini => 'Al-Hussaini';
+
+  @override
+  String get adhanSoundBakirBash => 'Bakir Bash';
+
+  @override
+  String get adhanSoundHafez => 'Hafez';
+
+  @override
+  String get adhanSoundHafizMurad => 'Hafiz Murad';
+
+  @override
+  String get adhanSoundSharifDoman => 'Sharif Doman';
+
+  @override
+  String get adhanSoundYusufIslam => 'Yusuf Islam';
+
+  @override
+  String get adhanSettingsAccountSectionTitle => 'Account Settings';
+
+  @override
+  String get adhanMadhabLabel => 'Madhab';
+
+  @override
+  String get madhabShafi => 'Shafi\'i, Maliki, Hanbali';
+
+  @override
+  String get madhabHanafi => 'Hanafi';
+
+  @override
+  String get adhanCalcMethodLabel => 'Calculation Method';
+
+  @override
+  String get calcMethodAlgeria => 'Algeria (Ministry of Religious Affairs)';
+
+  @override
+  String get calcMethodMWL => 'Muslim World League';
+
+  @override
+  String get calcMethodEgypt => 'Egyptian General Authority';
+
+  @override
+  String get calcMethodKarachi => 'University of Karachi';
+
+  @override
+  String get calcMethodUmmAlQura => 'Umm Al-Qura (Makkah)';
+
+  @override
+  String get calcMethodISNA => 'North America (ISNA)';
+
+  @override
+  String get adhanSoundSectionTitle => 'Adhan Sound';
+
+  @override
+  String get adhanModeLabel => 'Adhan Mode';
+
+  @override
+  String get adhanModeSound => 'Sound';
+
+  @override
+  String get adhanModeVibrate => 'Vibrate';
+
+  @override
+  String get adhanModeSilent => 'Silent';
+
+  @override
+  String get adhanVolumeLabel => 'Volume Level';
+
+  @override
+  String get adhanVibrateTypeLabel => 'Vibration';
+
+  @override
+  String get adhanVibrateTypeSublabel => 'Vibrate along with the adhan';
+
+  @override
+  String get adhanAdvancedSectionTitle => 'Advanced Settings';
+
+  @override
+  String get adhanAutoSilentLabel => 'Switch to Silent';
+
+  @override
+  String get adhanAutoSilentSublabel => 'Enable silent mode after the adhan';
+
+  @override
+  String get adhanSilentModeSettingsLabel => 'Silent Mode Settings';
+
+  @override
+  String get adhanSilentModeSettingsSublabel => 'Manage silent mode options';
+
+  @override
+  String get adhanEnableInSilentLabel => 'Play Adhan in Silent Mode';
+
+  @override
+  String get adhanEnableInSilentSublabel =>
+      'Play the adhan even when the device is on silent';
+
+  @override
+  String get adhanEnableNotifInSilentLabel =>
+      'Enable Notifications in Silent Mode';
+
+  @override
+  String get adhanEnableNotifInSilentSublabel =>
+      'Play notification sounds even when the device is on silent';
+
+  @override
+  String get adhanNotifSilentSheetTitle =>
+      'Notifications Enabled in Silent Mode';
+
+  @override
+  String get adhanSystemNotifSectionTitle => 'System Notifications';
+
+  @override
+  String get adhanWakeScreenLabel => 'Wake Screen During Adhan';
+
+  @override
+  String get adhanWakeScreenSublabel =>
+      'Keep the screen on while the adhan plays';
+
+  @override
+  String get adhanFlipToSilenceLabel => 'Silence by Flipping the Device';
+
+  @override
+  String get adhanFlipToSilenceSublabel =>
+      'Flip your phone face-down to silence the adhan';
+
+  @override
+  String get adhanAlarmNotifLabel => 'Alarm-style Adhan Notification';
+
+  @override
+  String get adhanAlarmNotifSublabel => 'Notify even in silent mode';
+
+  @override
+  String get adhanOngoingNotifLabel => 'Ongoing Prayer Times Notification';
+
+  @override
+  String get adhanOngoingNotifSublabel =>
+      'Show a persistent notification with time remaining until prayer';
+
+  @override
+  String get aboutScreenTitle => 'About the Developer';
+
+  @override
+  String get aboutSectionDeveloper => 'About Developer';
+
+  @override
+  String get aboutSectionSkills => 'Technical Skills';
+
+  @override
+  String get aboutSectionConnect => 'Connect With Me';
+
+  @override
+  String get aboutDevNameArabic => 'عماد الدين عينين';
+
+  @override
+  String get aboutDevNameLatin => 'Imadeddine Ainine';
+
+  @override
+  String get aboutDevBadge => 'Fullstack Developer';
+
+  @override
+  String get aboutBio =>
+      'A passionate software developer who loves building mobile apps and websites using the latest technologies. I care deeply about code quality and user experience, and I always strive to deliver innovative technical solutions that serve the Muslim community.';
+
+  @override
+  String get aboutFooterDuaRequest => 'Remember me in your sincere duas';
+
+  @override
+  String get aboutFooterMadeWithLove => 'Made with love for the Muslim Ummah';
+
+  @override
+  String get aboutFooterCopyright => '© 2026 - Imadeddine Ainine';
+
+  @override
+  String get khatmaScreenTitle => 'Khatma Progress';
+
+  @override
+  String khatmaProgressPercent(String percent) {
+    return '$percent% complete';
+  }
+
+  @override
+  String get khatmaStatCompletedLabel => 'Completed Khatmas';
+
+  @override
+  String get khatmaStatStreakLabel => 'Consecutive Days';
+
+  @override
+  String get khatmaStatPagesPerDayLabel => 'pages/day';
+
+  @override
+  String get khatmaWeeklyChartTitle => 'Weekly Reading';
+
+  @override
+  String get khatmaDaySun => 'Sunday';
+
+  @override
+  String get khatmaDayMon => 'Monday';
+
+  @override
+  String get khatmaDayTue => 'Tuesday';
+
+  @override
+  String get khatmaDayWed => 'Wednesday';
+
+  @override
+  String get khatmaDayThu => 'Thursday';
+
+  @override
+  String get khatmaDayFri => 'Friday';
+
+  @override
+  String get khatmaDaySat => 'Saturday';
+
+  @override
+  String get weekdayFullSunday => 'Sunday';
+
+  @override
+  String get weekdayShortSunday => 'Su';
+
+  @override
+  String get weekdayInitialSunday => 'S';
+
+  @override
+  String get weekdayFullMonday => 'Monday';
+
+  @override
+  String get weekdayShortMonday => 'Mo';
+
+  @override
+  String get weekdayInitialMonday => 'M';
+
+  @override
+  String get weekdayFullTuesday => 'Tuesday';
+
+  @override
+  String get weekdayShortTuesday => 'Tu';
+
+  @override
+  String get weekdayInitialTuesday => 'T';
+
+  @override
+  String get weekdayFullWednesday => 'Wednesday';
+
+  @override
+  String get weekdayShortWednesday => 'We';
+
+  @override
+  String get weekdayInitialWednesday => 'W';
+
+  @override
+  String get weekdayFullThursday => 'Thursday';
+
+  @override
+  String get weekdayShortThursday => 'Th';
+
+  @override
+  String get weekdayInitialThursday => 'T';
+
+  @override
+  String get weekdayFullFriday => 'Friday';
+
+  @override
+  String get weekdayShortFriday => 'Fr';
+
+  @override
+  String get weekdayInitialFriday => 'F';
+
+  @override
+  String get weekdayFullSaturday => 'Saturday';
+
+  @override
+  String get weekdayShortSaturday => 'Sa';
+
+  @override
+  String get weekdayInitialSaturday => 'S';
+
+  @override
+  String get appName => 'Takwa';
+
+  @override
+  String get onboardingSignInSubtitle => 'Sign in to save and sync your data';
+
+  @override
+  String get onboardingBenefitSaveProgress => 'Save your data and progress';
+
+  @override
+  String get onboardingBenefitCompete =>
+      'Compete with Muslims around the world';
+
+  @override
+  String get onboardingBenefitStats => 'Detailed, advanced statistics';
+
+  @override
+  String get onboardingBenefitSync => 'Automatic sync across your devices';
+
+  @override
+  String get onboardingContinueWithoutAccount => 'Continue without an account';
+
+  @override
+  String get onboardingChoosePlanTitle => 'Choose your plan';
+
+  @override
+  String get onboardingChoosePlanSubtitle => 'Join the Takwa family';
+
+  @override
+  String get onboardingPremiumTitle => 'Takwa ⭐ Premium';
+
+  @override
+  String get onboardingPremiumDesc =>
+      'No ads + advanced stats + cloud sync + priority support';
+
+  @override
+  String get onboardingPremiumBadge => 'Best value';
+
+  @override
+  String get onboardingPremiumPrice => '99 DZD / month';
+
+  @override
+  String get onboardingPremiumFeature1 => 'Completely ad-free';
+
+  @override
+  String get onboardingPremiumFeature2 => 'Advanced statistics and charts';
+
+  @override
+  String get onboardingPremiumFeature3 => 'Automatic cloud sync';
+
+  @override
+  String get onboardingPremiumFeature4 => 'Unlimited custom reminders';
+
+  @override
+  String get onboardingPremiumFeature5 => 'Priority technical support';
+
+  @override
+  String get onboardingFreeTitle => 'Takwa 🌙 Free';
+
+  @override
+  String get onboardingFreeDesc =>
+      'All core features with light ads to keep the service running';
+
+  @override
+  String get onboardingFreeFeature1 => 'All accountability features';
+
+  @override
+  String get onboardingFreeFeature2 => 'Prayer times and Qibla';
+
+  @override
+  String get onboardingFreeFeature3 => 'Adhkar and duas';
+
+  @override
+  String get onboardingFreeFeature4 => 'Light ads';
+
+  @override
+  String get onboardingStartPremiumCta => 'Start Premium 🌟';
+
+  @override
+  String get onboardingStartFreeCta => 'Start free 🤲';
+
+  @override
+  String get onboardingDemoTasbeehText => 'SubhanAllah';
+
+  @override
+  String get notifChannelPrayerSoundName => 'Prayer Adhan (Sound)';
+
+  @override
+  String get notifChannelPrayerSoundDesc =>
+      'Adhan-time notification with adhan sound';
+
+  @override
+  String get notifChannelPrayerVibrateName => 'Prayer Adhan (Vibrate)';
+
+  @override
+  String get notifChannelPrayerVibrateDesc =>
+      'Adhan-time notification, vibration only';
+
+  @override
+  String get notifChannelPrayerSilentName => 'Prayer Adhan (Silent)';
+
+  @override
+  String get notifChannelPrayerSilentDesc => 'Silent adhan-time notification';
+
+  @override
+  String get notifChannelAlertName => 'Prayer Alerts';
+
+  @override
+  String get notifChannelAlertDesc => 'Alerts before adhan and after iqama';
+
+  @override
+  String get notifChannelMuhasabaName => 'Self-Accountability';
+
+  @override
+  String get notifChannelMuhasabaDesc => 'Evening self-accountability reminder';
+
+  @override
+  String get notifChannelAdhkarName => 'Daily Adhkar';
+
+  @override
+  String get notifChannelAdhkarDesc =>
+      'Morning, evening and post-prayer adhkar';
+
+  @override
+  String get notifChannelDuasName => 'Duas';
+
+  @override
+  String get notifChannelDuasDesc => 'Selected prophetic and Quranic duas';
+
+  @override
+  String get notifChannelAchievementName => 'Achievements';
+
+  @override
+  String get notifChannelAchievementDesc => 'New achievement notifications';
+
+  @override
+  String get notifChannelRemindersName => 'Faith Reminders';
+
+  @override
+  String get notifChannelRemindersDesc =>
+      'Reminders for Friday sunnah, fasting and White Days';
+
+  @override
+  String get notifChannelRamadanName => 'Blessed Ramadan';
+
+  @override
+  String get notifChannelRamadanDesc => 'Suhoor and iftar alerts';
+
+  @override
+  String get notifChannelWakeUpAlarmName => 'Wake-up Alarm';
+
+  @override
+  String get notifChannelWakeUpAlarmDesc =>
+      'Custom alarm to wake up for Fajr prayer';
+
+  @override
+  String get overlayServiceChannelDesc =>
+      'Keeps the adhan and adhkar service active';
+
+  @override
+  String get overlayServiceLoadingPrayerTimes => 'Loading prayer times...';
+
+  @override
+  String get overlayServiceOpenAppButton => 'Open Takwa';
+
+  @override
+  String get overlayServiceUpdateLocationButton => 'Update location';
+
+  @override
+  String get overlayServiceUpdatingLocation => '🔄 Updating location...';
+
+  @override
+  String get overlayServiceDefaultCity => 'Algeria';
+
+  @override
+  String get overlayServiceUnknownCity => 'Unknown';
+
+  @override
+  String get overlayServicePrayerTimeOverlayTitle => 'Prayer Time';
+
+  @override
+  String overlayServicePrayerTimeOverlayContent(String prayer) {
+    return 'It\'s now time for the $prayer adhan';
+  }
+
+  @override
+  String get overlayServiceDuaOverlayTitle => 'Dua from Takwa';
+
+  @override
+  String get overlayServiceAdhkarOverlayTitle => 'Takwa Adhkar';
+
+  @override
+  String get overlayServiceDuaOverlayContent => 'Dua';
+
+  @override
+  String get overlayServiceAdhkarOverlayContent => 'Dhikr';
+
+  @override
+  String get prayerScreenTitle => 'Prayer Times';
+
+  @override
+  String prayerScreenIqamaTimeFor(String prayer) {
+    return 'Iqama time — $prayer';
+  }
+
+  @override
+  String prayerScreenPrayerFor(String prayer) {
+    return '$prayer prayer';
+  }
+
+  @override
+  String get prayerScreenEstablishPrayer => 'Establish the prayer';
+
+  @override
+  String get prayerScreenNextPrayerLabel => 'Next prayer';
+
+  @override
+  String get prayerScreenIqamaCountdownLabel => 'Iqama in';
+
+  @override
+  String get prayerScreenAdhanCountdownLabel => 'Adhan in';
+
+  @override
+  String get prayerScreenGetReady => 'Get ready';
+
+  @override
+  String get prayerScreenAdhanTimeLabel => 'Adhan Time';
+
+  @override
+  String get prayerScreenSalvationSlogan => 'Your prayer is your salvation';
+
+  @override
+  String get prayerScreenIqamaTimeLabel => 'Iqama Time';
+
+  @override
+  String prayerScreenIqamaOffsetShort(int minutes) {
+    return '+${minutes}m';
+  }
+
+  @override
+  String prayerScreenIqamaAfterMinutes(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'in $count minutes',
+      one: 'in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get prayerScreenTodaysPrayers => 'Today\'s Prayers';
+
+  @override
+  String get prayerScreenAdhanNowBadge => 'Adhan now';
+
+  @override
+  String get prayerScreenSunriseBadge => 'Sunrise';
+
+  @override
+  String get prayerScreenAdhanBadge => 'Adhan';
+
+  @override
+  String get prayerScreenIqamaBadge => 'Iqama';
+
+  @override
+  String get prayerScreenLocationErrorTitle => 'Couldn\'t determine location';
+
+  @override
+  String get prayerScreenLocationErrorSubtitle => 'Make sure GPS is enabled';
+
+  @override
+  String get prayerScreenRetryButton => 'Retry';
+
+  @override
+  String get quranReaderFallbackName => 'Quran';
+
+  @override
+  String get quranReaderMeccan => 'Meccan';
+
+  @override
+  String get quranReaderMedinan => 'Medinan';
+
+  @override
+  String quranReaderSurahHeaderTitle(String name) {
+    return 'Surah $name';
+  }
+
+  @override
+  String quranReaderAyahCountBadge(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verses',
+      one: '1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String quranReaderSurahLabel(String name) {
+    return 'Surah $name';
+  }
+
+  @override
+  String quranReaderAyahRefLabel(String ayah, String surah) {
+    return 'Verse $ayah — Surah $surah';
+  }
+
+  @override
+  String quranReaderJuzChip(String juz) {
+    return 'Juz: $juz';
+  }
+
+  @override
+  String quranReaderPageOfTotalChip(String current, String total) {
+    return 'Page: $current of $total';
+  }
+
+  @override
+  String quranReaderReadCountChip(String read, String total) {
+    return 'Read $read of $total pages';
+  }
+
+  @override
+  String get quranReaderGuideTitle => 'Reading Guide';
+
+  @override
+  String get quranReaderGuideTapToggle =>
+      'Tap once to show or hide the toolbar';
+
+  @override
+  String get quranReaderGuideDoubleTapZoom => 'Double-tap to zoom in and out';
+
+  @override
+  String get quranReaderGuideSwipeNavigate =>
+      'Swipe left or right to move between pages';
+
+  @override
+  String get quranReaderGuideLongPress => 'Long-press any verse to:';
+
+  @override
+  String get quranReaderGuideSaveAyah => '⭐ Save the verse as a bookmark';
+
+  @override
+  String get quranReaderGuideShareAyah =>
+      '📤 Share the verse (text, image, or video)';
+
+  @override
+  String get quranReaderGuideTafsir => '📖 Simplified Tafsir';
+
+  @override
+  String get quranReaderGuideTranslation => '🌐 Translation';
+
+  @override
+  String get quranReaderGuideListen => '🔊 Listen to the verse, page, or surah';
+
+  @override
+  String get quranReaderGuideAudioButton =>
+      'The speaker button at the top plays the whole page';
+
+  @override
+  String get quranReaderGuideNightModeButton =>
+      'The night-mode button switches the appearance';
+
+  @override
+  String get quranReaderGuideGotIt => 'Got it ✓';
+
+  @override
+  String quranReaderPageJumpError(String max) {
+    return 'Please enter a valid number between 1 and $max';
+  }
+
+  @override
+  String get quranReaderGoToPageTitle => 'Go to Page';
+
+  @override
+  String quranReaderCurrentPageLabel(String page) {
+    return 'You are currently on page $page';
+  }
+
+  @override
+  String quranReaderPageInputLabel(String range) {
+    return 'Enter the page number ($range)';
+  }
+
+  @override
+  String quranReaderPageRangeHint(String max) {
+    return '1-$max';
+  }
+
+  @override
+  String get quranReaderCancelButton => 'Cancel';
+
+  @override
+  String get quranReaderGoButton => 'Go';
+
+  @override
+  String get quranReaderSaveAyahOption => 'Save verse as bookmark';
+
+  @override
+  String get quranReaderShareAyahOption => 'Share verse';
+
+  @override
+  String get quranReaderTafsirOption => 'Simplified Tafsir';
+
+  @override
+  String get quranReaderTranslationOption => 'Translation';
+
+  @override
+  String get quranReaderListenAyahOption => 'Listen to verse';
+
+  @override
+  String get quranReaderSettingsTitle => 'Reading Settings';
+
+  @override
+  String get quranReaderFontSizeLabel => 'Font Size';
+
+  @override
+  String get quranReaderBackgroundStyleLabel => 'Background Style';
+
+  @override
+  String get quranReaderThemeNight => 'Night';
+
+  @override
+  String get quranReaderThemeSepia => 'Sepia';
+
+  @override
+  String get quranReaderThemeWhite => 'Light';
+
+  @override
+  String createKhatmaDefaultNamePrefix(String monthYear) {
+    return 'Khatma $monthYear';
+  }
+
+  @override
+  String get createKhatmaTitle => 'Create New Khatma';
+
+  @override
+  String get createKhatmaNameLabel => 'Khatma Name';
+
+  @override
+  String get createKhatmaTypeLabel => 'Khatma Type';
+
+  @override
+  String get createKhatmaTypeSubtitle =>
+      'Choose the type of khatma you want to create';
+
+  @override
+  String get createKhatmaTypeMuyassaraTitle => 'Flexible Khatma';
+
+  @override
+  String get createKhatmaTypeMuyassaraDesc =>
+      'Read the whole Quran in order, with no fixed daily portion or completion date';
+
+  @override
+  String get createKhatmaTypeMultazimaTitle => 'Committed Khatma';
+
+  @override
+  String get createKhatmaTypeMultazimaDesc =>
+      'A khatma with a fixed daily portion and a set completion date';
+
+  @override
+  String get createKhatmaStartDateLabel => 'Start Date';
+
+  @override
+  String get createKhatmaStartPageLabel => 'Start Page';
+
+  @override
+  String createKhatmaPageOption(String n) {
+    return 'Page $n';
+  }
+
+  @override
+  String get createKhatmaEnableNotifications => 'Enable Notifications';
+
+  @override
+  String get createKhatmaNotificationsDisabledWarning =>
+      'Notifications are off — no reminders will be sent';
+
+  @override
+  String get createKhatmaSummaryTitle => 'Khatma Summary';
+
+  @override
+  String get createKhatmaTypeFieldLabel => 'Khatma Type:';
+
+  @override
+  String get createKhatmaNameFieldLabel => 'Khatma Name:';
+
+  @override
+  String get createKhatmaStartDateFieldLabel => 'Start Date:';
+
+  @override
+  String get createKhatmaFirstPageFieldLabel => 'First Page:';
+
+  @override
+  String get createKhatmaNotificationsFieldLabel => 'Notifications:';
+
+  @override
+  String get createKhatmaNotificationsEnabledValue => 'Enabled';
+
+  @override
+  String get createKhatmaNotificationsDisabledValue => 'Disabled';
+
+  @override
+  String get createKhatmaStartReadingHint =>
+      'You can start reading right away once the khatma is created';
+
+  @override
+  String get createKhatmaPreviousButton => 'Previous';
+
+  @override
+  String get createKhatmaNextButton => 'Next';
+
+  @override
+  String get createKhatmaCreateButton => 'Create Khatma';
+
+  @override
+  String get createKhatmaDefaultLabelFallback => 'New Khatma';
+
+  @override
+  String get createKhatmaSuccessMessage => 'Khatma created successfully';
+
+  @override
+  String get userAdhkarAddButton => 'Add Dhikr';
+
+  @override
+  String get userAdhkarEmptyTitle => 'My Own Adhkar';
+
+  @override
+  String get userAdhkarEmptyBody =>
+      'You haven\'t added any adhkar yet.\nTap the button to add your first one.';
+
+  @override
+  String adhkarGenericError(String error) {
+    return 'An error occurred: $error';
+  }
+
+  @override
+  String get adhkarCopyTooltip => 'Copy';
+
+  @override
+  String get adhkarCopiedSnackbar => 'Copied';
+
+  @override
+  String get adhkarShareWithCommunity => 'Share with community';
+
+  @override
+  String get adhkarDeleteTooltip => 'Delete';
+
+  @override
+  String get adhkarDeleteConfirmTitle => 'Delete this dhikr?';
+
+  @override
+  String get adhkarDeleteConfirmBody =>
+      'Do you want to permanently delete this dhikr?';
+
+  @override
+  String get adhkarCancelButton => 'Cancel';
+
+  @override
+  String get adhkarShareToCommunityTitle => 'Share with Community';
+
+  @override
+  String get adhkarShareToCommunityDesc =>
+      'It will be added for review, then appear in the Community tab';
+
+  @override
+  String adhkarCountTimesLabel(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count times',
+      one: '1 time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get adhkarSharedSuccessMessage => 'Shared successfully!';
+
+  @override
+  String get communityAdhkarEmptyTitle => 'Adhkar Community';
+
+  @override
+  String get communityAdhkarEmptyBody =>
+      'No community shares yet.\nShare your adhkar from the \"My Adhkar\" tab.';
+
+  @override
+  String get communityAdhkarRetryButton => 'Retry';
+
+  @override
+  String get addAdhkarSheetTitle => 'Add New Dhikr';
+
+  @override
+  String get addAdhkarTextHint =>
+      'Type the dhikr here in clear Arabic letters...';
+
+  @override
+  String get addAdhkarRepeatCountLabel => 'Repeat count:';
+
+  @override
+  String get addAdhkarShareToggleDesc =>
+      'It will be added for review, then shown to everyone';
+
+  @override
+  String get addAdhkarAndShareButton => 'Add & Share with Community';
+
+  @override
+  String get addAdhkarButton => 'Add Dhikr';
+
+  @override
+  String get locationResultSuccess => 'Location updated successfully ✓';
+
+  @override
+  String get locationResultServiceDisabled => 'GPS is off — please enable it';
+
+  @override
+  String get locationResultPermissionDenied => 'Location permission denied';
+
+  @override
+  String get locationResultPermissionDeniedForever =>
+      'Please enable location permission from Settings';
+
+  @override
+  String get locationResultError => 'Error determining location';
+
+  @override
+  String get locationEnableAction => 'Enable';
+
+  @override
+  String get locationUpdateTileLabel => 'Update Location & Prayer Times';
+
+  @override
+  String get timezoneAlgiers => 'Algiers (UTC+1)';
+
+  @override
+  String get timezoneTunis => 'Tunis (UTC+1)';
+
+  @override
+  String get timezoneEgypt => 'Egypt (UTC+2)';
+
+  @override
+  String get timezoneRiyadh => 'Riyadh (UTC+3)';
+
+  @override
+  String get timezoneDubai => 'Dubai (UTC+4)';
+
+  @override
+  String get timezoneKuwait => 'Kuwait (UTC+3)';
+
+  @override
+  String get timezoneBeirut => 'Beirut (UTC+3)';
+
+  @override
+  String get timezoneJerusalem => 'Jerusalem (UTC+3)';
+
+  @override
+  String locationPickerLocationSetTo(String city) {
+    return 'Location set to $city ✓';
+  }
+
+  @override
+  String get locationPickerTitle => 'Update Geographic Location';
+
+  @override
+  String get locationPickerSubtitle =>
+      'Pinpoint your location to calculate prayer times';
+
+  @override
+  String get locationPickerOrChooseCity => 'Or choose a major city';
+
+  @override
+  String get locationPickerAutoDetectTitle => 'Detect Location Automatically';
+
+  @override
+  String get locationPickerAutoDetectSubtitle => 'Using GPS';
+
+  @override
+  String get locationPickerSelectButton => 'Select';
+
+  @override
+  String get manageIbadahTitle => 'Manage Habits';
+
+  @override
+  String get manageIbadahPositiveTab => 'Positive';
+
+  @override
+  String get manageIbadahNegativeTab => 'Negative (Prohibitions)';
+
+  @override
+  String get manageIbadahEmpty => 'No habits added yet';
+
+  @override
+  String get manageIbadahLoadError => 'An error occurred while loading data';
+
+  @override
+  String manageIbadahPointsEarned(String points) {
+    return 'Points: $points';
+  }
+
+  @override
+  String manageIbadahPointsDeducted(String points) {
+    return 'Points deducted: $points';
+  }
+
+  @override
+  String get manageIbadahDeleteConfirmTitle => 'Confirm Deletion';
+
+  @override
+  String manageIbadahDeleteConfirmBody(String name) {
+    return 'Are you sure you want to delete \"$name\"?';
+  }
+
+  @override
+  String get manageIbadahCancelButton => 'Cancel';
+
+  @override
+  String get manageIbadahDeleteButton => 'Delete';
+
+  @override
+  String get manageIbadahDeletedSuccess => 'Deleted successfully';
+
+  @override
+  String manageIbadahDeleteFailed(String error) {
+    return 'Failed to delete: $error';
+  }
+
+  @override
+  String get manageIbadahEditHabitTitle => 'Edit Habit';
+
+  @override
+  String get manageIbadahEditProhibitionTitle => 'Edit Prohibition';
+
+  @override
+  String get manageIbadahAddPositiveTitle => 'Add Positive Habit';
+
+  @override
+  String get manageIbadahAddNegativeTitle => 'Add Negative Habit (Prohibition)';
+
+  @override
+  String get manageIbadahNameFieldLabel => 'Habit Name';
+
+  @override
+  String get manageIbadahRequiredValidation => 'Required';
+
+  @override
+  String get manageIbadahPointsEarnedFieldLabel => 'Points you\'ll earn';
+
+  @override
+  String get manageIbadahPointsDeductedFieldLabel =>
+      'Points that will be deducted';
+
+  @override
+  String get manageIbadahInvalidNumberValidation => 'Invalid number';
+
+  @override
+  String get manageIbadahSaveButton => 'Save';
+
+  @override
+  String get manageIbadahAddButton => 'Add';
+
+  @override
+  String get manageIbadahUpdatedSuccess => 'Updated successfully';
+
+  @override
+  String get manageIbadahAddedSuccess => 'Added successfully';
+
+  @override
+  String adhanOverlayPrayerTimeTitle(String prayer) {
+    return 'It\'s time for $prayer';
+  }
+
+  @override
+  String get adhanOverlayCloseButton => 'Close';
+
+  @override
+  String get adhanOverlayGoToPrayerButton => 'Go to Prayer';
+
+  @override
+  String get adhanOverlayDuaSectionLabel => 'Dua after the Adhan';
+
+  @override
+  String get hijriEraSuffix => 'AH';
+
+  @override
+  String get authEnterEmailPassword => 'Enter your email and password';
+
+  @override
+  String get authUnexpectedError => 'An unexpected error occurred';
+
+  @override
+  String get authEnterUsername => 'Enter a username';
+
+  @override
+  String get authGoogleConfigIncomplete =>
+      'Google sign-in isn\'t fully configured: make sure the SHA-1 fingerprint and web client ID are added in Google Cloud Console.';
+
+  @override
+  String get authGoogleNetworkError =>
+      'Couldn\'t reach Google\'s servers — check your internet connection';
+
+  @override
+  String get authGoogleGenericError =>
+      'Couldn\'t sign in with Google, please try again later';
+
+  @override
+  String get authErrorInvalidCredentials => 'Incorrect email or password';
+
+  @override
+  String get authErrorEmailNotConfirmed =>
+      'Please confirm your email using the link sent to you first';
+
+  @override
+  String get authErrorEmailAlreadyRegistered =>
+      'This email is already registered — please sign in';
+
+  @override
+  String get authErrorUsernameTaken =>
+      'This username is already taken, choose another one';
+
+  @override
+  String get authErrorPasswordTooShort =>
+      'Password must be at least 6 characters';
+
+  @override
+  String get authErrorRateLimit => 'Too many attempts — please wait a moment';
+
+  @override
+  String get authErrorNetwork =>
+      'Connection failed — check your internet connection';
+
+  @override
+  String get authErrorGeneric =>
+      'An error occurred during sign-up, please try again later';
+
+  @override
+  String get authContinueAsGuest => 'Continue as guest — explore the app ➜';
+
+  @override
+  String get authSignInTab => 'Sign In';
+
+  @override
+  String get authSignUpTab => 'New Account';
+
+  @override
+  String get authUsernameHint => 'Username';
+
+  @override
+  String get authEmailHint => 'Email';
+
+  @override
+  String get authPasswordHint => 'Password';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authSecureSignInButton => 'Secure Sign In';
+
+  @override
+  String get authCreateAccountButton => 'Create Account';
+
+  @override
+  String get authOrSeparator => 'or';
+
+  @override
+  String get authGoogleSignInButton => 'Sign in with Google';
+
+  @override
+  String get authTagline =>
+      'Your companion for self-accountability and worship';
+
+  @override
+  String get bottomNavHome => 'Home';
+
+  @override
+  String get bottomNavQiyam => 'Qiyam';
+
+  @override
+  String get bottomNavMuhasaba => 'Accountability';
+
+  @override
+  String get bottomNavStatistics => 'Stats';
+
+  @override
+  String get bottomNavAsma => 'Names of Allah';
+
+  @override
+  String get bottomNavSettings => 'Settings';
+
+  @override
+  String get settingEnabled => 'Enabled';
+
+  @override
+  String get settingDisabled => 'Disabled';
+
+  @override
+  String get syncStatusSyncing => 'Syncing...';
+
+  @override
+  String get syncStatusSuccess => 'Synced successfully';
+
+  @override
+  String get overlaySettingsSectionTitle => 'Adhkar & Notifications';
+
+  @override
+  String get overlaySettingAdhanScreenLabel => 'Automatic Adhan Screen';
+
+  @override
+  String get overlaySettingAdhanScreenSublabel =>
+      'Show adhan screen when prayer time starts';
+
+  @override
+  String get overlaySettingAdhanSoundLabel => 'Adhan Audio';
+
+  @override
+  String get overlaySettingAdhanSoundSublabel =>
+      'Play adhan audio automatically at prayer time';
+
+  @override
+  String get overlaySettingPopupsLabel => 'Adhkar & Duas Popups';
+
+  @override
+  String get overlaySettingPopupsSublabel =>
+      'Show popup reminders for adhkar and duas';
+
+  @override
+  String get overlaySettingIntervalHeader => 'Adhkar Frequency';
+
+  @override
+  String get overlaySettingInterval15Min => 'Every 15 min (~96/day)';
+
+  @override
+  String get overlaySettingInterval20Min => 'Every 20 min (~72/day)';
+
+  @override
+  String get overlaySettingInterval24Min => 'Every 24 min (~60/day)';
+
+  @override
+  String get overlaySettingInterval30Min => 'Every 30 min (~48/day)';
+
+  @override
+  String get overlaySettingInterval1Hour => 'Every hour (~24/day)';
+
+  @override
+  String get overlaySettingInterval2Hours => 'Every 2 hours (~12/day)';
+
+  @override
+  String overlaySettingDailyCount(int count) {
+    return 'Popups will appear ~$count times daily';
+  }
 }

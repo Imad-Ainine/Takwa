@@ -9,6 +9,7 @@ import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ── Color constants ──────────────────────────────────────────
 const _kBgDark = Color(0xFF0D1E2D);
@@ -210,7 +211,6 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final audio = ref.watch(quranAudioProvider);
     final juz = pageToJuz(_currentPage);
     final surahNum = _surahForPage(_currentPage);
-    final surahName = ql.QuranLibrary.quranCtrl.surahs[surahNum - 1].arabicName;
 
     // Theme colors
     final bgColor = switch (state.theme) {
@@ -264,7 +264,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                 child: FadeTransition(
                   opacity: _topFade,
                   child: _TopBar(
-                    surahName: surahName,
+                    surahNum: surahNum,
                     isDark: isDark,
                     onBack: () => Navigator.pop(context),
                     onAudio: () => ref
@@ -472,6 +472,9 @@ class _SurahHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final name = isArabic ? surahMeta.nameAr : surahMeta.nameEn;
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 10, 20, 12),
       decoration: BoxDecoration(
@@ -506,7 +509,7 @@ class _SurahHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  surahMeta.type == 'meccan' ? 'مكية' : 'مدنية',
+                  surahMeta.type == 'meccan' ? l10n.quranReaderMeccan : l10n.quranReaderMedinan,
                   style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 12,
@@ -514,7 +517,7 @@ class _SurahHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'سُورَةُ ${surahMeta.nameAr}',
+                  l10n.quranReaderSurahHeaderTitle(name),
                   style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 22,
@@ -524,7 +527,7 @@ class _SurahHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${ar(surahMeta.ayahCount)} آية',
+                  l10n.quranReaderAyahCountBadge(surahMeta.ayahCount),
                   style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 12,
@@ -690,12 +693,12 @@ class _AyahNumberBadge extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  final String surahName;
+  final int surahNum;
   final bool isDark;
   final VoidCallback onBack, onAudio, onNightMode, onBookmark, onGuide;
 
   const _TopBar({
-    required this.surahName,
+    required this.surahNum,
     required this.isDark,
     required this.onBack,
     required this.onAudio,
@@ -706,6 +709,7 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final overlay = isDark
         ? const Color(0xD00A2818)
         : Colors.white.withOpacity(0.92);
@@ -754,7 +758,7 @@ class _TopBar extends StatelessWidget {
               const Spacer(),
               // Surah name
               Text(
-                'سورة $surahName',
+                l10n.quranReaderSurahLabel(localizedSurahName(context, surahNum)),
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 17,
@@ -815,6 +819,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bg = isDark
         ? const Color(0xF00A2818)
         : Colors.white.withOpacity(0.95);
@@ -848,16 +853,25 @@ class _BottomBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _infoChip('جزء: ${ar(juz)}', textDim),
+                  _infoChip(
+                    l10n.quranReaderJuzChip(localizedNumeral(context, juz)),
+                    textDim,
+                  ),
                   GestureDetector(
                     onTap: onPageNav,
                     child: _infoChip(
-                      'صفحة: ${ar(currentPage)} من ${ar(totalPages)}',
+                      l10n.quranReaderPageOfTotalChip(
+                        localizedNumeral(context, currentPage),
+                        localizedNumeral(context, totalPages),
+                      ),
                       textDim,
                     ),
                   ),
                   _infoChip(
-                    'قرأت ${ar(readCount)} من ${ar(khatmaPages)} صفحات',
+                    l10n.quranReaderReadCountChip(
+                      localizedNumeral(context, readCount),
+                      localizedNumeral(context, khatmaPages),
+                    ),
                     textDim,
                   ),
                 ],
@@ -945,7 +959,7 @@ class _BottomBar extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _surahNameShort(surahNum),
+                          localizedSurahName(context, surahNum),
                           style: TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 13,
@@ -953,7 +967,7 @@ class _BottomBar extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${_surahNameShort(audio.surah)}: ${ar(audio.ayah)}',
+                          '${localizedSurahName(context, audio.surah)}: ${localizedNumeral(context, audio.ayah)}',
                           style: TextStyle(
                             fontFamily: 'NotoNaskhArabic',
                             fontSize: 11,
@@ -1021,11 +1035,6 @@ class _BottomBar extends StatelessWidget {
         onTap: onTap,
         child: Icon(icon, color: color, size: 18),
       );
-
-  String _surahNameShort(int surahNum) {
-    if (surahNum < 1 || surahNum > kSurahData.length) return 'القرآن';
-    return kSurahData[surahNum - 1].nameAr;
-  }
 }
 
 class _ReadingGuideDialog extends StatelessWidget {
@@ -1033,6 +1042,7 @@ class _ReadingGuideDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(24),
@@ -1052,16 +1062,16 @@ class _ReadingGuideDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('📖', style: TextStyle(fontSize: 20)),
-                  SizedBox(width: 8),
+                  const Text('📖', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 8),
                   Text(
-                    'دليل القراءة',
-                    style: TextStyle(
+                    l10n.quranReaderGuideTitle,
+                    style: const TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -1073,45 +1083,45 @@ class _ReadingGuideDialog extends StatelessWidget {
             ),
             const Divider(color: Colors.white24, height: 1),
             // Guide items
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Column(
                 children: [
                   _GuideItem(
                     emoji: '👆',
-                    text: 'اضغط ضغطة واحدة لإظهار أو إخفاء أزرار التحكم',
+                    text: l10n.quranReaderGuideTapToggle,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '👆👆',
-                    text: 'اضغط مرتين للتكبير والتصغير',
+                    text: l10n.quranReaderGuideDoubleTapZoom,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '👈',
-                    text: 'اسحب يميناً أو يساراً للتنقل بين الصفحات',
+                    text: l10n.quranReaderGuideSwipeNavigate,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '📌',
-                    text: 'اضغط مطولاً على أي آية لعرض:',
+                    text: l10n.quranReaderGuideLongPress,
                     subItems: [
-                      '⭐ حفظ الآية كمرجع',
-                      '📤 مشاركة الآية (نص أو صورة أو فيديو)',
-                      '📖 التفسير الميسر',
-                      '🌐 الترجمة',
-                      '🔊 استماع للآية أو الصفحة أو السورة',
+                      l10n.quranReaderGuideSaveAyah,
+                      l10n.quranReaderGuideShareAyah,
+                      l10n.quranReaderGuideTafsir,
+                      l10n.quranReaderGuideTranslation,
+                      l10n.quranReaderGuideListen,
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '🎧',
-                    text: 'زر السماعة في الأعلى للاستماع للصفحة كاملة',
+                    text: l10n.quranReaderGuideAudioButton,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '🌙',
-                    text: 'زر الوضع الليلي لتبديل المظهر',
+                    text: l10n.quranReaderGuideNightModeButton,
                   ),
                 ],
               ),
@@ -1129,10 +1139,10 @@ class _ReadingGuideDialog extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
-                      'فهمت ✓',
-                      style: TextStyle(
+                      l10n.quranReaderGuideGotIt,
+                      style: const TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -1168,7 +1178,6 @@ class _GuideItem extends StatelessWidget {
             children: [
               Text(
                 text,
-                textDirection: TextDirection.rtl,
                 style: const TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   fontSize: 13,
@@ -1182,7 +1191,6 @@ class _GuideItem extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 3, right: 8),
                     child: Text(
                       s,
-                      textDirection: TextDirection.rtl,
                       style: const TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 12,
@@ -1228,7 +1236,9 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
     final val = int.tryParse(_ctrl.text);
     if (val == null || val < 1 || val > widget.totalPages) {
       setState(
-        () => _error = 'يرجى إدخال رقم صحيح بين ١ و ${ar(widget.totalPages)}',
+        () => _error = AppLocalizations.of(context)!.quranReaderPageJumpError(
+          localizedNumeral(context, widget.totalPages),
+        ),
       );
       return;
     }
@@ -1238,6 +1248,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 32),
@@ -1262,9 +1273,9 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                     size: 20,
                   ),
                 ),
-                const Text(
-                  'الانتقال إلى صفحة',
-                  style: TextStyle(
+                Text(
+                  l10n.quranReaderGoToPageTitle,
+                  style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 18,
                     color: Colors.white,
@@ -1276,7 +1287,9 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
             ),
             const SizedBox(height: 14),
             Text(
-              'أنت الآن في صفحة ${ar(widget.currentPage)}',
+              l10n.quranReaderCurrentPageLabel(
+                localizedNumeral(context, widget.currentPage),
+              ),
               style: const TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
@@ -1285,7 +1298,11 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'أدخل رقم الصفحة (١ - ${ar(widget.totalPages)})',
+              l10n.quranReaderPageInputLabel(
+                l10n.quranReaderPageRangeHint(
+                  localizedNumeral(context, widget.totalPages),
+                ),
+              ),
               style: const TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 12,
@@ -1304,7 +1321,9 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                 color: Colors.white,
               ),
               decoration: InputDecoration(
-                hintText: '١ - ${ar(widget.totalPages)}',
+                hintText: l10n.quranReaderPageRangeHint(
+                  localizedNumeral(context, widget.totalPages),
+                ),
                 hintStyle: const TextStyle(color: Colors.white24),
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.07),
@@ -1336,10 +1355,10 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.white12),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          'إلغاء',
-                          style: TextStyle(
+                          l10n.quranReaderCancelButton,
+                          style: const TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 16,
                             color: Colors.white60,
@@ -1367,10 +1386,10 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                           ),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          'انتقال',
-                          style: TextStyle(
+                          l10n.quranReaderGoButton,
+                          style: const TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
@@ -1402,9 +1421,8 @@ class _AyahOptionsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surahName = surahNum >= 1 && surahNum <= kSurahData.length
-        ? kSurahData[surahNum - 1].nameAr
-        : 'القرآن';
+    final l10n = AppLocalizations.of(context)!;
+    final surahName = localizedSurahName(context, surahNum);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -1426,7 +1444,10 @@ class _AyahOptionsSheet extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(
-            'الآية ${ar(ayahNum)} — سورة $surahName',
+            l10n.quranReaderAyahRefLabel(
+              localizedNumeral(context, ayahNum),
+              surahName,
+            ),
             style: const TextStyle(
               fontFamily: 'Amiri',
               fontSize: 17,
@@ -1439,25 +1460,29 @@ class _AyahOptionsSheet extends StatelessWidget {
           const SizedBox(height: 10),
           _OptionRow(
             emoji: '⭐',
-            label: 'حفظ الآية كمرجع',
+            label: l10n.quranReaderSaveAyahOption,
             onTap: () => Navigator.pop(context),
           ),
           _OptionRow(
             emoji: '📤',
-            label: 'مشاركة الآية',
+            label: l10n.quranReaderShareAyahOption,
             onTap: () => Navigator.pop(context),
           ),
           _OptionRow(
             emoji: '📖',
-            label: 'التفسير الميسر',
+            label: l10n.quranReaderTafsirOption,
             onTap: () => Navigator.pop(context),
           ),
           _OptionRow(
             emoji: '🌐',
-            label: 'الترجمة',
+            label: l10n.quranReaderTranslationOption,
             onTap: () => Navigator.pop(context),
           ),
-          _OptionRow(emoji: '🔊', label: 'استماع للآية', onTap: onPlay),
+          _OptionRow(
+            emoji: '🔊',
+            label: l10n.quranReaderListenAyahOption,
+            onTap: onPlay,
+          ),
         ],
       ),
     );
@@ -1528,6 +1553,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
       decoration: const BoxDecoration(
@@ -1546,9 +1572,9 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'إعدادات القراءة',
-            style: TextStyle(
+          Text(
+            l10n.quranReaderSettingsTitle,
+            style: const TextStyle(
               fontFamily: 'Amiri',
               fontSize: 22,
               color: _kGold,
@@ -1560,7 +1586,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${_fontSize.toInt()}',
+                localizedNumeral(context, _fontSize.toInt()),
                 style: const TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   color: _kGold,
@@ -1568,9 +1594,9 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Text(
-                'حجم الخط',
-                style: TextStyle(
+              Text(
+                l10n.quranReaderFontSizeLabel,
+                style: const TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   color: Colors.white60,
                   fontSize: 13,
@@ -1609,11 +1635,11 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             ),
           ),
           const SizedBox(height: 20),
-          const Align(
+          Align(
             alignment: Alignment.centerRight,
             child: Text(
-              'نمط الخلفية',
-              style: TextStyle(
+              l10n.quranReaderBackgroundStyleLabel,
+              style: const TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 color: Colors.white60,
                 fontSize: 13,
@@ -1623,10 +1649,10 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           const SizedBox(height: 12),
           Row(
             children: ReaderTheme.values.map((t) {
-              const labels = {
-                'night': 'ليلي',
-                'sepia': 'عاجي',
-                'white': 'فاتح',
+              final labels = {
+                'night': l10n.quranReaderThemeNight,
+                'sepia': l10n.quranReaderThemeSepia,
+                'white': l10n.quranReaderThemeWhite,
               };
               final selected = widget.theme == t;
               return Expanded(

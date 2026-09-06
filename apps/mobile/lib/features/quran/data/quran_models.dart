@@ -1,6 +1,8 @@
 
 enum ReaderMode { reading, tahajjud, tafseer, translation }
 
+enum KhatmaType { muyassara, multazima }
+
 enum ReaderTheme { night, sepia, white }
 
 // ─── Reading State ───────────────────────────────────────────
@@ -111,6 +113,103 @@ class QuranBookmark {
     savedAt: j['savedAt'] != null
         ? DateTime.tryParse(j['savedAt'].toString())
         : null,
+  );
+}
+
+// ─── Khatma (extended) session ─────────────────────────────────
+class KhatmaSessionEx {
+  final String id;
+  final String label;
+  final KhatmaType type;
+  final DateTime startDate;
+  final DateTime? endDate; // target end date for multazima
+  final DateTime? completedDate;
+  final DateTime? cancelledDate;
+  final int startPage;
+  final int currentPage;
+  final int pagesRead;
+  final bool notificationsEnabled;
+  final int? dailyPages; // for multazima
+  static const int totalPages = 604;
+
+  const KhatmaSessionEx({
+    required this.id,
+    required this.label,
+    required this.type,
+    required this.startDate,
+    this.endDate,
+    this.completedDate,
+    this.cancelledDate,
+    this.startPage = 1,
+    this.currentPage = 1,
+    this.pagesRead = 0,
+    this.notificationsEnabled = false,
+    this.dailyPages,
+  });
+
+  double get progress => pagesRead / totalPages;
+  bool get isCompleted => completedDate != null || pagesRead >= totalPages;
+  bool get isCancelled => cancelledDate != null;
+  bool get isActive => !isCompleted && !isCancelled;
+
+  KhatmaSessionEx copyWith({
+    int? currentPage,
+    int? pagesRead,
+    DateTime? completedDate,
+    DateTime? cancelledDate,
+    String? label,
+  }) => KhatmaSessionEx(
+    id: id,
+    label: label ?? this.label,
+    type: type,
+    startDate: startDate,
+    endDate: endDate,
+    completedDate: completedDate ?? this.completedDate,
+    cancelledDate: cancelledDate ?? this.cancelledDate,
+    startPage: startPage,
+    currentPage: currentPage ?? this.currentPage,
+    pagesRead: pagesRead ?? this.pagesRead,
+    notificationsEnabled: notificationsEnabled,
+    dailyPages: dailyPages,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'label': label,
+    'type': type.name,
+    'startDate': startDate.toIso8601String(),
+    'endDate': endDate?.toIso8601String(),
+    'completedDate': completedDate?.toIso8601String(),
+    'cancelledDate': cancelledDate?.toIso8601String(),
+    'startPage': startPage,
+    'currentPage': currentPage,
+    'pagesRead': pagesRead,
+    'notificationsEnabled': notificationsEnabled,
+    'dailyPages': dailyPages,
+  };
+
+  factory KhatmaSessionEx.fromJson(Map<String, dynamic> j) => KhatmaSessionEx(
+    id: j['id'] as String,
+    label: j['label'] as String? ?? 'ختمة',
+    type: KhatmaType.values.firstWhere(
+      (t) => t.name == j['type'],
+      orElse: () => KhatmaType.muyassara,
+    ),
+    startDate: DateTime.parse(j['startDate'].toString()),
+    endDate: j['endDate'] != null
+        ? DateTime.tryParse(j['endDate'].toString())
+        : null,
+    completedDate: j['completedDate'] != null
+        ? DateTime.tryParse(j['completedDate'].toString())
+        : null,
+    cancelledDate: j['cancelledDate'] != null
+        ? DateTime.tryParse(j['cancelledDate'].toString())
+        : null,
+    startPage: j['startPage'] as int? ?? 1,
+    currentPage: j['currentPage'] as int? ?? 1,
+    pagesRead: j['pagesRead'] as int? ?? 0,
+    notificationsEnabled: j['notificationsEnabled'] as bool? ?? false,
+    dailyPages: j['dailyPages'] as int?,
   );
 }
 

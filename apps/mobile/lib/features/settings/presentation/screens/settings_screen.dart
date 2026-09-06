@@ -86,7 +86,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const SizedBox(height: 8),
-
                       prefsAsync.when(
                         loading: () => const Center(
                           child: Padding(
@@ -342,8 +341,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             Text(
                               l10n.settingsBismillah,
-                              style: TextStyle(
-                                fontFamily: 'Amiri',
+                              style: context.typography.quranicVerse.copyWith(
                                 fontSize: 14,
                                 color: context.colors.gold,
                               ),
@@ -351,8 +349,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             const SizedBox(height: 4),
                             Text(
                               l10n.settingsAppVersionLabel,
-                              style: TextStyle(
-                                fontFamily: 'NotoNaskhArabic',
+                              style: context.typography.caption.copyWith(
                                 fontSize: 11,
                                 color: context.colors.textDim,
                               ),
@@ -396,8 +393,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: 14),
             Text(
               l10n.settingsTestNotifSheetTitle,
-              style: TextStyle(
-                fontFamily: 'Amiri',
+              style: context.typography.headingMedium.copyWith(
                 fontSize: 18,
                 color: context.colors.gold,
               ),
@@ -452,16 +448,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         title: Text(
           l10n.settingsResetTitle,
-          style: TextStyle(
-            fontFamily: 'Amiri',
+          style: context.typography.headingMedium.copyWith(
             fontSize: 18,
             color: context.colors.danger,
           ),
         ),
         content: Text(
           l10n.settingsResetConfirm,
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
+          style: context.typography.bodyMedium.copyWith(
             fontSize: 13,
             color: context.colors.textSecondary,
           ),
@@ -471,8 +465,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               l10n.commonCancel,
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              style: context.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: context.colors.textSecondary,
               ),
@@ -482,8 +475,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               l10n.commonDelete,
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              style: context.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: context.colors.danger,
               ),
@@ -507,16 +499,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
         title: Text(
           l10n.settingsLogoutLabel,
-          style: TextStyle(
-            fontFamily: 'Amiri',
+          style: context.typography.headingMedium.copyWith(
             fontSize: 18,
             color: context.colors.danger,
           ),
         ),
         content: Text(
           l10n.settingsLogoutConfirm,
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
+          style: context.typography.bodyMedium.copyWith(
             fontSize: 13,
             color: context.colors.textSecondary,
           ),
@@ -526,8 +516,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               l10n.commonCancel,
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              style: context.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: context.colors.textSecondary,
               ),
@@ -537,8 +526,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(context, true),
             child: Text(
               l10n.settingsLogoutConfirmButton,
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              style: context.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: context.colors.danger,
               ),

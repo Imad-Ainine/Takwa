@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutMeScreen extends StatelessWidget {
@@ -11,6 +11,8 @@ class AboutMeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -21,7 +23,7 @@ class AboutMeScreen extends StatelessWidget {
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _buildAppBar(context),
+              _buildAppBar(context, l),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -31,33 +33,33 @@ class AboutMeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildProfileHeader(context),
+                      _buildProfileHeader(context, l),
                       const SizedBox(height: 24),
                       _buildSectionTitle(
                         context,
-                        'عن المطور',
-                        'About Developer',
+                        l.aboutSectionDeveloper,
+                        l.aboutSectionDeveloper,
                       ),
                       const SizedBox(height: 12),
-                      _buildBioCard(context),
+                      _buildBioCard(context, l),
                       const SizedBox(height: 24),
                       _buildSectionTitle(
                         context,
-                        'المهارات التقنية',
-                        'Technical Skills',
+                        l.aboutSectionSkills,
+                        l.aboutSectionSkills,
                       ),
                       const SizedBox(height: 12),
                       _buildSkillsGrid(context),
                       const SizedBox(height: 24),
                       _buildSectionTitle(
                         context,
-                        'تواصل معي',
-                        'Connect With Me',
+                        l.aboutSectionConnect,
+                        l.aboutSectionConnect,
                       ),
                       const SizedBox(height: 12),
                       _buildSocialLinks(context),
                       const SizedBox(height: 40),
-                      _buildFooter(context),
+                      _buildFooter(context, l),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -70,14 +72,14 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, AppLocalizations l) {
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
       leading: const CustomLeadingButton(),
       title: Text(
-        'عن المطور',
+        l.aboutScreenTitle,
         style: context.typography.headingMedium.copyWith(
           color: context.colors.gold,
         ),
@@ -86,7 +88,7 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, AppLocalizations l) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -113,19 +115,17 @@ class AboutMeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           // Arabic Name
           Text(
-            'عماد الدين عينين',
-            style: TextStyle(
-              fontFamily: 'Amiri',
+            l.aboutDevNameArabic,
+            style: context.typography.headingLarge.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: context.colors.textPrimary,
             ),
           ),
-          // English Name
+          // Latin Name
           Text(
-            'Imadeddine Ainine',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
+            l.aboutDevNameLatin,
+            style: context.typography.headingMedium.copyWith(
               fontSize: 18,
               color: context.colors.goldLight,
               letterSpacing: 0.5,
@@ -134,7 +134,7 @@ class AboutMeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           // Badge
-          const TaqwaBadge(label: 'Fullstack Developer'),
+          TaqwaBadge(label: l.aboutDevBadge),
         ],
       ),
     );
@@ -142,22 +142,21 @@ class AboutMeScreen extends StatelessWidget {
 
   Widget _buildSectionTitle(
     BuildContext context,
-    String arabic,
-    String english,
+    String primary,
+    String secondary,
   ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          arabic,
+          primary,
           style: context.typography.headingMedium.copyWith(
             color: context.colors.teal,
           ),
         ),
         Text(
-          english,
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
+          secondary,
+          style: context.typography.caption.copyWith(
             fontSize: 12,
             color: context.colors.textDim,
             fontWeight: FontWeight.w500,
@@ -167,14 +166,14 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBioCard(BuildContext context) {
+  Widget _buildBioCard(BuildContext context, AppLocalizations l) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
       child: Text(
-        'مطور برمجيات شغوف ببناء تطبيقات الهاتف والمواقع الإلكترونية بأحدث التقنيات. أهتم بجودة الكود وتجربة المستخدم، وأسعى دوماً لتقديم حلول تقنية مبتكرة تخدم المجتمع المسلم.',
+        l.aboutBio,
         style: context.typography.bodyMedium.copyWith(height: 1.8),
         textAlign: TextAlign.justify,
       ),
@@ -182,7 +181,7 @@ class AboutMeScreen extends StatelessWidget {
   }
 
   Widget _buildSkillsGrid(BuildContext context) {
-    final skills = [
+    const skills = [
       'Flutter',
       'Dart',
       'Node.js',
@@ -285,7 +284,6 @@ class AboutMeScreen extends StatelessWidget {
           if (url != null) {
             final uri = Uri.parse(url);
             try {
-              // Try launching directly as canLaunchUrl can be unreliable on some devices/versions
               final launched = await launchUrl(
                 uri,
                 mode: LaunchMode.externalApplication,
@@ -312,21 +310,21 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
+  Widget _buildFooter(BuildContext context, AppLocalizations l) {
     return Center(
       child: Column(
         children: [
           Container(height: 1, width: 80, color: context.colors.border),
           const SizedBox(height: 20),
           Text(
-            'ادعوا لي من خالص دعائكم',
+            l.aboutFooterDuaRequest,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.gold,
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            'صنع بكل حب للأمة الإسلامية',
+            l.aboutFooterMadeWithLove,
             style: context.typography.caption.copyWith(
               color: context.colors.textDim,
             ),
@@ -338,9 +336,8 @@ class AboutMeScreen extends StatelessWidget {
               const Text('❤️', style: TextStyle(fontSize: 12)),
               const SizedBox(width: 6),
               Text(
-                '© 2026 - Imadeddine Ainine',
-                style: TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
+                l.aboutFooterCopyright,
+                style: context.typography.caption.copyWith(
                   fontSize: 11,
                   color: context.colors.textDim,
                 ),

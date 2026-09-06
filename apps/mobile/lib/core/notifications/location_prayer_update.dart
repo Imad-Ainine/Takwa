@@ -12,6 +12,7 @@ import '../providers/database_providers.dart';
 import 'notifications_service.dart';
 import '../utils/timezone_resolver.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class LocationPrayerManager {
   static bool _scheduled = false;
@@ -83,7 +84,9 @@ class LocationPrayerManager {
       TimezoneResolver.setLocalTimezone(tzName);
 
       // حل اسم المدينة (Reverse Geocoding)
-      String cityName = 'غير محدد';
+      String cityName = lookupAppLocalizations(
+        const Locale('ar'),
+      ).overlayServiceUnknownCity;
       try {
         final placemarks = await placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
@@ -275,26 +278,17 @@ class PrayerTimesWithTimezone {
     return p;
   }
 
-  /// تنسيق الوقت بالـ timezone المحلي
-  static String formatLocalTime(DateTime dt) {
-    final local = tz.TZDateTime.from(dt, tz.local);
-    final h = local.hour % 12 == 0 ? 12 : local.hour % 12;
-    final m = local.minute.toString().padLeft(2, '0');
-    final ampm = local.hour < 12 ? 'ص' : 'م';
-    return '$h:$m $ampm';
-  }
-
-  /// اسم الـ timezone بالعربي
-  static String timezoneDisplayName(String tzName) {
-    const map = {
-      'Africa/Algiers': 'الجزائر (UTC+1)',
-      'Africa/Tunis': 'تونس (UTC+1)',
-      'Africa/Cairo': 'مصر (UTC+2)',
-      'Asia/Riyadh': 'الرياض (UTC+3)',
-      'Asia/Dubai': 'دبي (UTC+4)',
-      'Asia/Kuwait': 'الكويت (UTC+3)',
-      'Asia/Beirut': 'بيروت (UTC+3)',
-      'Asia/Jerusalem': 'القدس (UTC+3)',
+  /// اسم الـ timezone المترجم لواجهة المستخدم
+  static String timezoneDisplayName(AppLocalizations l10n, String tzName) {
+    final map = {
+      'Africa/Algiers': l10n.timezoneAlgiers,
+      'Africa/Tunis': l10n.timezoneTunis,
+      'Africa/Cairo': l10n.timezoneEgypt,
+      'Asia/Riyadh': l10n.timezoneRiyadh,
+      'Asia/Dubai': l10n.timezoneDubai,
+      'Asia/Kuwait': l10n.timezoneKuwait,
+      'Asia/Beirut': l10n.timezoneBeirut,
+      'Asia/Jerusalem': l10n.timezoneJerusalem,
     };
     return map[tzName] ?? tzName;
   }
@@ -307,13 +301,13 @@ enum LocationResult {
   permissionDeniedForever,
   error;
 
-  String get messageAr => switch (this) {
-    LocationResult.success => 'تم تحديث الموقع بنجاح ✓',
-    LocationResult.serviceDisabled => 'GPS غير مفعّل، يرجى تفعيله',
-    LocationResult.permissionDenied => 'تم رفض إذن الموقع',
+  String message(AppLocalizations l10n) => switch (this) {
+    LocationResult.success => l10n.locationResultSuccess,
+    LocationResult.serviceDisabled => l10n.locationResultServiceDisabled,
+    LocationResult.permissionDenied => l10n.locationResultPermissionDenied,
     LocationResult.permissionDeniedForever =>
-      'يرجى تفعيل إذن الموقع من الإعدادات',
-    LocationResult.error => 'خطأ في تحديد الموقع',
+      l10n.locationResultPermissionDeniedForever,
+    LocationResult.error => l10n.locationResultError,
   };
 
   bool get isSuccess => this == LocationResult.success;
@@ -330,19 +324,24 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
   bool _loading = false;
   String? _lastCity;
   String? _lastTimezone;
+  bool _loadedOnce = false;
 
   @override
-  void initState() {
-    super.initState();
-    _loadSaved();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_loadedOnce) {
+      _loadedOnce = true;
+      _loadSaved();
+    }
   }
 
   Future<void> _loadSaved() async {
     final s = ref.read(settingsDaoProvider);
-    final city = await s.get('cityName') ?? 'غير محدد';
+    final l10n = AppLocalizations.of(context)!;
+    final city = await s.get('cityName') ?? l10n.overlayServiceUnknownCity;
     final tz = await s.get('timezone') ?? '';
     final tzDisplay = tz.isNotEmpty
-        ? PrayerTimesWithTimezone.timezoneDisplayName(tz)
+        ? PrayerTimesWithTimezone.timezoneDisplayName(l10n, tz)
         : null;
 
     if (mounted) {
@@ -359,18 +358,19 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
     setState(() => _loading = false);
 
     if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          result.messageAr,
+          result.message(l10n),
           style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
         ),
         action:
             result == LocationResult.serviceDisabled ||
                 result == LocationResult.permissionDeniedForever
             ? SnackBarAction(
-                label: 'تفعيل',
+                label: l10n.locationEnableAction,
                 textColor: Colors.white,
                 onPressed: () {
                   if (result == LocationResult.serviceDisabled) {
@@ -401,6 +401,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: _loading ? null : _update,
       child: Padding(
@@ -434,7 +435,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'تحديث الموقع وأوقات الصلاة',
+                    l10n.locationUpdateTileLabel,
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,

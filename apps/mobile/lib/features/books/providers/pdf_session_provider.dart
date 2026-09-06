@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/book_prefs_repository.dart';
 import '../../../core/supabase/supabase_config.dart';
 import '../../../core/providers/database_providers.dart';
+import 'books_reading_provider.dart' show bookPrefsRepositoryProvider;
 
 // ─────────────────────────────────────────
 //  STATE MODEL
@@ -63,7 +64,7 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
   Timer? _autoSave;
   String? _currentBookId;
 
-  static String _prefKey(String bookId) => 'pdf_session_$bookId';
+  BookPrefsRepository get _repo => _ref.read(bookPrefsRepositoryProvider);
 
   // ── lifecycle ────────────────────────────
 
@@ -72,12 +73,12 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
     _currentBookId = bookId;
 
     // 1. Load local cache first (instant)
-    final prefs = await SharedPreferences.getInstance();
+    final cached = _repo.getPdfSession(bookId);
     if (!mounted) return;
 
-    final page = prefs.getInt('${_prefKey(bookId)}_page') ?? 1;
-    final total = prefs.getInt('${_prefKey(bookId)}_total') ?? 0;
-    final secs = prefs.getInt('${_prefKey(bookId)}_secs') ?? 0;
+    final page = cached.page;
+    final total = cached.total;
+    final secs = cached.secs;
 
     state = state.copyWith(
       currentPage: page,
@@ -178,11 +179,8 @@ class PdfSessionNotifier extends StateNotifier<PdfSessionState> {
 
   // ── helpers ──────────────────────────────
 
-  Future<void> _saveLocal(String bookId, int page, int total, int secs) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('${_prefKey(bookId)}_page', page);
-    await prefs.setInt('${_prefKey(bookId)}_total', total);
-    await prefs.setInt('${_prefKey(bookId)}_secs', secs);
+  Future<void> _saveLocal(String bookId, int page, int total, int secs) {
+    return _repo.setPdfSession(bookId, page: page, total: total, secs: secs);
   }
 
   @override

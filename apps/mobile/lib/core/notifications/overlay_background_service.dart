@@ -16,6 +16,12 @@ import '../utils/timezone_resolver.dart';
 import '../providers/adhkar_providers.dart';
 import '../../features/duas/data/duas_data.dart';
 import 'notifications_service.dart';
+import 'package:takwa/l10n/app_localizations.dart';
+
+// This background isolate (spawned by flutter_foreground_task) doesn't share
+// the main isolate's Riverpod/locale state, so chrome strings below use a
+// fixed-locale lookup rather than trying to follow the live app locale.
+final AppLocalizations _l10n = lookupAppLocalizations(const Locale('ar'));
 
 // ─────────────────────────────────────────
 //  SHARED PREFS KEYS
@@ -77,7 +83,7 @@ class OverlayBackgroundService {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: _channelId,
         channelName: _channelName,
-        channelDescription: 'يُبقي خدمة الأذان والأذكار نشطة',
+        channelDescription: _l10n.overlayServiceChannelDesc,
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         enableVibration: false,
@@ -101,14 +107,17 @@ class OverlayBackgroundService {
     if (perm != NotificationPermission.granted) return;
 
     final prefs = await SharedPreferences.getInstance();
-    final cityName = prefs.getString(_kCityNameKey) ?? 'الجزائر';
+    final cityName = prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
 
     await FlutterForegroundTask.startService(
-      notificationTitle: '$cityName | تقوى 🌙',
-      notificationText: 'جاري تحميل أوقات الصلاة...',
+      notificationTitle: '$cityName | ${_l10n.appName} 🌙',
+      notificationText: _l10n.overlayServiceLoadingPrayerTimes,
       notificationButtons: [
-        const NotificationButton(id: 'open_app', text: 'افتح تقوى'),
-        const NotificationButton(id: 'update_location', text: 'تحديث الموقع'),
+        NotificationButton(id: 'open_app', text: _l10n.overlayServiceOpenAppButton),
+        NotificationButton(
+          id: 'update_location',
+          text: _l10n.overlayServiceUpdateLocationButton,
+        ),
       ],
       callback: startCallback,
     );
@@ -217,7 +226,7 @@ class _OverlayTaskHandler extends TaskHandler {
   }
 
   @override
-  Future<void> onDestroy(DateTime timestamp) async {}
+  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {}
 
   @override
   void onReceiveData(Object data) {
@@ -245,8 +254,8 @@ class _OverlayTaskHandler extends TaskHandler {
       FlutterForegroundTask.launchApp();
     } else if (id == 'update_location') {
       await FlutterForegroundTask.updateService(
-        notificationTitle: 'تقوى',
-        notificationText: '🔄 جاري تحديث الموقع...',
+        notificationTitle: _l10n.appName,
+        notificationText: _l10n.overlayServiceUpdatingLocation,
       );
       await _handleLocationUpdate();
     }
@@ -317,7 +326,7 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _updateForegroundNotification() async {
     final now = DateTime.now();
     final prefs = await SharedPreferences.getInstance();
-    final city = prefs.getString(_kCityNameKey) ?? 'الجزائر';
+    final city = prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceDefaultCity;
     final hijri = HijriCalendar.now();
     final hStr = '${hijri.hDay} ${_hijriMonthAr(hijri.hMonth)} ${hijri.hYear}';
 
@@ -335,8 +344,11 @@ class _OverlayTaskHandler extends TaskHandler {
       notificationTitle: '$city  |  $hStr',
       notificationText: text,
       notificationButtons: [
-        const NotificationButton(id: 'open_app', text: 'افتح تقوى'),
-        const NotificationButton(id: 'update_location', text: 'تحديث الموقع'),
+        NotificationButton(id: 'open_app', text: _l10n.overlayServiceOpenAppButton),
+        NotificationButton(
+          id: 'update_location',
+          text: _l10n.overlayServiceUpdateLocationButton,
+        ),
       ],
     );
   }
@@ -381,8 +393,10 @@ class _OverlayTaskHandler extends TaskHandler {
         if (hasOverlayPerm) {
           await ow.FlutterOverlayWindow.showOverlay(
             enableDrag: true,
-            overlayTitle: 'وقت الصلاة',
-            overlayContent: 'حان الآن موعد أذان ${prayer.nameAr}',
+            overlayTitle: _l10n.overlayServicePrayerTimeOverlayTitle,
+            overlayContent: _l10n.overlayServicePrayerTimeOverlayContent(
+              prayer.nameAr,
+            ),
             flag: ow.OverlayFlag.defaultFlag,
             alignment: ow.OverlayAlignment.center,
             visibility: ow.NotificationVisibility.visibilityPublic,
@@ -463,8 +477,12 @@ class _OverlayTaskHandler extends TaskHandler {
 
       await ow.FlutterOverlayWindow.showOverlay(
         enableDrag: true,
-        overlayTitle: showType == 'dua' ? 'دعاء من تقوى' : 'أذكار تقوى',
-        overlayContent: showType == 'dua' ? 'دعاء' : 'ذكر',
+        overlayTitle: showType == 'dua'
+            ? _l10n.overlayServiceDuaOverlayTitle
+            : _l10n.overlayServiceAdhkarOverlayTitle,
+        overlayContent: showType == 'dua'
+            ? _l10n.overlayServiceDuaOverlayContent
+            : _l10n.overlayServiceAdhkarOverlayContent,
         flag: ow.OverlayFlag.defaultFlag,
         alignment: ow.OverlayAlignment.topCenter,
         visibility: ow.NotificationVisibility.visibilityPublic,
@@ -714,7 +732,7 @@ class _OverlayTaskHandler extends TaskHandler {
       final lng = pos.longitude;
       final tzName = TimezoneResolver.resolveFromCoordinates(lat, lng);
 
-      String cityName = 'غير محدد';
+      String cityName = _l10n.overlayServiceUnknownCity;
       try {
         final placemarks = await placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {

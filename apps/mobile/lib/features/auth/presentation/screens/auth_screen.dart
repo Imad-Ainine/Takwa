@@ -15,6 +15,7 @@ import '../../../../core/supabase/supabase_config.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/auth_field.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -84,8 +85,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   // ── Actions ──────────────────────────────────────────
   Future<void> _signIn() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
-      setState(() => _error = 'أدخل البريد وكلمة المرور');
+      setState(() => _error = l10n.authEnterEmailPassword);
       return;
     }
     setState(() {
@@ -100,21 +102,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       await _syncGender();
       if (mounted) Navigator.pushReplacementNamed(context, '/');
     } on AuthException catch (e) {
-      if (mounted) setState(() => _error = _authError(e.message));
+      if (mounted) setState(() => _error = _authError(l10n, e.message));
     } catch (_) {
-      if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
+      if (mounted) setState(() => _error = l10n.authUnexpectedError);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _signUp() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_userCtrl.text.trim().isEmpty) {
-      setState(() => _error = 'أدخل اسم المستخدم');
+      setState(() => _error = l10n.authEnterUsername);
       return;
     }
     if (_emailCtrl.text.trim().isEmpty || _passCtrl.text.isEmpty) {
-      setState(() => _error = 'أدخل البريد وكلمة المرور');
+      setState(() => _error = l10n.authEnterEmailPassword);
       return;
     }
     setState(() {
@@ -136,15 +139,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         );
       }
     } on AuthException catch (e) {
-      if (mounted) setState(() => _error = _authError(e.message));
+      if (mounted) setState(() => _error = _authError(l10n, e.message));
     } catch (_) {
-      if (mounted) setState(() => _error = 'حدث خطأ غير متوقع');
+      if (mounted) setState(() => _error = l10n.authUnexpectedError);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
   Future<void> _signInGoogle() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _loading = true;
       _error = null;
@@ -161,18 +165,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       if (errStr.contains('ApiException: 10') ||
           errStr.contains('DEVELOPER_ERROR')) {
         if (mounted) {
-          setState(
-            () => _error =
-                'إعدادات Google غير مكتملة: تأكد من إضافة بصمة SHA-1 ومعرف الويب في Google Cloud Console.',
-          );
+          setState(() => _error = l10n.authGoogleConfigIncomplete);
         }
       } else if (errStr.contains('network') ||
           errStr.contains('SocketException')) {
         if (mounted) {
-          setState(
-            () =>
-                _error = 'تعذر الاتصال بخوادم Google، تحقق من اتصالك بالإنترنت',
-          );
+          setState(() => _error = l10n.authGoogleNetworkError);
         }
       } else if (errStr.contains('canceled') ||
           errStr.contains('cancelled') ||
@@ -180,9 +178,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         // Canceled by user - do not display error
       } else {
         if (mounted) {
-          setState(
-            () => _error = 'تعذر تسجيل الدخول عبر Google، يرجى المحاولة لاحقاً',
-          );
+          setState(() => _error = l10n.authGoogleGenericError);
         }
       }
     } finally {
@@ -198,35 +194,35 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  String _authError(String msg) {
+  String _authError(AppLocalizations l10n, String msg) {
     final lower = msg.toLowerCase();
     if (lower.contains('invalid login') ||
         lower.contains('invalid credentials') ||
         lower.contains('invalid_grant')) {
-      return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+      return l10n.authErrorInvalidCredentials;
     }
     if (lower.contains('email not confirmed')) {
-      return 'يرجى تأكيد بريدك الإلكتروني عبر الرابط المرسل إليك أولاً';
+      return l10n.authErrorEmailNotConfirmed;
     }
     if (lower.contains('already registered') ||
         lower.contains('user already exists')) {
-      return 'هذا البريد الإلكتروني مسجل مسبقاً، يرجى تسجيل الدخول';
+      return l10n.authErrorEmailAlreadyRegistered;
     }
     if (lower.contains('unique constraint') || lower.contains('username')) {
-      return 'اسم المستخدم مستخدم بالفعل، اختر اسماً آخر';
+      return l10n.authErrorUsernameTaken;
     }
     if (lower.contains('password should')) {
-      return 'كلمة المرور يجب أن تتكون من 6 خانات على الأقل';
+      return l10n.authErrorPasswordTooShort;
     }
     if (lower.contains('rate limit') || lower.contains('too many requests')) {
-      return 'تجاوزت عدد المحاولات المسموح بها، يرجى الانتظار قليلاً';
+      return l10n.authErrorRateLimit;
     }
     if (lower.contains('network') ||
         lower.contains('socket') ||
         lower.contains('connection')) {
-      return 'فشل الاتصال، تحقق من اتصالك بالإنترنت';
+      return l10n.authErrorNetwork;
     }
-    return 'حدث خطأ في عملية التسجيل، يرجى المحاولة لاحقاً';
+    return l10n.authErrorGeneric;
   }
 
   // ── Build ─────────────────────────────────────────────

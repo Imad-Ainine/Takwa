@@ -8,6 +8,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 import 'package:takwa/core/notifications/notifications_service.dart';
@@ -18,6 +19,7 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/shared_preferences_provider.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
@@ -40,7 +42,12 @@ void overlayMain() {
     ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
+        // The overlay only ever renders Arabic religious content (adhan/
+        // adhkar strings are Arabic literals regardless of the app's UI
+        // language — see AdhkarCategory data), so it doesn't need to read
+        // the user's locale setting here; fixed Arabic keeps this isolate
+        // simple and matches what it actually displays.
+        theme: AppTheme.dark(const Locale('ar')),
         home: const UnifiedOverlayWindow(),
       ),
     ),
@@ -55,38 +62,82 @@ void notificationTapBackground(NotificationResponse response) {
 // ─────────────────────────────────────────
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  await initializeDateFormatting('ar', null);
-  await initializeDateFormatting('en', null);
-  await SupabaseConfig.initialize();
-  AdhanForegroundService.initForegroundTask();
-  // try {
-  //   await FlutterWindowManagerPlus.addFlags(
-  //     FlutterWindowManagerPlus.FLAG_SECURE,
-  //   );
-  // } catch (e) {
-  //   debugPrint('WindowManager Error: $e');
-  // }
 
-  OverlayBackgroundService.init();
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('dotenv.load error: $e');
+  }
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF0A0E1A),
-      systemNavigationBarIconBrightness: Brightness.light,
+  try {
+    await initializeDateFormatting('ar', null);
+    await initializeDateFormatting('en', null);
+  } catch (e) {
+    debugPrint('DateFormatting error: $e');
+  }
+
+  try {
+    await SupabaseConfig.initialize();
+  } catch (e) {
+    debugPrint('Supabase initialize error: $e');
+  }
+
+  SharedPreferences? prefs;
+  try {
+    prefs = await SharedPreferences.getInstance();
+  } catch (e) {
+    debugPrint('SharedPreferences initialize error: $e');
+  }
+
+  try {
+    AdhanForegroundService.initForegroundTask();
+  } catch (e) {
+    debugPrint('AdhanForegroundService error: $e');
+  }
+
+  try {
+    OverlayBackgroundService.init();
+  } catch (e) {
+    debugPrint('OverlayBackgroundService error: $e');
+  }
+
+  try {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: Color(0xFF0A0E1A),
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
+  } catch (e) {
+    debugPrint('SystemChrome error: $e');
+  }
+
+  try {
+    await NotificationsService.initialize();
+  } catch (e) {
+    debugPrint('NotificationsService initialize error: $e');
+  }
+
+  try {
+    await QuranLibrary.init();
+  } catch (e) {
+    debugPrint('QuranLibrary init error: $e');
+  }
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        if (prefs != null) sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const TakwaApp(),
     ),
   );
-
-  await NotificationsService.initialize();
-  await QuranLibrary.init();
-
-  runApp(const ProviderScope(child: TakwaApp()));
 }
 
 // ─────────────────────────────────────────
@@ -109,18 +160,22 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
   }
 
   void _setupAuthListener() {
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      final event = data.event;
-      if (event == AuthChangeEvent.passwordRecovery) {
-        debugPrint('Auth: Password Recovery mode detected');
-        NotificationRouter.navigatorKey.currentState?.pushNamed(
-          Routes.updatePassword,
-        );
-      } else if (event == AuthChangeEvent.signedIn) {
-        debugPrint('Auth: User signed in. Triggering fullSync...');
-        ref.read(syncManagerProvider).fullSync();
-      }
-    });
+    try {
+      Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        final event = data.event;
+        if (event == AuthChangeEvent.passwordRecovery) {
+          debugPrint('Auth: Password Recovery mode detected');
+          NotificationRouter.navigatorKey.currentState?.pushNamed(
+            Routes.updatePassword,
+          );
+        } else if (event == AuthChangeEvent.signedIn) {
+          debugPrint('Auth: User signed in. Triggering fullSync...');
+          ref.read(syncManagerProvider).fullSync();
+        }
+      });
+    } catch (e) {
+      debugPrint('Auth listener setup error: $e');
+    }
   }
 
   @override
@@ -166,6 +221,11 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    // Driven by the language switcher in Settings (persisted via
+    // localeProvider); defaults to Arabic, matching today's behavior. Also
+    // picks the theme's font — Amiri/NotoNaskhArabic for Arabic (unchanged),
+    // Poppins for English — see appFontFamily()/appBodyFontFamily().
+    final locale = ref.watch(localeProvider);
 
     return WithForegroundTask(
       child: MaterialApp(
@@ -173,11 +233,11 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
         debugShowCheckedModeBanner: false,
         navigatorKey: NotificationRouter.navigatorKey,
         themeMode: ref.watch(themeModeProvider),
-        theme: isRamadan ? RamadanTheme.light : AppTheme.light,
-        darkTheme: isRamadan ? RamadanTheme.dark : AppTheme.dark,
-        // Driven by the language switcher in Settings (persisted via
-        // localeProvider); defaults to Arabic, matching today's behavior.
-        locale: ref.watch(localeProvider),
+        theme: isRamadan ? RamadanTheme.light(locale) : AppTheme.light(locale),
+        darkTheme: isRamadan
+            ? RamadanTheme.dark(locale)
+            : AppTheme.dark(locale),
+        locale: locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

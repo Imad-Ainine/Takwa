@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 import '../theme/app_theme.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
@@ -17,6 +17,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefsAsync = ref.watch(userPreferencesProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return prefsAsync.when(
       loading: () => const SizedBox(
@@ -27,14 +28,14 @@ class OverlayNotificationSettings extends ConsumerWidget {
       data: (prefs) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(title: 'الأذكار والإشعارات', icon: '📿'),
+          SectionHeader(title: l10n.overlaySettingsSectionTitle, icon: '📿'),
           SettingsCard(
             children: [
               // ── شاشة الأذان التلقائية ──
               ToggleSetting(
                 icon: '🕌',
-                label: 'شاشة الأذان التلقائية',
-                sublabel: 'يُظهر شاشة الأذان عند دخول وقت الصلاة',
+                label: l10n.overlaySettingAdhanScreenLabel,
+                sublabel: l10n.overlaySettingAdhanScreenSublabel,
                 value: prefs.adhanScreenEnabled,
                 onChanged: (v) => ref
                     .read(userPreferencesProvider.notifier)
@@ -45,8 +46,8 @@ class OverlayNotificationSettings extends ConsumerWidget {
               // ── صوت الأذان ──
               ToggleSetting(
                 icon: '🔊',
-                label: 'صوت الأذان',
-                sublabel: 'تشغيل صوت الأذان تلقائياً عند دخول الوقت',
+                label: l10n.overlaySettingAdhanSoundLabel,
+                sublabel: l10n.overlaySettingAdhanSoundSublabel,
                 value: prefs.adhanSoundEnabled,
                 onChanged: (v) {
                   ref
@@ -60,8 +61,8 @@ class OverlayNotificationSettings extends ConsumerWidget {
               // ── نوافذ الأذكار المنبثقة ──
               ToggleSetting(
                 icon: '📿',
-                label: 'نوافذ الأذكار والأدعية',
-                sublabel: 'يُظهر أذكاراً وأدعيةً بشكل منبثق على الشاشة',
+                label: l10n.overlaySettingPopupsLabel,
+                sublabel: l10n.overlaySettingPopupsSublabel,
                 value: prefs.overlayEnabled,
                 onChanged: (v) {
                   ref
@@ -116,7 +117,9 @@ class OverlayNotificationSettings extends ConsumerWidget {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'ستظهر النوافذ ~${(1440 / prefs.popupIntervalMins).floor()} مرة يومياً',
+                                l10n.overlaySettingDailyCount(
+                                  (1440 / prefs.popupIntervalMins).floor(),
+                                ),
                                 style: context.typography.caption.copyWith(
                                   color: context.colors.teal,
                                   fontSize: 11,
@@ -140,7 +143,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────
-//  SHARED CHILD WIDGETS (unchanged)
+//  SHARED CHILD WIDGETS
 // ─────────────────────────────────────────
 
 class _IntervalSelector extends StatelessWidget {
@@ -149,17 +152,20 @@ class _IntervalSelector extends StatelessWidget {
 
   const _IntervalSelector({required this.value, required this.onChanged});
 
-  static const _options = [
-    (label: 'كل 15 دقيقة (~96/يوم)', mins: 15),
-    (label: 'كل 20 دقيقة (~72/يوم)', mins: 20),
-    (label: 'كل 24 دقيقة (~60/يوم)', mins: 24),
-    (label: 'كل 30 دقيقة (~48/يوم)', mins: 30),
-    (label: 'كل ساعة (~24/يوم)', mins: 60),
-    (label: 'كل ساعتين (~12/يوم)', mins: 120),
+  List<({String label, int mins})> _options(AppLocalizations l10n) => [
+    (label: l10n.overlaySettingInterval15Min, mins: 15),
+    (label: l10n.overlaySettingInterval20Min, mins: 20),
+    (label: l10n.overlaySettingInterval24Min, mins: 24),
+    (label: l10n.overlaySettingInterval30Min, mins: 30),
+    (label: l10n.overlaySettingInterval1Hour, mins: 60),
+    (label: l10n.overlaySettingInterval2Hours, mins: 120),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final options = _options(l10n);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -168,7 +174,7 @@ class _IntervalSelector extends StatelessWidget {
             const Text('⏱️', style: TextStyle(fontSize: 16)),
             const SizedBox(width: 8),
             Text(
-              'معدل ظهور الأذكار',
+              l10n.overlaySettingIntervalHeader,
               style: context.typography.bodySmall.copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -181,7 +187,7 @@ class _IntervalSelector extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _options.map((opt) {
+          children: options.map((opt) {
             final isSelected = opt.mins == value;
             return GestureDetector(
               onTap: () => onChanged(opt.mins),

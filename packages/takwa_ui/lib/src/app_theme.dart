@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -271,83 +270,104 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
     double t,
   ) => this;
 
-  static AppTypographyExtension fromColors(AppColorsExtension colors) {
+  /// [locale] picks the font: Arabic keeps Amiri; English uses Poppins
+  /// paired with Tajawal as fallback so Arabic content renders in clean, modern Tajawal.
+  static AppTypographyExtension fromColors(
+    AppColorsExtension colors, [
+    Locale locale = const Locale('ar'),
+  ]) {
+    final font = appFontFamily(locale);
+    final fallback = appFontFamilyFallback(locale);
     return AppTypographyExtension(
       displayLarge: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 40,
         fontWeight: FontWeight.w700,
         color: colors.gold,
         height: 1.3,
       ),
       displayMedium: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 32,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
         height: 1.4,
       ),
       headingLarge: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 26,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
         height: 1.4,
       ),
       headingMedium: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: colors.textPrimary,
       ),
       bodyLarge: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 20,
         fontWeight: FontWeight.w400,
         color: colors.textPrimary,
         height: 1.8,
       ),
       bodyMedium: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 18,
         fontWeight: FontWeight.w400,
         color: colors.textPrimary,
         height: 1.6,
       ),
       bodySmall: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: colors.textSecondary,
         height: 1.5,
       ),
       labelLarge: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: colors.textPrimary,
       ),
       labelMedium: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: colors.textSecondary,
       ),
       caption: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 13,
         fontWeight: FontWeight.w400,
         color: colors.textDim,
       ),
       quranicVerse: TextStyle(
+        // Qur'anic text stays Amiri regardless of UI language — it's
+        // Arabic content, not UI chrome. Fallback to Tajawal & NotoNaskhArabic.
         fontFamily: 'Amiri',
+        fontFamilyFallback: const ['Tajawal', 'NotoNaskhArabic'],
         fontSize: 24,
         fontWeight: FontWeight.w400,
         color: colors.goldLight,
         height: 2.0,
       ),
       taqwaScore: TextStyle(
-        fontFamily: 'Amiri',
+        fontFamily: font,
+        fontFamilyFallback: fallback,
         fontSize: 34,
         fontWeight: FontWeight.w700,
         color: colors.gold,
@@ -355,6 +375,25 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
     );
   }
 }
+
+/// The UI font for [locale]: Arabic renders in Amiri; every other
+/// locale (English today) uses Poppins. Shared by [AppTypographyExtension],
+/// [RamadanTheme]'s text theme, and [AdaptiveStyle]'s `amiri()`/`naskh()`
+/// helpers so the choice lives in exactly one place.
+String appFontFamily(Locale locale) =>
+    locale.languageCode == 'ar' ? 'Amiri' : 'Poppins';
+
+/// The UI body font for [locale]: Arabic keeps NotoNaskhArabic
+/// (better long-run Arabic body legibility than Amiri); English uses
+/// Poppins, same as [appFontFamily].
+String appBodyFontFamily(Locale locale) =>
+    locale.languageCode == 'ar' ? 'NotoNaskhArabic' : 'Poppins';
+
+/// Fallback fonts: When locale is English, Poppins is paired with Tajawal so that
+/// any Arabic text (Quranic quotes, Dhikr, book titles, untranslated content)
+/// renders in clean, modern Tajawal font instead of harsh system fallbacks.
+List<String> appFontFamilyFallback(Locale locale) =>
+    const ['Tajawal', 'NotoNaskhArabic', 'Amiri'];
 
 // ─────────────────────────────────────────
 //  DECORATIONS & SHADOWS EXTENSIONS
@@ -529,9 +568,12 @@ class AppRadius {
 class AppTheme {
   AppTheme._();
 
-  static ThemeData get dark {
+  /// [locale] defaults to Arabic, matching this app's default UI language
+  /// and keeping every existing no-argument call site (there shouldn't be
+  /// any left, but this is a cheap safety net) behaving exactly as before.
+  static ThemeData dark([Locale locale = const Locale('ar')]) {
     const colors = AppColorsExtension.dark;
-    final typography = AppTypographyExtension.fromColors(colors);
+    final typography = AppTypographyExtension.fromColors(colors, locale);
     final shadows = AppShadowsExtension.fromColors(colors);
     final decorations = AppDecorationsExtension.fromColors(colors, shadows);
 
@@ -541,12 +583,13 @@ class AppTheme {
       typography,
       shadows,
       decorations,
+      locale,
     );
   }
 
-  static ThemeData get light {
+  static ThemeData light([Locale locale = const Locale('ar')]) {
     const colors = AppColorsExtension.light;
-    final typography = AppTypographyExtension.fromColors(colors);
+    final typography = AppTypographyExtension.fromColors(colors, locale);
     final shadows = AppShadowsExtension.fromColors(colors);
     final decorations = AppDecorationsExtension.fromColors(colors, shadows);
 
@@ -556,6 +599,7 @@ class AppTheme {
       typography,
       shadows,
       decorations,
+      locale,
     );
   }
 
@@ -565,10 +609,29 @@ class AppTheme {
     AppTypographyExtension typography,
     AppShadowsExtension shadows,
     AppDecorationsExtension decorations,
+    Locale locale,
   ) {
+    final mainFont = appFontFamily(locale);
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
+      fontFamily: mainFont,
+      textTheme: TextTheme(
+        displayLarge: typography.displayLarge,
+        displayMedium: typography.displayMedium,
+        headlineLarge: typography.headingLarge,
+        headlineMedium: typography.headingMedium,
+        headlineSmall: typography.headingMedium.copyWith(fontSize: 18),
+        titleLarge: typography.headingMedium.copyWith(fontSize: 16),
+        titleMedium: typography.labelLarge,
+        titleSmall: typography.labelMedium,
+        bodyLarge: typography.bodyLarge,
+        bodyMedium: typography.bodyMedium,
+        bodySmall: typography.bodySmall,
+        labelLarge: typography.labelLarge,
+        labelMedium: typography.labelMedium,
+        labelSmall: typography.caption,
+      ),
       extensions: [colors, typography, shadows, decorations],
       colorScheme: ColorScheme(
         brightness: brightness,

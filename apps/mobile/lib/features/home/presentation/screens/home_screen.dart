@@ -11,11 +11,13 @@ import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -100,8 +102,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final style = AdaptiveStyle(context, isRamadan);
 
     final hijri = HijriCalendar.now();
-    final hijriStr = '${hijri.hDay} ${_hMonth(hijri.hMonth)} ${hijri.hYear}';
-    final miladi = DateFormat('EEEE، d MMMM yyyy', 'ar').format(DateTime.now());
+    final hijriStr =
+        '${hijri.hDay} ${_hMonth(context, hijri.hMonth)} ${hijri.hYear}';
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final miladi = DateFormat(
+      languageCode == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy',
+      languageCode,
+    ).format(DateTime.now());
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -259,20 +266,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  static String _hMonth(int m) => const [
-    'محرم',
-    'صفر',
-    'ربيع الأول',
-    'ربيع الآخر',
-    'جمادى الأولى',
-    'جمادى الآخرة',
-    'رجب',
-    'شعبان',
-    'رمضان',
-    'شوال',
-    'ذو القعدة',
-    'ذو الحجة',
-  ][m - 1];
+  static String _hMonth(BuildContext context, int m) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.hijriMuharram,
+      l10n.hijriSafar,
+      l10n.hijriRabiAlAwwal,
+      l10n.hijriRabiAlThani,
+      l10n.hijriJumadaAlAwwal,
+      l10n.hijriJumadaAlThani,
+      l10n.hijriRajab,
+      l10n.hijriShaban,
+      l10n.hijriRamadan,
+      l10n.hijriShawwal,
+      l10n.hijriDhulQadah,
+      l10n.hijriDhulHijjah,
+    ][m - 1];
+  }
 }
 
 // ─────────────────────────────────────────
@@ -291,12 +301,13 @@ class _HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final h = DateTime.now().hour;
     final g = h < 12
-        ? 'صباح الخير 🌅'
+        ? l10n.homeGreetingMorning
         : h < 17
-        ? 'مساء الخير 🌤'
-        : 'مساء النور 🌙';
+        ? l10n.homeGreetingAfternoon
+        : l10n.homeGreetingEvening;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 47, 16, 10),
@@ -388,6 +399,7 @@ class _RamadanBannerState extends State<_RamadanBanner>
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (_, _) => Container(
@@ -421,9 +433,12 @@ class _RamadanBannerState extends State<_RamadanBanner>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('رمضان كريم', style: s.amiri(18, color: s.goldLight)),
                   Text(
-                    'اليوم ${widget.day} من شهر رمضان المبارك',
+                    l10n.homeRamadanBannerTitle,
+                    style: s.amiri(18, color: s.goldLight),
+                  ),
+                  Text(
+                    l10n.homeRamadanBannerSubtitle(widget.day),
                     style: s.naskh(11, color: s.textSec),
                   ),
                 ],
@@ -433,7 +448,7 @@ class _RamadanBannerState extends State<_RamadanBanner>
               children: [
                 Text('${30 - widget.day}', style: s.amiri(22, color: s.gold)),
                 Text(
-                  'يوم\nمتبقي',
+                  l10n.homeRamadanDaysRemaining,
                   style: s.naskh(9, color: s.textSec),
                   textAlign: TextAlign.center,
                 ),
@@ -477,56 +492,21 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
     super.dispose();
   }
 
-  String _getEmoji(String key) {
-    switch (key) {
-      case 'fajr':
-        return '🌙';
-      case 'sunrise':
-        return '🌅';
-      case 'dhuhr':
-        return '🌤';
-      case 'asr':
-        return '🌇';
-      case 'maghrib':
-        return '🌆';
-      case 'isha':
-        return '🌃';
-      default:
-        return '🕌';
-    }
-  }
-
-  String _getArabicName(String key) {
-    switch (key) {
-      case 'fajr':
-        return 'الفجر';
-      case 'sunrise':
-        return 'الشروق';
-      case 'dhuhr':
-        return 'الظهر';
-      case 'asr':
-        return 'العصر';
-      case 'maghrib':
-        return 'المغرب';
-      case 'isha':
-        return 'العشاء';
-      default:
-        return key;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
+    final l10n = AppLocalizations.of(context)!;
     final next = widget.prayerState.next!;
     final diff = widget.prayerState.remaining ?? const Duration();
     String countdown;
     if (diff.isNegative || diff.inSeconds == 0) {
-      countdown = 'حان الوقت الآن';
+      countdown = l10n.homeCountdownNow;
     } else {
       final h = diff.inHours;
       final m = diff.inMinutes % 60;
-      countdown = h > 0 ? 'بعد $hس $mد' : 'بعد $m دقيقة';
+      countdown = h > 0
+          ? l10n.homeCountdownHoursMinutes(h, m)
+          : l10n.homeCountdownMinutesOnly(m);
     }
 
     return AnimatedBuilder(
@@ -574,7 +554,7 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
               ),
               child: Center(
                 child: Text(
-                  _getEmoji(next.name),
+                  prayerEmoji(next.name),
                   style: const TextStyle(fontSize: 24),
                 ),
               ),
@@ -584,8 +564,16 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('الصلاة القادمة', style: s.naskh(10, color: s.textSec)),
-                  Text('صلاة ${_getArabicName(next.name)}', style: s.amiri(19)),
+                  Text(
+                    l10n.homeNextPrayerLabel,
+                    style: s.naskh(10, color: s.textSec),
+                  ),
+                  Text(
+                    l10n.checklistPrayerSheetTitle(
+                      prayerLocalizedName(l10n, next.name),
+                    ),
+                    style: s.amiri(19),
+                  ),
                   Text(
                     DateFormat('HH:mm').format(next.time),
                     style: s.naskh(12, color: s.textSec),
@@ -646,7 +634,10 @@ class _MosquePrayerSection extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8, bottom: 8),
           child: Row(
             children: [
-              Text('أوقات الصلاة', style: style.amiri(15, color: style.gold)),
+              Text(
+                AppLocalizations.of(context)!.homePrayerTimesTitle,
+                style: style.amiri(15, color: style.gold),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Container(height: 1, color: style.gold.withOpacity(0.2)),
@@ -746,48 +737,13 @@ class _MihrabPrayerChip extends StatelessWidget {
     required this.style,
   });
 
-  String _getEmoji(String key) {
-    switch (key) {
-      case 'fajr':
-        return '🌙';
-      case 'sunrise':
-        return '🌅';
-      case 'dhuhr':
-        return '🌤';
-      case 'asr':
-        return '🌇';
-      case 'maghrib':
-        return '🌆';
-      case 'isha':
-        return '🌃';
-      default:
-        return '🕌';
-    }
-  }
-
-  String _getArabicName(String key) {
-    switch (key) {
-      case 'fajr':
-        return 'الفجر';
-      case 'sunrise':
-        return 'الشروق';
-      case 'dhuhr':
-        return 'الظهر';
-      case 'asr':
-        return 'العصر';
-      case 'maghrib':
-        return 'المغرب';
-      case 'isha':
-        return 'العشاء';
-      default:
-        return key;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final emoji = _getEmoji(prayer.name);
-    final name = _getArabicName(prayer.name);
+    final emoji = prayerEmoji(prayer.name);
+    final name = prayerLocalizedName(
+      AppLocalizations.of(context)!,
+      prayer.name,
+    );
     final timeStr = DateFormat('HH:mm').format(prayer.time);
 
     return GestureDetector(
@@ -912,6 +868,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = style;
+    final l10n = AppLocalizations.of(context)!;
     final net = record?.netPoints ?? 0;
     final pct = (net / 100.0).clamp(0.0, 1.0);
 
@@ -926,10 +883,10 @@ class _TaqwaSectionMerged extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_msg(pct), style: s.amiri(15)),
+                Text(_msg(l10n, pct), style: s.amiri(15)),
                 const SizedBox(height: 3),
                 Text(
-                  '${(pct * 10).round()} من ١٠ عبادات',
+                  l10n.homeIbadahProgressLabel((pct * 10).round()),
                   style: s.naskh(11, color: s.textSec),
                 ),
                 const SizedBox(height: 8),
@@ -947,7 +904,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                         border: Border.all(color: s.gold.withOpacity(0.2)),
                       ),
                       child: Text(
-                        _level(net),
+                        _level(l10n, net),
                         style: s.naskh(11, color: s.gold),
                       ),
                     ),
@@ -994,7 +951,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                               const Text('🔥', style: TextStyle(fontSize: 12)),
                               const SizedBox(width: 4),
                               Text(
-                                '$n يوم متواصل',
+                                l10n.homeStreakDaysLabel(n),
                                 style: s.naskh(11, color: s.success),
                               ),
                             ],
@@ -1010,18 +967,18 @@ class _TaqwaSectionMerged extends StatelessWidget {
     );
   }
 
-  String _level(int p) {
-    if (p >= 600) return 'متقي ✨';
-    if (p >= 300) return 'مجاهد ⚔️';
-    if (p >= 100) return 'سالك 🌿';
-    return 'مبتدئ 🌱';
+  String _level(AppLocalizations l10n, int p) {
+    if (p >= 600) return l10n.homeLevelMutaqi;
+    if (p >= 300) return l10n.homeLevelMujahid;
+    if (p >= 100) return l10n.homeLevelSalik;
+    return l10n.homeLevelMubtadi;
   }
 
-  String _msg(double p) {
-    if (p >= .9) return 'ما شاء الله! 🌟';
-    if (p >= .6) return 'أحسنت، استمر 💪';
-    if (p >= .3) return 'بداية جيدة 🌿';
-    return 'بسم الله 🤲';
+  String _msg(AppLocalizations l10n, double p) {
+    if (p >= .9) return l10n.homeProgressMsgComplete;
+    if (p >= .6) return l10n.homeProgressMsgGreat;
+    if (p >= .3) return l10n.homeProgressMsgGood;
+    return l10n.homeProgressMsgStart;
   }
 }
 
@@ -1078,21 +1035,17 @@ class _RingWidgetState extends State<_RingWidget>
               children: [
                 Text(
                   '${(_anim.value * 100).round()}%',
-                  style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: widget.style.gold,
-                    height: 1,
-                  ),
+                  style: widget.style
+                      .naskh(
+                        17,
+                        color: widget.style.gold,
+                        weight: FontWeight.w700,
+                      )
+                      .copyWith(height: 1),
                 ),
                 Text(
-                  'اليوم',
-                  style: TextStyle(
-                    fontFamily: 'NotoNaskhArabic',
-                    fontSize: 9,
-                    color: widget.style.textSec,
-                  ),
+                  AppLocalizations.of(context)!.homeRingTodayLabel,
+                  style: widget.style.naskh(9, color: widget.style.textSec),
                 ),
               ],
             ),
@@ -1168,23 +1121,44 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = style;
+    final l10n = AppLocalizations.of(context)!;
+    // `id` is a stable routing key, independent of the localized `label` —
+    // the onTap logic used to switch on the (Arabic-only) label text
+    // directly, which would silently break navigation the moment the UI
+    // language changed.
     final items = [
-      ('🌅', 'الفجر', record?.fajrStatus == PrayerStatus.performed),
-      ('📖', 'القرآن', (record?.quranPages ?? 0) > 0),
-      ('☀️', 'الظهر', record?.dhuhrStatus == PrayerStatus.performed),
-      ('🌤', 'العصر', record?.asrStatus == PrayerStatus.performed),
+      (
+        '🌅',
+        'fajr',
+        l10n.prayerFajr,
+        record?.fajrStatus == PrayerStatus.performed,
+      ),
+      ('📖', 'quran', l10n.labelQuran, (record?.quranPages ?? 0) > 0),
+      (
+        '☀️',
+        'dhuhr',
+        l10n.prayerDhuhr,
+        record?.dhuhrStatus == PrayerStatus.performed,
+      ),
+      (
+        '🌤',
+        'asr',
+        l10n.prayerAsr,
+        record?.asrStatus == PrayerStatus.performed,
+      ),
       (
         '⭐',
-        'الأذكار',
+        'adhkar',
+        l10n.labelAdhkar,
         (record?.morningAdhkar ?? false) && (record?.eveningAdhkar ?? false),
       ),
-      ('🌌', 'قيام الليل', record?.nightPrayer ?? false),
+      ('🌌', 'qiyam', l10n.ibadahQiyamLabel, record?.nightPrayer ?? false),
     ];
     return Column(
       children: [
         Row(
           children: [
-            Text('عبادات اليوم', style: s.amiri(15)),
+            Text(l10n.homeTodayIbadahTitle, style: s.amiri(15)),
             const SizedBox(width: 8),
             Expanded(
               child: Container(height: 1, color: s.border.withOpacity(0.3)),
@@ -1195,7 +1169,10 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
                 Navigator.popUntil(context, (route) => route.isFirst);
                 ref.read(currentTabProvider.notifier).state = 2;
               },
-              child: Text('عرض الكل ←', style: s.naskh(11, color: s.teal)),
+              child: Text(
+                l10n.homeViewAllLabel,
+                style: s.naskh(11, color: s.teal),
+              ),
             ),
           ],
         ),
@@ -1211,8 +1188,9 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
               .map(
                 (item) => _IbadahChipMerged(
                   emoji: item.$1,
-                  label: item.$2,
-                  done: item.$3,
+                  id: item.$2,
+                  label: item.$3,
+                  done: item.$4,
                   style: s,
                 ),
               )
@@ -1224,11 +1202,12 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
 }
 
 class _IbadahChipMerged extends ConsumerWidget {
-  final String emoji, label;
+  final String emoji, id, label;
   final bool done;
   final AdaptiveStyle style;
   const _IbadahChipMerged({
     required this.emoji,
+    required this.id,
     required this.label,
     required this.done,
     required this.style,
@@ -1239,15 +1218,16 @@ class _IbadahChipMerged extends ConsumerWidget {
     final s = style;
     return GestureDetector(
       onTap: () {
-        if (label == 'الأذكار') {
-          Navigator.pushNamed(context, '/adhkar');
-        } else if (label == 'القرآن') {
-          Navigator.pushNamed(context, '/quran');
-        } else if (label == 'قيام الليل') {
-          HapticFeedback.mediumImpact();
-          ref.read(currentTabProvider.notifier).state = 1;
-        } else {
-          HapticFeedback.lightImpact();
+        switch (id) {
+          case 'adhkar':
+            Navigator.pushNamed(context, '/adhkar');
+          case 'quran':
+            Navigator.pushNamed(context, '/quran');
+          case 'qiyam':
+            HapticFeedback.mediumImpact();
+            ref.read(currentTabProvider.notifier).state = 1;
+          default:
+            HapticFeedback.lightImpact();
         }
       },
       child: AnimatedContainer(
@@ -1318,28 +1298,29 @@ class _FeatureRow extends StatelessWidget {
   final AdaptiveStyle style;
   const _FeatureRow({required this.style});
 
-  static const _features = [
-    ('🕌', 'أوقات\nالصلاة', '/prayer'),
-    ('📖', 'القرآن', '/quran'),
-    ('🧭', 'القبلة', '/qibla'),
-    ('📿', 'الأذكار', '/adhkar'),
-    ('🤲', 'الأدعية', '/duas'),
-    ('✨', 'المسبحة', '/misbaha'),
-    ('🕋', 'المساجد', '/mosques'),
-    ('📊', 'إحصائيات', '/statistics'),
-    ('🏆', 'الإنجازات', '/achievements'),
-    ('🔔', 'التذكيرات', '/reminders'),
+  static List<(String, String, String)> _features(AppLocalizations l10n) => [
+    ('🕌', l10n.homeFeaturePrayerTimes, '/prayer'),
+    ('📖', l10n.labelQuran, '/quran'),
+    ('🧭', l10n.homeFeatureQibla, '/qibla'),
+    ('📿', l10n.labelAdhkar, '/adhkar'),
+    ('🤲', l10n.homeFeatureDuas, '/duas'),
+    ('✨', l10n.homeFeatureMisbaha, '/misbaha'),
+    ('🕋', l10n.homeFeatureMosques, '/mosques'),
+    ('📊', l10n.homeFeatureStatistics, '/statistics'),
+    ('🏆', l10n.homeFeatureAchievements, '/achievements'),
+    ('🔔', l10n.homeFeatureReminders, '/reminders'),
   ];
 
   @override
   Widget build(BuildContext context) {
     final s = style;
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text('الميزات', style: s.amiri(15, color: s.gold)),
+            Text(l10n.homeFeaturesTitle, style: s.amiri(15, color: s.gold)),
             const SizedBox(width: 8),
             Expanded(
               child: Container(height: 1, color: s.gold.withOpacity(0.2)),
@@ -1353,8 +1334,10 @@ class _FeatureRow extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 0.85,
-          children: _features.map((f) => _FeatureItem(f: f, style: s)).toList(),
+          childAspectRatio: 0.81,
+          children: _features(
+            l10n,
+          ).map((f) => _FeatureItem(f: f, style: s)).toList(),
         ),
       ],
     );
@@ -1404,12 +1387,23 @@ class _FeatureItem extends StatelessWidget {
               child: Text(f.$1, style: const TextStyle(fontSize: 22)),
             ),
             const SizedBox(height: 8),
-            Text(
-              f.$2,
-              textAlign: TextAlign.center,
-              style: s
-                  .naskh(9, color: s.text, weight: FontWeight.w600)
-                  .copyWith(height: 1.2),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Text(
+                f.$2,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: s
+                    .naskh(
+                      Localizations.localeOf(context).languageCode == 'ar'
+                          ? 9.0
+                          : 8.5,
+                      color: s.text,
+                      weight: FontWeight.w600,
+                    )
+                    .copyWith(height: 1.15),
+              ),
             ),
           ],
         ),
@@ -1484,7 +1478,9 @@ class _VerseCardMerged extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            isRamadan ? verse.$2 : 'آية اليوم - ${verse.$2}',
+            isRamadan
+                ? verse.$2
+                : AppLocalizations.of(context)!.homeVerseOfDayLabel(verse.$2),
             style: s.naskh(10, color: s.textSec),
           ),
         ],
@@ -1506,8 +1502,12 @@ class _RamadanIftar extends ConsumerStatefulWidget {
 }
 
 class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
-  String _iftarCountdown = '';
-  String _suhoorCountdown = '';
+  // Kept as raw Durations rather than pre-formatted strings: formatting
+  // needs AppLocalizations, and that can't be looked up from initState()
+  // (no Localizations ancestor is wired up for dependency tracking yet at
+  // that point) — so the l10n-aware text is built once, in build().
+  Duration _iftarRemaining = Duration.zero;
+  Duration _suhoorRemaining = Duration.zero;
 
   @override
   void initState() {
@@ -1522,14 +1522,15 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
     final iftar = DateTime(now.year, now.month, now.day, 18, 30);
     final suhoor = DateTime(now.year, now.month, now.day + 1, 4, 15);
 
-    _iftarCountdown = _fmt(iftar.difference(now));
-    _suhoorCountdown = _fmt(suhoor.difference(now));
-    setState(() {});
+    setState(() {
+      _iftarRemaining = iftar.difference(now);
+      _suhoorRemaining = suhoor.difference(now);
+    });
     Future.delayed(const Duration(seconds: 1), _tick);
   }
 
-  String _fmt(Duration d) {
-    if (d.isNegative) return 'مضى ✓';
+  String _fmt(AppLocalizations l10n, Duration d) {
+    if (d.isNegative) return l10n.homeCountdownPassed;
     final h = d.inHours.toString().padLeft(2, '0');
     final m = (d.inMinutes % 60).toString().padLeft(2, '0');
     final s = (d.inSeconds % 60).toString().padLeft(2, '0');
@@ -1539,13 +1540,19 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
+    final l10n = AppLocalizations.of(context)!;
+    final iftarCountdown = _fmt(l10n, _iftarRemaining);
+    final suhoorCountdown = _fmt(l10n, _suhoorRemaining);
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: Row(
             children: [
-              Text('مواقيت رمضان', style: s.amiri(15, color: s.gold)),
+              Text(
+                l10n.homeRamadanTimesTitle,
+                style: s.amiri(15, color: s.gold),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Container(height: 1, color: s.gold.withOpacity(0.2)),
@@ -1557,8 +1564,8 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
           children: [
             Expanded(
               child: _IftarCard(
-                label: 'الإفطار',
-                countdown: _iftarCountdown,
+                label: l10n.homeIftarLabel,
+                countdown: iftarCountdown,
                 icon: '🌙',
                 color: s.gold,
                 style: s,
@@ -1567,8 +1574,8 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
             const SizedBox(width: 12),
             Expanded(
               child: _IftarCard(
-                label: 'السحور',
-                countdown: _suhoorCountdown,
+                label: l10n.homeSuhoorLabel,
+                countdown: suhoorCountdown,
                 icon: '🌅',
                 color: s.success,
                 style: s,
@@ -1651,7 +1658,10 @@ class _DailyDhikrCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ذكر اليوم', style: s.naskh(10, color: s.textSec)),
+                  Text(
+                    AppLocalizations.of(context)!.homeDailyDhikrLabel,
+                    style: s.naskh(10, color: s.textSec),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     _dhikrs[idx],
@@ -1711,7 +1721,10 @@ class _BooksSection extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 8, bottom: 12),
           child: Row(
             children: [
-              Text('المكتبة الإسلامية', style: s.amiri(16, color: s.gold)),
+              Text(
+                AppLocalizations.of(context)!.homeBooksLibraryTitle,
+                style: s.amiri(16, color: s.gold),
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Container(height: 1, color: s.gold.withOpacity(0.15)),
@@ -1720,7 +1733,7 @@ class _BooksSection extends ConsumerWidget {
               GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/books'),
                 child: Text(
-                  'عرض الكل ←',
+                  AppLocalizations.of(context)!.homeViewAllLabel,
                   style: s.naskh(11, color: s.goldLight),
                 ),
               ),
@@ -1879,7 +1892,9 @@ class _BookCard extends StatelessWidget {
                         Icon(Icons.access_time, size: 10, color: s.gold),
                         const SizedBox(width: 4),
                         Text(
-                          '${book.estimatedReadingMinutes} دقيقة',
+                          AppLocalizations.of(
+                            context,
+                          )!.homeMinutesLabel(book.estimatedReadingMinutes),
                           style: s.naskh(8, color: s.textDim),
                         ),
                       ],

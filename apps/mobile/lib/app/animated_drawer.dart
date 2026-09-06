@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +13,9 @@ import '../core/widgets/custom_pattern_background.dart';
 import '../core/supabase/supabase_config.dart';
 import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
+import '../core/utils/taqwa_level_display.dart';
 import 'main_shell.dart' show currentTabProvider;
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
 //  DRAWER STATE PROVIDER
@@ -261,7 +262,8 @@ class _DrawerHeader extends ConsumerWidget {
           // Profile section in header
           profileAsync.when(
             data: (profile) {
-              final username = profile?['username'] ?? 'مستخدم تقوى';
+              final l = AppLocalizations.of(context)!;
+              final username = profile?['username'] ?? l.drawerDefaultUsername;
               final avatar = profile?['avatar_emoji'] ?? '🌙';
               return GestureDetector(
                 onTap: () {
@@ -334,8 +336,8 @@ class _DrawerHeader extends ConsumerWidget {
                                   ),
                                   child: Text(
                                     profile!['gender'] == 'male'
-                                        ? 'ذكر'
-                                        : 'أنثى',
+                                        ? l.drawerGenderMale
+                                        : l.drawerGenderFemale,
                                     style: context.typography.caption.copyWith(
                                       color: context.colors.gold,
                                       fontSize: 10,
@@ -351,7 +353,7 @@ class _DrawerHeader extends ConsumerWidget {
                             Row(
                               children: [
                                 Text(
-                                  'عرض البروفايل',
+                                  l.drawerViewProfile,
                                   style: context.typography.caption.copyWith(
                                     fontSize: 11,
                                     color: context.colors.gold,
@@ -412,7 +414,7 @@ class _DrawerHeader extends ConsumerWidget {
                   error: (_, _) => const SizedBox(),
                   data: (s) => _MiniStatCard(
                     value: '${s.totalPoints}',
-                    label: 'نقطة التقوى',
+                    label: AppLocalizations.of(context)!.drawerStatTaqwaPoints,
                     icon: '🌟',
                     color: context.colors.gold,
                   ),
@@ -425,7 +427,7 @@ class _DrawerHeader extends ConsumerWidget {
                   error: (_, _) => const SizedBox(),
                   data: (s) => _MiniStatCard(
                     value: '$s',
-                    label: 'يوم متواصل',
+                    label: AppLocalizations.of(context)!.drawerStatStreakDays,
                     icon: '🔥',
                     color: context.colors.success,
                   ),
@@ -445,7 +447,9 @@ class _DrawerHeader extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'المستوى: ${s.levelLabel}',
+                      AppLocalizations.of(context)!.drawerLevelLabel(
+                        taqwaLevelLabel(AppLocalizations.of(context)!, s.level),
+                      ),
                       style: context.typography.caption.copyWith(
                         color: context.colors.gold,
                         fontWeight: FontWeight.w600,
@@ -541,15 +545,15 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     with SingleTickerProviderStateMixin {
   late final AnimationController _staggerCtrl;
 
-  static const _items = [
-    _NavItem('🏠', 'الرئيسية', '/home', 0),
-    _NavItem('✅', 'محاسبة اليوم', '/checklist', 1),
-    _NavItem('🕌', 'أوقات الصلاة', '/prayer', 2),
-    _NavItem('📚', 'المكتبة الإسلامية', '/books', 3),
-    _NavItem('📊', 'الإحصائيات', '/statistics', 4),
-    _NavItem('🏆', 'الإنجازات', '/achievements', 5),
-    _NavItem('👤', 'الملف الشخصي', '/profile', 6),
-    _NavItem('⚙️', 'الإعدادات', '/settings', 7),
+  static List<_NavItem> _buildItems(AppLocalizations l) => [
+    _NavItem('🏠', l.drawerNavHome, '/home', 0),
+    _NavItem('✅', l.drawerNavChecklist, '/checklist', 1),
+    _NavItem('🕌', l.drawerNavPrayer, '/prayer', 2),
+    _NavItem('📚', l.drawerNavBooks, '/books', 3),
+    _NavItem('📊', l.drawerNavStatistics, '/statistics', 4),
+    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 5),
+    _NavItem('👤', l.drawerNavProfile, '/profile', 6),
+    _NavItem('⚙️', l.drawerNavSettings, '/settings', 7),
   ];
 
   @override
@@ -571,10 +575,11 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final currentRoute = ModalRoute.of(context)?.settings.name ?? '/';
 
     final authStatus = ref.watch(authStatusProvider);
-    final visibleItems = _items.where((item) {
+    final visibleItems = _buildItems(l).where((item) {
       if (item.route == '/profile') {
         return authStatus == AuthStatus.authenticated;
       }
@@ -794,7 +799,7 @@ class _DrawerFooter extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
+                  AppLocalizations.of(context)!.drawerFooterQuote,
                   style: context.typography.bodySmall.copyWith(
                     fontSize: 11,
                     color: context.colors.textDim,
@@ -811,7 +816,7 @@ class _DrawerFooter extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            ' v1.0',
+            AppLocalizations.of(context)!.drawerFooterVersion,
             style: context.typography.caption.copyWith(
               fontSize: 10,
               color: context.colors.textDim,
@@ -978,7 +983,7 @@ class _LogoutButton extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'تسجيل الخروج',
+                AppLocalizations.of(context)!.drawerLogoutButton,
                 style: context.typography.bodyMedium.copyWith(
                   fontSize: 13,
                   color: context.colors.danger,
@@ -1006,17 +1011,15 @@ class _LogoutButton extends ConsumerWidget {
           side: BorderSide(color: dCtx.colors.border),
         ),
         title: Text(
-          'تسجيل الخروج',
-          style: TextStyle(
-            fontFamily: 'Amiri',
+          AppLocalizations.of(dCtx)!.drawerLogoutDialogTitle,
+          style: dCtx.typography.headingMedium.copyWith(
             fontSize: 18,
             color: dCtx.colors.danger,
           ),
         ),
         content: Text(
-          'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
+          AppLocalizations.of(dCtx)!.drawerLogoutDialogBody,
+          style: dCtx.typography.bodyMedium.copyWith(
             fontSize: 13,
             color: dCtx.colors.textSecondary,
           ),
@@ -1025,9 +1028,8 @@ class _LogoutButton extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.pop(dCtx, false),
             child: Text(
-              'إلغاء',
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              AppLocalizations.of(dCtx)!.drawerLogoutDialogCancel,
+              style: dCtx.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: dCtx.colors.textSecondary,
               ),
@@ -1036,9 +1038,8 @@ class _LogoutButton extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.pop(dCtx, true),
             child: Text(
-              'خروج',
-              style: TextStyle(
-                fontFamily: 'NotoNaskhArabic',
+              AppLocalizations.of(dCtx)!.drawerLogoutDialogConfirm,
+              style: dCtx.typography.labelMedium.copyWith(
                 fontSize: 13,
                 color: dCtx.colors.danger,
               ),

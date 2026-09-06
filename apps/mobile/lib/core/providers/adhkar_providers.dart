@@ -1,12 +1,12 @@
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
 import '../../features/settings/data/user_preferences.dart';
+import 'adhkar_progress_repository.dart';
+import 'shared_preferences_provider.dart';
 
 enum AdhkarCategory {
   wakingUp,
@@ -403,43 +403,30 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
 };
 
 
+final adhkarProgressRepositoryProvider = Provider<AdhkarProgressRepository>((
+  ref,
+) {
+  return AdhkarProgressRepository(ref.watch(sharedPreferencesProvider));
+});
+
 // ── حالة تقدم كل تصنيف (index → count) ──
 class AdhkarProgressNotifier extends StateNotifier<Map<int, int>> {
   final AdhkarCategory category;
+  final AdhkarProgressRepository _repo;
 
-  AdhkarProgressNotifier(this.category) : super({}) {
-    _load();
-  }
-
-  static const _prefix = 'adhkar_progress_';
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = '$_prefix${category.name}';
-    final raw = prefs.getString(key);
-    if (raw != null) {
-      final map = Map<String, dynamic>.from(jsonDecode(raw));
-      state = map.map((k, v) => MapEntry(int.parse(k), v as int));
-    }
-  }
-
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = '$_prefix${category.name}';
-    final encoded = jsonEncode(state.map((k, v) => MapEntry(k.toString(), v)));
-    await prefs.setString(key, encoded);
-  }
+  AdhkarProgressNotifier(this.category, this._repo)
+    : super(_repo.getProgress(category.name));
 
   void increment(int index, int maxCount) {
     final current = state[index] ?? 0;
     if (current >= maxCount) return;
     state = {...state, index: current + 1};
-    _save();
+    _repo.setProgress(category.name, state);
   }
 
   void reset() {
     state = {};
-    _save();
+    _repo.setProgress(category.name, state);
   }
 }
 
@@ -448,7 +435,10 @@ final adhkarProgressProvider =
       AdhkarProgressNotifier,
       Map<int, int>,
       AdhkarCategory
-    >((ref, cat) => AdhkarProgressNotifier(cat));
+    >(
+      (ref, cat) =>
+          AdhkarProgressNotifier(cat, ref.watch(adhkarProgressRepositoryProvider)),
+    );
 
 // Legacy SharedPreference providers removed since we now use UserPreferences.
 class AdhkarNotificationService {

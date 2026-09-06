@@ -1,9 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../data/book_prefs_repository.dart';
 import '../data/books_data.dart';
 import '../../../core/supabase/supabase_config.dart';
 import '../../../core/providers/database_providers.dart';
+import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/database/daos.dart';
+
+final bookPrefsRepositoryProvider = Provider<BookPrefsRepository>((ref) {
+  return BookPrefsRepository(ref.watch(sharedPreferencesProvider));
+});
 
 class BookProgress {
   final int chapterIndex;
@@ -170,27 +175,19 @@ class BookReadingProgress {
 // ─────────────────────────────────────────
 
 class BookFontSizeNotifier extends StateNotifier<int> {
-  BookFontSizeNotifier() : super(1) {
-    _load();
-  }
+  BookFontSizeNotifier(this._repo) : super(_repo.getFontSizeLevel());
 
-  static const _prefKey = 'book_font_size';
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    state = prefs.getInt(_prefKey) ?? 1;
-  }
+  final BookPrefsRepository _repo;
 
   Future<void> cycle() async {
     final next = (state + 1) % 3;
     state = next;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_prefKey, next);
+    await _repo.setFontSizeLevel(next);
   }
 }
 
 final bookFontSizeProvider = StateNotifierProvider<BookFontSizeNotifier, int>(
-  (ref) => BookFontSizeNotifier(),
+  (ref) => BookFontSizeNotifier(ref.watch(bookPrefsRepositoryProvider)),
 );
 
 double fontSizeFromLevel(int level) {

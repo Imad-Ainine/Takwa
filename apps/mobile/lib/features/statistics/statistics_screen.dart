@@ -10,11 +10,13 @@ import 'package:takwa/core/database/daos.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/utils/taqwa_level_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 
 /// فلتر الفترة الزمنية
@@ -154,12 +156,13 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
     final unseenAsync = ref.watch(_unseenAchievementsProvider);
 
     final hijri = HijriCalendar.now();
+    final l10n = AppLocalizations.of(context)!;
 
     // Label shown in the bar chart header
     final chartLabel = switch (period) {
-      StatsPeriod.week => 'آخر ٧ أيام',
-      StatsPeriod.month => 'هذا الشهر',
-      StatsPeriod.ramadan => 'رمضان',
+      StatsPeriod.week => l10n.statsPeriodLast7Days,
+      StatsPeriod.month => l10n.statsPeriodThisMonth,
+      StatsPeriod.ramadan => l10n.statsPeriodRamadan,
     };
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -272,6 +275,7 @@ class _StatsTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRamadan = hijri.hMonth == 9;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 52, 16, 14),
       decoration: BoxDecoration(
@@ -295,14 +299,14 @@ class _StatsTopBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isRamadan ? 'تقرير رمضان 🌙' : 'الإحصائيات',
+                isRamadan ? l10n.statsRamadanReportTitle : l10n.statsScreenTitle,
                 style: context.typography.displayMedium.copyWith(
                   color: context.colors.gold,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
-                '${hijri.hDay} ${_month(hijri.hMonth)} ${hijri.hYear}',
+                '${hijri.hDay} ${_month(context, hijri.hMonth)} ${hijri.hYear}',
                 style: context.typography.bodySmall.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -315,20 +319,23 @@ class _StatsTopBar extends StatelessWidget {
     );
   }
 
-  static String _month(int m) => const [
-    'محرم',
-    'صفر',
-    'ربيع الأول',
-    'ربيع الآخر',
-    'جمادى الأولى',
-    'جمادى الآخرة',
-    'رجب',
-    'شعبان',
-    'رمضان',
-    'شوال',
-    'ذو القعدة',
-    'ذو الحجة',
-  ][m - 1];
+  static String _month(BuildContext context, int m) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.hijriMuharram,
+      l10n.hijriSafar,
+      l10n.hijriRabiAlAwwal,
+      l10n.hijriRabiAlThani,
+      l10n.hijriJumadaAlAwwal,
+      l10n.hijriJumadaAlThani,
+      l10n.hijriRajab,
+      l10n.hijriShaban,
+      l10n.hijriRamadan,
+      l10n.hijriShawwal,
+      l10n.hijriDhulQadah,
+      l10n.hijriDhulHijjah,
+    ][m - 1];
+  }
 }
 
 class _RamadanProgress extends StatelessWidget {
@@ -342,7 +349,7 @@ class _RamadanProgress extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'يوم $day من ٣٠',
+          AppLocalizations.of(context)!.statsRamadanDayOf30(day),
           style: context.typography.caption.copyWith(
             color: context.colors.textSecondary,
           ),
@@ -378,10 +385,11 @@ class _PeriodSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final current = ref.watch(_statsPeriodProvider);
+    final l10n = AppLocalizations.of(context)!;
     final options = [
-      (StatsPeriod.week, 'هذا الأسبوع'),
-      (StatsPeriod.month, 'هذا الشهر'),
-      (StatsPeriod.ramadan, 'رمضان 🌙'),
+      (StatsPeriod.week, l10n.statsPeriodThisWeek),
+      (StatsPeriod.month, l10n.statsPeriodThisMonth),
+      (StatsPeriod.ramadan, l10n.statsPeriodRamadanEmoji),
     ];
 
     return Container(
@@ -442,6 +450,7 @@ class _TaqwaHeroCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = (stats.totalPoints / 3000.0).clamp(0.0, 1.0);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -464,7 +473,7 @@ class _TaqwaHeroCard extends StatelessWidget {
           _TaqwaScoreRing(
             progress: pct,
             points: stats.totalPoints,
-            levelEmoji: _levelEmoji(stats.level),
+            levelEmoji: taqwaLevelEmoji(stats.level),
           ),
           const SizedBox(width: 16),
 
@@ -473,7 +482,7 @@ class _TaqwaHeroCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  stats.levelLabel,
+                  taqwaLevelLabel(l10n, stats.level),
                   style: context.typography.headingMedium.copyWith(
                     color: context.colors.gold,
                     fontWeight: FontWeight.w700,
@@ -481,7 +490,7 @@ class _TaqwaHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${stats.totalPoints} نقطة هذا الشهر',
+                  l10n.statsPointsThisMonth(stats.totalPoints),
                   style: context.typography.bodySmall.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -502,12 +511,6 @@ class _TaqwaHeroCard extends StatelessWidget {
     );
   }
 
-  String _levelEmoji(TaqwaLevel l) => switch (l) {
-    TaqwaLevel.mubtadi => '🌱',
-    TaqwaLevel.salik => '🌿',
-    TaqwaLevel.mujahid => '⚔️',
-    TaqwaLevel.mutaqi => '✨',
-  };
 }
 
 class _TaqwaScoreRing extends StatefulWidget {
@@ -582,7 +585,7 @@ class _TaqwaScoreRingState extends State<_TaqwaScoreRing>
                 ),
               ),
               Text(
-                'نقطة',
+                AppLocalizations.of(context)!.labelPoints,
                 style: context.typography.caption.copyWith(
                   color: context.colors.textSecondary,
                 ),
@@ -703,6 +706,7 @@ class _LevelProgressBar extends StatelessWidget {
         ((stats.totalPoints - prevThreshold) / (nextThreshold - prevThreshold))
             .clamp(0.0, 1.0);
     final remaining = nextThreshold - stats.totalPoints;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -711,13 +715,15 @@ class _LevelProgressBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'المستوى التالي',
+              l10n.statsNextLevelLabel,
               style: context.typography.caption.copyWith(
                 color: context.colors.textDim,
               ),
             ),
             Text(
-              remaining > 0 ? '$remaining نقطة متبقية' : 'أقصى مستوى ✨',
+              remaining > 0
+                  ? l10n.statsPointsRemaining(remaining)
+                  : l10n.statsMaxLevelReached,
               style: context.typography.caption.copyWith(
                 color: context.colors.gold,
               ),
@@ -768,7 +774,7 @@ class _StreakBadgeLarge extends StatelessWidget {
         const Text('🔥', style: TextStyle(fontSize: 14)),
         const SizedBox(width: 6),
         Text(
-          '$days يوم متواصل',
+          AppLocalizations.of(context)!.homeStreakDaysLabel(days),
           style: context.typography.bodySmall.copyWith(
             color: context.colors.success,
             fontWeight: FontWeight.w600,
@@ -826,7 +832,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
           Row(
             children: [
               Text(
-                'أداء الفترة',
+                AppLocalizations.of(context)!.statsPerformanceTitle,
                 style: context.typography.headingMedium.copyWith(
                   color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -953,9 +959,15 @@ class _WeeklyChartState extends State<_WeeklyChart>
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ChartLegend(color: context.colors.gold, label: 'اليوم'),
+              _ChartLegend(
+                color: context.colors.gold,
+                label: AppLocalizations.of(context)!.homeRingTodayLabel,
+              ),
               const SizedBox(width: 16),
-              _ChartLegend(color: context.colors.border, label: 'أيام سابقة'),
+              _ChartLegend(
+                color: context.colors.border,
+                label: AppLocalizations.of(context)!.statsPreviousDaysLabel,
+              ),
             ],
           ),
         ],
@@ -998,28 +1010,29 @@ class _StatsCardsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cards = [
       _StatCardData(
         '📖',
-        'صفحات القرآن',
+        l10n.statsQuranPagesLabel,
         '${stats.quranPages}',
         context.colors.teal,
       ),
       _StatCardData(
         '🕌',
-        'حضور الصلوات',
+        l10n.statsPrayerAttendanceLabel,
         '${stats.prayerPercent}%',
         context.colors.gold,
       ),
       _StatCardData(
         '🔥',
-        'أطول سلسلة',
-        '${stats.longestStreak} يوم',
+        l10n.statsLongestStreakLabel,
+        l10n.statsDaysUnit(stats.longestStreak),
         context.colors.success,
       ),
       _StatCardData(
         '🌟',
-        'نقاط التقوى',
+        l10n.statsTaqwaPointsLabel,
         '${stats.totalPoints}',
         context.colors.gold,
       ),
@@ -1147,7 +1160,7 @@ class _PrayerAttendanceCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'حضور الصلوات',
+            AppLocalizations.of(context)!.statsPrayerAttendanceLabel,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.textPrimary,
               fontWeight: FontWeight.w700,
@@ -1303,6 +1316,7 @@ class _AchievementsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allAsync = ref.watch(_allAchievementsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1313,7 +1327,7 @@ class _AchievementsSection extends ConsumerWidget {
           Row(
             children: [
               Text(
-                'الإنجازات والشارات',
+                l10n.statsAchievementsSectionTitle,
                 style: context.typography.headingMedium.copyWith(
                   color: context.colors.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -1324,7 +1338,7 @@ class _AchievementsSection extends ConsumerWidget {
                 loading: () => const SizedBox(),
                 error: (_, _) => const SizedBox(),
                 data: (list) => Text(
-                  '${list.length} إنجاز',
+                  l10n.statsAchievementsCount(list.length),
                   style: context.typography.bodySmall.copyWith(
                     color: context.colors.textDim,
                   ),
@@ -1395,7 +1409,9 @@ class _AchievementBadge extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  '+${achievement.pointsReward} نقطة',
+                  AppLocalizations.of(
+                    context,
+                  )!.statsPointsRewardShort(achievement.pointsReward),
                   style: context.typography.caption.copyWith(
                     color: context.colors.textDim,
                   ),
@@ -1469,7 +1485,9 @@ class _AchievementDialog extends StatelessWidget {
                 border: Border.all(color: context.colors.gold.withOpacity(0.2)),
               ),
               child: Text(
-                '+${achievement.pointsReward} نقطة مكافأة 🌟',
+                AppLocalizations.of(
+                  context,
+                )!.statsPointsRewardFull(achievement.pointsReward),
                 style: context.typography.caption.copyWith(
                   color: context.colors.gold,
                   fontWeight: FontWeight.w600,
@@ -1479,7 +1497,7 @@ class _AchievementDialog extends StatelessWidget {
             const SizedBox(height: 20),
             PrimaryButton(
               onTap: () async => Navigator.pop(context),
-              label: 'شكراً لله 🤲',
+              label: AppLocalizations.of(context)!.statsThanksButtonLabel,
             ),
           ],
         ),
@@ -1497,14 +1515,14 @@ class _EmptyAchievements extends StatelessWidget {
         const Text('🏆', style: TextStyle(fontSize: 32)),
         const SizedBox(height: 8),
         Text(
-          'لا إنجازات بعد',
+          AppLocalizations.of(context)!.statsNoAchievementsYet,
           style: context.typography.bodyMedium.copyWith(
             color: context.colors.textDim,
           ),
         ),
         const SizedBox(height: 4),
         Text(
-          'حافظ على العبادات لتحصل على أول إنجاز',
+          AppLocalizations.of(context)!.statsNoAchievementsHint,
           style: context.typography.caption.copyWith(
             color: context.colors.textDim,
           ),
@@ -1517,13 +1535,21 @@ class _EmptyAchievements extends StatelessWidget {
 // إنجازات مقفلة
 class _LockedAchievementsRow extends StatelessWidget {
   static const _locked = [
-    ('streak_30', '🌙', 'شهر المجاهد', '٣٠ يوم متواصل'),
-    ('quran_khatma', '📖', 'ختمة كاملة', 'إتمام القرآن'),
-    ('full_week', '⭐', 'أسبوع مثالي', '٧ أيام مكتملة'),
+    ('streak_30', '🌙'),
+    ('quran_khatma', '📖'),
+    ('full_week', '⭐'),
   ];
+
+  static (String, String) _text(AppLocalizations l10n, String id) => switch (id) {
+    'streak_30' => (l10n.statsLockedStreak30Title, l10n.statsLockedStreak30Desc),
+    'quran_khatma' => (l10n.statsLockedKhatmaTitle, l10n.statsLockedKhatmaDesc),
+    'full_week' => (l10n.statsLockedFullWeekTitle, l10n.statsLockedFullWeekDesc),
+    _ => (id, ''),
+  };
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1534,7 +1560,7 @@ class _LockedAchievementsRow extends StatelessWidget {
               Container(width: 24, height: 1, color: context.colors.border),
               const SizedBox(width: 8),
               Text(
-                'قادم قريباً 🔒',
+                l10n.statsComingSoonLabel,
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
                 ),
@@ -1550,8 +1576,9 @@ class _LockedAchievementsRow extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: _locked
-              .map(
-                (l) => Opacity(
+              .map((l) {
+                final (title, desc) = _text(l10n, l.$1);
+                return Opacity(
                   opacity: 0.4,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -1573,13 +1600,13 @@ class _LockedAchievementsRow extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              l.$3,
+                              title,
                               style: context.typography.bodySmall.copyWith(
                                 color: context.colors.textSecondary,
                               ),
                             ),
                             Text(
-                              l.$4,
+                              desc,
                               style: context.typography.caption.copyWith(
                                 color: context.colors.textDim,
                               ),
@@ -1589,8 +1616,8 @@ class _LockedAchievementsRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
-              )
+                );
+              })
               .toList(),
         ),
       ],
@@ -1688,7 +1715,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'إنجاز جديد! 🎉',
+                        AppLocalizations.of(context)!.statsNewAchievementLabel,
                         style: context.typography.caption.copyWith(
                           color: context.colors.textSecondary,
                         ),

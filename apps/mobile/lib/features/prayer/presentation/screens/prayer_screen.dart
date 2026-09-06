@@ -13,6 +13,8 @@ import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/utils/prayer_display.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -29,12 +31,11 @@ const Map<String, int> _kIqamaOffsets = {
 //  PRAYER VISUAL DATA
 // ─────────────────────────────────────────
 class _PrayerVisual {
-  final String key, nameAr, emoji;
+  final String key, emoji;
   final Color primaryColor, secondaryColor;
   final String skyPhase; // dawn/morning/noon/afternoon/sunset/night
   const _PrayerVisual({
     required this.key,
-    required this.nameAr,
     required this.emoji,
     required this.primaryColor,
     required this.secondaryColor,
@@ -45,7 +46,6 @@ class _PrayerVisual {
 const _kPrayerVisuals = {
   'fajr': _PrayerVisual(
     key: 'fajr',
-    nameAr: 'الفجر',
     emoji: '🌙',
     primaryColor: Color(0xFF4A5568),
     secondaryColor: Color(0xFF7B8FA6),
@@ -53,7 +53,6 @@ const _kPrayerVisuals = {
   ),
   'sunrise': _PrayerVisual(
     key: 'sunrise',
-    nameAr: 'الشروق',
     emoji: '🌅',
     primaryColor: Color(0xFFE8945A),
     secondaryColor: Color(0xFFF6AD55),
@@ -61,7 +60,6 @@ const _kPrayerVisuals = {
   ),
   'dhuhr': _PrayerVisual(
     key: 'dhuhr',
-    nameAr: 'الظهر',
     emoji: '☀️',
     primaryColor: Color(0xFF1A6B8A),
     secondaryColor: Color(0xFF2E9CC4),
@@ -69,7 +67,6 @@ const _kPrayerVisuals = {
   ),
   'asr': _PrayerVisual(
     key: 'asr',
-    nameAr: 'العصر',
     emoji: '🌤',
     primaryColor: Color(0xFF8B5E3C),
     secondaryColor: Color(0xFFE8945A),
@@ -77,7 +74,6 @@ const _kPrayerVisuals = {
   ),
   'maghrib': _PrayerVisual(
     key: 'maghrib',
-    nameAr: 'المغرب',
     emoji: '🌆',
     primaryColor: Color(0xFF7B3F6E),
     secondaryColor: Color(0xFFE87B5A),
@@ -85,7 +81,6 @@ const _kPrayerVisuals = {
   ),
   'isha': _PrayerVisual(
     key: 'isha',
-    nameAr: 'العشاء',
     emoji: '🌃',
     primaryColor: Color(0xFF0D1117),
     secondaryColor: Color(0xFF1A2332),
@@ -160,11 +155,14 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
       final settings = _ref.read(settingsDaoProvider);
 
       // جلب الموقع المحفوظ أو تحديثه
+      final unknownCity = lookupAppLocalizations(
+        const Locale('ar'),
+      ).overlayServiceUnknownCity;
       final savedLat = await settings.get('latitude');
       final savedLng = await settings.get('longitude');
-      String city = await settings.get('cityName') ?? 'غير محدد';
+      String city = await settings.get('cityName') ?? unknownCity;
 
-      if (savedLat == null || savedLng == null || city == 'غير محدد') {
+      if (savedLat == null || savedLng == null || city == unknownCity) {
         final result = await LocationPrayerManager.refreshLocation(_ref);
         if (result == LocationResult.success) {
           city = await settings.get('cityName') ?? city;
@@ -564,6 +562,7 @@ class _PrayerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(0, -0.2),
@@ -620,7 +619,7 @@ class _PrayerHeader extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'أوقات الصلاة',
+                                l10n.prayerScreenTitle,
                                 style: style.amiri(26, color: style.gold),
                               ),
                               Row(
@@ -809,6 +808,8 @@ class _PrayerNameBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final name = prayerLocalizedName(l10n, visual.key);
     return Column(
       children: [
         ScaleTransition(
@@ -835,12 +836,16 @@ class _PrayerNameBadge extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          isIqama ? 'وقت الإقامة — ${visual.nameAr}' : 'صلاة ${visual.nameAr}',
+          isIqama
+              ? l10n.prayerScreenIqamaTimeFor(name)
+              : l10n.prayerScreenPrayerFor(name),
           style: style.amiri(28, color: Colors.white, weight: FontWeight.w700),
         ),
         const SizedBox(height: 4),
         Text(
-          isIqama ? 'أقم الصلاة' : 'الصلاة القادمة',
+          isIqama
+              ? l10n.prayerScreenEstablishPrayer
+              : l10n.prayerScreenNextPrayerLabel,
           style: style.naskh(13, color: Colors.white.withOpacity(0.6)),
         ),
       ],
@@ -865,7 +870,7 @@ class _CountdownRing extends StatelessWidget {
   });
 
   String get _timeStr {
-    if (remaining.isNegative) return '٠٠:٠٠:٠٠';
+    if (remaining.isNegative) return '00:00:00';
     final h = remaining.inHours;
     final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
     final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');
@@ -881,6 +886,7 @@ class _CountdownRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ScaleTransition(
       scale: pulseAnim,
       child: SizedBox(
@@ -937,7 +943,9 @@ class _CountdownRing extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    isIqama ? 'الإقامة بعد' : 'الأذان بعد',
+                    isIqama
+                        ? l10n.prayerScreenIqamaCountdownLabel
+                        : l10n.prayerScreenAdhanCountdownLabel,
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
@@ -972,7 +980,9 @@ class _CountdownRing extends StatelessWidget {
                       border: Border.all(color: Colors.white.withOpacity(0.12)),
                     ),
                     child: Text(
-                      isIqama ? '🕌 أقم الصلاة' : '🔔 استعد',
+                      isIqama
+                          ? '🕌 ${l10n.prayerScreenEstablishPrayer}'
+                          : '🔔 ${l10n.prayerScreenGetReady}',
                       style: TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 11,
@@ -1110,27 +1120,30 @@ class _AdhanIqamaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: _TimeCard(
-            label: 'وقت الأذان',
+            label: l10n.prayerScreenAdhanTimeLabel,
             time: _fmt(adhanTime),
             icon: '📢',
             color: style.gold,
             isActive: !isIqamaPhase,
-            subtitle: 'صلانك نجاتك',
+            subtitle: l10n.prayerScreenSalvationSlogan,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: _TimeCard(
-            label: 'وقت الإقامة',
-            time: iqamaTime != null ? _fmt(iqamaTime!) : '+$iqamaOffsetد',
+            label: l10n.prayerScreenIqamaTimeLabel,
+            time: iqamaTime != null
+                ? _fmt(iqamaTime!)
+                : l10n.prayerScreenIqamaOffsetShort(iqamaOffset),
             icon: '🕌',
             color: context.colors.success,
             isActive: isIqamaPhase,
-            subtitle: 'بعد $iqamaOffset دقيقة',
+            subtitle: l10n.prayerScreenIqamaAfterMinutes(iqamaOffset),
           ),
         ),
       ],
@@ -1252,8 +1265,15 @@ class _DailyPrayersTable extends StatelessWidget {
     return '$h:$m $ampm';
   }
 
+  String _dateHeaderLabel(BuildContext context) {
+    final code = Localizations.localeOf(context).languageCode;
+    final pattern = code == 'ar' ? 'EEE، d MMM' : 'EEE, d MMM';
+    return DateFormat(pattern, code).format(DateTime.now());
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FadeTransition(
       opacity: CurvedAnimation(
         parent: entryCtrl,
@@ -1286,7 +1306,7 @@ class _DailyPrayersTable extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'صلوات اليوم',
+                      l10n.prayerScreenTodaysPrayers,
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 16,
@@ -1308,7 +1328,7 @@ class _DailyPrayersTable extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        DateFormat('EEE، d MMM', 'ar').format(DateTime.now()),
+                        _dateHeaderLabel(context),
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 10,
@@ -1364,6 +1384,7 @@ class _PrayerTableRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final visual = _kPrayerVisuals[prayer.name]!;
 
     return AnimatedContainer(
@@ -1393,7 +1414,7 @@ class _PrayerTableRow extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        prayer.nameAr,
+                        prayerLocalizedName(l10n, prayer.name),
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 13,
@@ -1409,7 +1430,7 @@ class _PrayerTableRow extends StatelessWidget {
                       ),
                       if (isNext)
                         Text(
-                          'الأذان الآن',
+                          l10n.prayerScreenAdhanNowBadge,
                           style: TextStyle(
                             fontFamily: 'NotoNaskhArabic',
                             fontSize: 9,
@@ -1438,7 +1459,9 @@ class _PrayerTableRow extends StatelessWidget {
                       ),
                     ),
                     _MihrabPrayerChip(
-                      label: prayer.name == 'sunrise' ? 'شروق' : 'أذان',
+                      label: prayer.name == 'sunrise'
+                          ? l10n.prayerScreenSunriseBadge
+                          : l10n.prayerScreenAdhanBadge,
                       color: isNext
                           ? visual.secondaryColor
                           : Colors.white.withOpacity(0.3),
@@ -1475,7 +1498,7 @@ class _PrayerTableRow extends StatelessWidget {
                         ),
                       ),
                       _MihrabPrayerChip(
-                        label: 'إقامة',
+                        label: l10n.prayerScreenIqamaBadge,
                         color: isNext
                             ? context.colors.success
                             : Colors.white.withOpacity(0.2),
@@ -1692,6 +1715,7 @@ class _SunPhaseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     PrayerTimeInfo? fajrP, sunriseP, maghribP;
     for (final p in prayers) {
       if (p.name == 'fajr') fajrP = p;
@@ -1710,7 +1734,7 @@ class _SunPhaseRow extends StatelessWidget {
             Expanded(
               child: _SunChip(
                 icon: '🌙',
-                label: 'الفجر',
+                label: prayerLocalizedName(l10n, 'fajr'),
                 time: _fmt(fajrP.time),
                 color: const Color(0xFF7B8FA6),
               ),
@@ -1720,7 +1744,7 @@ class _SunPhaseRow extends StatelessWidget {
             Expanded(
               child: _SunChip(
                 icon: '🌅',
-                label: 'الشروق',
+                label: prayerLocalizedName(l10n, 'sunrise'),
                 time: _fmt(sunriseP.time),
                 color: const Color(0xFFE8945A),
               ),
@@ -1730,7 +1754,7 @@ class _SunPhaseRow extends StatelessWidget {
             Expanded(
               child: _SunChip(
                 icon: '🌆',
-                label: 'المغرب',
+                label: prayerLocalizedName(l10n, 'maghrib'),
                 time: _fmt(maghribP.time),
                 color: const Color(0xFF7B3F6E),
               ),
@@ -1979,6 +2003,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1986,7 +2011,7 @@ class _ErrorView extends StatelessWidget {
           const Text('📍', style: TextStyle(fontSize: 40)),
           const SizedBox(height: 12),
           Text(
-            'تعذّر تحديد الموقع',
+            l10n.prayerScreenLocationErrorTitle,
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 18,
@@ -1995,7 +2020,7 @@ class _ErrorView extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'تأكد من تفعيل GPS',
+            l10n.prayerScreenLocationErrorSubtitle,
             style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 12,
@@ -2007,7 +2032,7 @@ class _ErrorView extends StatelessWidget {
             width: 200,
             child: PrimaryButton(
               onTap: () async => onRetry(),
-              label: 'إعادة المحاولة',
+              label: l10n.prayerScreenRetryButton,
             ),
           ),
         ],

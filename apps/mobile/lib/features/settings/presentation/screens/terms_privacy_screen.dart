@@ -101,8 +101,7 @@ class TermsPrivacyScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'تطبيق تقوى',
-            style: TextStyle(
-              fontFamily: 'Amiri',
+            style: context.typography.headingLarge.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.bold,
               color: context.colors.textPrimary,
@@ -110,8 +109,7 @@ class TermsPrivacyScreen extends StatelessWidget {
           ),
           Text(
             'الشروط وسياسة الخصوصية',
-            style: TextStyle(
-              fontFamily: 'NotoNaskhArabic',
+            style: context.typography.labelMedium.copyWith(
               fontSize: 14,
               color: context.colors.goldLight,
               letterSpacing: 0.5,
@@ -139,8 +137,7 @@ class TermsPrivacyScreen extends StatelessWidget {
         ),
         Text(
           english,
-          style: TextStyle(
-            fontFamily: 'NotoNaskhArabic',
+          style: context.typography.caption.copyWith(
             fontSize: 12,
             color: context.colors.textDim,
             fontWeight: FontWeight.w500,

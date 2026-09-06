@@ -184,6 +184,7 @@ class UserSettings extends Table {
 // ─────────────────────────────────────────
 //  TABLE: ramadan_progress
 // ─────────────────────────────────────────
+@TableIndex(name: 'idx_ramadan_progress_record', columns: {#recordId})
 class RamadanProgress extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get year => integer()();
@@ -292,7 +293,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -301,6 +302,13 @@ class AppDatabase extends _$AppDatabase {
       await _seedDefaultData();
     },
     onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 8) {
+        // RamadanProgress.recordId isn't filtered on by any query today,
+        // but it's a FK like the other two indexed below — indexing it now
+        // avoids a silent full-table scan the day a lookup-by-record query
+        // gets added, for the cost of one small index.
+        await m.createIndex(idxRamadanProgressRecord);
+      }
       if (from < 7) {
         // Missing indexes on FK columns that are actually filtered on
         // (ProhibitionsLog.recordId, and the CustomIbadahLog record+ibadah

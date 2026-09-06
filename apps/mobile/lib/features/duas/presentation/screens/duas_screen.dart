@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,25 +15,46 @@ import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
 import 'package:takwa/features/duas/presentation/screens/favorite_duas_screen.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
-const _categoryMeta = {
-  DuaCategory.morning: ('🌅', 'الصباح'),
-  DuaCategory.evening: ('🌑', 'المساء'),
-  DuaCategory.sleep: ('🛌', 'النوم'),
-  DuaCategory.wakingUp: ('☀️', 'الاستيقاظ'),
-  DuaCategory.distress: ('🌊', 'الكرب'),
-  DuaCategory.guidance: ('🌟', 'الهداية'),
-  DuaCategory.forgiveness: ('🌿', 'المغفرة'),
-  DuaCategory.rizq: ('🌾', 'الرزق'),
-  DuaCategory.health: ('🫀', 'الصحة'),
-  DuaCategory.parents: ('❤️', 'الوالدين'),
-  DuaCategory.travel: ('✈️', 'السفر'),
-  DuaCategory.rain: ('🌧️', 'الاستسقاء'),
-  DuaCategory.istikhara: ('⚖️', 'الاستخارة'),
-  DuaCategory.mosque: ('🕌', 'المسجد'),
-  DuaCategory.knowledge: ('📖', 'طلب العلم'),
-  DuaCategory.afterPrayer: ('📿', 'بعد الصلاة'),
-  DuaCategory.general: ('🤲', 'عامة'),
+const _categoryEmoji = {
+  DuaCategory.morning: '🌅',
+  DuaCategory.evening: '🌑',
+  DuaCategory.sleep: '🛌',
+  DuaCategory.wakingUp: '☀️',
+  DuaCategory.distress: '🌊',
+  DuaCategory.guidance: '🌟',
+  DuaCategory.forgiveness: '🌿',
+  DuaCategory.rizq: '🌾',
+  DuaCategory.health: '🫀',
+  DuaCategory.parents: '❤️',
+  DuaCategory.travel: '✈️',
+  DuaCategory.rain: '🌧️',
+  DuaCategory.istikhara: '⚖️',
+  DuaCategory.mosque: '🕌',
+  DuaCategory.knowledge: '📖',
+  DuaCategory.afterPrayer: '📿',
+  DuaCategory.general: '🤲',
+};
+
+String _categoryLabel(AppLocalizations l10n, DuaCategory cat) => switch (cat) {
+  DuaCategory.morning => l10n.duaCategoryMorning,
+  DuaCategory.evening => l10n.duaCategoryEvening,
+  DuaCategory.sleep => l10n.duaCategorySleep,
+  DuaCategory.wakingUp => l10n.duaCategoryWakingUp,
+  DuaCategory.distress => l10n.duaCategoryDistress,
+  DuaCategory.guidance => l10n.duaCategoryGuidance,
+  DuaCategory.forgiveness => l10n.duaCategoryForgiveness,
+  DuaCategory.rizq => l10n.duaCategoryRizq,
+  DuaCategory.health => l10n.duaCategoryHealth,
+  DuaCategory.parents => l10n.duaCategoryParents,
+  DuaCategory.travel => l10n.duaCategoryTravel,
+  DuaCategory.rain => l10n.duaCategoryRain,
+  DuaCategory.istikhara => l10n.duaCategoryIstikhara,
+  DuaCategory.mosque => l10n.duaCategoryMosque,
+  DuaCategory.knowledge => l10n.duaCategoryKnowledge,
+  DuaCategory.afterPrayer => l10n.duaCategoryAfterPrayer,
+  DuaCategory.general => l10n.duaCategoryGeneral,
 };
 
 // ─────────────────────────────────────────
@@ -159,6 +179,7 @@ class _DuasTopBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -174,11 +195,11 @@ class _DuasTopBar extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'الأدعية المأثورة',
+                        l10n.duasScreenTitle,
                         style: style.amiri(22, color: style.gold),
                       ),
                       Text(
-                        'من الكتاب والسنة',
+                        l10n.duasScreenSubtitle,
                         style: style.naskh(11, color: style.textSec),
                       ),
                     ],
@@ -253,7 +274,7 @@ class _DuasTopBar extends ConsumerWidget {
                 onChanged: (v) =>
                     ref.read(_duaSearchProvider.notifier).state = v,
                 decoration: InputDecoration(
-                  hintText: 'ابحث في الأدعية...',
+                  hintText: l10n.duasSearchHint,
                   hintStyle: style.naskh(12, color: style.textSec),
                   prefixIcon: Icon(
                     Icons.search_rounded,
@@ -289,10 +310,10 @@ class _DuasTopBar extends ConsumerWidget {
                 unselectedLabelColor: style.textSec,
                 labelStyle: style.naskh(14, weight: FontWeight.w600),
                 unselectedLabelStyle: style.naskh(13, weight: FontWeight.w400),
-                tabs: const [
-                  Tab(text: 'المأثورة'),
-                  Tab(text: 'أدعيتي'),
-                  Tab(text: 'من المجتمع'),
+                tabs: [
+                  Tab(text: l10n.duasTabTraditional),
+                  Tab(text: l10n.duasTabMine),
+                  Tab(text: l10n.duasTabCommunity),
                 ],
               ),
             ),
@@ -310,6 +331,7 @@ class _CategoryFilter extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(_selectedCatProvider);
+    final l10n = AppLocalizations.of(context)!;
     const cats = DuaCategory.values;
 
     return SizedBox(
@@ -323,16 +345,17 @@ class _CategoryFilter extends ConsumerWidget {
           if (i == 0) {
             final isAll = selected == null;
             return _FilterChip(
-              label: '🤲 الكل',
+              label: l10n.duaCategoryAllFilter,
               isActive: isAll,
               style: style,
               onTap: () => ref.read(_selectedCatProvider.notifier).state = null,
             );
           }
           final cat = cats[i - 1];
-          final meta = _categoryMeta[cat] ?? ('🤲', 'أخرى');
+          final emoji = _categoryEmoji[cat] ?? '🤲';
+          final label = _categoryLabel(l10n, cat);
           return _FilterChip(
-            label: '${meta.$1} ${meta.$2}',
+            label: '$emoji $label',
             isActive: selected == cat,
             style: style,
             onTap: () => ref.read(_selectedCatProvider.notifier).state =
@@ -406,7 +429,10 @@ class _DuasList extends ConsumerWidget {
           children: [
             const Text('🔍', style: TextStyle(fontSize: 36)),
             const SizedBox(height: 10),
-            Text('لا توجد نتائج', style: style.amiri(16)),
+            Text(
+              AppLocalizations.of(context)!.duasNoResults,
+              style: style.amiri(16),
+            ),
           ],
         ),
       );
@@ -520,9 +546,9 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
-                            'تم النسخ ✓',
-                            style: TextStyle(
+                          content: Text(
+                            AppLocalizations.of(context)!.duasCopiedLabel,
+                            style: const TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
                             ),
@@ -647,7 +673,7 @@ class _UserDuasTabView extends ConsumerWidget {
         loading: () => const Center(child: TakwaLoadingIndicator()),
         error: (err, _) => Center(
           child: Text(
-            'حدث خطأ في جلب أدعيتك',
+            AppLocalizations.of(context)!.duasFetchErrorMessage,
             style: style.naskh(14, color: Colors.red),
           ),
         ),
@@ -660,7 +686,7 @@ class _UserDuasTabView extends ConsumerWidget {
                   const Text('🤲', style: TextStyle(fontSize: 48)),
                   const SizedBox(height: 16),
                   Text(
-                    'لم تقم بإضافة أي أدعية بعد',
+                    AppLocalizations.of(context)!.duasNoUserDuasYet,
                     style: style.amiri(18, color: style.textSec),
                   ),
                 ],
@@ -730,7 +756,7 @@ class _UserDuaCard extends ConsumerWidget {
                 // Copy
                 IconButton(
                   iconSize: 18,
-                  tooltip: 'نسخ',
+                  tooltip: AppLocalizations.of(context)!.duasCopyTooltip,
                   icon: Icon(
                     Icons.copy_rounded,
                     color: style.textSec,
@@ -741,9 +767,9 @@ class _UserDuaCard extends ConsumerWidget {
                     HapticFeedback.lightImpact();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
-                          'تم النسخ ✓',
-                          style: TextStyle(
+                        content: Text(
+                          AppLocalizations.of(context)!.duasCopiedLabel,
+                          style: const TextStyle(
                             fontFamily: 'NotoNaskhArabic',
                             fontSize: 12,
                           ),
@@ -761,7 +787,9 @@ class _UserDuaCard extends ConsumerWidget {
                 // Share to community
                 IconButton(
                   iconSize: 18,
-                  tooltip: 'مشاركة مع المجتمع',
+                  tooltip: AppLocalizations.of(
+                    context,
+                  )!.duasShareWithCommunityLabel,
                   icon: Icon(Icons.public_rounded, color: style.teal, size: 20),
                   onPressed: () => showModalBottomSheet(
                     context: context,
@@ -780,26 +808,30 @@ class _UserDuaCard extends ConsumerWidget {
                     size: 20,
                   ),
                   onPressed: () async {
+                    final l10n = AppLocalizations.of(context)!;
                     final ok = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: Text('حذف الدعاء', style: style.naskh(16)),
+                        title: Text(
+                          l10n.duasDeleteDialogTitle,
+                          style: style.naskh(16),
+                        ),
                         content: Text(
-                          'هل تريد حذف هذا الدعاء؟',
+                          l10n.duasDeleteConfirmMessage,
                           style: style.naskh(13, color: style.textSec),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
                             child: Text(
-                              'إلغاء',
+                              l10n.commonCancel,
                               style: style.naskh(13, color: style.textSec),
                             ),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, true),
                             child: Text(
-                              'حذف',
+                              l10n.commonDelete,
                               style: style.naskh(13, color: Colors.redAccent),
                             ),
                           ),
@@ -873,6 +905,7 @@ class _ShareToDuaCommunitySheetState
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         left: 20,
@@ -897,7 +930,7 @@ class _ShareToDuaCommunitySheetState
           ),
           const SizedBox(height: 20),
           Text(
-            _shared ? '✅ تمت المشاركة!' : '🌍 مشاركة مع المجتمع',
+            _shared ? l10n.duasSharedSuccessLabel : l10n.duasShareSheetTitle,
             style: s.amiri(20, color: _shared ? Colors.green : s.gold),
           ),
           const SizedBox(height: 16),
@@ -933,7 +966,9 @@ class _ShareToDuaCommunitySheetState
                           setState(() => _isSharing = false);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('خطأ: $e'),
+                              content: Text(
+                                l10n.checklistErrorPrefix(e.toString()),
+                              ),
                               backgroundColor: Colors.redAccent,
                             ),
                           );
@@ -941,13 +976,13 @@ class _ShareToDuaCommunitySheetState
                       }
                     },
               icon: Icons.public_rounded,
-              label: 'مشاركة مع المجتمع',
+              label: l10n.duasShareWithCommunityLabel,
               baseColor: s.teal,
               isLoading: _isSharing,
             )
           else
             Text(
-              'شكراً لمشاركتك مع مجتمع تقوى 🤍',
+              l10n.duasShareThanksMessage,
               textAlign: TextAlign.center,
               style: s.naskh(13, color: s.textSec),
             ),
@@ -965,11 +1000,12 @@ class _CommunityDuasTabView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(communityDuasProvider);
 
+    final l10n = AppLocalizations.of(context)!;
     return state.when(
       loading: () => Center(child: TakwaLoadingIndicator(color: style.teal)),
       error: (err, _) => Center(
         child: Text(
-          'تعذر تحميل أدعية المجتمع',
+          l10n.duasCommunityLoadError,
           style: style.naskh(14, color: Colors.red),
         ),
       ),
@@ -990,12 +1026,12 @@ class _CommunityDuasTabView extends ConsumerWidget {
                         const Text('🌍', style: TextStyle(fontSize: 48)),
                         const SizedBox(height: 16),
                         Text(
-                          'لا توجد أدعية مشتركة حالياً',
+                          l10n.duasCommunityEmptyTitle,
                           style: style.amiri(18, color: style.textSec),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'اسحب للأسفل للتحديث',
+                          l10n.duasPullToRefreshHint,
                           style: style.naskh(12, color: style.textSec),
                         ),
                       ],
@@ -1106,9 +1142,9 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
                     HapticFeedback.lightImpact();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
-                          'تم النسخ ✓',
-                          style: TextStyle(
+                        content: Text(
+                          AppLocalizations.of(context)!.duasCopiedLabel,
+                          style: const TextStyle(
                             fontFamily: 'NotoNaskhArabic',
                             fontSize: 12,
                           ),
@@ -1245,11 +1281,13 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
           );
 
       if (_shareToCommunity && mounted) {
-        await ref.read(supabaseServiceProvider).shareDuaToCommunity(
-          textAr: arabic,
-          titleAr: title,
-          occasion: _occasionCtrl.text.trim(),
-        );
+        await ref
+            .read(supabaseServiceProvider)
+            .shareDuaToCommunity(
+              textAr: arabic,
+              titleAr: title,
+              occasion: _occasionCtrl.text.trim(),
+            );
       }
 
       if (mounted) Navigator.of(context).pop();
@@ -1262,6 +1300,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.only(
@@ -1281,7 +1320,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('إضافة دعاء', style: s.amiri(22, color: s.gold)),
+              Text(l10n.duasAddSheetTitle, style: s.amiri(22, color: s.gold)),
               IconButton(
                 icon: Icon(Icons.close, color: s.textSec),
                 onPressed: () => Navigator.of(context).pop(),
@@ -1294,7 +1333,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
             textDirection: TextDirection.rtl,
             style: s.naskh(14),
             decoration: InputDecoration(
-              labelText: 'عنوان الدعاء',
+              labelText: l10n.duasAddTitleFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
               fillColor: s.border.withOpacity(0.5),
@@ -1311,7 +1350,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
             style: s.amiri(16),
             maxLines: 4,
             decoration: InputDecoration(
-              labelText: 'نص الدعاء (عربي)',
+              labelText: l10n.duasAddTextFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
               fillColor: s.border.withOpacity(0.5),
@@ -1327,7 +1366,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
             textDirection: TextDirection.rtl,
             style: s.naskh(14),
             decoration: InputDecoration(
-              labelText: 'المناسبة (اختياري)',
+              labelText: l10n.duasAddOccasionFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
               fillColor: s.border.withOpacity(0.5),
@@ -1342,7 +1381,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
             children: [
               Expanded(
                 child: Text(
-                  'مشاركة مع مجتمع تقوى (ليستفيد منه الآخرون)',
+                  l10n.duasAddShareToggleLabel,
                   style: s.naskh(12, color: s.text),
                 ),
               ),
@@ -1358,7 +1397,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
           ),
           const SizedBox(height: 24),
           PrimaryButton(
-            label: 'حفظ',
+            label: l10n.commonSave,
             onTap: _isSaving ? null : _save,
             isLoading: _isSaving,
           ),

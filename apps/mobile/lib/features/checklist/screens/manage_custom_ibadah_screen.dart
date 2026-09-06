@@ -11,6 +11,7 @@ import 'package:takwa/core/widgets/primary_switch.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class ManageCustomIbadahScreen extends ConsumerStatefulWidget {
   const ManageCustomIbadahScreen({super.key});
@@ -46,18 +47,19 @@ class _ManageCustomIbadahScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         leading: const CustomLeadingButton(),
-        title: const Text('إدارة العادات'),
+        title: Text(l10n.manageIbadahTitle),
         backgroundColor: Colors.transparent,
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'إيجابية'),
-            Tab(text: 'سلبية (محظورات)'),
+          tabs: [
+            Tab(text: l10n.manageIbadahPositiveTab),
+            Tab(text: l10n.manageIbadahNegativeTab),
           ],
         ),
       ),
@@ -101,6 +103,7 @@ class _IbadahList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final asyncData = ref.watch(provider);
     final items = asyncData.valueOrNull ?? [];
     final filteredItems = items.where((i) => i.nameAr != 'غضّ البصر').toList();
@@ -110,7 +113,7 @@ class _IbadahList extends ConsumerWidget {
         if (filteredItems.isEmpty) {
           return Center(
             child: Text(
-              'لا توجد عادات مضافة بعد',
+              l10n.manageIbadahEmpty,
               style: context.typography.bodyLarge.copyWith(
                 color: context.colors.textDim,
               ),
@@ -131,7 +134,7 @@ class _IbadahList extends ConsumerWidget {
           Center(child: TakwaLoadingIndicator(color: context.colors.gold)),
       error: (e, st) => Center(
         child: Text(
-          'حدث خطأ في تحميل البيانات',
+          l10n.manageIbadahLoadError,
           style: context.typography.bodyMedium.copyWith(
             color: context.colors.danger,
           ),
@@ -149,6 +152,7 @@ class _IbadahTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: context.decorations.card,
       padding: const EdgeInsets.symmetric(
@@ -187,8 +191,10 @@ class _IbadahTile extends ConsumerWidget {
                 const SizedBox(height: 2),
                 Text(
                   isPositive
-                      ? 'النقاط: ${item.points}'
-                      : 'خصم النقاط: ${item.points}',
+                      ? l10n.manageIbadahPointsEarned(item.points.toString())
+                      : l10n.manageIbadahPointsDeducted(
+                          item.points.toString(),
+                        ),
                   style: context.typography.caption.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -232,19 +238,21 @@ class _IbadahTile extends ConsumerWidget {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('تأكيد الحذف'),
-                  content: Text('هل أنت متأكد من حذف "${item.nameAr}"؟'),
+                  title: Text(l10n.manageIbadahDeleteConfirmTitle),
+                  content: Text(
+                    l10n.manageIbadahDeleteConfirmBody(item.nameAr),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('إلغاء'),
+                      child: Text(l10n.manageIbadahCancelButton),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, true),
                       style: TextButton.styleFrom(
                         foregroundColor: context.colors.danger,
                       ),
-                      child: const Text('حذف'),
+                      child: Text(l10n.manageIbadahDeleteButton),
                     ),
                   ],
                 ),
@@ -258,14 +266,18 @@ class _IbadahTile extends ConsumerWidget {
                       .deleteCustomIbadah(item.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم الحذف بنجاح')),
+                      SnackBar(content: Text(l10n.manageIbadahDeletedSuccess)),
                     );
                   }
                 } catch (e) {
                   if (context.mounted) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text('فشل الحذف: $e')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.manageIbadahDeleteFailed(e.toString()),
+                        ),
+                      ),
+                    );
                   }
                 }
               }
@@ -305,13 +317,16 @@ class _UpsertCustomIbadahDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Text(
         _isEditing
-            ? 'تعديل ${widget.isPositive ? 'العادة' : 'المحظور'}'
+            ? (widget.isPositive
+                  ? l10n.manageIbadahEditHabitTitle
+                  : l10n.manageIbadahEditProhibitionTitle)
             : (widget.isPositive
-                  ? 'إضافة عادة إيجابية'
-                  : 'إضافة عادة سلبية (محظور)'),
+                  ? l10n.manageIbadahAddPositiveTitle
+                  : l10n.manageIbadahAddNegativeTitle),
       ),
       content: Form(
         key: _formKey,
@@ -321,23 +336,26 @@ class _UpsertCustomIbadahDialogState
             children: [
               TextFormField(
                 initialValue: _name,
-                decoration: const InputDecoration(labelText: 'اسم العادة'),
-                validator: (val) =>
-                    val == null || val.trim().isEmpty ? 'مطلوب' : null,
+                decoration: InputDecoration(
+                  labelText: l10n.manageIbadahNameFieldLabel,
+                ),
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? l10n.manageIbadahRequiredValidation
+                    : null,
                 onSaved: (val) => _name = val!.trim(),
               ),
               const SizedBox(height: AppSpacing.md),
               TextFormField(
                 decoration: InputDecoration(
                   labelText: widget.isPositive
-                      ? 'النقاط التي ستكتسبها'
-                      : 'النقاط التي ستُخصم',
+                      ? l10n.manageIbadahPointsEarnedFieldLabel
+                      : l10n.manageIbadahPointsDeductedFieldLabel,
                 ),
                 keyboardType: TextInputType.number,
                 initialValue: _points.toString(),
                 validator: (val) =>
                     int.tryParse(val ?? '') == null || int.parse(val!) <= 0
-                    ? 'رقم غير صحيح'
+                    ? l10n.manageIbadahInvalidNumberValidation
                     : null,
                 onSaved: (val) => _points = int.parse(val!),
               ),
@@ -348,9 +366,14 @@ class _UpsertCustomIbadahDialogState
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('إلغاء'),
+          child: Text(l10n.manageIbadahCancelButton),
         ),
-        PrimaryButton(label: _isEditing ? 'حفظ' : 'إضافة', onTap: _submit),
+        PrimaryButton(
+          label: _isEditing
+              ? l10n.manageIbadahSaveButton
+              : l10n.manageIbadahAddButton,
+          onTap: _submit,
+        ),
       ],
     );
   }
@@ -399,10 +422,13 @@ class _UpsertCustomIbadahDialogState
         }
 
         if (mounted) {
+          final l10n = AppLocalizations.of(context)!;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                _isEditing ? 'تم التعديل بنجاح' : 'تمت الإضافة بنجاح',
+                _isEditing
+                    ? l10n.manageIbadahUpdatedSuccess
+                    : l10n.manageIbadahAddedSuccess,
               ),
             ),
           );
@@ -410,9 +436,13 @@ class _UpsertCustomIbadahDialogState
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.adhkarGenericError(e.toString()),
+              ),
+            ),
+          );
         }
       }
     }

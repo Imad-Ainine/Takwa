@@ -1,4 +1,4 @@
-
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:takwa/l10n/app_localizations.dart';
@@ -578,24 +578,24 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }
 
   Stream<MonthStats> watchMonthStats(int year, int month) {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getMonthStats(year, month));
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getMonthStats(year, month))
+        .distinct();
   }
 
   Stream<int> watchCurrentStreak() {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getCurrentStreak());
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getCurrentStreak())
+        .distinct();
   }
 
   Stream<List<WeeklyPoint>> watchWeeklyPoints() {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getWeeklyPoints());
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getWeeklyPoints())
+        .distinct(const ListEquality<WeeklyPoint>().equals);
   }
 
   // ── Range-based queries for period selector ──
@@ -609,13 +609,18 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
       dailyRecords,
     )..where((r) => r.date.isBetweenValues(from, to))).get();
 
+    // Same "DB layer can't be locale-aware without going through ARB
+    // directly" situation as checkAndGrantAchievements() — see that
+    // method's comment.
+    final l10n = lookupAppLocalizations(const Locale('ar'));
+
     if (rows.isEmpty) {
-      return const [
-        PrayerRateData(name: 'الفجر', emoji: '🌅', rate: 0),
-        PrayerRateData(name: 'الظهر', emoji: '☀️', rate: 0),
-        PrayerRateData(name: 'العصر', emoji: '🌤', rate: 0),
-        PrayerRateData(name: 'المغرب', emoji: '🌆', rate: 0),
-        PrayerRateData(name: 'العشاء', emoji: '🌃', rate: 0),
+      return [
+        PrayerRateData(name: l10n.prayerFajr, emoji: '🌅', rate: 0),
+        PrayerRateData(name: l10n.prayerDhuhr, emoji: '☀️', rate: 0),
+        PrayerRateData(name: l10n.prayerAsr, emoji: '🌤', rate: 0),
+        PrayerRateData(name: l10n.prayerMaghrib, emoji: '🌆', rate: 0),
+        PrayerRateData(name: l10n.prayerIsha, emoji: '🌃', rate: 0),
       ];
     }
 
@@ -629,11 +634,15 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     }
     final n = rows.length;
     return [
-      PrayerRateData(name: 'الفجر', emoji: '🌅', rate: fajr / n),
-      PrayerRateData(name: 'الظهر', emoji: '☀️', rate: dhuhr / n),
-      PrayerRateData(name: 'العصر', emoji: '🌤', rate: asr / n),
-      PrayerRateData(name: 'المغرب', emoji: '🌆', rate: maghrib / n),
-      PrayerRateData(name: 'العشاء', emoji: '🌃', rate: isha / n),
+      PrayerRateData(name: l10n.prayerFajr, emoji: '🌅', rate: fajr / n),
+      PrayerRateData(name: l10n.prayerDhuhr, emoji: '☀️', rate: dhuhr / n),
+      PrayerRateData(name: l10n.prayerAsr, emoji: '🌤', rate: asr / n),
+      PrayerRateData(
+        name: l10n.prayerMaghrib,
+        emoji: '🌆',
+        rate: maghrib / n,
+      ),
+      PrayerRateData(name: l10n.prayerIsha, emoji: '🌃', rate: isha / n),
     ];
   }
 
@@ -688,9 +697,7 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     final results = <WeeklyPoint>[];
     var cursor = start;
     while (!cursor.isAfter(end)) {
-      results.add(
-        WeeklyPoint(date: cursor, points: pointsByDate[cursor] ?? 0),
-      );
+      results.add(WeeklyPoint(date: cursor, points: pointsByDate[cursor] ?? 0));
       cursor = cursor.add(const Duration(days: 1));
     }
     return results;
@@ -699,33 +706,31 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   // ── Stream watchers for range queries ──
 
   Stream<MonthStats> watchStatsForRange(DateTime from, DateTime to) {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getStatsForRange(from, to));
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getStatsForRange(from, to))
+        .distinct();
   }
 
   Stream<List<WeeklyPoint>> watchPointsPerDay(DateTime from, DateTime to) {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getPointsPerDay(from, to));
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getPointsPerDay(from, to))
+        .distinct(const ListEquality<WeeklyPoint>().equals);
   }
 
   Stream<List<PrayerRateData>> watchPerPrayerRates(DateTime from, DateTime to) {
-    return customSelect(
-      'SELECT 1',
-      readsFrom: {dailyRecords},
-    ).watch().asyncMap((_) => getPerPrayerRates(from, to));
+    return customSelect('SELECT 1', readsFrom: {dailyRecords})
+        .watch()
+        .asyncMap((_) => getPerPrayerRates(from, to))
+        .distinct(const ListEquality<PrayerRateData>().equals);
   }
 
   /// Marks an earned achievement as seen, so its unlock animation only
   /// plays once (the achievements screen checks `seen` to decide whether
   /// to celebrate a card or just render it normally).
   Future<void> markAchievementSeen(String type) async {
-    await (update(
-      achievements,
-    )..where((a) => a.type.equals(type))).write(
+    await (update(achievements)..where((a) => a.type.equals(type))).write(
       const AchievementsCompanion(seen: Value(true)),
     );
   }
@@ -740,8 +745,8 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
   }) async {
     final existing = await (select(
       achievements,
-    )..where((a) => a.type.equals(type))).getSingleOrNull();
-    if (existing != null) return;
+    )..where((a) => a.type.equals(type))).get();
+    if (existing.isNotEmpty) return;
 
     await into(achievements).insert(
       AchievementsCompanion(
@@ -931,11 +936,12 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
     // runs after most user actions, so a full-table load here scaled
     // badly with tenure.
     final naflCountExp = dailyRecords.id.count();
-    final naflCount = await (selectOnly(dailyRecords)
-          ..addColumns([naflCountExp])
-          ..where(dailyRecords.fastingType.equals(FastingType.nafl.index)))
-        .map((row) => row.read(naflCountExp) ?? 0)
-        .getSingle();
+    final naflCount =
+        await (selectOnly(dailyRecords)
+              ..addColumns([naflCountExp])
+              ..where(dailyRecords.fastingType.equals(FastingType.nafl.index)))
+            .map((row) => row.read(naflCountExp) ?? 0)
+            .getSingle();
 
     // Fasting Nafl Check
     if (naflCount > 0) {
@@ -951,11 +957,12 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
 
     // Ramadan Knight Check (10 days of fard fasting)
     final fardCountExp = dailyRecords.id.count();
-    final ramadanDays = await (selectOnly(dailyRecords)
-          ..addColumns([fardCountExp])
-          ..where(dailyRecords.fastingType.equals(FastingType.fard.index)))
-        .map((row) => row.read(fardCountExp) ?? 0)
-        .getSingle();
+    final ramadanDays =
+        await (selectOnly(dailyRecords)
+              ..addColumns([fardCountExp])
+              ..where(dailyRecords.fastingType.equals(FastingType.fard.index)))
+            .map((row) => row.read(fardCountExp) ?? 0)
+            .getSingle();
     if (ramadanDays >= 10) {
       final a = await _tryGrant(
         'ramadan_knight',
@@ -969,9 +976,10 @@ class StatsDao extends DatabaseAccessor<AppDatabase> with _$StatsDaoMixin {
 
     // Total Lifetime Points Check
     final totalPointsExp = dailyRecords.netPoints.sum();
-    final totalPoints = await (selectOnly(
-      dailyRecords,
-    )..addColumns([totalPointsExp])).map((row) => row.read(totalPointsExp) ?? 0).getSingle();
+    final totalPoints =
+        await (selectOnly(dailyRecords)..addColumns([totalPointsExp]))
+            .map((row) => row.read(totalPointsExp) ?? 0)
+            .getSingle();
     if (totalPoints >= 100) {
       final a = await _tryGrant(
         'points_100',
@@ -1146,7 +1154,6 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
       }
     }
   }
-
 }
 
 // ─────────────────────────────────────────
@@ -1158,26 +1165,59 @@ class WeeklyPoint {
   final int points;
   WeeklyPoint({required this.date, required this.points});
 
-  String get dayLabel {
-    const days = ['أح', 'إث', 'ثل', 'أر', 'خم', 'جم', 'سب'];
-    return days[date.weekday % 7];
-  }
+  // Value equality lets the `watch*` streams below `.distinct()` — a write
+  // to `daily_records` on some other date still re-runs these queries (see
+  // the Performance audit note on `customSelect(readsFrom:)` granularity),
+  // but an unchanged result no longer re-emits and triggers a UI rebuild.
+  @override
+  bool operator ==(Object other) =>
+      other is WeeklyPoint && other.date == date && other.points == points;
 
-  String get fullDayName {
-    const days = [
-      'الأحد',
-      'الإثنين',
-      'الثلاثاء',
-      'الأربعاء',
-      'الخميس',
-      'الجمعة',
-      'السبت',
+  @override
+  int get hashCode => Object.hash(date, points);
+
+  // Same DB-layer-can't-use-BuildContext situation as
+  // checkAndGrantAchievements() — see that method's comment.
+  static final _l10n = lookupAppLocalizations(const Locale('ar'));
+
+  /// Two-letter weekday abbreviation, e.g. "أح" for Sunday.
+  String get dayLabel {
+    final days = [
+      _l10n.weekdayShortSunday,
+      _l10n.weekdayShortMonday,
+      _l10n.weekdayShortTuesday,
+      _l10n.weekdayShortWednesday,
+      _l10n.weekdayShortThursday,
+      _l10n.weekdayShortFriday,
+      _l10n.weekdayShortSaturday,
     ];
     return days[date.weekday % 7];
   }
 
+  String get fullDayName {
+    final days = [
+      _l10n.weekdayFullSunday,
+      _l10n.weekdayFullMonday,
+      _l10n.weekdayFullTuesday,
+      _l10n.weekdayFullWednesday,
+      _l10n.weekdayFullThursday,
+      _l10n.weekdayFullFriday,
+      _l10n.weekdayFullSaturday,
+    ];
+    return days[date.weekday % 7];
+  }
+
+  /// Single-letter weekday initial, e.g. "ح" for Sunday.
   String get shortDayName {
-    const days = ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'];
+    final days = [
+      _l10n.weekdayInitialSunday,
+      _l10n.weekdayInitialMonday,
+      _l10n.weekdayInitialTuesday,
+      _l10n.weekdayInitialWednesday,
+      _l10n.weekdayInitialThursday,
+      _l10n.weekdayInitialFriday,
+      _l10n.weekdayInitialSaturday,
+    ];
     return days[date.weekday % 7];
   }
 }
@@ -1192,6 +1232,16 @@ class PrayerRateData {
     required this.emoji,
     required this.rate,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      other is PrayerRateData &&
+      other.name == name &&
+      other.emoji == emoji &&
+      other.rate == rate;
+
+  @override
+  int get hashCode => Object.hash(name, emoji, rate);
 }
 
 class MonthStats {
@@ -1211,14 +1261,25 @@ class MonthStats {
 
   TaqwaLevel get level => taqwaLevelFor(totalPoints);
 
-  String get levelLabel => switch (level) {
-    TaqwaLevel.mubtadi => 'مبتدئ 🌱',
-    TaqwaLevel.salik => 'سالك 🌿',
-    TaqwaLevel.mujahid => 'مجاهد ⚔️',
-    TaqwaLevel.mutaqi => 'متقي ✨',
-  };
-
   int get prayerPercent => (prayerRate * 100).round();
+
+  @override
+  bool operator ==(Object other) =>
+      other is MonthStats &&
+      other.totalPoints == totalPoints &&
+      other.longestStreak == longestStreak &&
+      other.currentStreak == currentStreak &&
+      other.prayerRate == prayerRate &&
+      other.quranPages == quranPages;
+
+  @override
+  int get hashCode => Object.hash(
+    totalPoints,
+    longestStreak,
+    currentStreak,
+    prayerRate,
+    quranPages,
+  );
 }
 
 // ─────────────────────────────────────────
@@ -1463,8 +1524,9 @@ class PrayerTimesCacheDao extends DatabaseAccessor<AppDatabase>
   PrayerTimesCacheDao(super.db);
 
   Future<PrayerTimesCacheData?> getForDate(DateTime date) {
-    return (select(prayerTimesCache)..where((t) => t.date.equals(date)))
-        .getSingleOrNull();
+    return (select(
+      prayerTimesCache,
+    )..where((t) => t.date.equals(date))).getSingleOrNull();
   }
 
   Future<void> insertOrUpdate(PrayerTimesCacheCompanion companion) {
@@ -1497,13 +1559,13 @@ class RamadanProgressDao extends DatabaseAccessor<AppDatabase>
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
     final year = data['year'] as int;
     final dayNum = data['day_number'] as int;
-    
+
     final existing = await getProgress(year, dayNum);
     int? recordId;
     if (data['record_id'] != null) {
       recordId = data['record_id'] as int;
     }
-    
+
     final companion = RamadanProgressCompanion(
       year: Value(year),
       dayNumber: Value(dayNum),
@@ -1514,8 +1576,9 @@ class RamadanProgressDao extends DatabaseAccessor<AppDatabase>
     );
 
     if (existing != null) {
-      await (update(ramadanProgress)..where((t) => t.id.equals(existing.id)))
-          .write(companion);
+      await (update(
+        ramadanProgress,
+      )..where((t) => t.id.equals(existing.id))).write(companion);
     } else {
       await into(ramadanProgress).insert(companion);
     }
@@ -1610,9 +1673,9 @@ class BookProgressDao extends DatabaseAccessor<AppDatabase>
 
   /// Get progress for a specific book (returns null if never opened).
   Future<BookReadingProgressData?> getProgress(String bookId) {
-    return (select(bookReadingProgress)
-          ..where((t) => t.bookId.equals(bookId)))
-        .getSingleOrNull();
+    return (select(
+      bookReadingProgress,
+    )..where((t) => t.bookId.equals(bookId))).getSingleOrNull();
   }
 
   /// Get progress for all books at once.
@@ -1694,8 +1757,8 @@ class BookProgressDao extends DatabaseAccessor<AppDatabase>
 
   /// Delete progress for a book.
   Future<void> deleteProgress(String bookId) {
-    return (delete(bookReadingProgress)
-          ..where((t) => t.bookId.equals(bookId)))
-        .go();
+    return (delete(
+      bookReadingProgress,
+    )..where((t) => t.bookId.equals(bookId))).go();
   }
 }

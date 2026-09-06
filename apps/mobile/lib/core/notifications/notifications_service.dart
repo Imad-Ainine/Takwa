@@ -16,6 +16,7 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/app/main_shell.dart' show currentTabProvider;
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
 //  NOTIFICATION IDs
@@ -80,129 +81,133 @@ class NotifIds {
 //  NOTIFICATION CHANNELS (Android)
 // ─────────────────────────────────────────
 class NotifChannels {
+  static final AppLocalizations _l10n = lookupAppLocalizations(
+    const Locale('ar'),
+  );
+
   /// قناة الأذان — أعلى أولوية مع صوت الأذان
-  static const AndroidNotificationChannel prayerSound =
+  static final AndroidNotificationChannel prayerSound =
       AndroidNotificationChannel(
         'prayer_adhan_sound',
-        'أذان الصلاة (صوت)',
-        description: 'إشعار وقت الأذان مع صوت الأذان',
+        _l10n.notifChannelPrayerSoundName,
+        description: _l10n.notifChannelPrayerSoundDesc,
         importance: Importance.max,
-        sound: RawResourceAndroidNotificationSound('adhan'),
+        sound: const RawResourceAndroidNotificationSound('adhan'),
         playSound: true,
         enableVibration: true,
         enableLights: true,
-        ledColor: Color(0xFFC8A96E),
+        ledColor: const Color(0xFFC8A96E),
       );
 
   /// قناة الأذان — اهتزاز فقط
-  static const AndroidNotificationChannel prayerVibrate =
+  static final AndroidNotificationChannel prayerVibrate =
       AndroidNotificationChannel(
         'prayer_adhan_vibrate',
-        'أذان الصلاة (اهتزاز)',
-        description: 'إشعار وقت الأذان باهتزاز فقط',
+        _l10n.notifChannelPrayerVibrateName,
+        description: _l10n.notifChannelPrayerVibrateDesc,
         importance: Importance.high,
         playSound: false,
         enableVibration: true,
         enableLights: true,
-        ledColor: Color(0xFFC8A96E),
+        ledColor: const Color(0xFFC8A96E),
       );
 
   /// قناة الأذان — صامت
-  static const AndroidNotificationChannel prayerSilent =
+  static final AndroidNotificationChannel prayerSilent =
       AndroidNotificationChannel(
         'prayer_adhan_silent',
-        'أذان الصلاة (صامت)',
-        description: 'إشعار صامت لوقت الأذان',
+        _l10n.notifChannelPrayerSilentName,
+        description: _l10n.notifChannelPrayerSilentDesc,
         importance: Importance.high,
         playSound: false,
         enableVibration: false,
         enableLights: true,
-        ledColor: Color(0xFFC8A96E),
+        ledColor: const Color(0xFFC8A96E),
       );
 
   /// تنبيهات قبل الأذان والإقامة
-  static const AndroidNotificationChannel alert = AndroidNotificationChannel(
+  static final AndroidNotificationChannel alert = AndroidNotificationChannel(
     'prayer_alerts',
-    'تنبيهات الصلاة',
-    description: 'تنبيهات قبل الأذان وبعد الإقامة',
+    _l10n.notifChannelAlertName,
+    description: _l10n.notifChannelAlertDesc,
     importance: Importance.high,
-    sound: RawResourceAndroidNotificationSound('notification'),
+    sound: const RawResourceAndroidNotificationSound('notification'),
     playSound: true,
     enableVibration: true,
   );
 
   /// قناة المحاسبة
-  static const AndroidNotificationChannel muhasaba = AndroidNotificationChannel(
+  static final AndroidNotificationChannel muhasaba = AndroidNotificationChannel(
     'muhasaba',
-    'محاسبة النفس',
-    description: 'تذكير محاسبة النفس المسائية',
+    _l10n.notifChannelMuhasabaName,
+    description: _l10n.notifChannelMuhasabaDesc,
     importance: Importance.defaultImportance,
     enableVibration: false,
   );
 
   /// قناة الأذكار
-  static const AndroidNotificationChannel adhkar = AndroidNotificationChannel(
+  static final AndroidNotificationChannel adhkar = AndroidNotificationChannel(
     'adhkar_channel',
-    'الأذكار اليومية',
-    description: 'أذكار الصباح والمساء وبعد الصلاة',
+    _l10n.notifChannelAdhkarName,
+    description: _l10n.notifChannelAdhkarDesc,
     importance: Importance.defaultImportance,
     playSound: false,
     enableVibration: false,
   );
 
   /// قناة الأدعية
-  static const AndroidNotificationChannel duas = AndroidNotificationChannel(
+  static final AndroidNotificationChannel duas = AndroidNotificationChannel(
     'duas_channel',
-    'الأدعية',
-    description: 'نفحات من الأدعية النبوية والقرآنية',
+    _l10n.notifChannelDuasName,
+    description: _l10n.notifChannelDuasDesc,
     importance: Importance.defaultImportance,
     playSound: false,
     enableVibration: false,
   );
 
   /// قناة الإنجازات
-  static const AndroidNotificationChannel achievement =
+  static final AndroidNotificationChannel achievement =
       AndroidNotificationChannel(
         'achievement_channel',
-        'الإنجازات',
-        description: 'إشعارات الإنجازات الجديدة',
+        _l10n.notifChannelAchievementName,
+        description: _l10n.notifChannelAchievementDesc,
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
       );
 
   /// قناة التذكيرات الخاصة
-  static const AndroidNotificationChannel reminders =
+  static final AndroidNotificationChannel reminders =
       AndroidNotificationChannel(
         'special_reminders',
-        'تذكيرات إيمانية',
-        description: 'تذكيرات بسنن الجمعة والصيام والأيام البيض',
+        _l10n.notifChannelRemindersName,
+        description: _l10n.notifChannelRemindersDesc,
         importance: Importance.defaultImportance,
         enableVibration: false,
       );
 
   /// قناة رمضان
-  static const AndroidNotificationChannel ramadan = AndroidNotificationChannel(
+  static final AndroidNotificationChannel ramadan = AndroidNotificationChannel(
     'ramadan_channel',
-    'رمضان المبارك',
-    description: 'تنبيهات السحور والإفطار',
+    _l10n.notifChannelRamadanName,
+    description: _l10n.notifChannelRamadanDesc,
     importance: Importance.high,
     playSound: true,
     enableVibration: true,
   );
 
   /// قناة منبه الاستيقاظ
-  static const AndroidNotificationChannel wakeUpAlarm =
+  static final AndroidNotificationChannel wakeUpAlarm =
       AndroidNotificationChannel(
         'wakeup_alarm_channel',
-        'منبه الاستيقاظ',
-        description: 'منبه مخصص للاستيقاظ لصلاة الفجر',
+        _l10n.notifChannelWakeUpAlarmName,
+        description: _l10n.notifChannelWakeUpAlarmDesc,
         importance: Importance.max,
-        sound: RawResourceAndroidNotificationSound('adhan'),
+        sound: const RawResourceAndroidNotificationSound('adhan'),
         playSound: true,
         enableVibration: true,
         enableLights: true,
-        ledColor: Color(0xFFC8A96E),
+        ledColor: const Color(0xFFC8A96E),
       );
 
   static List<AndroidNotificationChannel> get all => [

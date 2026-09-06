@@ -6506,6 +6506,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_custom_ibadah_log_record_ibadah',
     'CREATE INDEX idx_custom_ibadah_log_record_ibadah ON custom_ibadah_log (record_id, ibadah_id)',
   );
+  late final Index idxRamadanProgressRecord = Index(
+    'idx_ramadan_progress_record',
+    'CREATE INDEX idx_ramadan_progress_record ON ramadan_progress (record_id)',
+  );
   late final DailyRecordDao dailyRecordDao = DailyRecordDao(
     this as AppDatabase,
   );
@@ -6545,6 +6549,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     bookReadingProgress,
     idxProhibitionsLogRecord,
     idxCustomIbadahLogRecordIbadah,
+    idxRamadanProgressRecord,
   ];
 }
 
@@ -6618,10 +6623,7 @@ final class $$DailyRecordsTableReferences
   static MultiTypedResultKey<$ProhibitionsLogTable, List<ProhibitionsLogData>>
   _prohibitionsLogRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.prohibitionsLog,
-    aliasName: $_aliasNameGenerator(
-      db.dailyRecords.id,
-      db.prohibitionsLog.recordId,
-    ),
+    aliasName: 'daily_records__id__prohibitions_log__record_id',
   );
 
   $$ProhibitionsLogTableProcessedTableManager get prohibitionsLogRefs {
@@ -6641,10 +6643,7 @@ final class $$DailyRecordsTableReferences
   static MultiTypedResultKey<$CustomIbadahLogTable, List<CustomIbadahLogData>>
   _customIbadahLogRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.customIbadahLog,
-    aliasName: $_aliasNameGenerator(
-      db.dailyRecords.id,
-      db.customIbadahLog.recordId,
-    ),
+    aliasName: 'daily_records__id__custom_ibadah_log__record_id',
   );
 
   $$CustomIbadahLogTableProcessedTableManager get customIbadahLogRefs {
@@ -6664,10 +6663,7 @@ final class $$DailyRecordsTableReferences
   static MultiTypedResultKey<$RamadanProgressTable, List<RamadanProgressData>>
   _ramadanProgressRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.ramadanProgress,
-    aliasName: $_aliasNameGenerator(
-      db.dailyRecords.id,
-      db.ramadanProgress.recordId,
-    ),
+    aliasName: 'daily_records__id__ramadan_progress__record_id',
   );
 
   $$RamadanProgressTableProcessedTableManager get ramadanProgressRefs {
@@ -7427,7 +7423,7 @@ class $$DailyRecordsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$DailyRecordsTable, DailyRecord>(table),
                   $$DailyRecordsTableReferences(db, table, e),
                 ),
               )
@@ -7575,10 +7571,8 @@ final class $$ProhibitionsLogTableReferences
     super.$_typedResult,
   );
 
-  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) =>
-      db.dailyRecords.createAlias(
-        $_aliasNameGenerator(db.prohibitionsLog.recordId, db.dailyRecords.id),
-      );
+  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) => db.dailyRecords
+      .createAlias('prohibitions_log__record_id__daily_records__id');
 
   $$DailyRecordsTableProcessedTableManager get recordId {
     final $_column = $_itemColumn<int>('record_id')!;
@@ -7880,7 +7874,9 @@ class $$ProhibitionsLogTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$ProhibitionsLogTable, ProhibitionsLogData>(
+                    table,
+                  ),
                   $$ProhibitionsLogTableReferences(db, table, e),
                 ),
               )
@@ -8236,7 +8232,18 @@ class $$PrayerTimesCacheTableTableManager
                 method: method,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$PrayerTimesCacheTable, PrayerTimesCacheData>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PrayerTimesCacheTable,
+                    PrayerTimesCacheData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -8493,7 +8500,16 @@ class $$AchievementsTableTableManager
                 seen: seen,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$AchievementsTable, Achievement>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AchievementsTable,
+                    Achievement
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -8546,10 +8562,7 @@ final class $$CustomIbadahTableReferences
   static MultiTypedResultKey<$CustomIbadahLogTable, List<CustomIbadahLogData>>
   _customIbadahLogRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.customIbadahLog,
-    aliasName: $_aliasNameGenerator(
-      db.customIbadah.id,
-      db.customIbadahLog.ibadahId,
-    ),
+    aliasName: 'custom_ibadah__id__custom_ibadah_log__ibadah_id',
   );
 
   $$CustomIbadahLogTableProcessedTableManager get customIbadahLogRefs {
@@ -8805,7 +8818,7 @@ class $$CustomIbadahTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$CustomIbadahTable, CustomIbadahData>(table),
                   $$CustomIbadahTableReferences(db, table, e),
                 ),
               )
@@ -8892,10 +8905,8 @@ final class $$CustomIbadahLogTableReferences
     super.$_typedResult,
   );
 
-  static $CustomIbadahTable _ibadahIdTable(_$AppDatabase db) =>
-      db.customIbadah.createAlias(
-        $_aliasNameGenerator(db.customIbadahLog.ibadahId, db.customIbadah.id),
-      );
+  static $CustomIbadahTable _ibadahIdTable(_$AppDatabase db) => db.customIbadah
+      .createAlias('custom_ibadah_log__ibadah_id__custom_ibadah__id');
 
   $$CustomIbadahTableProcessedTableManager get ibadahId {
     final $_column = $_itemColumn<int>('ibadah_id')!;
@@ -8911,10 +8922,8 @@ final class $$CustomIbadahLogTableReferences
     );
   }
 
-  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) =>
-      db.dailyRecords.createAlias(
-        $_aliasNameGenerator(db.customIbadahLog.recordId, db.dailyRecords.id),
-      );
+  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) => db.dailyRecords
+      .createAlias('custom_ibadah_log__record_id__daily_records__id');
 
   $$DailyRecordsTableProcessedTableManager get recordId {
     final $_column = $_itemColumn<int>('record_id')!;
@@ -9214,7 +9223,9 @@ class $$CustomIbadahLogTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$CustomIbadahLogTable, CustomIbadahLogData>(
+                    table,
+                  ),
                   $$CustomIbadahLogTableReferences(db, table, e),
                 ),
               )
@@ -9410,7 +9421,16 @@ class $$UserSettingsTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$UserSettingsTable, UserSetting>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $UserSettingsTable,
+                    UserSetting
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -9468,10 +9488,8 @@ final class $$RamadanProgressTableReferences
     super.$_typedResult,
   );
 
-  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) =>
-      db.dailyRecords.createAlias(
-        $_aliasNameGenerator(db.ramadanProgress.recordId, db.dailyRecords.id),
-      );
+  static $DailyRecordsTable _recordIdTable(_$AppDatabase db) => db.dailyRecords
+      .createAlias('ramadan_progress__record_id__daily_records__id');
 
   $$DailyRecordsTableProcessedTableManager? get recordId {
     final $_column = $_itemColumn<int>('record_id');
@@ -9734,7 +9752,9 @@ class $$RamadanProgressTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable(table),
+                  e.readTable<$RamadanProgressTable, RamadanProgressData>(
+                    table,
+                  ),
                   $$RamadanProgressTableReferences(db, table, e),
                 ),
               )
@@ -9986,7 +10006,16 @@ class $$RemindersTableTableManager
                 createdAt: createdAt,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$RemindersTable, Reminder>(table),
+                  BaseReferences<_$AppDatabase, $RemindersTable, Reminder>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -10185,7 +10214,16 @@ class $$UserAdhkarTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$UserAdhkarTable, UserAdhkarData>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $UserAdhkarTable,
+                    UserAdhkarData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -10420,7 +10458,16 @@ class $$UserDuasTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<$UserDuasTable, UserDua>(table),
+                  BaseReferences<_$AppDatabase, $UserDuasTable, UserDua>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),
@@ -10692,7 +10739,19 @@ class $$BookReadingProgressTableTableManager
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map(
+                (e) => (
+                  e.readTable<
+                    $BookReadingProgressTable,
+                    BookReadingProgressData
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $BookReadingProgressTable,
+                    BookReadingProgressData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
         ),

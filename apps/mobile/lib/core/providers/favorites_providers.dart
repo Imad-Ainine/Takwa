@@ -1,24 +1,20 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../supabase/supabase_config.dart';
 import '../supabase/supabase_providers.dart';
+import 'favorites_repository.dart';
+import 'shared_preferences_provider.dart';
+
+final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
+  return FavoritesRepository(ref.watch(sharedPreferencesProvider));
+});
 
 class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
   final String _key;
   final Ref ref;
 
-  FavoriteItemsNotifier(this._key, this.ref) : super({}) {
-    _load();
-  }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final list = prefs.getStringList(_key);
-    if (list != null) {
-      state = list.map(int.parse).toSet();
-    }
-  }
+  FavoriteItemsNotifier(this._key, this.ref)
+    : super(ref.read(favoritesRepositoryProvider).getIds(_key));
 
   void toggle(int id) {
     if (state.contains(id)) {
@@ -30,8 +26,7 @@ class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
   }
 
   Future<void> _save({bool syncToRemote = true}) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, state.map((e) => e.toString()).toList());
+    await ref.read(favoritesRepositoryProvider).setIds(_key, state);
 
     if (syncToRemote) {
       final isOnline = ref.read(connectivityProvider).value ?? false;

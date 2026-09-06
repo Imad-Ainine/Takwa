@@ -52,6 +52,7 @@ dependencies:
   permission_handler: ^12.0.1
 
   # ── Utils ──
+  collection: ^1.19.0
   intl: ^0.20.2
   shared_preferences: ^2.3.2
   url_launcher: ^6.3.0
@@ -74,22 +75,27 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
 
   # ── PDF and Images ──
-  syncfusion_flutter_pdfviewer: ^28.1.41
+  syncfusion_flutter_pdfviewer: ^34.2.6   # upgraded to resolve win32 ^6.x conflict
   cached_network_image: ^3.4.1
 
   # ── Adhan Background & UI ──
-  flutter_foreground_task: ^8.13.0
-  wakelock_plus: ^1.2.10
-  flutter_windowmanager_plus: ^1.0.1
+  # Bumped to 11.0.1 for built-in Kotlin (KGP) support — has breaking API changes,
+  # see https://pub.dev/packages/flutter_foreground_task/changelog
+  flutter_foreground_task: ^11.0.1
+  wakelock_plus: ^1.8.0         # 1.8.0 migrated to built-in Kotlin KGP
+  flutter_windowmanager_plus: ^1.1.0  # 1.1.0 published with AGP 8.13 / Kotlin 2.1.20
   flutter_overlay_window: ^0.5.0
   http: ^1.6.0
-  speech_to_text: ^7.3.0
-  flutter_tts: ^3.8.5
+  speech_to_text: ^7.4.0
+  # flutter_tts: KGP migration not yet released. Track https://github.com/dlutton/flutter_tts/issues/476
+  # Bumped to 4.2.5 (latest) in the meantime.
+  flutter_tts: ^4.2.5
 
-  share_plus: ^7.2.2
+  # Bumped to 13.3.0 for built-in Kotlin support — introduces SharePlus class, see changelog
+  share_plus: ^13.3.0
   sound_mode: ^3.0.1
   custom_refresh_indicator: ^4.0.1
-  sensors_plus: ^7.0.0
+  sensors_plus: ^7.1.0          # 7.1.0 added built-in Kotlin support
 
 dev_dependencies:
   flutter_test:
@@ -103,6 +109,7 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
+    - .env
     - assets/sounds/
     - assets/images/
     - assets/
@@ -120,4 +127,26 @@ flutter:
         - asset: assets/fonts/NotoNaskhArabic-SemiBold.ttf
           weight: 600
         - asset: assets/fonts/NotoNaskhArabic-Bold.ttf
+          weight: 700
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Tajawal-Regular.ttf
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+    # Used for English UI only — see AppTypographyExtension.fromColors()
+    # and AdaptiveStyle.amiri()/.naskh() in packages/takwa_ui, which pick
+    # this over Amiri/NotoNaskhArabic based on the active locale. Arabic
+    # rendering is untouched.
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
