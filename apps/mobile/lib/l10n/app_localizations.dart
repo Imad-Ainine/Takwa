@@ -5899,6 +5899,276 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حفظ كلمة المرور والدخول'**
   String get updatePasswordSaveAndSignInButton;
+
+  /// No description provided for @qiyamSunnahGuideTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة القيام والتهجد'**
+  String get qiyamSunnahGuideTitle;
+
+  /// No description provided for @qiyamSunnahGuideHeaderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'هدي النبي ﷺ في قيام الليل'**
+  String get qiyamSunnahGuideHeaderTitle;
+
+  /// No description provided for @qiyamSunnahGuideHeaderSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دليل شامل لتعلم كيفية صلاة التهجد كما وردت عن الرسول ﷺ والصحابة الكرام.'**
+  String get qiyamSunnahGuideHeaderSubtitle;
+
+  /// No description provided for @qiyamSunnahStep1Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'النية والإخلاص'**
+  String get qiyamSunnahStep1Title;
+
+  /// No description provided for @qiyamSunnahStep1Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'أن ينوي العبد قيام الليل تقرباً لله عز وجل، ويفضل أن ينام على طهارة.'**
+  String get qiyamSunnahStep1Content;
+
+  /// No description provided for @qiyamSunnahStep2Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستفتاح بركعتين خفيفتين'**
+  String get qiyamSunnahStep2Title;
+
+  /// No description provided for @qiyamSunnahStep2Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'كان النبي ﷺ إذا قام من الليل افتتح صلاته بركعتين خفيفتين، لتنشيط الجسد.'**
+  String get qiyamSunnahStep2Content;
+
+  /// No description provided for @qiyamSunnahStep3Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'كيفية الصلاة (مثنى مثنى)'**
+  String get qiyamSunnahStep3Title;
+
+  /// No description provided for @qiyamSunnahStep3Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'صلاة الليل مثنى مثنى، أي يسلم بعد كل ركعتين، ويطيل الركوع والسجود حسب الاستطاعة.'**
+  String get qiyamSunnahStep3Content;
+
+  /// No description provided for @qiyamSunnahStep4Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة بتدبر'**
+  String get qiyamSunnahStep4Title;
+
+  /// No description provided for @qiyamSunnahStep4Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'يستحب أن تكون القراءة بترتيل وتدبر، ويسأل الله عند آية الرحمة، ويتعوذ عند آية العذاب.'**
+  String get qiyamSunnahStep4Content;
+
+  /// No description provided for @qiyamSunnahStep5Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختم القيام بالوتر'**
+  String get qiyamSunnahStep5Title;
+
+  /// No description provided for @qiyamSunnahStep5Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'يختم المصلي قيامه بركعة واحدة توتر له ما صلى، لقوله ﷺ: \"اجعلوا آخر صلاتكم بالليل وتراً\".'**
+  String get qiyamSunnahStep5Content;
+
+  /// No description provided for @qiyamVirtuesScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فضائل قيام الليل'**
+  String get qiyamVirtuesScreenTitle;
+
+  /// No description provided for @qiyamVirtuesFromQuran.
+  ///
+  /// In ar, this message translates to:
+  /// **'من القرآن الكريم'**
+  String get qiyamVirtuesFromQuran;
+
+  /// No description provided for @qiyamVirtuesFromSunnah.
+  ///
+  /// In ar, this message translates to:
+  /// **'من السنة النبوية'**
+  String get qiyamVirtuesFromSunnah;
+
+  /// No description provided for @qiyamVirtuesFromSalaf.
+  ///
+  /// In ar, this message translates to:
+  /// **'من أقوال السلف'**
+  String get qiyamVirtuesFromSalaf;
+
+  /// No description provided for @qiyamStoriesScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قصص وعجائب القيام'**
+  String get qiyamStoriesScreenTitle;
+
+  /// No description provided for @qiyamStoryTitle1.
+  ///
+  /// In ar, this message translates to:
+  /// **'شرف المؤمن'**
+  String get qiyamStoryTitle1;
+
+  /// No description provided for @qiyamStoryTitle2.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيد التابعين والقيام'**
+  String get qiyamStoryTitle2;
+
+  /// No description provided for @qiyamStoryTitle3.
+  ///
+  /// In ar, this message translates to:
+  /// **'سهام الليل لا تخطئ'**
+  String get qiyamStoryTitle3;
+
+  /// No description provided for @qiyamStoryTitle4.
+  ///
+  /// In ar, this message translates to:
+  /// **'نور الوجه من القيام'**
+  String get qiyamStoryTitle4;
+
+  /// No description provided for @accountSettingsSavedSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ التغييرات بنجاح'**
+  String get accountSettingsSavedSuccess;
+
+  /// No description provided for @accountSettingsSaveError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء حفظ التغييرات'**
+  String get accountSettingsSaveError;
+
+  /// No description provided for @accountSettingsPersonalInfoSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'المعلومات الشخصية'**
+  String get accountSettingsPersonalInfoSection;
+
+  /// No description provided for @accountSettingsNameLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم'**
+  String get accountSettingsNameLabel;
+
+  /// No description provided for @accountSettingsNameHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل اسمك'**
+  String get accountSettingsNameHint;
+
+  /// No description provided for @accountSettingsNameRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرجاء إدخال الاسم'**
+  String get accountSettingsNameRequired;
+
+  /// No description provided for @accountSettingsEmailImmutableNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تغيير البريد الإلكتروني حالياً'**
+  String get accountSettingsEmailImmutableNote;
+
+  /// No description provided for @accountSettingsSaveButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ التغييرات'**
+  String get accountSettingsSaveButton;
+
+  /// No description provided for @accountSettingsSecuritySection.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأمان'**
+  String get accountSettingsSecuritySection;
+
+  /// No description provided for @accountSettingsChangePasswordTile.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير كلمة المرور'**
+  String get accountSettingsChangePasswordTile;
+
+  /// No description provided for @bookReaderCustomizeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخصيص القراءة'**
+  String get bookReaderCustomizeTitle;
+
+  /// No description provided for @bookReaderThemeDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'نهاري'**
+  String get bookReaderThemeDay;
+
+  /// No description provided for @bookReaderThemeSepia.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورقي'**
+  String get bookReaderThemeSepia;
+
+  /// No description provided for @bookReaderFontSizeSampleLetter.
+  ///
+  /// In ar, this message translates to:
+  /// **'أ'**
+  String get bookReaderFontSizeSampleLetter;
+
+  /// No description provided for @bookReaderNextButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get bookReaderNextButton;
+
+  /// No description provided for @bookReaderPrevButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'السابق'**
+  String get bookReaderPrevButton;
+
+  /// No description provided for @bookReaderPageProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{done} من {total}'**
+  String bookReaderPageProgress(String done, String total);
+
+  /// No description provided for @bookReaderPageLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة'**
+  String get bookReaderPageLabel;
+
+  /// No description provided for @favoriteAdhkarScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكاري المفضلة'**
+  String get favoriteAdhkarScreenTitle;
+
+  /// No description provided for @favoriteAdhkarCountLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{ذكر واحد محفوظ} two{ذكران محفوظان} few{{count} أذكار محفوظة} many{{count} ذكرًا محفوظًا} other{{count} ذكر محفوظ}}'**
+  String favoriteAdhkarCountLabel(int count);
+
+  /// No description provided for @favoriteAdhkarEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أذكار مفضلة بعد'**
+  String get favoriteAdhkarEmptyTitle;
+
+  /// No description provided for @favoriteAdhkarEmptySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على ❤️ في أي ذكر لحفظه هنا'**
+  String get favoriteAdhkarEmptySubtitle;
+
+  /// No description provided for @favoriteAdhkarCopiedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم النسخ ✓'**
+  String get favoriteAdhkarCopiedToast;
 }
 
 class _AppLocalizationsDelegate

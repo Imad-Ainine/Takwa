@@ -1787,5 +1787,67 @@
   "updatePasswordNewHint": "كلمة المرور الجديدة",
   "updatePasswordConfirmHint": "تأكيد كلمة المرور الجديدة",
   "updatePasswordSavingButton": "جاري الحفظ...",
-  "updatePasswordSaveAndSignInButton": "حفظ كلمة المرور والدخول"
+  "updatePasswordSaveAndSignInButton": "حفظ كلمة المرور والدخول",
+  "qiyamSunnahGuideTitle": "طريقة القيام والتهجد",
+  "qiyamSunnahGuideHeaderTitle": "هدي النبي ﷺ في قيام الليل",
+  "qiyamSunnahGuideHeaderSubtitle": "دليل شامل لتعلم كيفية صلاة التهجد كما وردت عن الرسول ﷺ والصحابة الكرام.",
+  "qiyamSunnahStep1Title": "النية والإخلاص",
+  "qiyamSunnahStep1Content": "أن ينوي العبد قيام الليل تقرباً لله عز وجل، ويفضل أن ينام على طهارة.",
+  "qiyamSunnahStep2Title": "الاستفتاح بركعتين خفيفتين",
+  "qiyamSunnahStep2Content": "كان النبي ﷺ إذا قام من الليل افتتح صلاته بركعتين خفيفتين، لتنشيط الجسد.",
+  "qiyamSunnahStep3Title": "كيفية الصلاة (مثنى مثنى)",
+  "qiyamSunnahStep3Content": "صلاة الليل مثنى مثنى، أي يسلم بعد كل ركعتين، ويطيل الركوع والسجود حسب الاستطاعة.",
+  "qiyamSunnahStep4Title": "القراءة بتدبر",
+  "qiyamSunnahStep4Content": "يستحب أن تكون القراءة بترتيل وتدبر، ويسأل الله عند آية الرحمة، ويتعوذ عند آية العذاب.",
+  "qiyamSunnahStep5Title": "ختم القيام بالوتر",
+  "qiyamSunnahStep5Content": "يختم المصلي قيامه بركعة واحدة توتر له ما صلى، لقوله ﷺ: \"اجعلوا آخر صلاتكم بالليل وتراً\".",
+  "qiyamVirtuesScreenTitle": "فضائل قيام الليل",
+  "qiyamVirtuesFromQuran": "من القرآن الكريم",
+  "qiyamVirtuesFromSunnah": "من السنة النبوية",
+  "qiyamVirtuesFromSalaf": "من أقوال السلف",
+  "qiyamStoriesScreenTitle": "قصص وعجائب القيام",
+  "qiyamStoryTitle1": "شرف المؤمن",
+  "qiyamStoryTitle2": "سيد التابعين والقيام",
+  "qiyamStoryTitle3": "سهام الليل لا تخطئ",
+  "qiyamStoryTitle4": "نور الوجه من القيام",
+  "accountSettingsSavedSuccess": "تم حفظ التغييرات بنجاح",
+  "accountSettingsSaveError": "حدث خطأ أثناء حفظ التغييرات",
+  "accountSettingsPersonalInfoSection": "المعلومات الشخصية",
+  "accountSettingsNameLabel": "الاسم",
+  "accountSettingsNameHint": "أدخل اسمك",
+  "accountSettingsNameRequired": "الرجاء إدخال الاسم",
+  "accountSettingsEmailImmutableNote": "لا يمكن تغيير البريد الإلكتروني حالياً",
+  "accountSettingsSaveButton": "حفظ التغييرات",
+  "accountSettingsSecuritySection": "الأمان",
+  "accountSettingsChangePasswordTile": "تغيير كلمة المرور",
+  "bookReaderCustomizeTitle": "تخصيص القراءة",
+  "bookReaderThemeDay": "نهاري",
+  "bookReaderThemeSepia": "ورقي",
+  "bookReaderFontSizeSampleLetter": "أ",
+  "bookReaderNextButton": "التالي",
+  "bookReaderPrevButton": "السابق",
+  "bookReaderPageProgress": "{done} من {total}",
+  "@bookReaderPageProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "bookReaderPageLabel": "صفحة",
+  "favoriteAdhkarScreenTitle": "أذكاري المفضلة",
+  "favoriteAdhkarCountLabel": "{count, plural, one{ذكر واحد محفوظ} two{ذكران محفوظان} few{{count} أذكار محفوظة} many{{count} ذكرًا محفوظًا} other{{count} ذكر محفوظ}}",
+  "@favoriteAdhkarCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteAdhkarEmptyTitle": "لا توجد أذكار مفضلة بعد",
+  "favoriteAdhkarEmptySubtitle": "اضغط على ❤️ في أي ذكر لحفظه هنا",
+  "favoriteAdhkarCopiedToast": "تم النسخ ✓"
 }

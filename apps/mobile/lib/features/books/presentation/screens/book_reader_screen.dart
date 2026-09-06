@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 enum ReaderTheme { light, sepia, dark }
 
@@ -552,6 +553,7 @@ class _SettingsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
 
@@ -581,7 +583,7 @@ class _SettingsSheet extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xxl),
           Text(
-            'تخصيص القراءة',
+            l10n.bookReaderCustomizeTitle,
             style: typography.headingMedium.copyWith(fontFamily: 'Amiri'),
           ),
           const SizedBox(height: AppSpacing.xxxl),
@@ -631,9 +633,9 @@ class _SettingsSheet extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       switch (t) {
-                        ReaderTheme.light => 'نهاري',
-                        ReaderTheme.sepia => 'ورقي',
-                        ReaderTheme.dark => 'ليلي',
+                        ReaderTheme.light => l10n.bookReaderThemeDay,
+                        ReaderTheme.sepia => l10n.bookReaderThemeSepia,
+                        ReaderTheme.dark => l10n.quranReaderThemeNight,
                       },
                       style: typography.caption.copyWith(
                         color: isSelected ? colors.gold : colors.textSecondary,
@@ -656,27 +658,27 @@ class _SettingsSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'حجم الخط',
+                l10n.quranReaderFontSizeLabel,
                 style: typography.labelLarge.copyWith(fontFamily: 'Amiri'),
               ),
               Row(
                 children: [
                   _SizeBtn(
-                    label: 'أ',
+                    label: l10n.bookReaderFontSizeSampleLetter,
                     isSelected: fontSizeLevel == 0,
                     onTap: onFontSizeToggle,
                     fontSize: 14,
                   ),
                   const SizedBox(width: AppSpacing.md),
                   _SizeBtn(
-                    label: 'أ',
+                    label: l10n.bookReaderFontSizeSampleLetter,
                     isSelected: fontSizeLevel == 1,
                     onTap: onFontSizeToggle,
                     fontSize: 18,
                   ),
                   const SizedBox(width: AppSpacing.md),
                   _SizeBtn(
-                    label: 'أ',
+                    label: l10n.bookReaderFontSizeSampleLetter,
                     isSelected: fontSizeLevel == 2,
                     onTap: onFontSizeToggle,
                     fontSize: 22,
@@ -763,6 +765,7 @@ class _BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
 
@@ -824,7 +827,7 @@ class _BottomNav extends StatelessWidget {
               children: [
                 _NavButton(
                   icon: Icons.chevron_left,
-                  label: 'التالي',
+                  label: l10n.bookReaderNextButton,
                   enabled: !isLast,
                   accentColor: accentColor,
                   onTap: onNext,
@@ -832,7 +835,10 @@ class _BottomNav extends StatelessWidget {
                 Column(
                   children: [
                     Text(
-                      '$globalDone من $total',
+                      l10n.bookReaderPageProgress(
+                        globalDone.toString(),
+                        total.toString(),
+                      ),
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 14,
@@ -841,14 +847,14 @@ class _BottomNav extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'صفحة',
+                      l10n.bookReaderPageLabel,
                       style: typography.caption.copyWith(fontSize: 10),
                     ),
                   ],
                 ),
                 _NavButton(
                   icon: Icons.chevron_right,
-                  label: 'السابق',
+                  label: l10n.bookReaderPrevButton,
                   enabled: !isFirst,
                   accentColor: accentColor,
                   onTap: onPrev,

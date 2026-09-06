@@ -7,12 +7,14 @@ import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class FavoriteAdhkarScreen extends ConsumerWidget {
   const FavoriteAdhkarScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final favIds = ref.watch(favoriteAdhkarProvider);
     final allDhikr = kAdhkarData.values.expand((l) => l).toList();
     final favDhikr = allDhikr.where((d) => favIds.contains(d.id)).toList();
@@ -44,7 +46,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'أذكاري المفضلة',
+                                l10n.favoriteAdhkarScreenTitle,
                                 style: context.typography.headingMedium
                                     .copyWith(
                                       fontSize: 20,
@@ -52,7 +54,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
                                     ),
                               ),
                               Text(
-                                '${favDhikr.length} ذكر محفوظ',
+                                l10n.favoriteAdhkarCountLabel(favDhikr.length),
                                 style: context.typography.caption.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
@@ -96,6 +98,7 @@ class _EmptyFavs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -103,7 +106,7 @@ class _EmptyFavs extends StatelessWidget {
           const Text('🤍', style: TextStyle(fontSize: 52)),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'لا توجد أذكار مفضلة بعد',
+            l10n.favoriteAdhkarEmptyTitle,
             style: context.typography.headingMedium.copyWith(
               color: colors.textPrimary,
               fontSize: 16,
@@ -111,7 +114,7 @@ class _EmptyFavs extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'اضغط على ❤️ في أي ذكر لحفظه هنا',
+            l10n.favoriteAdhkarEmptySubtitle,
             style: context.typography.caption.copyWith(
               color: colors.textSecondary,
             ),
@@ -157,6 +160,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final favIds = ref.watch(favoriteAdhkarProvider);
     final isFav = favIds.contains(widget.item.id);
 
@@ -201,7 +205,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                 children: [
                   Expanded(
                     child: Text(
-                      _categoryLabel(widget.item.category),
+                      _categoryLabel(l10n, widget.item.category),
                       style: context.typography.caption.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -261,7 +265,7 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('تم النسخ ✓'),
+                          content: Text(l10n.favoriteAdhkarCopiedToast),
                           backgroundColor: context.colors.teal,
                           behavior: SnackBarBehavior.floating,
                           duration: const Duration(seconds: 1),
@@ -387,15 +391,15 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
     );
   }
 
-  String _categoryLabel(AdhkarCategory cat) {
+  String _categoryLabel(AppLocalizations l10n, AdhkarCategory cat) {
     return switch (cat) {
-      AdhkarCategory.morning => '🌅 أذكار الصباح',
-      AdhkarCategory.evening => '🌆 أذكار المساء',
-      AdhkarCategory.afterPrayer => '🕌 بعد الصلاة',
-      AdhkarCategory.sleep => '🌙 أذكار النوم',
-      AdhkarCategory.misc => '📿 متنوعة',
-      AdhkarCategory.wakingUp => '📿 الاستيقاظ من النوم',
-      AdhkarCategory.food => '📿 الطعام',
+      AdhkarCategory.morning => '🌅 ${l10n.ibadahMorningAdhkarLabel}',
+      AdhkarCategory.evening => '🌆 ${l10n.ibadahEveningAdhkarLabel}',
+      AdhkarCategory.afterPrayer => '🕌 ${l10n.duaCategoryAfterPrayer}',
+      AdhkarCategory.sleep => '🌙 ${l10n.adhkarNotifSleepLabel}',
+      AdhkarCategory.misc => '📿 ${l10n.adhkarTabMisc}',
+      AdhkarCategory.wakingUp => '📿 ${l10n.adhkarTabWakingUp}',
+      AdhkarCategory.food => '📿 ${l10n.adhkarTabFood}',
     };
   }
 }

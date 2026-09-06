@@ -17,6 +17,19 @@ import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/checklist/widgets/custom_ibadah_group.dart';
 
+const _kArabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+String _localizedDigits(BuildContext context, int n) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  final s = n.toString();
+  return isArabic ? s.split('').map((c) => _kArabicDigits[int.parse(c)]).join() : s;
+}
+
+String _signedPoints(BuildContext context, int points) {
+  final sign = points < 0 ? '-' : '+';
+  return '$sign${_localizedDigits(context, points.abs())}';
+}
+
 class ChecklistScreen extends ConsumerStatefulWidget {
   const ChecklistScreen({super.key});
 
@@ -542,7 +555,7 @@ class _PrayersGroup extends ConsumerWidget {
     return _GroupCard(
       icon: '🕌',
       title: l10n.checklistFivePrayersTitle,
-      trailing: '$_countPerformed / ٥',
+      trailing: '${_localizedDigits(context, _countPerformed)} / ${_localizedDigits(context, 5)}',
       trailingColor: context.colors.gold,
       children: _prayerKeys.map((p) {
         final status = _statusOf(p.$2);
@@ -697,9 +710,9 @@ class _PrayerRow extends StatelessWidget {
                 ),
               ),
               if (isDone)
-                _MiniPts('+١٠', context.colors.success)
+                _MiniPts(_signedPoints(context, 10), context.colors.success)
               else if (isMissed)
-                _MiniPts('-٥', context.colors.danger),
+                _MiniPts(_signedPoints(context, -5), context.colors.danger),
               const SizedBox(width: AppSpacing.xs),
               Icon(
                 Icons.chevron_right_rounded,
@@ -887,7 +900,7 @@ class _IbadahGroup extends ConsumerWidget {
           emoji: '🌅',
           label: l10n.ibadahMorningAdhkarLabel,
           sublabel: l10n.ibadahMorningAdhkarSublabel,
-          points: '+٥',
+          points: _signedPoints(context, 5),
           value: record?.morningAdhkar ?? false,
           onChanged: (v) async {
             final rec = await ref
@@ -908,7 +921,7 @@ class _IbadahGroup extends ConsumerWidget {
           emoji: '🌆',
           label: l10n.ibadahEveningAdhkarLabel,
           sublabel: l10n.ibadahEveningAdhkarSublabel,
-          points: '+٥',
+          points: _signedPoints(context, 5),
           value: record?.eveningAdhkar ?? false,
           onChanged: (v) async {
             final rec = await ref
@@ -929,7 +942,7 @@ class _IbadahGroup extends ConsumerWidget {
           emoji: '🌌',
           label: l10n.ibadahQiyamLabel,
           sublabel: l10n.ibadahQiyamSublabel,
-          points: '+١٥',
+          points: _signedPoints(context, 15),
           value: record?.nightPrayer ?? false,
           onChanged: (v) async {
             final rec = await ref
@@ -950,7 +963,7 @@ class _IbadahGroup extends ConsumerWidget {
           emoji: '💧',
           label: l10n.ibadahSadaqahLabel,
           sublabel: l10n.ibadahSadaqahSublabel,
-          points: '+١٠',
+          points: _signedPoints(context, 10),
           value: record?.sadaqah ?? false,
           onChanged: (v) async {
             final rec = await ref
@@ -968,7 +981,7 @@ class _IbadahGroup extends ConsumerWidget {
           emoji: '👁️',
           label: l10n.ibadahGhadhBasarLabel,
           sublabel: l10n.ibadahGhadhBasarSublabel,
-          points: '+١٠',
+          points: _signedPoints(context, 10),
           value: record?.ghadhBasar ?? false,
           onChanged: (v) async {
             final rec = await ref
@@ -1049,7 +1062,7 @@ class _QuranInput extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
-                hintText: '٠',
+                hintText: _localizedDigits(context, 0),
                 hintStyle: context.typography.caption.copyWith(
                   fontSize: 13,
                   color: context.colors.textDim,
@@ -1094,7 +1107,7 @@ class _QuranInput extends ConsumerWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           Text(
-            '+١',
+            _signedPoints(context, 1),
             style: context.typography.caption.copyWith(
               fontSize: 10,
               color: context.colors.teal,
@@ -1267,7 +1280,7 @@ class _FastingSelector extends ConsumerWidget {
               ),
               if (current != FastingType.none)
                 _MiniPts(
-                  current == FastingType.fard ? '+٢٠' : '+١٠',
+                  _signedPoints(context, current == FastingType.fard ? 20 : 10),
                   context.colors.teal,
                 ),
             ],
@@ -1631,7 +1644,7 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
               ),
             ),
             const SizedBox(width: 6),
-            _MiniPts('-١٠', context.colors.danger),
+            _MiniPts(_signedPoints(context, -10), context.colors.danger),
           ],
         ],
       ),

@@ -143,8 +143,11 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(PrayerScreen), findsOneWidget);
     // Confirms real content rendered, not just the loading overlay or the
-    // error view — one Arabic prayer name from the fixed list above.
-    expect(find.text('الظهر'), findsWidgets);
+    // error view. Prayer names in the UI come from prayerLocalizedName()
+    // keyed off PrayerTimeInfo.name, not the .nameAr field set above, so
+    // assert on something every layout actually renders regardless of
+    // locale: the formatted dhuhr time from the fixed fixture.
+    expect(find.textContaining('12:15'), findsWidgets);
 
     // Same reasoning as widget_test.dart: tear the tree down under this
     // test's own pumping so PrayerNotifier's Timer.periodic (cancelled in
