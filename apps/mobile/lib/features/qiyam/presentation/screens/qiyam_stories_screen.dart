@@ -21,9 +21,10 @@ class QiyamStoriesScreen extends StatelessWidget {
                 _buildAppTopBar(context),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     itemCount: _stories.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: AppSpacing.lg),
                     itemBuilder: (context, index) =>
                         _buildStoryCard(context, _stories[index]),
                   ),
@@ -38,11 +39,14 @@ class QiyamStoriesScreen extends StatelessWidget {
 
   Widget _buildAppTopBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 0,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Text(
             'قصص وعجائب القيام',
             style: context.typography.displayMedium.copyWith(
@@ -60,25 +64,25 @@ class QiyamStoriesScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: context.colors.border),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Text(story.icon, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: Text(
                           story.title,
@@ -90,7 +94,7 @@ class QiyamStoriesScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     story.content,
                     style: context.typography.bodyMedium.copyWith(
@@ -99,7 +103,7 @@ class QiyamStoriesScreen extends StatelessWidget {
                     ),
                   ),
                   if (story.reference.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(

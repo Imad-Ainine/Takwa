@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 
 import '../../providers/adhkar_providers.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
@@ -251,7 +252,7 @@ class _GoldDivider extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           child: Text(
             '✦',
             style: TextStyle(
@@ -644,12 +645,12 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                     _buildHeader(item),
                     const SizedBox(height: 10),
                     const _GoldDivider(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     _buildArabicText(item),
                     if (item.source != null || item.fadl != null) ...[
                       const SizedBox(height: 10),
                       const _GoldDivider(),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       _buildSource(item),
                     ],
                   ],
@@ -731,12 +732,12 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                       letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
                   const Text(
                     '•',
                     style: TextStyle(color: _IGold.gold3, fontSize: 8),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
                   const Text(
                     'اضغط خارجاً للإغلاق',
                     style: TextStyle(
@@ -787,7 +788,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         physics: const BouncingScrollPhysics(),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -802,7 +803,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 item.arabic,
                 textAlign: TextAlign.center,
@@ -829,9 +830,12 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     final text = item.source ?? item.fadl ?? '';
     return Center(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: 5,
+        ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           gradient: LinearGradient(
             colors: [
               _IGold.gold3.withOpacity(0.3),

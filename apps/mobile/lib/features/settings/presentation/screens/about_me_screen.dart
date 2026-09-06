@@ -27,40 +27,40 @@ class AboutMeScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildProfileHeader(context, l),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
                         l.aboutSectionDeveloper,
                         l.aboutSectionDeveloper,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       _buildBioCard(context, l),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
                         l.aboutSectionSkills,
                         l.aboutSectionSkills,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       _buildSkillsGrid(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
                         l.aboutSectionConnect,
                         l.aboutSectionConnect,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       _buildSocialLinks(context),
                       const SizedBox(height: 40),
                       _buildFooter(context, l),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -91,7 +91,7 @@ class AboutMeScreen extends StatelessWidget {
   Widget _buildProfileHeader(BuildContext context, AppLocalizations l) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: context.decorations.goldCard.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
@@ -112,7 +112,7 @@ class AboutMeScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           // Arabic Name
           Text(
             l.aboutDevNameArabic,
@@ -132,7 +132,7 @@ class AboutMeScreen extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           // Badge
           TaqwaBadge(label: l.aboutDevBadge),
         ],
@@ -168,7 +168,7 @@ class AboutMeScreen extends StatelessWidget {
 
   Widget _buildBioCard(BuildContext context, AppLocalizations l) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
@@ -201,7 +201,10 @@ class AboutMeScreen extends StatelessWidget {
       children: skills
           .map(
             (skill) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: context.colors.card2,
                 borderRadius: AppRadius.chip,
@@ -231,14 +234,14 @@ class AboutMeScreen extends StatelessWidget {
               'GitHub',
               url: 'https://github.com/Imad-Ainine',
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             _buildSocialIcon(
               context,
               Icons.business_center_rounded,
               'LinkedIn',
               url: 'https://www.linkedin.com/in/imadeddine-ainine',
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             _buildSocialIcon(
               context,
               Icons.facebook_rounded,
@@ -247,7 +250,7 @@ class AboutMeScreen extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -257,7 +260,7 @@ class AboutMeScreen extends StatelessWidget {
               'Email',
               url: 'mailto:imad.ainine11@gmail.com',
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             _buildSocialIcon(
               context,
               Icons.phone_android_rounded,
@@ -315,14 +318,14 @@ class AboutMeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(height: 1, width: 80, color: context.colors.border),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Text(
             l.aboutFooterDuaRequest,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.gold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             l.aboutFooterMadeWithLove,
             style: context.typography.caption.copyWith(

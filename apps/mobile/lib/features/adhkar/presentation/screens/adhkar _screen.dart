@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -138,7 +137,7 @@ class _AdhkarTopBar extends StatelessWidget {
               child: Row(
                 children: [
                   const CustomLeadingButton(),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +180,7 @@ class _AdhkarTopBar extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             color: context.colors.card,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(color: context.colors.border),
                           ),
                           child: const Center(
@@ -189,7 +188,7 @@ class _AdhkarTopBar extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Consumer(
                         builder: (context, ref, _) => _NotifSettingsButton(),
                       ),
@@ -214,7 +213,7 @@ class _AdhkarTopBar extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [context.colors.gold, context.colors.teal],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
               indicatorPadding: const EdgeInsets.symmetric(
@@ -227,7 +226,10 @@ class _AdhkarTopBar extends StatelessWidget {
               unselectedLabelStyle: context.typography.bodySmall,
               labelColor: context.colors.night,
               unselectedLabelColor: context.colors.textSecondary,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
               tabs: tabs
                   .map((t) => Tab(text: '${t.$1} ${t.$2}', height: 36))
                   .toList(),
@@ -505,7 +507,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                   )
                 : null,
             color: isDone ? null : context.colors.card,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(
               color: isDone
                   ? context.colors.success.withOpacity(0.3)
@@ -551,13 +553,15 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                       secondChild: Column(
                         children: [
                           if (widget.dhikr.transliteration != null) ...[
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppSpacing.sm),
                             Container(
                               height: 1,
                               color: context.colors.border,
-                              margin: const EdgeInsets.symmetric(horizontal: 8),
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppSpacing.sm),
                             Text(
                               widget.dhikr.transliteration!,
                               textAlign: TextAlign.center,
@@ -568,7 +572,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             ),
                           ],
                           if (widget.dhikr.fadl != null) ...[
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppSpacing.sm),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -626,7 +630,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             current: count,
                             total: widget.dhikr.count,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Text(
                             '$remaining متبقي',
                             style: context.typography.caption.copyWith(
@@ -641,7 +645,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             ),
                             decoration: BoxDecoration(
                               color: context.colors.success.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
                               border: Border.all(
                                 color: context.colors.success.withOpacity(0.3),
                               ),
@@ -654,7 +658,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                                   size: 14,
                                   color: context.colors.success,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: AppSpacing.xs),
                                 Text(
                                   'مكتمل ${widget.dhikr.count}×',
                                   style: context.typography.bodySmall.copyWith(
@@ -695,7 +699,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             );
                           },
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
 
                         // expand hint
                         Text(
@@ -704,7 +708,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                             color: context.colors.textDim,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.xs),
                         AnimatedRotation(
                           turns: _expanded ? 0.5 : 0,
                           duration: const Duration(milliseconds: 250),
@@ -758,10 +762,13 @@ class _CounterBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
         color: context.colors.gold.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: context.colors.gold.withOpacity(0.25)),
       ),
       child: Row(
@@ -802,7 +809,7 @@ class _NotifSettingsButton extends ConsumerWidget {
           color: enabled
               ? context.colors.gold.withOpacity(0.1)
               : context.colors.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: enabled
                 ? context.colors.gold.withOpacity(0.3)
@@ -975,9 +982,9 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     }
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 const Divider(),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 _ToggleRow(
                   icon: '🌅',
                   label: 'بعد صلاة الفجر',
@@ -1010,7 +1017,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 //     baseColor: context.colors.gold,
                 //   ),
                 // ),
-                // const SizedBox(height: 12),
+                // const SizedBox(height: AppSpacing.md),
                 // SizedBox(
                 //   width: double.infinity,
                 //   child: PrimaryButton(
@@ -1032,10 +1039,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
   }
 
   Future<TimeOfDay?> _pickTime(BuildContext context, TimeOfDay current) =>
-      showCustomTimePicker(
-        context: context,
-        initialTime: current,
-      );
+      showCustomTimePicker(context: context, initialTime: current);
 }
 
 class _NotifRow extends StatelessWidget {
@@ -1133,7 +1137,6 @@ class _ToggleRow extends StatelessWidget {
     ),
   );
 }
-
 
 class _UserAdhkarTabView extends StatelessWidget {
   final AnimationController entryCtrl;

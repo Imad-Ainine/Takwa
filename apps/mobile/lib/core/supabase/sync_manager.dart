@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/database/app_database.dart';
@@ -134,8 +133,8 @@ class SyncManager {
       if (dr != null) {
         // Ensure points are correct in the local daily_records table
         await dailyDao.recalcPoints(dr.id);
-        
-        // Fetch the recalculated record and push to Supabase 
+
+        // Fetch the recalculated record and push to Supabase
         // to keep points in sync on the remote server
         final afterRecalc = await dailyDao.getRecordByDate(date);
         if (afterRecalc != null) {
@@ -345,8 +344,9 @@ class SyncManager {
         try {
           final dao = _ref.read(customIbadahDaoProvider);
           final ibadahItems = await dao.getAllIbadat();
-          final ibadah =
-              ibadahItems.where((i) => i.id == log.ibadahId).firstOrNull;
+          final ibadah = ibadahItems
+              .where((i) => i.id == log.ibadahId)
+              .firstOrNull;
 
           if (ibadah != null) {
             await syncCustomIbadah(ibadah);
@@ -441,7 +441,7 @@ class SyncManager {
     try {
       final remoteItems = await _service.getUserAdhkar();
       final dao = _ref.read(userAdhkarDaoProvider);
-      
+
       for (final remote in remoteItems) {
         await dao.upsertFromRemote(remote);
       }
@@ -454,7 +454,7 @@ class SyncManager {
     try {
       final remoteItems = await _service.getUserDuas();
       final dao = _ref.read(userDuasDaoProvider);
-      
+
       for (final remote in remoteItems) {
         await dao.upsertFromRemote(remote);
       }

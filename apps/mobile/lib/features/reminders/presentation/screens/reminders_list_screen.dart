@@ -39,7 +39,7 @@ class RemindersListScreen extends ConsumerWidget {
             slivers: [
               _buildAppBar(context),
               SliverPadding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _buildAddReminderButton(context),
@@ -47,7 +47,7 @@ class RemindersListScreen extends ConsumerWidget {
                     remindersAsync.when(
                       loading: () => const Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32.0),
+                          padding: EdgeInsets.all(AppSpacing.xxxl),
                           child: TakwaLoadingIndicator(size: 32),
                         ),
                       ),
@@ -61,7 +61,7 @@ class RemindersListScreen extends ConsumerWidget {
                           ? _buildEmptyState(context)
                           : _buildRemindersList(context, ref, reminders),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
                     const AdviceCard(
                       title: 'نصيحة',
                       description:
@@ -100,7 +100,10 @@ class RemindersListScreen extends ConsumerWidget {
       borderRadius: AppRadius.card,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.xxl,
+          horizontal: AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
           color: context.colors.card.withOpacity(0.85),
           borderRadius: AppRadius.card,
@@ -112,7 +115,7 @@ class RemindersListScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: context.colors.tealDim,
                 shape: BoxShape.circle,
@@ -123,14 +126,14 @@ class RemindersListScreen extends ConsumerWidget {
                 size: 32,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               'إضافة تذكير جديد',
               style: context.typography.headingMedium.copyWith(
                 color: context.colors.teal,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               'اضغط هنا لإنشاء تذكير مخصص',
               style: context.typography.bodySmall,
@@ -143,7 +146,7 @@ class RemindersListScreen extends ConsumerWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
       child: Column(
         children: [
           Icon(
@@ -151,14 +154,14 @@ class RemindersListScreen extends ConsumerWidget {
             size: 64,
             color: context.colors.textDim,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'لا يوجد تذكيرات بعد',
             style: context.typography.headingMedium.copyWith(
               color: context.colors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             'أضف أول تذكير لك بالضغط على الزر أعلاه',
             style: context.typography.bodySmall,
@@ -188,7 +191,7 @@ class RemindersListScreen extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         ...reminders.map(
           (reminder) => Padding(
             padding: const EdgeInsets.only(bottom: 12.0),

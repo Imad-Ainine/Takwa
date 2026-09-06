@@ -78,7 +78,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                 ],
               ),
               SliverPadding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     prefsAsync.when(
@@ -127,7 +127,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: AppSpacing.xl),
                           SectionHeader(
                             icon: '🔊',
                             title: l10n.adhanSoundSectionTitle,
@@ -180,7 +180,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: AppSpacing.xl),
                           SectionHeader(
                             icon: '⚙️',
                             title: l10n.adhanAdvancedSectionTitle,
@@ -231,8 +231,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               ActionSetting(
                                 icon: '📢',
                                 label: l10n.adhanEnableNotifInSilentLabel,
-                                sublabel:
-                                    l10n.adhanEnableNotifInSilentSublabel,
+                                sublabel: l10n.adhanEnableNotifInSilentSublabel,
                                 onTap: () => PrayerSelectionSheet.show(
                                   context: context,
                                   title: l10n.adhanNotifSilentSheetTitle,
@@ -249,7 +248,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: AppSpacing.xl),
                           SectionHeader(
                             icon: '📱',
                             title: l10n.adhanSystemNotifSectionTitle,
@@ -296,7 +295,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
                   ]),
                 ),
               ),
@@ -319,7 +318,7 @@ class AdhanSoundPreviewButton extends ConsumerWidget {
     final isPlaying = playingPath == soundPath;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       child: IconButton(
         onPressed: () async {
           if (isPlaying) {

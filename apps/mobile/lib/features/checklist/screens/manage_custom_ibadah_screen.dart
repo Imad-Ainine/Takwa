@@ -192,9 +192,7 @@ class _IbadahTile extends ConsumerWidget {
                 Text(
                   isPositive
                       ? l10n.manageIbadahPointsEarned(item.points.toString())
-                      : l10n.manageIbadahPointsDeducted(
-                          item.points.toString(),
-                        ),
+                      : l10n.manageIbadahPointsDeducted(item.points.toString()),
                   style: context.typography.caption.copyWith(
                     color: context.colors.textSecondary,
                   ),

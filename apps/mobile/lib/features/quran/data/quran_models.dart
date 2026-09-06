@@ -1,4 +1,3 @@
-
 enum ReaderMode { reading, tahajjud, tafseer, translation }
 
 enum KhatmaType { muyassara, multazima }

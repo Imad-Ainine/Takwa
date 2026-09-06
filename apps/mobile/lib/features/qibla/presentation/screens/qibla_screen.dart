@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -147,7 +146,7 @@ class _QiblaTopBar extends StatelessWidget {
     child: Row(
       children: [
         const CustomLeadingButton(),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +499,7 @@ class _QiblaInfoRow extends StatelessWidget {
     final deg = diff < 180 ? diff.round() : (360 - diff).round();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Row(
         children: [
           Expanded(
@@ -512,7 +511,7 @@ class _QiblaInfoRow extends StatelessWidget {
               isActive: isAligned,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: _InfoCard(
               label: 'اتجاهك الحالي',
@@ -521,7 +520,7 @@ class _QiblaInfoRow extends StatelessWidget {
               style: style,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: _InfoCard(
               label: isAligned ? 'محاذٍ ✓' : 'أدر $dir',
@@ -552,7 +551,10 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedContainer(
     duration: const Duration(milliseconds: 300),
-    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+    padding: const EdgeInsets.symmetric(
+      vertical: AppSpacing.md,
+      horizontal: AppSpacing.sm,
+    ),
     decoration: BoxDecoration(
       color: isActive ? style.gold.withOpacity(0.12) : style.card,
       borderRadius: BorderRadius.circular(14),
@@ -563,7 +565,7 @@ class _InfoCard extends StatelessWidget {
     child: Column(
       children: [
         Text(icon, style: const TextStyle(fontSize: 18)),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           value,
           style: style.naskh(
@@ -590,10 +592,16 @@ class _QiblaHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.xl,
+      vertical: AppSpacing.sm,
+    ),
     child: AnimatedContainer(
       duration: const Duration(milliseconds: 400),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         gradient: isAligned
             ? LinearGradient(
@@ -649,7 +657,7 @@ class _QiblaLocationError extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text('📍', style: TextStyle(fontSize: 40)),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text('يلزم تفعيل الموقع', style: style.amiri(16)),
         const SizedBox(height: 6),
         Text(
@@ -671,7 +679,7 @@ class _QiblaCompassError extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text('🧭', style: TextStyle(fontSize: 40)),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text('البوصلة غير متاحة', style: style.amiri(16)),
         const SizedBox(height: 6),
         Text(

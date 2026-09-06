@@ -94,7 +94,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text('🧐', style: TextStyle(fontSize: 50)),
-                          SizedBox(height: 16),
+                          SizedBox(height: AppSpacing.lg),
                           Text('لم يتم العثور على كتب'),
                         ],
                       ),
@@ -104,8 +104,8 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
 
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20,
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.xl,
                   ),
                   sliver: _isGridView
                       ? SliverGrid(
@@ -151,7 +151,9 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
               error: (err, stack) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xxl,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -160,12 +162,12 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                         size: 80,
                         color: colors.textSecondary.withOpacity(0.3),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppSpacing.xl),
                       Text(
                         'تعذر الاتصال بالخادم',
                         style: typography.headingMedium.copyWith(fontSize: 22),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       Text(
                         'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً\nأو اسحب الشاشة للأسفل للتحديث',
                         style: TextStyle(
@@ -175,18 +177,18 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       ElevatedButton(
                         onPressed: () => ref.invalidate(booksListProvider),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.gold,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
+                            horizontal: AppSpacing.xxxl,
                             vertical: 14,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                           ),
                           elevation: 0,
                         ),
@@ -194,7 +196,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.refresh, size: 20),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.sm),
                             Text(
                               'إعادة المحاولة',
                               style: TextStyle(
@@ -233,7 +235,7 @@ class _SearchBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: colors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
@@ -253,7 +255,7 @@ class _SearchBar extends StatelessWidget {
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 15,
-            horizontal: 20,
+            horizontal: AppSpacing.xl,
           ),
         ),
       ),
@@ -281,7 +283,7 @@ class _CategorySelector extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         reverse: true, // RTL feel
         itemCount: categories.length + 1,
         itemBuilder: (ctx, i) {
@@ -291,7 +293,7 @@ class _CategorySelector extends StatelessWidget {
           final label = isAll ? 'الكل' : _labelFor(cat!);
 
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: ChoiceChip(
               label: Text(label),
               selected: isSelected,
@@ -303,7 +305,7 @@ class _CategorySelector extends StatelessWidget {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 side: BorderSide(
                   color: isSelected ? colors.gold : colors.border,
                 ),
@@ -402,12 +404,12 @@ class _BookCard extends ConsumerWidget {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: AppSpacing.sm,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: c1.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Text(
                               book.categoryLabel,
@@ -420,7 +422,7 @@ class _BookCard extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         book.titleAr,
                         style: typography.headingMedium.copyWith(
@@ -440,7 +442,7 @@ class _BookCard extends ConsumerWidget {
                         ),
                         textAlign: TextAlign.right,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -448,7 +450,7 @@ class _BookCard extends ConsumerWidget {
                             icon: Icons.calendar_today,
                             text: '${book.publishYear} هـ',
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.md),
                           _InfoChip(
                             icon: Icons.auto_stories,
                             text: book.publishYear > 500 ? "مجلد" : "كتيب",
@@ -470,7 +472,7 @@ class _BookCard extends ConsumerWidget {
                 child: Container(
                   width: 100,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     boxShadow: [
                       BoxShadow(
                         color: c1.withOpacity(0.4),
@@ -480,7 +482,7 @@ class _BookCard extends ConsumerWidget {
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -567,7 +569,7 @@ class _BookGridCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: colors.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
@@ -625,7 +627,7 @@ class _BookGridCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 8,
+                  vertical: AppSpacing.sm,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -641,7 +643,7 @@ class _BookGridCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       book.authorAr,
                       style: typography.caption.copyWith(
@@ -660,7 +662,7 @@ class _BookGridCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: colors.goldDim,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                       child: Text(
                         book.categoryLabel,
@@ -702,7 +704,7 @@ class _InfoChip extends StatelessWidget {
             fontSize: 11,
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xs),
         Icon(icon, size: 12, color: colors.gold.withOpacity(0.6)),
       ],
     );
@@ -722,7 +724,7 @@ class _BooksSkeleton extends StatelessWidget {
     return Center(
       child: Container(
         height: 160,
-        margin: const EdgeInsets.symmetric(horizontal: 24),
+        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
         decoration: BoxDecoration(
           color: colors.card,
           borderRadius: BorderRadius.circular(24),
@@ -740,7 +742,7 @@ class _BooksSkeleton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const TakwaLoadingIndicator(),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'جاري تحميل الكتب...',
                 style: TextStyle(

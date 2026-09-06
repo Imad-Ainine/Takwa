@@ -38,7 +38,7 @@ class RamadanToggle extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(isRamadan ? '🌙' : '☽', style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           PrimarySwitch(
             value: isRamadan,
             onChanged: (v) async {

@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -20,7 +19,10 @@ abstract class SupabaseService {
     required String username,
   });
 
-  Future<AuthResponse> signIn({required String email, required String password});
+  Future<AuthResponse> signIn({
+    required String email,
+    required String password,
+  });
 
   Future<AuthResponse?> signInWithGoogle();
 

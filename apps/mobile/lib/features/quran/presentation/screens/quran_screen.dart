@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,7 +64,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                 slivers: [
                   SliverToBoxAdapter(child: _buildTopBar(style)),
                   SliverToBoxAdapter(child: _buildDatePill(style)),
-                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: AppSpacing.md),
+                  ),
                   SliverToBoxAdapter(child: _buildVerseCard(dailyVerse, style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 10)),
                   SliverToBoxAdapter(child: _buildKhatmaButton(khatma, style)),
@@ -73,7 +74,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   SliverToBoxAdapter(child: _buildFreeReadingButton(style)),
                   const SliverToBoxAdapter(child: SizedBox(height: 18)),
                   SliverToBoxAdapter(child: _buildGrid(style)),
-                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: AppSpacing.xxxl),
+                  ),
                 ],
               ),
             ),
@@ -121,7 +124,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               height: 44,
               decoration: BoxDecoration(
                 color: style.gold.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(color: style.gold.withOpacity(0.35)),
               ),
               child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
@@ -140,7 +143,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           height: 44,
           decoration: BoxDecoration(
             color: style.text.withOpacity(0.07),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: style.border),
           ),
           child: Icon(icon, color: style.textSec, size: 22),
@@ -150,8 +153,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   Widget _buildDatePill(AdaptiveStyle style) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           color: style.text.withOpacity(0.06),
           borderRadius: BorderRadius.circular(22),
@@ -161,7 +167,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.calendar_today_rounded, color: style.textDim, size: 14),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               hijriDateString(),
               style: style.naskh(13, color: style.textSec),
@@ -177,7 +183,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       margin: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
         color: style.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: style.border),
       ),
       child: Column(
@@ -196,7 +202,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: AppSpacing.md,
+            ),
             child: Text(
               verse['text'] as String,
               textAlign: TextAlign.center,
@@ -223,12 +232,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
+                    horizontal: AppSpacing.md,
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
                     color: style.text.withOpacity(0.06),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -237,7 +246,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                         'آية ${ar(verse['ayahNumber'] as int)}',
                         style: style.amiri(13, color: style.textSec),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         '»»',
                         style: TextStyle(color: style.textDim, fontSize: 11),
@@ -254,10 +263,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   }
 
   Widget _surahChip(String name, AdaptiveStyle style) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
       color: style.gold.withOpacity(0.2),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       border: Border.all(color: style.gold.withOpacity(0.4)),
     ),
     child: Row(
@@ -303,10 +312,13 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 18),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 18,
+        ),
         decoration: BoxDecoration(
           color: style.isRamadan ? style.gold.withOpacity(0.9) : style.teal,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: (style.isRamadan ? style.gold : style.teal).withOpacity(
@@ -375,12 +387,15 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       onTap: () => _push(const FreeReadingScreen()),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 18),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 18,
+        ),
         decoration: BoxDecoration(
           color: style.isRamadan
               ? style.goldDim
               : style.success.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: (style.isRamadan ? style.goldDim : style.success)

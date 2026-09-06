@@ -154,8 +154,8 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       // AppBar replacement
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.md,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,16 +176,16 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       // Current Location Indicator
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.sm,
                         ),
                         margin: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 8,
+                          horizontal: AppSpacing.xxl,
+                          vertical: AppSpacing.sm,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(AppRadius.xl),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -195,7 +195,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                               color: Colors.white,
                               size: 18,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             Text(
                               'الموقع الحالي: $_cityName',
                               style: style.naskh(
@@ -327,7 +327,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -352,7 +352,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     mosque.name,
@@ -376,7 +376,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             // Address Row
             Row(
               children: [
@@ -396,7 +396,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             // Next Prayer Row
             Row(
               children: [
@@ -408,7 +408,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             // Action Buttons
             Row(
               children: [
@@ -422,7 +422,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: AppColors.gold,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -432,7 +432,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             color: Colors.white,
                             size: 18,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Text(
                             'توجيه',
                             style: style.naskh(
@@ -446,7 +446,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                     ),
                   ),
                 ),
-                if (hasPhone) const SizedBox(width: 12),
+                if (hasPhone) const SizedBox(width: AppSpacing.md),
                 if (hasPhone)
                   Expanded(
                     child: GestureDetector(
@@ -459,7 +459,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         decoration: BoxDecoration(
                           color: style.bg,
                           border: Border.all(color: AppColors.gold),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -469,7 +469,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                               color: AppColors.gold,
                               size: 18,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             Text(
                               'اتصال',
                               style: style.naskh(
@@ -493,8 +493,8 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
 
   Widget _buildHadithFooter(AdaptiveStyle style) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: const Color(0xFFFFF9E5),
         borderRadius: BorderRadius.circular(24),
@@ -510,7 +510,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 color: Color(0xFFD4AF37),
                 size: 16,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 'فضل الذهاب للمسجد',
                 style: style.naskh(
@@ -519,7 +519,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                   weight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               const Icon(
                 Icons.star_rounded,
                 color: Color(0xFFD4AF37),
@@ -527,7 +527,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             'عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: "من غدا إلى المسجد، أو راح، أعد الله له في الجنة نزلا، كلما غدا، أو راح"',
             style: style.amiri(
@@ -538,7 +538,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             'متفق عليه',
             style: style.naskh(
@@ -564,7 +564,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
   Widget _buildErrorState(Object err, AdaptiveStyle style) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -573,13 +573,13 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
               size: 48,
               color: AppColors.gold.withOpacity(0.5),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               err.toString().replaceAll('Exception: ', ''),
               style: style.naskh(16, color: style.textSec),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.xxl),
             SizedBox(
               width: 200,
               child: PrimaryButton(

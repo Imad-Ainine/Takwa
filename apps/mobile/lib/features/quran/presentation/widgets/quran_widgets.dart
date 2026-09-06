@@ -1,4 +1,3 @@
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:quran_library/quran_library.dart' as ql;
@@ -33,7 +32,7 @@ class DailyVerseCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
         color: style.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: style.border, width: 1),
         boxShadow: [
           BoxShadow(
@@ -44,7 +43,7 @@ class DailyVerseCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,23 +55,22 @@ class DailyVerseCard extends StatelessWidget {
                   _surahChip(verse['surahName'] as String, style),
                   const Spacer(),
                   _iconBtn(Icons.share_rounded, onShare, style),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
                   _iconBtn(Icons.refresh_rounded, onRefresh, style),
                 ],
               ),
             ),
             // Ayah text
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: 10,
+              ),
               child: Text(
                 verse['text'] as String,
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
-                style: style.amiri(
-                  19,
-                  color: style.text,
-                  height: 2.0,
-                ),
+                style: style.amiri(19, color: style.text, height: 2.0),
               ),
             ),
             // Bottom row
@@ -100,10 +98,10 @@ class DailyVerseCard extends StatelessWidget {
   }
 
   Widget _surahChip(String name, AdaptiveStyle style) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
       color: style.gold.withOpacity(0.15),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       border: Border.all(color: style.gold.withOpacity(0.4)),
     ),
     child: Row(
@@ -113,42 +111,36 @@ class DailyVerseCard extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           name,
-          style: style.amiri(
-            14,
-            color: style.gold,
-            weight: FontWeight.bold,
-          ),
+          style: style.amiri(14, color: style.gold, weight: FontWeight.bold),
         ),
       ],
     ),
   );
 
-  Widget _iconBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: const EdgeInsets.all(7),
-      decoration: BoxDecoration(
-        color: style.text.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Icon(icon, color: style.textSec, size: 17),
-    ),
-  );
+  Widget _iconBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) =>
+      GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: style.text.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: style.textSec, size: 17),
+        ),
+      );
 
   Widget _ayahBadge(int ayah, AdaptiveStyle style) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
       color: style.text.withOpacity(0.06),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'آية ${ar(ayah)}',
-          style: style.amiri(13, color: style.textSec),
-        ),
-        const SizedBox(width: 4),
+        Text('آية ${ar(ayah)}', style: style.amiri(13, color: style.textSec)),
+        const SizedBox(width: AppSpacing.xs),
         Text('»»', style: TextStyle(color: style.textDim, fontSize: 11)),
       ],
     ),
@@ -184,10 +176,13 @@ class KhatmaActionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 18,
+        ),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: color.withOpacity(0.3),
@@ -206,7 +201,7 @@ class KhatmaActionCard extends StatelessWidget {
                 Colors.white,
                 onBack!,
               ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             // Text
             Expanded(
               child: Column(
@@ -223,12 +218,15 @@ class KhatmaActionCard extends StatelessWidget {
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
-                    style: style.naskh(12, color: Colors.white.withOpacity(0.85)),
+                    style: style.naskh(
+                      12,
+                      color: Colors.white.withOpacity(0.85),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             // Action icon button
             _circleBtn(
               actionIcon,
@@ -443,11 +441,12 @@ class QuranSurahRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: style.border, width: 0.5),
-          ),
+          border: Border(bottom: BorderSide(color: style.border, width: 0.5)),
         ),
         child: Row(
           children: [
@@ -455,7 +454,7 @@ class QuranSurahRow extends StatelessWidget {
               size: const Size(42, 42),
               painter: SurahBadgePainter(s.number, c),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,21 +470,14 @@ class QuranSurahRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${s.revelationType == 'Meccan' ? 'مكية' : 'مدنية'} • ${s.ayahsNumber} آية',
-                    style: style.naskh(
-                      12,
-                      color: style.textDim,
-                    ),
+                    style: style.naskh(12, color: style.textDim),
                   ),
                 ],
               ),
             ),
             Text(
               s.name,
-              style: style.amiri(
-                22,
-                weight: FontWeight.bold,
-                color: c,
-              ),
+              style: style.amiri(22, weight: FontWeight.bold, color: c),
             ),
           ],
         ),
@@ -519,11 +511,11 @@ class QuranJuzCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: style.card,
           border: Border.all(color: style.border),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
@@ -544,7 +536,7 @@ class QuranJuzCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,10 +551,7 @@ class QuranJuzCard extends StatelessWidget {
                   ),
                   Text(
                     '${(progress * 100).toInt()}% مكتمل',
-                    style: style.naskh(
-                      12,
-                      color: style.textSec,
-                    ),
+                    style: style.naskh(12, color: style.textSec),
                   ),
                 ],
               ),
@@ -601,10 +590,13 @@ class AyahBlock extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       decoration: BoxDecoration(
         color: isPlaying ? style.gold.withOpacity(0.08) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: 10,
+        ),
         child: Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -612,13 +604,9 @@ class AyahBlock extends StatelessWidget {
             Text(
               a.text,
               textAlign: TextAlign.center,
-              style: style.amiri(
-                fontSize,
-                color: c,
-                height: 1.8,
-              ),
+              style: style.amiri(fontSize, color: c, height: 1.8),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             GestureDetector(
               onTap: onPlay,
               child: CustomPaint(
@@ -633,6 +621,5 @@ class AyahBlock extends StatelessWidget {
         ),
       ),
     );
-
   }
 }

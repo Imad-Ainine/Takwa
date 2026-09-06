@@ -26,7 +26,7 @@ class ReminderCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       opacity: isEnabled ? 1.0 : 0.6,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: context.colors.card.withOpacity(0.7),
           borderRadius: AppRadius.card,
@@ -45,7 +45,7 @@ class ReminderCard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: isEnabled ? context.colors.tealGoldGradient : null,
                 color: isEnabled ? null : context.colors.card2,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
               child: Center(
                 child: Icon(
@@ -55,7 +55,7 @@ class ReminderCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             // Details
             Expanded(
               child: Column(
@@ -69,7 +69,7 @@ class ReminderCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Row(
                     children: [
                       Icon(
@@ -77,7 +77,7 @@ class ReminderCard extends StatelessWidget {
                         size: 13,
                         color: context.colors.textSecondary,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         time,
                         style: context.typography.bodySmall.copyWith(

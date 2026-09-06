@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -23,32 +22,32 @@ class TermsPrivacyScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildProfileHeader(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
                         'شروط الاستخدام',
                         'Terms of Service',
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       _buildTermsContent(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
                         'سياسة الخصوصية',
                         'Privacy Policy',
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       _buildPrivacyContent(context),
                       const SizedBox(height: 40),
                       _buildFooter(context),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -79,7 +78,7 @@ class TermsPrivacyScreen extends StatelessWidget {
   Widget _buildProfileHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: context.decorations.goldCard.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
@@ -98,7 +97,7 @@ class TermsPrivacyScreen extends StatelessWidget {
               size: 40,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'تطبيق تقوى',
             style: context.typography.headingLarge.copyWith(
@@ -149,7 +148,7 @@ class TermsPrivacyScreen extends StatelessWidget {
 
   Widget _buildTermsContent(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
@@ -163,7 +162,7 @@ class TermsPrivacyScreen extends StatelessWidget {
 
   Widget _buildPrivacyContent(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
@@ -180,14 +179,14 @@ class TermsPrivacyScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(height: 1, width: 80, color: context.colors.border),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Text(
             'شكراً لثقتكم بتطبيق تقوى',
             style: context.typography.headingMedium.copyWith(
               color: context.colors.gold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             'نسأل الله أن ينفعنا وإياكم بما فيه الخير',
             style: context.typography.caption.copyWith(

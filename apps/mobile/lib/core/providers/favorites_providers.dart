@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../supabase/supabase_config.dart';
 import '../supabase/supabase_providers.dart';
@@ -32,9 +31,10 @@ class FavoriteItemsNotifier extends StateNotifier<Set<int>> {
       final isOnline = ref.read(connectivityProvider).value ?? false;
       final isAuth = ref.read(currentUserProvider) != null;
       if (isOnline && isAuth) {
-        ref.read(supabaseServiceProvider).updateSettings({
-          _key: state.toList(),
-        }).catchError((_) {}); // Handle silently in background
+        ref
+            .read(supabaseServiceProvider)
+            .updateSettings({_key: state.toList()})
+            .catchError((_) {}); // Handle silently in background
       }
     }
   }

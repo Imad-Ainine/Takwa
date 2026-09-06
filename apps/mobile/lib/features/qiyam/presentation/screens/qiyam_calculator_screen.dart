@@ -52,7 +52,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
         _buildAppTopBar(context),
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
               children: [
                 _buildTimeCard(
@@ -63,7 +63,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
                   icon: Icons.brightness_3,
                   color: context.colors.teal,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.lg),
                 _buildTimeCard(
                   context,
                   title: 'بداية الثلث الأخير',
@@ -73,7 +73,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
                   color: context.colors.gold,
                   isHighlight: true,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
                 _buildinfoSection(context),
               ],
             ),
@@ -85,11 +85,11 @@ class QiyamCalculatorScreen extends ConsumerWidget {
 
   Widget _buildAppTopBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Row(
         children: [
           const CustomLeadingButton(),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Text(
             'حاسبة الليل',
             style: context.typography.displayMedium.copyWith(
@@ -115,7 +115,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: isHighlight ? color.withOpacity(0.5) : context.colors.border,
           width: isHighlight ? 2 : 1,
@@ -131,27 +131,25 @@ class QiyamCalculatorScreen extends ConsumerWidget {
             : null,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
-              child: CustomPatternBackground(
-                pattern: BackgroundPattern.adhkar,
-              ),
+              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: color, size: 28),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.lg),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,16 +189,16 @@ class QiyamCalculatorScreen extends ConsumerWidget {
 
   Widget _buildinfoSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: context.colors.gold.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: context.colors.gold.withOpacity(0.2)),
       ),
       child: Column(
         children: [
           Icon(Icons.info_outline, color: context.colors.gold),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             'عن أبي هريرة رضي الله عنه أن رسول الله ﷺ قال: "ينزل ربنا تبارك وتعالى كل ليلة إلى السماء الدنيا حين يبقى ثلث الليل الآخر يقول: من يدعوني فأستجيب له، من يسألني فأعطيه، من يستغفرني فأغفر له"',
             style: context.typography.quranicVerse.copyWith(

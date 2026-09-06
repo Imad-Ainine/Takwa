@@ -1,4 +1,3 @@
-
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -109,7 +108,9 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
               ),
               error: (e, _) => Center(
                 child: Text(
-                  AppLocalizations.of(context)!.checklistErrorPrefix(e.toString()),
+                  AppLocalizations.of(
+                    context,
+                  )!.checklistErrorPrefix(e.toString()),
                   style: context.typography.bodyMedium.copyWith(
                     color: context.colors.danger,
                   ),
@@ -154,30 +155,30 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
 
               // ① مؤشر التقدم
               _anim(0, _DayProgressBar(record: record)),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
 
               // ② الصلوات الخمس
               _anim(1, _PrayersGroup(record: record)),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
 
               // ③ القرآن + الأذكار + الصيام + الصدقة
               _anim(2, _IbadahGroup(record: record, quranCtrl: _quranCtrl)),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
 
               // ④ المحظورات
               _anim(3, _ProhibitionsGroup(record: record)),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
 
               // ⑤ عاداتي وإضافاتي (Custom Ibadaat)
               _anim(4, CustomIbadahGroup(record: record)),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
 
               // ⑥ ملاحظة اليوم
               _DayNoteField(record: record),
@@ -233,7 +234,7 @@ class _TopBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const CustomLeadingButton(),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +268,7 @@ class _TopBar extends StatelessWidget {
                     ? context.colors.gold
                     : context.colors.danger,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Row(
                 children: [
                   _PointsPill(
@@ -276,7 +277,7 @@ class _TopBar extends StatelessWidget {
                     color: context.colors.success,
                     small: true,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
                   _PointsPill(
                     label: '-',
                     value: deducted,
@@ -314,7 +315,7 @@ class _PointsPill extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: color.withOpacity(0.25)),
       ),
       child: Text(
@@ -381,7 +382,7 @@ class _DayProgressBar extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           _AnimatedProgressBar(progress: pct),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -466,7 +467,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: _anim,
     builder: (_, _) => ClipRRect(
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(AppRadius.xs),
       child: Stack(
         children: [
           Container(height: 10, color: context.colors.border),
@@ -483,7 +484,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
                         : context.colors.teal,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.xs),
                 boxShadow: [
                   BoxShadow(
                     color: context.colors.gold.withOpacity(0.3),
@@ -620,91 +621,94 @@ class _PrayerRow extends StatelessWidget {
       onTap: () => _showStatusPicker(context),
       excludeSemantics: true,
       child: GestureDetector(
-      onTap: () => _showStatusPicker(context),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        margin: const EdgeInsets.only(bottom: 7),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-        decoration: BoxDecoration(
-          color: isDone
-              ? context.colors.success.withOpacity(0.08)
-              : isQadaa
-              ? context.colors.warning.withOpacity(0.07)
-              : isMissed
-              ? context.colors.danger.withOpacity(0.07)
-              : context.colors.card,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isDone
-                ? context.colors.success.withOpacity(0.25)
-                : isQadaa
-                ? context.colors.warning.withOpacity(0.22)
-                : isMissed
-                ? context.colors.danger.withOpacity(0.22)
-                : context.colors.border,
+        onTap: () => _showStatusPicker(context),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          margin: const EdgeInsets.only(bottom: 7),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 11,
           ),
-        ),
-        child: Row(
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDone ? context.colors.success : Colors.transparent,
-                border: Border.all(
-                  color: _rowColor(context),
-                  width: isDone ? 0 : 1.8,
+          decoration: BoxDecoration(
+            color: isDone
+                ? context.colors.success.withOpacity(0.08)
+                : isQadaa
+                ? context.colors.warning.withOpacity(0.07)
+                : isMissed
+                ? context.colors.danger.withOpacity(0.07)
+                : context.colors.card,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: isDone
+                  ? context.colors.success.withOpacity(0.25)
+                  : isQadaa
+                  ? context.colors.warning.withOpacity(0.22)
+                  : isMissed
+                  ? context.colors.danger.withOpacity(0.22)
+                  : context.colors.border,
+            ),
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDone ? context.colors.success : Colors.transparent,
+                  border: Border.all(
+                    color: _rowColor(context),
+                    width: isDone ? 0 : 1.8,
+                  ),
+                ),
+                child: isDone
+                    ? const Center(
+                        child: Text(
+                          '✓',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 10),
+              Text(emoji, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: context.typography.bodyMedium.copyWith(
+                        fontSize: 13,
+                        color: context.colors.textPrimary,
+                        fontWeight: isDone ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                    Text(
+                      _statusLabel(context),
+                      style: context.typography.caption.copyWith(
+                        fontSize: 10,
+                        color: _rowColor(context),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: isDone
-                  ? const Center(
-                      child: Text(
-                        '✓',
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 10),
-            Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
-                      color: context.colors.textPrimary,
-                      fontWeight: isDone ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                  Text(
-                    _statusLabel(context),
-                    style: context.typography.caption.copyWith(
-                      fontSize: 10,
-                      color: _rowColor(context),
-                    ),
-                  ),
-                ],
+              if (isDone)
+                _MiniPts('+١٠', context.colors.success)
+              else if (isMissed)
+                _MiniPts('-٥', context.colors.danger),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: context.colors.textDim,
               ),
-            ),
-            if (isDone)
-              _MiniPts('+١٠', context.colors.success)
-            else if (isMissed)
-              _MiniPts('-٥', context.colors.danger),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: context.colors.textDim,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -825,10 +829,13 @@ class _StatusOption extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? color.withOpacity(0.12) : context.colors.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isSelected ? color.withOpacity(0.4) : context.colors.border,
             width: isSelected ? 1.5 : 1,
@@ -837,7 +844,7 @@ class _StatusOption extends StatelessWidget {
         child: Row(
           children: [
             Text(emoji, style: const TextStyle(fontSize: 18)),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 label,
@@ -874,7 +881,7 @@ class _IbadahGroup extends ConsumerWidget {
       title: l10n.checklistQuranAdhkarTitle,
       children: [
         _QuranInput(record: record, ctrl: quranCtrl),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
 
         _ToggleRow(
           emoji: '🌅',
@@ -990,12 +997,15 @@ class _QuranInput extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasPages = (record?.quranPages ?? 0) > 0;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 10,
+      ),
       decoration: BoxDecoration(
         color: hasPages
             ? context.colors.teal.withOpacity(0.07)
             : context.colors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: hasPages
               ? context.colors.teal.withOpacity(0.3)
@@ -1047,8 +1057,8 @@ class _QuranInput extends ConsumerWidget {
                 filled: true,
                 fillColor: context.colors.card,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 8,
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.sm,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -1082,7 +1092,7 @@ class _QuranInput extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(
             '+١',
             style: context.typography.caption.copyWith(
@@ -1123,7 +1133,8 @@ class _ToggleRow extends StatelessWidget {
     // One "$label, on/off" toggle node instead of the checkmark circle,
     // emoji, label, sublabel and points chip each being a separate stop.
     return Semantics(
-      label: '$label${AppLocalizations.of(context)!.semanticsSeparator}$sublabel',
+      label:
+          '$label${AppLocalizations.of(context)!.semanticsSeparator}$sublabel',
       toggled: value,
       onTap: () {
         HapticFeedback.selectionClick();
@@ -1138,12 +1149,15 @@ class _ToggleRow extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.only(bottom: 7),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 11,
+          ),
           decoration: BoxDecoration(
             color: value
                 ? context.colors.success.withOpacity(0.08)
                 : context.colors.card,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: value
                   ? context.colors.success.withOpacity(0.25)
@@ -1177,7 +1191,7 @@ class _ToggleRow extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(emoji, style: const TextStyle(fontSize: 18)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1221,12 +1235,15 @@ class _FastingSelector extends ConsumerWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 11,
+      ),
       decoration: BoxDecoration(
         color: current != FastingType.none
             ? context.colors.teal.withOpacity(0.07)
             : context.colors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: current != FastingType.none
               ? context.colors.teal.withOpacity(0.25)
@@ -1238,7 +1255,7 @@ class _FastingSelector extends ConsumerWidget {
           Row(
             children: [
               const Text('🌙', style: TextStyle(fontSize: 18)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   l10n.checklistFastingLabel,
@@ -1317,7 +1334,7 @@ class _FastingSelector extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
             color: selected ? color.withOpacity(0.15) : context.colors.card,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: selected ? color.withOpacity(0.4) : context.colors.border,
               width: selected ? 1.5 : 1,
@@ -1378,7 +1395,10 @@ class _ProhibitionsGroup extends ConsumerWidget {
       titleColor: context.colors.danger,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: AppSpacing.sm,
+          ),
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
             color: context.colors.danger.withOpacity(0.07),
@@ -1388,7 +1408,7 @@ class _ProhibitionsGroup extends ConsumerWidget {
           child: Row(
             children: [
               const Text('⚠️', style: TextStyle(fontSize: 14)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   l10n.checklistProhibitionsSubtitle,
@@ -1485,12 +1505,15 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.only(bottom: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 11,
+      ),
       decoration: BoxDecoration(
         color: _committed
             ? context.colors.danger.withOpacity(0.07)
             : context.colors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: _committed
               ? context.colors.danger.withOpacity(0.25)
@@ -1514,7 +1537,7 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                 width: 26,
                 height: 26,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                   color: _committed
                       ? context.colors.danger
                       : Colors.transparent,
@@ -1538,7 +1561,7 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
           ),
           const SizedBox(width: 10),
           Text(widget.emoji, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1576,11 +1599,11 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 4,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: context.colors.danger.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: context.colors.danger.withOpacity(0.3),
                     ),
@@ -1596,7 +1619,7 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Icon(
                         Icons.add_rounded,
                         size: 14,
@@ -1669,21 +1692,21 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
             filled: true,
             fillColor: context.colors.card,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: BorderSide(color: context.colors.border),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: BorderSide(color: context.colors.border),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: BorderSide(color: context.colors.gold, width: 1.5),
             ),
           ),
           onChanged: (_) => setState(() {}),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         PrimaryButton(
           onTap: _saving ? null : () async => _save(),
           label: l10n.checklistNoteSaveButton,
@@ -1750,7 +1773,7 @@ class _GroupCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: context.colors.border),
       ),
       child: Column(
@@ -1759,7 +1782,7 @@ class _GroupCard extends StatelessWidget {
           Row(
             children: [
               Text(icon, style: const TextStyle(fontSize: 16)),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 title,
                 style: context.typography.headingMedium.copyWith(
@@ -1798,10 +1821,10 @@ class _MiniPts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
     decoration: BoxDecoration(
       color: color.withOpacity(0.12),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       border: Border.all(color: color.withOpacity(0.3)),
     ),
     child: Text(

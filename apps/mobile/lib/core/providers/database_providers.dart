@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/database/daos.dart';
@@ -73,7 +72,10 @@ final settingProvider = FutureProvider.family<String?, String>((ref, key) {
   return ref.watch(settingsDaoProvider).get(key);
 });
 
-final settingStreamProvider = StreamProvider.family<String?, String>((ref, key) {
+final settingStreamProvider = StreamProvider.family<String?, String>((
+  ref,
+  key,
+) {
   return ref.watch(settingsDaoProvider).watch(key);
 });
 

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,7 +114,9 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
     if (hex == null) return const Color(0xFFC8A96E);
     try {
       if (hex.startsWith('0x')) return Color(int.parse(hex));
-      if (hex.startsWith('#')) return Color(int.parse('0xFF${hex.substring(1)}'));
+      if (hex.startsWith('#')) {
+        return Color(int.parse('0xFF${hex.substring(1)}'));
+      }
       return Color(int.parse('0xFF$hex'));
     } catch (_) {
       return const Color(0xFFC8A96E);
@@ -123,16 +124,16 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
   }
 
   Color _getBgColor() => switch (_currentTheme) {
-        ReaderTheme.light => Colors.white,
-        ReaderTheme.sepia => const Color(0xFFF4ECD8),
-        ReaderTheme.dark => const Color(0xFF121212),
-      };
+    ReaderTheme.light => Colors.white,
+    ReaderTheme.sepia => const Color(0xFFF4ECD8),
+    ReaderTheme.dark => const Color(0xFF121212),
+  };
 
   Color _getTextColor() => switch (_currentTheme) {
-        ReaderTheme.light => const Color(0xFF2D2D2D),
-        ReaderTheme.sepia => const Color(0xFF5B4636),
-        ReaderTheme.dark => const Color(0xFFE0E0E0),
-      };
+    ReaderTheme.light => const Color(0xFF2D2D2D),
+    ReaderTheme.sepia => const Color(0xFF5B4636),
+    ReaderTheme.dark => const Color(0xFFE0E0E0),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +187,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     // Content Rendering
                     if (_page.isHadith) ...[
@@ -209,7 +210,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                           ),
                           textAlign: TextAlign.right,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                       ],
                       Text(
                         _page.content,
@@ -234,8 +235,14 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                           children: [
                             Container(width: 40, height: 1, color: accentColor),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Icon(Icons.auto_awesome, color: accentColor, size: 18),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.lg,
+                              ),
+                              child: Icon(
+                                Icons.auto_awesome,
+                                color: accentColor,
+                                size: 18,
+                              ),
                             ),
                             Container(width: 40, height: 1, color: accentColor),
                           ],
@@ -329,10 +336,13 @@ class _HadithCard extends StatelessWidget {
           children: [
             if (page.source != null) ...[
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
                   color: accentColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Text(
                   page.source!,
@@ -342,15 +352,18 @@ class _HadithCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
             ],
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: 5,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [accentColor, accentColor.withOpacity(0.8)],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 boxShadow: [
                   BoxShadow(
                     color: accentColor.withOpacity(0.3),
@@ -371,7 +384,7 @@ class _HadithCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppSpacing.xl),
         if (page.title != null) ...[
           Text(
             page.title!,
@@ -383,11 +396,11 @@ class _HadithCard extends StatelessWidget {
             ),
             textAlign: TextAlign.right,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
         ],
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.xxl),
           decoration: BoxDecoration(
             color: cardBg,
             borderRadius: BorderRadius.circular(24),
@@ -471,10 +484,14 @@ class _TopBar extends StatelessWidget {
                   );
                 },
                 currentTheme: currentTheme,
-                child: Icon(Icons.settings_outlined, color: accentColor, size: 22),
+                child: Icon(
+                  Icons.settings_outlined,
+                  color: accentColor,
+                  size: 22,
+                ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
 
               Expanded(
                 child: Column(
@@ -502,17 +519,13 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
 
               // Back button
               _IconBtn(
                 onTap: () => Navigator.pop(context),
                 currentTheme: currentTheme,
-                child: Icon(
-                  Icons.close,
-                  color: accentColor,
-                  size: 22,
-                ),
+                child: Icon(Icons.close, color: accentColor, size: 22),
               ),
             ],
           ),
@@ -543,7 +556,7 @@ class _SettingsSheet extends StatelessWidget {
     final typography = context.typography;
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
         color: colors.card,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
@@ -566,12 +579,12 @@ class _SettingsSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           Text(
             'تخصيص القراءة',
             style: typography.headingMedium.copyWith(fontFamily: 'Amiri'),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
 
           // Themes
           Row(
@@ -602,15 +615,17 @@ class _SettingsSheet extends StatelessWidget {
                                 BoxShadow(
                                   color: accentColor.withOpacity(0.3),
                                   blurRadius: 10,
-                                )
+                                ),
                               ]
                             : null,
                       ),
                       child: isSelected
-                          ? Icon(Icons.check,
+                          ? Icon(
+                              Icons.check,
                               color: t == ReaderTheme.dark
                                   ? Colors.white
-                                  : accentColor)
+                                  : accentColor,
+                            )
                           : null,
                     ),
                     const SizedBox(height: 10),
@@ -634,13 +649,16 @@ class _SettingsSheet extends StatelessWidget {
 
           const SizedBox(height: 40),
           const Divider(),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
 
           // Font Size
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('حجم الخط', style: typography.labelLarge.copyWith(fontFamily: 'Amiri')),
+              Text(
+                'حجم الخط',
+                style: typography.labelLarge.copyWith(fontFamily: 'Amiri'),
+              ),
               Row(
                 children: [
                   _SizeBtn(
@@ -649,14 +667,14 @@ class _SettingsSheet extends StatelessWidget {
                     onTap: onFontSizeToggle,
                     fontSize: 14,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   _SizeBtn(
                     label: 'أ',
                     isSelected: fontSizeLevel == 1,
                     onTap: onFontSizeToggle,
                     fontSize: 18,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   _SizeBtn(
                     label: 'أ',
                     isSelected: fontSizeLevel == 2,
@@ -698,7 +716,7 @@ class _SizeBtn extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: isSelected ? colors.gold.withOpacity(0.1) : colors.background,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: isSelected ? colors.gold : colors.border,
             width: isSelected ? 2 : 1,
@@ -760,7 +778,10 @@ class _BottomNav extends StatelessWidget {
     final progress = (globalDone / total).clamp(0.0, 1.0);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xxl,
+        vertical: AppSpacing.xl,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
@@ -797,7 +818,7 @@ class _BottomNav extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -866,24 +887,39 @@ class _NavButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 10,
+        ),
         decoration: BoxDecoration(
           color: accentColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: accentColor.withOpacity(0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: isRtl
               ? [
-                  Text(label, style: const TextStyle(fontFamily: 'Amiri', fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 4),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontFamily: 'Amiri',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
                   Icon(icon, size: 20, color: accentColor),
                 ]
               : [
                   Icon(icon, size: 20, color: accentColor),
-                  const SizedBox(width: 4),
-                  Text(label, style: const TextStyle(fontFamily: 'Amiri', fontWeight: FontWeight.bold)),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontFamily: 'Amiri',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
         ),
       ),
@@ -911,7 +947,9 @@ class _IconBtn extends StatelessWidget {
         width: 46,
         height: 46,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+          color: isDark
+              ? Colors.white.withOpacity(0.1)
+              : Colors.black.withOpacity(0.05),
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),

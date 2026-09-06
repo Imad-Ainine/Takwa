@@ -46,7 +46,9 @@ class QiyamNotifier extends StateNotifier<QiyamSessionState> {
 
   void updatePlanDuration(Duration duration) {
     _timer?.cancel();
-    final updatedStages = state.stages.map((s) => s.copyWith(defaultDuration: duration)).toList();
+    final updatedStages = state.stages
+        .map((s) => s.copyWith(defaultDuration: duration))
+        .toList();
     state = state.copyWith(
       stages: updatedStages,
       elapsed: Duration.zero,

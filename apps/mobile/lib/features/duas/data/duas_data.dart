@@ -1,4 +1,3 @@
-
 enum DuaCategory {
   morning, // أذكار الصباح
   evening, // أذكار المساء

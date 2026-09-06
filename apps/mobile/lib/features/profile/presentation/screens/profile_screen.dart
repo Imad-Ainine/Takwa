@@ -36,16 +36,16 @@ class ProfileScreen extends ConsumerWidget {
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     children: [
                       // Profile Header Card
                       _buildProfileHeader(context, profileAsync),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
 
                       // Stats Row
                       _buildStatsGrid(context, statsAsync, streakAsync),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
 
                       // Quick Actions / Menu
                       _buildProfileMenu(context),
@@ -55,7 +55,7 @@ class ProfileScreen extends ConsumerWidget {
                       // Logout Button
                       _buildLogoutButton(context, ref),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                     ],
                   ),
                 ),
@@ -101,7 +101,7 @@ class ProfileScreen extends ConsumerWidget {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.xxl),
           decoration: context.decorations.goldCard.copyWith(
             color: context.colors.card.withOpacity(0.8),
           ),
@@ -130,7 +130,7 @@ class ProfileScreen extends ConsumerWidget {
                   child: Text(avatar, style: const TextStyle(fontSize: 48)),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 username,
                 style: context.typography.headingLarge.copyWith(
@@ -139,15 +139,15 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               if (profile?['gender'] != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 4,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: context.colors.gold.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
                     border: Border.all(
                       color: context.colors.gold.withOpacity(0.4),
                     ),
@@ -162,14 +162,14 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 profile?['email'] ?? '',
                 style: context.typography.caption.copyWith(
                   color: context.colors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               const TaqwaBadge(label: 'عضو مجتهد'),
             ],
           ),
@@ -197,7 +197,7 @@ class ProfileScreen extends ConsumerWidget {
             error: (_, _) => const SizedBox(),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: streakAsync.when(
             data: (s) => _StatCard(
@@ -287,14 +287,14 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.9),
       ),
       child: Column(
         children: [
           Text(icon, style: const TextStyle(fontSize: 24)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             value,
             style: context.typography.taqwaScore.copyWith(

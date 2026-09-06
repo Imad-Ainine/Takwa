@@ -189,7 +189,7 @@ class _DuasTopBar extends ConsumerWidget {
             Row(
               children: [
                 const CustomLeadingButton(),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +223,7 @@ class _DuasTopBar extends ConsumerWidget {
                             height: 40,
                             decoration: BoxDecoration(
                               color: style.goldDim,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               border: Border.all(
                                 color: style.gold.withOpacity(0.3),
                               ),
@@ -284,12 +284,12 @@ class _DuasTopBar extends ConsumerWidget {
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 12,
+                    vertical: AppSpacing.md,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Theme(
               data: Theme.of(context).copyWith(
                 highlightColor: Colors.transparent,
@@ -339,7 +339,7 @@ class _CategoryFilter extends ConsumerWidget {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         reverse: true,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
         itemCount: cats.length + 1,
         itemBuilder: (_, i) {
           if (i == 0) {
@@ -387,13 +387,16 @@ class _FilterChip extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.xs,
+        ),
         decoration: BoxDecoration(
           gradient: isActive
               ? LinearGradient(colors: [style.gold, style.teal])
               : null,
           color: isActive ? null : style.card,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: isActive ? style.gold : style.border),
         ),
         child: Text(
@@ -513,7 +516,7 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
               Row(
                 children: [
                   Text(widget.dua.emoji, style: const TextStyle(fontSize: 22)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       widget.dua.occasion,
@@ -539,7 +542,7 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   GestureDetector(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: widget.dua.arabic));
@@ -597,18 +600,18 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                           .naskh(12, color: s.textSec)
                           .copyWith(height: 1.8),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
                             color: s.goldDim,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(color: s.gold.withOpacity(0.2)),
                           ),
                           child: Text(
@@ -684,7 +687,7 @@ class _UserDuasTabView extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('🤲', style: TextStyle(fontSize: 48)),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   Text(
                     AppLocalizations.of(context)!.duasNoUserDuasYet,
                     style: style.amiri(18, color: style.textSec),
@@ -742,7 +745,7 @@ class _UserDuaCard extends ConsumerWidget {
                   dua.emoji.isNotEmpty ? dua.emoji : '🤲',
                   style: const TextStyle(fontSize: 20),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     dua.titleAr,
@@ -859,9 +862,9 @@ class _UserDuaCard extends ConsumerWidget {
                       .copyWith(height: 1.9),
                 ),
                 if (dua.occasion.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Container(height: 1, color: style.border),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -870,7 +873,7 @@ class _UserDuaCard extends ConsumerWidget {
                         size: 12,
                         color: style.textSec,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         dua.occasion,
                         style: style.naskh(12, color: style.textSec),
@@ -928,17 +931,17 @@ class _ShareToDuaCommunitySheetState
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Text(
             _shared ? l10n.duasSharedSuccessLabel : l10n.duasShareSheetTitle,
             style: s.amiri(20, color: _shared ? Colors.green : s.gold),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: s.teal.withOpacity(0.07),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: s.teal.withOpacity(0.25)),
             ),
             child: Text(
@@ -947,7 +950,7 @@ class _ShareToDuaCommunitySheetState
               style: s.amiri(18, color: s.text).copyWith(height: 1.9),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           if (!_shared)
             PrimaryButton(
               onTap: _isSharing
@@ -1024,12 +1027,12 @@ class _CommunityDuasTabView extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text('🌍', style: TextStyle(fontSize: 48)),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         Text(
                           l10n.duasCommunityEmptyTitle,
                           style: style.amiri(18, color: style.textSec),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         Text(
                           l10n.duasPullToRefreshHint,
                           style: style.naskh(12, color: style.textSec),
@@ -1128,7 +1131,7 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
                   dua.emoji.isNotEmpty ? dua.emoji : '🌐',
                   style: const TextStyle(fontSize: 20),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     dua.titleAr,
@@ -1159,7 +1162,7 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
                     );
                   },
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     child: Icon(Icons.copy_rounded, size: 16, color: s.textSec),
                   ),
                 ),
@@ -1181,12 +1184,12 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
               child: Column(
                 children: [
                   Container(height: 1, color: s.teal.withOpacity(0.2)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.schedule_rounded, size: 12, color: s.textSec),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(dua.occasion, style: s.naskh(12, color: s.textSec)),
                     ],
                   ),
@@ -1327,7 +1330,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           TextField(
             controller: _titleCtrl,
             textDirection: TextDirection.rtl,
@@ -1338,12 +1341,12 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               filled: true,
               fillColor: s.border.withOpacity(0.5),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           TextField(
             controller: _arabicCtrl,
             textDirection: TextDirection.rtl,
@@ -1355,12 +1358,12 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               filled: true,
               fillColor: s.border.withOpacity(0.5),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           TextField(
             controller: _occasionCtrl,
             textDirection: TextDirection.rtl,
@@ -1371,12 +1374,12 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               filled: true,
               fillColor: s.border.withOpacity(0.5),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
               Expanded(
@@ -1395,7 +1398,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
           PrimaryButton(
             label: l10n.commonSave,
             onTap: _isSaving ? null : _save,

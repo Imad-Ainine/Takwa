@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -256,7 +255,9 @@ class OnboardingScreen extends ConsumerWidget {
             if (state.gender != null) {
               await ref.read(settingsDaoProvider).set('gender', state.gender!);
               try {
-                await ref.read(supabaseServiceProvider).updateProfile({'gender': state.gender});
+                await ref.read(supabaseServiceProvider).updateProfile({
+                  'gender': state.gender,
+                });
               } catch (e) {
                 // Ignore error if offline
                 print('Error updating gender: $e');
@@ -526,7 +527,7 @@ class _GenderStep extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.xxl),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -537,7 +538,7 @@ class _GenderStep extends StatelessWidget {
                       selected: selected == 'male',
                       onTap: () => onSelect('male'),
                     ),
-                    const SizedBox(width: 20),
+                    const SizedBox(width: AppSpacing.xl),
                     _GenderCard(
                       label: l10n.onboardingGenderFemale,
                       value: 'female',
@@ -547,9 +548,11 @@ class _GenderStep extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.xl),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xxxl,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 14,
@@ -557,7 +560,7 @@ class _GenderStep extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.goldDim,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
                         color: AppColors.gold.withOpacity(0.2),
                       ),
@@ -565,7 +568,7 @@ class _GenderStep extends StatelessWidget {
                     child: Row(
                       children: [
                         const Text('ℹ️', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
                             l10n.onboardingGenderInfoHint,
@@ -665,7 +668,7 @@ class _GenderCardState extends State<_GenderCard>
                   )
                 : null,
             color: widget.selected ? null : AppColors.card,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: widget.selected
                   ? AppColors.gold.withOpacity(0.6)
@@ -714,7 +717,7 @@ class _GenderCardState extends State<_GenderCard>
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 widget.label,
                 style: TextStyle(
@@ -824,7 +827,7 @@ class _AuthStepState extends State<_AuthStep>
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
         child: Column(
           children: [
             const SizedBox(height: 80),
@@ -856,7 +859,7 @@ class _AuthStepState extends State<_AuthStep>
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             _anim(
               1,
               Column(
@@ -883,7 +886,7 @@ class _AuthStepState extends State<_AuthStep>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             _anim(
               2,
               Container(
@@ -896,11 +899,11 @@ class _AuthStepState extends State<_AuthStep>
                 child: Column(
                   children: [
                     _BenefitRow('💾', l10n.onboardingBenefitSaveProgress),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     _BenefitRow('🏆', l10n.onboardingBenefitCompete),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     _BenefitRow('📊', l10n.onboardingBenefitStats),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     _BenefitRow('🌙', l10n.onboardingBenefitSync),
                   ],
                 ),
@@ -910,7 +913,7 @@ class _AuthStepState extends State<_AuthStep>
             _anim(
               4,
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                 child: GestureDetector(
                   onTap: widget.onSkip,
                   child: Text(
@@ -992,7 +995,7 @@ class _PlanStepState extends State<_PlanStep>
     final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
         child: Column(
           children: [
             const SizedBox(height: 72),
@@ -1009,7 +1012,7 @@ class _PlanStepState extends State<_PlanStep>
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             FadeTransition(
               opacity: CurvedAnimation(
                 parent: _ctrl,
@@ -1026,7 +1029,7 @@ class _PlanStepState extends State<_PlanStep>
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     l10n.onboardingChoosePlanSubtitle,
                     style: const TextStyle(
@@ -1038,7 +1041,7 @@ class _PlanStepState extends State<_PlanStep>
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Expanded(
               child: FadeTransition(
                 opacity: CurvedAnimation(
@@ -1094,7 +1097,7 @@ class _PlanStepState extends State<_PlanStep>
                 onTap: widget.onStart,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
           ],
         ),
       ),
@@ -1143,7 +1146,7 @@ class _PlanCard extends StatelessWidget {
                 )
               : null,
           color: selected ? null : AppColors.card,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: selected
                 ? AppColors.gold.withOpacity(0.5)
@@ -1201,12 +1204,12 @@ class _PlanCard extends StatelessWidget {
                 if (badge != null)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppSpacing.sm,
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
                       color: (badgeColor ?? AppColors.gold).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
                         color: (badgeColor ?? AppColors.gold).withOpacity(0.3),
                       ),
@@ -1235,7 +1238,7 @@ class _PlanCard extends StatelessWidget {
                 ],
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               desc,
               style: const TextStyle(
@@ -1336,14 +1339,14 @@ class _InfoCard extends StatelessWidget {
               color: AppColors.textDim,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           PrimaryButton(
             label: primaryLabel,
             icon: primaryIcon,
             onTap: onPrimary,
           ),
           if (skipLabel != null && onSkip != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             GestureDetector(
               onTap: onSkip,
               child: Text(
@@ -1386,7 +1389,7 @@ class _BottomActions extends StatelessWidget {
           onTap: onPrimary != null ? () async => onPrimary!() : null,
         ),
         if (skipLabel != null) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           GestureDetector(
             onTap: onSkip,
             child: Text(

@@ -98,7 +98,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     } on AuthException catch (e) {
       if (mounted) setState(() => _error = _mapAuthError(e.message));
     } catch (e) {
-      if (mounted) setState(() => _error = 'تعذر إرسال الرمز، تأكد من اتصال الإنترنت.');
+      if (mounted) {
+        setState(() => _error = 'تعذر إرسال الرمز، تأكد من اتصال الإنترنت.');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -146,7 +148,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (msg.contains('rate limit') || msg.contains('too many requests')) {
       return 'تجاوزت الحد المسموح من المحاولات، يرجى الانتظار قليلاً';
     }
-    if (msg.contains('token') || msg.contains('otp') || msg.contains('invalid')) {
+    if (msg.contains('token') ||
+        msg.contains('otp') ||
+        msg.contains('invalid')) {
       return 'رمز التحقق غير صحيح أو انتهت صلاحيته';
     }
     if (msg.contains('user not found')) {
@@ -171,12 +175,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               children: [
                 // App bar with back button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(Icons.arrow_back_ios_new_rounded, color: s.gold),
+                        icon: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: s.gold,
+                        ),
                       ),
                       const Spacer(),
                     ],
@@ -185,7 +195,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xxl,
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -222,7 +234,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: AppSpacing.xxl),
 
                           // Title
                           Text(
@@ -232,7 +244,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             style: s.amiri(32, weight: FontWeight.w700),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: AppSpacing.sm),
 
                           // Subtitle
                           Text(
@@ -242,7 +254,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             style: s.naskh(13, color: s.textSec),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: AppSpacing.xxxl),
 
                           // Email field
                           AuthField(
@@ -258,7 +270,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                           // OTP field (shown when code is sent)
                           if (_codeSent) ...[
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             AuthField(
                               ctrl: _otpCtrl,
                               hint: 'رمز التحقق (6 أرقام)',
@@ -266,19 +278,23 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               style: s,
                               keyboardType: TextInputType.number,
                               onChanged: (_) {
-                                if (_error != null) setState(() => _error = null);
+                                if (_error != null) {
+                                  setState(() => _error = null);
+                                }
                               },
                             ),
                           ],
 
                           // Success Message Banner
                           if (_successMessage != null) ...[
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
                                 border: Border.all(
                                   color: Colors.greenAccent.withOpacity(0.4),
                                 ),
@@ -307,12 +323,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                           // Error Banner
                           if (_error != null) ...[
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
                                 color: Colors.red.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
                                 border: Border.all(
                                   color: Colors.redAccent.withOpacity(0.4),
                                 ),
@@ -359,7 +377,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                           // Resend Code or Change Email
                           if (_codeSent) ...[
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

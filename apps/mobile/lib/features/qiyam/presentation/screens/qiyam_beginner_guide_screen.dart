@@ -21,10 +21,10 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                 _buildAppBar(context),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     children: [
                       _buildIntroHeader(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildTipSection(
                         context,
                         title: 'ابدأ بالقليل',
@@ -53,9 +53,9 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                             'الاستمرارية أهم من الكثرة، "أحب الأعمال إلى الله أدومها وإن قل".',
                         icon: Icons.repeat,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       _buildQASection(context),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                     ],
                   ),
                 ),
@@ -69,7 +69,10 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
@@ -93,7 +96,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
     return Column(
       children: [
         Icon(Icons.rocket_launch, size: 60, color: context.colors.gold),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           'خطوتك الأولى في قيام الليل',
           style: context.typography.displayMedium.copyWith(
@@ -103,7 +106,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         Text(
           'لا تقلق إذا كنت في البداية، فكل قائم لليل بدأ بخطوة بسيطة. إليك خارطة الطريق.',
           style: context.typography.bodyLarge.copyWith(
@@ -126,29 +129,29 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: context.colors.border),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: context.colors.gold),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.lg),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +163,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                             color: context.colors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           content,
                           style: context.typography.caption.copyWith(
@@ -203,14 +206,14 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
             color: context.colors.gold,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         ...questions.map(
           (qa) => Container(
             margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: context.colors.gold.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(color: context.colors.gold.withOpacity(0.1)),
             ),
             child: Column(
@@ -223,7 +226,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                     color: context.colors.gold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   qa['a']!,
                   style: context.typography.bodyLarge.copyWith(

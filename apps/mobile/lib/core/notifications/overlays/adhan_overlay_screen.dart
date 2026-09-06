@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -69,7 +70,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     _initSensors(prefs);
     _initVibration(prefs);
-    
+
     if (widget.autoPlay) {
       await _initAudio(prefs);
     }
@@ -79,8 +80,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     final mode = prefs.adhanMode;
 
     // Only vibrate if mode is vibrate, or if mode is sound and vibrateWithAdhan is true.
-    if (mode == 'vibrate' ||
-        (mode == 'sound' && prefs.vibrateWithAdhan)) {
+    if (mode == 'vibrate' || (mode == 'sound' && prefs.vibrateWithAdhan)) {
       _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
         if (AdhanAudioPlayer.isPlaying || mode == 'vibrate') {
           // Vibrate if playing or if only vibrating
@@ -115,7 +115,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   Future<void> _initAudio(prefs) async {
     // Respect the adhan mode (sound vs silent/vibrate)
     final mode = prefs.adhanMode;
-    
+
     if (mode == 'silent' || mode == 'vibrate') return;
 
     // Use the user-selected sound file
@@ -360,7 +360,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Hijri date
                   FadeTransition(
@@ -381,7 +381,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
 
                   // Hadith quote
                   FadeTransition(
@@ -430,7 +430,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                               baseColor: Colors.white70,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.md),
                           // Go to Prayer
                           Expanded(
                             flex: 2,
@@ -456,12 +456,14 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xxl,
+                      ),
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: const Color(0xFFD4AF37).withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(
                             color: const Color(0xFFD4AF37).withOpacity(0.2),
                           ),
@@ -489,7 +491,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppSpacing.sm),
                             const Text(
                               'اللَّهُمَّ رَبَّ هَٰذِهِ الدَّعْوَةِ التَّامَّةِ، وَالصَّلَاةِ الْقَائِمَةِ، آتِ مُحَمَّدًا الْوَسِيلَةَ وَالْفَضِيلَةَ',
                               style: TextStyle(
@@ -507,7 +509,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppSpacing.xxxl),
                 ],
               ),
             ),

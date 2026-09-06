@@ -1,4 +1,3 @@
-
 class SurahMeta {
   final int number, ayahCount, juzNumber, startPage;
   final String nameAr, nameEn, type; // 'meccan' | 'medinan'

@@ -1,4 +1,3 @@
-
 import 'dart:math' as math;
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/l10n/app_localizations.dart';
-
 
 /// فلتر الفترة الزمنية
 enum StatsPeriod { week, month, ramadan }
@@ -193,13 +191,15 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                     ),
                   ),
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         // ① Period Selector
                         _anim(0, _PeriodSelector()),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         // ② Taqwa Score Hero Card
                         _anim(
                           1,
@@ -216,7 +216,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         // ③ Bar Chart (period-aware)
                         _anim(
                           2,
@@ -229,7 +229,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         // ④ Stats Cards Grid
                         _anim(
                           3,
@@ -239,10 +239,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                             data: (s) => _StatsCardsGrid(stats: s),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         // ⑤ Prayer Attendance (real data)
                         _anim(4, _PrayerAttendanceCard(range: range)),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.lg),
                         // ⑥ Achievements
                         _anim(5, _AchievementsSection()),
                         const SizedBox(height: 100),
@@ -299,7 +299,9 @@ class _StatsTopBar extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isRamadan ? l10n.statsRamadanReportTitle : l10n.statsScreenTitle,
+                isRamadan
+                    ? l10n.statsRamadanReportTitle
+                    : l10n.statsScreenTitle,
                 style: context.typography.displayMedium.copyWith(
                   color: context.colors.gold,
                   fontWeight: FontWeight.w700,
@@ -354,7 +356,7 @@ class _RamadanProgress extends StatelessWidget {
             color: context.colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         SizedBox(
           width: 80,
           height: 80,
@@ -393,10 +395,10 @@ class _PeriodSelector extends ConsumerWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: context.colors.border),
       ),
       child: Row(
@@ -453,7 +455,7 @@ class _TaqwaHeroCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
@@ -475,7 +477,7 @@ class _TaqwaHeroCard extends StatelessWidget {
             points: stats.totalPoints,
             levelEmoji: taqwaLevelEmoji(stats.level),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.lg),
 
           Expanded(
             child: Column(
@@ -488,7 +490,7 @@ class _TaqwaHeroCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   l10n.statsPointsThisMonth(stats.totalPoints),
                   style: context.typography.bodySmall.copyWith(
@@ -510,7 +512,6 @@ class _TaqwaHeroCard extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class _TaqwaScoreRing extends StatefulWidget {
@@ -762,10 +763,10 @@ class _StreakBadgeLarge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
     decoration: BoxDecoration(
       color: context.colors.success.withOpacity(0.12),
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       border: Border.all(color: context.colors.success.withOpacity(0.3)),
     ),
     child: Row(
@@ -824,7 +825,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
     final isWeekly = widget.points.length <= 7;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -847,7 +848,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           // Chart area
           AnimatedBuilder(
             animation: _anim,
@@ -884,7 +885,9 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                 margin: const EdgeInsets.only(bottom: 4),
                                 decoration: BoxDecoration(
                                   color: context.colors.card2,
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.xs,
+                                  ),
                                   border: Border.all(
                                     color: context.colors.border,
                                   ),
@@ -963,7 +966,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
                 color: context.colors.gold,
                 label: AppLocalizations.of(context)!.homeRingTodayLabel,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.lg),
               _ChartLegend(
                 color: context.colors.border,
                 label: AppLocalizations.of(context)!.statsPreviousDaysLabel,
@@ -1154,7 +1157,7 @@ class _PrayerAttendanceCard extends ConsumerWidget {
     final ratesAsync = ref.watch(periodPrayerRatesProvider(range));
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1170,7 +1173,7 @@ class _PrayerAttendanceCard extends ConsumerWidget {
           ratesAsync.when(
             loading: () => const Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppSpacing.lg),
                 child: TakwaLoadingIndicator(strokeWidth: 2),
               ),
             ),
@@ -1246,7 +1249,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
       child: Row(
         children: [
           Text(widget.emoji, style: const TextStyle(fontSize: 16)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           SizedBox(
             width: 44,
             child: Text(
@@ -1256,7 +1259,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: AnimatedBuilder(
               animation: _anim,
@@ -1291,7 +1294,7 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           SizedBox(
             width: 34,
             child: AnimatedBuilder(
@@ -1319,7 +1322,7 @@ class _AchievementsSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1346,7 +1349,7 @@ class _AchievementsSection extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           allAsync.when(
             loading: () => Center(
@@ -1384,12 +1387,15 @@ class _AchievementBadge extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _showDetail(context, ref),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: context.colors.gold.withOpacity(0.25)),
         ),
         child: Row(
@@ -1453,12 +1459,12 @@ class _AchievementDialog extends StatelessWidget {
         side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(achievement.emoji, style: const TextStyle(fontSize: 48)),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               achievement.titleAr,
               style: context.typography.headingMedium.copyWith(
@@ -1467,7 +1473,7 @@ class _AchievementDialog extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               achievement.descAr,
               textAlign: TextAlign.center,
@@ -1478,10 +1484,13 @@ class _AchievementDialog extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
               decoration: BoxDecoration(
                 color: context.colors.gold.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 border: Border.all(color: context.colors.gold.withOpacity(0.2)),
               ),
               child: Text(
@@ -1494,7 +1503,7 @@ class _AchievementDialog extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             PrimaryButton(
               onTap: () async => Navigator.pop(context),
               label: AppLocalizations.of(context)!.statsThanksButtonLabel,
@@ -1509,18 +1518,18 @@ class _AchievementDialog extends StatelessWidget {
 class _EmptyAchievements extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(vertical: 20),
+    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
     child: Column(
       children: [
         const Text('🏆', style: TextStyle(fontSize: 32)),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           AppLocalizations.of(context)!.statsNoAchievementsYet,
           style: context.typography.bodyMedium.copyWith(
             color: context.colors.textDim,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           AppLocalizations.of(context)!.statsNoAchievementsHint,
           style: context.typography.caption.copyWith(
@@ -1540,12 +1549,22 @@ class _LockedAchievementsRow extends StatelessWidget {
     ('full_week', '⭐'),
   ];
 
-  static (String, String) _text(AppLocalizations l10n, String id) => switch (id) {
-    'streak_30' => (l10n.statsLockedStreak30Title, l10n.statsLockedStreak30Desc),
-    'quran_khatma' => (l10n.statsLockedKhatmaTitle, l10n.statsLockedKhatmaDesc),
-    'full_week' => (l10n.statsLockedFullWeekTitle, l10n.statsLockedFullWeekDesc),
-    _ => (id, ''),
-  };
+  static (String, String) _text(AppLocalizations l10n, String id) =>
+      switch (id) {
+        'streak_30' => (
+          l10n.statsLockedStreak30Title,
+          l10n.statsLockedStreak30Desc,
+        ),
+        'quran_khatma' => (
+          l10n.statsLockedKhatmaTitle,
+          l10n.statsLockedKhatmaDesc,
+        ),
+        'full_week' => (
+          l10n.statsLockedFullWeekTitle,
+          l10n.statsLockedFullWeekDesc,
+        ),
+        _ => (id, ''),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -1558,14 +1577,14 @@ class _LockedAchievementsRow extends StatelessWidget {
           child: Row(
             children: [
               Container(width: 24, height: 1, color: context.colors.border),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 l10n.statsComingSoonLabel,
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Container(height: 1, color: context.colors.border),
               ),
@@ -1575,50 +1594,48 @@ class _LockedAchievementsRow extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: _locked
-              .map((l) {
-                final (title, desc) = _text(l10n, l.$1);
-                return Opacity(
-                  opacity: 0.4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.colors.card2,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.colors.border),
-                    ),
-                    child: Row(
+          children: _locked.map((l) {
+            final (title, desc) = _text(l10n, l.$1);
+            return Opacity(
+              opacity: 0.4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colors.card2,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: context.colors.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🔒', style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 6),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('🔒', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 6),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              title,
-                              style: context.typography.bodySmall.copyWith(
-                                color: context.colors.textSecondary,
-                              ),
-                            ),
-                            Text(
-                              desc,
-                              style: context.typography.caption.copyWith(
-                                color: context.colors.textDim,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          title,
+                          style: context.typography.bodySmall.copyWith(
+                            color: context.colors.textSecondary,
+                          ),
+                        ),
+                        Text(
+                          desc,
+                          style: context.typography.caption.copyWith(
+                            color: context.colors.textDim,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                );
-              })
-              .toList(),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -1685,7 +1702,10 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
         child: FadeTransition(
           opacity: _fade,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -1693,7 +1713,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                   context.colors.gold,
                 ],
               ),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: context.colors.gold.withOpacity(0.4)),
               boxShadow: [
                 BoxShadow(
@@ -1709,7 +1729,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                   widget.achievement.emoji,
                   style: const TextStyle(fontSize: 28),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1741,12 +1761,12 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: context.colors.goldDim,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                   child: Text(
                     '+${widget.achievement.pointsReward}',
@@ -1824,7 +1844,7 @@ class _StatSkeleton extends StatelessWidget {
     height: height,
     decoration: BoxDecoration(
       color: context.colors.card,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       border: Border.all(color: context.colors.border),
     ),
     child: Center(

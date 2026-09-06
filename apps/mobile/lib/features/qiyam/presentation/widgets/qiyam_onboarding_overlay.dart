@@ -1,4 +1,4 @@
-                                     import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:takwa/core/theme/app_theme.dart';
@@ -8,7 +8,8 @@ class QiyamOnboardingOverlay extends ConsumerStatefulWidget {
   const QiyamOnboardingOverlay({super.key});
 
   @override
-  ConsumerState<QiyamOnboardingOverlay> createState() => _QiyamOnboardingOverlayState();
+  ConsumerState<QiyamOnboardingOverlay> createState() =>
+      _QiyamOnboardingOverlayState();
 }
 
 class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
@@ -26,18 +27,12 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
       vsync: this,
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     _audioPlayer = AudioPlayer();
     _controller.forward();
@@ -76,7 +71,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
                 _buildIcon(),
                 const SizedBox(height: 40),
                 _buildTitle(context),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppSpacing.xl),
                 _buildDescription(context),
                 const SizedBox(height: 50),
                 _buildSteps(context),
@@ -107,12 +102,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
           ),
         ],
       ),
-      child: const Center(
-        child: Text(
-          '🌙',
-          style: TextStyle(fontSize: 60),
-        ),
-      ),
+      child: const Center(child: Text('🌙', style: TextStyle(fontSize: 60))),
     );
   }
 
@@ -165,11 +155,13 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
             child: Center(
               child: Text(
                 number,
-                style: context.typography.caption.copyWith(color: context.colors.gold),
+                style: context.typography.caption.copyWith(
+                  color: context.colors.gold,
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppSpacing.lg),
           Text(
             text,
             style: context.typography.bodyMedium.copyWith(color: Colors.white),
@@ -197,10 +189,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
         ),
         child: const Text(
           'ابدأ الرحلة الآن',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );

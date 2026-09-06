@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:quran_library/quran_library.dart' as ql;
@@ -444,7 +445,7 @@ class _QuranPageView extends StatelessWidget {
                     _SurahHeader(surahMeta: kSurahData[surahIdx]),
                     if (!noBasmala)
                       _BasmalaLine(textColor: textColor, isDark: isDark),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                   ],
                   _PageContent(
                     surahNum: sNum,
@@ -483,7 +484,7 @@ class _SurahHeader extends StatelessWidget {
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
         border: Border.all(color: _kGold.withOpacity(0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -504,12 +505,17 @@ class _SurahHeader extends StatelessWidget {
           ),
           const Positioned(top: 4, left: 8, child: _CornerOrnament(flip: true)),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: AppSpacing.lg,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  surahMeta.type == 'meccan' ? l10n.quranReaderMeccan : l10n.quranReaderMedinan,
+                  surahMeta.type == 'meccan'
+                      ? l10n.quranReaderMeccan
+                      : l10n.quranReaderMedinan,
                   style: const TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 12,
@@ -568,7 +574,10 @@ class _BasmalaLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: AppSpacing.xxl,
+      ),
       child: Text(
         'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
         textAlign: TextAlign.center,
@@ -758,7 +767,9 @@ class _TopBar extends StatelessWidget {
               const Spacer(),
               // Surah name
               Text(
-                l10n.quranReaderSurahLabel(localizedSurahName(context, surahNum)),
+                l10n.quranReaderSurahLabel(
+                  localizedSurahName(context, surahNum),
+                ),
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 17,
@@ -791,7 +802,7 @@ class _TapIcon extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     child: Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(AppSpacing.sm),
       child: Icon(icon, color: color, size: 22),
     ),
   );
@@ -880,7 +891,10 @@ class _BottomBar extends StatelessWidget {
 
             // ── Progress bar ─────────────────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: 6,
+              ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
@@ -915,9 +929,9 @@ class _BottomBar extends StatelessWidget {
                   children: [
                     // Left icons: person, download, fullscreen
                     _audioIcon(Icons.person_outlined, textDim, () {}),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     _audioIcon(Icons.download_outlined, textDim, () {}),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     _audioIcon(Icons.fit_screen_outlined, textDim, () {}),
                     const Spacer(),
 
@@ -983,12 +997,12 @@ class _BottomBar extends StatelessWidget {
                       onTap: onSpeedTap,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xs,
                         ),
                         decoration: BoxDecoration(
                           border: Border.all(color: textDim),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
                         child: Text(
                           '${audio.speed}x',
@@ -996,7 +1010,7 @@ class _BottomBar extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
 
                     // Stop
                     GestureDetector(
@@ -1005,7 +1019,7 @@ class _BottomBar extends StatelessWidget {
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
                           color: Colors.white.withOpacity(0.08),
                         ),
                         child: Icon(
@@ -1045,11 +1059,11 @@ class _ReadingGuideDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(24),
+      insetPadding: const EdgeInsets.all(AppSpacing.xxl),
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1A5234),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.4),
@@ -1068,7 +1082,7 @@ class _ReadingGuideDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text('📖', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     l10n.quranReaderGuideTitle,
                     style: const TextStyle(
@@ -1087,10 +1101,7 @@ class _ReadingGuideDialog extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Column(
                 children: [
-                  _GuideItem(
-                    emoji: '👆',
-                    text: l10n.quranReaderGuideTapToggle,
-                  ),
+                  _GuideItem(emoji: '👆', text: l10n.quranReaderGuideTapToggle),
                   const SizedBox(height: 10),
                   _GuideItem(
                     emoji: '👆👆',
@@ -1126,7 +1137,7 @@ class _ReadingGuideDialog extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             // Got it button
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -1251,12 +1262,12 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
     final l10n = AppLocalizations.of(context)!;
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
           color: const Color(0xFF1A2D3E),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
         child: Column(
@@ -1282,7 +1293,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: AppSpacing.xl),
               ],
             ),
             const SizedBox(height: 14),
@@ -1296,7 +1307,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                 color: Colors.white60,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.quranReaderPageInputLabel(
                 l10n.quranReaderPageRangeHint(
@@ -1328,7 +1339,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                 filled: true,
                 fillColor: Colors.white.withOpacity(0.07),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   borderSide: BorderSide.none,
                 ),
                 errorText: _error,
@@ -1337,22 +1348,24 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                   fontSize: 11,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
+                  horizontal: AppSpacing.lg,
                   vertical: 14,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             Row(
               children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: Colors.white12),
                       ),
                       child: Center(
@@ -1368,16 +1381,18 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   flex: 2,
                   child: GestureDetector(
                     onTap: _navigate,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1A5234),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFF1A5234).withOpacity(0.4),
@@ -1455,7 +1470,7 @@ class _AyahOptionsSheet extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           const Divider(color: Colors.white12, height: 1),
           const SizedBox(height: 10),
           _OptionRow(
@@ -1503,7 +1518,10 @@ class _OptionRow extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),
+        padding: const EdgeInsets.symmetric(
+          vertical: 11,
+          horizontal: AppSpacing.xs,
+        ),
         child: Row(
           children: [
             const Icon(Icons.chevron_left, color: Colors.white24, size: 18),
@@ -1571,7 +1589,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             l10n.quranReaderSettingsTitle,
             style: const TextStyle(
@@ -1581,7 +1599,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1617,7 +1635,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           ),
           // Preview
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: Colors.black26,
               borderRadius: BorderRadius.circular(10),
@@ -1634,7 +1652,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -1646,7 +1664,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: ReaderTheme.values.map((t) {
               final labels = {
@@ -1660,11 +1678,13 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                   onTap: () => widget.onThemeChanged(t),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                    ),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: selected ? _kGold : Colors.white10,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Center(
                       child: Text(

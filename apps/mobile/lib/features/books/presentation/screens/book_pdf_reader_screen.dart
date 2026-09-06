@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 
@@ -189,7 +188,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.error_outline, size: 64, color: colors.textDim),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.',
                 style: typography.bodyMedium,
@@ -246,14 +245,14 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
                 onTextSelectionChanged:
                     (PdfTextSelectionChangedDetails details) {
-                  final text = details.selectedText ?? '';
-                  if (mounted) {
-                    setState(() {
-                      _selectedText = text;
-                      _isTextSelected = text.isNotEmpty;
-                    });
-                  }
-                },
+                      final text = details.selectedText ?? '';
+                      if (mounted) {
+                        setState(() {
+                          _selectedText = text;
+                          _isTextSelected = text.isNotEmpty;
+                        });
+                      }
+                    },
                 onDocumentLoaded: (details) {
                   final total = details.document.pages.count;
                   Future.microtask(() {
@@ -346,7 +345,10 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
     return Center(
       child: Container(
         width: 240,
-        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.xxxl,
+          horizontal: AppSpacing.xxl,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFF2C2C2C),
           borderRadius: BorderRadius.circular(24),
@@ -363,7 +365,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             TakwaLoadingIndicator(color: accentColor, strokeWidth: 2.5),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             Text(
               _downloadProgress > 0
                   ? 'جاري التحميل... $pct%'
@@ -375,7 +377,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
@@ -394,7 +396,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   Widget _buildErrorView() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -403,7 +405,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               color: Colors.orangeAccent,
               size: 56,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             const Text(
               'تعذّر تحميل الملف',
               style: TextStyle(
@@ -414,7 +416,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               ),
               textDirection: TextDirection.rtl,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               _error ?? '',
               style: const TextStyle(color: Colors.white38, fontSize: 11),
@@ -422,18 +424,18 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             ElevatedButton.icon(
               onPressed: _startDownload,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFC8A96E),
                 foregroundColor: Colors.black87,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
+                  horizontal: AppSpacing.xl,
+                  vertical: AppSpacing.md,
                 ),
               ),
               icon: const Icon(Icons.refresh_rounded),
@@ -469,7 +471,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
       child: Row(
         children: [
           const CustomLeadingButton(),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -534,13 +536,13 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               minHeight: 4,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
 
           Row(
             children: [
               // Reading time
               _InfoChip(icon: Icons.timer_outlined, label: session.timerLabel),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
 
               // Page slider
               Expanded(
@@ -573,7 +575,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                       )
                     : const SizedBox.shrink(),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
 
               // Page counter chip
               _InfoChip(
@@ -645,7 +647,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                     duration: const Duration(seconds: 1),
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                   ),
                 );
@@ -673,7 +675,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                     duration: const Duration(seconds: 1),
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                   ),
                 );
@@ -711,14 +713,14 @@ class _InfoChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.black54,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: Colors.white12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: Colors.white70, size: 13),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(
             label,
             style: const TextStyle(
@@ -753,7 +755,10 @@ class _SelectionActionButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

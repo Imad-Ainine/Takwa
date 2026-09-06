@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +8,6 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/l10n/app_localizations.dart';
-
 
 class UserAdhkarTabView extends ConsumerWidget {
   final AnimationController entryCtrl;
@@ -42,19 +40,21 @@ class UserAdhkarTabView extends ConsumerWidget {
           if (adhkar.isEmpty) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xxxl,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('✨', style: TextStyle(fontSize: 64)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       l10n.userAdhkarEmptyTitle,
                       style: context.typography.bodySmall.copyWith(
                         color: context.colors.gold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       l10n.userAdhkarEmptyBody,
                       style: context.typography.bodyMedium.copyWith(
@@ -173,7 +173,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                       child: Text('📿', style: TextStyle(fontSize: 18)),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Text(
                       d.textAr,
@@ -204,11 +204,11 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 4,
+                      vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
                       color: context.colors.gold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: context.colors.gold.withOpacity(0.25),
                       ),
@@ -239,7 +239,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                       );
                     },
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Share to community button
                   _IconActionButton(
@@ -248,7 +248,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                     color: context.colors.teal,
                     onTap: () => _onShare(context),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Delete button
                   _IconActionButton(
@@ -261,7 +261,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                         builder: (ctx) => AlertDialog(
                           backgroundColor: context.colors.card,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                           ),
                           title: Text(
                             l10n.adhkarDeleteConfirmTitle,
@@ -301,7 +301,6 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
   }
 }
 
-
 class _ShareToCommunitySheet extends ConsumerStatefulWidget {
   final UserAdhkarItem item;
   const _ShareToCommunitySheet({required this.item});
@@ -327,7 +326,11 @@ class _ShareToCommunitySheetState
       if (mounted) {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.adhkarGenericError(e.toString()))),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.adhkarGenericError(e.toString()),
+            ),
+          ),
         );
       }
     }
@@ -361,7 +364,7 @@ class _ShareToCommunitySheetState
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
 
           // Icon + Title
           Container(
@@ -380,7 +383,7 @@ class _ShareToCommunitySheetState
               child: Text('🌍', style: TextStyle(fontSize: 28)),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             l10n.adhkarShareToCommunityTitle,
             style: context.typography.headingMedium.copyWith(
@@ -389,7 +392,7 @@ class _ShareToCommunitySheetState
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             l10n.adhkarShareToCommunityDesc,
             style: context.typography.caption.copyWith(
@@ -397,12 +400,15 @@ class _ShareToCommunitySheetState
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
 
           // Dhikr preview card
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: 14,
+            ),
             decoration: BoxDecoration(
               color: context.colors.gold.withOpacity(0.06),
               borderRadius: BorderRadius.circular(14),
@@ -419,7 +425,7 @@ class _ShareToCommunitySheetState
                     color: context.colors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -428,7 +434,7 @@ class _ShareToCommunitySheetState
                       size: 14,
                       color: context.colors.gold,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       l10n.adhkarCountTimesLabel(widget.item.count),
                       style: context.typography.caption.copyWith(
@@ -440,7 +446,7 @@ class _ShareToCommunitySheetState
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
 
           // Buttons
           if (_done)
@@ -452,7 +458,7 @@ class _ShareToCommunitySheetState
                   color: context.colors.success,
                   size: 24,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   l10n.adhkarSharedSuccessMessage,
                   style: context.typography.bodyMedium.copyWith(
@@ -472,7 +478,7 @@ class _ShareToCommunitySheetState
                     isOutline: true,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   flex: 2,
                   child: PrimaryButton(
@@ -490,7 +496,6 @@ class _ShareToCommunitySheetState
     );
   }
 }
-
 
 class CommunityAdhkarTabView extends ConsumerWidget {
   final AnimationController entryCtrl;
@@ -515,16 +520,18 @@ class CommunityAdhkarTabView extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('🌍', style: TextStyle(fontSize: 64)),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       l10n.communityAdhkarEmptyTitle,
                       style: context.typography.bodySmall.copyWith(
                         color: context.colors.gold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xxxl,
+                      ),
                       child: Text(
                         l10n.communityAdhkarEmptyBody,
                         style: context.typography.bodyMedium.copyWith(
@@ -572,13 +579,13 @@ class CommunityAdhkarTabView extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('⚠️', style: TextStyle(fontSize: 48)),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               l10n.adhkarGenericError(e.toString()),
               style: const TextStyle(color: Colors.redAccent),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: 200,
               child: PrimaryButton(
@@ -637,7 +644,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                     child: Text('🤝', style: TextStyle(fontSize: 18)),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     item.textAr,
@@ -668,11 +675,11 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 4,
+                    vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
                     color: context.colors.teal.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
                       color: context.colors.teal.withOpacity(0.25),
                     ),
@@ -703,7 +710,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                     );
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
 
                 // Like button
                 GestureDetector(
@@ -717,14 +724,14 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
+                      horizontal: AppSpacing.md,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
                       color: item.likedByMe
                           ? Colors.redAccent.withOpacity(0.1)
                           : context.colors.card,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: item.likedByMe
                             ? Colors.redAccent.withOpacity(0.4)
@@ -743,7 +750,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                               : context.colors.textDim,
                           size: 16,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.xs),
                         Text(
                           '${item.likes}',
                           style: context.typography.caption.copyWith(
@@ -765,7 +772,6 @@ class _CommunityAdhkarCard extends ConsumerWidget {
     );
   }
 }
-
 
 class AddAdhkarSheet extends ConsumerStatefulWidget {
   const AddAdhkarSheet({super.key});
@@ -796,10 +802,9 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
           .add(textAr: text, count: _count);
 
       if (_shareWithCommunity) {
-        await ref.read(supabaseServiceProvider).shareAdhkarToCommunity(
-          textAr: text,
-          count: _count,
-        );
+        await ref
+            .read(supabaseServiceProvider)
+            .shareAdhkarToCommunity(textAr: text, count: _count);
         ref.invalidate(communityAdhkarProvider);
       }
 
@@ -847,7 +852,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -866,7 +871,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           TextField(
             controller: _textCtrl,
             maxLines: 4,
@@ -894,12 +899,15 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
 
           // Count picker
           Row(
             children: [
-              Text(l10n.addAdhkarRepeatCountLabel, style: context.typography.bodyMedium),
+              Text(
+                l10n.addAdhkarRepeatCountLabel,
+                style: context.typography.bodyMedium,
+              ),
               const Spacer(),
               IconButton(
                 onPressed: () =>
@@ -924,7 +932,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
 
           // Share toggle
           GestureDetector(
@@ -932,7 +940,10 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                 setState(() => _shareWithCommunity = !_shareWithCommunity),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 color: _shareWithCommunity
                     ? context.colors.teal.withOpacity(0.08)
@@ -982,7 +993,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
 
           PrimaryButton(
             onTap: _isLoading ? null : () async => _save(),
@@ -1020,7 +1031,7 @@ class _IconActionButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
             color: color.withOpacity(0.08),
             borderRadius: BorderRadius.circular(10),

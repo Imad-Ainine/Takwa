@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
@@ -302,7 +303,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
 
                   // Hijri date
                   FadeTransition(
@@ -323,7 +324,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.sm),
 
                   // Hadith quote
                   FadeTransition(
@@ -376,7 +377,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                               baseColor: Colors.white,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: AppSpacing.lg),
                           Expanded(
                             child: PrimaryButton(
                               onTap: () async => _close(),

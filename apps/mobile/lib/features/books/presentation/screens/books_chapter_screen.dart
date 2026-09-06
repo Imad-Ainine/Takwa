@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +42,7 @@ class BooksChapterScreen extends ConsumerWidget {
         title: book.titleAr,
         height: 260,
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.xxl),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -75,7 +74,7 @@ class BooksChapterScreen extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           book.authorAr,
                           style: TextStyle(
@@ -89,7 +88,7 @@ class BooksChapterScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.lg),
                   Hero(
                     tag: 'book-emoji-${book.id}',
                     child: Text(
@@ -99,7 +98,7 @@ class BooksChapterScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
               // Stats row
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -108,21 +107,21 @@ class BooksChapterScreen extends ConsumerWidget {
                     label: book.categoryLabel,
                     icon: Icons.category_outlined,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   _StatChip(
                     label: '${book.totalPages} صفحة',
                     icon: Icons.menu_book_rounded,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   _StatChip(
                     label: '~${book.estimatedReadingMinutes} د',
                     icon: Icons.schedule_rounded,
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               _ReadingProgressBar(book: book, accentColor: Colors.white),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
             ],
           ),
         ),
@@ -148,7 +147,7 @@ class BooksChapterScreen extends ConsumerWidget {
                         fontFamily: 'Amiri',
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Container(
                       width: 4,
                       height: 20,
@@ -159,7 +158,7 @@ class BooksChapterScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   book.descriptionAr,
                   style: TextStyle(
@@ -176,7 +175,10 @@ class BooksChapterScreen extends ConsumerWidget {
 
           // ── Primary Action ──────────────────────────────────
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xxl,
+              vertical: AppSpacing.lg,
+            ),
             child: _PrimaryActionButton(
               book: book,
               savedProgress: savedProgress,
@@ -206,7 +208,7 @@ class BooksChapterScreen extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
               child: Column(
                 children: List.generate(book.chapters.length, (i) {
                   final ch = book.chapters[i];
@@ -250,10 +252,13 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 6,
+      ),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
       child: Row(
@@ -328,7 +333,7 @@ class _PrimaryActionButton extends StatelessWidget {
           gradient: LinearGradient(
             colors: [accentColor, accentColor.withOpacity(0.8)],
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: accentColor.withOpacity(0.3),
@@ -349,7 +354,7 @@ class _PrimaryActionButton extends StatelessWidget {
                 fontFamily: 'Amiri',
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Icon(icon, color: Colors.white, size: 24),
           ],
         ),
@@ -384,7 +389,7 @@ class _ChapterItem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
           color: isCurrent ? accentColor.withOpacity(0.05) : colors.card,
           borderRadius: BorderRadius.circular(24),
@@ -412,7 +417,7 @@ class _ChapterItem extends StatelessWidget {
                     ),
                     textAlign: TextAlign.right,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -420,14 +425,14 @@ class _ChapterItem extends StatelessWidget {
                         '${chapter.totalPages} صفحة',
                         style: typography.caption,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Text(
                         '•',
                         style: typography.caption.copyWith(
                           color: colors.textDim,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Text(
                         '~${chapter.estimatedMinutes} دقيقة',
                         style: typography.caption,
@@ -435,7 +440,7 @@ class _ChapterItem extends StatelessWidget {
                     ],
                   ),
                   if (isCurrent) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
@@ -449,7 +454,7 @@ class _ChapterItem extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: AppSpacing.xl),
             Container(
               width: 44,
               height: 44,

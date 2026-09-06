@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -402,7 +401,6 @@ const kAdhkarData = <AdhkarCategory, List<DhikrItem>>{
   ],
 };
 
-
 final adhkarProgressRepositoryProvider = Provider<AdhkarProgressRepository>((
   ref,
 ) {
@@ -436,8 +434,10 @@ final adhkarProgressProvider =
       Map<int, int>,
       AdhkarCategory
     >(
-      (ref, cat) =>
-          AdhkarProgressNotifier(cat, ref.watch(adhkarProgressRepositoryProvider)),
+      (ref, cat) => AdhkarProgressNotifier(
+        cat,
+        ref.watch(adhkarProgressRepositoryProvider),
+      ),
     );
 
 // Legacy SharedPreference providers removed since we now use UserPreferences.

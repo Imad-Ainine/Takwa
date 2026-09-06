@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -159,7 +158,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
           );
         }
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           itemCount: list.length,
           itemBuilder: (_, i) =>
               _KhatmaCard(session: list[i], onDelete: null, style: style),
@@ -187,7 +186,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
           );
         }
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           itemCount: list.length,
           itemBuilder: (_, i) => _KhatmaCard(
             session: list[i],
@@ -210,13 +209,13 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 72, color: style.textDim.withOpacity(0.15)),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.xl),
           Text(
             title,
             style: style.naskh(18, color: style.textDim),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
@@ -236,7 +235,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       builder: (_) => AlertDialog(
         backgroundColor: style.card,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           side: BorderSide(color: style.border),
         ),
         title: Text(
@@ -277,7 +276,10 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
   Widget _buildToast(AdaptiveStyle style) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 14,
+      ),
       color: style.gold.withOpacity(0.9),
       child: Text(
         _toastMsg ?? '',
@@ -309,10 +311,10 @@ class _KhatmaCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: style.card,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: style.border),
       ),
       child: Column(
@@ -327,7 +329,7 @@ class _KhatmaCard extends StatelessWidget {
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.redAccent.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: const Icon(
                       Icons.delete_outline_rounded,
@@ -340,7 +342,7 @@ class _KhatmaCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
+                  vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
                   color: session.isCompleted
@@ -357,7 +359,7 @@ class _KhatmaCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 session.label,
                 style: style.amiri(
@@ -368,7 +370,7 @@ class _KhatmaCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
@@ -406,7 +408,7 @@ class _KhatmaCard extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       Icon(icon, size: 12, color: style.textDim),
-      const SizedBox(width: 4),
+      const SizedBox(width: AppSpacing.xs),
       Text(text, style: style.naskh(11, color: style.textSec)),
     ],
   );

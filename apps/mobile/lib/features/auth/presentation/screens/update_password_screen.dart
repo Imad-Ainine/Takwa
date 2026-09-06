@@ -79,14 +79,14 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
             content: const Row(
               children: [
                 Icon(Icons.check_circle_rounded, color: Colors.white),
-                SizedBox(width: 8),
+                SizedBox(width: AppSpacing.sm),
                 Text('تم تعيين كلمة المرور الجديدة بنجاح ✓'),
               ],
             ),
             backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
           ),
         );
@@ -139,7 +139,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(AppSpacing.xxl),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -174,7 +174,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xxl),
 
                     // Title
                     Text(
@@ -182,7 +182,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       style: s.amiri(32, weight: FontWeight.w700),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
 
                     // Subtitle
                     Text(
@@ -190,7 +190,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       style: s.naskh(13, color: s.textSec),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     // Password Field
                     AuthField(
@@ -206,9 +206,11 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
 
                     // Strength bar
                     if (_passCtrl.text.isNotEmpty) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                        ),
                         child: PasswordStrengthBar(
                           strength: _passStrength,
                           style: s,
@@ -216,7 +218,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
 
                     // Confirm Password Field
                     AuthField(
@@ -232,12 +234,12 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
 
                     // Error banner
                     if (_error != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
                             color: Colors.redAccent.withOpacity(0.4),
                           ),
@@ -261,7 +263,7 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       ),
                     ],
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppSpacing.xxxl),
 
                     // Submit Button
                     PrimaryButton(

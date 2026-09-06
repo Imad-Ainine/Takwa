@@ -77,7 +77,7 @@ class _CustomLeadingButtonState extends State<CustomLeadingButton>
             height: widget.size,
             decoration: BoxDecoration(
               color: colors.goldDim,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(color: colors.gold.withOpacity(0.2), width: 1),
               boxShadow: [
                 BoxShadow(

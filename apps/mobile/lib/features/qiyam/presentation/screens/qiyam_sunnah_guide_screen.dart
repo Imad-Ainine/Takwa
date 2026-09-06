@@ -21,10 +21,10 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
                 _buildAppBar(context),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     children: [
                       _buildGuideHeader(context),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildStepCard(
                         context,
                         number: '1',
@@ -60,7 +60,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
                         content:
                             'يختم المصلي قيامه بركعة واحدة توتر له ما صلى، لقوله ﷺ: "اجعلوا آخر صلاتكم بالليل وتراً".',
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildQuoteSection(context),
                     ],
                   ),
@@ -75,7 +75,10 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
@@ -97,7 +100,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
 
   Widget _buildGuideHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
         color: context.colors.gold.withOpacity(0.1),
         borderRadius: BorderRadius.circular(24),
@@ -106,7 +109,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
       child: Column(
         children: [
           const Icon(Icons.star, color: Colors.amber, size: 40),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             'هدي النبي ﷺ في قيام الليل',
             style: context.typography.displayMedium.copyWith(
@@ -116,7 +119,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Text(
             'دليل شامل لتعلم كيفية صلاة التهجد كما وردت عن الرسول ﷺ والصحابة الكرام.',
             style: context.typography.bodyLarge.copyWith(
@@ -140,18 +143,18 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: context.colors.card,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: context.colors.border),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Stack(
           children: [
             const Positioned.fill(
               child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -172,7 +175,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacing.lg),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +187,7 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
                             color: context.colors.gold,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         Text(
                           content,
                           style: context.typography.bodyLarge.copyWith(
@@ -206,10 +209,10 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
 
   Widget _buildQuoteSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: context.colors.teal.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: context.colors.teal.withOpacity(0.2)),
       ),
       child: Text(

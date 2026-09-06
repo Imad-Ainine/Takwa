@@ -127,7 +127,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     final email = profile?['email'] ?? '';
 
                     return Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.all(AppSpacing.xxl),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -139,17 +139,17 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                 color: context.colors.textDim,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             Container(
                               decoration: context.decorations.card.copyWith(
                                 color: context.colors.card.withOpacity(0.8),
                               ),
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.xl),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _buildLabel(context, 'الاسم'),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: AppSpacing.sm),
                                   TextFormField(
                                     controller: _nameController,
                                     style: context.typography.bodyMedium,
@@ -162,9 +162,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                         ? 'الرجاء إدخال الاسم'
                                         : null,
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: AppSpacing.xl),
                                   _buildLabel(context, 'البريد الإلكتروني'),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: AppSpacing.sm),
                                   TextFormField(
                                     initialValue: email,
                                     enabled: false,
@@ -178,7 +178,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                               .withOpacity(0.3),
                                         ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: AppSpacing.sm),
                                   Text(
                                     'لا يمكن تغيير البريد الإلكتروني حالياً',
                                     style: context.typography.caption.copyWith(
@@ -188,14 +188,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 32),
+                            const SizedBox(height: AppSpacing.xxxl),
                             PrimaryButton(
                               onTap: _saveChanges,
                               label: 'حفظ التغييرات',
                               icon: Icons.save_rounded,
                               isLoading: _isSaving,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: AppSpacing.xxl),
                             // Update Password Section
                             Text(
                               'الأمان',
@@ -203,7 +203,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                 color: context.colors.textDim,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: AppSpacing.lg),
                             Container(
                               decoration: context.decorations.card.copyWith(
                                 color: context.colors.card.withOpacity(0.8),
@@ -260,18 +260,21 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       filled: true,
       fillColor: context.colors.card.withOpacity(0.5),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         borderSide: BorderSide(color: context.colors.border.withOpacity(0.3)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         borderSide: BorderSide(color: context.colors.gold, width: 1.5),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: 14,
+      ),
     );
   }
 }

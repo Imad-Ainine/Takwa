@@ -48,13 +48,12 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                 ],
               ),
               SliverPadding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     prefsAsync.when(
-                      loading: () => const Center(
-                        child: TakwaLoadingIndicator(size: 40),
-                      ),
+                      loading: () =>
+                          const Center(child: TakwaLoadingIndicator(size: 40)),
                       error: (err, _) => Center(child: Text('Error: $err')),
                       data: (prefs) => Column(
                         children: [

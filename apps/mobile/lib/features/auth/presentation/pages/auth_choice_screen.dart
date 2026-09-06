@@ -27,14 +27,14 @@ class AuthChoiceScreen extends ConsumerWidget {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxxl),
               child: Column(
                 children: [
                   const Spacer(flex: 2),
 
                   // Logo & Name
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: context.colors.gold.withOpacity(0.1),
@@ -52,7 +52,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                     ),
                     child: const Text('🌙', style: TextStyle(fontSize: 60)),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xxl),
                   ShaderMask(
                     shaderCallback: (bounds) => LinearGradient(
                       colors: [style.gold, style.gold],
@@ -64,7 +64,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                           .copyWith(color: Colors.white),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     'رفيقك نحو حياة مليئة بالإيمان',
                     textAlign: TextAlign.center,
@@ -84,7 +84,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                         onTap: () async =>
                             Navigator.pushNamed(context, Routes.auth),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       PrimaryButton(
                         label: 'المتابعة كضيف',
                         icon: Icons.person_outline_rounded,
@@ -107,7 +107,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                       color: context.colors.textDim,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                 ],
               ),
             ),

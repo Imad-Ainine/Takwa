@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/providers/database_providers.dart';

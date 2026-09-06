@@ -17,7 +17,7 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(icon, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Text(
             title,
             style: context.typography.headingMedium.copyWith(
@@ -65,7 +65,7 @@ class SettingsCard extends StatelessWidget {
           padding: padding ?? const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: context.colors.card.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: context.colors.border.withOpacity(0.5)),
             boxShadow: [
               BoxShadow(
@@ -122,10 +122,13 @@ class ToggleSetting extends StatelessWidget {
         // color: value
         //     ? (accentColor ?? context.colors.teal).withOpacity(0.05)
         //     : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.xs,
+        ),
         child: Row(
           children: [
             AnimatedScale(
@@ -136,7 +139,7 @@ class ToggleSetting extends StatelessWidget {
                 height: 38,
                 decoration: BoxDecoration(
                   color: (accentColor ?? context.colors.gold).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
                     color: (accentColor ?? context.colors.gold).withOpacity(
                       0.1,
@@ -149,7 +152,7 @@ class ToggleSetting extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +184,8 @@ class ToggleSetting extends StatelessWidget {
                 Text(
                   value
                       ? (AppLocalizations.of(context)?.settingEnabled ?? 'مفعل')
-                      : (AppLocalizations.of(context)?.settingDisabled ?? 'معطل'),
+                      : (AppLocalizations.of(context)?.settingDisabled ??
+                            'معطل'),
                   style: context.typography.caption.copyWith(
                     color: value ? context.colors.teal : context.colors.textDim,
                     fontSize: 8.5,
@@ -220,9 +224,12 @@ class ActionSetting extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           children: [
             Container(
@@ -240,7 +247,7 @@ class ActionSetting extends StatelessWidget {
                 child: Text(icon, style: const TextStyle(fontSize: 18)),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,9 +305,12 @@ class SelectSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showPicker(context),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           children: [
             Container(
@@ -314,7 +324,7 @@ class SelectSetting extends StatelessWidget {
                 child: Text(icon, style: const TextStyle(fontSize: 18)),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,7 +404,7 @@ class SelectSetting extends StatelessWidget {
                 const SizedBox(width: 40), // Spacer for centering
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(ctx).size.height * 0.6,
@@ -412,18 +422,18 @@ class SelectSetting extends StatelessWidget {
                           onChanged(e.key);
                           Navigator.pop(ctx);
                         },
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: AppSpacing.lg,
                             vertical: 14,
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? context.colors.gold.withOpacity(0.08)
                                 : context.colors.card.withOpacity(0.4),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                             border: Border.all(
                               color: isSelected
                                   ? context.colors.gold.withOpacity(0.3)
@@ -489,9 +499,12 @@ class CheckboxSetting extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => onChanged(!value),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           children: [
             SizedBox(
@@ -506,7 +519,7 @@ class CheckboxSetting extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -550,21 +563,26 @@ class SyncStatusIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: context.colors.card.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: context.colors.border.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildIndicator(context),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Text(
             isSyncing
-                ? (AppLocalizations.of(context)?.syncStatusSyncing ?? 'جاري المزامنة...')
-                : (AppLocalizations.of(context)?.syncStatusSuccess ?? 'تمت المزامنة بنجاح'),
+                ? (AppLocalizations.of(context)?.syncStatusSyncing ??
+                      'جاري المزامنة...')
+                : (AppLocalizations.of(context)?.syncStatusSuccess ??
+                      'تمت المزامنة بنجاح'),
             style: context.typography.caption.copyWith(
               color: context.colors.textSecondary,
               fontSize: 10,
@@ -621,9 +639,12 @@ class TimeSetting extends StatelessWidget {
         );
         if (picked != null) onChanged(picked);
       },
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: AppSpacing.md,
+        ),
         child: Row(
           children: [
             Container(
@@ -637,7 +658,7 @@ class TimeSetting extends StatelessWidget {
                 child: Text(icon, style: const TextStyle(fontSize: 18)),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 label,
@@ -648,7 +669,10 @@ class TimeSetting extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: 6,
+              ),
               decoration: BoxDecoration(
                 color: context.colors.goldDim,
                 borderRadius: BorderRadius.circular(10),
@@ -702,7 +726,7 @@ class SliderSetting extends StatelessWidget {
           Row(
             children: [
               Text(icon, style: const TextStyle(fontSize: 18)),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 label,
                 style: context.typography.bodyMedium.copyWith(
@@ -712,7 +736,7 @@ class SliderSetting extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 2,

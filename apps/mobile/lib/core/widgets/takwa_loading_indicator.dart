@@ -40,13 +40,17 @@ class _TakwaLoadingIndicatorState extends State<TakwaLoadingIndicator>
     // Gentle scale pulse: 0.88 → 1.0 → 0.88
     _pulse = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.88, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.88,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.88)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.88,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_ctrl);
@@ -54,13 +58,17 @@ class _TakwaLoadingIndicatorState extends State<TakwaLoadingIndicator>
     // Fade: fades slightly on the "inhale"
     _fade = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.5, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.5,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.5)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.5,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 50,
       ),
     ]).animate(_ctrl);
@@ -180,11 +188,7 @@ class _SweepArcPainter extends CustomPainter {
         center: Alignment.center,
         startAngle: rotation,
         endAngle: rotation + 1.5 * math.pi,
-        colors: [
-          color.withOpacity(0.0),
-          color.withOpacity(0.6),
-          color,
-        ],
+        colors: [color.withOpacity(0.0), color.withOpacity(0.6), color],
       ).createShader(rect);
 
     canvas.drawArc(rect, rotation, 1.5 * math.pi, false, sweepPaint);

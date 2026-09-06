@@ -21,7 +21,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                 _buildAppBar(context),
                 Expanded(
                   child: ListView(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
                     children: [
                       _buildVirtueSection(
                         context,
@@ -34,7 +34,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                           '﴿أَمَّنْ هُوَ قَانِتٌ آنَاءَ اللَّيْلِ سَاجِدًا وَقَائِمًا يَحْذَرُ الْآخِرَةَ وَيَرْجُو رَحْمَةَ رَبِّهِ﴾ [الزمر: 9]',
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildVirtueSection(
                         context,
                         title: 'من السنة النبوية',
@@ -46,7 +46,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
                           '"إنَّ في اللَّيْلِ لَسَاعَةً، لا يُوَافِقُهَا رَجُلٌ مُسْلِمٌ، يَسْأَلُ اللَّهَ خَيْرًا مِن أَمْرِ الدُّنْيَا وَالآخِرَةِ، إلَّا أَعْطَاهُ إيَّاهُ، وَذلكَ كُلَّ لَيْلَةٍ"',
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xxl),
                       _buildVirtueSection(
                         context,
                         title: 'من أقوال السلف',
@@ -70,7 +70,10 @@ class QiyamVirtuesScreen extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 10,
+      ),
       child: Row(
         children: [
           const CustomLeadingButton(),
@@ -103,14 +106,14 @@ class QiyamVirtuesScreen extends StatelessWidget {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Text(
               title,
               style: context.typography.displayMedium.copyWith(
@@ -121,14 +124,14 @@ class QiyamVirtuesScreen extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         ...items.map(
           (item) => Container(
             margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             decoration: BoxDecoration(
               color: context.colors.card,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               border: Border.all(color: context.colors.border),
               boxShadow: [
                 BoxShadow(

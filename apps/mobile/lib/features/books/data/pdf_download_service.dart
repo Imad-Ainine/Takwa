@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 
@@ -124,9 +123,7 @@ class PdfDownloadService {
       final response = await client.send(request);
 
       if (response.statusCode != 200) {
-        throw HttpException(
-          'HTTP ${response.statusCode} for $url',
-        );
+        throw HttpException('HTTP ${response.statusCode} for $url');
       }
 
       final total = response.contentLength ?? -1;

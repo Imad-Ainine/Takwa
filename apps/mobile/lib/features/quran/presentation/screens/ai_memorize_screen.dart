@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -151,10 +150,14 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
               ? 'أدخل رقم الصفحة (1-604)'
               : 'ابحث في السور',
           hintStyle: style.naskh(13, color: style.textSec.withOpacity(0.5)),
-          suffixIcon: Icon(Icons.search, color: style.textSec.withOpacity(0.5), size: 20),
+          suffixIcon: Icon(
+            Icons.search,
+            color: style.textSec.withOpacity(0.5),
+            size: 20,
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
+            horizontal: AppSpacing.lg,
             vertical: 14,
           ),
         ),
@@ -182,7 +185,11 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
       itemCount: filteredPages.length,
       itemBuilder: (_, i) {
         final page = filteredPages[i];
-        return _PageItem(page: page, style: style, onTap: () => _goToPage(page));
+        return _PageItem(
+          page: page,
+          style: style,
+          onTap: () => _goToPage(page),
+        );
       },
     );
   }
@@ -237,7 +244,11 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
             ),
             child: Row(
               children: [
-                Icon(Icons.chevron_left, color: style.textSec.withOpacity(0.3), size: 20),
+                Icon(
+                  Icons.chevron_left,
+                  color: style.textSec.withOpacity(0.3),
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 // Badge number on left
                 Container(
@@ -262,11 +273,18 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                     children: [
                       Text(
                         meta.nameAr.isNotEmpty ? meta.nameAr : s.englishName,
-                        style: style.amiri(18, color: style.text, weight: FontWeight.bold),
+                        style: style.amiri(
+                          18,
+                          color: style.text,
+                          weight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         '${ar(s.ayahsNumber)} آية',
-                        style: style.naskh(12, color: style.textSec.withOpacity(0.6)),
+                        style: style.naskh(
+                          12,
+                          color: style.textSec.withOpacity(0.6),
+                        ),
                       ),
                     ],
                   ),
@@ -300,7 +318,11 @@ class _PageItem extends StatelessWidget {
   final int page;
   final AdaptiveStyle style;
   final VoidCallback onTap;
-  const _PageItem({required this.page, required this.style, required this.onTap});
+  const _PageItem({
+    required this.page,
+    required this.style,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +331,7 @@ class _PageItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: style.card,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: style.border),
         ),
         child: Center(

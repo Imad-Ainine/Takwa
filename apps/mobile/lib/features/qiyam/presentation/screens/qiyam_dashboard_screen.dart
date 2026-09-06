@@ -101,15 +101,15 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                     child: Column(
                       children: [
                         _buildPlanSelector(context, session),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                         _buildTimerRing(context, session),
                         const SizedBox(height: 40),
                         _buildStageInfo(context, session),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                         _buildControls(context, session),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: AppSpacing.xl),
                         _buildStoriesButton(context),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: AppSpacing.xxl),
                         _buildToolsSection(context),
                         const SizedBox(height: 40),
                       ],
@@ -136,7 +136,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   Widget _buildHeader(BuildContext context, QiyamSessionState session) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: 0,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -178,7 +181,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xxl,
+            vertical: AppSpacing.sm,
+          ),
           child: Text(
             'اختر مدة المرحلة',
             style: context.typography.caption.copyWith(
@@ -190,7 +196,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
           child: Row(
             children: durations.map((mins) {
               final isSelected = currentDuration == mins;
@@ -206,7 +215,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
+                      horizontal: AppSpacing.xxl,
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
@@ -309,7 +318,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(stage.emoji, style: const TextStyle(fontSize: 40)),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   _formatDuration(
                     (stage.defaultDuration - session.elapsed).isNegative
@@ -349,7 +358,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           stage.subtitle,
           style: context.typography.bodyLarge.copyWith(
@@ -427,7 +436,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     return IconButton(
       onPressed: onPressed,
       icon: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: context.colors.border),
@@ -446,12 +455,12 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   Widget _buildStoriesButton(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: InkWell(
         onTap: () => Navigator.pushNamed(context, Routes.qiyamStories),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -460,7 +469,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   context.colors.teal.withOpacity(0.05),
                 ],
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               border: Border.all(color: context.colors.gold.withOpacity(0.3)),
             ),
             child: Stack(
@@ -471,7 +480,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Row(
                     children: [
                       Container(
@@ -486,7 +495,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                           size: 24,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSpacing.lg),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,7 +533,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xxl,
+            vertical: AppSpacing.sm,
+          ),
           child: Text(
             'الأدوات والدليل الإيماني',
             style: context.typography.caption.copyWith(
@@ -537,7 +549,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           childAspectRatio: 1.5,
@@ -602,13 +614,13 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Container(
           decoration: BoxDecoration(
             color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: color.withOpacity(0.2)),
           ),
           child: Stack(
@@ -623,7 +635,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(icon, color: color, size: 28),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       title,
                       style: context.typography.labelMedium.copyWith(
@@ -703,7 +715,10 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
           child: Material(
             color: Colors.transparent,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -711,7 +726,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                     context.colors.gold,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
                 border: Border.all(color: context.colors.gold.withOpacity(0.4)),
                 boxShadow: [
                   BoxShadow(
@@ -724,7 +739,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
               child: Row(
                 children: [
                   const Text('🌙', style: TextStyle(fontSize: 28)),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
