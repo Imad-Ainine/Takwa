@@ -1860,5 +1860,132 @@
   "qiyamSleepCycle6h": "6 ساعات (جيد)",
   "qiyamSleepCycle45h": "4.5 ساعات (كافٍ)",
   "qiyamSleepCycle15h": "1.5 ساعة (غفوة)",
-  "qiyamSleepCalcSleepAtLabel": "يجب أن تنام الساعة"
+  "qiyamSleepCalcSleepAtLabel": "يجب أن تنام الساعة",
+  "bookPdfNoUrlError": "عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.",
+  "bookPdfDownloadingLabel": "جاري التحميل...",
+  "bookPdfDownloadingPercentLabel": "جاري التحميل... {pct}%",
+  "@bookPdfDownloadingPercentLabel": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bookPdfLoadFailedTitle": "تعذّر تحميل الملف",
+  "bookPdfShareAction": "مشاركة",
+  "bookPdfCopiedToast": "تم النسخ",
+  "bookPdfHighlightAction": "تحديد",
+  "bookPdfHighlightedToast": "تم تحديد النص",
+  "notifPreAdhanTitle": "⏳ اقترب وقت {prayerName}",
+  "@notifPreAdhanTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifPreAdhanBody": "15 دقيقة على أذان {prayerName}، استعدَّ للصلاة",
+  "@notifPreAdhanBody": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAdhanTitle": "حان وقت {prayerName}",
+  "@notifAdhanTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAdhanBody": "اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح",
+  "notifIqamaTitle": "وقت الإقامة — {prayerName}",
+  "@notifIqamaTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifIqamaBody": "حان وقت إقامة صلاة {prayerName}، الله أكبر الله أكبر",
+  "@notifIqamaBody": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMuhasabaTitle": "وقت محاسبة النفس",
+  "notifMuhasabaMsg1": "كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙",
+  "notifMuhasabaMsg2": "\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\" — عمر بن الخطاب",
+  "notifMuhasabaMsg3": "ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝",
+  "notifMuhasabaMsg4": "الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟",
+  "notifMuhasabaMsg5": "لا تنم قبل أن تحاسب نفسك على يومك 💫",
+  "notifMuhasabaMsg6": "ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲",
+  "notifMuhasabaMsg7": "أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏",
+  "notifDuaMorningTitle": "دعاء الصباح",
+  "notifDuaEveningTitle": "دعاء المساء",
+  "notifDuaTodayTitle": "دعاء اليوم",
+  "notifFridayKahfTitle": "سورة الكهف",
+  "notifFridayKahfBody": "لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين",
+  "notifFridaySalawatTitle": "الصلاة على النبي ﷺ",
+  "notifFridaySalawatBody": "اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة",
+  "notifFastingMondayTitle": "تذكير بصيام الاثنين",
+  "notifFastingMondayBody": "غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم",
+  "notifFastingThursdayTitle": "تذكير بصيام الخميس",
+  "notifFastingThursdayBody": "غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام",
+  "notifWhiteDaysTitle": "غداً من الأيام البيض",
+  "notifWhiteDaysBody": "غداً يوم {day} من {month} الهجري — صيام الأيام البيض سنّة مؤكدة",
+  "@notifWhiteDaysBody": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "notifSuhoorTitle": "تنبيه السحور",
+  "notifSuhoorBody": "بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك",
+  "notifIftarTitle": "حان وقت الإفطار",
+  "notifIftarBody": "اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك",
+  "notifWakeUpTitle": "حان وقت الاستيقاظ",
+  "notifWakeUpBody": "الصلاة خير من النوم — استيقظ لصلاة الفجر",
+  "notifWakeUpSnoozeTitle": "حان وقت الاستيقاظ (غفوة)",
+  "notifAchievementNewPrefix": "إنجاز جديد: {title}",
+  "@notifAchievementNewPrefix": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAchievementPointsSuffix": "+{points} نقطة تقوى 🌟",
+  "@notifAchievementPointsSuffix": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifAchievementPointsShort": "+{points} نقطة تقوى",
+  "@notifAchievementPointsShort": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifAdhkarMorningTitle": "حان وقت أذكار الصباح",
+  "notifAdhkarEveningTitle": "حان وقت أذكار المساء",
+  "notifAdhkarSleepTitle": "حان وقت أذكار النوم",
+  "notifAdhkarMorningChannelName": "أذكار الصباح",
+  "notifAdhkarEveningChannelName": "أذكار المساء",
+  "notifAdhkarSleepChannelName": "أذكار النوم",
+  "notifAdhkarChannelDesc": "أذكار وأدعية من حصن المسلم",
+  "notifAdhkarActionRead": "قرأت الأذكار ✓",
+  "notifAdhkarActionOpen": "فتح الأذكار"
 }

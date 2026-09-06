@@ -1357,5 +1357,132 @@
   "qiyamSleepCycle6h": "6 hours (good)",
   "qiyamSleepCycle45h": "4.5 hours (sufficient)",
   "qiyamSleepCycle15h": "1.5 hours (nap)",
-  "qiyamSleepCalcSleepAtLabel": "You should sleep at"
+  "qiyamSleepCalcSleepAtLabel": "You should sleep at",
+  "bookPdfNoUrlError": "Sorry, no PDF link was found for this book.",
+  "bookPdfDownloadingLabel": "Downloading...",
+  "bookPdfDownloadingPercentLabel": "Downloading... {pct}%",
+  "@bookPdfDownloadingPercentLabel": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bookPdfLoadFailedTitle": "Failed to load file",
+  "bookPdfShareAction": "Share",
+  "bookPdfCopiedToast": "Copied",
+  "bookPdfHighlightAction": "Highlight",
+  "bookPdfHighlightedToast": "Text highlighted",
+  "notifPreAdhanTitle": "⏳ {prayerName} time is approaching",
+  "@notifPreAdhanTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifPreAdhanBody": "15 minutes until {prayerName} adhan — prepare for prayer",
+  "@notifPreAdhanBody": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAdhanTitle": "It's time for {prayerName}",
+  "@notifAdhanTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAdhanBody": "Allahu Akbar, Allahu Akbar — Hayya 'ala-s-Salah, Hayya 'ala-l-Falah",
+  "notifIqamaTitle": "Iqama time — {prayerName}",
+  "@notifIqamaTitle": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifIqamaBody": "It's time for Iqama of {prayerName} prayer, Allahu Akbar Allahu Akbar",
+  "@notifIqamaBody": {
+    "placeholders": {
+      "prayerName": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMuhasabaTitle": "Time for self-accountability",
+  "notifMuhasabaMsg1": "How was your day with Allah? Take yourself to account before you sleep 🌙",
+  "notifMuhasabaMsg2": "\"Hold yourselves accountable before you are held accountable\" — Umar ibn al-Khattab",
+  "notifMuhasabaMsg3": "What have you offered today? Log your worship now 📝",
+  "notifMuhasabaMsg4": "The night calls out: O believer, what did you do today? 🌟",
+  "notifMuhasabaMsg5": "Don't sleep before holding yourself accountable for your day 💫",
+  "notifMuhasabaMsg6": "Three minutes of self-accountability are better than hours of regret 🤲",
+  "notifMuhasabaMsg7": "Did you accomplish something good today? Write it down and thank Allah 🙏",
+  "notifDuaMorningTitle": "Morning Dua",
+  "notifDuaEveningTitle": "Evening Dua",
+  "notifDuaTodayTitle": "Today's Dua",
+  "notifFridayKahfTitle": "Surah Al-Kahf",
+  "notifFridayKahfBody": "Don't forget to read Surah Al-Kahf today — a light between the two Fridays",
+  "notifFridaySalawatTitle": "Salawat upon the Prophet ﷺ",
+  "notifFridaySalawatBody": "O Allah, send blessings and peace upon our master Muhammad — increase your salawat on Friday",
+  "notifFastingMondayTitle": "Monday Fasting Reminder",
+  "notifFastingMondayBody": "Tomorrow is Monday — deeds are presented on this day, may yours find you fasting",
+  "notifFastingThursdayTitle": "Thursday Fasting Reminder",
+  "notifFastingThursdayBody": "Tomorrow is Thursday — deeds are raised on this day, blessed is the one who fasts",
+  "notifWhiteDaysTitle": "Tomorrow is a White Day",
+  "notifWhiteDaysBody": "Tomorrow is day {day} of {month} in the Hijri calendar — fasting the White Days is a confirmed Sunnah",
+  "@notifWhiteDaysBody": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "notifSuhoorTitle": "Suhoor Reminder",
+  "notifSuhoorBody": "30 minutes left until Imsak — wake up for suhoor, may Allah bless you",
+  "notifIftarTitle": "It's Time for Iftar",
+  "notifIftarBody": "O Allah, I have fasted for You and with Your provision I break my fast — blessed Ramadan",
+  "notifWakeUpTitle": "Time to Wake Up",
+  "notifWakeUpBody": "Prayer is better than sleep — wake up for Fajr prayer",
+  "notifWakeUpSnoozeTitle": "Time to Wake Up (Snooze)",
+  "notifAchievementNewPrefix": "New achievement: {title}",
+  "@notifAchievementNewPrefix": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notifAchievementPointsSuffix": "+{points} Taqwa points 🌟",
+  "@notifAchievementPointsSuffix": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifAchievementPointsShort": "+{points} Taqwa points",
+  "@notifAchievementPointsShort": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifAdhkarMorningTitle": "Time for Morning Adhkar",
+  "notifAdhkarEveningTitle": "Time for Evening Adhkar",
+  "notifAdhkarSleepTitle": "Time for Sleep Adhkar",
+  "notifAdhkarMorningChannelName": "Morning Adhkar",
+  "notifAdhkarEveningChannelName": "Evening Adhkar",
+  "notifAdhkarSleepChannelName": "Sleep Adhkar",
+  "notifAdhkarChannelDesc": "Adhkar and duas from Hisn al-Muslim",
+  "notifAdhkarActionRead": "I've read it ✓",
+  "notifAdhkarActionOpen": "Open Adhkar"
 }

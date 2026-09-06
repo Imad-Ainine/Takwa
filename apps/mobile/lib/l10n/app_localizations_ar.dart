@@ -3368,4 +3368,198 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiyamSleepCalcSleepAtLabel => 'يجب أن تنام الساعة';
+
+  @override
+  String get bookPdfNoUrlError =>
+      'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.';
+
+  @override
+  String get bookPdfDownloadingLabel => 'جاري التحميل...';
+
+  @override
+  String bookPdfDownloadingPercentLabel(int pct) {
+    return 'جاري التحميل... $pct%';
+  }
+
+  @override
+  String get bookPdfLoadFailedTitle => 'تعذّر تحميل الملف';
+
+  @override
+  String get bookPdfShareAction => 'مشاركة';
+
+  @override
+  String get bookPdfCopiedToast => 'تم النسخ';
+
+  @override
+  String get bookPdfHighlightAction => 'تحديد';
+
+  @override
+  String get bookPdfHighlightedToast => 'تم تحديد النص';
+
+  @override
+  String notifPreAdhanTitle(String prayerName) {
+    return '⏳ اقترب وقت $prayerName';
+  }
+
+  @override
+  String notifPreAdhanBody(String prayerName) {
+    return '15 دقيقة على أذان $prayerName، استعدَّ للصلاة';
+  }
+
+  @override
+  String notifAdhanTitle(String prayerName) {
+    return 'حان وقت $prayerName';
+  }
+
+  @override
+  String get notifAdhanBody =>
+      'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح';
+
+  @override
+  String notifIqamaTitle(String prayerName) {
+    return 'وقت الإقامة — $prayerName';
+  }
+
+  @override
+  String notifIqamaBody(String prayerName) {
+    return 'حان وقت إقامة صلاة $prayerName، الله أكبر الله أكبر';
+  }
+
+  @override
+  String get notifMuhasabaTitle => 'وقت محاسبة النفس';
+
+  @override
+  String get notifMuhasabaMsg1 =>
+      'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙';
+
+  @override
+  String get notifMuhasabaMsg2 =>
+      '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\" — عمر بن الخطاب';
+
+  @override
+  String get notifMuhasabaMsg3 => 'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝';
+
+  @override
+  String get notifMuhasabaMsg4 =>
+      'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟';
+
+  @override
+  String get notifMuhasabaMsg5 => 'لا تنم قبل أن تحاسب نفسك على يومك 💫';
+
+  @override
+  String get notifMuhasabaMsg6 =>
+      'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲';
+
+  @override
+  String get notifMuhasabaMsg7 =>
+      'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏';
+
+  @override
+  String get notifDuaMorningTitle => 'دعاء الصباح';
+
+  @override
+  String get notifDuaEveningTitle => 'دعاء المساء';
+
+  @override
+  String get notifDuaTodayTitle => 'دعاء اليوم';
+
+  @override
+  String get notifFridayKahfTitle => 'سورة الكهف';
+
+  @override
+  String get notifFridayKahfBody =>
+      'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين';
+
+  @override
+  String get notifFridaySalawatTitle => 'الصلاة على النبي ﷺ';
+
+  @override
+  String get notifFridaySalawatBody =>
+      'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة';
+
+  @override
+  String get notifFastingMondayTitle => 'تذكير بصيام الاثنين';
+
+  @override
+  String get notifFastingMondayBody =>
+      'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم';
+
+  @override
+  String get notifFastingThursdayTitle => 'تذكير بصيام الخميس';
+
+  @override
+  String get notifFastingThursdayBody =>
+      'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام';
+
+  @override
+  String get notifWhiteDaysTitle => 'غداً من الأيام البيض';
+
+  @override
+  String notifWhiteDaysBody(int day, String month) {
+    return 'غداً يوم $day من $month الهجري — صيام الأيام البيض سنّة مؤكدة';
+  }
+
+  @override
+  String get notifSuhoorTitle => 'تنبيه السحور';
+
+  @override
+  String get notifSuhoorBody =>
+      'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك';
+
+  @override
+  String get notifIftarTitle => 'حان وقت الإفطار';
+
+  @override
+  String get notifIftarBody => 'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك';
+
+  @override
+  String get notifWakeUpTitle => 'حان وقت الاستيقاظ';
+
+  @override
+  String get notifWakeUpBody => 'الصلاة خير من النوم — استيقظ لصلاة الفجر';
+
+  @override
+  String get notifWakeUpSnoozeTitle => 'حان وقت الاستيقاظ (غفوة)';
+
+  @override
+  String notifAchievementNewPrefix(String title) {
+    return 'إنجاز جديد: $title';
+  }
+
+  @override
+  String notifAchievementPointsSuffix(int points) {
+    return '+$points نقطة تقوى 🌟';
+  }
+
+  @override
+  String notifAchievementPointsShort(int points) {
+    return '+$points نقطة تقوى';
+  }
+
+  @override
+  String get notifAdhkarMorningTitle => 'حان وقت أذكار الصباح';
+
+  @override
+  String get notifAdhkarEveningTitle => 'حان وقت أذكار المساء';
+
+  @override
+  String get notifAdhkarSleepTitle => 'حان وقت أذكار النوم';
+
+  @override
+  String get notifAdhkarMorningChannelName => 'أذكار الصباح';
+
+  @override
+  String get notifAdhkarEveningChannelName => 'أذكار المساء';
+
+  @override
+  String get notifAdhkarSleepChannelName => 'أذكار النوم';
+
+  @override
+  String get notifAdhkarChannelDesc => 'أذكار وأدعية من حصن المسلم';
+
+  @override
+  String get notifAdhkarActionRead => 'قرأت الأذكار ✓';
+
+  @override
+  String get notifAdhkarActionOpen => 'فتح الأذكار';
 }

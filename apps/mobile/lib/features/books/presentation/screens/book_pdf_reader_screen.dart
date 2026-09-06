@@ -13,6 +13,7 @@ import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/data/pdf_download_service.dart';
 import 'package:takwa/features/books/providers/pdf_session_provider.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class BookPdfReaderScreen extends ConsumerStatefulWidget {
   final IslamicBook book;
@@ -165,6 +166,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
     final accentColor = _parseColor(widget.book.coverColor);
@@ -190,7 +192,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               Icon(Icons.error_outline, size: 64, color: colors.textDim),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.',
+                l10n.bookPdfNoUrlError,
                 style: typography.bodyMedium,
                 textDirection: TextDirection.rtl,
               ),
@@ -341,6 +343,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   // ── Sub-widgets ───────────────────────────
 
   Widget _buildLoadingView(Color accentColor) {
+    final l10n = AppLocalizations.of(context)!;
     final pct = (_downloadProgress * 100).toInt();
     return Center(
       child: Container(
@@ -368,8 +371,8 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
             const SizedBox(height: AppSpacing.xl),
             Text(
               _downloadProgress > 0
-                  ? 'جاري التحميل... $pct%'
-                  : 'جاري التحميل...',
+                  ? l10n.bookPdfDownloadingPercentLabel(pct)
+                  : l10n.bookPdfDownloadingLabel,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 14,
@@ -394,6 +397,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   }
 
   Widget _buildErrorView() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -406,9 +410,9 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
               size: 56,
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text(
-              'تعذّر تحميل الملف',
-              style: TextStyle(
+            Text(
+              l10n.bookPdfLoadFailedTitle,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontFamily: 'Amiri',
@@ -439,9 +443,9 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                 ),
               ),
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text(
-                'إعادة المحاولة',
-                style: TextStyle(
+              label: Text(
+                l10n.prayerScreenRetryButton,
+                style: const TextStyle(
                   fontFamily: 'Amiri',
                   fontWeight: FontWeight.bold,
                 ),
@@ -592,6 +596,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
   /// Bottom action bar that appears when text is selected.
   /// Offers Share, Underline-highlight copy, and Bookmark actions.
   Widget _buildSelectionActionBar(Color accentColor) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
@@ -618,7 +623,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           // Share
           _SelectionActionButton(
             icon: Icons.share_rounded,
-            label: 'مشاركة',
+            label: l10n.bookPdfShareAction,
             accentColor: accentColor,
             onTap: () {
               if (_selectedText.isNotEmpty) {
@@ -631,17 +636,17 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           // Copy
           _SelectionActionButton(
             icon: Icons.copy_rounded,
-            label: 'نسخ',
+            label: l10n.adhkarCopyTooltip,
             accentColor: accentColor,
             onTap: () {
               if (_selectedText.isNotEmpty) {
                 Clipboard.setData(ClipboardData(text: _selectedText));
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text(
-                      'تم النسخ',
+                    content: Text(
+                      l10n.bookPdfCopiedToast,
                       textDirection: TextDirection.rtl,
-                      style: TextStyle(fontFamily: 'Amiri'),
+                      style: const TextStyle(fontFamily: 'Amiri'),
                     ),
                     backgroundColor: accentColor,
                     duration: const Duration(seconds: 1),
@@ -659,17 +664,17 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           // Highlight (visual underline feedback)
           _SelectionActionButton(
             icon: Icons.format_underline_rounded,
-            label: 'تحديد',
+            label: l10n.bookPdfHighlightAction,
             accentColor: accentColor,
             onTap: () {
               // Syncfusion's addAnnotation API or simply copy with visual cue
               if (_selectedText.isNotEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text(
-                      'تم تحديد النص',
+                    content: Text(
+                      l10n.bookPdfHighlightedToast,
                       textDirection: TextDirection.rtl,
-                      style: TextStyle(fontFamily: 'Amiri'),
+                      style: const TextStyle(fontFamily: 'Amiri'),
                     ),
                     backgroundColor: Colors.amber.shade700,
                     duration: const Duration(seconds: 1),
@@ -687,7 +692,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           // Dismiss
           _SelectionActionButton(
             icon: Icons.close_rounded,
-            label: 'إلغاء',
+            label: l10n.commonCancel,
             accentColor: Colors.white54,
             onTap: _clearSelection,
           ),

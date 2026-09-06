@@ -3402,4 +3402,201 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiyamSleepCalcSleepAtLabel => 'You should sleep at';
+
+  @override
+  String get bookPdfNoUrlError => 'Sorry, no PDF link was found for this book.';
+
+  @override
+  String get bookPdfDownloadingLabel => 'Downloading...';
+
+  @override
+  String bookPdfDownloadingPercentLabel(int pct) {
+    return 'Downloading... $pct%';
+  }
+
+  @override
+  String get bookPdfLoadFailedTitle => 'Failed to load file';
+
+  @override
+  String get bookPdfShareAction => 'Share';
+
+  @override
+  String get bookPdfCopiedToast => 'Copied';
+
+  @override
+  String get bookPdfHighlightAction => 'Highlight';
+
+  @override
+  String get bookPdfHighlightedToast => 'Text highlighted';
+
+  @override
+  String notifPreAdhanTitle(String prayerName) {
+    return '⏳ $prayerName time is approaching';
+  }
+
+  @override
+  String notifPreAdhanBody(String prayerName) {
+    return '15 minutes until $prayerName adhan — prepare for prayer';
+  }
+
+  @override
+  String notifAdhanTitle(String prayerName) {
+    return 'It\'s time for $prayerName';
+  }
+
+  @override
+  String get notifAdhanBody =>
+      'Allahu Akbar, Allahu Akbar — Hayya \'ala-s-Salah, Hayya \'ala-l-Falah';
+
+  @override
+  String notifIqamaTitle(String prayerName) {
+    return 'Iqama time — $prayerName';
+  }
+
+  @override
+  String notifIqamaBody(String prayerName) {
+    return 'It\'s time for Iqama of $prayerName prayer, Allahu Akbar Allahu Akbar';
+  }
+
+  @override
+  String get notifMuhasabaTitle => 'Time for self-accountability';
+
+  @override
+  String get notifMuhasabaMsg1 =>
+      'How was your day with Allah? Take yourself to account before you sleep 🌙';
+
+  @override
+  String get notifMuhasabaMsg2 =>
+      '\"Hold yourselves accountable before you are held accountable\" — Umar ibn al-Khattab';
+
+  @override
+  String get notifMuhasabaMsg3 =>
+      'What have you offered today? Log your worship now 📝';
+
+  @override
+  String get notifMuhasabaMsg4 =>
+      'The night calls out: O believer, what did you do today? 🌟';
+
+  @override
+  String get notifMuhasabaMsg5 =>
+      'Don\'t sleep before holding yourself accountable for your day 💫';
+
+  @override
+  String get notifMuhasabaMsg6 =>
+      'Three minutes of self-accountability are better than hours of regret 🤲';
+
+  @override
+  String get notifMuhasabaMsg7 =>
+      'Did you accomplish something good today? Write it down and thank Allah 🙏';
+
+  @override
+  String get notifDuaMorningTitle => 'Morning Dua';
+
+  @override
+  String get notifDuaEveningTitle => 'Evening Dua';
+
+  @override
+  String get notifDuaTodayTitle => 'Today\'s Dua';
+
+  @override
+  String get notifFridayKahfTitle => 'Surah Al-Kahf';
+
+  @override
+  String get notifFridayKahfBody =>
+      'Don\'t forget to read Surah Al-Kahf today — a light between the two Fridays';
+
+  @override
+  String get notifFridaySalawatTitle => 'Salawat upon the Prophet ﷺ';
+
+  @override
+  String get notifFridaySalawatBody =>
+      'O Allah, send blessings and peace upon our master Muhammad — increase your salawat on Friday';
+
+  @override
+  String get notifFastingMondayTitle => 'Monday Fasting Reminder';
+
+  @override
+  String get notifFastingMondayBody =>
+      'Tomorrow is Monday — deeds are presented on this day, may yours find you fasting';
+
+  @override
+  String get notifFastingThursdayTitle => 'Thursday Fasting Reminder';
+
+  @override
+  String get notifFastingThursdayBody =>
+      'Tomorrow is Thursday — deeds are raised on this day, blessed is the one who fasts';
+
+  @override
+  String get notifWhiteDaysTitle => 'Tomorrow is a White Day';
+
+  @override
+  String notifWhiteDaysBody(int day, String month) {
+    return 'Tomorrow is day $day of $month in the Hijri calendar — fasting the White Days is a confirmed Sunnah';
+  }
+
+  @override
+  String get notifSuhoorTitle => 'Suhoor Reminder';
+
+  @override
+  String get notifSuhoorBody =>
+      '30 minutes left until Imsak — wake up for suhoor, may Allah bless you';
+
+  @override
+  String get notifIftarTitle => 'It\'s Time for Iftar';
+
+  @override
+  String get notifIftarBody =>
+      'O Allah, I have fasted for You and with Your provision I break my fast — blessed Ramadan';
+
+  @override
+  String get notifWakeUpTitle => 'Time to Wake Up';
+
+  @override
+  String get notifWakeUpBody =>
+      'Prayer is better than sleep — wake up for Fajr prayer';
+
+  @override
+  String get notifWakeUpSnoozeTitle => 'Time to Wake Up (Snooze)';
+
+  @override
+  String notifAchievementNewPrefix(String title) {
+    return 'New achievement: $title';
+  }
+
+  @override
+  String notifAchievementPointsSuffix(int points) {
+    return '+$points Taqwa points 🌟';
+  }
+
+  @override
+  String notifAchievementPointsShort(int points) {
+    return '+$points Taqwa points';
+  }
+
+  @override
+  String get notifAdhkarMorningTitle => 'Time for Morning Adhkar';
+
+  @override
+  String get notifAdhkarEveningTitle => 'Time for Evening Adhkar';
+
+  @override
+  String get notifAdhkarSleepTitle => 'Time for Sleep Adhkar';
+
+  @override
+  String get notifAdhkarMorningChannelName => 'Morning Adhkar';
+
+  @override
+  String get notifAdhkarEveningChannelName => 'Evening Adhkar';
+
+  @override
+  String get notifAdhkarSleepChannelName => 'Sleep Adhkar';
+
+  @override
+  String get notifAdhkarChannelDesc => 'Adhkar and duas from Hisn al-Muslim';
+
+  @override
+  String get notifAdhkarActionRead => 'I\'ve read it ✓';
+
+  @override
+  String get notifAdhkarActionOpen => 'Open Adhkar';
 }

@@ -6235,6 +6235,330 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'يجب أن تنام الساعة'**
   String get qiyamSleepCalcSleepAtLabel;
+
+  /// No description provided for @bookPdfNoUrlError.
+  ///
+  /// In ar, this message translates to:
+  /// **'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.'**
+  String get bookPdfNoUrlError;
+
+  /// No description provided for @bookPdfDownloadingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري التحميل...'**
+  String get bookPdfDownloadingLabel;
+
+  /// No description provided for @bookPdfDownloadingPercentLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري التحميل... {pct}%'**
+  String bookPdfDownloadingPercentLabel(int pct);
+
+  /// No description provided for @bookPdfLoadFailedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل الملف'**
+  String get bookPdfLoadFailedTitle;
+
+  /// No description provided for @bookPdfShareAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة'**
+  String get bookPdfShareAction;
+
+  /// No description provided for @bookPdfCopiedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم النسخ'**
+  String get bookPdfCopiedToast;
+
+  /// No description provided for @bookPdfHighlightAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد'**
+  String get bookPdfHighlightAction;
+
+  /// No description provided for @bookPdfHighlightedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديد النص'**
+  String get bookPdfHighlightedToast;
+
+  /// No description provided for @notifPreAdhanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'⏳ اقترب وقت {prayerName}'**
+  String notifPreAdhanTitle(String prayerName);
+
+  /// No description provided for @notifPreAdhanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'15 دقيقة على أذان {prayerName}، استعدَّ للصلاة'**
+  String notifPreAdhanBody(String prayerName);
+
+  /// No description provided for @notifAdhanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت {prayerName}'**
+  String notifAdhanTitle(String prayerName);
+
+  /// No description provided for @notifAdhanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح'**
+  String get notifAdhanBody;
+
+  /// No description provided for @notifIqamaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت الإقامة — {prayerName}'**
+  String notifIqamaTitle(String prayerName);
+
+  /// No description provided for @notifIqamaBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت إقامة صلاة {prayerName}، الله أكبر الله أكبر'**
+  String notifIqamaBody(String prayerName);
+
+  /// No description provided for @notifMuhasabaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت محاسبة النفس'**
+  String get notifMuhasabaTitle;
+
+  /// No description provided for @notifMuhasabaMsg1.
+  ///
+  /// In ar, this message translates to:
+  /// **'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙'**
+  String get notifMuhasabaMsg1;
+
+  /// No description provided for @notifMuhasabaMsg2.
+  ///
+  /// In ar, this message translates to:
+  /// **'\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\" — عمر بن الخطاب'**
+  String get notifMuhasabaMsg2;
+
+  /// No description provided for @notifMuhasabaMsg3.
+  ///
+  /// In ar, this message translates to:
+  /// **'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝'**
+  String get notifMuhasabaMsg3;
+
+  /// No description provided for @notifMuhasabaMsg4.
+  ///
+  /// In ar, this message translates to:
+  /// **'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟'**
+  String get notifMuhasabaMsg4;
+
+  /// No description provided for @notifMuhasabaMsg5.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنم قبل أن تحاسب نفسك على يومك 💫'**
+  String get notifMuhasabaMsg5;
+
+  /// No description provided for @notifMuhasabaMsg6.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲'**
+  String get notifMuhasabaMsg6;
+
+  /// No description provided for @notifMuhasabaMsg7.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏'**
+  String get notifMuhasabaMsg7;
+
+  /// No description provided for @notifDuaMorningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الصباح'**
+  String get notifDuaMorningTitle;
+
+  /// No description provided for @notifDuaEveningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء المساء'**
+  String get notifDuaEveningTitle;
+
+  /// No description provided for @notifDuaTodayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء اليوم'**
+  String get notifDuaTodayTitle;
+
+  /// No description provided for @notifFridayKahfTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة الكهف'**
+  String get notifFridayKahfTitle;
+
+  /// No description provided for @notifFridayKahfBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين'**
+  String get notifFridayKahfBody;
+
+  /// No description provided for @notifFridaySalawatTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة على النبي ﷺ'**
+  String get notifFridaySalawatTitle;
+
+  /// No description provided for @notifFridaySalawatBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة'**
+  String get notifFridaySalawatBody;
+
+  /// No description provided for @notifFastingMondayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير بصيام الاثنين'**
+  String get notifFastingMondayTitle;
+
+  /// No description provided for @notifFastingMondayBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم'**
+  String get notifFastingMondayBody;
+
+  /// No description provided for @notifFastingThursdayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير بصيام الخميس'**
+  String get notifFastingThursdayTitle;
+
+  /// No description provided for @notifFastingThursdayBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام'**
+  String get notifFastingThursdayBody;
+
+  /// No description provided for @notifWhiteDaysTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً من الأيام البيض'**
+  String get notifWhiteDaysTitle;
+
+  /// No description provided for @notifWhiteDaysBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً يوم {day} من {month} الهجري — صيام الأيام البيض سنّة مؤكدة'**
+  String notifWhiteDaysBody(int day, String month);
+
+  /// No description provided for @notifSuhoorTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه السحور'**
+  String get notifSuhoorTitle;
+
+  /// No description provided for @notifSuhoorBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك'**
+  String get notifSuhoorBody;
+
+  /// No description provided for @notifIftarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الإفطار'**
+  String get notifIftarTitle;
+
+  /// No description provided for @notifIftarBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك'**
+  String get notifIftarBody;
+
+  /// No description provided for @notifWakeUpTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الاستيقاظ'**
+  String get notifWakeUpTitle;
+
+  /// No description provided for @notifWakeUpBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة خير من النوم — استيقظ لصلاة الفجر'**
+  String get notifWakeUpBody;
+
+  /// No description provided for @notifWakeUpSnoozeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الاستيقاظ (غفوة)'**
+  String get notifWakeUpSnoozeTitle;
+
+  /// No description provided for @notifAchievementNewPrefix.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجاز جديد: {title}'**
+  String notifAchievementNewPrefix(String title);
+
+  /// No description provided for @notifAchievementPointsSuffix.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة تقوى 🌟'**
+  String notifAchievementPointsSuffix(int points);
+
+  /// No description provided for @notifAchievementPointsShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة تقوى'**
+  String notifAchievementPointsShort(int points);
+
+  /// No description provided for @notifAdhkarMorningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار الصباح'**
+  String get notifAdhkarMorningTitle;
+
+  /// No description provided for @notifAdhkarEveningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار المساء'**
+  String get notifAdhkarEveningTitle;
+
+  /// No description provided for @notifAdhkarSleepTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار النوم'**
+  String get notifAdhkarSleepTitle;
+
+  /// No description provided for @notifAdhkarMorningChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get notifAdhkarMorningChannelName;
+
+  /// No description provided for @notifAdhkarEveningChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get notifAdhkarEveningChannelName;
+
+  /// No description provided for @notifAdhkarSleepChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get notifAdhkarSleepChannelName;
+
+  /// No description provided for @notifAdhkarChannelDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار وأدعية من حصن المسلم'**
+  String get notifAdhkarChannelDesc;
+
+  /// No description provided for @notifAdhkarActionRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرأت الأذكار ✓'**
+  String get notifAdhkarActionRead;
+
+  /// No description provided for @notifAdhkarActionOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح الأذكار'**
+  String get notifAdhkarActionOpen;
 }
 
 class _AppLocalizationsDelegate
