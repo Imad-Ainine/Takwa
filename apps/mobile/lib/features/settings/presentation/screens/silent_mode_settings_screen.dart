@@ -7,12 +7,14 @@ import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import '../widgets/settings_widgets.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class SilentModeSettingsScreen extends ConsumerWidget {
   const SilentModeSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
 
@@ -31,7 +33,7 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                 pinned: true,
                 leading: const CustomLeadingButton(),
                 title: Text(
-                  'إعدادات الوضع الصامت',
+                  l10n.silentModeSettingsTitle,
                   style: context.typography.headingMedium.copyWith(
                     color: context.colors.gold,
                   ),
@@ -54,16 +56,16 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                     prefsAsync.when(
                       loading: () =>
                           const Center(child: TakwaLoadingIndicator(size: 40)),
-                      error: (err, _) => Center(child: Text('Error: $err')),
+                      error: (err, _) =>
+                          Center(child: Text(l10n.checklistErrorPrefix('$err'))),
                       data: (prefs) => Column(
                         children: [
                           SettingsCard(
                             children: [
                               ToggleSetting(
                                 icon: '🔇',
-                                label: 'تفعيل وضع الصامت',
-                                sublabel:
-                                    'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم',
+                                label: l10n.silentModeEnableLabel,
+                                sublabel: l10n.silentModeEnableSublabel,
                                 value: prefs.silentModeEnabled,
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
@@ -72,8 +74,8 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                               const SettingsDivider(),
                               ToggleSetting(
                                 icon: '📳',
-                                label: 'إهتزاز',
-                                sublabel: 'تفعيل الإهتزاز أثناء الوضع الصامت',
+                                label: l10n.silentModeVibrationLabel,
+                                sublabel: l10n.silentModeVibrationSublabel,
                                 value: prefs.silentVibrationEnabled,
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
@@ -82,13 +84,13 @@ class SilentModeSettingsScreen extends ConsumerWidget {
                               const SettingsDivider(),
                               SelectSetting(
                                 icon: '🔔',
-                                label: 'التنبيه عند التحويل',
+                                label: l10n.silentModeAlertStyleLabel,
                                 value: prefs.silentModeAlertStyle,
-                                options: const {
-                                  'none': 'بدون تنبيه',
-                                  'vibrate': 'اهتزاز فقط',
-                                  'tone': 'نغمة بدون اهتزاز',
-                                  'toneVibrate': 'نغمة مع اهتزاز',
+                                options: {
+                                  'none': l10n.silentModeAlertNone,
+                                  'vibrate': l10n.silentModeAlertVibrateOnly,
+                                  'tone': l10n.silentModeAlertToneOnly,
+                                  'toneVibrate': l10n.silentModeAlertToneVibrate,
                                 },
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)

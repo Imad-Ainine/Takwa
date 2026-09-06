@@ -3599,4 +3599,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifAdhkarActionOpen => 'Open Adhkar';
+
+  @override
+  String get silentModeSettingsTitle => 'Silent Mode Settings';
+
+  @override
+  String get silentModeEnableLabel => 'Enable silent mode';
+
+  @override
+  String get silentModeEnableSublabel =>
+      'We recommend enabling this if the adhan doesn’t play reliably on your phone';
+
+  @override
+  String get silentModeVibrationLabel => 'Vibration';
+
+  @override
+  String get silentModeVibrationSublabel =>
+      'Enable vibration while in silent mode';
+
+  @override
+  String get silentModeAlertStyleLabel => 'Alert on switch';
+
+  @override
+  String get silentModeAlertNone => 'No alert';
+
+  @override
+  String get silentModeAlertVibrateOnly => 'Vibrate only';
+
+  @override
+  String get silentModeAlertToneOnly => 'Tone without vibration';
+
+  @override
+  String get silentModeAlertToneVibrate => 'Tone with vibration';
 }

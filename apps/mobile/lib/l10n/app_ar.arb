@@ -1987,5 +1987,15 @@
   "notifAdhkarSleepChannelName": "أذكار النوم",
   "notifAdhkarChannelDesc": "أذكار وأدعية من حصن المسلم",
   "notifAdhkarActionRead": "قرأت الأذكار ✓",
-  "notifAdhkarActionOpen": "فتح الأذكار"
+  "notifAdhkarActionOpen": "فتح الأذكار",
+  "silentModeSettingsTitle": "إعدادات الوضع الصامت",
+  "silentModeEnableLabel": "تفعيل وضع الصامت",
+  "silentModeEnableSublabel": "ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم",
+  "silentModeVibrationLabel": "إهتزاز",
+  "silentModeVibrationSublabel": "تفعيل الإهتزاز أثناء الوضع الصامت",
+  "silentModeAlertStyleLabel": "التنبيه عند التحويل",
+  "silentModeAlertNone": "بدون تنبيه",
+  "silentModeAlertVibrateOnly": "اهتزاز فقط",
+  "silentModeAlertToneOnly": "نغمة بدون اهتزاز",
+  "silentModeAlertToneVibrate": "نغمة مع اهتزاز"
 }

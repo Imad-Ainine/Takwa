@@ -3562,4 +3562,35 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifAdhkarActionOpen => 'فتح الأذكار';
+
+  @override
+  String get silentModeSettingsTitle => 'إعدادات الوضع الصامت';
+
+  @override
+  String get silentModeEnableLabel => 'تفعيل وضع الصامت';
+
+  @override
+  String get silentModeEnableSublabel =>
+      'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم';
+
+  @override
+  String get silentModeVibrationLabel => 'إهتزاز';
+
+  @override
+  String get silentModeVibrationSublabel => 'تفعيل الإهتزاز أثناء الوضع الصامت';
+
+  @override
+  String get silentModeAlertStyleLabel => 'التنبيه عند التحويل';
+
+  @override
+  String get silentModeAlertNone => 'بدون تنبيه';
+
+  @override
+  String get silentModeAlertVibrateOnly => 'اهتزاز فقط';
+
+  @override
+  String get silentModeAlertToneOnly => 'نغمة بدون اهتزاز';
+
+  @override
+  String get silentModeAlertToneVibrate => 'نغمة مع اهتزاز';
 }

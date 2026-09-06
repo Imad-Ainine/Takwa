@@ -1484,5 +1484,15 @@
   "notifAdhkarSleepChannelName": "Sleep Adhkar",
   "notifAdhkarChannelDesc": "Adhkar and duas from Hisn al-Muslim",
   "notifAdhkarActionRead": "I've read it ✓",
-  "notifAdhkarActionOpen": "Open Adhkar"
+  "notifAdhkarActionOpen": "Open Adhkar",
+  "silentModeSettingsTitle": "Silent Mode Settings",
+  "silentModeEnableLabel": "Enable silent mode",
+  "silentModeEnableSublabel": "We recommend enabling this if the adhan doesn’t play reliably on your phone",
+  "silentModeVibrationLabel": "Vibration",
+  "silentModeVibrationSublabel": "Enable vibration while in silent mode",
+  "silentModeAlertStyleLabel": "Alert on switch",
+  "silentModeAlertNone": "No alert",
+  "silentModeAlertVibrateOnly": "Vibrate only",
+  "silentModeAlertToneOnly": "Tone without vibration",
+  "silentModeAlertToneVibrate": "Tone with vibration"
 }

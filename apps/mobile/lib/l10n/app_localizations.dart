@@ -6559,6 +6559,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'فتح الأذكار'**
   String get notifAdhkarActionOpen;
+
+  /// No description provided for @silentModeSettingsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الوضع الصامت'**
+  String get silentModeSettingsTitle;
+
+  /// No description provided for @silentModeEnableLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل وضع الصامت'**
+  String get silentModeEnableLabel;
+
+  /// No description provided for @silentModeEnableSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم'**
+  String get silentModeEnableSublabel;
+
+  /// No description provided for @silentModeVibrationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إهتزاز'**
+  String get silentModeVibrationLabel;
+
+  /// No description provided for @silentModeVibrationSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل الإهتزاز أثناء الوضع الصامت'**
+  String get silentModeVibrationSublabel;
+
+  /// No description provided for @silentModeAlertStyleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنبيه عند التحويل'**
+  String get silentModeAlertStyleLabel;
+
+  /// No description provided for @silentModeAlertNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون تنبيه'**
+  String get silentModeAlertNone;
+
+  /// No description provided for @silentModeAlertVibrateOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'اهتزاز فقط'**
+  String get silentModeAlertVibrateOnly;
+
+  /// No description provided for @silentModeAlertToneOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'نغمة بدون اهتزاز'**
+  String get silentModeAlertToneOnly;
+
+  /// No description provided for @silentModeAlertToneVibrate.
+  ///
+  /// In ar, this message translates to:
+  /// **'نغمة مع اهتزاز'**
+  String get silentModeAlertToneVibrate;
 }
 
 class _AppLocalizationsDelegate
