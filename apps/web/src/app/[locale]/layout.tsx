@@ -44,7 +44,7 @@ export async function generateMetadata({
 				},
 			],
 			locale:
-				locale === 'ar' ? 'ar_SA' : 'en_US',
+				locale === 'ar' ? 'ar_SA' : locale === 'fr' ? 'fr_FR' : 'en_US',
 			type: 'website',
 		},
 		twitter: {
