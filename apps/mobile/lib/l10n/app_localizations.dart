@@ -4399,6 +4399,1506 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ستظهر النوافذ ~{count} مرة يومياً'**
   String overlaySettingDailyCount(int count);
+
+  /// No description provided for @adhkarTabMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصباح'**
+  String get adhkarTabMorning;
+
+  /// No description provided for @adhkarTabEvening.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساء'**
+  String get adhkarTabEvening;
+
+  /// No description provided for @adhkarTabAfterPrayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد الصلاة'**
+  String get adhkarTabAfterPrayer;
+
+  /// No description provided for @adhkarTabSleep.
+  ///
+  /// In ar, this message translates to:
+  /// **'النوم'**
+  String get adhkarTabSleep;
+
+  /// No description provided for @adhkarTabWakingUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستيقاظ من النوم'**
+  String get adhkarTabWakingUp;
+
+  /// No description provided for @adhkarTabFood.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطعام'**
+  String get adhkarTabFood;
+
+  /// No description provided for @adhkarTabMisc.
+  ///
+  /// In ar, this message translates to:
+  /// **'متنوعة'**
+  String get adhkarTabMisc;
+
+  /// No description provided for @adhkarTabMine.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكاري'**
+  String get adhkarTabMine;
+
+  /// No description provided for @adhkarTabCommunity.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجتمع'**
+  String get adhkarTabCommunity;
+
+  /// No description provided for @adhkarScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأذكار والأدعية'**
+  String get adhkarScreenTitle;
+
+  /// No description provided for @adhkarScreenSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حصن المسلم'**
+  String get adhkarScreenSubtitle;
+
+  /// No description provided for @adhkarProgressComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'✅ مكتمل الحمد لله!'**
+  String get adhkarProgressComplete;
+
+  /// No description provided for @adhkarProgressCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{done} / {total} ذكر'**
+  String adhkarProgressCount(String done, String total);
+
+  /// No description provided for @adhkarResetButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة'**
+  String get adhkarResetButton;
+
+  /// No description provided for @adhkarRemainingCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{remaining} متبقي'**
+  String adhkarRemainingCount(String remaining);
+
+  /// No description provided for @adhkarCompletedCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتمل {count}×'**
+  String adhkarCompletedCount(String count);
+
+  /// No description provided for @adhkarHideFadl.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء'**
+  String get adhkarHideFadl;
+
+  /// No description provided for @adhkarShowFadl.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفضل'**
+  String get adhkarShowFadl;
+
+  /// No description provided for @adhkarNotifSettingsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إشعارات الأذكار'**
+  String get adhkarNotifSettingsTitle;
+
+  /// No description provided for @adhkarNotifDisabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات متوقفة'**
+  String get adhkarNotifDisabled;
+
+  /// No description provided for @adhkarNotifMorningLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get adhkarNotifMorningLabel;
+
+  /// No description provided for @adhkarNotifEveningLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get adhkarNotifEveningLabel;
+
+  /// No description provided for @adhkarNotifSleepLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get adhkarNotifSleepLabel;
+
+  /// No description provided for @adhkarNotifAfterFajrLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد صلاة الفجر'**
+  String get adhkarNotifAfterFajrLabel;
+
+  /// No description provided for @adhkarNotifAfterAsrLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد صلاة العصر'**
+  String get adhkarNotifAfterAsrLabel;
+
+  /// No description provided for @qiblaScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتجاه القبلة'**
+  String get qiblaScreenTitle;
+
+  /// No description provided for @qiblaScreenSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نحو الكعبة المشرفة 🕋'**
+  String get qiblaScreenSubtitle;
+
+  /// No description provided for @qiblaCompassLabelAligned.
+  ///
+  /// In ar, this message translates to:
+  /// **'بوصلة القبلة، أنت متجه إلى القبلة الآن'**
+  String get qiblaCompassLabelAligned;
+
+  /// No description provided for @qiblaCompassLabelUnaligned.
+  ///
+  /// In ar, this message translates to:
+  /// **'بوصلة القبلة، أدر جهازك {deg} درجة إلى {dir} لمواجهة القبلة'**
+  String qiblaCompassLabelUnaligned(String deg, String dir);
+
+  /// No description provided for @qiblaDirRight.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليمين'**
+  String get qiblaDirRight;
+
+  /// No description provided for @qiblaDirLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليسار'**
+  String get qiblaDirLeft;
+
+  /// No description provided for @qiblaTurnRightShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'يميناً'**
+  String get qiblaTurnRightShort;
+
+  /// No description provided for @qiblaTurnLeftShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'يساراً'**
+  String get qiblaTurnLeftShort;
+
+  /// No description provided for @qiblaCurrentDirectionLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتجاهك الحالي'**
+  String get qiblaCurrentDirectionLabel;
+
+  /// No description provided for @qiblaAlignedLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'محاذٍ ✓'**
+  String get qiblaAlignedLabel;
+
+  /// No description provided for @qiblaTurnLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدر {dir}'**
+  String qiblaTurnLabel(String dir);
+
+  /// No description provided for @qiblaCorrectValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'صحيح'**
+  String get qiblaCorrectValue;
+
+  /// No description provided for @qiblaFacingNowHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت تواجه القبلة الآن'**
+  String get qiblaFacingNowHint;
+
+  /// No description provided for @qiblaHoldPhoneHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'أمسك هاتفك أفقياً وابتعد عن المعادن'**
+  String get qiblaHoldPhoneHint;
+
+  /// No description provided for @qiblaLocationRequiredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يلزم تفعيل الموقع'**
+  String get qiblaLocationRequiredTitle;
+
+  /// No description provided for @qiblaLocationRequiredSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لحساب اتجاه القبلة'**
+  String get qiblaLocationRequiredSubtitle;
+
+  /// No description provided for @qiblaCompassUnavailableTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'البوصلة غير متاحة'**
+  String get qiblaCompassUnavailableTitle;
+
+  /// No description provided for @qiblaCompassUnavailableSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكد من دعم جهازك للبوصلة'**
+  String get qiblaCompassUnavailableSubtitle;
+
+  /// No description provided for @qiblaCompassNorth.
+  ///
+  /// In ar, this message translates to:
+  /// **'ش'**
+  String get qiblaCompassNorth;
+
+  /// No description provided for @qiblaCompassEast.
+  ///
+  /// In ar, this message translates to:
+  /// **'ق'**
+  String get qiblaCompassEast;
+
+  /// No description provided for @qiblaCompassSouth.
+  ///
+  /// In ar, this message translates to:
+  /// **'ج'**
+  String get qiblaCompassSouth;
+
+  /// No description provided for @qiblaCompassWest.
+  ///
+  /// In ar, this message translates to:
+  /// **'غ'**
+  String get qiblaCompassWest;
+
+  /// No description provided for @khatmaProgressScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقدم الختمة'**
+  String get khatmaProgressScreenTitle;
+
+  /// No description provided for @khatmaProgressPercentComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'{percent}٪ مكتملة'**
+  String khatmaProgressPercentComplete(String percent);
+
+  /// No description provided for @khatmaStatDaysLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيام'**
+  String get khatmaStatDaysLabel;
+
+  /// No description provided for @khatmaStatPagesReadLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة مقروءة'**
+  String get khatmaStatPagesReadLabel;
+
+  /// No description provided for @khatmaWeeklyReadingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة الأسبوعية'**
+  String get khatmaWeeklyReadingTitle;
+
+  /// No description provided for @khatmaReadingAppearanceLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مظهر القراءة'**
+  String get khatmaReadingAppearanceLabel;
+
+  /// No description provided for @khatmaSettingsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الختمة'**
+  String get khatmaSettingsSectionTitle;
+
+  /// No description provided for @khatmaReciterLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'القارئ'**
+  String get khatmaReciterLabel;
+
+  /// No description provided for @khatmaReciterDefaultValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشيخ المنشاوي'**
+  String get khatmaReciterDefaultValue;
+
+  /// No description provided for @khatmaDailyReminderLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير يومي'**
+  String get khatmaDailyReminderLabel;
+
+  /// No description provided for @overlayAdhkarMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get overlayAdhkarMorning;
+
+  /// No description provided for @overlayAdhkarEvening.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get overlayAdhkarEvening;
+
+  /// No description provided for @overlayAdhkarAfterPrayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار بعد الصلاة'**
+  String get overlayAdhkarAfterPrayer;
+
+  /// No description provided for @overlayAdhkarSleep.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get overlayAdhkarSleep;
+
+  /// No description provided for @overlayAdhkarMisc.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار متنوعة'**
+  String get overlayAdhkarMisc;
+
+  /// No description provided for @overlayAdhkarWakingUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستيقاظ من النوم'**
+  String get overlayAdhkarWakingUp;
+
+  /// No description provided for @overlayAdhkarFood.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الطعام'**
+  String get overlayAdhkarFood;
+
+  /// No description provided for @overlayDuaMorning.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الصباح'**
+  String get overlayDuaMorning;
+
+  /// No description provided for @overlayDuaDistress.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الكرب'**
+  String get overlayDuaDistress;
+
+  /// No description provided for @overlayDuaGuidance.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الهداية'**
+  String get overlayDuaGuidance;
+
+  /// No description provided for @overlayDuaForgiveness.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء المغفرة'**
+  String get overlayDuaForgiveness;
+
+  /// No description provided for @overlayDuaRizq.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الرزق'**
+  String get overlayDuaRizq;
+
+  /// No description provided for @overlayDuaHealth.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الصحة'**
+  String get overlayDuaHealth;
+
+  /// No description provided for @overlayDuaParents.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الوالدين'**
+  String get overlayDuaParents;
+
+  /// No description provided for @overlayDuaTravel.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء السفر'**
+  String get overlayDuaTravel;
+
+  /// No description provided for @overlayDuaRain.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الاستسقاء'**
+  String get overlayDuaRain;
+
+  /// No description provided for @overlayDuaGeneral.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء عام'**
+  String get overlayDuaGeneral;
+
+  /// No description provided for @overlayTypeDua.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء'**
+  String get overlayTypeDua;
+
+  /// No description provided for @overlayTypeDhikr.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكر'**
+  String get overlayTypeDhikr;
+
+  /// No description provided for @overlayTapOutsideToClose.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط خارجاً للإغلاق'**
+  String get overlayTapOutsideToClose;
+
+  /// No description provided for @forgotPasswordEnterEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال البريد الإلكتروني'**
+  String get forgotPasswordEnterEmail;
+
+  /// No description provided for @forgotPasswordInvalidEmailFormat.
+  ///
+  /// In ar, this message translates to:
+  /// **'صيغة البريد الإلكتروني غير صحيحة'**
+  String get forgotPasswordInvalidEmailFormat;
+
+  /// No description provided for @forgotPasswordCodeSentMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال رمز التحقق ورابط إعادة التعيين إلى بريدك الإلكتروني.'**
+  String get forgotPasswordCodeSentMessage;
+
+  /// No description provided for @forgotPasswordSendCodeFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر إرسال الرمز، تأكد من اتصال الإنترنت.'**
+  String get forgotPasswordSendCodeFailed;
+
+  /// No description provided for @forgotPasswordEnterOtp.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال رمز التحقق المكون من 6 أرقام'**
+  String get forgotPasswordEnterOtp;
+
+  /// No description provided for @forgotPasswordInvalidOtp.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق غير صحيح أو منتهي الصلاحية'**
+  String get forgotPasswordInvalidOtp;
+
+  /// No description provided for @forgotPasswordVerifyFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر التحقق من الرمز، حاول مجدداً'**
+  String get forgotPasswordVerifyFailed;
+
+  /// No description provided for @forgotPasswordRateLimited.
+  ///
+  /// In ar, this message translates to:
+  /// **'تجاوزت الحد المسموح من المحاولات، يرجى الانتظار قليلاً'**
+  String get forgotPasswordRateLimited;
+
+  /// No description provided for @forgotPasswordTokenInvalidOrExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق غير صحيح أو انتهت صلاحيته'**
+  String get forgotPasswordTokenInvalidOrExpired;
+
+  /// No description provided for @forgotPasswordNoAccountFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد حساب مرتبط بهذا البريد الإلكتروني'**
+  String get forgotPasswordNoAccountFound;
+
+  /// No description provided for @forgotPasswordGenericError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء المعالجة، يرجى المحاولة لاحقاً'**
+  String get forgotPasswordGenericError;
+
+  /// No description provided for @forgotPasswordEnterCodeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدخال رمز التحقق'**
+  String get forgotPasswordEnterCodeTitle;
+
+  /// No description provided for @forgotPasswordRecoverTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة كلمة المرور'**
+  String get forgotPasswordRecoverTitle;
+
+  /// No description provided for @forgotPasswordEnterCodeSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك أو اضغط على الرابط في الرسالة'**
+  String get forgotPasswordEnterCodeSubtitle;
+
+  /// No description provided for @forgotPasswordRecoverSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل بريدك الإلكتروني المسجل لنرسل لك رمز تأكيد إعادة تعيين كلمة المرور'**
+  String get forgotPasswordRecoverSubtitle;
+
+  /// No description provided for @forgotPasswordOtpHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق (6 أرقام)'**
+  String get forgotPasswordOtpHint;
+
+  /// No description provided for @forgotPasswordProcessing.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري المعالجة...'**
+  String get forgotPasswordProcessing;
+
+  /// No description provided for @forgotPasswordVerifyAndContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقق ومتابعة'**
+  String get forgotPasswordVerifyAndContinue;
+
+  /// No description provided for @forgotPasswordSendCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال الرمز'**
+  String get forgotPasswordSendCode;
+
+  /// No description provided for @forgotPasswordResendCountdown.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة الإرسال بعد {seconds} ثانية'**
+  String forgotPasswordResendCountdown(String seconds);
+
+  /// No description provided for @forgotPasswordResendCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة إرسال الرمز'**
+  String get forgotPasswordResendCode;
+
+  /// No description provided for @timePeriodAm.
+  ///
+  /// In ar, this message translates to:
+  /// **'ص'**
+  String get timePeriodAm;
+
+  /// No description provided for @timePeriodPm.
+  ///
+  /// In ar, this message translates to:
+  /// **'م'**
+  String get timePeriodPm;
+
+  /// No description provided for @wakeUpOverlayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الاستيقاظ'**
+  String get wakeUpOverlayTitle;
+
+  /// No description provided for @wakeUpSnoozeButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'غفوة 10د'**
+  String get wakeUpSnoozeButton;
+
+  /// No description provided for @wakeUpStopAlarmButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف المنبه'**
+  String get wakeUpStopAlarmButton;
+
+  /// No description provided for @booksLibraryTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المكتبة الإسلامية'**
+  String get booksLibraryTitle;
+
+  /// No description provided for @booksListViewTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض القائمة'**
+  String get booksListViewTooltip;
+
+  /// No description provided for @booksGridViewTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الشبكة'**
+  String get booksGridViewTooltip;
+
+  /// No description provided for @booksNoResultsFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يتم العثور على كتب'**
+  String get booksNoResultsFound;
+
+  /// No description provided for @booksServerConnectionError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر الاتصال بالخادم'**
+  String get booksServerConnectionError;
+
+  /// No description provided for @booksConnectionErrorHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً\nأو اسحب الشاشة للأسفل للتحديث'**
+  String get booksConnectionErrorHint;
+
+  /// No description provided for @booksSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن كتاب أو مؤلف...'**
+  String get booksSearchHint;
+
+  /// No description provided for @booksCategoryAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get booksCategoryAll;
+
+  /// No description provided for @booksCategoryHadith.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحديث'**
+  String get booksCategoryHadith;
+
+  /// No description provided for @booksCategoryFiqh.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفقه'**
+  String get booksCategoryFiqh;
+
+  /// No description provided for @booksCategorySeerah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السيرة'**
+  String get booksCategorySeerah;
+
+  /// No description provided for @booksCategoryAqeedah.
+  ///
+  /// In ar, this message translates to:
+  /// **'العقيدة'**
+  String get booksCategoryAqeedah;
+
+  /// No description provided for @booksCategoryAdab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآداب'**
+  String get booksCategoryAdab;
+
+  /// No description provided for @booksCategoryTazkiyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'التزكية'**
+  String get booksCategoryTazkiyah;
+
+  /// No description provided for @booksCategoryQuranicSciences.
+  ///
+  /// In ar, this message translates to:
+  /// **'علوم القرآن'**
+  String get booksCategoryQuranicSciences;
+
+  /// No description provided for @booksVolumeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مجلد'**
+  String get booksVolumeLabel;
+
+  /// No description provided for @booksBookletLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'كتيب'**
+  String get booksBookletLabel;
+
+  /// No description provided for @booksLoadingMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري تحميل الكتب...'**
+  String get booksLoadingMessage;
+
+  /// No description provided for @khatmaDailyGoalLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الهدف اليومي'**
+  String get khatmaDailyGoalLabel;
+
+  /// No description provided for @khatmaDailyGoalPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} صفحات'**
+  String khatmaDailyGoalPages(String n);
+
+  /// No description provided for @khatmaAppInfoSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلومات التطبيق'**
+  String get khatmaAppInfoSectionTitle;
+
+  /// No description provided for @khatmaVersionLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإصدار'**
+  String get khatmaVersionLabel;
+
+  /// No description provided for @khatmaRateAppLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقييم التطبيق'**
+  String get khatmaRateAppLabel;
+
+  /// No description provided for @khatmaHistoryTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الختمات'**
+  String get khatmaHistoryTitle;
+
+  /// No description provided for @khatmaHistoryCompletedTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتملة ({count})'**
+  String khatmaHistoryCompletedTab(String count);
+
+  /// No description provided for @khatmaHistoryCancelledTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملغاة ({count})'**
+  String khatmaHistoryCancelledTab(String count);
+
+  /// No description provided for @khatmaHistoryError.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ'**
+  String get khatmaHistoryError;
+
+  /// No description provided for @khatmaHistoryEmptyCompletedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد ختمات مكتملة أو منتهية'**
+  String get khatmaHistoryEmptyCompletedTitle;
+
+  /// No description provided for @khatmaHistoryEmptyCompletedSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ ختمة جديدة لتظهر هنا عند اكتمالها أو إنهائها'**
+  String get khatmaHistoryEmptyCompletedSubtitle;
+
+  /// No description provided for @khatmaHistoryEmptyCancelledTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد ختمات ملغاة'**
+  String get khatmaHistoryEmptyCancelledTitle;
+
+  /// No description provided for @khatmaHistoryEmptyCancelledSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الختمات الملغاة ستظهر هنا'**
+  String get khatmaHistoryEmptyCancelledSubtitle;
+
+  /// No description provided for @khatmaHistoryDeleteTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الختمة'**
+  String get khatmaHistoryDeleteTitle;
+
+  /// No description provided for @khatmaHistoryDeleteConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل تريد حذف هذه الختمة نهائياً؟'**
+  String get khatmaHistoryDeleteConfirm;
+
+  /// No description provided for @khatmaHistoryDeletedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف الختمة بنجاح'**
+  String get khatmaHistoryDeletedToast;
+
+  /// No description provided for @khatmaHistoryStatusCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتملة'**
+  String get khatmaHistoryStatusCompleted;
+
+  /// No description provided for @khatmaHistoryStatusCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملغاة'**
+  String get khatmaHistoryStatusCancelled;
+
+  /// No description provided for @khatmaHistoryDaysLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} يوم'**
+  String khatmaHistoryDaysLabel(String n);
+
+  /// No description provided for @khatmaHistoryPagesProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{read} / {total} صفحة'**
+  String khatmaHistoryPagesProgress(String read, String total);
+
+  /// No description provided for @qiyamWirdTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد القيام'**
+  String get qiyamWirdTitle;
+
+  /// No description provided for @qiyamWirdBeforeQiyamHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار ما قبل القيام'**
+  String get qiyamWirdBeforeQiyamHeader;
+
+  /// No description provided for @qiyamWirdIstighfarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستغفار'**
+  String get qiyamWirdIstighfarTitle;
+
+  /// No description provided for @qiyamWirdTasbihTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التسبيح'**
+  String get qiyamWirdTasbihTitle;
+
+  /// No description provided for @qiyamWirdLastThirdHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدعية مأثورة في السحر'**
+  String get qiyamWirdLastThirdHeader;
+
+  /// No description provided for @qiyamWirdProphetDuaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء النبي ﷺ'**
+  String get qiyamWirdProphetDuaTitle;
+
+  /// No description provided for @qiyamWirdSayyidIstighfarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيد الاستغفار'**
+  String get qiyamWirdSayyidIstighfarTitle;
+
+  /// No description provided for @qiyamWirdMulkHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة الملك (المنجية)'**
+  String get qiyamWirdMulkHeader;
+
+  /// No description provided for @qiyamWirdReadMulkTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة سورة الملك'**
+  String get qiyamWirdReadMulkTitle;
+
+  /// No description provided for @qiyamWirdMulkSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشفع لصاحبها وتنجي من عذاب القبر'**
+  String get qiyamWirdMulkSubtitle;
+
+  /// No description provided for @qiyamWirdCompletedButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الورد بنجاح'**
+  String get qiyamWirdCompletedButton;
+
+  /// No description provided for @qiyamWirdTapToCountButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط للعد'**
+  String get qiyamWirdTapToCountButton;
+
+  /// No description provided for @qiyamDashboardTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيام الليل'**
+  String get qiyamDashboardTitle;
+
+  /// No description provided for @qiyamDashboardStageProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'المرحلة {current} من {total}'**
+  String qiyamDashboardStageProgress(String current, String total);
+
+  /// No description provided for @qiyamDashboardChooseStageDuration.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر مدة المرحلة'**
+  String get qiyamDashboardChooseStageDuration;
+
+  /// No description provided for @qiyamDashboardMinutesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{mins, plural, one{دقيقة واحدة} two{دقيقتان} few{{mins} دقائق} many{{mins} دقيقة} other{{mins} دقيقة}}'**
+  String qiyamDashboardMinutesLabel(num mins);
+
+  /// No description provided for @qiyamDashboardTimeRemainingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوقت المتبقي'**
+  String get qiyamDashboardTimeRemainingLabel;
+
+  /// No description provided for @qiyamDashboardStoriesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عجائب وقصص القيام'**
+  String get qiyamDashboardStoriesTitle;
+
+  /// No description provided for @qiyamDashboardStoriesSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قصص واقعية ملهمة عن أثر قيام الليل'**
+  String get qiyamDashboardStoriesSubtitle;
+
+  /// No description provided for @qiyamDashboardToolsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأدوات والدليل الإيماني'**
+  String get qiyamDashboardToolsSectionTitle;
+
+  /// No description provided for @qiyamDashboardVirtuesTool.
+  ///
+  /// In ar, this message translates to:
+  /// **'فضائل القيام'**
+  String get qiyamDashboardVirtuesTool;
+
+  /// No description provided for @qiyamDashboardSleepCalcTool.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة النوم'**
+  String get qiyamDashboardSleepCalcTool;
+
+  /// No description provided for @qiyamDashboardSunnahTool.
+  ///
+  /// In ar, this message translates to:
+  /// **'السنة النبوية'**
+  String get qiyamDashboardSunnahTool;
+
+  /// No description provided for @qiyamDashboardBeginnerGuideTool.
+  ///
+  /// In ar, this message translates to:
+  /// **'دليل المبتدئين'**
+  String get qiyamDashboardBeginnerGuideTool;
+
+  /// No description provided for @qiyamDashboardHourCalcTool.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة الساعة'**
+  String get qiyamDashboardHourCalcTool;
+
+  /// No description provided for @qiyamDashboardBannerLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه'**
+  String get qiyamDashboardBannerLabel;
+
+  /// No description provided for @qiyamDashboardBannerDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'برنامج متكامل لصلاة الليل... خطوة للقرب من الله.'**
+  String get qiyamDashboardBannerDesc;
+
+  /// No description provided for @qiyamGuideIntroTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطوتك الأولى في قيام الليل'**
+  String get qiyamGuideIntroTitle;
+
+  /// No description provided for @qiyamGuideIntroSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تقلق إذا كنت في البداية، فكل قائم لليل بدأ بخطوة بسيطة. إليك خارطة الطريق.'**
+  String get qiyamGuideIntroSubtitle;
+
+  /// No description provided for @qiyamGuideTip1Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ بالقليل'**
+  String get qiyamGuideTip1Title;
+
+  /// No description provided for @qiyamGuideTip1Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تشق على نفسك في البداية، ابدأ بركعتين فقط بعد صلاة العشاء، ثم زد تدريجياً.'**
+  String get qiyamGuideTip1Content;
+
+  /// No description provided for @qiyamGuideTip2Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'التبكير في النوم'**
+  String get qiyamGuideTip2Title;
+
+  /// No description provided for @qiyamGuideTip2Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'النوم مبكراً هو المفتاح الذهبي للاستيقاظ بنشاط في وقت السحر.'**
+  String get qiyamGuideTip2Content;
+
+  /// No description provided for @qiyamGuideTip3Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضوء وبسملة'**
+  String get qiyamGuideTip3Title;
+
+  /// No description provided for @qiyamGuideTip3Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'توضأ قبل النوم واقرأ الأذكار، فذلك يعين الروح على القيام.'**
+  String get qiyamGuideTip3Content;
+
+  /// No description provided for @qiyamGuideTip4Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'اجعلها عادة'**
+  String get qiyamGuideTip4Title;
+
+  /// No description provided for @qiyamGuideTip4Content.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستمرارية أهم من الكثرة، \"أحب الأعمال إلى الله أدومها وإن قل\".'**
+  String get qiyamGuideTip4Content;
+
+  /// No description provided for @qiyamGuideFaqTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسئلة شائعة'**
+  String get qiyamGuideFaqTitle;
+
+  /// No description provided for @qiyamGuideFaqQ1.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل يجب النوم قبل القيام؟'**
+  String get qiyamGuideFaqQ1;
+
+  /// No description provided for @qiyamGuideFaqA1.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يشترط، ولكن ما كان بعد نوم يسمى \"تهجداً\".'**
+  String get qiyamGuideFaqA1;
+
+  /// No description provided for @qiyamGuideFaqQ2.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما هو أقل عدد للركعات؟'**
+  String get qiyamGuideFaqQ2;
+
+  /// No description provided for @qiyamGuideFaqA2.
+  ///
+  /// In ar, this message translates to:
+  /// **'ركعة واحدة (الوتر)، وأفضلها إحدى عشرة ركعة.'**
+  String get qiyamGuideFaqA2;
+
+  /// No description provided for @qiyamGuideFaqQ3.
+  ///
+  /// In ar, this message translates to:
+  /// **'متى يبدأ وقت القيام؟'**
+  String get qiyamGuideFaqQ3;
+
+  /// No description provided for @qiyamGuideFaqA3.
+  ///
+  /// In ar, this message translates to:
+  /// **'من بعد صلاة العشاء وحتى أذان الفجر.'**
+  String get qiyamGuideFaqA3;
+
+  /// No description provided for @mosquesCannotOpenMaps.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن فتح الخرائط'**
+  String get mosquesCannotOpenMaps;
+
+  /// No description provided for @mosquesCannotMakeCall.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن إجراء المكالمة'**
+  String get mosquesCannotMakeCall;
+
+  /// No description provided for @mosquesNearbyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساجد القريبة'**
+  String get mosquesNearbyTitle;
+
+  /// No description provided for @mosquesCurrentLocationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموقع الحالي: {city}'**
+  String mosquesCurrentLocationLabel(String city);
+
+  /// No description provided for @mosquesViewOnMapButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض على الخريطة'**
+  String get mosquesViewOnMapButton;
+
+  /// No description provided for @mosquesDistanceMeters.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} متر'**
+  String mosquesDistanceMeters(String n);
+
+  /// No description provided for @mosquesDistanceKm.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} كم'**
+  String mosquesDistanceKm(String n);
+
+  /// No description provided for @mosquesNextPrayerLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة القادمة: {time}'**
+  String mosquesNextPrayerLabel(String time);
+
+  /// No description provided for @mosquesDirectionsButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'توجيه'**
+  String get mosquesDirectionsButton;
+
+  /// No description provided for @mosquesCallButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتصال'**
+  String get mosquesCallButton;
+
+  /// No description provided for @mosquesHadithSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فضل الذهاب للمسجد'**
+  String get mosquesHadithSectionTitle;
+
+  /// No description provided for @mosquesEmptyState.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يتم العثور على مساجد قريبة في محيط 5 كيلومتر'**
+  String get mosquesEmptyState;
+
+  /// No description provided for @quranScreenKhatmaLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة'**
+  String get quranScreenKhatmaLabel;
+
+  /// No description provided for @quranScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن الكريم'**
+  String get quranScreenTitle;
+
+  /// No description provided for @quranScreenAyahLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية {n}'**
+  String quranScreenAyahLabel(String n);
+
+  /// No description provided for @quranScreenContinueKhatma.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة الختمة'**
+  String get quranScreenContinueKhatma;
+
+  /// No description provided for @quranScreenStartNewKhatma.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ ختمة جديدة'**
+  String get quranScreenStartNewKhatma;
+
+  /// No description provided for @quranScreenContinueFromPage.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل القراءة من صفحة {page}'**
+  String quranScreenContinueFromPage(String page);
+
+  /// No description provided for @quranScreenChooseKhatmaOptions.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدد خيارات الختمة التي تناسبك'**
+  String get quranScreenChooseKhatmaOptions;
+
+  /// No description provided for @quranScreenFreeReadingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة حرة'**
+  String get quranScreenFreeReadingTitle;
+
+  /// No description provided for @quranScreenFreeReadingSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ القرآن الكريم بحرية'**
+  String get quranScreenFreeReadingSubtitle;
+
+  /// No description provided for @quranScreenHistoryGridSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الختمات المكتملة'**
+  String get quranScreenHistoryGridSubtitle;
+
+  /// No description provided for @quranScreenProgressGridSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إحصائيات القراءة'**
+  String get quranScreenProgressGridSubtitle;
+
+  /// No description provided for @quranScreenSettingsGridSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخصيص التطبيق'**
+  String get quranScreenSettingsGridSubtitle;
+
+  /// No description provided for @quranScreenAiMemorizeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحفيظ ذكي'**
+  String get quranScreenAiMemorizeTitle;
+
+  /// No description provided for @quranScreenAiMemorizeSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ القرآن بالذكاء الاصطناعي'**
+  String get quranScreenAiMemorizeSubtitle;
+
+  /// No description provided for @remindersAdviceTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نصيحة'**
+  String get remindersAdviceTitle;
+
+  /// No description provided for @remindersAdviceDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'المداومة على الأذكار اليومية تجلب السكينة والطمأنينة للقلب. احرص على تفعيل التذكيرات لتبقى على اتصال دائم بالله.'**
+  String get remindersAdviceDesc;
+
+  /// No description provided for @remindersScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التذكيرات'**
+  String get remindersScreenTitle;
+
+  /// No description provided for @remindersAddButtonTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة تذكير جديد'**
+  String get remindersAddButtonTitle;
+
+  /// No description provided for @remindersAddButtonSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط هنا لإنشاء تذكير مخصص'**
+  String get remindersAddButtonSubtitle;
+
+  /// No description provided for @remindersEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد تذكيرات بعد'**
+  String get remindersEmptyTitle;
+
+  /// No description provided for @remindersEmptySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أضف أول تذكير لك بالضغط على الزر أعلاه'**
+  String get remindersEmptySubtitle;
+
+  /// No description provided for @remindersMyRemindersTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكيراتي'**
+  String get remindersMyRemindersTitle;
+
+  /// No description provided for @remindersCountBadge.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{تذكير واحد} two{تذكيران} few{{count} تذكيرات} many{{count} تذكيراً} other{{count} تذكير}}'**
+  String remindersCountBadge(num count);
+
+  /// No description provided for @remindersDeleteDialogTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف التذكير'**
+  String get remindersDeleteDialogTitle;
+
+  /// No description provided for @remindersDeleteDialogConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل تريد حذف \"{title}\"؟'**
+  String remindersDeleteDialogConfirm(String title);
+
+  /// No description provided for @profileScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الملف الشخصي'**
+  String get profileScreenTitle;
+
+  /// No description provided for @profileLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ في تحميل البيانات'**
+  String get profileLoadError;
+
+  /// No description provided for @profileDefaultUsername.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستخدم تقوى'**
+  String get profileDefaultUsername;
+
+  /// No description provided for @profileGenderMale.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذكر'**
+  String get profileGenderMale;
+
+  /// No description provided for @profileGenderFemale.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنثى'**
+  String get profileGenderFemale;
+
+  /// No description provided for @profileMemberBadge.
+  ///
+  /// In ar, this message translates to:
+  /// **'عضو مجتهد'**
+  String get profileMemberBadge;
+
+  /// No description provided for @profileTaqwaPointsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقاط التقوى'**
+  String get profileTaqwaPointsLabel;
+
+  /// No description provided for @profileStreakDaysLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيام متواصلة'**
+  String get profileStreakDaysLabel;
+
+  /// No description provided for @profileAchievementsMenuTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإنجازات'**
+  String get profileAchievementsMenuTitle;
+
+  /// No description provided for @profileAccountingLogMenuTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجل المحاسبة'**
+  String get profileAccountingLogMenuTitle;
+
+  /// No description provided for @profileAccountSettingsMenuTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الحساب'**
+  String get profileAccountSettingsMenuTitle;
+
+  /// No description provided for @profileLogoutDialogTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get profileLogoutDialogTitle;
+
+  /// No description provided for @profileLogoutDialogConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من رغبتك في تسجيل الخروج؟'**
+  String get profileLogoutDialogConfirm;
+
+  /// No description provided for @profileLogoutConfirmButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'خروج'**
+  String get profileLogoutConfirmButton;
+
+  /// No description provided for @updatePasswordEnterNew.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل كلمة المرور الجديدة'**
+  String get updatePasswordEnterNew;
+
+  /// No description provided for @updatePasswordMismatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمات المرور غير متطابقة'**
+  String get updatePasswordMismatch;
+
+  /// No description provided for @updatePasswordSuccessMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تعيين كلمة المرور الجديدة بنجاح ✓'**
+  String get updatePasswordSuccessMessage;
+
+  /// No description provided for @updatePasswordUnexpectedError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً'**
+  String get updatePasswordUnexpectedError;
+
+  /// No description provided for @updatePasswordSameAsOld.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور الجديدة مطابقة لكلمة المرور الحالية'**
+  String get updatePasswordSameAsOld;
+
+  /// No description provided for @updatePasswordMinLength.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور يجب أن تكون 6 أحرف على الأقل'**
+  String get updatePasswordMinLength;
+
+  /// No description provided for @updatePasswordSessionExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت صلاحية الجلسة، يرجى طلب رمز استعادة جديد'**
+  String get updatePasswordSessionExpired;
+
+  /// No description provided for @updatePasswordGenericFailure.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تحديث كلمة المرور، حاول مجدداً'**
+  String get updatePasswordGenericFailure;
+
+  /// No description provided for @updatePasswordTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعيين كلمة مرور جديدة'**
+  String get updatePasswordTitle;
+
+  /// No description provided for @updatePasswordSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قم بإدخال كلمة المرور الجديدة لحسابك لتسجيل الدخول بأمان'**
+  String get updatePasswordSubtitle;
+
+  /// No description provided for @updatePasswordNewHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور الجديدة'**
+  String get updatePasswordNewHint;
+
+  /// No description provided for @updatePasswordConfirmHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور الجديدة'**
+  String get updatePasswordConfirmHint;
+
+  /// No description provided for @updatePasswordSavingButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري الحفظ...'**
+  String get updatePasswordSavingButton;
+
+  /// No description provided for @updatePasswordSaveAndSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ كلمة المرور والدخول'**
+  String get updatePasswordSaveAndSignInButton;
 }
 
 class _AppLocalizationsDelegate

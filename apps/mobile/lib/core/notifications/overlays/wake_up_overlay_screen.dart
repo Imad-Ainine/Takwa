@@ -10,6 +10,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class WakeUpOverlayScreen extends ConsumerStatefulWidget {
   const WakeUpOverlayScreen({super.key});
@@ -98,9 +99,10 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
   }
 
   String get _formattedTime {
+    final l10n = AppLocalizations.of(context)!;
     final h = _now.hour % 12 == 0 ? 12 : _now.hour % 12;
     final m = _now.minute.toString().padLeft(2, '0');
-    final ap = _now.hour < 12 ? 'ص' : 'م';
+    final ap = _now.hour < 12 ? l10n.timePeriodAm : l10n.timePeriodPm;
     return '$h:$m $ap';
   }
 
@@ -111,9 +113,10 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hijri = HijriCalendar.now();
     final hijriStr =
-        '${hijri.hDay} ${_hijriMonthAr(hijri.hMonth)} ${hijri.hYear} هـ';
+        '${hijri.hDay} ${hijri.getLongMonthName()} ${hijri.hYear} ${l10n.hijriEraSuffix}';
 
     return WillPopScope(
       onWillPop: () async {
@@ -286,9 +289,9 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                             Color(0xFF2DD4BF),
                           ],
                         ).createShader(bounds),
-                        child: const Text(
-                          'حان وقت الاستيقاظ',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.wakeUpOverlayTitle,
+                          style: const TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
@@ -372,7 +375,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                 _close();
                               },
                               icon: Icons.snooze,
-                              label: 'غفوة 10د',
+                              label: l10n.wakeUpSnoozeButton,
                               isOutline: true,
                               baseColor: Colors.white,
                             ),
@@ -382,7 +385,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                             child: PrimaryButton(
                               onTap: () async => _close(),
                               icon: Icons.stop_circle_outlined,
-                              label: 'إيقاف المنبه',
+                              label: l10n.wakeUpStopAlarmButton,
                             ),
                           ),
                         ],
@@ -400,23 +403,6 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
     );
   }
 
-  String _hijriMonthAr(int month) {
-    const months = [
-      'محرم',
-      'صفر',
-      'ربيع الأول',
-      'ربيع الآخر',
-      'جمادى الأولى',
-      'جمادى الآخرة',
-      'رجب',
-      'شعبان',
-      'رمضان',
-      'شوال',
-      'ذو القعدة',
-      'ذو الحجة',
-    ];
-    return months[(month - 1).clamp(0, 11)];
-  }
 }
 
 class _AdhanStarsPainter extends CustomPainter {

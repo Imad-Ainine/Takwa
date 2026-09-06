@@ -13,6 +13,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/adhkar/presentation/screens/_user_community_adhkar_views.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AdhkarScreen extends ConsumerStatefulWidget {
   final int initialCategoryIndex;
@@ -26,16 +27,18 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     with TickerProviderStateMixin {
   late final AnimationController _entryCtrl;
   late final TabController _tabCtrl;
-  static const _tabs = [
-    ('🌅', 'الصباح'),
-    ('🌆', 'المساء'),
-    ('🕌', 'بعد الصلاة'),
-    ('🌙', 'النوم'),
-    ('📿', 'الاستيقاظ من النوم'),
-    ('📿', 'الطعام'),
-    ('📿', 'متنوعة'),
-    ('✨', 'أذكاري'),
-    ('🌍', 'المجتمع'),
+  static final _tabCount = AdhkarCategory.values.length + 2; // + mine + community
+
+  List<(String, String)> _tabs(AppLocalizations l10n) => [
+    ('🌅', l10n.adhkarTabMorning),
+    ('🌆', l10n.adhkarTabEvening),
+    ('🕌', l10n.adhkarTabAfterPrayer),
+    ('🌙', l10n.adhkarTabSleep),
+    ('📿', l10n.adhkarTabWakingUp),
+    ('📿', l10n.adhkarTabFood),
+    ('📿', l10n.adhkarTabMisc),
+    ('✨', l10n.adhkarTabMine),
+    ('🌍', l10n.adhkarTabCommunity),
   ];
 
   @override
@@ -43,7 +46,7 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     super.initState();
     _tabCtrl = TabController(
       initialIndex: widget.initialCategoryIndex,
-      length: _tabs.length,
+      length: _tabCount,
 
       vsync: this,
     );
@@ -70,6 +73,7 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
+    final l10n = AppLocalizations.of(context)!;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -84,7 +88,7 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
             ),
             Column(
               children: [
-                _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs),
+                _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs(l10n)),
                 Expanded(
                   child: TabBarView(
                     controller: _tabCtrl,
@@ -120,6 +124,7 @@ class _AdhkarTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -143,7 +148,7 @@ class _AdhkarTopBar extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'الأذكار والأدعية',
+                          l10n.adhkarScreenTitle,
                           style: context.typography.headingMedium.copyWith(
                             fontSize: 22,
                             color: context.colors.gold,
@@ -157,7 +162,7 @@ class _AdhkarTopBar extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'حصن المسلم',
+                          l10n.adhkarScreenSubtitle,
                           style: context.typography.caption.copyWith(
                             color: context.colors.textSecondary,
                           ),
@@ -345,6 +350,7 @@ class _CategoryProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final pct = total > 0 ? done / total : 0.0;
     final isDone = done >= total;
 
@@ -367,7 +373,9 @@ class _CategoryProgressBar extends StatelessWidget {
           Row(
             children: [
               Text(
-                isDone ? '✅ مكتمل الحمد لله!' : '$done / $total ذكر',
+                isDone
+                    ? l10n.adhkarProgressComplete
+                    : l10n.adhkarProgressCount(done.toString(), total.toString()),
                 style: context.typography.bodySmall.copyWith(
                   color: isDone
                       ? context.colors.success
@@ -383,7 +391,7 @@ class _CategoryProgressBar extends StatelessWidget {
                     onReset();
                   },
                   child: Text(
-                    'إعادة',
+                    l10n.adhkarResetButton,
                     style: context.typography.caption.copyWith(
                       color: context.colors.textDim,
                     ),
@@ -471,6 +479,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = ref.watch(adhkarProgressProvider(widget.category));
     final count = progress[widget.index] ?? 0;
     final isDone = count >= widget.dhikr.count;
@@ -632,7 +641,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            '$remaining متبقي',
+                            l10n.adhkarRemainingCount(remaining.toString()),
                             style: context.typography.caption.copyWith(
                               color: context.colors.textDim,
                             ),
@@ -660,7 +669,9 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                                 ),
                                 const SizedBox(width: AppSpacing.xs),
                                 Text(
-                                  'مكتمل ${widget.dhikr.count}×',
+                                  l10n.adhkarCompletedCount(
+                                    widget.dhikr.count.toString(),
+                                  ),
                                   style: context.typography.bodySmall.copyWith(
                                     color: context.colors.success,
                                     fontWeight: FontWeight.w600,
@@ -703,7 +714,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
 
                         // expand hint
                         Text(
-                          _expanded ? 'إخفاء' : 'الفضل',
+                          _expanded ? l10n.adhkarHideFadl : l10n.adhkarShowFadl,
                           style: context.typography.caption.copyWith(
                             color: context.colors.textDim,
                           ),
@@ -847,6 +858,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final prefsAsync = ref.watch(userPreferencesProvider);
     final prefs = prefsAsync.valueOrNull;
     final enabled = prefs?.adhkarNotifEnabled ?? true;
@@ -883,7 +895,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
             child: Row(
               children: [
                 Text(
-                  'إشعارات الأذكار',
+                  l10n.adhkarNotifSettingsTitle,
                   style: context.typography.headingMedium.copyWith(
                     fontSize: 18,
                     color: context.colors.gold,
@@ -921,7 +933,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                   const Text('🔕', style: TextStyle(fontSize: 20)),
                   const SizedBox(width: 10),
                   Text(
-                    'الإشعارات متوقفة',
+                    l10n.adhkarNotifDisabled,
                     style: context.typography.bodyMedium.copyWith(
                       color: context.colors.textDim,
                     ),
@@ -936,7 +948,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
               children: [
                 _NotifRow(
                   icon: '🌅',
-                  label: 'أذكار الصباح',
+                  label: l10n.adhkarNotifMorningLabel,
                   time: morningTime,
                   onTimeTap: () async {
                     final t = await _pickTime(context, morningTime);
@@ -952,7 +964,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 ),
                 _NotifRow(
                   icon: '🌆',
-                  label: 'أذكار المساء',
+                  label: l10n.adhkarNotifEveningLabel,
                   time: eveningTime,
                   onTimeTap: () async {
                     final t = await _pickTime(context, eveningTime);
@@ -968,7 +980,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 ),
                 _NotifRow(
                   icon: '🌙',
-                  label: 'أذكار النوم',
+                  label: l10n.adhkarNotifSleepLabel,
                   time: sleepTime,
                   onTimeTap: () async {
                     final t = await _pickTime(context, sleepTime);
@@ -987,7 +999,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.md),
                 _ToggleRow(
                   icon: '🌅',
-                  label: 'بعد صلاة الفجر',
+                  label: l10n.adhkarNotifAfterFajrLabel,
                   value: afterFajr,
                   onChanged: (v) => ref
                       .read(userPreferencesProvider.notifier)
@@ -995,7 +1007,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                 ),
                 _ToggleRow(
                   icon: '🌇',
-                  label: 'بعد صلاة العصر',
+                  label: l10n.adhkarNotifAfterAsrLabel,
                   value: afterAsr,
                   onChanged: (v) => ref
                       .read(userPreferencesProvider.notifier)

@@ -9,6 +9,7 @@ import 'package:takwa/features/books/presentation/screens/books_chapter_screen.d
 import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_refresh_indicator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class BooksLibraryScreen extends ConsumerStatefulWidget {
   const BooksLibraryScreen({super.key});
@@ -24,6 +25,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
     final booksAsync = ref.watch(booksListProvider);
@@ -31,7 +33,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBarWidget(
-        title: 'المكتبة الإسلامية',
+        title: l10n.booksLibraryTitle,
         leading: const CustomLeadingButton(),
         actions: [
           IconButton(
@@ -40,7 +42,9 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
               _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
               color: Colors.white,
             ),
-            tooltip: _isGridView ? 'عرض القائمة' : 'عرض الشبكة',
+            tooltip: _isGridView
+                ? l10n.booksListViewTooltip
+                : l10n.booksGridViewTooltip,
           ),
         ],
       ),
@@ -87,15 +91,15 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return const SliverFillRemaining(
+                  return SliverFillRemaining(
                     hasScrollBody: false,
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('🧐', style: TextStyle(fontSize: 50)),
-                          SizedBox(height: AppSpacing.lg),
-                          Text('لم يتم العثور على كتب'),
+                          const Text('🧐', style: TextStyle(fontSize: 50)),
+                          const SizedBox(height: AppSpacing.lg),
+                          Text(l10n.booksNoResultsFound),
                         ],
                       ),
                     ),
@@ -164,12 +168,12 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
-                        'تعذر الاتصال بالخادم',
+                        l10n.booksServerConnectionError,
                         style: typography.headingMedium.copyWith(fontSize: 22),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً\nأو اسحب الشاشة للأسفل للتحديث',
+                        l10n.booksConnectionErrorHint,
                         style: TextStyle(
                           color: colors.textSecondary,
                           fontSize: 15,
@@ -192,14 +196,14 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                           ),
                           elevation: 0,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.refresh, size: 20),
-                            SizedBox(width: AppSpacing.sm),
+                            const Icon(Icons.refresh, size: 20),
+                            const SizedBox(width: AppSpacing.sm),
                             Text(
-                              'إعادة المحاولة',
-                              style: TextStyle(
+                              l10n.prayerScreenRetryButton,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -231,6 +235,7 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     return Container(
       decoration: BoxDecoration(
@@ -249,7 +254,7 @@ class _SearchBar extends StatelessWidget {
         onChanged: onChanged,
         textAlign: TextAlign.right,
         decoration: InputDecoration(
-          hintText: 'ابحث عن كتاب أو مؤلف...',
+          hintText: l10n.booksSearchHint,
           hintStyle: TextStyle(color: colors.textSecondary.withOpacity(0.5)),
           prefixIcon: Icon(Icons.search, color: colors.gold),
           border: InputBorder.none,
@@ -275,6 +280,7 @@ class _CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     const categories = BookCategory.values;
 
@@ -290,7 +296,7 @@ class _CategorySelector extends StatelessWidget {
           final isAll = i == 0;
           final cat = isAll ? null : categories[i - 1];
           final isSelected = selected == cat;
-          final label = isAll ? 'الكل' : _labelFor(cat!);
+          final label = isAll ? l10n.booksCategoryAll : _labelFor(l10n, cat!);
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
@@ -318,14 +324,14 @@ class _CategorySelector extends StatelessWidget {
     );
   }
 
-  String _labelFor(BookCategory cat) => switch (cat) {
-    BookCategory.hadith => 'الحديث',
-    BookCategory.fiqh => 'الفقه',
-    BookCategory.seerah => 'السيرة',
-    BookCategory.aqeedah => 'العقيدة',
-    BookCategory.adab => 'الآداب',
-    BookCategory.tazkiyah => 'التزكية',
-    BookCategory.quran => 'علوم القرآن',
+  String _labelFor(AppLocalizations l10n, BookCategory cat) => switch (cat) {
+    BookCategory.hadith => l10n.booksCategoryHadith,
+    BookCategory.fiqh => l10n.booksCategoryFiqh,
+    BookCategory.seerah => l10n.booksCategorySeerah,
+    BookCategory.aqeedah => l10n.booksCategoryAqeedah,
+    BookCategory.adab => l10n.booksCategoryAdab,
+    BookCategory.tazkiyah => l10n.booksCategoryTazkiyah,
+    BookCategory.quran => l10n.booksCategoryQuranicSciences,
   };
 }
 
@@ -349,6 +355,7 @@ class _BookCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
     final progress = ref.watch(readingProgressProvider);
@@ -448,12 +455,14 @@ class _BookCard extends ConsumerWidget {
                         children: [
                           _InfoChip(
                             icon: Icons.calendar_today,
-                            text: '${book.publishYear} هـ',
+                            text: '${book.publishYear} ${l10n.hijriEraSuffix}',
                           ),
                           const SizedBox(width: AppSpacing.md),
                           _InfoChip(
                             icon: Icons.auto_stories,
-                            text: book.publishYear > 500 ? "مجلد" : "كتيب",
+                            text: book.publishYear > 500
+                                ? l10n.booksVolumeLabel
+                                : l10n.booksBookletLabel,
                           ),
                         ],
                       ),
@@ -719,6 +728,7 @@ class _BooksSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
 
     return Center(
@@ -744,7 +754,7 @@ class _BooksSkeleton extends StatelessWidget {
               const TakwaLoadingIndicator(),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'جاري تحميل الكتب...',
+                l10n.booksLoadingMessage,
                 style: TextStyle(
                   color: colors.textSecondary,
                   fontSize: 14,

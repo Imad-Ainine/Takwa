@@ -10,6 +10,7 @@ import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
 import '../../../../core/supabase/supabase_providers.dart';
 import '../../../../core/supabase/supabase_config.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -68,13 +69,14 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
       leading: const CustomLeadingButton(),
       title: Text(
-        'الملف الشخصي',
+        l10n.profileScreenTitle,
         style: context.typography.headingMedium.copyWith(
           color: context.colors.gold,
         ),
@@ -87,16 +89,17 @@ class ProfileScreen extends ConsumerWidget {
     BuildContext context,
     AsyncValue<Map<String, dynamic>?> profileAsync,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return profileAsync.when(
       loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (e, _) => Center(
         child: Text(
-          'خطأ في تحميل البيانات',
+          l10n.profileLoadError,
           style: context.typography.bodySmall,
         ),
       ),
       data: (profile) {
-        final username = profile?['username'] ?? 'مستخدم تقوى';
+        final username = profile?['username'] ?? l10n.profileDefaultUsername;
         final avatar = profile?['avatar_emoji'] ?? '🌙';
 
         return Container(
@@ -153,7 +156,9 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    profile!['gender'] == 'male' ? 'ذكر' : 'أنثى',
+                    profile!['gender'] == 'male'
+                        ? l10n.profileGenderMale
+                        : l10n.profileGenderFemale,
                     style: context.typography.caption.copyWith(
                       color: context.colors.gold,
                       fontSize: 12,
@@ -170,7 +175,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              const TaqwaBadge(label: 'عضو مجتهد'),
+              TaqwaBadge(label: l10n.profileMemberBadge),
             ],
           ),
         );
@@ -183,12 +188,13 @@ class ProfileScreen extends ConsumerWidget {
     AsyncValue<MonthStats> statsAsync,
     AsyncValue<int> streakAsync,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
           child: statsAsync.when(
             data: (s) => _StatCard(
-              label: 'نقاط التقوى',
+              label: l10n.profileTaqwaPointsLabel,
               value: '${s.totalPoints}',
               icon: '🌟',
               color: context.colors.gold,
@@ -201,7 +207,7 @@ class ProfileScreen extends ConsumerWidget {
         Expanded(
           child: streakAsync.when(
             data: (s) => _StatCard(
-              label: 'أيام متواصلة',
+              label: l10n.profileStreakDaysLabel,
               value: '$s',
               icon: '🔥',
               color: context.colors.success,
@@ -215,21 +221,22 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildProfileMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         _MenuTile(
           icon: Icons.emoji_events_outlined,
-          title: 'الإنجازات',
+          title: l10n.profileAchievementsMenuTitle,
           onTap: () => Navigator.pushNamed(context, '/achievements'),
         ),
         _MenuTile(
           icon: Icons.history_rounded,
-          title: 'سجل المحاسبة',
+          title: l10n.profileAccountingLogMenuTitle,
           onTap: () => Navigator.pushNamed(context, '/checklist'),
         ),
         _MenuTile(
           icon: Icons.settings_outlined,
-          title: 'إعدادات الحساب',
+          title: l10n.profileAccountSettingsMenuTitle,
           onTap: () => Navigator.pushNamed(context, '/account-settings'),
         ),
       ],
@@ -237,22 +244,23 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final supabaseService = ref.read(supabaseServiceProvider);
     return PrimaryButton(
       onTap: () async {
         final proceed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('تسجيل الخروج'),
-            content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج؟'),
+            title: Text(l10n.profileLogoutDialogTitle),
+            content: Text(l10n.profileLogoutDialogConfirm),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('إلغاء'),
+                child: Text(l10n.adhkarCancelButton),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('خروج'),
+                child: Text(l10n.profileLogoutConfirmButton),
               ),
             ],
           ),
@@ -266,7 +274,7 @@ class ProfileScreen extends ConsumerWidget {
         }
       },
       icon: Icons.logout_rounded,
-      label: 'تسجيل الخروج',
+      label: l10n.profileLogoutDialogTitle,
       isOutline: true,
       baseColor: Colors.redAccent,
     );

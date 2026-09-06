@@ -8,6 +8,7 @@ import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // Styles are managed via AdaptiveStyle
 
@@ -38,6 +39,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
@@ -53,14 +55,14 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(style),
-            _buildTabBar(style, completedCount, cancelledCount),
+            _buildHeader(style, l10n),
+            _buildTabBar(style, l10n, completedCount, cancelledCount),
             Expanded(
               child: TabBarView(
                 controller: _tab,
                 children: [
-                  _buildCompletedList(style, completed),
-                  _buildCancelledList(style, cancelled),
+                  _buildCompletedList(style, l10n, completed),
+                  _buildCancelledList(style, l10n, cancelled),
                 ],
               ),
             ),
@@ -70,7 +72,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildHeader(AdaptiveStyle style) {
+  Widget _buildHeader(AdaptiveStyle style, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
@@ -78,7 +80,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'تاريخ الختمات',
+            l10n.khatmaHistoryTitle,
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
           const Spacer(),
@@ -90,6 +92,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 
   Widget _buildTabBar(
     AdaptiveStyle style,
+    AppLocalizations l10n,
     int completedCount,
     int cancelledCount,
   ) {
@@ -115,7 +118,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
                 const Icon(Icons.check_circle_outline, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  'مكتملة ($completedCount)',
+                  l10n.khatmaHistoryCompletedTab(completedCount.toString()),
                   style: style.naskh(13, weight: FontWeight.bold),
                 ),
               ],
@@ -128,7 +131,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
                 const Icon(Icons.archive_outlined, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  'ملغاة ($cancelledCount)',
+                  l10n.khatmaHistoryCancelledTab(cancelledCount.toString()),
                   style: style.naskh(13, weight: FontWeight.bold),
                 ),
               ],
@@ -141,20 +144,21 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 
   Widget _buildCompletedList(
     AdaptiveStyle style,
+    AppLocalizations l10n,
     AsyncValue<List<KhatmaSessionEx>> async,
   ) {
     return async.when(
       loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (_, __) => Center(
-        child: Text('خطأ', style: style.naskh(14, color: style.text)),
+        child: Text(l10n.khatmaHistoryError, style: style.naskh(14, color: style.text)),
       ),
       data: (list) {
         if (list.isEmpty) {
           return _buildEmpty(
             style: style,
             icon: Icons.history_rounded,
-            title: 'لا توجد ختمات مكتملة أو منتهية',
-            subtitle: 'ابدأ ختمة جديدة لتظهر هنا عند اكتمالها أو إنهائها',
+            title: l10n.khatmaHistoryEmptyCompletedTitle,
+            subtitle: l10n.khatmaHistoryEmptyCompletedSubtitle,
           );
         }
         return ListView.builder(
@@ -169,20 +173,21 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 
   Widget _buildCancelledList(
     AdaptiveStyle style,
+    AppLocalizations l10n,
     AsyncValue<List<KhatmaSessionEx>> async,
   ) {
     return async.when(
       loading: () => const Center(child: TakwaLoadingIndicator()),
       error: (_, __) => Center(
-        child: Text('خطأ', style: style.naskh(14, color: style.text)),
+        child: Text(l10n.khatmaHistoryError, style: style.naskh(14, color: style.text)),
       ),
       data: (list) {
         if (list.isEmpty) {
           return _buildEmpty(
             style: style,
             icon: Icons.archive_outlined,
-            title: 'لا توجد ختمات ملغاة',
-            subtitle: 'الختمات الملغاة ستظهر هنا',
+            title: l10n.khatmaHistoryEmptyCancelledTitle,
+            subtitle: l10n.khatmaHistoryEmptyCancelledSubtitle,
           );
         }
         return ListView.builder(
@@ -230,6 +235,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
   }
 
   void _showDeleteConfirm(AdaptiveStyle style, KhatmaSessionEx session) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -239,27 +245,33 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
           side: BorderSide(color: style.border),
         ),
         title: Text(
-          'حذف الختمة',
+          l10n.khatmaHistoryDeleteTitle,
           textAlign: TextAlign.right,
           style: style.amiri(20, color: style.text, weight: FontWeight.bold),
         ),
         content: Text(
-          'هل تريد حذف هذه الختمة نهائياً؟',
+          l10n.khatmaHistoryDeleteConfirm,
           textAlign: TextAlign.right,
           style: style.naskh(14, color: style.textSec),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء', style: style.naskh(14, color: style.textDim)),
+            child: Text(
+              l10n.adhkarCancelButton,
+              style: style.naskh(14, color: style.textDim),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _showToast('تم حذف الختمة بنجاح');
+              _showToast(l10n.khatmaHistoryDeletedToast);
               ref.invalidate(khatmaCancelledProvider);
             },
-            child: const Text('حذف', style: TextStyle(color: Colors.redAccent)),
+            child: Text(
+              l10n.adhkarDeleteTooltip,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
@@ -302,6 +314,7 @@ class _KhatmaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final fmt = DateFormat('d/M/yyyy');
     final days =
         (session.completedDate ?? session.cancelledDate ?? DateTime.now())
@@ -351,7 +364,9 @@ class _KhatmaCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  session.isCompleted ? 'مكتملة' : 'ملغاة',
+                  session.isCompleted
+                      ? l10n.khatmaHistoryStatusCompleted
+                      : l10n.khatmaHistoryStatusCancelled,
                   style: style.naskh(
                     12,
                     color: session.isCompleted ? style.gold : Colors.redAccent,
@@ -386,11 +401,18 @@ class _KhatmaCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildInfo(style, Icons.timer_rounded, '${ar(days)} يوم'),
+              _buildInfo(
+                style,
+                Icons.timer_rounded,
+                l10n.khatmaHistoryDaysLabel(localizedNumeral(context, days)),
+              ),
               _buildInfo(
                 style,
                 Icons.auto_stories_rounded,
-                '${ar(session.pagesRead)} / ${ar(KhatmaSessionEx.totalPages)} صفحة',
+                l10n.khatmaHistoryPagesProgress(
+                  localizedNumeral(context, session.pagesRead),
+                  localizedNumeral(context, KhatmaSessionEx.totalPages),
+                ),
               ),
               _buildInfo(
                 style,

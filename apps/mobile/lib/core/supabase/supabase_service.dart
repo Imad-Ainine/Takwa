@@ -619,18 +619,17 @@ class SupabaseClientService implements SupabaseService {
 
   @override
   Future<void> likeAdhkar(String id) async {
-    // Use an RPC or a direct update. We do a read-then-write for simplicity;
-    // on production you'd use a Postgres function to avoid race conditions.
-    final row = await _db
-        .from('community_adhkar')
-        .select('likes')
-        .eq('id', id)
-        .single();
-    final currentLikes = (row['likes'] as int?) ?? 0;
-    await _db
-        .from('community_adhkar')
-        .update({'likes': currentLikes + 1})
-        .eq('id', id);
+    // A SECURITY DEFINER function (migration
+    // 20260906190603_fix_community_content_policies.sql), not a client-side
+    // read-then-write: the old approach both raced (two likes in quick
+    // succession could read the same count and both write current+1) and
+    // needed an RLS policy broad enough to let any signed-in user UPDATE
+    // any column on any row. The function only ever touches `likes`, only
+    // on already-approved rows, atomically.
+    await _db.rpc(
+      'increment_community_adhkar_likes',
+      params: {'row_id': id},
+    );
   }
 
   @override
@@ -663,16 +662,8 @@ class SupabaseClientService implements SupabaseService {
 
   @override
   Future<void> likeDua(String id) async {
-    final row = await _db
-        .from('community_duas')
-        .select('likes')
-        .eq('id', id)
-        .single();
-    final currentLikes = (row['likes'] as int?) ?? 0;
-    await _db
-        .from('community_duas')
-        .update({'likes': currentLikes + 1})
-        .eq('id', id);
+    // See likeAdhkar() above — same SECURITY DEFINER-function fix.
+    await _db.rpc('increment_community_duas_likes', params: {'row_id': id});
   }
 
   @override

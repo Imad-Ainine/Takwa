@@ -16,6 +16,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class MosquesScreen extends ConsumerStatefulWidget {
   const MosquesScreen({super.key});
@@ -25,7 +26,9 @@ class MosquesScreen extends ConsumerStatefulWidget {
 }
 
 class _MosquesScreenState extends ConsumerState<MosquesScreen> {
-  String _cityName = 'الجزائر';
+  String _cityName = lookupAppLocalizations(
+    const Locale('ar'),
+  ).overlayServiceDefaultCity;
   Position? _currentPosition;
 
   @override
@@ -87,9 +90,11 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
       await launchUrl(url);
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('لا يمكن فتح الخرائط')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.mosquesCannotOpenMaps),
+          ),
+        );
       }
     }
   }
@@ -100,15 +105,18 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
       await launchUrl(url);
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('لا يمكن إجراء المكالمة')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context)!.mosquesCannotMakeCall),
+          ),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final prayersAsyncValue = ref.watch(prayerTimesProvider);
@@ -146,7 +154,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             Column(
               children: [
                 AppBarWidget(
-                  title: 'المساجد القريبة',
+                  title: l10n.mosquesNearbyTitle,
                   height: 380,
                   showBackground: true,
                   child: Column(
@@ -162,7 +170,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                           children: [
                             const CustomLeadingButton(),
                             Text(
-                              'المساجد القريبة',
+                              l10n.mosquesNearbyTitle,
                               style: style.amiri(
                                 22,
                                 color: Colors.white,
@@ -197,7 +205,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Text(
-                              'الموقع الحالي: $_cityName',
+                              l10n.mosquesCurrentLocationLabel(_cityName),
                               style: style.naskh(
                                 14,
                                 color: Colors.white,
@@ -244,7 +252,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                                 width: 180,
                                 child: PrimaryButton(
                                   onTap: () async => _openMap(0, 0),
-                                  label: 'عرض على الخريطة',
+                                  label: l10n.mosquesViewOnMapButton,
                                   isBg: true,
                                 ),
                               ),
@@ -259,7 +267,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                   child: mosquesAsyncValue.when(
                     data: (mosques) {
                       if (mosques.isEmpty) {
-                        return _buildEmptyState(style);
+                        return _buildEmptyState(style, l10n);
                       }
                       return ListView.builder(
                         physics: const BouncingScrollPhysics(),
@@ -273,7 +281,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             mosques.length + 1, // +1 for the Hadith footer
                         itemBuilder: (context, index) {
                           if (index == mosques.length) {
-                            return _buildHadithFooter(style);
+                            return _buildHadithFooter(style, l10n);
                           }
                           final mosque = mosques[index];
                           return _buildEnhancedMosqueCard(
@@ -281,12 +289,13 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             index + 1,
                             nextPrayerTime,
                             style,
+                            l10n,
                           );
                         },
                       );
                     },
                     loading: () => const Center(child: TakwaLoadingIndicator()),
-                    error: (err, stack) => _buildErrorState(err, style),
+                    error: (err, stack) => _buildErrorState(err, style, l10n),
                   ),
                 ),
               ],
@@ -302,12 +311,17 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     int index,
     String nextPrayerTime,
     AdaptiveStyle style,
+    AppLocalizations l10n,
   ) {
     String formattedDistance;
     if (mosque.distance < 1000) {
-      formattedDistance = '${mosque.distance.toStringAsFixed(0)} متر';
+      formattedDistance = l10n.mosquesDistanceMeters(
+        mosque.distance.toStringAsFixed(0),
+      );
     } else {
-      formattedDistance = '${(mosque.distance / 1000).toStringAsFixed(1)} كم';
+      formattedDistance = l10n.mosquesDistanceKm(
+        (mosque.distance / 1000).toStringAsFixed(1),
+      );
     }
 
     final hasPhone = mosque.phone.isNotEmpty;
@@ -403,7 +417,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 Icon(Icons.access_time_rounded, size: 16, color: style.textSec),
                 const SizedBox(width: 6),
                 Text(
-                  'الصلاة القادمة: $nextPrayerTime',
+                  l10n.mosquesNextPrayerLabel(nextPrayerTime),
                   style: style.naskh(13, color: style.textSec),
                 ),
               ],
@@ -434,7 +448,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            'توجيه',
+                            l10n.mosquesDirectionsButton,
                             style: style.naskh(
                               14,
                               color: Colors.white,
@@ -471,7 +485,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Text(
-                              'اتصال',
+                              l10n.mosquesCallButton,
                               style: style.naskh(
                                 14,
                                 color: AppColors.gold,
@@ -491,7 +505,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     );
   }
 
-  Widget _buildHadithFooter(AdaptiveStyle style) {
+  Widget _buildHadithFooter(AdaptiveStyle style, AppLocalizations l10n) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -512,7 +526,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'فضل الذهاب للمسجد',
+                l10n.mosquesHadithSectionTitle,
                 style: style.naskh(
                   14,
                   color: const Color(0xFF8B7322),
@@ -551,17 +565,17 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     );
   }
 
-  Widget _buildEmptyState(AdaptiveStyle style) {
+  Widget _buildEmptyState(AdaptiveStyle style, AppLocalizations l10n) {
     return Center(
       child: Text(
-        'لم يتم العثور على مساجد قريبة في محيط 5 كيلومتر',
+        l10n.mosquesEmptyState,
         style: style.naskh(16, color: style.textSec),
         textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _buildErrorState(Object err, AdaptiveStyle style) {
+  Widget _buildErrorState(Object err, AdaptiveStyle style, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -584,7 +598,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
               width: 200,
               child: PrimaryButton(
                 onTap: () async => ref.refresh(nearbyMosquesProvider),
-                label: 'إعادة المحاولة',
+                label: l10n.prayerScreenRetryButton,
               ),
             ),
           ],

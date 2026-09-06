@@ -7,6 +7,13 @@ import 'package:takwa/core/theme/app_theme.dart';
 
 import '../../providers/adhkar_providers.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
+import 'package:takwa/l10n/app_localizations.dart';
+
+// This overlay runs in the separate isolate spawned for the system overlay
+// window (see main.dart's overlayMain()), so a fixed-locale lookup is used
+// here rather than trying to follow the main isolate's live app locale —
+// same rationale as overlay_background_service.dart.
+final AppLocalizations _l10n = lookupAppLocalizations(const Locale('ar'));
 
 class _IGold {
   // static const deep = Color(0xFF0B0F1C); // خلفية عميقة
@@ -46,13 +53,13 @@ List<_PopupItem> _buildAllItems() {
   final items = <_PopupItem>[];
 
   final catNames = {
-    AdhkarCategory.morning: ('🌅', 'أذكار الصباح'),
-    AdhkarCategory.evening: ('🌆', 'أذكار المساء'),
-    AdhkarCategory.afterPrayer: ('🕌', 'أذكار بعد الصلاة'),
-    AdhkarCategory.sleep: ('🌙', 'أذكار النوم'),
-    AdhkarCategory.misc: ('📿', 'أذكار متنوعة'),
-    AdhkarCategory.wakingUp: ('📿', 'الاستيقاظ من النوم'),
-    AdhkarCategory.food: ('📿', 'أذكار الطعام'),
+    AdhkarCategory.morning: ('🌅', _l10n.overlayAdhkarMorning),
+    AdhkarCategory.evening: ('🌆', _l10n.overlayAdhkarEvening),
+    AdhkarCategory.afterPrayer: ('🕌', _l10n.overlayAdhkarAfterPrayer),
+    AdhkarCategory.sleep: ('🌙', _l10n.overlayAdhkarSleep),
+    AdhkarCategory.misc: ('📿', _l10n.overlayAdhkarMisc),
+    AdhkarCategory.wakingUp: ('📿', _l10n.overlayAdhkarWakingUp),
+    AdhkarCategory.food: ('📿', _l10n.overlayAdhkarFood),
   };
 
   for (final entry in kAdhkarData.entries) {
@@ -71,17 +78,17 @@ List<_PopupItem> _buildAllItems() {
     }
   }
 
-  const duaCatNames = {
-    DuaCategory.morning: ('🌅', 'دعاء الصباح'),
-    DuaCategory.distress: ('🌊', 'دعاء الكرب'),
-    DuaCategory.guidance: ('🌟', 'دعاء الهداية'),
-    DuaCategory.forgiveness: ('🌿', 'دعاء المغفرة'),
-    DuaCategory.rizq: ('🌾', 'دعاء الرزق'),
-    DuaCategory.health: ('🫀', 'دعاء الصحة'),
-    DuaCategory.parents: ('❤️', 'دعاء الوالدين'),
-    DuaCategory.travel: ('✈️', 'دعاء السفر'),
-    DuaCategory.rain: ('🌧️', 'دعاء الاستسقاء'),
-    DuaCategory.general: ('🤲', 'دعاء عام'),
+  final duaCatNames = {
+    DuaCategory.morning: ('🌅', _l10n.overlayDuaMorning),
+    DuaCategory.distress: ('🌊', _l10n.overlayDuaDistress),
+    DuaCategory.guidance: ('🌟', _l10n.overlayDuaGuidance),
+    DuaCategory.forgiveness: ('🌿', _l10n.overlayDuaForgiveness),
+    DuaCategory.rizq: ('🌾', _l10n.overlayDuaRizq),
+    DuaCategory.health: ('🫀', _l10n.overlayDuaHealth),
+    DuaCategory.parents: ('❤️', _l10n.overlayDuaParents),
+    DuaCategory.travel: ('✈️', _l10n.overlayDuaTravel),
+    DuaCategory.rain: ('🌧️', _l10n.overlayDuaRain),
+    DuaCategory.general: ('🤲', _l10n.overlayDuaGeneral),
   };
   for (final entry in kDuasData.entries) {
     final meta = duaCatNames[entry.key];
@@ -724,7 +731,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
               Row(
                 children: [
                   Text(
-                    item.isDua ? 'دعاء' : 'ذكر',
+                    item.isDua ? _l10n.overlayTypeDua : _l10n.overlayTypeDhikr,
                     style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 10,
@@ -738,9 +745,9 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                     style: TextStyle(color: _IGold.gold3, fontSize: 8),
                   ),
                   const SizedBox(width: AppSpacing.xs),
-                  const Text(
-                    'اضغط خارجاً للإغلاق',
-                    style: TextStyle(
+                  Text(
+                    _l10n.overlayTapOutsideToClose,
+                    style: const TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 10,
                       color: _IGold.white50,

@@ -10,6 +10,7 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
 //  QIBLA CALCULATION PROVIDER
@@ -141,27 +142,30 @@ class _QiblaTopBar extends StatelessWidget {
   const _QiblaTopBar({required this.style});
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-    child: Row(
-      children: [
-        const CustomLeadingButton(),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('اتجاه القبلة', style: style.amiri(22)),
-              Text(
-                'نحو الكعبة المشرفة 🕋',
-                style: style.naskh(11, color: style.textSec),
-              ),
-            ],
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      child: Row(
+        children: [
+          const CustomLeadingButton(),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.qiblaScreenTitle, style: style.amiri(22)),
+                Text(
+                  l10n.qiblaScreenSubtitle,
+                  style: style.naskh(11, color: style.textSec),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 // ── المحتوى الرئيسي ──
@@ -184,14 +188,15 @@ class _QiblaContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Matches _QiblaInfoRow's own dir/deg math so the semantic label says
     // the same thing the visible info cards do.
     final diff = ((qiblaDir - heading) % 360 + 360) % 360;
-    final turnDir = diff < 180 ? 'اليمين' : 'اليسار';
+    final turnDir = diff < 180 ? l10n.qiblaDirRight : l10n.qiblaDirLeft;
     final turnDeg = (diff < 180 ? diff : 360 - diff).round();
     final compassLabel = isAligned
-        ? 'بوصلة القبلة، أنت متجه إلى القبلة الآن'
-        : 'بوصلة القبلة، أدر جهازك $turnDeg درجة إلى $turnDir لمواجهة القبلة';
+        ? l10n.qiblaCompassLabelAligned
+        : l10n.qiblaCompassLabelUnaligned(turnDeg.toString(), turnDir);
 
     return FadeTransition(
       opacity: CurvedAnimation(parent: entryCtrl, curve: Curves.easeOut),
@@ -223,6 +228,10 @@ class _QiblaContent extends StatelessWidget {
                     primaryColor: style.gold,
                     tealColor: style.teal,
                     isRamadan: style.isRamadan,
+                    north: l10n.qiblaCompassNorth,
+                    east: l10n.qiblaCompassEast,
+                    south: l10n.qiblaCompassSouth,
+                    west: l10n.qiblaCompassWest,
                   ),
                   child: Center(
                     child: _CompassCenter(
@@ -258,6 +267,7 @@ class _QiblaCompassPainter extends CustomPainter {
   final bool isAligned;
   final Color primaryColor, tealColor;
   final bool isRamadan;
+  final String north, east, south, west;
 
   _QiblaCompassPainter({
     required this.needleAngle,
@@ -266,6 +276,10 @@ class _QiblaCompassPainter extends CustomPainter {
     required this.primaryColor,
     required this.tealColor,
     required this.isRamadan,
+    required this.north,
+    required this.east,
+    required this.south,
+    required this.west,
   });
 
   @override
@@ -337,7 +351,7 @@ class _QiblaCompassPainter extends CustomPainter {
     }
 
     // ── حرف N,S,E,W ──
-    const dirs = [('ش', 0.0), ('ق', 90.0), ('ج', 180.0), ('غ', 270.0)];
+    final dirs = [(north, 0.0), (east, 90.0), (south, 180.0), (west, 270.0)];
     final tp = TextPainter(textDirection: TextDirection.rtl);
     for (final d in dirs) {
       final a = (d.$2 - heading) * math.pi / 180;
@@ -349,7 +363,7 @@ class _QiblaCompassPainter extends CustomPainter {
         style: TextStyle(
           fontFamily: 'Amiri',
           fontSize: 13,
-          color: d.$1 == 'ش' ? primaryColor : primaryColor.withOpacity(0.4),
+          color: d.$1 == north ? primaryColor : primaryColor.withOpacity(0.4),
         ),
       );
       tp.layout();
@@ -422,7 +436,9 @@ class _QiblaCompassPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_QiblaCompassPainter old) =>
-      old.needleAngle != needleAngle || old.isAligned != isAligned;
+      old.needleAngle != needleAngle ||
+      old.isAligned != isAligned ||
+      old.north != north;
 }
 
 // ── مركز الكومباس ──
@@ -494,8 +510,9 @@ class _QiblaInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final diff = ((qiblaDir - heading) % 360 + 360) % 360;
-    final dir = diff < 180 ? 'يميناً' : 'يساراً';
+    final dir = diff < 180 ? l10n.qiblaTurnRightShort : l10n.qiblaTurnLeftShort;
     final deg = diff < 180 ? diff.round() : (360 - diff).round();
 
     return Padding(
@@ -504,7 +521,7 @@ class _QiblaInfoRow extends StatelessWidget {
         children: [
           Expanded(
             child: _InfoCard(
-              label: 'اتجاه القبلة',
+              label: l10n.qiblaScreenTitle,
               value: '${qiblaDir.round()}°',
               icon: '🕋',
               style: style,
@@ -514,7 +531,7 @@ class _QiblaInfoRow extends StatelessWidget {
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: _InfoCard(
-              label: 'اتجاهك الحالي',
+              label: l10n.qiblaCurrentDirectionLabel,
               value: '${heading.round() % 360}°',
               icon: '🧭',
               style: style,
@@ -523,8 +540,10 @@ class _QiblaInfoRow extends StatelessWidget {
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: _InfoCard(
-              label: isAligned ? 'محاذٍ ✓' : 'أدر $dir',
-              value: isAligned ? 'صحيح' : '$deg°',
+              label: isAligned
+                  ? l10n.qiblaAlignedLabel
+                  : l10n.qiblaTurnLabel(dir),
+              value: isAligned ? l10n.qiblaCorrectValue : '$deg°',
               icon: isAligned ? '✅' : '↩️',
               style: style,
               isActive: isAligned,
@@ -591,50 +610,51 @@ class _QiblaHint extends StatelessWidget {
   const _QiblaHint({required this.style, required this.isAligned});
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.xl,
-      vertical: AppSpacing.sm,
-    ),
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.md,
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.sm,
       ),
-      decoration: BoxDecoration(
-        gradient: isAligned
-            ? LinearGradient(
-                colors: [
-                  style.teal.withOpacity(0.15),
-                  style.gold.withOpacity(0.1),
-                ],
-              )
-            : null,
-        color: isAligned ? null : style.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isAligned ? style.teal.withOpacity(0.4) : style.border,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        decoration: BoxDecoration(
+          gradient: isAligned
+              ? LinearGradient(
+                  colors: [
+                    style.teal.withOpacity(0.15),
+                    style.gold.withOpacity(0.1),
+                  ],
+                )
+              : null,
+          color: isAligned ? null : style.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isAligned ? style.teal.withOpacity(0.4) : style.border,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(isAligned ? '✅' : '📱', style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 10),
+            Text(
+              isAligned ? l10n.qiblaFacingNowHint : l10n.qiblaHoldPhoneHint,
+              style: style.naskh(
+                12,
+                color: isAligned ? style.teal : style.textSec,
+              ),
+            ),
+          ],
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(isAligned ? '✅' : '📱', style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 10),
-          Text(
-            isAligned
-                ? 'أنت تواجه القبلة الآن'
-                : 'أمسك هاتفك أفقياً وابتعد عن المعادن',
-            style: style.naskh(
-              12,
-              color: isAligned ? style.teal : style.textSec,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+    );
+  }
 }
 
 // ── Error / Loading states ──
@@ -652,21 +672,24 @@ class _QiblaLocationError extends StatelessWidget {
   final AdaptiveStyle style;
   const _QiblaLocationError({required this.style});
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text('📍', style: TextStyle(fontSize: 40)),
-        const SizedBox(height: AppSpacing.md),
-        Text('يلزم تفعيل الموقع', style: style.amiri(16)),
-        const SizedBox(height: 6),
-        Text(
-          'لحساب اتجاه القبلة',
-          style: style.naskh(12, color: style.textSec),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('📍', style: TextStyle(fontSize: 40)),
+          const SizedBox(height: AppSpacing.md),
+          Text(l10n.qiblaLocationRequiredTitle, style: style.amiri(16)),
+          const SizedBox(height: 6),
+          Text(
+            l10n.qiblaLocationRequiredSubtitle,
+            style: style.naskh(12, color: style.textSec),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _QiblaCompassError extends StatelessWidget {
@@ -674,19 +697,22 @@ class _QiblaCompassError extends StatelessWidget {
   final Object error;
   const _QiblaCompassError({required this.style, required this.error});
   @override
-  Widget build(BuildContext context) => Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text('🧭', style: TextStyle(fontSize: 40)),
-        const SizedBox(height: AppSpacing.md),
-        Text('البوصلة غير متاحة', style: style.amiri(16)),
-        const SizedBox(height: 6),
-        Text(
-          'تأكد من دعم جهازك للبوصلة',
-          style: style.naskh(12, color: style.textSec),
-        ),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('🧭', style: TextStyle(fontSize: 40)),
+          const SizedBox(height: AppSpacing.md),
+          Text(l10n.qiblaCompassUnavailableTitle, style: style.amiri(16)),
+          const SizedBox(height: 6),
+          Text(
+            l10n.qiblaCompassUnavailableSubtitle,
+            style: style.naskh(12, color: style.textSec),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -1371,5 +1371,421 @@
         "type": "int"
       }
     }
-  }
+  },
+  "adhkarTabMorning": "الصباح",
+  "adhkarTabEvening": "المساء",
+  "adhkarTabAfterPrayer": "بعد الصلاة",
+  "adhkarTabSleep": "النوم",
+  "adhkarTabWakingUp": "الاستيقاظ من النوم",
+  "adhkarTabFood": "الطعام",
+  "adhkarTabMisc": "متنوعة",
+  "adhkarTabMine": "أذكاري",
+  "adhkarTabCommunity": "المجتمع",
+  "adhkarScreenTitle": "الأذكار والأدعية",
+  "adhkarScreenSubtitle": "حصن المسلم",
+  "adhkarProgressComplete": "✅ مكتمل الحمد لله!",
+  "adhkarProgressCount": "{done} / {total} ذكر",
+  "@adhkarProgressCount": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "adhkarResetButton": "إعادة",
+  "adhkarRemainingCount": "{remaining} متبقي",
+  "@adhkarRemainingCount": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "adhkarCompletedCount": "مكتمل {count}×",
+  "@adhkarCompletedCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "adhkarHideFadl": "إخفاء",
+  "adhkarShowFadl": "الفضل",
+  "adhkarNotifSettingsTitle": "إشعارات الأذكار",
+  "adhkarNotifDisabled": "الإشعارات متوقفة",
+  "adhkarNotifMorningLabel": "أذكار الصباح",
+  "adhkarNotifEveningLabel": "أذكار المساء",
+  "adhkarNotifSleepLabel": "أذكار النوم",
+  "adhkarNotifAfterFajrLabel": "بعد صلاة الفجر",
+  "adhkarNotifAfterAsrLabel": "بعد صلاة العصر",
+  "qiblaScreenTitle": "اتجاه القبلة",
+  "qiblaScreenSubtitle": "نحو الكعبة المشرفة 🕋",
+  "qiblaCompassLabelAligned": "بوصلة القبلة، أنت متجه إلى القبلة الآن",
+  "qiblaCompassLabelUnaligned": "بوصلة القبلة، أدر جهازك {deg} درجة إلى {dir} لمواجهة القبلة",
+  "@qiblaCompassLabelUnaligned": {
+    "placeholders": {
+      "deg": {
+        "type": "String"
+      },
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaDirRight": "اليمين",
+  "qiblaDirLeft": "اليسار",
+  "qiblaTurnRightShort": "يميناً",
+  "qiblaTurnLeftShort": "يساراً",
+  "qiblaCurrentDirectionLabel": "اتجاهك الحالي",
+  "qiblaAlignedLabel": "محاذٍ ✓",
+  "qiblaTurnLabel": "أدر {dir}",
+  "@qiblaTurnLabel": {
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaCorrectValue": "صحيح",
+  "qiblaFacingNowHint": "أنت تواجه القبلة الآن",
+  "qiblaHoldPhoneHint": "أمسك هاتفك أفقياً وابتعد عن المعادن",
+  "qiblaLocationRequiredTitle": "يلزم تفعيل الموقع",
+  "qiblaLocationRequiredSubtitle": "لحساب اتجاه القبلة",
+  "qiblaCompassUnavailableTitle": "البوصلة غير متاحة",
+  "qiblaCompassUnavailableSubtitle": "تأكد من دعم جهازك للبوصلة",
+  "qiblaCompassNorth": "ش",
+  "qiblaCompassEast": "ق",
+  "qiblaCompassSouth": "ج",
+  "qiblaCompassWest": "غ",
+  "khatmaProgressScreenTitle": "تقدم الختمة",
+  "khatmaProgressPercentComplete": "{percent}٪ مكتملة",
+  "@khatmaProgressPercentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaStatDaysLabel": "أيام",
+  "khatmaStatPagesReadLabel": "صفحة مقروءة",
+  "khatmaWeeklyReadingTitle": "القراءة الأسبوعية",
+  "khatmaReadingAppearanceLabel": "مظهر القراءة",
+  "khatmaSettingsSectionTitle": "إعدادات الختمة",
+  "khatmaReciterLabel": "القارئ",
+  "khatmaReciterDefaultValue": "الشيخ المنشاوي",
+  "khatmaDailyReminderLabel": "تذكير يومي",
+  "overlayAdhkarMorning": "أذكار الصباح",
+  "overlayAdhkarEvening": "أذكار المساء",
+  "overlayAdhkarAfterPrayer": "أذكار بعد الصلاة",
+  "overlayAdhkarSleep": "أذكار النوم",
+  "overlayAdhkarMisc": "أذكار متنوعة",
+  "overlayAdhkarWakingUp": "الاستيقاظ من النوم",
+  "overlayAdhkarFood": "أذكار الطعام",
+  "overlayDuaMorning": "دعاء الصباح",
+  "overlayDuaDistress": "دعاء الكرب",
+  "overlayDuaGuidance": "دعاء الهداية",
+  "overlayDuaForgiveness": "دعاء المغفرة",
+  "overlayDuaRizq": "دعاء الرزق",
+  "overlayDuaHealth": "دعاء الصحة",
+  "overlayDuaParents": "دعاء الوالدين",
+  "overlayDuaTravel": "دعاء السفر",
+  "overlayDuaRain": "دعاء الاستسقاء",
+  "overlayDuaGeneral": "دعاء عام",
+  "overlayTypeDua": "دعاء",
+  "overlayTypeDhikr": "ذكر",
+  "overlayTapOutsideToClose": "اضغط خارجاً للإغلاق",
+  "forgotPasswordEnterEmail": "يرجى إدخال البريد الإلكتروني",
+  "forgotPasswordInvalidEmailFormat": "صيغة البريد الإلكتروني غير صحيحة",
+  "forgotPasswordCodeSentMessage": "تم إرسال رمز التحقق ورابط إعادة التعيين إلى بريدك الإلكتروني.",
+  "forgotPasswordSendCodeFailed": "تعذر إرسال الرمز، تأكد من اتصال الإنترنت.",
+  "forgotPasswordEnterOtp": "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+  "forgotPasswordInvalidOtp": "رمز التحقق غير صحيح أو منتهي الصلاحية",
+  "forgotPasswordVerifyFailed": "تعذر التحقق من الرمز، حاول مجدداً",
+  "forgotPasswordRateLimited": "تجاوزت الحد المسموح من المحاولات، يرجى الانتظار قليلاً",
+  "forgotPasswordTokenInvalidOrExpired": "رمز التحقق غير صحيح أو انتهت صلاحيته",
+  "forgotPasswordNoAccountFound": "لا يوجد حساب مرتبط بهذا البريد الإلكتروني",
+  "forgotPasswordGenericError": "حدث خطأ أثناء المعالجة، يرجى المحاولة لاحقاً",
+  "forgotPasswordEnterCodeTitle": "إدخال رمز التحقق",
+  "forgotPasswordRecoverTitle": "استعادة كلمة المرور",
+  "forgotPasswordEnterCodeSubtitle": "أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك أو اضغط على الرابط في الرسالة",
+  "forgotPasswordRecoverSubtitle": "أدخل بريدك الإلكتروني المسجل لنرسل لك رمز تأكيد إعادة تعيين كلمة المرور",
+  "forgotPasswordOtpHint": "رمز التحقق (6 أرقام)",
+  "forgotPasswordProcessing": "جاري المعالجة...",
+  "forgotPasswordVerifyAndContinue": "تحقق ومتابعة",
+  "forgotPasswordSendCode": "إرسال الرمز",
+  "forgotPasswordResendCountdown": "إعادة الإرسال بعد {seconds} ثانية",
+  "@forgotPasswordResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "forgotPasswordResendCode": "إعادة إرسال الرمز",
+  "timePeriodAm": "ص",
+  "timePeriodPm": "م",
+  "wakeUpOverlayTitle": "حان وقت الاستيقاظ",
+  "wakeUpSnoozeButton": "غفوة 10د",
+  "wakeUpStopAlarmButton": "إيقاف المنبه",
+  "booksLibraryTitle": "المكتبة الإسلامية",
+  "booksListViewTooltip": "عرض القائمة",
+  "booksGridViewTooltip": "عرض الشبكة",
+  "booksNoResultsFound": "لم يتم العثور على كتب",
+  "booksServerConnectionError": "تعذر الاتصال بالخادم",
+  "booksConnectionErrorHint": "يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً\nأو اسحب الشاشة للأسفل للتحديث",
+  "booksSearchHint": "ابحث عن كتاب أو مؤلف...",
+  "booksCategoryAll": "الكل",
+  "booksCategoryHadith": "الحديث",
+  "booksCategoryFiqh": "الفقه",
+  "booksCategorySeerah": "السيرة",
+  "booksCategoryAqeedah": "العقيدة",
+  "booksCategoryAdab": "الآداب",
+  "booksCategoryTazkiyah": "التزكية",
+  "booksCategoryQuranicSciences": "علوم القرآن",
+  "booksVolumeLabel": "مجلد",
+  "booksBookletLabel": "كتيب",
+  "booksLoadingMessage": "جاري تحميل الكتب...",
+  "khatmaDailyGoalLabel": "الهدف اليومي",
+  "khatmaDailyGoalPages": "{n} صفحات",
+  "@khatmaDailyGoalPages": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAppInfoSectionTitle": "معلومات التطبيق",
+  "khatmaVersionLabel": "الإصدار",
+  "khatmaRateAppLabel": "تقييم التطبيق",
+  "khatmaHistoryTitle": "تاريخ الختمات",
+  "khatmaHistoryCompletedTab": "مكتملة ({count})",
+  "@khatmaHistoryCompletedTab": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaHistoryCancelledTab": "ملغاة ({count})",
+  "@khatmaHistoryCancelledTab": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaHistoryError": "خطأ",
+  "khatmaHistoryEmptyCompletedTitle": "لا توجد ختمات مكتملة أو منتهية",
+  "khatmaHistoryEmptyCompletedSubtitle": "ابدأ ختمة جديدة لتظهر هنا عند اكتمالها أو إنهائها",
+  "khatmaHistoryEmptyCancelledTitle": "لا توجد ختمات ملغاة",
+  "khatmaHistoryEmptyCancelledSubtitle": "الختمات الملغاة ستظهر هنا",
+  "khatmaHistoryDeleteTitle": "حذف الختمة",
+  "khatmaHistoryDeleteConfirm": "هل تريد حذف هذه الختمة نهائياً؟",
+  "khatmaHistoryDeletedToast": "تم حذف الختمة بنجاح",
+  "khatmaHistoryStatusCompleted": "مكتملة",
+  "khatmaHistoryStatusCancelled": "ملغاة",
+  "khatmaHistoryDaysLabel": "{n} يوم",
+  "@khatmaHistoryDaysLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaHistoryPagesProgress": "{read} / {total} صفحة",
+  "@khatmaHistoryPagesProgress": {
+    "placeholders": {
+      "read": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "qiyamWirdTitle": "ورد القيام",
+  "qiyamWirdBeforeQiyamHeader": "أذكار ما قبل القيام",
+  "qiyamWirdIstighfarTitle": "الاستغفار",
+  "qiyamWirdTasbihTitle": "التسبيح",
+  "qiyamWirdLastThirdHeader": "أدعية مأثورة في السحر",
+  "qiyamWirdProphetDuaTitle": "دعاء النبي ﷺ",
+  "qiyamWirdSayyidIstighfarTitle": "سيد الاستغفار",
+  "qiyamWirdMulkHeader": "سورة الملك (المنجية)",
+  "qiyamWirdReadMulkTitle": "قراءة سورة الملك",
+  "qiyamWirdMulkSubtitle": "تشفع لصاحبها وتنجي من عذاب القبر",
+  "qiyamWirdCompletedButton": "تم الورد بنجاح",
+  "qiyamWirdTapToCountButton": "اضغط للعد",
+  "qiyamDashboardTitle": "قيام الليل",
+  "qiyamDashboardStageProgress": "المرحلة {current} من {total}",
+  "@qiyamDashboardStageProgress": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "qiyamDashboardChooseStageDuration": "اختر مدة المرحلة",
+  "qiyamDashboardMinutesLabel": "{mins, plural, one{دقيقة واحدة} two{دقيقتان} few{{mins} دقائق} many{{mins} دقيقة} other{{mins} دقيقة}}",
+  "@qiyamDashboardMinutesLabel": {
+    "placeholders": {
+      "mins": {
+        "type": "num"
+      }
+    }
+  },
+  "qiyamDashboardTimeRemainingLabel": "الوقت المتبقي",
+  "qiyamDashboardStoriesTitle": "عجائب وقصص القيام",
+  "qiyamDashboardStoriesSubtitle": "قصص واقعية ملهمة عن أثر قيام الليل",
+  "qiyamDashboardToolsSectionTitle": "الأدوات والدليل الإيماني",
+  "qiyamDashboardVirtuesTool": "فضائل القيام",
+  "qiyamDashboardSleepCalcTool": "حاسبة النوم",
+  "qiyamDashboardSunnahTool": "السنة النبوية",
+  "qiyamDashboardBeginnerGuideTool": "دليل المبتدئين",
+  "qiyamDashboardHourCalcTool": "حاسبة الساعة",
+  "qiyamDashboardBannerLabel": "تنبيه",
+  "qiyamDashboardBannerDesc": "برنامج متكامل لصلاة الليل... خطوة للقرب من الله.",
+  "qiyamGuideIntroTitle": "خطوتك الأولى في قيام الليل",
+  "qiyamGuideIntroSubtitle": "لا تقلق إذا كنت في البداية، فكل قائم لليل بدأ بخطوة بسيطة. إليك خارطة الطريق.",
+  "qiyamGuideTip1Title": "ابدأ بالقليل",
+  "qiyamGuideTip1Content": "لا تشق على نفسك في البداية، ابدأ بركعتين فقط بعد صلاة العشاء، ثم زد تدريجياً.",
+  "qiyamGuideTip2Title": "التبكير في النوم",
+  "qiyamGuideTip2Content": "النوم مبكراً هو المفتاح الذهبي للاستيقاظ بنشاط في وقت السحر.",
+  "qiyamGuideTip3Title": "وضوء وبسملة",
+  "qiyamGuideTip3Content": "توضأ قبل النوم واقرأ الأذكار، فذلك يعين الروح على القيام.",
+  "qiyamGuideTip4Title": "اجعلها عادة",
+  "qiyamGuideTip4Content": "الاستمرارية أهم من الكثرة، \"أحب الأعمال إلى الله أدومها وإن قل\".",
+  "qiyamGuideFaqTitle": "أسئلة شائعة",
+  "qiyamGuideFaqQ1": "هل يجب النوم قبل القيام؟",
+  "qiyamGuideFaqA1": "لا يشترط، ولكن ما كان بعد نوم يسمى \"تهجداً\".",
+  "qiyamGuideFaqQ2": "ما هو أقل عدد للركعات؟",
+  "qiyamGuideFaqA2": "ركعة واحدة (الوتر)، وأفضلها إحدى عشرة ركعة.",
+  "qiyamGuideFaqQ3": "متى يبدأ وقت القيام؟",
+  "qiyamGuideFaqA3": "من بعد صلاة العشاء وحتى أذان الفجر.",
+  "mosquesCannotOpenMaps": "لا يمكن فتح الخرائط",
+  "mosquesCannotMakeCall": "لا يمكن إجراء المكالمة",
+  "mosquesNearbyTitle": "المساجد القريبة",
+  "mosquesCurrentLocationLabel": "الموقع الحالي: {city}",
+  "@mosquesCurrentLocationLabel": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "mosquesViewOnMapButton": "عرض على الخريطة",
+  "mosquesDistanceMeters": "{n} متر",
+  "@mosquesDistanceMeters": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "mosquesDistanceKm": "{n} كم",
+  "@mosquesDistanceKm": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "mosquesNextPrayerLabel": "الصلاة القادمة: {time}",
+  "@mosquesNextPrayerLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "mosquesDirectionsButton": "توجيه",
+  "mosquesCallButton": "اتصال",
+  "mosquesHadithSectionTitle": "فضل الذهاب للمسجد",
+  "mosquesEmptyState": "لم يتم العثور على مساجد قريبة في محيط 5 كيلومتر",
+  "quranScreenKhatmaLabel": "ختمة",
+  "quranScreenTitle": "القرآن الكريم",
+  "quranScreenAyahLabel": "آية {n}",
+  "@quranScreenAyahLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "quranScreenContinueKhatma": "متابعة الختمة",
+  "quranScreenStartNewKhatma": "ابدأ ختمة جديدة",
+  "quranScreenContinueFromPage": "أكمل القراءة من صفحة {page}",
+  "@quranScreenContinueFromPage": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "quranScreenChooseKhatmaOptions": "حدد خيارات الختمة التي تناسبك",
+  "quranScreenFreeReadingTitle": "قراءة حرة",
+  "quranScreenFreeReadingSubtitle": "اقرأ القرآن الكريم بحرية",
+  "quranScreenHistoryGridSubtitle": "الختمات المكتملة",
+  "quranScreenProgressGridSubtitle": "إحصائيات القراءة",
+  "quranScreenSettingsGridSubtitle": "تخصيص التطبيق",
+  "quranScreenAiMemorizeTitle": "تحفيظ ذكي",
+  "quranScreenAiMemorizeSubtitle": "حفظ القرآن بالذكاء الاصطناعي",
+  "remindersAdviceTitle": "نصيحة",
+  "remindersAdviceDesc": "المداومة على الأذكار اليومية تجلب السكينة والطمأنينة للقلب. احرص على تفعيل التذكيرات لتبقى على اتصال دائم بالله.",
+  "remindersScreenTitle": "التذكيرات",
+  "remindersAddButtonTitle": "إضافة تذكير جديد",
+  "remindersAddButtonSubtitle": "اضغط هنا لإنشاء تذكير مخصص",
+  "remindersEmptyTitle": "لا يوجد تذكيرات بعد",
+  "remindersEmptySubtitle": "أضف أول تذكير لك بالضغط على الزر أعلاه",
+  "remindersMyRemindersTitle": "تذكيراتي",
+  "remindersCountBadge": "{count, plural, one{تذكير واحد} two{تذكيران} few{{count} تذكيرات} many{{count} تذكيراً} other{{count} تذكير}}",
+  "@remindersCountBadge": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "remindersDeleteDialogTitle": "حذف التذكير",
+  "remindersDeleteDialogConfirm": "هل تريد حذف \"{title}\"؟",
+  "@remindersDeleteDialogConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "profileScreenTitle": "الملف الشخصي",
+  "profileLoadError": "خطأ في تحميل البيانات",
+  "profileDefaultUsername": "مستخدم تقوى",
+  "profileGenderMale": "ذكر",
+  "profileGenderFemale": "أنثى",
+  "profileMemberBadge": "عضو مجتهد",
+  "profileTaqwaPointsLabel": "نقاط التقوى",
+  "profileStreakDaysLabel": "أيام متواصلة",
+  "profileAchievementsMenuTitle": "الإنجازات",
+  "profileAccountingLogMenuTitle": "سجل المحاسبة",
+  "profileAccountSettingsMenuTitle": "إعدادات الحساب",
+  "profileLogoutDialogTitle": "تسجيل الخروج",
+  "profileLogoutDialogConfirm": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+  "profileLogoutConfirmButton": "خروج",
+  "updatePasswordEnterNew": "أدخل كلمة المرور الجديدة",
+  "updatePasswordMismatch": "كلمات المرور غير متطابقة",
+  "updatePasswordSuccessMessage": "تم تعيين كلمة المرور الجديدة بنجاح ✓",
+  "updatePasswordUnexpectedError": "حدث خطأ غير متوقع، يرجى المحاولة لاحقاً",
+  "updatePasswordSameAsOld": "كلمة المرور الجديدة مطابقة لكلمة المرور الحالية",
+  "updatePasswordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "updatePasswordSessionExpired": "انتهت صلاحية الجلسة، يرجى طلب رمز استعادة جديد",
+  "updatePasswordGenericFailure": "تعذر تحديث كلمة المرور، حاول مجدداً",
+  "updatePasswordTitle": "تعيين كلمة مرور جديدة",
+  "updatePasswordSubtitle": "قم بإدخال كلمة المرور الجديدة لحسابك لتسجيل الدخول بأمان",
+  "updatePasswordNewHint": "كلمة المرور الجديدة",
+  "updatePasswordConfirmHint": "تأكيد كلمة المرور الجديدة",
+  "updatePasswordSavingButton": "جاري الحفظ...",
+  "updatePasswordSaveAndSignInButton": "حفظ كلمة المرور والدخول"
 }

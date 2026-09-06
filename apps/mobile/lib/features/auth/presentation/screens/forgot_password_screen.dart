@@ -8,6 +8,7 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/auth_field.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   final String? initialEmail;
@@ -66,13 +67,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _sendResetCode() async {
+    final l10n = AppLocalizations.of(context)!;
     final email = _emailCtrl.text.trim();
     if (email.isEmpty) {
-      setState(() => _error = 'يرجى إدخال البريد الإلكتروني');
+      setState(() => _error = l10n.forgotPasswordEnterEmail);
       return;
     }
     if (!_isValidEmail(email)) {
-      setState(() => _error = 'صيغة البريد الإلكتروني غير صحيحة');
+      setState(() => _error = l10n.forgotPasswordInvalidEmailFormat);
       return;
     }
 
@@ -90,16 +92,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       if (mounted) {
         setState(() {
           _codeSent = true;
-          _successMessage =
-              'تم إرسال رمز التحقق ورابط إعادة التعيين إلى بريدك الإلكتروني.';
+          _successMessage = l10n.forgotPasswordCodeSentMessage;
         });
         _startCountdown();
       }
     } on AuthException catch (e) {
-      if (mounted) setState(() => _error = _mapAuthError(e.message));
+      if (mounted) setState(() => _error = _mapAuthError(l10n, e.message));
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'تعذر إرسال الرمز، تأكد من اتصال الإنترنت.');
+        setState(() => _error = l10n.forgotPasswordSendCodeFailed);
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -107,11 +108,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   }
 
   Future<void> _verifyOtp() async {
+    final l10n = AppLocalizations.of(context)!;
     final email = _emailCtrl.text.trim();
     final token = _otpCtrl.text.trim();
 
     if (token.isEmpty) {
-      setState(() => _error = 'يرجى إدخال رمز التحقق المكون من 6 أرقام');
+      setState(() => _error = l10n.forgotPasswordEnterOtp);
       return;
     }
 
@@ -131,36 +133,37 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         Navigator.pushReplacementNamed(context, Routes.updatePassword);
       } else {
         if (mounted) {
-          setState(() => _error = 'رمز التحقق غير صحيح أو منتهي الصلاحية');
+          setState(() => _error = l10n.forgotPasswordInvalidOtp);
         }
       }
     } on AuthException catch (e) {
-      if (mounted) setState(() => _error = _mapAuthError(e.message));
+      if (mounted) setState(() => _error = _mapAuthError(l10n, e.message));
     } catch (_) {
-      if (mounted) setState(() => _error = 'تعذر التحقق من الرمز، حاول مجدداً');
+      if (mounted) setState(() => _error = l10n.forgotPasswordVerifyFailed);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  String _mapAuthError(String message) {
+  String _mapAuthError(AppLocalizations l10n, String message) {
     final msg = message.toLowerCase();
     if (msg.contains('rate limit') || msg.contains('too many requests')) {
-      return 'تجاوزت الحد المسموح من المحاولات، يرجى الانتظار قليلاً';
+      return l10n.forgotPasswordRateLimited;
     }
     if (msg.contains('token') ||
         msg.contains('otp') ||
         msg.contains('invalid')) {
-      return 'رمز التحقق غير صحيح أو انتهت صلاحيته';
+      return l10n.forgotPasswordTokenInvalidOrExpired;
     }
     if (msg.contains('user not found')) {
-      return 'لا يوجد حساب مرتبط بهذا البريد الإلكتروني';
+      return l10n.forgotPasswordNoAccountFound;
     }
-    return 'حدث خطأ أثناء المعالجة، يرجى المحاولة لاحقاً';
+    return l10n.forgotPasswordGenericError;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
 
@@ -239,8 +242,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           // Title
                           Text(
                             _codeSent
-                                ? 'إدخال رمز التحقق'
-                                : 'استعادة كلمة المرور',
+                                ? l10n.forgotPasswordEnterCodeTitle
+                                : l10n.forgotPasswordRecoverTitle,
                             style: s.amiri(32, weight: FontWeight.w700),
                             textAlign: TextAlign.center,
                           ),
@@ -249,8 +252,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           // Subtitle
                           Text(
                             _codeSent
-                                ? 'أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك أو اضغط على الرابط في الرسالة'
-                                : 'أدخل بريدك الإلكتروني المسجل لنرسل لك رمز تأكيد إعادة تعيين كلمة المرور',
+                                ? l10n.forgotPasswordEnterCodeSubtitle
+                                : l10n.forgotPasswordRecoverSubtitle,
                             style: s.naskh(13, color: s.textSec),
                             textAlign: TextAlign.center,
                           ),
@@ -259,7 +262,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           // Email field
                           AuthField(
                             ctrl: _emailCtrl,
-                            hint: 'البريد الإلكتروني',
+                            hint: l10n.authEmailHint,
                             icon: Icons.alternate_email_rounded,
                             style: s,
                             keyboardType: TextInputType.emailAddress,
@@ -273,7 +276,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             AuthField(
                               ctrl: _otpCtrl,
-                              hint: 'رمز التحقق (6 أرقام)',
+                              hint: l10n.forgotPasswordOtpHint,
                               icon: Icons.pin_outlined,
                               style: s,
                               keyboardType: TextInputType.number,
@@ -371,8 +374,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                     }
                                   },
                             label: _loading
-                                ? 'جاري المعالجة...'
-                                : (_codeSent ? 'تحقق ومتابعة' : 'إرسال الرمز'),
+                                ? l10n.forgotPasswordProcessing
+                                : (_codeSent
+                                      ? l10n.forgotPasswordVerifyAndContinue
+                                      : l10n.forgotPasswordSendCode),
                           ),
 
                           // Resend Code or Change Email
@@ -383,14 +388,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               children: [
                                 if (_resendCountdown > 0)
                                   Text(
-                                    'إعادة الإرسال بعد $_resendCountdown ثانية',
+                                    l10n.forgotPasswordResendCountdown(
+                                      _resendCountdown.toString(),
+                                    ),
                                     style: s.naskh(12, color: s.textDim),
                                   )
                                 else
                                   TextButton(
                                     onPressed: _loading ? null : _sendResetCode,
                                     child: Text(
-                                      'إعادة إرسال الرمز',
+                                      l10n.forgotPasswordResendCode,
                                       style: s.naskh(
                                         12,
                                         color: s.gold,

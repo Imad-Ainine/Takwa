@@ -15,6 +15,7 @@ import 'khatma_settings_screen.dart';
 import 'ai_memorize_screen.dart';
 import 'quran_reader_screen.dart';
 import 'free_reading_screen.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // Styles are handled by AdaptiveStyle
 
@@ -87,6 +88,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   }
 
   Widget _buildTopBar(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -99,7 +101,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             // Center: title
             Column(
               children: [
-                Text('ختمة', style: style.amiri(28, color: style.text)),
+                Text(
+                  l10n.quranScreenKhatmaLabel,
+                  style: style.amiri(28, color: style.text),
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -111,7 +116,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     border: Border.all(color: style.gold.withOpacity(0.45)),
                   ),
                   child: Text(
-                    'القرآن الكريم',
+                    l10n.quranScreenTitle,
                     style: style.amiri(13, color: style.gold),
                   ),
                 ),
@@ -179,6 +184,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   }
 
   Widget _buildVerseCard(Map<String, dynamic> verse, AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
@@ -243,7 +249,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'آية ${ar(verse['ayahNumber'] as int)}',
+                        l10n.quranScreenAyahLabel(
+                          localizedNumeral(context, verse['ayahNumber'] as int),
+                        ),
                         style: style.amiri(13, color: style.textSec),
                       ),
                       const SizedBox(width: AppSpacing.xs),
@@ -296,6 +304,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       );
 
   Widget _buildKhatmaButton(KhatmaSessionEx? khatma, AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     final hasActive = khatma != null && khatma.isActive;
     return GestureDetector(
       onTap: () {
@@ -342,7 +351,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               child: Column(
                 children: [
                   Text(
-                    hasActive ? 'متابعة الختمة' : 'ابدأ ختمة جديدة',
+                    hasActive
+                        ? l10n.quranScreenContinueKhatma
+                        : l10n.quranScreenStartNewKhatma,
                     style: style.amiri(
                       19,
                       color: Colors.white,
@@ -352,8 +363,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   const SizedBox(height: 3),
                   Text(
                     hasActive
-                        ? 'أكمل القراءة من صفحة ${ar(khatma.currentPage)}'
-                        : 'حدد خيارات الختمة التي تناسبك',
+                        ? l10n.quranScreenContinueFromPage(
+                            localizedNumeral(context, khatma.currentPage),
+                          )
+                        : l10n.quranScreenChooseKhatmaOptions,
                     style: style.naskh(
                       12,
                       color: Colors.white.withOpacity(0.85),
@@ -383,6 +396,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   }
 
   Widget _buildFreeReadingButton(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => _push(const FreeReadingScreen()),
       child: Container(
@@ -418,7 +432,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               child: Column(
                 children: [
                   Text(
-                    'قراءة حرة',
+                    l10n.quranScreenFreeReadingTitle,
                     style: style.amiri(
                       19,
                       color: Colors.white,
@@ -427,7 +441,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'اقرأ القرآن الكريم بحرية',
+                    l10n.quranScreenFreeReadingSubtitle,
                     style: style.naskh(
                       12,
                       color: Colors.white.withOpacity(0.85),
@@ -461,11 +475,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       );
 
   Widget _buildGrid(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     final items = [
       _GridItem(
         icon: Icons.history_rounded,
-        title: 'تاريخ الختمات',
-        subtitle: 'الختمات المكتملة',
+        title: l10n.khatmaHistoryTitle,
+        subtitle: l10n.quranScreenHistoryGridSubtitle,
         color: style.isRamadan
             ? style.gold.withOpacity(0.7)
             : const Color(0xFF7A6833),
@@ -473,8 +488,8 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       ),
       _GridItem(
         icon: Icons.bar_chart_rounded,
-        title: 'تقدم الختمة',
-        subtitle: 'إحصائيات القراءة',
+        title: l10n.khatmaProgressScreenTitle,
+        subtitle: l10n.quranScreenProgressGridSubtitle,
         color: style.isRamadan
             ? style.goldDark.withOpacity(0.7)
             : const Color(0xFF1A5C3A),
@@ -482,8 +497,8 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       ),
       _GridItem(
         icon: Icons.settings_rounded,
-        title: 'الإعدادات',
-        subtitle: 'تخصيص التطبيق',
+        title: l10n.settingsScreenTitle,
+        subtitle: l10n.quranScreenSettingsGridSubtitle,
         color: style.isRamadan
             ? style.gold.withOpacity(0.7)
             : const Color(0xFF7A6833),
@@ -491,8 +506,8 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       ),
       _GridItem(
         isAi: true,
-        title: 'تحفيظ ذكي',
-        subtitle: 'حفظ القرآن بالذكاء الاصطناعي',
+        title: l10n.quranScreenAiMemorizeTitle,
+        subtitle: l10n.quranScreenAiMemorizeSubtitle,
         color: style.isRamadan
             ? style.teal.withOpacity(0.7)
             : const Color(0xFF1A4060),

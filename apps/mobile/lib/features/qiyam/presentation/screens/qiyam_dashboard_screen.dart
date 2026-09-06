@@ -11,6 +11,7 @@ import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../widgets/qiyam_onboarding_overlay.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamDashboardScreen extends ConsumerStatefulWidget {
   const QiyamDashboardScreen({super.key});
@@ -135,6 +136,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildHeader(BuildContext context, QiyamSessionState session) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -147,7 +149,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           Column(
             children: [
               Text(
-                'قيام الليل',
+                l10n.qiyamDashboardTitle,
                 style: context.typography.displayMedium.copyWith(
                   fontSize: 22,
                   color: context.colors.gold,
@@ -155,7 +157,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 ),
               ),
               Text(
-                'المرحلة ${session.currentStageIndex + 1} من ${session.stages.length}',
+                l10n.qiyamDashboardStageProgress(
+                  (session.currentStageIndex + 1).toString(),
+                  session.stages.length.toString(),
+                ),
                 style: context.typography.caption.copyWith(
                   color: context.colors.textDim,
                   fontSize: 16,
@@ -174,6 +179,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildPlanSelector(BuildContext context, QiyamSessionState session) {
+    final l10n = AppLocalizations.of(context)!;
     final durations = [5, 10, 15, 20, 30];
     final currentDuration = session.stages.first.defaultDuration.inMinutes;
 
@@ -186,7 +192,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             vertical: AppSpacing.sm,
           ),
           child: Text(
-            'اختر مدة المرحلة',
+            l10n.qiyamDashboardChooseStageDuration,
             style: context.typography.caption.copyWith(
               fontSize: 20,
               color: context.colors.textPrimary,
@@ -246,7 +252,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                           : null,
                     ),
                     child: Text(
-                      '$mins دقيقة',
+                      l10n.qiyamDashboardMinutesLabel(mins),
                       style: context.typography.bodyMedium.copyWith(
                         color: isSelected
                             ? context.colors.night
@@ -267,6 +273,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildTimerRing(BuildContext context, QiyamSessionState session) {
+    final l10n = AppLocalizations.of(context)!;
     final stage = session.currentStage;
     final progress =
         session.elapsed.inSeconds / stage.defaultDuration.inSeconds;
@@ -332,7 +339,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                   ),
                 ),
                 Text(
-                  'الوقت المتبقي',
+                  l10n.qiyamDashboardTimeRemainingLabel,
                   style: context.typography.caption.copyWith(
                     color: context.colors.textDim,
                     fontSize: 10,
@@ -454,6 +461,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildStoriesButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: InkWell(
@@ -501,14 +509,14 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'عجائب وقصص القيام',
+                              l10n.qiyamDashboardStoriesTitle,
                               style: context.typography.bodyLarge.copyWith(
                                 color: context.colors.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              'قصص واقعية ملهمة عن أثر قيام الليل',
+                              l10n.qiyamDashboardStoriesSubtitle,
                               style: context.typography.caption.copyWith(
                                 color: context.colors.textDim,
                               ),
@@ -529,6 +537,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildToolsSection(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -538,7 +547,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             vertical: AppSpacing.sm,
           ),
           child: Text(
-            'الأدوات والدليل الإيماني',
+            l10n.qiyamDashboardToolsSectionTitle,
             style: context.typography.caption.copyWith(
               color: context.colors.textDim,
               fontWeight: FontWeight.bold,
@@ -556,21 +565,21 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           children: [
             _buildToolCard(
               context,
-              title: 'ورد القيام',
+              title: l10n.qiyamWirdTitle,
               icon: Icons.auto_awesome,
               color: context.colors.gold,
               onTap: () => Navigator.pushNamed(context, Routes.qiyamWird),
             ),
             _buildToolCard(
               context,
-              title: 'فضائل القيام',
+              title: l10n.qiyamDashboardVirtuesTool,
               icon: Icons.star_rounded,
               color: context.colors.teal,
               onTap: () => Navigator.pushNamed(context, Routes.qiyamVirtues),
             ),
             _buildToolCard(
               context,
-              title: 'حاسبة النوم',
+              title: l10n.qiyamDashboardSleepCalcTool,
               icon: Icons.bedtime_outlined,
               color: Colors.indigoAccent,
               onTap: () =>
@@ -578,7 +587,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             ),
             _buildToolCard(
               context,
-              title: 'السنة النبوية',
+              title: l10n.qiyamDashboardSunnahTool,
               icon: Icons.history_edu,
               color: Colors.brown[400]!,
               onTap: () =>
@@ -586,7 +595,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             ),
             _buildToolCard(
               context,
-              title: 'دليل المبتدئين',
+              title: l10n.qiyamDashboardBeginnerGuideTool,
               icon: Icons.lightbulb_outline,
               color: context.colors.success,
               onTap: () =>
@@ -594,7 +603,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             ),
             _buildToolCard(
               context,
-              title: 'حاسبة الساعة',
+              title: l10n.qiyamDashboardHourCalcTool,
               icon: Icons.timer_outlined,
               color: context.colors.goldDark,
               onTap: () => Navigator.pushNamed(context, Routes.qiyamCalculator),
@@ -704,6 +713,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Positioned(
       top: MediaQuery.of(context).padding.top + 60,
       left: 16,
@@ -746,20 +756,20 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'تنبيه',
+                          l10n.qiyamDashboardBannerLabel,
                           style: context.typography.caption.copyWith(
                             color: context.colors.textSecondary,
                           ),
                         ),
                         Text(
-                          'قيام الليل',
+                          l10n.qiyamDashboardTitle,
                           style: context.typography.headingMedium.copyWith(
                             fontWeight: FontWeight.w800,
                             color: context.colors.background,
                           ),
                         ),
                         Text(
-                          'برنامج متكامل لصلاة الليل... خطوة للقرب من الله.',
+                          l10n.qiyamDashboardBannerDesc,
                           style: context.typography.bodyMedium.copyWith(
                             fontWeight: FontWeight.w500,
                             color: context.colors.background.withOpacity(0.8),
