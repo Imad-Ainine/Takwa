@@ -151,22 +151,22 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildLabel(context, 'الاسم'),
+                                  _buildLabel(context, l10n.accountSettingsNameLabel),
                                   const SizedBox(height: AppSpacing.sm),
                                   TextFormField(
                                     controller: _nameController,
                                     style: context.typography.bodyMedium,
                                     decoration: _getInputDecoration(
                                       context,
-                                      'أدخل اسمك',
+                                      l10n.accountSettingsNameHint,
                                     ),
                                     validator: (val) =>
                                         (val == null || val.trim().isEmpty)
-                                        ? 'الرجاء إدخال الاسم'
+                                        ? l10n.accountSettingsNameRequired
                                         : null,
                                   ),
                                   const SizedBox(height: AppSpacing.xl),
-                                  _buildLabel(context, 'البريد الإلكتروني'),
+                                  _buildLabel(context, l10n.authEmailHint),
                                   const SizedBox(height: AppSpacing.sm),
                                   TextFormField(
                                     initialValue: email,
@@ -183,7 +183,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    'لا يمكن تغيير البريد الإلكتروني حالياً',
+                                    l10n.accountSettingsEmailImmutableNote,
                                     style: context.typography.caption.copyWith(
                                       color: context.colors.textDim,
                                     ),
@@ -194,14 +194,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             const SizedBox(height: AppSpacing.xxxl),
                             PrimaryButton(
                               onTap: _saveChanges,
-                              label: 'حفظ التغييرات',
+                              label: l10n.accountSettingsSaveButton,
                               icon: Icons.save_rounded,
                               isLoading: _isSaving,
                             ),
                             const SizedBox(height: AppSpacing.xxl),
                             // Update Password Section
                             Text(
-                              'الأمان',
+                              l10n.accountSettingsSecuritySection,
                               style: context.typography.labelLarge.copyWith(
                                 color: context.colors.textDim,
                               ),
@@ -217,7 +217,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                   color: context.colors.gold,
                                 ),
                                 title: Text(
-                                  'تغيير كلمة المرور',
+                                  l10n.accountSettingsChangePasswordTile,
                                   style: context.typography.labelLarge,
                                 ),
                                 trailing: Icon(

@@ -3179,4 +3179,159 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get updatePasswordSaveAndSignInButton => 'حفظ كلمة المرور والدخول';
+
+  @override
+  String get qiyamSunnahGuideTitle => 'طريقة القيام والتهجد';
+
+  @override
+  String get qiyamSunnahGuideHeaderTitle => 'هدي النبي ﷺ في قيام الليل';
+
+  @override
+  String get qiyamSunnahGuideHeaderSubtitle =>
+      'دليل شامل لتعلم كيفية صلاة التهجد كما وردت عن الرسول ﷺ والصحابة الكرام.';
+
+  @override
+  String get qiyamSunnahStep1Title => 'النية والإخلاص';
+
+  @override
+  String get qiyamSunnahStep1Content =>
+      'أن ينوي العبد قيام الليل تقرباً لله عز وجل، ويفضل أن ينام على طهارة.';
+
+  @override
+  String get qiyamSunnahStep2Title => 'الاستفتاح بركعتين خفيفتين';
+
+  @override
+  String get qiyamSunnahStep2Content =>
+      'كان النبي ﷺ إذا قام من الليل افتتح صلاته بركعتين خفيفتين، لتنشيط الجسد.';
+
+  @override
+  String get qiyamSunnahStep3Title => 'كيفية الصلاة (مثنى مثنى)';
+
+  @override
+  String get qiyamSunnahStep3Content =>
+      'صلاة الليل مثنى مثنى، أي يسلم بعد كل ركعتين، ويطيل الركوع والسجود حسب الاستطاعة.';
+
+  @override
+  String get qiyamSunnahStep4Title => 'القراءة بتدبر';
+
+  @override
+  String get qiyamSunnahStep4Content =>
+      'يستحب أن تكون القراءة بترتيل وتدبر، ويسأل الله عند آية الرحمة، ويتعوذ عند آية العذاب.';
+
+  @override
+  String get qiyamSunnahStep5Title => 'ختم القيام بالوتر';
+
+  @override
+  String get qiyamSunnahStep5Content =>
+      'يختم المصلي قيامه بركعة واحدة توتر له ما صلى، لقوله ﷺ: \"اجعلوا آخر صلاتكم بالليل وتراً\".';
+
+  @override
+  String get qiyamVirtuesScreenTitle => 'فضائل قيام الليل';
+
+  @override
+  String get qiyamVirtuesFromQuran => 'من القرآن الكريم';
+
+  @override
+  String get qiyamVirtuesFromSunnah => 'من السنة النبوية';
+
+  @override
+  String get qiyamVirtuesFromSalaf => 'من أقوال السلف';
+
+  @override
+  String get qiyamStoriesScreenTitle => 'قصص وعجائب القيام';
+
+  @override
+  String get qiyamStoryTitle1 => 'شرف المؤمن';
+
+  @override
+  String get qiyamStoryTitle2 => 'سيد التابعين والقيام';
+
+  @override
+  String get qiyamStoryTitle3 => 'سهام الليل لا تخطئ';
+
+  @override
+  String get qiyamStoryTitle4 => 'نور الوجه من القيام';
+
+  @override
+  String get accountSettingsSavedSuccess => 'تم حفظ التغييرات بنجاح';
+
+  @override
+  String get accountSettingsSaveError => 'حدث خطأ أثناء حفظ التغييرات';
+
+  @override
+  String get accountSettingsPersonalInfoSection => 'المعلومات الشخصية';
+
+  @override
+  String get accountSettingsNameLabel => 'الاسم';
+
+  @override
+  String get accountSettingsNameHint => 'أدخل اسمك';
+
+  @override
+  String get accountSettingsNameRequired => 'الرجاء إدخال الاسم';
+
+  @override
+  String get accountSettingsEmailImmutableNote =>
+      'لا يمكن تغيير البريد الإلكتروني حالياً';
+
+  @override
+  String get accountSettingsSaveButton => 'حفظ التغييرات';
+
+  @override
+  String get accountSettingsSecuritySection => 'الأمان';
+
+  @override
+  String get accountSettingsChangePasswordTile => 'تغيير كلمة المرور';
+
+  @override
+  String get bookReaderCustomizeTitle => 'تخصيص القراءة';
+
+  @override
+  String get bookReaderThemeDay => 'نهاري';
+
+  @override
+  String get bookReaderThemeSepia => 'ورقي';
+
+  @override
+  String get bookReaderFontSizeSampleLetter => 'أ';
+
+  @override
+  String get bookReaderNextButton => 'التالي';
+
+  @override
+  String get bookReaderPrevButton => 'السابق';
+
+  @override
+  String bookReaderPageProgress(String done, String total) {
+    return '$done من $total';
+  }
+
+  @override
+  String get bookReaderPageLabel => 'صفحة';
+
+  @override
+  String get favoriteAdhkarScreenTitle => 'أذكاري المفضلة';
+
+  @override
+  String favoriteAdhkarCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ذكر محفوظ',
+      many: '$count ذكرًا محفوظًا',
+      few: '$count أذكار محفوظة',
+      two: 'ذكران محفوظان',
+      one: 'ذكر واحد محفوظ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteAdhkarEmptyTitle => 'لا توجد أذكار مفضلة بعد';
+
+  @override
+  String get favoriteAdhkarEmptySubtitle => 'اضغط على ❤️ في أي ذكر لحفظه هنا';
+
+  @override
+  String get favoriteAdhkarCopiedToast => 'تم النسخ ✓';
 }

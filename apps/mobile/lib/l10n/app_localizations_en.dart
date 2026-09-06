@@ -3213,4 +3213,159 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updatePasswordSaveAndSignInButton => 'Save Password & Sign In';
+
+  @override
+  String get qiyamSunnahGuideTitle => 'The Method of Qiyam and Tahajjud';
+
+  @override
+  String get qiyamSunnahGuideHeaderTitle =>
+      'The Prophet\'s ﷺ Guidance on Night Prayer';
+
+  @override
+  String get qiyamSunnahGuideHeaderSubtitle =>
+      'A comprehensive guide to learning how to pray Tahajjud as reported from the Messenger ﷺ and his noble companions.';
+
+  @override
+  String get qiyamSunnahStep1Title => 'Intention and Sincerity';
+
+  @override
+  String get qiyamSunnahStep1Content =>
+      'The worshiper intends to pray qiyam al-layl to draw closer to Allah, and it is preferred to sleep in a state of purity.';
+
+  @override
+  String get qiyamSunnahStep2Title => 'Opening with Two Light Rak\'ahs';
+
+  @override
+  String get qiyamSunnahStep2Content =>
+      'When the Prophet ﷺ rose at night, he would open his prayer with two light rak\'ahs to energize the body.';
+
+  @override
+  String get qiyamSunnahStep3Title => 'How to Pray (Two by Two)';
+
+  @override
+  String get qiyamSunnahStep3Content =>
+      'Night prayer is performed two by two — giving the taslim after every two rak\'ahs — prolonging the bowing and prostration as one is able.';
+
+  @override
+  String get qiyamSunnahStep4Title => 'Reciting with Reflection';
+
+  @override
+  String get qiyamSunnahStep4Content =>
+      'It is recommended to recite slowly and reflectively — asking Allah when passing a verse of mercy, and seeking refuge when passing a verse of punishment.';
+
+  @override
+  String get qiyamSunnahStep5Title => 'Ending Qiyam with Witr';
+
+  @override
+  String get qiyamSunnahStep5Content =>
+      'The worshiper concludes their qiyam with a single rak\'ah that makes their prayer odd-numbered (Witr), following his ﷺ saying: \"Make the last of your night prayer Witr.\"';
+
+  @override
+  String get qiyamVirtuesScreenTitle => 'Virtues of Night Prayer';
+
+  @override
+  String get qiyamVirtuesFromQuran => 'From the Noble Quran';
+
+  @override
+  String get qiyamVirtuesFromSunnah => 'From the Prophetic Sunnah';
+
+  @override
+  String get qiyamVirtuesFromSalaf => 'From the Sayings of the Salaf';
+
+  @override
+  String get qiyamStoriesScreenTitle => 'Stories and Wonders of Qiyam';
+
+  @override
+  String get qiyamStoryTitle1 => 'The Believer\'s Honor';
+
+  @override
+  String get qiyamStoryTitle2 => 'The Master of the Tabi\'un and Qiyam';
+
+  @override
+  String get qiyamStoryTitle3 => 'The Arrows of the Night Never Miss';
+
+  @override
+  String get qiyamStoryTitle4 => 'The Radiance of the Face from Qiyam';
+
+  @override
+  String get accountSettingsSavedSuccess => 'Changes saved successfully';
+
+  @override
+  String get accountSettingsSaveError =>
+      'An error occurred while saving changes';
+
+  @override
+  String get accountSettingsPersonalInfoSection => 'Personal Information';
+
+  @override
+  String get accountSettingsNameLabel => 'Name';
+
+  @override
+  String get accountSettingsNameHint => 'Enter your name';
+
+  @override
+  String get accountSettingsNameRequired => 'Please enter your name';
+
+  @override
+  String get accountSettingsEmailImmutableNote =>
+      'Email cannot be changed at this time';
+
+  @override
+  String get accountSettingsSaveButton => 'Save Changes';
+
+  @override
+  String get accountSettingsSecuritySection => 'Security';
+
+  @override
+  String get accountSettingsChangePasswordTile => 'Change Password';
+
+  @override
+  String get bookReaderCustomizeTitle => 'Customize Reading';
+
+  @override
+  String get bookReaderThemeDay => 'Day';
+
+  @override
+  String get bookReaderThemeSepia => 'Paper';
+
+  @override
+  String get bookReaderFontSizeSampleLetter => 'A';
+
+  @override
+  String get bookReaderNextButton => 'Next';
+
+  @override
+  String get bookReaderPrevButton => 'Previous';
+
+  @override
+  String bookReaderPageProgress(String done, String total) {
+    return '$done of $total';
+  }
+
+  @override
+  String get bookReaderPageLabel => 'Page';
+
+  @override
+  String get favoriteAdhkarScreenTitle => 'My Favorite Adhkar';
+
+  @override
+  String favoriteAdhkarCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved adhkar',
+      one: '1 saved dhikr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteAdhkarEmptyTitle => 'No favorite adhkar yet';
+
+  @override
+  String get favoriteAdhkarEmptySubtitle =>
+      'Tap ❤️ on any dhikr to save it here';
+
+  @override
+  String get favoriteAdhkarCopiedToast => 'Copied ✓';
 }
