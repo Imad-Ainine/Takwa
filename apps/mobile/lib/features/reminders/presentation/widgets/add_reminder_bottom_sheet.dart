@@ -6,6 +6,7 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/widgets/custom_time_picker.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 /// Map from human-readable icon key to IconData.
 /// Used to persist and restore icons from the database.
@@ -79,15 +80,17 @@ class _AddReminderBottomSheetState
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء الحفظ: $e')));
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.addReminderSaveError('$e'))),
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -136,7 +139,7 @@ class _AddReminderBottomSheetState
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Text(
-                      'إضافة تذكير جديد',
+                      l10n.addReminderTitle,
                       style: context.typography.headingMedium,
                     ),
                   ],
@@ -144,7 +147,10 @@ class _AddReminderBottomSheetState
                 const SizedBox(height: 28),
 
                 // ── عنوان التذكير ──
-                Text('عنوان التذكير', style: context.typography.labelLarge),
+                Text(
+                  l10n.addReminderTitleLabel,
+                  style: context.typography.labelLarge,
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 TextFormField(
                   controller: _titleController,
@@ -152,12 +158,12 @@ class _AddReminderBottomSheetState
                   textDirection: TextDirection.rtl,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
-                      return 'يرجى إدخال عنوان للتذكير';
+                      return l10n.addReminderTitleRequired;
                     }
                     return null;
                   },
                   decoration: InputDecoration(
-                    hintText: 'مثال: صلاة الضحى، قراءة ورد يومي...',
+                    hintText: l10n.addReminderTitleHint,
                     hintStyle: context.typography.bodyMedium.copyWith(
                       color: context.colors.textDim,
                     ),
@@ -171,7 +177,10 @@ class _AddReminderBottomSheetState
                 const SizedBox(height: AppSpacing.xxl),
 
                 // ── وقت التذكير ──
-                Text('وقت التذكير', style: context.typography.labelLarge),
+                Text(
+                  l10n.addReminderTimeLabel,
+                  style: context.typography.labelLarge,
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 InkWell(
                   onTap: () => _selectTime(context),
@@ -213,7 +222,10 @@ class _AddReminderBottomSheetState
                 const SizedBox(height: AppSpacing.xxl),
 
                 // ── اختر الأيقونة ──
-                Text('أيقونة التذكير', style: context.typography.labelLarge),
+                Text(
+                  l10n.addReminderIconLabel,
+                  style: context.typography.labelLarge,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 Wrap(
                   spacing: 10,
@@ -265,14 +277,17 @@ class _AddReminderBottomSheetState
                   children: [
                     Expanded(
                       child: PrimaryButton(
-                        label: 'إلغاء',
+                        label: l10n.commonCancel,
                         isOutline: true,
                         onTap: () async => Navigator.pop(context),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.lg),
                     Expanded(
-                      child: PrimaryButton(label: 'إضافة', onTap: _save),
+                      child: PrimaryButton(
+                        label: l10n.addReminderAddButton,
+                        onTap: _save,
+                      ),
                     ),
                   ],
                 ),

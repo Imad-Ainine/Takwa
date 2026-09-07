@@ -3739,4 +3739,30 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get termsPrivacyFooterDua =>
       'نسأل الله أن ينفعنا وإياكم بما فيه الخير';
+
+  @override
+  String get addReminderTitle => 'إضافة تذكير جديد';
+
+  @override
+  String get addReminderTitleLabel => 'عنوان التذكير';
+
+  @override
+  String get addReminderTitleRequired => 'يرجى إدخال عنوان للتذكير';
+
+  @override
+  String get addReminderTitleHint => 'مثال: صلاة الضحى، قراءة ورد يومي...';
+
+  @override
+  String get addReminderTimeLabel => 'وقت التذكير';
+
+  @override
+  String get addReminderIconLabel => 'أيقونة التذكير';
+
+  @override
+  String addReminderSaveError(String error) {
+    return 'حدث خطأ أثناء الحفظ: $error';
+  }
+
+  @override
+  String get addReminderAddButton => 'إضافة';
 }

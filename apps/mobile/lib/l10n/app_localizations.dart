@@ -6847,6 +6847,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نسأل الله أن ينفعنا وإياكم بما فيه الخير'**
   String get termsPrivacyFooterDua;
+
+  /// No description provided for @addReminderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة تذكير جديد'**
+  String get addReminderTitle;
+
+  /// No description provided for @addReminderTitleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'عنوان التذكير'**
+  String get addReminderTitleLabel;
+
+  /// No description provided for @addReminderTitleRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال عنوان للتذكير'**
+  String get addReminderTitleRequired;
+
+  /// No description provided for @addReminderTitleHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثال: صلاة الضحى، قراءة ورد يومي...'**
+  String get addReminderTitleHint;
+
+  /// No description provided for @addReminderTimeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت التذكير'**
+  String get addReminderTimeLabel;
+
+  /// No description provided for @addReminderIconLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيقونة التذكير'**
+  String get addReminderIconLabel;
+
+  /// No description provided for @addReminderSaveError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء الحفظ: {error}'**
+  String addReminderSaveError(String error);
+
+  /// No description provided for @addReminderAddButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة'**
+  String get addReminderAddButton;
 }
 
 class _AppLocalizationsDelegate

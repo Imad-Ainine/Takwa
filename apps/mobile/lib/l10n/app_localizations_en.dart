@@ -3771,4 +3771,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get termsPrivacyFooterDua =>
       'We ask Allah to benefit us all with what is good';
+
+  @override
+  String get addReminderTitle => 'Add New Reminder';
+
+  @override
+  String get addReminderTitleLabel => 'Reminder Title';
+
+  @override
+  String get addReminderTitleRequired =>
+      'Please enter a title for the reminder';
+
+  @override
+  String get addReminderTitleHint => 'e.g. Duha prayer, daily wird reading...';
+
+  @override
+  String get addReminderTimeLabel => 'Reminder Time';
+
+  @override
+  String get addReminderIconLabel => 'Reminder Icon';
+
+  @override
+  String addReminderSaveError(String error) {
+    return 'An error occurred while saving: $error';
+  }
+
+  @override
+  String get addReminderAddButton => 'Add';
 }
