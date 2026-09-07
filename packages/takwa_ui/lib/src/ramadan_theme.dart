@@ -109,53 +109,28 @@ class RamadanTheme {
       tealGoldGradient: AppColorsExtension.dark.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors, locale);
-    final shadows = AppShadowsExtension.fromColors(colors);
-    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      fontFamily: appFontFamily(locale),
-      extensions: [colors, typography, shadows, decorations],
-      colorScheme: const ColorScheme.dark(
-        primary: RamadanColors.goldenAura,
-        onPrimary: Color(0xFF241B05), // 7.68:1 on goldenAura
-        onError: Colors.white,
-        secondary: RamadanColors.emeraldLight,
-        onSecondary: RamadanColors.deepLapis,
-        surface: RamadanColors.lapisCard,
-        onSurface: RamadanColors.ivory,
-        error: RamadanColors.rubyLight,
-        outline: RamadanColors.border,
-        primaryContainer: RamadanColors.goldenDim,
-        secondaryContainer: RamadanColors.emeraldDim,
-      ),
-      scaffoldBackgroundColor: RamadanColors.deepLapis,
-      cardTheme: CardThemeData(
-        color: RamadanColors.lapisCard,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: RamadanColors.border, width: 1),
-        ),
-      ),
-      textTheme: _buildTextTheme(
-        RamadanColors.ivory,
-        RamadanColors.goldenAura,
-        locale,
-      ),
-      elevatedButtonTheme: _buildButtonTheme(
-        RamadanColors.goldenAura,
-        RamadanColors.deepLapis,
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: RamadanColors.lapis,
-        selectedItemColor: RamadanColors.goldenAura,
-        unselectedItemColor: RamadanColors.ivoryDim.withValues(alpha: 0.4),
-      ),
-      dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenAura, locale),
+    // Delegates to the shared builder behind AppTheme.dark/light instead of
+    // hand-rolling a second ThemeData here. That used to mean this theme
+    // only got 6 of the 17 component themes AppTheme builds (no
+    // navigationBarTheme, inputDecorationTheme, chipTheme, dialogTheme,
+    // snackBarTheme, sliderTheme, tabBarTheme, checkbox/switch themes, ...),
+    // a hand-built ColorScheme with ~11 roles instead of the ~20 AppTheme
+    // fills out (so e.g. NavigationBar/SearchBar/Badge fell back to the
+    // stock purple-tinted M3 defaults), and its own type scale that
+    // disagreed with AppTheme's on every role's size by 2-6px. The one
+    // deliberate divergence — a transparent app bar so RamadanBgPainter
+    // shows through behind it, instead of the base theme's opaque
+    // `colors.deep` — is preserved via `appBarBackground`.
+    //
+    // Visible side effect: card corner radius moves from this theme's
+    // previous 24px to AppTheme's 16px (`AppRadius.card`) — the two had
+    // silently diverged and there was no reason for Ramadan cards alone to
+    // be rounder.
+    return AppTheme.fromColors(
+      colors,
+      Brightness.dark,
+      locale,
+      Colors.transparent,
     );
   }
 
@@ -195,148 +170,14 @@ class RamadanTheme {
       tealGoldGradient: AppColorsExtension.light.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors, locale);
-    final shadows = AppShadowsExtension.fromColors(colors);
-    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      fontFamily: appFontFamily(locale),
-      extensions: [colors, typography, shadows, decorations],
-      colorScheme: const ColorScheme.light(
-        primary: RamadanColors.goldenAura,
-        // white on goldenAura is 2.0:1 — the same defect as the base theme.
-        onPrimary: Color(0xFF241B05), // 7.68:1
-        onError: Colors.white,
-        secondary: RamadanColors.emerald,
-        onSecondary: Colors.white,
-        surface: Colors.white,
-        onSurface: RamadanColors.deepLapis,
-        error: RamadanColors.ruby,
-        outline: RamadanColors.border,
-        primaryContainer: RamadanColors.goldenDim,
-        secondaryContainer: RamadanColors.emeraldDim,
-      ),
-      scaffoldBackgroundColor: RamadanColors.ivoryLight,
-      cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: RamadanColors.border, width: 1),
-        ),
-      ),
-      textTheme: _buildTextTheme(
-        RamadanColors.deepLapis,
-        RamadanColors.goldenDeep,
-        locale,
-      ),
-      elevatedButtonTheme: _buildButtonTheme(
-        RamadanColors.goldenAura,
-        // white on goldenAura is 2.21:1
-        const Color(0xFF241B05), // 7.68:1
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.white,
-        selectedItemColor: RamadanColors.goldenDeep,
-        unselectedItemColor: RamadanColors.deepLapis.withValues(alpha: 0.4),
-      ),
-      dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenDeep, locale),
+    // See the comment in dark() above — same collapse, same caveats.
+    return AppTheme.fromColors(
+      colors,
+      Brightness.light,
+      locale,
+      Colors.transparent,
     );
   }
-
-  static TextTheme _buildTextTheme(Color main, Color accent, Locale locale) {
-    final displayFont = appFontFamily(locale);
-    final bodyFont = appBodyFontFamily(locale);
-    final fallback = appFontFamilyFallback(locale);
-    return TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 36,
-        fontWeight: FontWeight.w700,
-        color: accent,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      headlineLarge: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 16,
-        color: main,
-        height: 1.9,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 14,
-        color: main,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 12,
-        color: main.withValues(alpha: 0.7),
-      ),
-      labelLarge: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: main,
-      ),
-    );
-  }
-
-  static ElevatedButtonThemeData _buildButtonTheme(Color bg, Color fg) =>
-      ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        ),
-      );
-
-  static AppBarTheme _buildAppBarTheme(Color accent, Locale locale) =>
-      AppBarTheme(
-        // Removes the shadow/elevation for all AppBars
-        scrolledUnderElevation: 0.0,
-        // Removes the color tint highlight for all AppBars
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        titleTextStyle: TextStyle(
-          fontFamily: appFontFamily(locale),
-          fontSize: 20,
-          color: accent,
-          fontWeight: FontWeight.w700,
-        ),
-        iconTheme: IconThemeData(color: accent),
-      );
 }
 
 class RamadanDecorations {
