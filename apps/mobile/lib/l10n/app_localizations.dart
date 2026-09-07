@@ -7327,6 +7327,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'العادات السلبية (محظورات مخصصة)'**
   String get customIbadahNegativeHeader;
+
+  /// No description provided for @authChoiceAppName.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقوى'**
+  String get authChoiceAppName;
+
+  /// No description provided for @authChoiceTagline.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفيقك نحو حياة مليئة بالإيمان'**
+  String get authChoiceTagline;
+
+  /// No description provided for @authChoiceSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get authChoiceSignInButton;
+
+  /// No description provided for @authChoiceGuestButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتابعة كضيف'**
+  String get authChoiceGuestButton;
+
+  /// No description provided for @authChoiceSyncNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك'**
+  String get authChoiceSyncNote;
 }
 
 class _AppLocalizationsDelegate

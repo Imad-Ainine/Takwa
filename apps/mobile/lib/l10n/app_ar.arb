@@ -2209,5 +2209,10 @@
   "customIbadahGroupTitle": "عاداتي وإضافاتي",
   "customIbadahAddButton": "إضافة وتخصيص عاداتك",
   "customIbadahPositiveHeader": "العادات الإيجابية",
-  "customIbadahNegativeHeader": "العادات السلبية (محظورات مخصصة)"
+  "customIbadahNegativeHeader": "العادات السلبية (محظورات مخصصة)",
+  "authChoiceAppName": "تقوى",
+  "authChoiceTagline": "رفيقك نحو حياة مليئة بالإيمان",
+  "authChoiceSignInButton": "تسجيل الدخول",
+  "authChoiceGuestButton": "المتابعة كضيف",
+  "authChoiceSyncNote": "تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك"
 }

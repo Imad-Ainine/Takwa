@@ -1706,5 +1706,10 @@
   "customIbadahGroupTitle": "My Habits & Additions",
   "customIbadahAddButton": "Add and customize your habits",
   "customIbadahPositiveHeader": "Positive Habits",
-  "customIbadahNegativeHeader": "Negative Habits (custom prohibitions)"
+  "customIbadahNegativeHeader": "Negative Habits (custom prohibitions)",
+  "authChoiceAppName": "Takwa",
+  "authChoiceTagline": "Your companion toward a life full of faith",
+  "authChoiceSignInButton": "Sign In",
+  "authChoiceGuestButton": "Continue as Guest",
+  "authChoiceSyncNote": "Signing in ensures your data is saved across all your devices"
 }

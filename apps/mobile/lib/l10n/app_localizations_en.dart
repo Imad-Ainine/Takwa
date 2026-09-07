@@ -4047,4 +4047,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get customIbadahNegativeHeader =>
       'Negative Habits (custom prohibitions)';
+
+  @override
+  String get authChoiceAppName => 'Takwa';
+
+  @override
+  String get authChoiceTagline => 'Your companion toward a life full of faith';
+
+  @override
+  String get authChoiceSignInButton => 'Sign In';
+
+  @override
+  String get authChoiceGuestButton => 'Continue as Guest';
+
+  @override
+  String get authChoiceSyncNote =>
+      'Signing in ensures your data is saved across all your devices';
 }

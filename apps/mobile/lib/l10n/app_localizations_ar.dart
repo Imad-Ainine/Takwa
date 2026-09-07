@@ -4009,4 +4009,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customIbadahNegativeHeader => 'العادات السلبية (محظورات مخصصة)';
+
+  @override
+  String get authChoiceAppName => 'تقوى';
+
+  @override
+  String get authChoiceTagline => 'رفيقك نحو حياة مليئة بالإيمان';
+
+  @override
+  String get authChoiceSignInButton => 'تسجيل الدخول';
+
+  @override
+  String get authChoiceGuestButton => 'المتابعة كضيف';
+
+  @override
+  String get authChoiceSyncNote => 'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك';
 }
