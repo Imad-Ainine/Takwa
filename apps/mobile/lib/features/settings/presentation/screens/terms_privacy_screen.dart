@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class TermsPrivacyScreen extends StatelessWidget {
   const TermsPrivacyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -32,16 +34,14 @@ class TermsPrivacyScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
-                        'شروط الاستخدام',
-                        'Terms of Service',
+                        l10n.termsPrivacyTermsSectionTitle,
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _buildTermsContent(context),
                       const SizedBox(height: AppSpacing.xxl),
                       _buildSectionTitle(
                         context,
-                        'سياسة الخصوصية',
-                        'Privacy Policy',
+                        l10n.termsPrivacyPolicySectionTitle,
                       ),
                       const SizedBox(height: AppSpacing.md),
                       _buildPrivacyContent(context),
@@ -60,13 +60,14 @@ class TermsPrivacyScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverAppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
       pinned: true,
       leading: const CustomLeadingButton(),
       title: Text(
-        'الشروط والخصوصية',
+        l10n.termsPrivacyScreenTitle,
         style: context.typography.headingMedium.copyWith(
           color: context.colors.gold,
         ),
@@ -76,6 +77,7 @@ class TermsPrivacyScreen extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -99,7 +101,7 @@ class TermsPrivacyScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'تطبيق تقوى',
+            l10n.termsPrivacyAppName,
             style: context.typography.headingLarge.copyWith(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -107,7 +109,7 @@ class TermsPrivacyScreen extends StatelessWidget {
             ),
           ),
           Text(
-            'الشروط وسياسة الخصوصية',
+            l10n.termsPrivacySubtitle,
             style: context.typography.labelMedium.copyWith(
               fontSize: 14,
               color: context.colors.goldLight,
@@ -120,40 +122,24 @@ class TermsPrivacyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(
-    BuildContext context,
-    String arabic,
-    String english,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          arabic,
-          style: context.typography.headingMedium.copyWith(
-            color: context.colors.teal,
-          ),
-        ),
-        Text(
-          english,
-          style: context.typography.caption.copyWith(
-            fontSize: 12,
-            color: context.colors.textDim,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: context.typography.headingMedium.copyWith(
+        color: context.colors.teal,
+      ),
     );
   }
 
   Widget _buildTermsContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
       child: Text(
-        'أهلاً بك في تطبيق "تقوى". باستخدامك لهذا التطبيق، فإنك توافق على شروط وأحكام الاستخدام الموضحة. نهدف من خلال هذا التطبيق لتقديم خدمات إسلامية من أذكار، مواقيت الصلاة، والقيم الإسلامية بما ينفع أمتنا الإسلامية. يرجى استخدام التطبيق وفق الغرض المخصص له، وعدم إساءة استخدام الخدمات أو المحتوى.',
+        l10n.termsPrivacyTermsBody,
         style: context.typography.bodyMedium.copyWith(height: 1.8),
         textAlign: TextAlign.justify,
       ),
@@ -161,13 +147,14 @@ class TermsPrivacyScreen extends StatelessWidget {
   }
 
   Widget _buildPrivacyContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withOpacity(0.85),
       ),
       child: Text(
-        'نحن نحترم خصوصيتك ونهتم بحماية بياناتك الشخصية. التطبيق قد يحتاج إلى الوصول لموقعك الجغرافي فقط لتحديد أوقات الصلاة بدقة. لا نقوم بمشاركة أو بيع بياناتك الشخصية لأي جهة خارجية. بياناتك تُستخدم محلياً داخل جهازك لتوفير تجربة مستخدم أفضل.',
+        l10n.termsPrivacyPolicyBody,
         style: context.typography.bodyMedium.copyWith(height: 1.8),
         textAlign: TextAlign.justify,
       ),
@@ -175,20 +162,21 @@ class TermsPrivacyScreen extends StatelessWidget {
   }
 
   Widget _buildFooter(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         children: [
           Container(height: 1, width: 80, color: context.colors.border),
           const SizedBox(height: AppSpacing.xl),
           Text(
-            'شكراً لثقتكم بتطبيق تقوى',
+            l10n.termsPrivacyFooterThanks,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.gold,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'نسأل الله أن ينفعنا وإياكم بما فيه الخير',
+            l10n.termsPrivacyFooterDua,
             style: context.typography.caption.copyWith(
               color: context.colors.textDim,
             ),

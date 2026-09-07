@@ -3741,4 +3741,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String prayerSelectionAdhanLabel(String name) {
     return '$name Adhan';
   }
+
+  @override
+  String get termsPrivacyScreenTitle => 'Terms & Privacy';
+
+  @override
+  String get termsPrivacyAppName => 'Takwa App';
+
+  @override
+  String get termsPrivacySubtitle => 'Terms & Privacy Policy';
+
+  @override
+  String get termsPrivacyTermsSectionTitle => 'Terms of Service';
+
+  @override
+  String get termsPrivacyPolicySectionTitle => 'Privacy Policy';
+
+  @override
+  String get termsPrivacyTermsBody =>
+      'Welcome to the \"Takwa\" app. By using this app, you agree to the terms and conditions of use outlined here. Through this app, we aim to provide Islamic services — adhkar, prayer times, and Islamic values — that benefit our Muslim community. Please use the app for its intended purpose and refrain from misusing its services or content.';
+
+  @override
+  String get termsPrivacyPolicyBody =>
+      'We respect your privacy and are committed to protecting your personal data. The app may need access to your location solely to determine accurate prayer times. We do not share or sell your personal data to any third party. Your data is used locally on your device to provide a better user experience.';
+
+  @override
+  String get termsPrivacyFooterThanks => 'Thank you for trusting the Takwa app';
+
+  @override
+  String get termsPrivacyFooterDua =>
+      'We ask Allah to benefit us all with what is good';
 }

@@ -6793,6 +6793,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أذان {name}'**
   String prayerSelectionAdhanLabel(String name);
+
+  /// No description provided for @termsPrivacyScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشروط والخصوصية'**
+  String get termsPrivacyScreenTitle;
+
+  /// No description provided for @termsPrivacyAppName.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطبيق تقوى'**
+  String get termsPrivacyAppName;
+
+  /// No description provided for @termsPrivacySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشروط وسياسة الخصوصية'**
+  String get termsPrivacySubtitle;
+
+  /// No description provided for @termsPrivacyTermsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام'**
+  String get termsPrivacyTermsSectionTitle;
+
+  /// No description provided for @termsPrivacyPolicySectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية'**
+  String get termsPrivacyPolicySectionTitle;
+
+  /// No description provided for @termsPrivacyTermsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أهلاً بك في تطبيق \"تقوى\". باستخدامك لهذا التطبيق، فإنك توافق على شروط وأحكام الاستخدام الموضحة. نهدف من خلال هذا التطبيق لتقديم خدمات إسلامية من أذكار، مواقيت الصلاة، والقيم الإسلامية بما ينفع أمتنا الإسلامية. يرجى استخدام التطبيق وفق الغرض المخصص له، وعدم إساءة استخدام الخدمات أو المحتوى.'**
+  String get termsPrivacyTermsBody;
+
+  /// No description provided for @termsPrivacyPolicyBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نحن نحترم خصوصيتك ونهتم بحماية بياناتك الشخصية. التطبيق قد يحتاج إلى الوصول لموقعك الجغرافي فقط لتحديد أوقات الصلاة بدقة. لا نقوم بمشاركة أو بيع بياناتك الشخصية لأي جهة خارجية. بياناتك تُستخدم محلياً داخل جهازك لتوفير تجربة مستخدم أفضل.'**
+  String get termsPrivacyPolicyBody;
+
+  /// No description provided for @termsPrivacyFooterThanks.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكراً لثقتكم بتطبيق تقوى'**
+  String get termsPrivacyFooterThanks;
+
+  /// No description provided for @termsPrivacyFooterDua.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسأل الله أن ينفعنا وإياكم بما فيه الخير'**
+  String get termsPrivacyFooterDua;
 }
 
 class _AppLocalizationsDelegate

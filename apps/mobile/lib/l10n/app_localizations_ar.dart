@@ -3709,4 +3709,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String prayerSelectionAdhanLabel(String name) {
     return 'أذان $name';
   }
+
+  @override
+  String get termsPrivacyScreenTitle => 'الشروط والخصوصية';
+
+  @override
+  String get termsPrivacyAppName => 'تطبيق تقوى';
+
+  @override
+  String get termsPrivacySubtitle => 'الشروط وسياسة الخصوصية';
+
+  @override
+  String get termsPrivacyTermsSectionTitle => 'شروط الاستخدام';
+
+  @override
+  String get termsPrivacyPolicySectionTitle => 'سياسة الخصوصية';
+
+  @override
+  String get termsPrivacyTermsBody =>
+      'أهلاً بك في تطبيق \"تقوى\". باستخدامك لهذا التطبيق، فإنك توافق على شروط وأحكام الاستخدام الموضحة. نهدف من خلال هذا التطبيق لتقديم خدمات إسلامية من أذكار، مواقيت الصلاة، والقيم الإسلامية بما ينفع أمتنا الإسلامية. يرجى استخدام التطبيق وفق الغرض المخصص له، وعدم إساءة استخدام الخدمات أو المحتوى.';
+
+  @override
+  String get termsPrivacyPolicyBody =>
+      'نحن نحترم خصوصيتك ونهتم بحماية بياناتك الشخصية. التطبيق قد يحتاج إلى الوصول لموقعك الجغرافي فقط لتحديد أوقات الصلاة بدقة. لا نقوم بمشاركة أو بيع بياناتك الشخصية لأي جهة خارجية. بياناتك تُستخدم محلياً داخل جهازك لتوفير تجربة مستخدم أفضل.';
+
+  @override
+  String get termsPrivacyFooterThanks => 'شكراً لثقتكم بتطبيق تقوى';
+
+  @override
+  String get termsPrivacyFooterDua =>
+      'نسأل الله أن ينفعنا وإياكم بما فيه الخير';
 }
