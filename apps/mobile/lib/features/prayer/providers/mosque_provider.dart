@@ -32,7 +32,9 @@ final nearbyMosquesProvider = FutureProvider.autoDispose<List<Mosque>>((
   }
 
   final position = await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.medium,
+    locationSettings: const LocationSettings(
+      accuracy: LocationAccuracy.medium,
+    ),
   );
   final repo = ref.read(mosqueRepositoryProvider);
   return repo.fetchNearbyMosques(position, radius: 5000, l10n: l10n);

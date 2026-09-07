@@ -134,9 +134,22 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
           AnimatedBuilder(
             animation: _ctrl,
             builder: (_, child) => Transform(
+              // translate()/scale() are deprecated in this Flutter version's
+              // vector_math in favor of the ByDouble/Values variants —
+              // multiply() by an explicit translation/scale matrix is the
+              // non-deprecated equivalent (same right-multiply semantics
+              // the old cascade had).
               transform: Matrix4.identity()
-                ..translate(isRtl ? -_slide.value : _slide.value, 0.0)
-                ..scale(_scale.value)
+                ..multiply(
+                  Matrix4.translationValues(
+                    isRtl ? -_slide.value : _slide.value,
+                    0.0,
+                    0.0,
+                  ),
+                )
+                ..multiply(
+                  Matrix4.diagonal3Values(_scale.value, _scale.value, 1.0),
+                )
                 ..rotateZ(isRtl ? -_rotate.value : _rotate.value),
               alignment: AlignmentDirectional.centerStart,
               child: ClipRRect(

@@ -958,9 +958,12 @@ class _ShareToDuaCommunitySheetState
                             .shareDua(widget.dua);
                         if (mounted) setState(() => _shared = true);
                         await Future.delayed(const Duration(seconds: 1));
-                        if (mounted) Navigator.pop(context);
+                        // `context` here is build()'s local parameter, not
+                        // State.context, so the guard needs to check the
+                        // BuildContext itself rather than State.mounted.
+                        if (context.mounted) Navigator.pop(context);
                       } catch (e) {
-                        if (mounted) {
+                        if (context.mounted) {
                           setState(() => _isSharing = false);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -1386,7 +1389,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               Switch(
                 value: _shareToCommunity,
                 onChanged: (v) => setState(() => _shareToCommunity = v),
-                activeColor: s.teal,
+                activeThumbColor: s.teal,
                 activeTrackColor: s.teal.withValues(alpha: 0.3),
                 inactiveTrackColor: s.border,
                 inactiveThumbColor: s.textDim,

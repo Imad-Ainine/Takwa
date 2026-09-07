@@ -258,9 +258,11 @@ class MisbahaNotifier extends Notifier<MisbahaState> {
           _lastRecognizedWords = words;
         },
         localeId: 'ar-SA', // Ensure Arabic Saudi Arabia locale
-        cancelOnError: false,
-        partialResults: true,
-        listenMode: stt.ListenMode.dictation,
+        listenOptions: stt.SpeechListenOptions(
+          cancelOnError: false,
+          partialResults: true,
+          listenMode: stt.ListenMode.dictation,
+        ),
       );
     } catch (e) {
       state = state.copyWith(isListening: false);

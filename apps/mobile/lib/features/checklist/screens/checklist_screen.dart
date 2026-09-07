@@ -769,10 +769,11 @@ class _PrayerRow extends StatelessWidget {
                 _MiniPts(_signedPoints(context, -5), context.colors.danger),
               const SizedBox(width: AppSpacing.xs),
               Icon(
-                Icons.chevron_right_rounded,
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.chevron_left_rounded
+                    : Icons.chevron_right_rounded,
                 size: 18,
                 color: context.colors.textDim,
-                matchTextDirection: true,
               ),
             ],
           ),

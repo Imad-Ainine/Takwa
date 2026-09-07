@@ -81,15 +81,17 @@ class DailyVerseCard extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: onNavigate,
-                    // chevron_right + matchTextDirection points toward
-                    // "forward" regardless of layout position — right in
-                    // LTR, left in RTL — which is what a drill-in affordance
-                    // needs whether it sits leading or trailing in its Row.
+                    // Resolved by hand (Icon has no matchTextDirection
+                    // param): chevron_right in LTR / chevron_left in RTL
+                    // always points "forward" regardless of layout
+                    // position — what a drill-in affordance needs whether
+                    // it sits leading or trailing in its Row.
                     child: Icon(
-                      Icons.chevron_right,
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.chevron_left
+                          : Icons.chevron_right,
                       color: style.textDim,
                       size: 22,
-                      matchTextDirection: true,
                     ),
                   ),
                   const Spacer(),
@@ -205,10 +207,13 @@ class KhatmaActionCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Back arrow button
+            // Back arrow button — chevron_left in LTR / chevron_right in
+            // RTL always points "backward".
             if (onBack != null)
               _circleBtn(
-                Icons.chevron_left,
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.chevron_right
+                    : Icons.chevron_left,
                 Colors.white.withValues(alpha: 0.2),
                 Colors.white,
                 onBack!,
@@ -252,6 +257,8 @@ class KhatmaActionCard extends StatelessWidget {
     );
   }
 
+  // Callers resolve the correct chevron direction themselves (Icon has no
+  // matchTextDirection param) before passing `icon` in.
   Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
       GestureDetector(
         onTap: f,
@@ -259,10 +266,7 @@ class KhatmaActionCard extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-          // matchTextDirection is a no-op for the symmetric icons this also
-          // renders (e.g. an action/share glyph) and is the fix for the one
-          // directional icon it does render — the back-arrow chevron above.
-          child: Icon(icon, color: fg, size: 22, matchTextDirection: true),
+          child: Icon(icon, color: fg, size: 22),
         ),
       );
 }
@@ -577,7 +581,12 @@ class QuranJuzCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: style.textDim, matchTextDirection: true),
+            Icon(
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
+              color: style.textDim,
+            ),
           ],
         ),
       ),

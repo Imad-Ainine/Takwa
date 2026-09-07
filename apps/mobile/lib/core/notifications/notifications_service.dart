@@ -1101,7 +1101,9 @@ class PrayerTimesService {
     }
     if (perm == LocationPermission.deniedForever) return null;
     return Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.medium,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.medium,
+      ),
     );
   }
 

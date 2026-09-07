@@ -417,7 +417,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                           '',
                           trailing: Switch(
                             value: false,
-                            activeColor: style.gold,
+                            activeThumbColor: style.gold,
                             onChanged: (_) {},
                           ),
                         ),

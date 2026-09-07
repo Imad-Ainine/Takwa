@@ -409,10 +409,11 @@ class _ChapterItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              Icons.chevron_right,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               color: colors.textDim,
               size: 20,
-              matchTextDirection: true,
             ),
             const Spacer(),
             Expanded(

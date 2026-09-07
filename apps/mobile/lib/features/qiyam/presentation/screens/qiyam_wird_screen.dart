@@ -184,9 +184,10 @@ class QiyamWirdScreen extends StatelessWidget {
                       ),
                     ),
                     Icon(
-                      Icons.chevron_right,
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.chevron_left
+                          : Icons.chevron_right,
                       color: context.colors.gold,
-                      matchTextDirection: true,
                     ),
                   ],
                 ),

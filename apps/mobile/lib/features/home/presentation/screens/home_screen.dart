@@ -1717,10 +1717,11 @@ class _DailyDhikrCard extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.chevron_right_rounded,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left_rounded
+                  : Icons.chevron_right_rounded,
               size: 18,
               color: s.textSec,
-              matchTextDirection: true,
             ),
           ],
         ),

@@ -204,7 +204,10 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _animateZoom(double targetScale) {
     _zoomAnimController?.dispose();
     final startMatrix = _transformationController.value;
-    final endMatrix = Matrix4.identity()..scale(targetScale);
+    // scale() is deprecated in this Flutter version's vector_math —
+    // multiply() by an explicit scale matrix is the equivalent.
+    final endMatrix = Matrix4.identity()
+      ..multiply(Matrix4.diagonal3Values(targetScale, targetScale, 1.0));
     _zoomAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
@@ -597,12 +600,12 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                             : Colors.black87,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: _kGold.withOpacity(0.6),
+                          color: _kGold.withValues(alpha: 0.6),
                           width: 1,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
+                            color: Colors.black.withValues(alpha: 0.35),
                             blurRadius: 10,
                             offset: const Offset(0, 3),
                           ),
@@ -1178,7 +1181,7 @@ class _TopBar extends StatelessWidget {
         border: Border(bottom: BorderSide(color: divider)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.25 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1248,11 +1251,11 @@ class _TopBar extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? _kGold.withOpacity(0.35) : Colors.black12,
+                      color: isDark ? _kGold.withValues(alpha: 0.35) : Colors.black12,
                       width: 1,
                     ),
                   ),
@@ -1399,7 +1402,7 @@ class _BottomBar extends StatelessWidget {
         border: Border(top: BorderSide(color: border)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
             blurRadius: 10,
             offset: const Offset(0, -3),
           ),
@@ -1427,7 +1430,7 @@ class _BottomBar extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isDark
                             ? Colors.white10
-                            : Colors.black.withOpacity(0.04),
+                            : Colors.black.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -1472,8 +1475,8 @@ class _BottomBar extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? Colors.white.withOpacity(0.08)
-                                : Colors.black.withOpacity(0.05),
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isDark ? Colors.white12 : Colors.black12,
@@ -1509,7 +1512,7 @@ class _BottomBar extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isDark
                             ? Colors.white10
-                            : Colors.black.withOpacity(0.04),
+                            : Colors.black.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -2226,11 +2229,12 @@ class _OptionRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(
-              Icons.chevron_right,
+            Icon(
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               color: Colors.white24,
               size: 18,
-              matchTextDirection: true,
             ),
             const Spacer(),
             Text(
@@ -2560,7 +2564,7 @@ class _FontSizeSheetState extends State<_FontSizeSheet> {
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.white12),
                   ),
@@ -2683,7 +2687,7 @@ class _FontSizeSheetState extends State<_FontSizeSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.white10),
             ),
@@ -2834,7 +2838,7 @@ class _SurahPickerSheetState extends State<_SurahPickerSheet> {
                     )
                   : const Icon(Icons.search, color: Colors.white38),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.07),
+              fillColor: Colors.white.withValues(alpha: 0.07),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14,
                 vertical: 10,
@@ -2870,7 +2874,7 @@ class _SurahPickerSheetState extends State<_SurahPickerSheet> {
                     decoration: BoxDecoration(
                       color: isCurrent
                           ? _kGold
-                          : Colors.white.withOpacity(0.08),
+                          : Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -3016,7 +3020,7 @@ class _JuzPickerSheet extends StatelessWidget {
                             fontFamily: 'NotoNaskhArabic',
                             fontSize: 11,
                             color: isSelected
-                                ? const Color(0xFF0A2818).withOpacity(0.8)
+                                ? const Color(0xFF0A2818).withValues(alpha: 0.8)
                                 : Colors.white60,
                           ),
                         ),
@@ -3079,8 +3083,8 @@ class _ReciterSheet extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? _kGold.withOpacity(0.18)
-                    : Colors.white.withOpacity(0.05),
+                    ? _kGold.withValues(alpha: 0.18)
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: isSelected ? _kGold : Colors.white12),
               ),
@@ -3174,7 +3178,7 @@ class _DownloadSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF1A5234).withOpacity(0.5),
+                    color: const Color(0xFF1A5234).withValues(alpha: 0.5),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -3302,7 +3306,7 @@ class _KhatmaStatsSheet extends StatelessWidget {
     child: Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white12),
       ),

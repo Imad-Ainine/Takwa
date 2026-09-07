@@ -93,7 +93,7 @@ class ReminderCard extends StatelessWidget {
             Switch(
               value: isEnabled,
               onChanged: onToggle,
-              activeColor: Colors.white,
+              activeThumbColor: Colors.white,
               activeTrackColor: context.colors.teal,
               inactiveThumbColor: context.colors.textDim,
               inactiveTrackColor: context.colors.border,
