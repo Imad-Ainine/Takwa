@@ -7441,6 +7441,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'العودة لتسجيل الدخول'**
   String get emailConfirmationBackToSignInButton;
+
+  /// No description provided for @guestGuardTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ميزة سحابية'**
+  String get guestGuardTitle;
+
+  /// No description provided for @guestGuardMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.'**
+  String get guestGuardMessage;
+
+  /// No description provided for @guestGuardSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل دخول / إنشاء حساب'**
+  String get guestGuardSignInButton;
+
+  /// No description provided for @guestGuardBackButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة'**
+  String get guestGuardBackButton;
 }
 
 class _AppLocalizationsDelegate

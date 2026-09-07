@@ -2242,5 +2242,9 @@
     }
   },
   "emailConfirmationInstructions": "يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.",
-  "emailConfirmationBackToSignInButton": "العودة لتسجيل الدخول"
+  "emailConfirmationBackToSignInButton": "العودة لتسجيل الدخول",
+  "guestGuardTitle": "ميزة سحابية",
+  "guestGuardMessage": "هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.",
+  "guestGuardSignInButton": "تسجيل دخول / إنشاء حساب",
+  "guestGuardBackButton": "العودة"
 }

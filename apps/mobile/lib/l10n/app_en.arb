@@ -1739,5 +1739,9 @@
     }
   },
   "emailConfirmationInstructions": "Please check your email and tap the link to activate your account and begin your journey with Takwa.",
-  "emailConfirmationBackToSignInButton": "Back to Sign In"
+  "emailConfirmationBackToSignInButton": "Back to Sign In",
+  "guestGuardTitle": "Cloud Feature",
+  "guestGuardMessage": "This feature (checklist and statistics) requires cloud sync to save your progress. Please sign in to enable it.",
+  "guestGuardSignInButton": "Sign In / Create Account",
+  "guestGuardBackButton": "Back"
 }

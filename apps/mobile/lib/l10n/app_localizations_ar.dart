@@ -4074,4 +4074,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get emailConfirmationBackToSignInButton => 'العودة لتسجيل الدخول';
+
+  @override
+  String get guestGuardTitle => 'ميزة سحابية';
+
+  @override
+  String get guestGuardMessage =>
+      'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.';
+
+  @override
+  String get guestGuardSignInButton => 'تسجيل دخول / إنشاء حساب';
+
+  @override
+  String get guestGuardBackButton => 'العودة';
 }

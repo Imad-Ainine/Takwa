@@ -4113,4 +4113,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emailConfirmationBackToSignInButton => 'Back to Sign In';
+
+  @override
+  String get guestGuardTitle => 'Cloud Feature';
+
+  @override
+  String get guestGuardMessage =>
+      'This feature (checklist and statistics) requires cloud sync to save your progress. Please sign in to enable it.';
+
+  @override
+  String get guestGuardSignInButton => 'Sign In / Create Account';
+
+  @override
+  String get guestGuardBackButton => 'Back';
 }
