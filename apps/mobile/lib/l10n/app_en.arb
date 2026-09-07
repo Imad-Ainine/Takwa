@@ -1494,5 +1494,35 @@
   "silentModeAlertNone": "No alert",
   "silentModeAlertVibrateOnly": "Vibrate only",
   "silentModeAlertToneOnly": "Tone without vibration",
-  "silentModeAlertToneVibrate": "Tone with vibration"
+  "silentModeAlertToneVibrate": "Tone with vibration",
+  "booksChapterAboutTitle": "About the Book",
+  "booksChapterTocTitle": "Table of Contents",
+  "booksChapterPagesCount": "{count, plural, one{1 page} other{{count} pages}}",
+  "@booksChapterPagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterChaptersCount": "{count, plural, one{1 chapter} other{{count} chapters}}",
+  "@booksChapterChaptersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterMinutesAbbrev": "~{minutes} min",
+  "@booksChapterMinutesAbbrev": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterReadPdfButton": "Read PDF Version",
+  "booksChapterStartReadingButton": "Start Reading",
+  "booksChapterContinueReadingButton": "Continue Reading",
+  "booksChapterReadingProgressLabel": "Reading Progress"
 }

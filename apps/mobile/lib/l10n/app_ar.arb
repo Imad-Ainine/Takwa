@@ -1997,5 +1997,35 @@
   "silentModeAlertNone": "بدون تنبيه",
   "silentModeAlertVibrateOnly": "اهتزاز فقط",
   "silentModeAlertToneOnly": "نغمة بدون اهتزاز",
-  "silentModeAlertToneVibrate": "نغمة مع اهتزاز"
+  "silentModeAlertToneVibrate": "نغمة مع اهتزاز",
+  "booksChapterAboutTitle": "عن الكتاب",
+  "booksChapterTocTitle": "الفصول المحتواة",
+  "booksChapterPagesCount": "{count, plural, one{صفحة واحدة} two{صفحتان} few{{count} صفحات} many{{count} صفحة} other{{count} صفحة}}",
+  "@booksChapterPagesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterChaptersCount": "{count, plural, one{فصل واحد} two{فصلان} few{{count} فصول} many{{count} فصلاً} other{{count} فصل}}",
+  "@booksChapterChaptersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterMinutesAbbrev": "~{minutes} د",
+  "@booksChapterMinutesAbbrev": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "booksChapterReadPdfButton": "قراءة نسخة PDF",
+  "booksChapterStartReadingButton": "ابدأ القراءة",
+  "booksChapterContinueReadingButton": "متابعة القراءة",
+  "booksChapterReadingProgressLabel": "تقدم القراءة"
 }

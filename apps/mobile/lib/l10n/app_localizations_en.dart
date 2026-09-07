@@ -3631,4 +3631,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get silentModeAlertToneVibrate => 'Tone with vibration';
+
+  @override
+  String get booksChapterAboutTitle => 'About the Book';
+
+  @override
+  String get booksChapterTocTitle => 'Table of Contents';
+
+  @override
+  String booksChapterPagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterChaptersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count chapters',
+      one: '1 chapter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterMinutesAbbrev(int minutes) {
+    return '~$minutes min';
+  }
+
+  @override
+  String get booksChapterReadPdfButton => 'Read PDF Version';
+
+  @override
+  String get booksChapterStartReadingButton => 'Start Reading';
+
+  @override
+  String get booksChapterContinueReadingButton => 'Continue Reading';
+
+  @override
+  String get booksChapterReadingProgressLabel => 'Reading Progress';
 }

@@ -6619,6 +6619,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نغمة مع اهتزاز'**
   String get silentModeAlertToneVibrate;
+
+  /// No description provided for @booksChapterAboutTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عن الكتاب'**
+  String get booksChapterAboutTitle;
+
+  /// No description provided for @booksChapterTocTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفصول المحتواة'**
+  String get booksChapterTocTitle;
+
+  /// No description provided for @booksChapterPagesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{صفحة واحدة} two{صفحتان} few{{count} صفحات} many{{count} صفحة} other{{count} صفحة}}'**
+  String booksChapterPagesCount(int count);
+
+  /// No description provided for @booksChapterChaptersCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{فصل واحد} two{فصلان} few{{count} فصول} many{{count} فصلاً} other{{count} فصل}}'**
+  String booksChapterChaptersCount(int count);
+
+  /// No description provided for @booksChapterMinutesAbbrev.
+  ///
+  /// In ar, this message translates to:
+  /// **'~{minutes} د'**
+  String booksChapterMinutesAbbrev(int minutes);
+
+  /// No description provided for @booksChapterReadPdfButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة نسخة PDF'**
+  String get booksChapterReadPdfButton;
+
+  /// No description provided for @booksChapterStartReadingButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ القراءة'**
+  String get booksChapterStartReadingButton;
+
+  /// No description provided for @booksChapterContinueReadingButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة القراءة'**
+  String get booksChapterContinueReadingButton;
+
+  /// No description provided for @booksChapterReadingProgressLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقدم القراءة'**
+  String get booksChapterReadingProgressLabel;
 }
 
 class _AppLocalizationsDelegate

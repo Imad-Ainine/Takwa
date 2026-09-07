@@ -3593,4 +3593,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get silentModeAlertToneVibrate => 'نغمة مع اهتزاز';
+
+  @override
+  String get booksChapterAboutTitle => 'عن الكتاب';
+
+  @override
+  String get booksChapterTocTitle => 'الفصول المحتواة';
+
+  @override
+  String booksChapterPagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة',
+      many: '$count صفحة',
+      few: '$count صفحات',
+      two: 'صفحتان',
+      one: 'صفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterChaptersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count فصل',
+      many: '$count فصلاً',
+      few: '$count فصول',
+      two: 'فصلان',
+      one: 'فصل واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterMinutesAbbrev(int minutes) {
+    return '~$minutes د';
+  }
+
+  @override
+  String get booksChapterReadPdfButton => 'قراءة نسخة PDF';
+
+  @override
+  String get booksChapterStartReadingButton => 'ابدأ القراءة';
+
+  @override
+  String get booksChapterContinueReadingButton => 'متابعة القراءة';
+
+  @override
+  String get booksChapterReadingProgressLabel => 'تقدم القراءة';
 }
