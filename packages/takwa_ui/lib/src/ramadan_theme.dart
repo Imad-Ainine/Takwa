@@ -616,8 +616,28 @@ class AdaptiveStyle {
     );
   }
 
-  TextStyle _override(TextStyle style, {Color? color, FontWeight? weight, double? height}) =>
-      style.copyWith(color: color, fontWeight: weight, height: height);
+  TextStyle _override(
+    TextStyle style, {
+    Color? color,
+    FontWeight? weight,
+    double? height,
+    bool bodyFont = false,
+  }) {
+    final withColor = style.copyWith(color: color, fontWeight: weight, height: height);
+    if (!bodyFont) return withColor;
+    // AppTypographyExtension.fromColors bakes appFontFamily (the display/
+    // heading face — Amiri for Arabic) into every role, since that's what
+    // amiri() always used. naskh() call sites are body text in a
+    // DIFFERENT face (NotoNaskhArabic for Arabic) — swapping those to a
+    // role without this would silently change their rendered font, not
+    // just their size. bodyFont: true swaps back to the body face while
+    // keeping the role's size/weight/line-height.
+    final locale = Localizations.localeOf(context);
+    return withColor.copyWith(
+      fontFamily: appBodyFontFamily(locale),
+      fontFamilyFallback: appFontFamilyFallback(locale),
+    );
+  }
 
   TextStyle displayLarge({Color? color, FontWeight? weight, double? height}) =>
       _override(_withRamadanGlow(_type.displayLarge, strong: true), color: color, weight: weight, height: height);
@@ -631,23 +651,28 @@ class AdaptiveStyle {
   TextStyle headingMedium({Color? color, FontWeight? weight, double? height}) =>
       _override(_withRamadanGlow(_type.headingMedium, strong: false), color: color, weight: weight, height: height);
 
-  TextStyle bodyLarge({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.bodyLarge, color: color, weight: weight, height: height);
+  /// [bodyFont]: use the body face (NotoNaskhArabic for Arabic) instead of
+  /// this role's baked-in display face — pass this when migrating a
+  /// `naskh(N)` call site, so the rendered font doesn't change along with
+  /// the size. Leave it false when migrating an `amiri(N)` call site,
+  /// which already used the display face this role defaults to.
+  TextStyle bodyLarge({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.bodyLarge, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
-  TextStyle bodyMedium({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.bodyMedium, color: color, weight: weight, height: height);
+  TextStyle bodyMedium({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.bodyMedium, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
-  TextStyle bodySmall({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.bodySmall, color: color, weight: weight, height: height);
+  TextStyle bodySmall({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.bodySmall, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
-  TextStyle labelLarge({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.labelLarge, color: color, weight: weight, height: height);
+  TextStyle labelLarge({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.labelLarge, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
-  TextStyle labelMedium({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.labelMedium, color: color, weight: weight, height: height);
+  TextStyle labelMedium({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.labelMedium, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
-  TextStyle caption({Color? color, FontWeight? weight, double? height}) =>
-      _override(_type.caption, color: color, weight: weight, height: height);
+  TextStyle caption({Color? color, FontWeight? weight, double? height, bool bodyFont = false}) =>
+      _override(_type.caption, color: color, weight: weight, height: height, bodyFont: bodyFont);
 
   TextStyle quranicVerse({Color? color, FontWeight? weight, double? height}) =>
       _override(_type.quranicVerse, color: color, weight: weight, height: height);
