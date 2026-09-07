@@ -4008,4 +4008,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String quranJuzPercentComplete(String percent) {
     return '$percent% complete';
   }
+
+  @override
+  String get favoriteDuasScreenTitle => 'My Favorite Duas';
+
+  @override
+  String favoriteDuasCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved duas',
+      one: '1 saved dua',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteDuasEmptyTitle => 'No favorite duas yet';
+
+  @override
+  String get favoriteDuasEmptySubtitle => 'Tap ❤️ on any dua to save it here';
+
+  @override
+  String get quranReaderMushafModeTitle => 'Mushaf';
+
+  @override
+  String get quranReaderMushafModeTooltip => 'Mushaf Mode';
 }

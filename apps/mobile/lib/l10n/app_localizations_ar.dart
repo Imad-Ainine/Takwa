@@ -3968,4 +3968,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String quranJuzPercentComplete(String percent) {
     return '$percent% مكتمل';
   }
+
+  @override
+  String get favoriteDuasScreenTitle => 'أدعيتي المفضلة';
+
+  @override
+  String favoriteDuasCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count دعاء محفوظ',
+      many: '$count دعاءً محفوظاً',
+      few: '$count أدعية محفوظة',
+      two: 'دعاءان محفوظان',
+      one: 'دعاء واحد محفوظ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteDuasEmptyTitle => 'لا توجد أدعية مفضلة بعد';
+
+  @override
+  String get favoriteDuasEmptySubtitle => 'اضغط على ❤️ داخل أي دعاء لحفظه هنا';
+
+  @override
+  String get quranReaderMushafModeTitle => 'المصحف';
+
+  @override
+  String get quranReaderMushafModeTooltip => 'وضع المصحف';
 }

@@ -7267,6 +7267,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{percent}% مكتمل'**
   String quranJuzPercentComplete(String percent);
+
+  /// No description provided for @favoriteDuasScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدعيتي المفضلة'**
+  String get favoriteDuasScreenTitle;
+
+  /// No description provided for @favoriteDuasCountLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{دعاء واحد محفوظ} two{دعاءان محفوظان} few{{count} أدعية محفوظة} many{{count} دعاءً محفوظاً} other{{count} دعاء محفوظ}}'**
+  String favoriteDuasCountLabel(int count);
+
+  /// No description provided for @favoriteDuasEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أدعية مفضلة بعد'**
+  String get favoriteDuasEmptyTitle;
+
+  /// No description provided for @favoriteDuasEmptySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على ❤️ داخل أي دعاء لحفظه هنا'**
+  String get favoriteDuasEmptySubtitle;
+
+  /// No description provided for @quranReaderMushafModeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المصحف'**
+  String get quranReaderMushafModeTitle;
+
+  /// No description provided for @quranReaderMushafModeTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع المصحف'**
+  String get quranReaderMushafModeTooltip;
 }
 
 class _AppLocalizationsDelegate

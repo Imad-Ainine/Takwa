@@ -1689,5 +1689,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "favoriteDuasScreenTitle": "My Favorite Duas",
+  "favoriteDuasCountLabel": "{count, plural, one{1 saved dua} other{{count} saved duas}}",
+  "@favoriteDuasCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteDuasEmptyTitle": "No favorite duas yet",
+  "favoriteDuasEmptySubtitle": "Tap ❤️ on any dua to save it here",
+  "quranReaderMushafModeTitle": "Mushaf",
+  "quranReaderMushafModeTooltip": "Mushaf Mode"
 }

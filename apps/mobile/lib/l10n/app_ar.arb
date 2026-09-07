@@ -2192,5 +2192,18 @@
         "type": "String"
       }
     }
-  }
+  },
+  "favoriteDuasScreenTitle": "أدعيتي المفضلة",
+  "favoriteDuasCountLabel": "{count, plural, one{دعاء واحد محفوظ} two{دعاءان محفوظان} few{{count} أدعية محفوظة} many{{count} دعاءً محفوظاً} other{{count} دعاء محفوظ}}",
+  "@favoriteDuasCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteDuasEmptyTitle": "لا توجد أدعية مفضلة بعد",
+  "favoriteDuasEmptySubtitle": "اضغط على ❤️ داخل أي دعاء لحفظه هنا",
+  "quranReaderMushafModeTitle": "المصحف",
+  "quranReaderMushafModeTooltip": "وضع المصحف"
 }

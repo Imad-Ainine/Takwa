@@ -7,12 +7,14 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class FavoriteDuasScreen extends ConsumerWidget {
   const FavoriteDuasScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final favIds = ref.watch(favoriteDuasProvider);
     final allDuas = kDuasData.values.expand((l) => l).toList();
     final favDuas = allDuas.where((d) => favIds.contains(d.id)).toList();
@@ -44,7 +46,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'أدعيتي المفضلة',
+                                l10n.favoriteDuasScreenTitle,
                                 style: context.typography.headingMedium
                                     .copyWith(
                                       fontSize: 20,
@@ -52,7 +54,7 @@ class FavoriteDuasScreen extends ConsumerWidget {
                                     ),
                               ),
                               Text(
-                                '${favDuas.length} دعاء محفوظ',
+                                l10n.favoriteDuasCountLabel(favDuas.length),
                                 style: context.typography.caption.copyWith(
                                   color: context.colors.textSecondary,
                                 ),
@@ -97,6 +99,7 @@ class _EmptyFavs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -104,7 +107,7 @@ class _EmptyFavs extends StatelessWidget {
           const Text('🤍', style: TextStyle(fontSize: 52)),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'لا توجد أدعية مفضلة بعد',
+            l10n.favoriteDuasEmptyTitle,
             style: context.typography.headingMedium.copyWith(
               color: colors.textPrimary,
               fontSize: 16,
@@ -112,7 +115,7 @@ class _EmptyFavs extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'اضغط على ❤️ داخل أي دعاء لحفظه هنا',
+            l10n.favoriteDuasEmptySubtitle,
             style: context.typography.caption.copyWith(
               color: colors.textSecondary,
             ),
@@ -158,6 +161,7 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final favs = ref.watch(favoriteDuasProvider);
     final isFav = favs.contains(widget.dua.id);
 
@@ -238,9 +242,9 @@ class _FavDuaCardState extends ConsumerState<_FavDuaCard> {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
-                            'تم النسخ ✓',
-                            style: TextStyle(
+                          content: Text(
+                            l10n.favoriteAdhkarCopiedToast,
+                            style: const TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
                             ),
