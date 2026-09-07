@@ -3730,4 +3730,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get achievementsGotItButton => 'Got it';
+
+  @override
+  String get prayerJumuah => 'Jumu\'ah';
+
+  @override
+  String get prayerSelectionSunriseAlertsLabel => 'Sunrise alerts';
+
+  @override
+  String prayerSelectionAdhanLabel(String name) {
+    return '$name Adhan';
+  }
 }

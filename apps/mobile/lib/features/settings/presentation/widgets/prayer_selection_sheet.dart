@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/utils/prayer_display.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class PrayerSelectionSheet extends StatefulWidget {
   final String title;
@@ -45,16 +47,6 @@ class PrayerSelectionSheet extends StatefulWidget {
 class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
   late List<String> _currentSelection;
 
-  final Map<String, String> _prayerNames = {
-    'fajr': 'الفجر',
-    'sunrise': 'الشروق',
-    'dhuhr': 'الظهر',
-    'jumuah': 'الجمعة',
-    'asr': 'العصر',
-    'maghrib': 'المغرب',
-    'isha': 'العشاء',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -74,6 +66,7 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final prayers = [
       'fajr',
       if (widget.includeSunrise) 'sunrise',
@@ -132,10 +125,10 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
                 mainAxisSize: MainAxisSize.min,
                 children: prayers.map((key) {
                   final isSelected = _currentSelection.contains(key);
-                  final name = _prayerNames[key] ?? key;
+                  final name = prayerLocalizedName(l10n, key);
                   final label = key == 'sunrise'
-                      ? 'تنبيهات الشروق'
-                      : 'أذان $name';
+                      ? l10n.prayerSelectionSunriseAlertsLabel
+                      : l10n.prayerSelectionAdhanLabel(name);
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),

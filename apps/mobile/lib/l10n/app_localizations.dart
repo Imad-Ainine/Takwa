@@ -6775,6 +6775,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'فهمت'**
   String get achievementsGotItButton;
+
+  /// No description provided for @prayerJumuah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجمعة'**
+  String get prayerJumuah;
+
+  /// No description provided for @prayerSelectionSunriseAlertsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيهات الشروق'**
+  String get prayerSelectionSunriseAlertsLabel;
+
+  /// No description provided for @prayerSelectionAdhanLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذان {name}'**
+  String prayerSelectionAdhanLabel(String name);
 }
 
 class _AppLocalizationsDelegate

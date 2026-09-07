@@ -1548,5 +1548,15 @@
     }
   },
   "achievementsEncourageMessage": "Keep going to double your efforts and earn this achievement! ✨",
-  "achievementsGotItButton": "Got it"
+  "achievementsGotItButton": "Got it",
+  "prayerJumuah": "Jumu'ah",
+  "prayerSelectionSunriseAlertsLabel": "Sunrise alerts",
+  "prayerSelectionAdhanLabel": "{name} Adhan",
+  "@prayerSelectionAdhanLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

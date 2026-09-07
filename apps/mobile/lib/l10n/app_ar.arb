@@ -2051,5 +2051,15 @@
     }
   },
   "achievementsEncourageMessage": "استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨",
-  "achievementsGotItButton": "فهمت"
+  "achievementsGotItButton": "فهمت",
+  "prayerJumuah": "الجمعة",
+  "prayerSelectionSunriseAlertsLabel": "تنبيهات الشروق",
+  "prayerSelectionAdhanLabel": "أذان {name}",
+  "@prayerSelectionAdhanLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

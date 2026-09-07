@@ -3698,4 +3698,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get achievementsGotItButton => 'فهمت';
+
+  @override
+  String get prayerJumuah => 'الجمعة';
+
+  @override
+  String get prayerSelectionSunriseAlertsLabel => 'تنبيهات الشروق';
+
+  @override
+  String prayerSelectionAdhanLabel(String name) {
+    return 'أذان $name';
+  }
 }
