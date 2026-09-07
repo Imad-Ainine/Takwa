@@ -1723,5 +1723,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "mosqueErrorLocationPermission": "Please enable location permission to see nearby mosques",
+  "mosqueErrorLocationPermissionForever": "You must enable location permissions from device settings",
+  "mosqueFetchError": "Could not load mosques (server is busy). Please try again later",
+  "mosqueDefaultName": "Nearby Mosque",
+  "mosqueDefaultAddress": "No specific address"
 }

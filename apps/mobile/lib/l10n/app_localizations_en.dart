@@ -4080,4 +4080,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String authPasswordStrengthLabel(String strength) {
     return 'Password strength: $strength';
   }
+
+  @override
+  String get mosqueErrorLocationPermission =>
+      'Please enable location permission to see nearby mosques';
+
+  @override
+  String get mosqueErrorLocationPermissionForever =>
+      'You must enable location permissions from device settings';
+
+  @override
+  String get mosqueFetchError =>
+      'Could not load mosques (server is busy). Please try again later';
+
+  @override
+  String get mosqueDefaultName => 'Nearby Mosque';
+
+  @override
+  String get mosqueDefaultAddress => 'No specific address';
 }

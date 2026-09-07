@@ -7387,6 +7387,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'قوة كلمة المرور: {strength}'**
   String authPasswordStrengthLabel(String strength);
+
+  /// No description provided for @mosqueErrorLocationPermission.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى تفعيل صلاحية الموقع لرؤية المساجد القريبة'**
+  String get mosqueErrorLocationPermission;
+
+  /// No description provided for @mosqueErrorLocationPermissionForever.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب تفعيل صلاحيات الموقع من إعدادات الجهاز'**
+  String get mosqueErrorLocationPermissionForever;
+
+  /// No description provided for @mosqueFetchError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً'**
+  String get mosqueFetchError;
+
+  /// No description provided for @mosqueDefaultName.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسجد قريب'**
+  String get mosqueDefaultName;
+
+  /// No description provided for @mosqueDefaultAddress.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون عنوان محدد'**
+  String get mosqueDefaultAddress;
 }
 
 class _AppLocalizationsDelegate

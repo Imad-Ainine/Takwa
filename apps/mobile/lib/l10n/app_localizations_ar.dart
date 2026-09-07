@@ -4041,4 +4041,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String authPasswordStrengthLabel(String strength) {
     return 'قوة كلمة المرور: $strength';
   }
+
+  @override
+  String get mosqueErrorLocationPermission =>
+      'يرجى تفعيل صلاحية الموقع لرؤية المساجد القريبة';
+
+  @override
+  String get mosqueErrorLocationPermissionForever =>
+      'يجب تفعيل صلاحيات الموقع من إعدادات الجهاز';
+
+  @override
+  String get mosqueFetchError =>
+      'تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً';
+
+  @override
+  String get mosqueDefaultName => 'مسجد قريب';
+
+  @override
+  String get mosqueDefaultAddress => 'بدون عنوان محدد';
 }
