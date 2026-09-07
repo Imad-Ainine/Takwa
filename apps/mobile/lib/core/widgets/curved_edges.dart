@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomCurvedEdges extends CustomClipper<Path> {
+  const CustomCurvedEdges();
+
   @override
   Path getClip(Size size) {
     var path = Path();
@@ -34,7 +36,14 @@ class CustomCurvedEdges extends CustomClipper<Path> {
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => true;
+  // getClip() is a pure function of `size` alone — this clipper has no
+  // fields, so no two instances can ever produce a different path for the
+  // same size. `false` is correct, not just faster: a size change is
+  // already handled separately by the render object regardless of what
+  // this returns, and this used to hardcode `true`, forcing the non-
+  // rectangular clip path to be recomputed on every rebuild of whatever
+  // wraps it (TCurvedEdgeWidget), even a same-size one.
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
 class TCurvedEdgeWidget extends StatelessWidget {
@@ -45,7 +54,7 @@ class TCurvedEdgeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isCurved) return child ?? const SizedBox();
-    return ClipPath(clipper: CustomCurvedEdges(), child: child);
+    return ClipPath(clipper: const CustomCurvedEdges(), child: child);
   }
 }
 

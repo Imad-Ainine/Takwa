@@ -41,16 +41,16 @@ class _AuthFieldState extends State<AuthField> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
         decoration: BoxDecoration(
-          color: _focused ? s.card.withOpacity(0.6) : s.bg.withOpacity(0.55),
+          color: _focused ? s.card.withValues(alpha: 0.6) : s.bg.withValues(alpha: 0.55),
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
-            color: _focused ? s.gold : s.border.withOpacity(0.5),
+            color: _focused ? s.gold : s.border.withValues(alpha: 0.5),
             width: _focused ? 2 : 1.5,
           ),
           boxShadow: _focused
               ? [
                   BoxShadow(
-                    color: s.gold.withOpacity(0.15),
+                    color: s.gold.withValues(alpha: 0.15),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
@@ -136,7 +136,7 @@ class PasswordStrengthBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: Stack(
             children: [
-              Container(height: 4, color: style.border.withOpacity(0.3)),
+              Container(height: 4, color: style.border.withValues(alpha: 0.3)),
               AnimatedFractionallySizedBox(
                 duration: const Duration(milliseconds: 300),
                 widthFactor: strength.clamp(0.05, 1.0),
@@ -147,7 +147,7 @@ class PasswordStrengthBar extends StatelessWidget {
                     color: color,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
-                      BoxShadow(color: color.withOpacity(0.4), blurRadius: 6),
+                      BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 6),
                     ],
                   ),
                 ),

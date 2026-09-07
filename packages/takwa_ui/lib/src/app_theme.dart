@@ -478,23 +478,23 @@ class AppDecorationsExtension extends ThemeExtension<AppDecorationsExtension> {
       goldCard: BoxDecoration(
         gradient: colors.cardGradient,
         borderRadius: AppRadius.card,
-        border: Border.all(color: colors.gold.withOpacity(0.2)),
+        border: Border.all(color: colors.gold.withValues(alpha: 0.2)),
         boxShadow: shadows.goldGlow,
       ),
       tealCard: BoxDecoration(
         color: colors.card,
         borderRadius: AppRadius.card,
-        border: Border.all(color: colors.teal.withOpacity(0.25)),
+        border: Border.all(color: colors.teal.withValues(alpha: 0.25)),
       ),
       successRow: BoxDecoration(
         color: colors.successDim,
         borderRadius: AppRadius.card,
-        border: Border.all(color: colors.success.withOpacity(0.25)),
+        border: Border.all(color: colors.success.withValues(alpha: 0.25)),
       ),
       dangerRow: BoxDecoration(
         color: colors.dangerDim,
         borderRadius: AppRadius.card,
-        border: Border.all(color: colors.danger.withOpacity(0.2)),
+        border: Border.all(color: colors.danger.withValues(alpha: 0.2)),
       ),
       appBackground: BoxDecoration(gradient: colors.backgroundGradient),
     );
@@ -528,22 +528,22 @@ class AppShadowsExtension extends ThemeExtension<AppShadowsExtension> {
       card: [
         BoxShadow(
           color: isLight
-              ? Colors.black.withOpacity(0.05)
-              : Colors.black.withOpacity(0.3),
+              ? Colors.black.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.3),
           blurRadius: 16,
           offset: const Offset(0, 4),
         ),
       ],
       goldGlow: [
         BoxShadow(
-          color: colors.gold.withOpacity(isLight ? 0.15 : 0.25),
+          color: colors.gold.withValues(alpha: isLight ? 0.15 : 0.25),
           blurRadius: 20,
           spreadRadius: 0,
         ),
       ],
       tealGlow: [
         BoxShadow(
-          color: colors.teal.withOpacity(isLight ? 0.1 : 0.2),
+          color: colors.teal.withValues(alpha: isLight ? 0.1 : 0.2),
           blurRadius: 16,
         ),
       ],
@@ -599,6 +599,76 @@ class AppRadius {
   static BorderRadius get button => BorderRadius.circular(full);
   static BorderRadius get chip => BorderRadius.circular(full);
   static BorderRadius get input => BorderRadius.circular(md);
+}
+
+// ─────────────────────────────────────────
+//  MOTION TOKENS
+// ─────────────────────────────────────────
+
+/// Before this, animation timing was invented per call site — durations
+/// scattered across 100/150/180/200/220/250/280/300/350/420/500ms and
+/// beyond, chosen ad hoc rather than from a shared scale. These three
+/// buckets are drawn from where the actual usage already clustered, not
+/// picked arbitrarily: pick the nearest one for new code instead of adding
+/// a fourth nearby number.
+class AppMotion {
+  AppMotion._();
+
+  /// Press/selection feedback, toggle and switch transitions.
+  static const Duration fast = Duration(milliseconds: 180);
+
+  /// Card and section enter/exit, most crossfades — the default for
+  /// anything that isn't explicitly a quick tap response or a full
+  /// page-level transition.
+  static const Duration base = Duration(milliseconds: 280);
+
+  /// Page-level transitions, the drawer's open/close.
+  static const Duration slow = Duration(milliseconds: 420);
+
+  /// Default easing for the above — a decelerating entrance/settle.
+  static const Curve standard = Curves.easeOutCubic;
+
+  /// For transitions that move through a midpoint state (cross-fades,
+  /// expand/collapse) rather than settling from one side.
+  static const Curve emphasized = Curves.easeInOutCubic;
+}
+
+/// Whether [context]'s platform reports the reduce-motion accessibility
+/// setting. A named wrapper over MediaQuery.disableAnimationsOf so call
+/// sites read as intent ("should this decorative loop run?") rather than a
+/// raw platform query repeated at every site.
+bool prefersReducedMotion(BuildContext context) =>
+    MediaQuery.disableAnimationsOf(context);
+
+extension ReducedMotionRepeat on AnimationController {
+  /// Starts (or keeps running) an infinite repeat, unless the user has
+  /// reduce-motion on — in which case the controller is left at rest at
+  /// [restingValue] instead of ticking forever in the background.
+  ///
+  /// Call this from `didChangeDependencies`, not `initState`: MediaQuery
+  /// dependencies are only tracked from the point a widget's build/dependency
+  /// methods actually read them, so a call from initState wouldn't notice
+  /// the setting being flipped mid-session without an app restart.
+  ///
+  /// This is for PURELY DECORATIVE, ambient loops — a breathing background
+  /// shape, a twinkling starfield — the kind of motion the reduce-motion
+  /// setting exists to suppress. Do NOT use it for functional motion (a
+  /// loading spinner, a progress ring): those communicate that work is in
+  /// progress and stopping them under reduce-motion would remove
+  /// information, not just flourish, which is the opposite of what the
+  /// setting is for.
+  void repeatUnlessReducedMotion(
+    BuildContext context, {
+    bool reverse = false,
+    double restingValue = 0,
+  }) {
+    if (prefersReducedMotion(context)) {
+      if (isAnimating) stop();
+      value = restingValue;
+    } else if (!isAnimating) {
+      repeat(reverse: reverse);
+    }
+  }
 }
 
 // ─────────────────────────────────────────
@@ -921,7 +991,7 @@ class TaqwaBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppRadius.chip,
-        border: Border.all(color: c.withOpacity(0.3)),
+        border: Border.all(color: c.withValues(alpha: 0.3)),
       ),
       child: Text(label, style: context.typography.caption.copyWith(color: c)),
     );
@@ -942,7 +1012,7 @@ class StreakBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.successDim,
         borderRadius: AppRadius.chip,
-        border: Border.all(color: context.colors.success.withOpacity(0.3)),
+        border: Border.all(color: context.colors.success.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -976,7 +1046,7 @@ class SectionLabel extends StatelessWidget {
         children: [
           Text(label, style: context.typography.caption.copyWith(color: c)),
           const SizedBox(width: 8),
-          Expanded(child: Container(height: 1, color: c.withOpacity(0.2))),
+          Expanded(child: Container(height: 1, color: c.withValues(alpha: 0.2))),
         ],
       ),
     );

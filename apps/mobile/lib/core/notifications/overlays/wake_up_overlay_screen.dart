@@ -118,10 +118,14 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
     final hijriStr =
         '${hijri.hDay} ${hijri.getLongMonthName()} ${hijri.hYear} ${l10n.hijriEraSuffix}';
 
-    return WillPopScope(
-      onWillPop: () async {
-        _player.stop();
-        return true;
+    return PopScope(
+      // WillPopScope is deprecated in favor of PopScope. The old
+      // onWillPop always returned true — it only existed to stop the
+      // player as a side effect of the pop, never to actually block
+      // navigation — so canPop: true (always allow) preserves that.
+      canPop: true,
+      onPopInvokedWithPop: (didPop, result) {
+        if (didPop) _player.stop();
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -205,7 +209,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                   border: Border.all(
                                     color: const Color(
                                       0xFFD4AF37,
-                                    ).withOpacity(0.3 * (1 - wrappedPulse)),
+                                    ).withValues(alpha: 0.3 * (1 - wrappedPulse)),
                                     width: 1.5,
                                   ),
                                 ),
@@ -219,7 +223,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    const Color(0xFFD4AF37).withOpacity(0.3),
+                                    const Color(0xFFD4AF37).withValues(alpha: 0.3),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -231,7 +235,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                                   BoxShadow(
                                     color: const Color(
                                       0xFFD4AF37,
-                                    ).withOpacity(0.3 + 0.2 * pulse),
+                                    ).withValues(alpha: 0.3 + 0.2 * pulse),
                                     blurRadius: 30 + 15 * pulse,
                                     spreadRadius: 2,
                                   ),
@@ -321,7 +325,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                       style: TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -344,7 +348,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                         style: TextStyle(
                           fontFamily: 'Amiri',
                           fontSize: 16,
-                          color: const Color(0xFFD4AF37).withOpacity(0.8),
+                          color: const Color(0xFFD4AF37).withValues(alpha: 0.8),
                           fontStyle: FontStyle.italic,
                         ),
                         textAlign: TextAlign.center,
@@ -424,8 +428,8 @@ class _AdhanStarsPainter extends CustomPainter {
       final isGold = i % 9 == 0;
 
       paint.color = isGold
-          ? const Color(0xFFD4AF37).withOpacity(opacity * 0.8)
-          : Colors.white.withOpacity(opacity * 0.7);
+          ? const Color(0xFFD4AF37).withValues(alpha: opacity * 0.8)
+          : Colors.white.withValues(alpha: opacity * 0.7);
       canvas.drawCircle(Offset(x, y), radius, paint);
     }
   }
@@ -438,7 +442,7 @@ class _MosqueSilhouettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFD4AF37).withOpacity(0.07)
+      ..color = const Color(0xFFD4AF37).withValues(alpha: 0.07)
       ..style = PaintingStyle.fill;
 
     final w = size.width;

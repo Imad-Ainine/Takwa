@@ -88,63 +88,69 @@ class _TakwaLoadingIndicatorState extends State<TakwaLoadingIndicator>
     final gold = widget.color ?? context.colors.gold;
     final logoSize = widget.size * 0.60;
 
-    return Center(
-      child: SizedBox(
-        width: widget.size,
-        height: widget.size,
-        child: AnimatedBuilder(
-          animation: _ctrl,
-          builder: (context, child) {
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                // ── Outer glow halo ──────────────────────────────────
-                Opacity(
-                  opacity: _fade.value * 0.35,
-                  child: Container(
-                    width: widget.size,
-                    height: widget.size,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: gold,
-                          blurRadius: widget.size * 0.45,
-                          spreadRadius: widget.size * 0.05,
-                        ),
-                      ],
+    // This spinner is embedded all over the app — cards, buttons, list
+    // items — and animates continuously while visible. RepaintBoundary
+    // isolates its per-tick repaints to its own compositing layer instead
+    // of forcing whatever it's embedded in to repaint alongside it.
+    return RepaintBoundary(
+      child: Center(
+        child: SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: AnimatedBuilder(
+            animation: _ctrl,
+            builder: (context, child) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // ── Outer glow halo ──────────────────────────────
+                  Opacity(
+                    opacity: _fade.value * 0.35,
+                    child: Container(
+                      width: widget.size,
+                      height: widget.size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: gold,
+                            blurRadius: widget.size * 0.45,
+                            spreadRadius: widget.size * 0.05,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
 
-                // ── Sweeping arc ring ─────────────────────────────────
-                CustomPaint(
-                  size: Size(widget.size, widget.size),
-                  painter: _SweepArcPainter(
-                    rotation: _arc.value,
-                    color: gold,
-                    strokeWidth: widget.strokeWidth,
-                  ),
-                ),
-
-                // ── Logo (pulsing) ────────────────────────────────────
-                Transform.scale(
-                  scale: _pulse.value,
-                  child: Opacity(
-                    opacity: (_fade.value * 0.5 + 0.5).clamp(0.0, 1.0),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: logoSize,
-                      height: logoSize,
-                      fit: BoxFit.contain,
+                  // ── Sweeping arc ring ───────────────────────────────
+                  CustomPaint(
+                    size: Size(widget.size, widget.size),
+                    painter: _SweepArcPainter(
+                      rotation: _arc.value,
                       color: gold,
-                      colorBlendMode: BlendMode.srcIn,
+                      strokeWidth: widget.strokeWidth,
                     ),
                   ),
-                ),
-              ],
-            );
-          },
+
+                  // ── Logo (pulsing) ──────────────────────────────────
+                  Transform.scale(
+                    scale: _pulse.value,
+                    child: Opacity(
+                      opacity: (_fade.value * 0.5 + 0.5).clamp(0.0, 1.0),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: logoSize,
+                        height: logoSize,
+                        fit: BoxFit.contain,
+                        color: gold,
+                        colorBlendMode: BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -175,7 +181,7 @@ class _SweepArcPainter extends CustomPainter {
     final trackPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
-      ..color = color.withOpacity(0.10)
+      ..color = color.withValues(alpha: 0.10)
       ..strokeCap = StrokeCap.round;
     canvas.drawArc(rect, 0, math.pi * 2, false, trackPaint);
 
@@ -188,7 +194,7 @@ class _SweepArcPainter extends CustomPainter {
         center: Alignment.center,
         startAngle: rotation,
         endAngle: rotation + 1.5 * math.pi,
-        colors: [color.withOpacity(0.0), color.withOpacity(0.6), color],
+        colors: [color.withValues(alpha: 0.0), color.withValues(alpha: 0.6), color],
       ).createShader(rect);
 
     canvas.drawArc(rect, rotation, 1.5 * math.pi, false, sweepPaint);

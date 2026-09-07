@@ -125,28 +125,39 @@ class _CustomPatternBackgroundState
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    // This drives a purely decorative starfield twinkle + lantern flicker
+    // (see RamadanBgPainter) — exactly the ambient motion the platform's
+    // reduce-motion setting exists to suppress. The painter still renders
+    // its static content at whatever frame the controller is parked on;
+    // only the animation itself stops.
+    final reduceMotion = prefersReducedMotion(context);
 
-    // Optimization: Stop animation if not in Ramadan mode to save resources
-    if (!isRamadan && _ctrl.isAnimating) {
+    // Optimization: stop the animation outside Ramadan mode, or when the
+    // user prefers reduced motion, to save resources.
+    if ((!isRamadan || reduceMotion) && _ctrl.isAnimating) {
       _ctrl.stop();
-    } else if (isRamadan && !_ctrl.isAnimating) {
+    } else if (isRamadan && !reduceMotion && !_ctrl.isAnimating) {
       _ctrl.repeat();
     }
 
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
+      // No AnimatedBuilder here on purpose: RamadanBgPainter is constructed
+      // with `repaint: _ctrl` (see its constructor), so the render object
+      // calls paint() again on this SAME painter instance every animation
+      // tick without rebuilding this subtree or constructing a new painter.
+      // That's what lets the painter's internal Picture/star caches (see
+      // that class) actually get reused instead of being rebuilt from
+      // scratch ~15 times a second.
       return SizedBox.expand(
         child: Stack(
           children: [
             Positioned.fill(
               child: RepaintBoundary(
-                child: AnimatedBuilder(
-                  animation: _ctrl,
-                  builder: (context, _) => CustomPaint(
-                    painter: RamadanBgPainter(
-                      animT: _ctrl.value,
-                      brightness: brightness,
-                    ),
+                child: CustomPaint(
+                  painter: RamadanBgPainter(
+                    animation: _ctrl,
+                    brightness: brightness,
                   ),
                 ),
               ),

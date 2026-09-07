@@ -116,16 +116,14 @@ class _TakwaRefreshIndicatorState extends State<TakwaRefreshIndicator>
                             color: context.colors.card,
                             boxShadow: [
                               BoxShadow(
-                                color: logoColor.withOpacity(
-                                  isArmedOrLoading ? 0.35 : 0.15,
-                                ),
+                                color: logoColor.withValues(alpha: isArmedOrLoading ? 0.35 : 0.15),
                                 blurRadius: isArmedOrLoading ? 25 : 10,
                                 spreadRadius: isArmedOrLoading ? 2 : 0,
                                 offset: const Offset(0, 5),
                               ),
                             ],
                             border: Border.all(
-                              color: logoColor.withOpacity(0.3),
+                              color: logoColor.withValues(alpha: 0.3),
                               width: 1.5,
                             ),
                           ),

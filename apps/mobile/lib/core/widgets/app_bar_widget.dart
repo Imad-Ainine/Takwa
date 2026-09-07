@@ -46,7 +46,10 @@ class _AppBarWidgetState extends State<AppBarWidget>
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, not here — that
+    // is where the reduce-motion check happens, gated on a BuildContext
+    // that isn't meaningfully available yet at this point in initState.
 
     _breathingAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(
@@ -61,6 +64,16 @@ class _AppBarWidgetState extends State<AppBarWidget>
         curve: Curves.easeInOutSine,
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative — three drifting circles behind the title — so it
+    // respects reduce-motion. Checked here rather than initState so a
+    // setting flipped mid-session is picked up on the next dependency
+    // change instead of only at first build.
+    _animationController.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override
@@ -91,16 +104,16 @@ class _AppBarWidgetState extends State<AppBarWidget>
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    colors.gold.withOpacity(0.75),
-                    colors.background.withOpacity(0.85),
+                    colors.gold.withValues(alpha: 0.75),
+                    colors.background.withValues(alpha: 0.85),
                   ],
                 )
               : LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    colors.background.withOpacity(0.65),
-                    colors.gold.withOpacity(0.80),
+                    colors.background.withValues(alpha: 0.65),
+                    colors.gold.withValues(alpha: 0.80),
                   ],
                 ));
 
@@ -126,11 +139,9 @@ class _AppBarWidgetState extends State<AppBarWidget>
     final circleAlphaB = isDark ? 0.20 : 0.22;
     final circleAlphaC = isDark ? 0.10 : 0.18;
 
-    final circleColorA = Colors.white.withOpacity(circleAlphaA);
-    final circleColorB = (widget.secondShade ?? colors.gold).withOpacity(
-      circleAlphaB,
-    );
-    final circleColorC = Colors.white.withOpacity(circleAlphaC);
+    final circleColorA = Colors.white.withValues(alpha: circleAlphaA);
+    final circleColorB = (widget.secondShade ?? colors.gold).withValues(alpha: circleAlphaB);
+    final circleColorC = Colors.white.withValues(alpha: circleAlphaC);
 
     return TCurvedEdgeWidget(
       isCurved: widget.isCurved,
@@ -149,50 +160,69 @@ class _AppBarWidgetState extends State<AppBarWidget>
               ),
 
             // ── Animated Decorative Circles ──────────────────────────
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return Stack(
-                  children: [
-                    Positioned(
+            // Each circle gets its own AnimatedBuilder with the static
+            // TCirculerContainer passed in as `child` instead of one builder
+            // reconstructing all three Positioned/Transform/Container
+            // subtrees from scratch on every tick — the builder callback now
+            // only rebuilds the cheap Positioned+Transform.scale wrapper
+            // around a child it doesn't otherwise touch. Wrapped in one
+            // RepaintBoundary so this continuous 4s animation repaints its
+            // own compositing layer instead of forcing a repaint of the
+            // CustomPatternBackground and AppBar title/actions painted in
+            // the same Stack.
+            RepaintBoundary(
+              child: Stack(
+                children: [
+                  AnimatedBuilder(
+                    animation: _animationController,
+                    child: TCirculerContainer(
+                      width: 150,
+                      height: 150,
+                      backgroundColor: circleColorA,
+                    ),
+                    builder: (context, child) => Positioned(
                       bottom: -20 + _floatingAnimation.value,
                       left: -40,
                       child: Transform.scale(
                         scale: _breathingAnimation.value,
-                        child: TCirculerContainer(
-                          width: 150,
-                          height: 150,
-                          backgroundColor: circleColorA,
-                        ),
+                        child: child,
                       ),
                     ),
-                    Positioned(
+                  ),
+                  AnimatedBuilder(
+                    animation: _animationController,
+                    child: TCirculerContainer(
+                      width: 100,
+                      height: 100,
+                      backgroundColor: circleColorB,
+                    ),
+                    builder: (context, child) => Positioned(
                       top: 40 - _floatingAnimation.value,
                       right: -30,
                       child: Transform.scale(
                         scale: 2.0 - _breathingAnimation.value,
-                        child: TCirculerContainer(
-                          width: 100,
-                          height: 100,
-                          backgroundColor: circleColorB,
-                        ),
+                        child: child,
                       ),
                     ),
-                    Positioned(
+                  ),
+                  AnimatedBuilder(
+                    animation: _animationController,
+                    child: TCirculerContainer(
+                      width: 140,
+                      height: 140,
+                      backgroundColor: circleColorC,
+                    ),
+                    builder: (context, child) => Positioned(
                       top: -80 + _floatingAnimation.value * 0.5,
                       right: 110,
                       child: Transform.scale(
                         scale: _breathingAnimation.value,
-                        child: TCirculerContainer(
-                          width: 140,
-                          height: 140,
-                          backgroundColor: circleColorC,
-                        ),
+                        child: child,
                       ),
                     ),
-                  ],
-                );
-              },
+                  ),
+                ],
+              ),
             ),
 
             // ── AppBar Content ───────────────────────────────────────
@@ -219,9 +249,7 @@ class _AppBarWidgetState extends State<AppBarWidget>
                                     titleColor == Colors.white
                                 ? [
                                     Shadow(
-                                      color: Colors.black.withOpacity(
-                                        isDark ? 0.40 : 0.20,
-                                      ),
+                                      color: Colors.black.withValues(alpha: isDark ? 0.40 : 0.20),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),

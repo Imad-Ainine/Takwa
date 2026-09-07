@@ -125,7 +125,7 @@ class _AdhkarTopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [context.colors.gold.withOpacity(0.1), Colors.transparent],
+          colors: [context.colors.gold.withValues(alpha: 0.1), Colors.transparent],
         ),
       ),
       child: SafeArea(
@@ -150,7 +150,7 @@ class _AdhkarTopBar extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                             shadows: [
                               Shadow(
-                                color: context.colors.gold.withOpacity(0.3),
+                                color: context.colors.gold.withValues(alpha: 0.3),
                                 blurRadius: 12,
                               ),
                             ],
@@ -354,12 +354,12 @@ class _CategoryProgressBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isDone
-            ? context.colors.success.withOpacity(0.1)
+            ? context.colors.success.withValues(alpha: 0.1)
             : context.colors.card,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDone
-              ? context.colors.success.withOpacity(0.3)
+              ? context.colors.success.withValues(alpha: 0.3)
               : context.colors.border,
         ),
       ),
@@ -418,7 +418,7 @@ class _CategoryProgressBar extends StatelessWidget {
                               (isDone
                                       ? context.colors.success
                                       : context.colors.gold)
-                                  .withOpacity(0.4),
+                                  .withValues(alpha: 0.4),
                           blurRadius: 6,
                         ),
                       ],
@@ -505,8 +505,8 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
             gradient: isDone
                 ? LinearGradient(
                     colors: [
-                      context.colors.success.withOpacity(0.08),
-                      context.colors.teal.withOpacity(0.05),
+                      context.colors.success.withValues(alpha: 0.08),
+                      context.colors.teal.withValues(alpha: 0.05),
                     ],
                   )
                 : null,
@@ -514,14 +514,14 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(
               color: isDone
-                  ? context.colors.success.withOpacity(0.3)
+                  ? context.colors.success.withValues(alpha: 0.3)
                   : context.colors.border,
               width: isDone ? 1.5 : 1,
             ),
             boxShadow: isDone
                 ? [
                     BoxShadow(
-                      color: context.colors.success.withOpacity(0.1),
+                      color: context.colors.success.withValues(alpha: 0.1),
                       blurRadius: 10,
                     ),
                   ]
@@ -541,7 +541,7 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                       style: context.typography.headingMedium.copyWith(
                         fontSize: 20,
                         color: isDone
-                            ? context.colors.success.withOpacity(0.8)
+                            ? context.colors.success.withValues(alpha: 0.8)
                             : context.colors.textPrimary,
                         height: 2.0,
                       ),
@@ -583,10 +583,10 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                                 vertical: 7,
                               ),
                               decoration: BoxDecoration(
-                                color: context.colors.gold.withOpacity(0.1),
+                                color: context.colors.gold.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: context.colors.gold.withOpacity(0.15),
+                                  color: context.colors.gold.withValues(alpha: 0.15),
                                 ),
                               ),
                               child: Row(
@@ -648,10 +648,10 @@ class _DhikrCardState extends ConsumerState<_DhikrCard>
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              color: context.colors.success.withOpacity(0.15),
+                              color: context.colors.success.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(AppRadius.xl),
                               border: Border.all(
-                                color: context.colors.success.withOpacity(0.3),
+                                color: context.colors.success.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Row(
@@ -773,9 +773,9 @@ class _CounterBubble extends StatelessWidget {
         vertical: 5,
       ),
       decoration: BoxDecoration(
-        color: context.colors.gold.withOpacity(0.1),
+        color: context.colors.gold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: context.colors.gold.withOpacity(0.25)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -813,12 +813,12 @@ class _NotifSettingsButton extends ConsumerWidget {
         height: 40,
         decoration: BoxDecoration(
           color: enabled
-              ? context.colors.gold.withOpacity(0.1)
+              ? context.colors.gold.withValues(alpha: 0.1)
               : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: enabled
-                ? context.colors.gold.withOpacity(0.3)
+                ? context.colors.gold.withValues(alpha: 0.3)
                 : context.colors.border,
           ),
         ),
@@ -908,7 +908,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     if (!v) AdhkarNotificationService.cancelAll();
                   },
                   activeColor: context.colors.gold,
-                  activeTrackColor: context.colors.gold.withOpacity(0.3),
+                  activeTrackColor: context.colors.gold.withValues(alpha: 0.3),
                   inactiveTrackColor: context.colors.border,
                   inactiveThumbColor: context.colors.textDim,
                 ),
@@ -1084,10 +1084,10 @@ class _NotifRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                color: context.colors.gold.withOpacity(0.1),
+                color: context.colors.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: context.colors.gold.withOpacity(0.25),
+                  color: context.colors.gold.withValues(alpha: 0.25),
                 ),
               ),
               child: Text(
@@ -1136,7 +1136,7 @@ class _ToggleRow extends StatelessWidget {
           value: value,
           onChanged: onChanged,
           activeColor: context.colors.teal,
-          activeTrackColor: context.colors.teal.withOpacity(0.3),
+          activeTrackColor: context.colors.teal.withValues(alpha: 0.3),
           inactiveTrackColor: context.colors.border,
           inactiveThumbColor: context.colors.textDim,
         ),

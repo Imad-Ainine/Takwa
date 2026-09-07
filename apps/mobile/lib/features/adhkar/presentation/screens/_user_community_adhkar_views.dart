@@ -148,7 +148,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
           border: Border.all(color: context.colors.border),
           boxShadow: [
             BoxShadow(
-              color: context.colors.gold.withOpacity(0.04),
+              color: context.colors.gold.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -166,7 +166,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
@@ -192,7 +192,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: context.colors.gold.withOpacity(0.04),
+                color: context.colors.gold.withValues(alpha: 0.04),
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(18),
                 ),
@@ -207,10 +207,10 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                       vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.25),
+                        color: context.colors.gold.withValues(alpha: 0.25),
                       ),
                     ),
                     child: Text(
@@ -373,8 +373,8 @@ class _ShareToCommunitySheetState
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  context.colors.teal.withOpacity(0.2),
-                  context.colors.gold.withOpacity(0.1),
+                  context.colors.teal.withValues(alpha: 0.2),
+                  context.colors.gold.withValues(alpha: 0.1),
                 ],
               ),
               shape: BoxShape.circle,
@@ -410,9 +410,9 @@ class _ShareToCommunitySheetState
               vertical: 14,
             ),
             decoration: BoxDecoration(
-              color: context.colors.gold.withOpacity(0.06),
+              color: context.colors.gold.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
             ),
             child: Column(
               children: [
@@ -619,7 +619,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
         border: Border.all(color: context.colors.border),
         boxShadow: [
           BoxShadow(
-            color: context.colors.teal.withOpacity(0.04),
+            color: context.colors.teal.withValues(alpha: 0.04),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -637,7 +637,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: context.colors.teal.withOpacity(0.1),
+                    color: context.colors.teal.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Center(
@@ -663,7 +663,7 @@ class _CommunityAdhkarCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: context.colors.teal.withOpacity(0.04),
+              color: context.colors.teal.withValues(alpha: 0.04),
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(18),
               ),
@@ -678,10 +678,10 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.teal.withOpacity(0.1),
+                    color: context.colors.teal.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
-                      color: context.colors.teal.withOpacity(0.25),
+                      color: context.colors.teal.withValues(alpha: 0.25),
                     ),
                   ),
                   child: Text(
@@ -729,12 +729,12 @@ class _CommunityAdhkarCard extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: item.likedByMe
-                          ? Colors.redAccent.withOpacity(0.1)
+                          ? Colors.redAccent.withValues(alpha: 0.1)
                           : context.colors.card,
                       borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
                         color: item.likedByMe
-                            ? Colors.redAccent.withOpacity(0.4)
+                            ? Colors.redAccent.withValues(alpha: 0.4)
                             : context.colors.border,
                       ),
                     ),
@@ -881,10 +881,10 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               hintText: l10n.addAdhkarTextHint,
               hintStyle: TextStyle(
                 fontFamily: 'Amiri',
-                color: const Color(0xFF9E9E9E).withOpacity(0.7),
+                color: const Color(0xFF9E9E9E).withValues(alpha: 0.7),
               ),
               filled: true,
-              fillColor: context.colors.night.withOpacity(0.04),
+              fillColor: context.colors.night.withValues(alpha: 0.04),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -946,12 +946,12 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
               ),
               decoration: BoxDecoration(
                 color: _shareWithCommunity
-                    ? context.colors.teal.withOpacity(0.08)
+                    ? context.colors.teal.withValues(alpha: 0.08)
                     : context.colors.card,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: _shareWithCommunity
-                      ? context.colors.teal.withOpacity(0.4)
+                      ? context.colors.teal.withValues(alpha: 0.4)
                       : context.colors.border,
                 ),
               ),
@@ -985,7 +985,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                     value: _shareWithCommunity,
                     onChanged: (v) => setState(() => _shareWithCommunity = v),
                     activeColor: context.colors.teal,
-                    activeTrackColor: context.colors.teal.withOpacity(0.3),
+                    activeTrackColor: context.colors.teal.withValues(alpha: 0.3),
                     inactiveTrackColor: context.colors.border,
                     inactiveThumbColor: context.colors.textDim,
                   ),
@@ -1033,7 +1033,7 @@ class _IconActionButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, size: 18, color: color),

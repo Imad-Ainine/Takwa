@@ -303,8 +303,8 @@ class _StatsTopBar extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             isRamadan
-                ? context.colors.gold.withOpacity(0.15)
-                : context.colors.teal.withOpacity(0.1),
+                ? context.colors.gold.withValues(alpha: 0.15)
+                : context.colors.teal.withValues(alpha: 0.1),
             Colors.transparent,
           ],
         ),
@@ -480,12 +480,12 @@ class _TaqwaHeroCard extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            context.colors.gold.withOpacity(0.15),
-            context.colors.teal.withOpacity(0.08),
+            context.colors.gold.withValues(alpha: 0.15),
+            context.colors.teal.withValues(alpha: 0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
         boxShadow: context.shadows.card,
       ),
       child: Row(
@@ -784,9 +784,9 @@ class _StreakBadgeLarge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
     decoration: BoxDecoration(
-      color: context.colors.success.withOpacity(0.12),
+      color: context.colors.success.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: context.colors.success.withOpacity(0.3)),
+      border: Border.all(color: context.colors.success.withValues(alpha: 0.3)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -952,9 +952,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                         : isSelected
                                         ? [
                                             context.colors.teal,
-                                            context.colors.teal.withOpacity(
-                                              0.6,
-                                            ),
+                                            context.colors.teal.withValues(alpha: 0.6),
                                           ]
                                         // Was colors.border -> colors.card2:
                                         // a hairline-border color used as a
@@ -966,7 +964,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                         : [
                                             context.colors.textDim,
                                             context.colors.textDim
-                                                .withOpacity(0.4),
+                                                .withValues(alpha: 0.4),
                                           ],
                                   ),
                                   borderRadius: const BorderRadius.vertical(
@@ -976,7 +974,7 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                       ? [
                                           BoxShadow(
                                             color: context.colors.gold
-                                                .withOpacity(0.3),
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 8,
                                           ),
                                         ]
@@ -1331,13 +1329,13 @@ class _PrayerRateRowState extends State<_PrayerRateRow>
                           gradient: LinearGradient(
                             colors: [
                               _color(context),
-                              _color(context).withOpacity(0.6),
+                              _color(context).withValues(alpha: 0.6),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(4),
                           boxShadow: [
                             BoxShadow(
-                              color: _color(context).withOpacity(0.3),
+                              color: _color(context).withValues(alpha: 0.3),
                               blurRadius: 4,
                             ),
                           ],
@@ -1454,10 +1452,10 @@ class _AchievementBadge extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
+            colors: [context.colors.gold.withValues(alpha: 0.12), Colors.transparent],
           ),
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: context.colors.gold.withOpacity(0.25)),
+          border: Border.all(color: context.colors.gold.withValues(alpha: 0.25)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1550,9 +1548,9 @@ class _AchievementDialog extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               decoration: BoxDecoration(
-                color: context.colors.gold.withOpacity(0.1),
+                color: context.colors.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.xl),
-                border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+                border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
               ),
               child: Text(
                 AppLocalizations.of(
@@ -1770,15 +1768,15 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  context.colors.goldDim.withOpacity(0.5),
+                  context.colors.goldDim.withValues(alpha: 0.5),
                   context.colors.gold,
                 ],
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: context.colors.gold.withOpacity(0.4)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.4)),
               boxShadow: [
                 BoxShadow(
-                  color: context.colors.gold.withOpacity(0.15),
+                  color: context.colors.gold.withValues(alpha: 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -1814,7 +1812,7 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                         widget.achievement.descAr,
                         style: context.typography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: context.colors.background.withOpacity(0.8),
+                          color: context.colors.background.withValues(alpha: 0.8),
                         ),
                       ),
                     ],

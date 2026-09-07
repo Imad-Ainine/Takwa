@@ -37,12 +37,12 @@ class GuestModeGuard extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: context.colors.card.withOpacity(0.95),
+                color: context.colors.card.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+                border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 30,
                     spreadRadius: -5,
                   ),
@@ -56,9 +56,9 @@ class GuestModeGuard extends ConsumerWidget {
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.2),
+                        color: context.colors.gold.withValues(alpha: 0.2),
                         width: 2,
                       ),
                     ),

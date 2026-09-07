@@ -139,8 +139,8 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                colors.gold.withOpacity(0.15),
-                colors.background.withOpacity(0),
+                colors.gold.withValues(alpha: 0.15),
+                colors.background.withValues(alpha: 0),
               ],
             ),
           ),
@@ -158,7 +158,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   decoration: BoxDecoration(
                     gradient: colors.cardGradient,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: colors.gold.withOpacity(0.2)),
+                    border: Border.all(color: colors.gold.withValues(alpha: 0.2)),
                     boxShadow: context.shadows.card,
                   ),
                   child: Row(
@@ -328,7 +328,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
           color: colors.background,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           border: Border(
-            top: BorderSide(color: colors.gold.withOpacity(0.3), width: 1.5),
+            top: BorderSide(color: colors.gold.withValues(alpha: 0.3), width: 1.5),
           ),
         ),
         child: Column(
@@ -377,9 +377,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   vertical: AppSpacing.lg,
                 ),
                 decoration: BoxDecoration(
-                  color: colors.success.withOpacity(0.1),
+                  color: colors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: colors.success.withOpacity(0.2)),
+                  border: Border.all(color: colors.success.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -405,9 +405,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   vertical: AppSpacing.lg,
                 ),
                 decoration: BoxDecoration(
-                  color: colors.gold.withOpacity(0.05),
+                  color: colors.gold.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: colors.gold.withOpacity(0.2)),
+                  border: Border.all(color: colors.gold.withValues(alpha: 0.2)),
                 ),
                 child: Text(
                   l10n.achievementsEncourageMessage,

@@ -37,7 +37,7 @@ class DailyVerseCard extends StatelessWidget {
         border: Border.all(color: style.border, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -101,9 +101,9 @@ class DailyVerseCard extends StatelessWidget {
   Widget _surahChip(String name, AdaptiveStyle style) => Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
-      color: style.gold.withOpacity(0.15),
+      color: style.gold.withValues(alpha: 0.15),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: style.gold.withOpacity(0.4)),
+      border: Border.all(color: style.gold.withValues(alpha: 0.4)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -124,7 +124,7 @@ class DailyVerseCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: style.text.withOpacity(0.06),
+            color: style.text.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: style.textSec, size: 17),
@@ -135,7 +135,7 @@ class DailyVerseCard extends StatelessWidget {
       Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
-      color: style.text.withOpacity(0.06),
+      color: style.text.withValues(alpha: 0.06),
       borderRadius: BorderRadius.circular(AppRadius.xl),
     ),
     child: Row(
@@ -192,7 +192,7 @@ class KhatmaActionCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -204,7 +204,7 @@ class KhatmaActionCard extends StatelessWidget {
             if (onBack != null)
               _circleBtn(
                 Icons.chevron_left,
-                Colors.white.withOpacity(0.2),
+                Colors.white.withValues(alpha: 0.2),
                 Colors.white,
                 onBack!,
               ),
@@ -227,7 +227,7 @@ class KhatmaActionCard extends StatelessWidget {
                     subtitle,
                     style: style.naskh(
                       12,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -237,7 +237,7 @@ class KhatmaActionCard extends StatelessWidget {
             // Action icon button
             _circleBtn(
               actionIcon,
-              Colors.white.withOpacity(0.25),
+              Colors.white.withValues(alpha: 0.25),
               Colors.white,
               onTap,
             ),
@@ -404,12 +404,12 @@ class _RingPainter extends CustomPainter {
     final cy = size.height / 2;
     final r = (size.width - 16) / 2;
     final track = Paint()
-      ..color = Colors.white.withOpacity(0.04)
+      ..color = Colors.white.withValues(alpha: 0.04)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10;
     final fill = Paint()
       ..shader = LinearGradient(
-        colors: [color ?? kGoldChip, color?.withOpacity(0.5) ?? kGoldL],
+        colors: [color ?? kGoldChip, color?.withValues(alpha: 0.5) ?? kGoldL],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: r))
@@ -602,7 +602,7 @@ class AyahBlock extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
       decoration: BoxDecoration(
-        color: isPlaying ? style.gold.withOpacity(0.08) : Colors.transparent,
+        color: isPlaying ? style.gold.withValues(alpha: 0.08) : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Padding(

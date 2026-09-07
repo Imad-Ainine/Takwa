@@ -143,13 +143,13 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? context.colors.gold.withOpacity(0.08)
-                              : context.colors.card.withOpacity(0.4),
+                              ? context.colors.gold.withValues(alpha: 0.08)
+                              : context.colors.card.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(
                             color: isSelected
-                                ? context.colors.gold.withOpacity(0.3)
-                                : context.colors.border.withOpacity(0.5),
+                                ? context.colors.gold.withValues(alpha: 0.3)
+                                : context.colors.border.withValues(alpha: 0.5),
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -178,7 +178,7 @@ class _PrayerSelectionSheetState extends State<PrayerSelectionSheet> {
                             else
                               Icon(
                                 Icons.circle_outlined,
-                                color: context.colors.textDim.withOpacity(0.3),
+                                color: context.colors.textDim.withValues(alpha: 0.3),
                                 size: 20,
                               ),
                           ],

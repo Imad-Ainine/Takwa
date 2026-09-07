@@ -100,7 +100,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    context.colors.teal.withOpacity(0.1),
+                    context.colors.teal.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -117,7 +117,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    context.colors.gold.withOpacity(0.12),
+                    context.colors.gold.withValues(alpha: 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -149,9 +149,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: context.colors.gold.withOpacity(
-                                      0.25,
-                                    ),
+                                    color: context.colors.gold.withValues(alpha: 0.25),
                                     blurRadius: 60,
                                     spreadRadius: 10,
                                   ),
@@ -209,7 +207,7 @@ class _VerseCard extends StatelessWidget {
           colors: [Color(0x1CC8A96E), Color(0x0E3AAFA9)],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: context.colors.gold.withOpacity(0.18)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.18)),
       ),
       child: Column(
         children: [
@@ -219,7 +217,7 @@ class _VerseCard extends StatelessWidget {
               Container(
                 width: 28,
                 height: 1,
-                color: context.colors.gold.withOpacity(0.3),
+                color: context.colors.gold.withValues(alpha: 0.3),
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
@@ -230,7 +228,7 @@ class _VerseCard extends StatelessWidget {
               Container(
                 width: 28,
                 height: 1,
-                color: context.colors.gold.withOpacity(0.3),
+                color: context.colors.gold.withValues(alpha: 0.3),
               ),
             ],
           ),

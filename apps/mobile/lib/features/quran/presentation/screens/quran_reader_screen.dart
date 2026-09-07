@@ -372,7 +372,7 @@ class _QuranBgPainter extends CustomPainter {
 
     // Top glow
     final topGlow = RadialGradient(
-      colors: [_kGreenHdr.withOpacity(0.12), Colors.transparent],
+      colors: [_kGreenHdr.withValues(alpha: 0.12), Colors.transparent],
     );
     canvas.drawCircle(
       Offset(size.width / 2, 0),
@@ -499,10 +499,10 @@ class _SurahHeader extends StatelessWidget {
           end: Alignment.centerRight,
         ),
         borderRadius: BorderRadius.circular(AppRadius.xs),
-        border: Border.all(color: _kGold.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: _kGold.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: _kGreenHdr.withOpacity(0.3),
+            color: _kGreenHdr.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -697,7 +697,7 @@ class _AyahNumberBadge extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 3),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isPlaying ? _kGold.withOpacity(0.15) : Colors.transparent,
+        color: isPlaying ? _kGold.withValues(alpha: 0.15) : Colors.transparent,
         border: Border.all(color: ring, width: 0.8),
       ),
       child: Center(
@@ -741,7 +741,7 @@ class _TopBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final overlay = isDark
         ? const Color(0xD00A2818)
-        : Colors.white.withOpacity(0.92);
+        : Colors.white.withValues(alpha: 0.92);
     final fg = isDark ? Colors.white70 : Colors.black54;
     final divider = isDark ? Colors.white12 : Colors.black12;
 
@@ -861,7 +861,7 @@ class _BottomBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final bg = isDark
         ? const Color(0xF00A2818)
-        : Colors.white.withOpacity(0.95);
+        : Colors.white.withValues(alpha: 0.95);
     final textDim = isDark ? Colors.white54 : Colors.black45;
     final border = isDark ? Colors.white10 : Colors.black12;
 
@@ -927,7 +927,7 @@ class _BottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
                   value: readCount / khatmaPages,
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  backgroundColor: Colors.white.withValues(alpha: 0.08),
                   valueColor: const AlwaysStoppedAnimation<Color>(_kGreenHdr),
                   minHeight: 3,
                 ),
@@ -944,12 +944,12 @@ class _BottomBar extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.black.withOpacity(0.35)
-                      : Colors.grey.withOpacity(0.1),
+                      ? Colors.black.withValues(alpha: 0.35)
+                      : Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
+                        ? Colors.white.withValues(alpha: 0.08)
                         : Colors.black12,
                   ),
                 ),
@@ -974,7 +974,7 @@ class _BottomBar extends StatelessWidget {
                           color: audio.isLoading ? Colors.white24 : _kGreenHdr,
                           boxShadow: [
                             BoxShadow(
-                              color: _kGreenHdr.withOpacity(0.4),
+                              color: _kGreenHdr.withValues(alpha: 0.4),
                               blurRadius: 8,
                             ),
                           ],
@@ -1048,7 +1048,7 @@ class _BottomBar extends StatelessWidget {
                         height: 28,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadius.xs),
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                         ),
                         child: Icon(
                           Icons.stop_rounded,
@@ -1094,7 +1094,7 @@ class _ReadingGuideDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -1296,7 +1296,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
         decoration: BoxDecoration(
           color: const Color(0xFF1A2D3E),
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1365,7 +1365,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                 ),
                 hintStyle: const TextStyle(color: Colors.white24),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.07),
+                fillColor: Colors.white.withValues(alpha: 0.07),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   borderSide: BorderSide.none,
@@ -1392,7 +1392,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                         vertical: AppSpacing.md,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: Colors.white12),
                       ),
@@ -1423,7 +1423,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF1A5234).withOpacity(0.4),
+                            color: const Color(0xFF1A5234).withValues(alpha: 0.4),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),

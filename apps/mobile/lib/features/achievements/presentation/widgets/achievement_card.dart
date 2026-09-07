@@ -99,13 +99,13 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
-            color: isEarned ? colors.card : colors.card.withOpacity(0.5),
+            color: isEarned ? colors.card : colors.card.withValues(alpha: 0.5),
             gradient: isEarned ? colors.cardGradient : null,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: isEarned
-                  ? colors.gold.withOpacity(0.4)
-                  : colors.border.withOpacity(0.6),
+                  ? colors.gold.withValues(alpha: 0.4)
+                  : colors.border.withValues(alpha: 0.6),
               width: isEarned ? 1.5 : 1,
             ),
             boxShadow: isEarned
@@ -113,7 +113,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                     ...context.shadows.card,
                     if (_celebrating)
                       BoxShadow(
-                        color: colors.gold.withOpacity(0.55 * _glow.value),
+                        color: colors.gold.withValues(alpha: 0.55 * _glow.value),
                         blurRadius: 32 * _glow.value,
                         spreadRadius: 4 * _glow.value,
                       ),
@@ -128,12 +128,12 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: isEarned
-                      ? colors.gold.withOpacity(0.12)
-                      : colors.border.withOpacity(0.2),
+                      ? colors.gold.withValues(alpha: 0.12)
+                      : colors.border.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                   boxShadow: isEarned ? context.shadows.goldGlow : null,
                   border: isEarned
-                      ? Border.all(color: colors.gold.withOpacity(0.2))
+                      ? Border.all(color: colors.gold.withValues(alpha: 0.2))
                       : null,
                 ),
                 child: Opacity(
@@ -166,7 +166,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: colors.gold.withOpacity(0.1),
+                    color: colors.gold.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
@@ -183,14 +183,14 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                   intl.DateFormat('yyyy/MM/dd').format(achievement.earnedAt!),
                   style: typography.caption.copyWith(
                     fontSize: 10,
-                    color: colors.textSecondary.withOpacity(0.7),
+                    color: colors.textSecondary.withValues(alpha: 0.7),
                   ),
                 ),
               ] else ...[
                 Text(
                   'قيد الانتظار',
                   style: typography.caption.copyWith(
-                    color: colors.textDim.withOpacity(0.5),
+                    color: colors.textDim.withValues(alpha: 0.5),
                     fontWeight: FontWeight.w500,
                   ),
                 ),

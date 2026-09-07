@@ -88,7 +88,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           min: 14,
                           max: 34,
                           activeColor: style.gold,
-                          inactiveColor: style.gold.withOpacity(0.1),
+                          inactiveColor: style.gold.withValues(alpha: 0.1),
                           onChanged: (v) => ref
                               .read(quranStateProvider.notifier)
                               .setFontSize(v),
@@ -231,7 +231,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           ),
                         ),
                         Divider(
-                          color: style.gold.withOpacity(0.05),
+                          color: style.gold.withValues(alpha: 0.05),
                           height: 20,
                         ),
                         _tileRow(
@@ -246,7 +246,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           ),
                         ),
                         Divider(
-                          color: style.gold.withOpacity(0.05),
+                          color: style.gold.withValues(alpha: 0.05),
                           height: 20,
                         ),
                         _tileRow(
@@ -273,7 +273,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           '1.0.0',
                         ),
                         Divider(
-                          color: style.gold.withOpacity(0.05),
+                          color: style.gold.withValues(alpha: 0.05),
                           height: 20,
                         ),
                         _tileRow(
@@ -301,7 +301,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
       title,
       style: style.amiri(
         16,
-        color: style.text.withOpacity(0.5),
+        color: style.text.withValues(alpha: 0.5),
         weight: FontWeight.bold,
       ),
     ),
@@ -313,7 +313,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: style.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: style.gold.withOpacity(0.1)),
+          border: Border.all(color: style.gold.withValues(alpha: 0.1)),
         ),
         child: child,
       );
@@ -328,12 +328,12 @@ class KhatmaSettingsScreen extends ConsumerWidget {
     children: [
       Icon(icon, color: style.gold, size: 20),
       const SizedBox(width: AppSpacing.md),
-      Text(label, style: style.naskh(14, color: style.text.withOpacity(0.7))),
+      Text(label, style: style.naskh(14, color: style.text.withValues(alpha: 0.7))),
       const Spacer(),
       if (trailing != null)
         trailing
       else
-        Text(value, style: style.naskh(13, color: style.text.withOpacity(0.4))),
+        Text(value, style: style.naskh(13, color: style.text.withValues(alpha: 0.4))),
     ],
   );
 }

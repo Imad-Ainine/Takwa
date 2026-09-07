@@ -105,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.xxl),
           decoration: context.decorations.goldCard.copyWith(
-            color: context.colors.card.withOpacity(0.8),
+            color: context.colors.card.withValues(alpha: 0.8),
           ),
           child: Column(
             children: [
@@ -117,12 +117,12 @@ class ProfileScreen extends ConsumerWidget {
                   shape: BoxShape.circle,
                   color: context.colors.goldDim,
                   border: Border.all(
-                    color: context.colors.gold.withOpacity(0.5),
+                    color: context.colors.gold.withValues(alpha: 0.5),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: context.colors.gold.withOpacity(0.2),
+                      color: context.colors.gold.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -148,10 +148,10 @@ class ProfileScreen extends ConsumerWidget {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.gold.withOpacity(0.15),
+                    color: context.colors.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.xs),
                     border: Border.all(
-                      color: context.colors.gold.withOpacity(0.4),
+                      color: context.colors.gold.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Text(
@@ -303,7 +303,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card.copyWith(
-        color: context.colors.card.withOpacity(0.9),
+        color: context.colors.card.withValues(alpha: 0.9),
       ),
       child: Column(
         children: [
@@ -344,7 +344,7 @@ class _MenuTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: context.decorations.card.copyWith(
-        color: context.colors.card.withOpacity(0.6),
+        color: context.colors.card.withValues(alpha: 0.6),
       ),
       child: ListTile(
         onTap: onTap,

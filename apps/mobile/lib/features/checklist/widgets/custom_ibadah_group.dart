@@ -145,7 +145,7 @@ class CustomIbadahGroup extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -284,10 +284,10 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
         vertical: 11,
       ),
       decoration: BoxDecoration(
-        color: _committed ? color.withOpacity(0.07) : context.colors.card,
+        color: _committed ? color.withValues(alpha: 0.07) : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: _committed ? color.withOpacity(0.25) : context.colors.border,
+          color: _committed ? color.withValues(alpha: 0.25) : context.colors.border,
         ),
       ),
       child: Row(
@@ -346,9 +346,9 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: color.withOpacity(0.3)),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

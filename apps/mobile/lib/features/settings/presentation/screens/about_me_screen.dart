@@ -93,7 +93,7 @@ class AboutMeScreen extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: context.decorations.goldCard.copyWith(
-        color: context.colors.card.withOpacity(0.85),
+        color: context.colors.card.withValues(alpha: 0.85),
       ),
       child: Column(
         children: [
@@ -170,7 +170,7 @@ class AboutMeScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: context.decorations.card.copyWith(
-        color: context.colors.card.withOpacity(0.85),
+        color: context.colors.card.withValues(alpha: 0.85),
       ),
       child: Text(
         l.aboutBio,

@@ -187,7 +187,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: i == 3
                               ? style.gold
-                              : style.gold.withOpacity(0.4),
+                              : style.gold.withValues(alpha: 0.4),
                           borderRadius: BorderRadius.circular(AppRadius.xs),
                         ),
                       ),

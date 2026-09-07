@@ -158,12 +158,12 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                           end: Alignment.bottomRight,
                         ),
                         border: Border.all(
-                          color: s.gold.withOpacity(0.5),
+                          color: s.gold.withValues(alpha: 0.5),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: s.gold.withOpacity(0.2),
+                            color: s.gold.withValues(alpha: 0.2),
                             blurRadius: 20,
                             spreadRadius: 2,
                           ),
@@ -241,10 +241,10 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.12),
+                          color: Colors.red.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
-                            color: Colors.redAccent.withOpacity(0.4),
+                            color: Colors.redAccent.withValues(alpha: 0.4),
                           ),
                         ),
                         child: Row(

@@ -220,7 +220,7 @@ class _DuasTopBar extends ConsumerWidget {
                               color: style.goldDim,
                               borderRadius: BorderRadius.circular(AppRadius.md),
                               border: Border.all(
-                                color: style.gold.withOpacity(0.3),
+                                color: style.gold.withValues(alpha: 0.3),
                               ),
                             ),
                             child: const Center(
@@ -489,17 +489,17 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
         decoration: BoxDecoration(
           gradient: _expanded
               ? LinearGradient(
-                  colors: [s.gold.withOpacity(0.12), s.teal.withOpacity(0.06)],
+                  colors: [s.gold.withValues(alpha: 0.12), s.teal.withValues(alpha: 0.06)],
                 )
               : null,
           color: _expanded ? null : s.card,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: _expanded ? s.gold.withOpacity(0.4) : s.border,
+            color: _expanded ? s.gold.withValues(alpha: 0.4) : s.border,
             width: _expanded ? 1.5 : 1,
           ),
           boxShadow: _expanded
-              ? [BoxShadow(color: s.gold.withOpacity(0.1), blurRadius: 12)]
+              ? [BoxShadow(color: s.gold.withValues(alpha: 0.1), blurRadius: 12)]
               : null,
         ),
         child: Padding(
@@ -607,7 +607,7 @@ class _DuaCardState extends ConsumerState<_DuaCard> {
                           decoration: BoxDecoration(
                             color: s.goldDim,
                             borderRadius: BorderRadius.circular(AppRadius.xl),
-                            border: Border.all(color: s.gold.withOpacity(0.2)),
+                            border: Border.all(color: s.gold.withValues(alpha: 0.2)),
                           ),
                           child: Text(
                             widget.dua.source,
@@ -722,7 +722,7 @@ class _UserDuaCard extends ConsumerWidget {
         border: Border.all(color: style.border),
         boxShadow: [
           BoxShadow(
-            color: style.gold.withOpacity(0.04),
+            color: style.gold.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -935,9 +935,9 @@ class _ShareToDuaCommunitySheetState
           Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: s.teal.withOpacity(0.07),
+              color: s.teal.withValues(alpha: 0.07),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: s.teal.withOpacity(0.25)),
+              border: Border.all(color: s.teal.withValues(alpha: 0.25)),
             ),
             child: Text(
               widget.dua.textAr,
@@ -1102,13 +1102,13 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [s.teal.withOpacity(0.09), s.card],
+          colors: [s.teal.withValues(alpha: 0.09), s.card],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: s.teal.withOpacity(0.3)),
+        border: Border.all(color: s.teal.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: s.teal.withOpacity(0.05),
+            color: s.teal.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1178,7 +1178,7 @@ class _CommunityDuaCardState extends ConsumerState<_CommunityDuaCard>
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
               child: Column(
                 children: [
-                  Container(height: 1, color: s.teal.withOpacity(0.2)),
+                  Container(height: 1, color: s.teal.withValues(alpha: 0.2)),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1334,7 +1334,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               labelText: l10n.duasAddTitleFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
-              fillColor: s.border.withOpacity(0.5),
+              fillColor: s.border.withValues(alpha: 0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
@@ -1351,7 +1351,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               labelText: l10n.duasAddTextFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
-              fillColor: s.border.withOpacity(0.5),
+              fillColor: s.border.withValues(alpha: 0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
@@ -1367,7 +1367,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
               labelText: l10n.duasAddOccasionFieldLabel,
               labelStyle: s.naskh(12, color: s.textSec),
               filled: true,
-              fillColor: s.border.withOpacity(0.5),
+              fillColor: s.border.withValues(alpha: 0.5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 borderSide: BorderSide.none,
@@ -1387,7 +1387,7 @@ class _AddDuaSheetState extends ConsumerState<AddDuaSheet> {
                 value: _shareToCommunity,
                 onChanged: (v) => setState(() => _shareToCommunity = v),
                 activeColor: s.teal,
-                activeTrackColor: s.teal.withOpacity(0.3),
+                activeTrackColor: s.teal.withValues(alpha: 0.3),
                 inactiveTrackColor: s.border,
                 inactiveThumbColor: s.textDim,
               ),

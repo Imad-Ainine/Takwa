@@ -250,13 +250,13 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.colors.card.withOpacity(0.95),
+        color: context.colors.card.withValues(alpha: 0.95),
         border: Border(
           top: BorderSide(color: context.colors.border, width: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -317,7 +317,7 @@ class _BottomNav extends StatelessWidget {
                                         ? [
                                             BoxShadow(
                                               color: context.colors.gold
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               blurRadius: 8,
                                             ),
                                           ]
@@ -336,7 +336,7 @@ class _BottomNav extends StatelessWidget {
                                           ? [
                                               Shadow(
                                                 color: context.colors.gold
-                                                    .withOpacity(0.6 * t),
+                                                    .withValues(alpha: 0.6 * t),
                                                 blurRadius: 10,
                                               ),
                                             ]
@@ -469,9 +469,7 @@ class _SplashScreenState extends State<_SplashScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: context.colors.gold.withOpacity(
-                                0.3 - i * 0.08,
-                              ),
+                              color: context.colors.gold.withValues(alpha: 0.3 - i * 0.08),
                               width: 1,
                             ),
                           ),

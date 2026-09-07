@@ -416,7 +416,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: context.colors.teal.withOpacity(0.12),
+                color: context.colors.teal.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -461,7 +461,7 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
             Icon(
               Icons.refresh_rounded,
               size: 18,
-              color: context.colors.teal.withOpacity(0.7),
+              color: context.colors.teal.withValues(alpha: 0.7),
             ),
           ],
         ),

@@ -60,7 +60,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.black.withOpacity(0.85),
+      color: Colors.black.withValues(alpha: 0.85),
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: SlideTransition(
@@ -98,7 +98,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
         ),
         boxShadow: [
           BoxShadow(
-            color: context.colors.gold.withOpacity(0.3),
+            color: context.colors.gold.withValues(alpha: 0.3),
             blurRadius: 30,
             spreadRadius: 5,
           ),
@@ -126,7 +126,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
     return Text(
       l10n.qiyamOnboardingDescription,
       style: context.typography.bodyLarge.copyWith(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         height: 1.6,
       ),
       textAlign: TextAlign.center,
@@ -155,7 +155,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
             height: 32,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: context.colors.gold.withOpacity(0.5)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.5)),
             ),
             child: Center(
               child: Text(

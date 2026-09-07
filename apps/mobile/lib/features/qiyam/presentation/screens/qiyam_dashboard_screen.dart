@@ -248,7 +248,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: context.colors.gold.withOpacity(0.3),
+                                color: context.colors.gold.withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -295,7 +295,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: stage.color.withOpacity(0.15),
+                  color: stage.color.withValues(alpha: 0.15),
                   blurRadius: 40,
                   spreadRadius: 10,
                 ),
@@ -323,7 +323,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 end: Alignment.bottomRight,
                 colors: [context.colors.card, context.colors.night],
               ),
-              border: Border.all(color: stage.color.withOpacity(0.3), width: 2),
+              border: Border.all(color: stage.color.withValues(alpha: 0.3), width: 2),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -416,7 +416,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.3),
+                    color: context.colors.gold.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -478,12 +478,12 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  context.colors.gold.withOpacity(0.15),
-                  context.colors.teal.withOpacity(0.05),
+                  context.colors.gold.withValues(alpha: 0.15),
+                  context.colors.teal.withValues(alpha: 0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(AppRadius.xl),
-              border: Border.all(color: context.colors.gold.withOpacity(0.3)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.3)),
             ),
             child: Stack(
               children: [
@@ -499,7 +499,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: context.colors.gold.withOpacity(0.2),
+                          color: context.colors.gold.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -633,9 +633,9 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: color.withOpacity(0.2)),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
           ),
           child: Stack(
             children: [
@@ -737,15 +737,15 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    context.colors.goldDim.withOpacity(0.5),
+                    context.colors.goldDim.withValues(alpha: 0.5),
                     context.colors.gold,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(color: context.colors.gold.withOpacity(0.4)),
+                border: Border.all(color: context.colors.gold.withValues(alpha: 0.4)),
                 boxShadow: [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.15),
+                    color: context.colors.gold.withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -777,7 +777,7 @@ class _IntroBannerNotificationState extends State<_IntroBannerNotification>
                           l10n.qiyamDashboardBannerDesc,
                           style: context.typography.bodyMedium.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: context.colors.background.withOpacity(0.8),
+                            color: context.colors.background.withValues(alpha: 0.8),
                           ),
                         ),
                       ],

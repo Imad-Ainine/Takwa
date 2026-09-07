@@ -213,7 +213,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 72, color: style.textDim.withOpacity(0.15)),
+          Icon(icon, size: 72, color: style.textDim.withValues(alpha: 0.15)),
           const SizedBox(height: AppSpacing.xl),
           Text(
             title,
@@ -225,7 +225,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Text(
               subtitle,
-              style: style.naskh(13, color: style.textSec.withOpacity(0.5)),
+              style: style.naskh(13, color: style.textSec.withValues(alpha: 0.5)),
               textAlign: TextAlign.center,
             ),
           ),
@@ -292,7 +292,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
         horizontal: AppSpacing.xl,
         vertical: 14,
       ),
-      color: style.gold.withOpacity(0.9),
+      color: style.gold.withValues(alpha: 0.9),
       child: Text(
         _toastMsg ?? '',
         textAlign: TextAlign.right,
@@ -341,7 +341,7 @@ class _KhatmaCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.redAccent.withOpacity(0.1),
+                      color: Colors.redAccent.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: const Icon(
@@ -359,8 +359,8 @@ class _KhatmaCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: session.isCompleted
-                      ? style.gold.withOpacity(0.18)
-                      : Colors.redAccent.withOpacity(0.1),
+                      ? style.gold.withValues(alpha: 0.18)
+                      : Colors.redAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
@@ -390,7 +390,7 @@ class _KhatmaCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: session.progress,
-              backgroundColor: Colors.white.withOpacity(0.08),
+              backgroundColor: Colors.white.withValues(alpha: 0.08),
               valueColor: AlwaysStoppedAnimation<Color>(
                 session.isCompleted ? style.gold : style.textDim,
               ),

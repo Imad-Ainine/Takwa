@@ -144,7 +144,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
                       ? GestureDetector(
                           onTap: _close,
                           child: Container(
-                            color: Colors.black.withOpacity(_fade.value),
+                            color: Colors.black.withValues(alpha: _fade.value),
                           ),
                         )
                       : const SizedBox(),
@@ -305,12 +305,12 @@ class _DrawerHeader extends ConsumerWidget {
                         shape: BoxShape.circle,
                         color: context.colors.goldDim,
                         border: Border.all(
-                          color: context.colors.gold.withOpacity(0.4),
+                          color: context.colors.gold.withValues(alpha: 0.4),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: context.colors.gold.withOpacity(0.1),
+                            color: context.colors.gold.withValues(alpha: 0.1),
                             blurRadius: 10,
                           ),
                         ],
@@ -350,12 +350,10 @@ class _DrawerHeader extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: context.colors.gold.withOpacity(0.1),
+                                    color: context.colors.gold.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
-                                      color: context.colors.gold.withOpacity(
-                                        0.3,
-                                      ),
+                                      color: context.colors.gold.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Text(
@@ -419,7 +417,7 @@ class _DrawerHeader extends ConsumerWidget {
             decoration: BoxDecoration(
               color: context.colors.goldDim,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: context.colors.gold.withOpacity(0.15)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.15)),
             ),
             child: Row(
               children: [
@@ -511,7 +509,7 @@ class _DrawerHeader extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: (s.totalPoints / 600).clamp(0, 1),
-                    backgroundColor: context.colors.gold.withOpacity(0.1),
+                    backgroundColor: context.colors.gold.withValues(alpha: 0.1),
                     color: context.colors.gold,
                     minHeight: 4,
                   ),
@@ -542,9 +540,9 @@ class _MiniStatCard extends StatelessWidget {
       horizontal: 10,
     ),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: color.withOpacity(0.18)),
+      border: Border.all(color: color.withValues(alpha: 0.18)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -759,8 +757,8 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
               gradient: widget.isActive
                   ? LinearGradient(
                       colors: [
-                        context.colors.gold.withOpacity(0.15),
-                        context.colors.teal.withOpacity(0.08),
+                        context.colors.gold.withValues(alpha: 0.15),
+                        context.colors.teal.withValues(alpha: 0.08),
                       ],
                     )
                   : null,
@@ -768,7 +766,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: widget.isActive
-                    ? context.colors.gold.withOpacity(0.25)
+                    ? context.colors.gold.withValues(alpha: 0.25)
                     : Colors.transparent,
               ),
             ),
@@ -797,7 +795,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                     shadows: widget.isActive
                         ? [
                             Shadow(
-                              color: context.colors.gold.withOpacity(0.5),
+                              color: context.colors.gold.withValues(alpha: 0.5),
                               blurRadius: 8,
                             ),
                           ]
@@ -812,7 +810,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                       fontSize: 14,
                       color: widget.isActive
                           ? context.colors.gold
-                          : context.colors.textPrimary.withOpacity(0.75),
+                          : context.colors.textPrimary.withValues(alpha: 0.75),
                       fontWeight: widget.isActive
                           ? FontWeight.w600
                           : FontWeight.w400,
@@ -896,12 +894,12 @@ class DrawerMenuButton extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isOpen
               ? context.colors.goldDim
-              : Colors.white.withOpacity(0.08),
+              : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isOpen
-                ? context.colors.gold.withOpacity(0.3)
-                : Colors.white.withOpacity(0.12),
+                ? context.colors.gold.withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.12),
           ),
         ),
         child: Center(
@@ -1079,9 +1077,9 @@ class _LogoutButton extends ConsumerWidget {
             vertical: 10,
           ),
           decoration: BoxDecoration(
-            color: context.colors.danger.withOpacity(0.08),
+            color: context.colors.danger.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
+            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [

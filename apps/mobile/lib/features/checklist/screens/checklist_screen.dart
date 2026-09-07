@@ -299,7 +299,7 @@ class _TopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
+          colors: [context.colors.gold.withValues(alpha: 0.12), Colors.transparent],
         ),
       ),
       child: Row(
@@ -386,9 +386,9 @@ class _PointsPill extends StatelessWidget {
         vertical: small ? 3 : 5,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(
         '$label$value${AppLocalizations.of(context)!.checklistPointsSuffix}',
@@ -559,7 +559,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
                 borderRadius: BorderRadius.circular(AppRadius.xs),
                 boxShadow: [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.3),
+                    color: context.colors.gold.withValues(alpha: 0.3),
                     blurRadius: 6,
                   ),
                 ],
@@ -698,20 +698,20 @@ class _PrayerRow extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isDone
-                ? context.colors.success.withOpacity(0.08)
+                ? context.colors.success.withValues(alpha: 0.08)
                 : isQadaa
-                ? context.colors.warning.withOpacity(0.07)
+                ? context.colors.warning.withValues(alpha: 0.07)
                 : isMissed
-                ? context.colors.danger.withOpacity(0.07)
+                ? context.colors.danger.withValues(alpha: 0.07)
                 : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: isDone
-                  ? context.colors.success.withOpacity(0.25)
+                  ? context.colors.success.withValues(alpha: 0.25)
                   : isQadaa
-                  ? context.colors.warning.withOpacity(0.22)
+                  ? context.colors.warning.withValues(alpha: 0.22)
                   : isMissed
-                  ? context.colors.danger.withOpacity(0.22)
+                  ? context.colors.danger.withValues(alpha: 0.22)
                   : context.colors.border,
             ),
           ),
@@ -901,10 +901,10 @@ class _StatusOption extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.12) : context.colors.card,
+          color: isSelected ? color.withValues(alpha: 0.12) : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: isSelected ? color.withOpacity(0.4) : context.colors.border,
+            color: isSelected ? color.withValues(alpha: 0.4) : context.colors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -1051,12 +1051,12 @@ class _QuranInput extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: hasPages
-            ? context.colors.teal.withOpacity(0.07)
+            ? context.colors.teal.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: hasPages
-              ? context.colors.teal.withOpacity(0.3)
+              ? context.colors.teal.withValues(alpha: 0.3)
               : context.colors.border,
         ),
       ),
@@ -1198,12 +1198,12 @@ class _ToggleRow extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: value
-                ? context.colors.success.withOpacity(0.08)
+                ? context.colors.success.withValues(alpha: 0.08)
                 : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: value
-                  ? context.colors.success.withOpacity(0.25)
+                  ? context.colors.success.withValues(alpha: 0.25)
                   : context.colors.border,
             ),
           ),
@@ -1284,12 +1284,12 @@ class _FastingSelector extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: current != FastingType.none
-            ? context.colors.teal.withOpacity(0.07)
+            ? context.colors.teal.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: current != FastingType.none
-              ? context.colors.teal.withOpacity(0.25)
+              ? context.colors.teal.withValues(alpha: 0.25)
               : context.colors.border,
         ),
       ),
@@ -1375,10 +1375,10 @@ class _FastingSelector extends ConsumerWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
-            color: selected ? color.withOpacity(0.15) : context.colors.card,
+            color: selected ? color.withValues(alpha: 0.15) : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
-              color: selected ? color.withOpacity(0.4) : context.colors.border,
+              color: selected ? color.withValues(alpha: 0.4) : context.colors.border,
               width: selected ? 1.5 : 1,
             ),
           ),
@@ -1443,9 +1443,9 @@ class _ProhibitionsGroup extends ConsumerWidget {
           ),
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: context.colors.danger.withOpacity(0.07),
+            color: context.colors.danger.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
+            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
@@ -1456,7 +1456,7 @@ class _ProhibitionsGroup extends ConsumerWidget {
                   l10n.checklistProhibitionsSubtitle,
                   style: context.typography.caption.copyWith(
                     fontSize: 11,
-                    color: context.colors.danger.withOpacity(0.8),
+                    color: context.colors.danger.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -1568,12 +1568,12 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
       ),
       decoration: BoxDecoration(
         color: _committed
-            ? context.colors.danger.withOpacity(0.07)
+            ? context.colors.danger.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: _committed
-              ? context.colors.danger.withOpacity(0.25)
+              ? context.colors.danger.withValues(alpha: 0.25)
               : context.colors.border,
         ),
       ),
@@ -1659,10 +1659,10 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.danger.withOpacity(0.12),
+                    color: context.colors.danger.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
-                      color: context.colors.danger.withOpacity(0.3),
+                      color: context.colors.danger.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -1890,9 +1890,9 @@ class _MiniPts extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.12),
+      color: color.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: color.withOpacity(0.3)),
+      border: Border.all(color: color.withValues(alpha: 0.3)),
     ),
     child: Text(
       label,

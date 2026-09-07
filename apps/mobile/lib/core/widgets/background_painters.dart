@@ -62,7 +62,7 @@ abstract class IslamicBasePainter extends CustomPainter {
       final c = Canvas(recorder);
 
       final p = Paint()
-        ..color = color.withOpacity(opacity)
+        ..color = color.withValues(alpha: opacity)
         ..strokeWidth = strokeWidth
         ..style = PaintingStyle.stroke;
 
@@ -1762,7 +1762,7 @@ class QiblaBgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = goldColor.withOpacity(0.04)
+      ..color = goldColor.withValues(alpha: 0.04)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.85;
     final center = Offset(size.width / 2, size.height * 0.45);

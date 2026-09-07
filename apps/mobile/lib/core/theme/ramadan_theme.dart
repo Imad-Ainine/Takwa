@@ -31,7 +31,7 @@ class RamadanToggle extends ConsumerWidget {
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
       decoration: BoxDecoration(
-        color: isRamadan ? style.gold.withOpacity(0.1) : Colors.transparent,
+        color: isRamadan ? style.gold.withValues(alpha: 0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(

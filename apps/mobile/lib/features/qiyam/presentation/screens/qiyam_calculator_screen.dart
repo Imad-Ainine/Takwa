@@ -122,13 +122,13 @@ class QiyamCalculatorScreen extends ConsumerWidget {
         color: context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
-          color: isHighlight ? color.withOpacity(0.5) : context.colors.border,
+          color: isHighlight ? color.withValues(alpha: 0.5) : context.colors.border,
           width: isHighlight ? 2 : 1,
         ),
         boxShadow: isHighlight
             ? [
                 BoxShadow(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   blurRadius: 15,
                   spreadRadius: 2,
                 ),
@@ -149,7 +149,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
+                      color: color.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: color, size: 28),
@@ -196,9 +196,9 @@ class QiyamCalculatorScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: context.colors.gold.withOpacity(0.05),
+        color: context.colors.gold.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [

@@ -156,7 +156,7 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
             decoration: BoxDecoration(
               color: style.card,
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: style.gold.withOpacity(0.1)),
+              border: Border.all(color: style.gold.withValues(alpha: 0.1)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -169,7 +169,7 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
                         localizedNumeral(context, values[i].toInt()),
                         style: style.naskh(
                           10,
-                          color: style.text.withOpacity(0.3),
+                          color: style.text.withValues(alpha: 0.3),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
@@ -180,7 +180,7 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: i == 3
                               ? style.gold
-                              : style.gold.withOpacity(0.3),
+                              : style.gold.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(AppRadius.xs),
                         ),
                       ),
@@ -189,7 +189,7 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
                         days[i],
                         style: style.naskh(
                           10,
-                          color: style.text.withOpacity(0.3),
+                          color: style.text.withValues(alpha: 0.3),
                         ),
                       ),
                     ],
@@ -224,7 +224,7 @@ class _StatsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: style.card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: style.gold.withOpacity(0.1)),
+        border: Border.all(color: style.gold.withValues(alpha: 0.1)),
       ),
       child: Column(
         children: [
@@ -237,7 +237,7 @@ class _StatsCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             label,
-            style: style.naskh(10, color: style.text.withOpacity(0.5)),
+            style: style.naskh(10, color: style.text.withValues(alpha: 0.5)),
             textAlign: TextAlign.center,
           ),
         ],
@@ -307,7 +307,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                           min: 14,
                           max: 34,
                           activeColor: style.gold,
-                          inactiveColor: style.gold.withOpacity(0.1),
+                          inactiveColor: style.gold.withValues(alpha: 0.1),
                           onChanged: (v) => ref
                               .read(quranStateProvider.notifier)
                               .setFontSize(v),
@@ -368,7 +368,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                                     ),
                                     decoration: BoxDecoration(
                                       color: state.theme == theme.$2
-                                          ? style.gold.withOpacity(0.1)
+                                          ? style.gold.withValues(alpha: 0.1)
                                           : style.card,
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
@@ -384,7 +384,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                                           14,
                                           color: state.theme == theme.$2
                                               ? style.gold
-                                              : style.text.withOpacity(0.5),
+                                              : style.text.withValues(alpha: 0.5),
                                         ),
                                       ),
                                     ),
@@ -409,7 +409,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                           l10n.khatmaReciterLabel,
                           l10n.khatmaReciterDefaultValue,
                         ),
-                        Divider(color: style.gold.withOpacity(0.1), height: 20),
+                        Divider(color: style.gold.withValues(alpha: 0.1), height: 20),
                         _settingRow(
                           style,
                           Icons.notifications_rounded,
@@ -437,7 +437,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
     t,
     style: style.amiri(
       16,
-      color: style.text.withOpacity(0.5),
+      color: style.text.withValues(alpha: 0.5),
       weight: FontWeight.bold,
     ),
   );
@@ -448,7 +448,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
         decoration: BoxDecoration(
           color: style.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: style.gold.withOpacity(0.1)),
+          border: Border.all(color: style.gold.withValues(alpha: 0.1)),
         ),
         child: child,
       );
@@ -463,12 +463,12 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
     children: [
       if (trailing != null) trailing,
       const Spacer(),
-      Text(label, style: style.naskh(14, color: style.text.withOpacity(0.7))),
+      Text(label, style: style.naskh(14, color: style.text.withValues(alpha: 0.7))),
       const SizedBox(width: AppSpacing.sm),
       Icon(icon, color: style.gold, size: 18),
       const SizedBox(width: AppSpacing.sm),
       if (value.isNotEmpty)
-        Text(value, style: style.naskh(13, color: style.text.withOpacity(0.4))),
+        Text(value, style: style.naskh(13, color: style.text.withValues(alpha: 0.4))),
     ],
   );
 }
