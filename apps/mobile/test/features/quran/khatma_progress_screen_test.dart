@@ -64,7 +64,14 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    // Not pumpAndSettle(): the screen's app bar (AppBarWidget) runs a
+    // perpetually repeating decorative AnimationController by design (see
+    // widget_test.dart's own comment on the same pattern), so "settled" is
+    // never reached — pumpAndSettle timed out here once the screen was
+    // migrated onto AppBarWidget. A few bounded pumps are enough for the
+    // async providers and one-shot animations to resolve.
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
   }
 
   testWidgets('renders without throwing when there is no active khatma', (
@@ -96,7 +103,9 @@ void main() {
             startPage: 1,
           );
       await container.read(khatmaExProvider.notifier).advancePage(61);
-      await tester.pumpAndSettle();
+      // Same reasoning as pumpScreen() above — not pumpAndSettle().
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
 
       // pagesRead = 61 - 1 = 60; 60 / 604 * 100 = 9.9 (1dp), matching the
       // widget's own `(progress * 100).toStringAsFixed(1)` formatting.
