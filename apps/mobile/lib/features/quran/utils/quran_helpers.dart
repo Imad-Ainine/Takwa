@@ -80,6 +80,11 @@ int pageToJuz(int page) {
   return 1;
 }
 
+int juzToPage(int juz) {
+  final idx = (juz - 1).clamp(0, _juzPageStarts.length - 1);
+  return _juzPageStarts[idx];
+}
+
 // ─── Juz Start (Surah, Ayah) ──────────────────────────────────
 const juzStarts = [
   (1, 1),
