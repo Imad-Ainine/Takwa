@@ -2085,5 +2085,33 @@
       }
     }
   },
-  "addReminderAddButton": "إضافة"
+  "addReminderAddButton": "إضافة",
+  "freeReadingScreenTitle": "القراءة الحرة",
+  "freeReadingTabSurah": "سورة",
+  "freeReadingTabReview": "مراجعة",
+  "freeReadingTabIndex": "فهرس",
+  "freeReadingTabJuz": "جزء",
+  "freeReadingTabRub": "ربع",
+  "freeReadingSearchHintSurah": "ابحث عن سورة أو آية أو صفحة",
+  "freeReadingSearchHintOther": "ابحث في السور",
+  "freeReadingLastReadLabel": "آخر قراءة: {surah} - صفحة {page}",
+  "@freeReadingLastReadLabel": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "freeReadingLastReadNone": "آخر قراءة: لا يوجد",
+  "freeReadingHizbLabel": "حزب {number}",
+  "@freeReadingHizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  }
 }

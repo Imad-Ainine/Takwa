@@ -6895,6 +6895,72 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إضافة'**
   String get addReminderAddButton;
+
+  /// No description provided for @freeReadingScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة الحرة'**
+  String get freeReadingScreenTitle;
+
+  /// No description provided for @freeReadingTabSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة'**
+  String get freeReadingTabSurah;
+
+  /// No description provided for @freeReadingTabReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة'**
+  String get freeReadingTabReview;
+
+  /// No description provided for @freeReadingTabIndex.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهرس'**
+  String get freeReadingTabIndex;
+
+  /// No description provided for @freeReadingTabJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'جزء'**
+  String get freeReadingTabJuz;
+
+  /// No description provided for @freeReadingTabRub.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع'**
+  String get freeReadingTabRub;
+
+  /// No description provided for @freeReadingSearchHintSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن سورة أو آية أو صفحة'**
+  String get freeReadingSearchHintSurah;
+
+  /// No description provided for @freeReadingSearchHintOther.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في السور'**
+  String get freeReadingSearchHintOther;
+
+  /// No description provided for @freeReadingLastReadLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر قراءة: {surah} - صفحة {page}'**
+  String freeReadingLastReadLabel(String surah, String page);
+
+  /// No description provided for @freeReadingLastReadNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر قراءة: لا يوجد'**
+  String get freeReadingLastReadNone;
+
+  /// No description provided for @freeReadingHizbLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزب {number}'**
+  String freeReadingHizbLabel(String number);
 }
 
 class _AppLocalizationsDelegate

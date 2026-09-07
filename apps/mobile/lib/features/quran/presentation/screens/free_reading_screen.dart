@@ -9,6 +9,7 @@ import '../../data/quran_data.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 import 'quran_reader_screen.dart';
 
 // Styles are managed via AdaptiveStyle
@@ -25,8 +26,17 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
   final _search = TextEditingController();
   String _query = '';
 
-  // Tabs in RTL order (displayed right-to-left)
-  static const _tabs = ['سورة', 'مراجعة', 'فهرس', 'جزء', 'ربع'];
+  // Tab count only — display titles come from _tabTitles(l10n) below, in
+  // the same RTL order (displayed right-to-left).
+  static const _tabs = [0, 1, 2, 3, 4];
+
+  static List<String> _tabTitles(AppLocalizations l10n) => [
+    l10n.freeReadingTabSurah,
+    l10n.freeReadingTabReview,
+    l10n.freeReadingTabIndex,
+    l10n.freeReadingTabJuz,
+    l10n.freeReadingTabRub,
+  ];
 
   @override
   void initState() {
@@ -44,6 +54,7 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
@@ -52,9 +63,9 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(style),
-            _buildTabBar(style),
-            if (_tab.index == 0 || _tab.index == 2) _buildSearchBar(style),
+            _buildHeader(l10n, style),
+            _buildTabBar(l10n, style),
+            if (_tab.index == 0 || _tab.index == 2) _buildSearchBar(l10n, style),
             Expanded(
               child: TabBarView(
                 controller: _tab,
@@ -78,7 +89,7 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
     );
   }
 
-  Widget _buildHeader(AdaptiveStyle style) {
+  Widget _buildHeader(AppLocalizations l10n, AdaptiveStyle style) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
@@ -86,7 +97,7 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'القراءة الحرة',
+            l10n.freeReadingScreenTitle,
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
           const Spacer(),
@@ -96,7 +107,7 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
     );
   }
 
-  Widget _buildTabBar(AdaptiveStyle style) {
+  Widget _buildTabBar(AppLocalizations l10n, AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
@@ -121,12 +132,12 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
           fontFamily: 'Amiri',
           fontSize: 14,
         ),
-        tabs: _tabs.map((t) => Tab(text: t)).toList(),
+        tabs: _tabTitles(l10n).map((t) => Tab(text: t)).toList(),
       ),
     );
   }
 
-  Widget _buildSearchBar(AdaptiveStyle style) {
+  Widget _buildSearchBar(AppLocalizations l10n, AdaptiveStyle style) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       decoration: BoxDecoration(
@@ -141,8 +152,8 @@ class _FreeReadingScreenState extends ConsumerState<FreeReadingScreen>
         style: style.naskh(15, color: style.text),
         decoration: InputDecoration(
           hintText: _tab.index == 0
-              ? 'ابحث عن سورة أو آية أو صفحة'
-              : 'ابحث في السور',
+              ? l10n.freeReadingSearchHintSurah
+              : l10n.freeReadingSearchHintOther,
           hintStyle: style.naskh(13, color: style.textDim),
           prefixIcon: Icon(Icons.search, color: style.textDim, size: 20),
           border: InputBorder.none,
@@ -225,6 +236,7 @@ class _SurahRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final surahNum = s.number as int;
     final colors = [
       style.gold,
@@ -275,7 +287,7 @@ class _SurahRow extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${s.ayahsNumber as int} آية',
+                  l10n.quranReaderAyahCountBadge(s.ayahsNumber as int),
                   style: style.naskh(12, color: style.textSec),
                 ),
               ],
@@ -292,7 +304,7 @@ class _SurahRow extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  ar(surahNum),
+                  localizedNumeral(context, surahNum),
                   style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 12,
@@ -383,7 +395,7 @@ class _ReviewTab extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      ar(i + 1),
+                      localizedNumeral(context, i + 1),
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 11,
@@ -419,6 +431,7 @@ class _IndexTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Last read banner
@@ -434,8 +447,11 @@ class _IndexTab extends StatelessWidget {
             child: Center(
               child: Text(
                 lastRead != null
-                    ? 'آخر قراءة: ${lastRead!.surahName} - صفحة ${ar(lastRead!.page)}'
-                    : 'آخر قراءة: لا يوجد',
+                    ? l10n.freeReadingLastReadLabel(
+                        lastRead!.surahName,
+                        localizedNumeral(context, lastRead!.page),
+                      )
+                    : l10n.freeReadingLastReadNone,
                 style: style.naskh(
                   15,
                   color: Colors.white,
@@ -475,7 +491,7 @@ class _IndexTab extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        ar(page),
+                        localizedNumeral(context, page),
                         style: style.amiri(
                           20,
                           color: style.gold,
@@ -484,7 +500,7 @@ class _IndexTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'صفحة',
+                        l10n.bookReaderPageLabel,
                         style: style.naskh(10, color: style.textDim),
                       ),
                     ],
@@ -573,7 +589,7 @@ class _JuzTab extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      ar(i + 1),
+                      localizedNumeral(context, i + 1),
                       style: TextStyle(
                         fontFamily: 'Amiri',
                         fontSize: 12,
@@ -602,6 +618,7 @@ class _RubTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final surahs = ql.QuranLibrary.quranCtrl.surahs;
 
     // Build hizb groups (60 hizbs, each with 4 quarters)
@@ -648,7 +665,7 @@ class _RubTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               child: Text(
-                'حزب $hizb',
+                l10n.freeReadingHizbLabel(localizedNumeral(context, hizb)),
                 style: style.amiri(
                   16,
                   color: style.textSec,

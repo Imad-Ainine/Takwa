@@ -3798,4 +3798,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addReminderAddButton => 'Add';
+
+  @override
+  String get freeReadingScreenTitle => 'Free Reading';
+
+  @override
+  String get freeReadingTabSurah => 'Surah';
+
+  @override
+  String get freeReadingTabReview => 'Review';
+
+  @override
+  String get freeReadingTabIndex => 'Index';
+
+  @override
+  String get freeReadingTabJuz => 'Juz';
+
+  @override
+  String get freeReadingTabRub => 'Rub';
+
+  @override
+  String get freeReadingSearchHintSurah => 'Search a surah, ayah, or page';
+
+  @override
+  String get freeReadingSearchHintOther => 'Search surahs';
+
+  @override
+  String freeReadingLastReadLabel(String surah, String page) {
+    return 'Last read: $surah - page $page';
+  }
+
+  @override
+  String get freeReadingLastReadNone => 'Last read: none';
+
+  @override
+  String freeReadingHizbLabel(String number) {
+    return 'Hizb $number';
+  }
 }

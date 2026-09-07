@@ -1582,5 +1582,33 @@
       }
     }
   },
-  "addReminderAddButton": "Add"
+  "addReminderAddButton": "Add",
+  "freeReadingScreenTitle": "Free Reading",
+  "freeReadingTabSurah": "Surah",
+  "freeReadingTabReview": "Review",
+  "freeReadingTabIndex": "Index",
+  "freeReadingTabJuz": "Juz",
+  "freeReadingTabRub": "Rub",
+  "freeReadingSearchHintSurah": "Search a surah, ayah, or page",
+  "freeReadingSearchHintOther": "Search surahs",
+  "freeReadingLastReadLabel": "Last read: {surah} - page {page}",
+  "@freeReadingLastReadLabel": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "freeReadingLastReadNone": "Last read: none",
+  "freeReadingHizbLabel": "Hizb {number}",
+  "@freeReadingHizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  }
 }
