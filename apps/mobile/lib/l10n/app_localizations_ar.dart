@@ -3850,4 +3850,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiyamCalcLastThirdSubtitle => 'أفضل وقت لصلاة القيام والوتر';
+
+  @override
+  String get qiyamStageIstighfarTitle => 'الاستغفار';
+
+  @override
+  String get qiyamStageIstighfarSubtitle => 'تطهير القلب والروح';
+
+  @override
+  String get qiyamStageDuaTitle => 'الدعاء';
+
+  @override
+  String get qiyamStageDuaSubtitle => 'مناجاة الرحمن في السحر';
+
+  @override
+  String get qiyamStageSalahTitle => 'صلاة القيام';
+
+  @override
+  String get qiyamStageSalahSubtitle => 'طول القنوت والركوع';
+
+  @override
+  String get qiyamStageWitrTitle => 'الوتر';
+
+  @override
+  String get qiyamStageWitrSubtitle => 'خاتمة صلاة الليل';
 }

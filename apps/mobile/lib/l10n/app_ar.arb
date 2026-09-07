@@ -2135,5 +2135,13 @@
   "qiyamCalcMidnightTitle": "منتصف الليل الشرعي",
   "qiyamCalcMidnightSubtitle": "ينتهي فيه وقت العشاء الاختياري",
   "qiyamCalcLastThirdTitle": "بداية الثلث الأخير",
-  "qiyamCalcLastThirdSubtitle": "أفضل وقت لصلاة القيام والوتر"
+  "qiyamCalcLastThirdSubtitle": "أفضل وقت لصلاة القيام والوتر",
+  "qiyamStageIstighfarTitle": "الاستغفار",
+  "qiyamStageIstighfarSubtitle": "تطهير القلب والروح",
+  "qiyamStageDuaTitle": "الدعاء",
+  "qiyamStageDuaSubtitle": "مناجاة الرحمن في السحر",
+  "qiyamStageSalahTitle": "صلاة القيام",
+  "qiyamStageSalahSubtitle": "طول القنوت والركوع",
+  "qiyamStageWitrTitle": "الوتر",
+  "qiyamStageWitrSubtitle": "خاتمة صلاة الليل"
 }

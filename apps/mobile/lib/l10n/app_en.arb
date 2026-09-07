@@ -1632,5 +1632,13 @@
   "qiyamCalcMidnightTitle": "Islamic Midnight",
   "qiyamCalcMidnightSubtitle": "The optional Isha window ends here",
   "qiyamCalcLastThirdTitle": "Start of the Last Third",
-  "qiyamCalcLastThirdSubtitle": "The best time for Qiyam and Witr prayer"
+  "qiyamCalcLastThirdSubtitle": "The best time for Qiyam and Witr prayer",
+  "qiyamStageIstighfarTitle": "Istighfar",
+  "qiyamStageIstighfarSubtitle": "Purifying the heart and soul",
+  "qiyamStageDuaTitle": "Dua",
+  "qiyamStageDuaSubtitle": "Intimate supplication in the last part of the night",
+  "qiyamStageSalahTitle": "Qiyam Prayer",
+  "qiyamStageSalahSubtitle": "Lengthening the qunut and ruku",
+  "qiyamStageWitrTitle": "Witr",
+  "qiyamStageWitrSubtitle": "The closing prayer of the night"
 }

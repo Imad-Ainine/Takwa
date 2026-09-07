@@ -3884,4 +3884,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get qiyamCalcLastThirdSubtitle =>
       'The best time for Qiyam and Witr prayer';
+
+  @override
+  String get qiyamStageIstighfarTitle => 'Istighfar';
+
+  @override
+  String get qiyamStageIstighfarSubtitle => 'Purifying the heart and soul';
+
+  @override
+  String get qiyamStageDuaTitle => 'Dua';
+
+  @override
+  String get qiyamStageDuaSubtitle =>
+      'Intimate supplication in the last part of the night';
+
+  @override
+  String get qiyamStageSalahTitle => 'Qiyam Prayer';
+
+  @override
+  String get qiyamStageSalahSubtitle => 'Lengthening the qunut and ruku';
+
+  @override
+  String get qiyamStageWitrTitle => 'Witr';
+
+  @override
+  String get qiyamStageWitrSubtitle => 'The closing prayer of the night';
 }

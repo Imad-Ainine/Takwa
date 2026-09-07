@@ -7051,6 +7051,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أفضل وقت لصلاة القيام والوتر'**
   String get qiyamCalcLastThirdSubtitle;
+
+  /// No description provided for @qiyamStageIstighfarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستغفار'**
+  String get qiyamStageIstighfarTitle;
+
+  /// No description provided for @qiyamStageIstighfarSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطهير القلب والروح'**
+  String get qiyamStageIstighfarSubtitle;
+
+  /// No description provided for @qiyamStageDuaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء'**
+  String get qiyamStageDuaTitle;
+
+  /// No description provided for @qiyamStageDuaSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مناجاة الرحمن في السحر'**
+  String get qiyamStageDuaSubtitle;
+
+  /// No description provided for @qiyamStageSalahTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صلاة القيام'**
+  String get qiyamStageSalahTitle;
+
+  /// No description provided for @qiyamStageSalahSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طول القنوت والركوع'**
+  String get qiyamStageSalahSubtitle;
+
+  /// No description provided for @qiyamStageWitrTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوتر'**
+  String get qiyamStageWitrTitle;
+
+  /// No description provided for @qiyamStageWitrSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خاتمة صلاة الليل'**
+  String get qiyamStageWitrSubtitle;
 }
 
 class _AppLocalizationsDelegate
