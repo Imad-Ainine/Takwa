@@ -1610,5 +1610,14 @@
         "type": "String"
       }
     }
-  }
+  },
+  "misbahaScreenTitle": "Digital Tasbih",
+  "misbahaSelectedDhikrLabel": "Selected Dhikr",
+  "misbahaChooseDhikrPrompt": "Choose a dhikr to count",
+  "misbahaTapToChooseHint": "Tap here to choose a dhikr from the list to focus your worship",
+  "misbahaListeningLabel": "Listening...",
+  "misbahaTapOrHoldHint": "Tap or press and hold",
+  "misbahaResetButton": "Reset",
+  "misbahaSoundButton": "Sound",
+  "misbahaChooseDhikrTitle": "Choose a Dhikr"
 }

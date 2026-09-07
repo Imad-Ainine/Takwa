@@ -3802,4 +3802,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String freeReadingHizbLabel(String number) {
     return 'حزب $number';
   }
+
+  @override
+  String get misbahaScreenTitle => 'المسبحة الإلكترونية';
+
+  @override
+  String get misbahaSelectedDhikrLabel => 'الذكر المختار';
+
+  @override
+  String get misbahaChooseDhikrPrompt => 'اختر ذكراً للتسبيح';
+
+  @override
+  String get misbahaTapToChooseHint =>
+      'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك';
+
+  @override
+  String get misbahaListeningLabel => 'جاري الاستماع...';
+
+  @override
+  String get misbahaTapOrHoldHint => 'انقر أو اضغط مطولاً';
+
+  @override
+  String get misbahaResetButton => 'إعادة';
+
+  @override
+  String get misbahaSoundButton => 'الصوت';
+
+  @override
+  String get misbahaChooseDhikrTitle => 'اختر ذكراً';
 }

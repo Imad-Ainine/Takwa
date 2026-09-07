@@ -3835,4 +3835,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String freeReadingHizbLabel(String number) {
     return 'Hizb $number';
   }
+
+  @override
+  String get misbahaScreenTitle => 'Digital Tasbih';
+
+  @override
+  String get misbahaSelectedDhikrLabel => 'Selected Dhikr';
+
+  @override
+  String get misbahaChooseDhikrPrompt => 'Choose a dhikr to count';
+
+  @override
+  String get misbahaTapToChooseHint =>
+      'Tap here to choose a dhikr from the list to focus your worship';
+
+  @override
+  String get misbahaListeningLabel => 'Listening...';
+
+  @override
+  String get misbahaTapOrHoldHint => 'Tap or press and hold';
+
+  @override
+  String get misbahaResetButton => 'Reset';
+
+  @override
+  String get misbahaSoundButton => 'Sound';
+
+  @override
+  String get misbahaChooseDhikrTitle => 'Choose a Dhikr';
 }

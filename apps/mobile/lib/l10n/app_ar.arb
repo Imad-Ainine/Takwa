@@ -2113,5 +2113,14 @@
         "type": "String"
       }
     }
-  }
+  },
+  "misbahaScreenTitle": "المسبحة الإلكترونية",
+  "misbahaSelectedDhikrLabel": "الذكر المختار",
+  "misbahaChooseDhikrPrompt": "اختر ذكراً للتسبيح",
+  "misbahaTapToChooseHint": "انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك",
+  "misbahaListeningLabel": "جاري الاستماع...",
+  "misbahaTapOrHoldHint": "انقر أو اضغط مطولاً",
+  "misbahaResetButton": "إعادة",
+  "misbahaSoundButton": "الصوت",
+  "misbahaChooseDhikrTitle": "اختر ذكراً"
 }

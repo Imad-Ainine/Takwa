@@ -6961,6 +6961,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حزب {number}'**
   String freeReadingHizbLabel(String number);
+
+  /// No description provided for @misbahaScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المسبحة الإلكترونية'**
+  String get misbahaScreenTitle;
+
+  /// No description provided for @misbahaSelectedDhikrLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الذكر المختار'**
+  String get misbahaSelectedDhikrLabel;
+
+  /// No description provided for @misbahaChooseDhikrPrompt.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ذكراً للتسبيح'**
+  String get misbahaChooseDhikrPrompt;
+
+  /// No description provided for @misbahaTapToChooseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك'**
+  String get misbahaTapToChooseHint;
+
+  /// No description provided for @misbahaListeningLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري الاستماع...'**
+  String get misbahaListeningLabel;
+
+  /// No description provided for @misbahaTapOrHoldHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'انقر أو اضغط مطولاً'**
+  String get misbahaTapOrHoldHint;
+
+  /// No description provided for @misbahaResetButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة'**
+  String get misbahaResetButton;
+
+  /// No description provided for @misbahaSoundButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصوت'**
+  String get misbahaSoundButton;
+
+  /// No description provided for @misbahaChooseDhikrTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ذكراً'**
+  String get misbahaChooseDhikrTitle;
 }
 
 class _AppLocalizationsDelegate
