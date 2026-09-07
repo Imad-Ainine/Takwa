@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/database/app_database.dart';
@@ -247,7 +249,7 @@ class SyncManager {
         'notes': record.notes,
       });
     } catch (e) {
-      print('SyncManager: syncDailyRecord exception: $e');
+      developer.log('syncDailyRecord exception: $e', name: 'SyncManager');
     }
   }
 
@@ -284,7 +286,7 @@ class SyncManager {
         'notes': log.notes,
       });
     } catch (e) {
-      print('SyncManager: syncProhibition exception: $e');
+      developer.log('syncProhibition exception: $e', name: 'SyncManager');
     }
   }
 
@@ -395,7 +397,7 @@ class SyncManager {
     try {
       await _ref.read(readingProgressProvider.notifier).syncFromRemote();
     } catch (e) {
-      print('SyncManager: Failed to sync book progress: $e');
+      developer.log('Failed to sync book progress: $e', name: 'SyncManager');
     }
   }
 
@@ -410,7 +412,7 @@ class SyncManager {
         await dao.upsertFromRemote(remote);
       }
     } catch (e) {
-      print('SyncManager: Failed to sync reminders: $e');
+      developer.log('Failed to sync reminders: $e', name: 'SyncManager');
     }
   }
 
@@ -446,7 +448,7 @@ class SyncManager {
         await dao.upsertFromRemote(remote);
       }
     } catch (e) {
-      print('SyncManager: Failed to sync user adhkar: $e');
+      developer.log('Failed to sync user adhkar: $e', name: 'SyncManager');
     }
   }
 
@@ -459,7 +461,7 @@ class SyncManager {
         await dao.upsertFromRemote(remote);
       }
     } catch (e) {
-      print('SyncManager: Failed to sync user duas: $e');
+      developer.log('Failed to sync user duas: $e', name: 'SyncManager');
     }
   }
 }

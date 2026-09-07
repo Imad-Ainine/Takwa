@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -260,7 +261,10 @@ class OnboardingScreen extends ConsumerWidget {
                 });
               } catch (e) {
                 // Ignore error if offline
-                print('Error updating gender: $e');
+                developer.log(
+                  'Error updating gender: $e',
+                  name: 'OnboardingScreen',
+                );
               }
             }
             await ref.read(settingsDaoProvider).set('onboardingDone', 'true');
