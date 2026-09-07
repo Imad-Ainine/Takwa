@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -36,7 +38,7 @@ final achievementsProvider = FutureProvider<List<AchievementView>>((ref) async {
     try {
       await syncManager.syncAchievement(ach);
     } catch (e) {
-      print('[Achievements] Cannot sync to Supabase: $e');
+      developer.log('Cannot sync to Supabase: $e', name: 'Achievements');
     }
   }
 

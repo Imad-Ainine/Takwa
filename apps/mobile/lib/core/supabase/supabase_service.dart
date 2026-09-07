@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -170,14 +171,16 @@ class SupabaseClientService implements SupabaseService {
         return await request();
       } on SocketException catch (e) {
         if (attempts >= maxAttempts) rethrow;
-        print(
+        developer.log(
           'Supabase Request failed (SocketException), retrying $attempts/$maxAttempts: $e',
+          name: 'SupabaseService',
         );
         await Future.delayed(const Duration(seconds: 1));
       } on http.ClientException catch (e) {
         if (attempts >= maxAttempts) rethrow;
-        print(
+        developer.log(
           'Supabase Request failed (ClientException), retrying $attempts/$maxAttempts: $e',
+          name: 'SupabaseService',
         );
         await Future.delayed(const Duration(seconds: 1));
       } catch (e) {

@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/book_prefs_repository.dart';
 import '../data/books_data.dart';
@@ -48,7 +50,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
       }
       state = map;
     } catch (e) {
-      print('Failed to load book progress from local DB: $e');
+      developer.log('Failed to load book progress from local DB: $e', name: 'BooksReadingProvider');
     }
   }
 
@@ -76,7 +78,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
         readPages: updatedReadPages,
       );
     } catch (e) {
-      print('Failed to write book progress to local DB: $e');
+      developer.log('Failed to write book progress to local DB: $e', name: 'BooksReadingProvider');
     }
 
     // 3. Best-effort push to Supabase (ignored if offline).
@@ -87,7 +89,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
         'read_pages': updatedReadPages.toList(),
       });
     } catch (e) {
-      print('Offline book sync skipped: $e');
+      developer.log('Offline book sync skipped: $e', name: 'BooksReadingProvider');
     }
   }
 
@@ -106,14 +108,14 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
         readingSeconds: readingSeconds,
       );
     } catch (e) {
-      print('Failed to write pdf session to local DB: $e');
+      developer.log('Failed to write pdf session to local DB: $e', name: 'BooksReadingProvider');
     }
     try {
       await _ref
           .read(supabaseServiceProvider)
           .upsertPdfSession(bookId, pdfPage, totalPdfPages, readingSeconds);
     } catch (e) {
-      print('Offline pdf session sync skipped: $e');
+      developer.log('Offline pdf session sync skipped: $e', name: 'BooksReadingProvider');
     }
   }
 
@@ -129,7 +131,7 @@ class ReadingProgressNotifier extends StateNotifier<Map<String, BookProgress>> {
       }
       await _load();
     } catch (e) {
-      print('Failed to sync remote book progress: $e');
+      developer.log('Failed to sync remote book progress: $e', name: 'BooksReadingProvider');
     }
   }
 

@@ -9,7 +9,6 @@
 # packages, and plugins designed to encourage good coding practices.
 analyzer:
   errors:
-    avoid_print: ignore
     file_names: ignore
     unused_element: ignore
     unused_local_variable: ignore
@@ -20,6 +19,10 @@ analyzer:
     # audited for real BuildContext-after-await gaps across the app and none
     # were found. Leave both enabled so a real regression gets caught by
     # `flutter analyze` instead of silently passing.
+    #
+    # avoid_print was ignored here too, masking 16 print() calls in lib/.
+    # All 16 are now dart:developer's log() instead, so it's re-enabled for
+    # the same reason.
   exclude:
     - build/**
     - android/**
