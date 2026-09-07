@@ -599,21 +599,35 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     with SingleTickerProviderStateMixin {
   late final AnimationController _staggerCtrl;
 
+  // Emoji → real icons (audit §H2) — same motivation as main_shell.dart's
+  // bottom nav: these render as fixed-color glyphs on the app's own gold
+  // accent (see _NavRowState below), not the un-tintable Text-emoji this
+  // replaced.
   static List<_NavItem> _buildItems(AppLocalizations l) => [
-    _NavItem('🏠', l.drawerNavHome, '/home', 0),
-    _NavItem('✅', l.drawerNavChecklist, '/checklist', 1),
-    _NavItem('🕌', l.drawerNavPrayer, '/prayer', 2),
-    _NavItem('📚', l.drawerNavBooks, '/books', 3),
-    _NavItem('📊', l.drawerNavStatistics, '/statistics', 4),
+    _NavItem(Icons.home_rounded, l.drawerNavHome, '/home', 0),
+    _NavItem(Icons.checklist_rounded, l.drawerNavChecklist, '/checklist', 1),
+    _NavItem(Icons.mosque_rounded, l.drawerNavPrayer, '/prayer', 2),
+    _NavItem(Icons.menu_book_rounded, l.drawerNavBooks, '/books', 3),
+    _NavItem(
+      Icons.bar_chart_rounded,
+      l.drawerNavStatistics,
+      '/statistics',
+      4,
+    ),
     // Moved out of the bottom nav (main_shell.dart §C10: 6 destinations was
     // one over Material's guidance) — a reference/browse screen fits an
     // occasional-lookup drawer entry better than a persistent tab. '/asma'
     // isn't in shellRouteToTab below, so this pushes AsmaScreen as its own
     // route rather than switching a shell tab.
-    _NavItem('✨', l.drawerNavAsma, '/asma', 5),
-    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 6),
-    _NavItem('👤', l.drawerNavProfile, '/profile', 7),
-    _NavItem('⚙️', l.drawerNavSettings, '/settings', 8),
+    _NavItem(Icons.auto_awesome_rounded, l.drawerNavAsma, '/asma', 5),
+    _NavItem(
+      Icons.emoji_events_rounded,
+      l.drawerNavAchievements,
+      '/achievements',
+      6,
+    ),
+    _NavItem(Icons.person_rounded, l.drawerNavProfile, '/profile', 7),
+    _NavItem(Icons.settings_rounded, l.drawerNavSettings, '/settings', 8),
   ];
 
   @override
@@ -808,19 +822,20 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                 ),
                 SizedBox(width: widget.isActive ? 8 : 0),
 
-                Text(
-                  widget.item.emoji,
-                  style: TextStyle(
-                    fontSize: 20,
-                    shadows: widget.isActive
-                        ? [
-                            Shadow(
-                              color: context.colors.gold.withValues(alpha: 0.5),
-                              blurRadius: 8,
-                            ),
-                          ]
-                        : null,
-                  ),
+                Icon(
+                  widget.item.icon,
+                  size: 20,
+                  color: widget.isActive
+                      ? context.colors.gold
+                      : context.colors.textPrimary.withValues(alpha: 0.75),
+                  shadows: widget.isActive
+                      ? [
+                          Shadow(
+                            color: context.colors.gold.withValues(alpha: 0.5),
+                            blurRadius: 8,
+                          ),
+                        ]
+                      : null,
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -1021,9 +1036,10 @@ class _DrawerBgPainter extends CustomPainter {
 //  DATA CLASS
 // ─────────────────────────────────────────
 class _NavItem {
-  final String emoji, label, route;
+  final IconData icon;
+  final String label, route;
   final int index;
-  const _NavItem(this.emoji, this.label, this.route, this.index);
+  const _NavItem(this.icon, this.label, this.route, this.index);
 }
 
 // ── حالة الاتصال والمزامنة ──
