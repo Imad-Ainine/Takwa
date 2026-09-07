@@ -7465,6 +7465,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'العودة'**
   String get guestGuardBackButton;
+
+  /// No description provided for @customTimePickerTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختيار الوقت'**
+  String get customTimePickerTitle;
+
+  /// No description provided for @customTimePickerConfirmButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get customTimePickerConfirmButton;
+
+  /// No description provided for @quranReaderBookmarkSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ العلامة المرجعية'**
+  String get quranReaderBookmarkSaved;
 }
 
 class _AppLocalizationsDelegate

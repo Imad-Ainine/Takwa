@@ -4087,4 +4087,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get guestGuardBackButton => 'العودة';
+
+  @override
+  String get customTimePickerTitle => 'اختيار الوقت';
+
+  @override
+  String get customTimePickerConfirmButton => 'تأكيد';
+
+  @override
+  String get quranReaderBookmarkSaved => 'تم حفظ العلامة المرجعية';
 }

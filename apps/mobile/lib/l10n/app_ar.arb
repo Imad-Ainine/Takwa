@@ -2246,5 +2246,8 @@
   "guestGuardTitle": "ميزة سحابية",
   "guestGuardMessage": "هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.",
   "guestGuardSignInButton": "تسجيل دخول / إنشاء حساب",
-  "guestGuardBackButton": "العودة"
+  "guestGuardBackButton": "العودة",
+  "customTimePickerTitle": "اختيار الوقت",
+  "customTimePickerConfirmButton": "تأكيد",
+  "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية"
 }

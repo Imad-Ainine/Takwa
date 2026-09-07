@@ -4126,4 +4126,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get guestGuardBackButton => 'Back';
+
+  @override
+  String get customTimePickerTitle => 'Select Time';
+
+  @override
+  String get customTimePickerConfirmButton => 'Confirm';
+
+  @override
+  String get quranReaderBookmarkSaved => 'Bookmark saved';
 }

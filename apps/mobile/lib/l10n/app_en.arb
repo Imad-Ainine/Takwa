@@ -1743,5 +1743,8 @@
   "guestGuardTitle": "Cloud Feature",
   "guestGuardMessage": "This feature (checklist and statistics) requires cloud sync to save your progress. Please sign in to enable it.",
   "guestGuardSignInButton": "Sign In / Create Account",
-  "guestGuardBackButton": "Back"
+  "guestGuardBackButton": "Back",
+  "customTimePickerTitle": "Select Time",
+  "customTimePickerConfirmButton": "Confirm",
+  "quranReaderBookmarkSaved": "Bookmark saved"
 }
