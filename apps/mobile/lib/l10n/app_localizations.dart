@@ -6847,6 +6847,120 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'نسأل الله أن ينفعنا وإياكم بما فيه الخير'**
   String get termsPrivacyFooterDua;
+
+  /// No description provided for @addReminderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة تذكير جديد'**
+  String get addReminderTitle;
+
+  /// No description provided for @addReminderTitleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'عنوان التذكير'**
+  String get addReminderTitleLabel;
+
+  /// No description provided for @addReminderTitleRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى إدخال عنوان للتذكير'**
+  String get addReminderTitleRequired;
+
+  /// No description provided for @addReminderTitleHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثال: صلاة الضحى، قراءة ورد يومي...'**
+  String get addReminderTitleHint;
+
+  /// No description provided for @addReminderTimeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت التذكير'**
+  String get addReminderTimeLabel;
+
+  /// No description provided for @addReminderIconLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيقونة التذكير'**
+  String get addReminderIconLabel;
+
+  /// No description provided for @addReminderSaveError.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ أثناء الحفظ: {error}'**
+  String addReminderSaveError(String error);
+
+  /// No description provided for @addReminderAddButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة'**
+  String get addReminderAddButton;
+
+  /// No description provided for @freeReadingScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القراءة الحرة'**
+  String get freeReadingScreenTitle;
+
+  /// No description provided for @freeReadingTabSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة'**
+  String get freeReadingTabSurah;
+
+  /// No description provided for @freeReadingTabReview.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة'**
+  String get freeReadingTabReview;
+
+  /// No description provided for @freeReadingTabIndex.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهرس'**
+  String get freeReadingTabIndex;
+
+  /// No description provided for @freeReadingTabJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'جزء'**
+  String get freeReadingTabJuz;
+
+  /// No description provided for @freeReadingTabRub.
+  ///
+  /// In ar, this message translates to:
+  /// **'ربع'**
+  String get freeReadingTabRub;
+
+  /// No description provided for @freeReadingSearchHintSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن سورة أو آية أو صفحة'**
+  String get freeReadingSearchHintSurah;
+
+  /// No description provided for @freeReadingSearchHintOther.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في السور'**
+  String get freeReadingSearchHintOther;
+
+  /// No description provided for @freeReadingLastReadLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر قراءة: {surah} - صفحة {page}'**
+  String freeReadingLastReadLabel(String surah, String page);
+
+  /// No description provided for @freeReadingLastReadNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر قراءة: لا يوجد'**
+  String get freeReadingLastReadNone;
+
+  /// No description provided for @freeReadingHizbLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزب {number}'**
+  String freeReadingHizbLabel(String number);
 }
 
 class _AppLocalizationsDelegate

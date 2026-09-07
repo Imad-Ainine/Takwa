@@ -1567,5 +1567,48 @@
   "termsPrivacyTermsBody": "Welcome to the \"Takwa\" app. By using this app, you agree to the terms and conditions of use outlined here. Through this app, we aim to provide Islamic services — adhkar, prayer times, and Islamic values — that benefit our Muslim community. Please use the app for its intended purpose and refrain from misusing its services or content.",
   "termsPrivacyPolicyBody": "We respect your privacy and are committed to protecting your personal data. The app may need access to your location solely to determine accurate prayer times. We do not share or sell your personal data to any third party. Your data is used locally on your device to provide a better user experience.",
   "termsPrivacyFooterThanks": "Thank you for trusting the Takwa app",
-  "termsPrivacyFooterDua": "We ask Allah to benefit us all with what is good"
+  "termsPrivacyFooterDua": "We ask Allah to benefit us all with what is good",
+  "addReminderTitle": "Add New Reminder",
+  "addReminderTitleLabel": "Reminder Title",
+  "addReminderTitleRequired": "Please enter a title for the reminder",
+  "addReminderTitleHint": "e.g. Duha prayer, daily wird reading...",
+  "addReminderTimeLabel": "Reminder Time",
+  "addReminderIconLabel": "Reminder Icon",
+  "addReminderSaveError": "An error occurred while saving: {error}",
+  "@addReminderSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addReminderAddButton": "Add",
+  "freeReadingScreenTitle": "Free Reading",
+  "freeReadingTabSurah": "Surah",
+  "freeReadingTabReview": "Review",
+  "freeReadingTabIndex": "Index",
+  "freeReadingTabJuz": "Juz",
+  "freeReadingTabRub": "Rub",
+  "freeReadingSearchHintSurah": "Search a surah, ayah, or page",
+  "freeReadingSearchHintOther": "Search surahs",
+  "freeReadingLastReadLabel": "Last read: {surah} - page {page}",
+  "@freeReadingLastReadLabel": {
+    "placeholders": {
+      "surah": {
+        "type": "String"
+      },
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "freeReadingLastReadNone": "Last read: none",
+  "freeReadingHizbLabel": "Hizb {number}",
+  "@freeReadingHizbLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  }
 }

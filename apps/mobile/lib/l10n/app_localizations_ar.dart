@@ -3739,4 +3739,67 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get termsPrivacyFooterDua =>
       'نسأل الله أن ينفعنا وإياكم بما فيه الخير';
+
+  @override
+  String get addReminderTitle => 'إضافة تذكير جديد';
+
+  @override
+  String get addReminderTitleLabel => 'عنوان التذكير';
+
+  @override
+  String get addReminderTitleRequired => 'يرجى إدخال عنوان للتذكير';
+
+  @override
+  String get addReminderTitleHint => 'مثال: صلاة الضحى، قراءة ورد يومي...';
+
+  @override
+  String get addReminderTimeLabel => 'وقت التذكير';
+
+  @override
+  String get addReminderIconLabel => 'أيقونة التذكير';
+
+  @override
+  String addReminderSaveError(String error) {
+    return 'حدث خطأ أثناء الحفظ: $error';
+  }
+
+  @override
+  String get addReminderAddButton => 'إضافة';
+
+  @override
+  String get freeReadingScreenTitle => 'القراءة الحرة';
+
+  @override
+  String get freeReadingTabSurah => 'سورة';
+
+  @override
+  String get freeReadingTabReview => 'مراجعة';
+
+  @override
+  String get freeReadingTabIndex => 'فهرس';
+
+  @override
+  String get freeReadingTabJuz => 'جزء';
+
+  @override
+  String get freeReadingTabRub => 'ربع';
+
+  @override
+  String get freeReadingSearchHintSurah => 'ابحث عن سورة أو آية أو صفحة';
+
+  @override
+  String get freeReadingSearchHintOther => 'ابحث في السور';
+
+  @override
+  String freeReadingLastReadLabel(String surah, String page) {
+    return 'آخر قراءة: $surah - صفحة $page';
+  }
+
+  @override
+  String get freeReadingLastReadNone => 'آخر قراءة: لا يوجد';
+
+  @override
+  String freeReadingHizbLabel(String number) {
+    return 'حزب $number';
+  }
 }
