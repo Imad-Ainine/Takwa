@@ -3700,4 +3700,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get asmaDetailDuaTitle => 'Supplication with this Name';
+
+  @override
+  String get achievementsScreenTitle => 'My Achievements';
+
+  @override
+  String get achievementsProgressLabel => 'Progress';
+
+  @override
+  String get achievementsCategoryDaily => 'Daily Achievements';
+
+  @override
+  String get achievementsCategoryMilestone => 'Milestones';
+
+  @override
+  String get achievementsCategoryIbadah => 'Worship & Dhikr';
+
+  @override
+  String get achievementsCategorySpecial => 'Special Achievements';
+
+  @override
+  String achievementsAchievedOnLabel(String date) {
+    return 'Achieved on $date';
+  }
+
+  @override
+  String get achievementsEncourageMessage =>
+      'Keep going to double your efforts and earn this achievement! ✨';
+
+  @override
+  String get achievementsGotItButton => 'Got it';
 }

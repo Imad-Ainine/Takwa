@@ -6721,6 +6721,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الدعاء بهذا الاسم'**
   String get asmaDetailDuaTitle;
+
+  /// No description provided for @achievementsScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازاتي'**
+  String get achievementsScreenTitle;
+
+  /// No description provided for @achievementsProgressLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التقدم المحرز'**
+  String get achievementsProgressLabel;
+
+  /// No description provided for @achievementsCategoryDaily.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازات يومية'**
+  String get achievementsCategoryDaily;
+
+  /// No description provided for @achievementsCategoryMilestone.
+  ///
+  /// In ar, this message translates to:
+  /// **'محطات رئيسية'**
+  String get achievementsCategoryMilestone;
+
+  /// No description provided for @achievementsCategoryIbadah.
+  ///
+  /// In ar, this message translates to:
+  /// **'العبادات والذكر'**
+  String get achievementsCategoryIbadah;
+
+  /// No description provided for @achievementsCategorySpecial.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازات خاصة'**
+  String get achievementsCategorySpecial;
+
+  /// No description provided for @achievementsAchievedOnLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم التحقيق في {date}'**
+  String achievementsAchievedOnLabel(String date);
+
+  /// No description provided for @achievementsEncourageMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨'**
+  String get achievementsEncourageMessage;
+
+  /// No description provided for @achievementsGotItButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهمت'**
+  String get achievementsGotItButton;
 }
 
 class _AppLocalizationsDelegate

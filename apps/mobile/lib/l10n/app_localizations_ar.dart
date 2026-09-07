@@ -3668,4 +3668,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get asmaDetailDuaTitle => 'الدعاء بهذا الاسم';
+
+  @override
+  String get achievementsScreenTitle => 'إنجازاتي';
+
+  @override
+  String get achievementsProgressLabel => 'التقدم المحرز';
+
+  @override
+  String get achievementsCategoryDaily => 'إنجازات يومية';
+
+  @override
+  String get achievementsCategoryMilestone => 'محطات رئيسية';
+
+  @override
+  String get achievementsCategoryIbadah => 'العبادات والذكر';
+
+  @override
+  String get achievementsCategorySpecial => 'إنجازات خاصة';
+
+  @override
+  String achievementsAchievedOnLabel(String date) {
+    return 'تم التحقيق في $date';
+  }
+
+  @override
+  String get achievementsEncourageMessage =>
+      'استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨';
+
+  @override
+  String get achievementsGotItButton => 'فهمت';
 }

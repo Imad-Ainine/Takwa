@@ -2035,5 +2035,21 @@
   "asmaDuaLabel": "الدعاء",
   "asmaDetailExplanationTitle": "الشرح والبيان",
   "asmaDetailQuranTitle": "من القرآن الكريم",
-  "asmaDetailDuaTitle": "الدعاء بهذا الاسم"
+  "asmaDetailDuaTitle": "الدعاء بهذا الاسم",
+  "achievementsScreenTitle": "إنجازاتي",
+  "achievementsProgressLabel": "التقدم المحرز",
+  "achievementsCategoryDaily": "إنجازات يومية",
+  "achievementsCategoryMilestone": "محطات رئيسية",
+  "achievementsCategoryIbadah": "العبادات والذكر",
+  "achievementsCategorySpecial": "إنجازات خاصة",
+  "achievementsAchievedOnLabel": "تم التحقيق في {date}",
+  "@achievementsAchievedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsEncourageMessage": "استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨",
+  "achievementsGotItButton": "فهمت"
 }

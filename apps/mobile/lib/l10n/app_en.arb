@@ -1532,5 +1532,21 @@
   "asmaDuaLabel": "Dua",
   "asmaDetailExplanationTitle": "Explanation",
   "asmaDetailQuranTitle": "From the Noble Quran",
-  "asmaDetailDuaTitle": "Supplication with this Name"
+  "asmaDetailDuaTitle": "Supplication with this Name",
+  "achievementsScreenTitle": "My Achievements",
+  "achievementsProgressLabel": "Progress",
+  "achievementsCategoryDaily": "Daily Achievements",
+  "achievementsCategoryMilestone": "Milestones",
+  "achievementsCategoryIbadah": "Worship & Dhikr",
+  "achievementsCategorySpecial": "Special Achievements",
+  "achievementsAchievedOnLabel": "Achieved on {date}",
+  "@achievementsAchievedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementsEncourageMessage": "Keep going to double your efforts and earn this achievement! ✨",
+  "achievementsGotItButton": "Got it"
 }

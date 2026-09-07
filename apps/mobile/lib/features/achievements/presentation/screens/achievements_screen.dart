@@ -8,6 +8,7 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AchievementsScreen extends ConsumerStatefulWidget {
   const AchievementsScreen({super.key});
@@ -73,6 +74,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final achievementsAsync = ref.watch(achievementsProvider);
     final colors = context.colors;
 
@@ -94,7 +96,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   child: Center(child: TakwaLoadingIndicator()),
                 ),
                 error: (e, s) => SliverFillRemaining(
-                  child: Center(child: Text('حدث خطأ ما: $e')),
+                  child: Center(
+                    child: Text(l10n.checklistErrorPrefix('$e')),
+                  ),
                 ),
               ),
 
@@ -107,6 +111,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final earnedCount = ref.watch(earnedAchievementsCountProvider);
     final totalCount = AchievementDefinition.all.length;
@@ -121,7 +126,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       surfaceTintColor: Colors.transparent,
       leading: const CustomLeadingButton(),
       title: Text(
-        'إنجازاتي',
+        l10n.achievementsScreenTitle,
         style: context.typography.headingLarge.copyWith(
           color: colors.gold,
           fontWeight: FontWeight.w700,
@@ -182,7 +187,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'التقدم المحرز',
+                                  l10n.achievementsProgressLabel,
                                   style: context.typography.labelLarge.copyWith(
                                     color: colors.gold,
                                   ),
@@ -231,6 +236,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
   }
 
   Widget _buildContent(BuildContext context, List<AchievementView> list) {
+    final l10n = AppLocalizations.of(context)!;
     const categories = AchievementCategory.values;
 
     return SliverList(
@@ -260,7 +266,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      _getCategoryTitle(cat),
+                      _getCategoryTitle(l10n, cat),
                       style: context.typography.headingMedium.copyWith(
                         fontSize: 18,
                         color: context.colors.gold,
@@ -294,20 +300,21 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
     );
   }
 
-  String _getCategoryTitle(AchievementCategory cat) {
+  String _getCategoryTitle(AppLocalizations l10n, AchievementCategory cat) {
     switch (cat) {
       case AchievementCategory.daily:
-        return 'إنجازات يومية';
+        return l10n.achievementsCategoryDaily;
       case AchievementCategory.milestone:
-        return 'محطات رئيسية';
+        return l10n.achievementsCategoryMilestone;
       case AchievementCategory.ibadah:
-        return 'العبادات والذكر';
+        return l10n.achievementsCategoryIbadah;
       case AchievementCategory.special:
-        return 'إنجازات خاصة';
+        return l10n.achievementsCategorySpecial;
     }
   }
 
   void _showAchievementDetails(BuildContext context, AchievementView a) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final def = a.definition;
 
@@ -380,7 +387,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     Icon(Icons.verified_rounded, color: colors.success),
                     const SizedBox(width: 10),
                     Text(
-                      'تم التحقيق في ${_formatDate(a.earnedAt)}',
+                      l10n.achievementsAchievedOnLabel(
+                        _formatDate(a.earnedAt),
+                      ),
                       style: context.typography.labelMedium.copyWith(
                         color: colors.success,
                         fontWeight: FontWeight.w600,
@@ -401,7 +410,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   border: Border.all(color: colors.gold.withOpacity(0.2)),
                 ),
                 child: Text(
-                  'استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨',
+                  l10n.achievementsEncourageMessage,
                   textAlign: TextAlign.center,
                   style: context.typography.labelMedium.copyWith(
                     color: colors.gold,
@@ -411,7 +420,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
             ],
             const SizedBox(height: AppSpacing.xxl),
             PrimaryButton(
-              label: 'فهمت',
+              label: l10n.achievementsGotItButton,
               onTap: () async => Navigator.pop(context),
             ),
           ],
