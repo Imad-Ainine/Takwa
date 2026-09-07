@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/features/quran/data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -24,26 +25,17 @@ class KhatmaProgressSettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: style.bg,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29). As a plain
+      // Scaffold.appBar (not inside the scroll view) it's always visible
+      // regardless of scroll, matching this SliverAppBar's pinned: true.
+      appBar: AppBarWidget(
+        title: l10n.khatmaProgressScreenTitle,
+        leading: const CustomLeadingButton(),
+      ),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: style.isRamadan
-                ? style.bg
-                : const Color.fromARGB(46, 4, 1, 35),
-            foregroundColor: style.text,
-            pinned: true,
-            leading: const CustomLeadingButton(),
-            title: Text(
-              l10n.khatmaProgressScreenTitle,
-              style: style.amiri(
-                22,
-                color: style.text,
-                weight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-          ),
           SliverToBoxAdapter(
             child: Column(
               children: [
@@ -261,26 +253,17 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: style.bg,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29). As a plain
+      // Scaffold.appBar (not inside the scroll view) it's always visible
+      // regardless of scroll, matching this SliverAppBar's pinned: true.
+      appBar: AppBarWidget(
+        title: l10n.settingsScreenTitle,
+        leading: const CustomLeadingButton(),
+      ),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: style.isRamadan
-                ? style.bg
-                : const Color.fromARGB(46, 4, 1, 35),
-            foregroundColor: style.text,
-            pinned: true,
-            leading: const CustomLeadingButton(),
-            title: Text(
-              l10n.settingsScreenTitle,
-              style: style.amiri(
-                22,
-                color: style.text,
-                weight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(18),

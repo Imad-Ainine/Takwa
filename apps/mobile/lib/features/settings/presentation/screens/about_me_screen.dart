@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_tappable.dart';
@@ -16,6 +17,9 @@ class AboutMeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29).
+      appBar: _buildAppBar(context, l),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -24,7 +28,6 @@ class AboutMeScreen extends StatelessWidget {
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _buildAppBar(context, l),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -73,19 +76,10 @@ class AboutMeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, AppLocalizations l) {
-    return SliverAppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      pinned: true,
+  AppBarWidget _buildAppBar(BuildContext context, AppLocalizations l) {
+    return AppBarWidget(
       leading: const CustomLeadingButton(),
-      title: Text(
-        l.aboutScreenTitle,
-        style: context.typography.headingMedium.copyWith(
-          color: context.colors.gold,
-        ),
-      ),
-      centerTitle: true,
+      title: l.aboutScreenTitle,
     );
   }
 

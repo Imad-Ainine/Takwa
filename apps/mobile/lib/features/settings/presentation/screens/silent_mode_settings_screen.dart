@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
@@ -20,6 +21,20 @@ class SilentModeSettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29).
+      appBar: AppBarWidget(
+        leading: const CustomLeadingButton(),
+        title: l10n.silentModeSettingsTitle,
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 16),
+              child: SyncStatusIndicator(isSyncing: isSyncing),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -28,27 +43,6 @@ class SilentModeSettingsScreen extends ConsumerWidget {
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: Colors.transparent,
-                pinned: true,
-                leading: const CustomLeadingButton(),
-                title: Text(
-                  l10n.silentModeSettingsTitle,
-                  style: context.typography.headingMedium.copyWith(
-                    color: context.colors.gold,
-                  ),
-                ),
-                centerTitle: true,
-                elevation: 0,
-                actions: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.only(start: 16),
-                      child: SyncStatusIndicator(isSyncing: isSyncing),
-                    ),
-                  ),
-                ],
-              ),
               SliverPadding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(

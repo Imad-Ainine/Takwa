@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 import '../widgets/quran_widgets.dart';
@@ -31,80 +32,71 @@ class KhatmaProgressScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: style.bg,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29). As a plain
+      // Scaffold.appBar (not inside the scroll view) it's always visible
+      // regardless of scroll, matching this SliverAppBar's pinned: true.
+      appBar: AppBarWidget(
+        title: l.khatmaScreenTitle,
+        leading: const CustomLeadingButton(),
+        actions: [
+          if (khatma != null && khatma.isActive)
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert_rounded, color: style.text),
+              color: style.card,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                side: BorderSide(color: style.border),
+              ),
+              onSelected: (v) {
+                if (v == 'finish') {
+                  _confirmMarkFinished(context, ref, style, l);
+                } else if (v == 'cancel') {
+                  _confirmCancel(context, ref, style, l);
+                }
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: 'finish',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline_rounded,
+                        size: 18,
+                        color: style.gold,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        l.khatmaMenuMarkFinished,
+                        style: style.naskh(14, color: style.text),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'cancel',
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.cancel_outlined,
+                        size: 18,
+                        color: Colors.redAccent,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        l.khatmaMenuCancelKhatma,
+                        style: style.naskh(14, color: Colors.redAccent),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            backgroundColor: style.isRamadan
-                ? style.bg
-                : const Color.fromARGB(46, 4, 1, 35),
-            foregroundColor: style.text,
-            pinned: true,
-            leading: const CustomLeadingButton(),
-            title: Text(
-              l.khatmaScreenTitle,
-              style: style.amiri(
-                22,
-                color: style.text,
-                weight: FontWeight.bold,
-              ),
-            ),
-            centerTitle: true,
-            actions: [
-              if (khatma != null && khatma.isActive)
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert_rounded, color: style.text),
-                  color: style.card,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    side: BorderSide(color: style.border),
-                  ),
-                  onSelected: (v) {
-                    if (v == 'finish') {
-                      _confirmMarkFinished(context, ref, style, l);
-                    } else if (v == 'cancel') {
-                      _confirmCancel(context, ref, style, l);
-                    }
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'finish',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline_rounded,
-                            size: 18,
-                            color: style.gold,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            l.khatmaMenuMarkFinished,
-                            style: style.naskh(14, color: style.text),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'cancel',
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.cancel_outlined,
-                            size: 18,
-                            color: Colors.redAccent,
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            l.khatmaMenuCancelKhatma,
-                            style: style.naskh(14, color: Colors.redAccent),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-          ),
           if (khatma == null)
             SliverFillRemaining(
               hasScrollBody: false,

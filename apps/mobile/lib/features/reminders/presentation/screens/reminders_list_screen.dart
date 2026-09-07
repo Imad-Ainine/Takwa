@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -31,6 +32,9 @@ class RemindersListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29).
+      appBar: _buildAppBar(context),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -39,7 +43,6 @@ class RemindersListScreen extends ConsumerWidget {
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _buildAppBar(context),
               SliverPadding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 sliver: SliverList(
@@ -79,20 +82,11 @@ class RemindersListScreen extends ConsumerWidget {
     );
   }
 
-  SliverAppBar _buildAppBar(BuildContext context) {
+  AppBarWidget _buildAppBar(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return SliverAppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      pinned: true,
+    return AppBarWidget(
       leading: const CustomLeadingButton(),
-      title: Text(
-        l10n.remindersScreenTitle,
-        style: context.typography.headingMedium.copyWith(
-          color: context.colors.gold,
-        ),
-      ),
-      centerTitle: true,
+      title: l10n.remindersScreenTitle,
     );
   }
 
