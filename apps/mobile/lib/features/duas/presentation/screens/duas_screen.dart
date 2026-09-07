@@ -381,7 +381,7 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
+        margin: const EdgeInsetsDirectional.only(start: 8, top: 4, bottom: 4),
         padding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: AppSpacing.xs,

@@ -664,7 +664,7 @@ class _MosquePrayerSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(right: 8, bottom: 8),
+          padding: const EdgeInsetsDirectional.only(start: 8, bottom: 8),
           child: Row(
             children: [
               Text(
@@ -1716,7 +1716,12 @@ class _DailyDhikrCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: s.textSec),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: s.textSec,
+              matchTextDirection: true,
+            ),
           ],
         ),
       ),
@@ -1760,7 +1765,7 @@ class _BooksSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(right: 8, bottom: 12),
+          padding: const EdgeInsetsDirectional.only(start: 8, bottom: 12),
           child: Row(
             children: [
               Text(

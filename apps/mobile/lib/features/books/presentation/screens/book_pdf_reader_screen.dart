@@ -488,7 +488,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                     fontWeight: FontWeight.bold,
                     fontSize: 17,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

@@ -51,7 +51,7 @@ class SettingsCard extends StatelessWidget {
       children: [
         if (title != null)
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8, top: 4),
+            padding: const EdgeInsetsDirectional.only(start: 4, bottom: 8, top: 4),
             child: Text(
               title!,
               style: context.typography.caption.copyWith(
@@ -273,6 +273,7 @@ class ActionSetting extends StatelessWidget {
               Icons.chevron_right_rounded,
               size: 18,
               color: context.colors.textDim,
+              matchTextDirection: true,
             ),
           ],
         ),
@@ -350,6 +351,7 @@ class SelectSetting extends StatelessWidget {
               Icons.chevron_right_rounded,
               size: 18,
               color: context.colors.textDim,
+              matchTextDirection: true,
             ),
           ],
         ),

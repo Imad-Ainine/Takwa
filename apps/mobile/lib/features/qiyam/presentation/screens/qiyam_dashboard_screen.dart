@@ -529,7 +529,11 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                           ],
                         ),
                       ),
-                      Icon(Icons.chevron_right, color: context.colors.gold),
+                      Icon(
+                        Icons.chevron_right,
+                        color: context.colors.gold,
+                        matchTextDirection: true,
+                      ),
                     ],
                   ),
                 ),

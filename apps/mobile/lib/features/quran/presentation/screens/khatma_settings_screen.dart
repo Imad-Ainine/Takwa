@@ -296,7 +296,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
   }
 
   Widget _sectionHeader(AdaptiveStyle style, String title) => Padding(
-    padding: const EdgeInsets.only(right: 4),
+    padding: const EdgeInsetsDirectional.only(start: 4),
     child: Text(
       title,
       style: style.amiri(
