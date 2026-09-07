@@ -7141,6 +7141,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'سيتم تفعيل الدفع قريباً إن شاء الله'**
   String get paymentComingSoonMessage;
+
+  /// No description provided for @qiyamOnboardingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرحباً بك في قيام الليل'**
+  String get qiyamOnboardingTitle;
+
+  /// No description provided for @qiyamOnboardingDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلة إيمانية هادئة في جوف الليل، تبدأ بالذكر، وتمر بالقرآن، وتكتمل بالصلاة والاستغفار.'**
+  String get qiyamOnboardingDescription;
+
+  /// No description provided for @qiyamOnboardingStep1.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعد بالذكر والثناء'**
+  String get qiyamOnboardingStep1;
+
+  /// No description provided for @qiyamOnboardingStep2.
+  ///
+  /// In ar, this message translates to:
+  /// **'رتل آيات الله بتدبر'**
+  String get qiyamOnboardingStep2;
+
+  /// No description provided for @qiyamOnboardingStep3.
+  ///
+  /// In ar, this message translates to:
+  /// **'ناجِ ربك بالصلاة والدعاء'**
+  String get qiyamOnboardingStep3;
+
+  /// No description provided for @qiyamOnboardingStep4.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختم بالاستغفار والأسحار'**
+  String get qiyamOnboardingStep4;
+
+  /// No description provided for @qiyamOnboardingStartButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الرحلة الآن'**
+  String get qiyamOnboardingStartButton;
 }
 
 class _AppLocalizationsDelegate

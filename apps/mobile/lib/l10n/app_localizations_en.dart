@@ -3932,4 +3932,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get paymentComingSoonMessage =>
       'Payment will be enabled soon, insha\'Allah';
+
+  @override
+  String get qiyamOnboardingTitle => 'Welcome to Qiyam al-Layl';
+
+  @override
+  String get qiyamOnboardingDescription =>
+      'A calm spiritual journey in the depth of the night — beginning with dhikr, passing through the Quran, and completed with prayer and istighfar.';
+
+  @override
+  String get qiyamOnboardingStep1 => 'Prepare with dhikr and praise';
+
+  @override
+  String get qiyamOnboardingStep2 =>
+      'Recite the verses of Allah with reflection';
+
+  @override
+  String get qiyamOnboardingStep3 =>
+      'Converse with your Lord through prayer and dua';
+
+  @override
+  String get qiyamOnboardingStep4 =>
+      'Conclude with istighfar in the last hours of the night';
+
+  @override
+  String get qiyamOnboardingStartButton => 'Begin the Journey Now';
 }

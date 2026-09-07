@@ -3896,4 +3896,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get paymentComingSoonMessage => 'سيتم تفعيل الدفع قريباً إن شاء الله';
+
+  @override
+  String get qiyamOnboardingTitle => 'مرحباً بك في قيام الليل';
+
+  @override
+  String get qiyamOnboardingDescription =>
+      'رحلة إيمانية هادئة في جوف الليل، تبدأ بالذكر، وتمر بالقرآن، وتكتمل بالصلاة والاستغفار.';
+
+  @override
+  String get qiyamOnboardingStep1 => 'استعد بالذكر والثناء';
+
+  @override
+  String get qiyamOnboardingStep2 => 'رتل آيات الله بتدبر';
+
+  @override
+  String get qiyamOnboardingStep3 => 'ناجِ ربك بالصلاة والدعاء';
+
+  @override
+  String get qiyamOnboardingStep4 => 'اختم بالاستغفار والأسحار';
+
+  @override
+  String get qiyamOnboardingStartButton => 'ابدأ الرحلة الآن';
 }
