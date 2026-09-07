@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class EmailConfirmationScreen extends StatelessWidget {
   final String email;
@@ -10,6 +11,7 @@ class EmailConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Stack(
         children: [
@@ -38,7 +40,7 @@ class EmailConfirmationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxxl),
                   Text(
-                    'تأكيد البريد الإلكتروني',
+                    l10n.emailConfirmationTitle,
                     style: context.typography.headingLarge.copyWith(
                       color: context.colors.gold,
                     ),
@@ -46,13 +48,13 @@ class EmailConfirmationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'تم إرسال رابط التأكيد إلى:\n$email',
+                    l10n.emailConfirmationLinkSentLabel(email),
                     style: context.typography.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   Text(
-                    'يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.',
+                    l10n.emailConfirmationInstructions,
                     style: context.typography.bodyMedium.copyWith(
                       color: context.colors.textSecondary,
                     ),
@@ -62,7 +64,7 @@ class EmailConfirmationScreen extends StatelessWidget {
                   PrimaryButton(
                     onTap: () =>
                         Navigator.pushReplacementNamed(context, '/auth'),
-                    label: 'العودة لتسجيل الدخول',
+                    label: l10n.emailConfirmationBackToSignInButton,
                   ),
                 ],
               ),

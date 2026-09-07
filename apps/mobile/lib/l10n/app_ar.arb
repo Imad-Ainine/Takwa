@@ -2233,6 +2233,201 @@
       }
     }
   },
+  "mosqueErrorLocationPermission": "يرجى تفعيل صلاحية الموقع لرؤية المساجد القريبة",
+  "mosqueErrorLocationPermissionForever": "يجب تفعيل صلاحيات الموقع من إعدادات الجهاز",
+  "mosqueFetchError": "تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً",
+  "mosqueDefaultName": "مسجد قريب",
+  "mosqueDefaultAddress": "بدون عنوان محدد",
+  "emailConfirmationTitle": "تأكيد البريد الإلكتروني",
+  "emailConfirmationLinkSentLabel": "تم إرسال رابط التأكيد إلى:\n{email}",
+  "@emailConfirmationLinkSentLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailConfirmationInstructions": "يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.",
+  "emailConfirmationBackToSignInButton": "العودة لتسجيل الدخول",
+  "guestGuardTitle": "ميزة سحابية",
+  "guestGuardMessage": "هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.",
+  "guestGuardSignInButton": "تسجيل دخول / إنشاء حساب",
+  "guestGuardBackButton": "العودة",
+  "customTimePickerTitle": "اختيار الوقت",
+  "customTimePickerConfirmButton": "تأكيد",
+  "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية",
+  "achievementPointsRewardLabel": "+{points} نقطة",
+  "@achievementPointsRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementPendingLabel": "قيد الانتظار",
+  "khatmaMenuMarkFinished": "تحديد كمنتهية",
+  "khatmaMenuCancelKhatma": "إلغاء الختمة",
+  "khatmaMarkFinishedDialogTitle": "تحديد كمنتهية",
+  "khatmaMarkFinishedDialogBody": "هل أنت متأكد من تحديد هذه الختمة كمنتهية؟",
+  "khatmaMarkFinishedDialogNote": "هذا الخيار مناسب إذا كنت قد أنهيت قراءة القرآن من مصدر آخر.",
+  "khatmaMarkFinishedConfirm": "تأكيد",
+  "khatmaCancelDialogTitle": "إلغاء الختمة",
+  "khatmaCancelDialogBody": "هل أنت متأكد من إلغاء هذه الختمة؟",
+  "khatmaCancelDialogWarning": "تنبيه: سيتم حفظ تقدمك في التاريخ ولكن لن تتمكن من استرجاع الختمة الملغاة مرة أخرى.",
+  "khatmaCancelConfirmFinal": "إلغاء الختمة نهائياً",
+  "khatmaDialogGoBack": "تراجع",
+  "khatmaInfoSectionTitle": "معلومات الختمة",
+  "khatmaInfoNameLabel": "اسم الختمة",
+  "khatmaInfoTypeLabel": "نوع الختمة",
+  "khatmaInfoStartDateLabel": "تاريخ البداية",
+  "khatmaInfoCompletedDaysLabel": "الأيام المكتملة",
+  "khatmaInfoCompletedDaysValue": "{n} يوم",
+  "@khatmaInfoCompletedDaysValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaInfoEndTypeLabel": "مدة الختمة",
+  "khatmaInfoEndTypeNoLimit": "بدون وقت محدد للانتهاء",
+  "khatmaInfoEndTypeTarget": "حتى {date}",
+  "@khatmaInfoEndTypeTarget": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaTypeMuyassaraLabel": "ختمة ميسرة",
+  "khatmaTypeMultazimaLabel": "ختمة ملتزمة",
+  "khatmaOverallProgressTitle": "التقدم الإجمالي",
+  "khatmaReachedPageLabel": "وصلت إلى صفحة",
+  "khatmaReachedPageValue": "{current} من {total}",
+  "@khatmaReachedPageValue": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaCurrentPageLabel": "الصفحة الحالية",
+  "khatmaCurrentPageValue": "صفحة {n}",
+  "@khatmaCurrentPageValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemainingPagesLabel": "الصفحات المتبقية",
+  "khatmaRemainingPagesValue": "{n} صفحة",
+  "@khatmaRemainingPagesValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEstimatedHasanatLabel": "الحسنات المقدرة",
+  "khatmaEstimatedHasanatValue": "{n} حسنة",
+  "@khatmaEstimatedHasanatValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaStatusMuyassaraBadge": "ختمة ميسرة - بدون ضغط زمني",
+  "khatmaStatusMultazimaBadge": "ختمة ملتزمة - {n} صفحة/يوم",
+  "@khatmaStatusMultazimaBadge": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAvgPagesPerDayLabel": "متوسط الصفحات/اليوم",
+  "khatmaTypeDescriptionLabel": "نوع الختمة",
+  "khatmaTypeDescriptionFree": "بدون ضغط زمني أو ورد يومي محدد",
+  "khatmaTypeDescriptionTarget": "ورد يومي محدد: {n} صفحة",
+  "@khatmaTypeDescriptionTarget": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaExtraStatsTitle": "إحصائيات إضافية",
+  "khatmaTotalReadingTimeLabel": "إجمالي وقت القراءة",
+  "khatmaAvgReadingTimeLabel": "متوسط وقت القراءة",
+  "khatmaCurrentStreakLabel": "السلسلة الحالية",
+  "khatmaLongestStreakLabel": "أطول سلسلة",
+  "khatmaLastReadLabel": "آخر قراءة",
+  "khatmaStreakDaysValue": "{n} أيام",
+  "@khatmaStreakDaysValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaNoDataValue": "—",
+  "khatmaReadingDaysTitle": "أيام القراءة",
+  "khatmaReadingDaysSubtitle": "الأيام التي قرأت فيها القرآن الكريم",
+  "khatmaLegendFuture": "مستقبلي",
+  "khatmaLegendMissed": "فائت",
+  "khatmaLegendPartial": "ناقص",
+  "khatmaLegendComplete": "مكتمل",
+  "khatmaDurationHoursMinutes": "{hours}س {minutes}د",
+  "@khatmaDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDurationMinutesSeconds": "{minutes}د {seconds}ث",
+  "@khatmaDurationMinutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDurationSecondsOnly": "{seconds}ث",
+  "@khatmaDurationSecondsOnly": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaHistorySortMenuTooltip": "ترتيب وعرض",
+  "khatmaHistorySortByDate": "ترتيب حسب التاريخ",
+  "khatmaHistorySortByName": "ترتيب حسب الاسم",
+  "khatmaHistorySortByDuration": "ترتيب حسب المدة",
+  "khatmaHistorySortByProgress": "ترتيب حسب نسبة الإنجاز",
+  "khatmaHistoryShowStats": "عرض الإحصائيات",
+  "khatmaHistoryViewDetails": "عرض التفاصيل",
+  "khatmaHistoryDetailsTitle": "تفاصيل الختمة",
+  "khatmaHistoryStatsTitle": "إحصائيات الختمات",
+  "khatmaHistoryStatsTotal": "إجمالي الختمات",
+  "khatmaHistoryStatsCompleted": "ختمات مكتملة",
+  "khatmaHistoryStatsCancelled": "ختمات ملغاة",
+  "khatmaHistoryStatsTotalPages": "إجمالي الصفحات المقروءة",
+  "khatmaHistoryCloseButton": "إغلاق",
+  "khatmaProgressEmptyTitle": "لا توجد ختمة نشطة حالياً",
+  "khatmaProgressEmptySubtitle": "ابدأ ختمة جديدة لتتبع تقدمك هنا",
   "routeNotFoundTitle": "الصفحة غير متاحة",
   "@routeNotFoundTitle": {
     "description": "Title of the fallback screen shown for an unknown route"
