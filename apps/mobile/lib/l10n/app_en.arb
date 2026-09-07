@@ -1640,5 +1640,12 @@
   "qiyamStageSalahTitle": "Qiyam Prayer",
   "qiyamStageSalahSubtitle": "Lengthening the qunut and ruku",
   "qiyamStageWitrTitle": "Witr",
-  "qiyamStageWitrSubtitle": "The closing prayer of the night"
+  "qiyamStageWitrSubtitle": "The closing prayer of the night",
+  "paymentMethodsScreenTitle": "Payment Method",
+  "paymentMethodEdahabiaTitle": "Edahabia / CIB",
+  "paymentMethodVisaTitle": "Visa / Mastercard",
+  "paymentSupportTitle": "Ongoing Charity",
+  "paymentSupportMessage": "With your small contribution, you help make \"Takwa\" available to millions of Muslims as an ongoing charity (sadaqah jariyah) on your behalf and your parents'. 100 DZD or €10 a month ensures this work continues and keeps improving.",
+  "paymentContinueButton": "Continue to Payment",
+  "paymentComingSoonMessage": "Payment will be enabled soon, insha'Allah"
 }

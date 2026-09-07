@@ -7099,6 +7099,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'خاتمة صلاة الليل'**
   String get qiyamStageWitrSubtitle;
+
+  /// No description provided for @paymentMethodsScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة الدفع'**
+  String get paymentMethodsScreenTitle;
+
+  /// No description provided for @paymentMethodEdahabiaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الذهبية / CIB'**
+  String get paymentMethodEdahabiaTitle;
+
+  /// No description provided for @paymentMethodVisaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فيزا / ماستركارد'**
+  String get paymentMethodVisaTitle;
+
+  /// No description provided for @paymentSupportTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صدقة جارية'**
+  String get paymentSupportTitle;
+
+  /// No description provided for @paymentSupportMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'بمساهمتك البسيطة، تجعل \"تقوى\" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.'**
+  String get paymentSupportMessage;
+
+  /// No description provided for @paymentContinueButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتابعة للدفع'**
+  String get paymentContinueButton;
+
+  /// No description provided for @paymentComingSoonMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيتم تفعيل الدفع قريباً إن شاء الله'**
+  String get paymentComingSoonMessage;
 }
 
 class _AppLocalizationsDelegate

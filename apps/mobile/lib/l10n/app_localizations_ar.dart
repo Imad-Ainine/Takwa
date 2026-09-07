@@ -3874,4 +3874,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiyamStageWitrSubtitle => 'خاتمة صلاة الليل';
+
+  @override
+  String get paymentMethodsScreenTitle => 'طريقة الدفع';
+
+  @override
+  String get paymentMethodEdahabiaTitle => 'الذهبية / CIB';
+
+  @override
+  String get paymentMethodVisaTitle => 'فيزا / ماستركارد';
+
+  @override
+  String get paymentSupportTitle => 'صدقة جارية';
+
+  @override
+  String get paymentSupportMessage =>
+      'بمساهمتك البسيطة، تجعل \"تقوى\" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.';
+
+  @override
+  String get paymentContinueButton => 'المتابعة للدفع';
+
+  @override
+  String get paymentComingSoonMessage => 'سيتم تفعيل الدفع قريباً إن شاء الله';
 }

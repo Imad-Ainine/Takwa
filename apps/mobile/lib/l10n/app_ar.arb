@@ -2143,5 +2143,12 @@
   "qiyamStageSalahTitle": "صلاة القيام",
   "qiyamStageSalahSubtitle": "طول القنوت والركوع",
   "qiyamStageWitrTitle": "الوتر",
-  "qiyamStageWitrSubtitle": "خاتمة صلاة الليل"
+  "qiyamStageWitrSubtitle": "خاتمة صلاة الليل",
+  "paymentMethodsScreenTitle": "طريقة الدفع",
+  "paymentMethodEdahabiaTitle": "الذهبية / CIB",
+  "paymentMethodVisaTitle": "فيزا / ماستركارد",
+  "paymentSupportTitle": "صدقة جارية",
+  "paymentSupportMessage": "بمساهمتك البسيطة، تجعل \"تقوى\" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.",
+  "paymentContinueButton": "المتابعة للدفع",
+  "paymentComingSoonMessage": "سيتم تفعيل الدفع قريباً إن شاء الله"
 }

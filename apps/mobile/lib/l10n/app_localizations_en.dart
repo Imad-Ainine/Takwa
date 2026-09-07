@@ -3909,4 +3909,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiyamStageWitrSubtitle => 'The closing prayer of the night';
+
+  @override
+  String get paymentMethodsScreenTitle => 'Payment Method';
+
+  @override
+  String get paymentMethodEdahabiaTitle => 'Edahabia / CIB';
+
+  @override
+  String get paymentMethodVisaTitle => 'Visa / Mastercard';
+
+  @override
+  String get paymentSupportTitle => 'Ongoing Charity';
+
+  @override
+  String get paymentSupportMessage =>
+      'With your small contribution, you help make \"Takwa\" available to millions of Muslims as an ongoing charity (sadaqah jariyah) on your behalf and your parents\'. 100 DZD or €10 a month ensures this work continues and keeps improving.';
+
+  @override
+  String get paymentContinueButton => 'Continue to Payment';
+
+  @override
+  String get paymentComingSoonMessage =>
+      'Payment will be enabled soon, insha\'Allah';
 }

@@ -4,6 +4,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class PaymentMethodsScreen extends ConsumerStatefulWidget {
   const PaymentMethodsScreen({super.key});
@@ -18,6 +19,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: Stack(
         children: [
@@ -42,14 +44,14 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                         const SizedBox(height: AppSpacing.xxl),
                         _buildMethodCard(
                           index: 0,
-                          title: 'الذهبية / CIB',
+                          title: l10n.paymentMethodEdahabiaTitle,
                           subtitle: '100.00 DZD',
                           icon: '💳',
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         _buildMethodCard(
                           index: 1,
-                          title: 'فيزا / ماستركارد',
+                          title: l10n.paymentMethodVisaTitle,
                           subtitle: '€10.00',
                           icon: '🌍',
                         ),
@@ -67,6 +69,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -77,7 +80,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           CustomLeadingButton(onPressed: () => Navigator.pop(context)),
           const SizedBox(width: AppSpacing.md),
           Text(
-            'طريقة الدفع',
+            l10n.paymentMethodsScreenTitle,
             style: context.typography.headingMedium.copyWith(
               color: context.colors.textPrimary,
             ),
@@ -171,6 +174,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
   }
 
   Widget _buildSupportMessage(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
@@ -206,7 +210,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
               ),
               const SizedBox(width: AppSpacing.md),
               Text(
-                'صدقة جارية',
+                l10n.paymentSupportTitle,
                 style: context.typography.labelLarge.copyWith(
                   color: context.colors.gold,
                   fontWeight: FontWeight.w800,
@@ -217,7 +221,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'بمساهمتك البسيطة، تجعل "تقوى" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.',
+            l10n.paymentSupportMessage,
             style: context.typography.bodyMedium.copyWith(
               color: context.colors.textPrimary.withOpacity(0.9),
               height: 1.6,
@@ -256,16 +260,15 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
   }
 
   Widget _buildBottomButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
       child: PrimaryButton(
-        label: 'المتابعة للدفع',
+        label: l10n.paymentContinueButton,
         onTap: () {
           // Implementation for actual payment would go here
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('سيتم تفعيل الدفع قريباً إن شاء الله'),
-            ),
+            SnackBar(content: Text(l10n.paymentComingSoonMessage)),
           );
         },
       ),
