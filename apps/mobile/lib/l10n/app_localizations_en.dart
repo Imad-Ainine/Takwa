@@ -4034,4 +4034,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quranReaderMushafModeTooltip => 'Mushaf Mode';
+
+  @override
+  String get customIbadahGroupTitle => 'My Habits & Additions';
+
+  @override
+  String get customIbadahAddButton => 'Add and customize your habits';
+
+  @override
+  String get customIbadahPositiveHeader => 'Positive Habits';
+
+  @override
+  String get customIbadahNegativeHeader =>
+      'Negative Habits (custom prohibitions)';
 }

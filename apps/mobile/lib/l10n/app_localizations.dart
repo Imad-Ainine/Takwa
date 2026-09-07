@@ -7303,6 +7303,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'وضع المصحف'**
   String get quranReaderMushafModeTooltip;
+
+  /// No description provided for @customIbadahGroupTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عاداتي وإضافاتي'**
+  String get customIbadahGroupTitle;
+
+  /// No description provided for @customIbadahAddButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة وتخصيص عاداتك'**
+  String get customIbadahAddButton;
+
+  /// No description provided for @customIbadahPositiveHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادات الإيجابية'**
+  String get customIbadahPositiveHeader;
+
+  /// No description provided for @customIbadahNegativeHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادات السلبية (محظورات مخصصة)'**
+  String get customIbadahNegativeHeader;
 }
 
 class _AppLocalizationsDelegate

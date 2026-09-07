@@ -1702,5 +1702,9 @@
   "favoriteDuasEmptyTitle": "No favorite duas yet",
   "favoriteDuasEmptySubtitle": "Tap ❤️ on any dua to save it here",
   "quranReaderMushafModeTitle": "Mushaf",
-  "quranReaderMushafModeTooltip": "Mushaf Mode"
+  "quranReaderMushafModeTooltip": "Mushaf Mode",
+  "customIbadahGroupTitle": "My Habits & Additions",
+  "customIbadahAddButton": "Add and customize your habits",
+  "customIbadahPositiveHeader": "Positive Habits",
+  "customIbadahNegativeHeader": "Negative Habits (custom prohibitions)"
 }

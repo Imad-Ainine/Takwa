@@ -2205,5 +2205,9 @@
   "favoriteDuasEmptyTitle": "لا توجد أدعية مفضلة بعد",
   "favoriteDuasEmptySubtitle": "اضغط على ❤️ داخل أي دعاء لحفظه هنا",
   "quranReaderMushafModeTitle": "المصحف",
-  "quranReaderMushafModeTooltip": "وضع المصحف"
+  "quranReaderMushafModeTooltip": "وضع المصحف",
+  "customIbadahGroupTitle": "عاداتي وإضافاتي",
+  "customIbadahAddButton": "إضافة وتخصيص عاداتك",
+  "customIbadahPositiveHeader": "العادات الإيجابية",
+  "customIbadahNegativeHeader": "العادات السلبية (محظورات مخصصة)"
 }

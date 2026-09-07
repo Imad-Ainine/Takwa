@@ -3997,4 +3997,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quranReaderMushafModeTooltip => 'وضع المصحف';
+
+  @override
+  String get customIbadahGroupTitle => 'عاداتي وإضافاتي';
+
+  @override
+  String get customIbadahAddButton => 'إضافة وتخصيص عاداتك';
+
+  @override
+  String get customIbadahPositiveHeader => 'العادات الإيجابية';
+
+  @override
+  String get customIbadahNegativeHeader => 'العادات السلبية (محظورات مخصصة)';
 }
