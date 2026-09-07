@@ -4,6 +4,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/achievements/providers/achievements_providers.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AchievementCard extends ConsumerStatefulWidget {
   final AchievementView achievement;
@@ -81,6 +82,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
     final achievement = widget.achievement;
@@ -170,7 +172,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    '+${def.pointsReward} نقطة',
+                    l10n.achievementPointsRewardLabel(def.pointsReward),
                     style: typography.caption.copyWith(
                       color: colors.gold,
                       fontWeight: FontWeight.w700,
@@ -188,7 +190,7 @@ class _AchievementCardState extends ConsumerState<AchievementCard>
                 ),
               ] else ...[
                 Text(
-                  'قيد الانتظار',
+                  l10n.achievementPendingLabel,
                   style: typography.caption.copyWith(
                     color: colors.textDim.withOpacity(0.5),
                     fontWeight: FontWeight.w500,

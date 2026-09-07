@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class Mosque {
   final int id;
@@ -17,7 +18,7 @@ class Mosque {
     required this.lat,
     required this.lon,
     required this.distance,
-    this.address = 'بدون عنوان محدد',
+    required this.address,
     this.phone = '',
   });
 }
@@ -33,6 +34,7 @@ class MosqueRepository {
   Future<List<Mosque>> fetchNearbyMosques(
     Position position, {
     double radius = 5000,
+    required AppLocalizations l10n,
   }) async {
     // Failsafe: Prevent querying the ocean if GPS defaults to 0.0
     if (position.latitude == 0 && position.longitude == 0) {
@@ -77,11 +79,12 @@ class MosqueRepository {
                 if (lat == null || lon == null) return null;
 
                 final tags = e['tags'] ?? {};
-                final name = tags['name'] ?? tags['name:ar'] ?? 'مسجد قريب';
+                final name =
+                    tags['name'] ?? tags['name:ar'] ?? l10n.mosqueDefaultName;
                 final address =
                     tags['addr:full'] ??
                     tags['addr:street'] ??
-                    'بدون عنوان محدد';
+                    l10n.mosqueDefaultAddress;
                 final phone = tags['contact:phone'] ?? tags['phone'] ?? '';
 
                 final distance = Geolocator.distanceBetween(
@@ -113,8 +116,6 @@ class MosqueRepository {
       }
     }
 
-    throw Exception(
-      'تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً',
-    );
+    throw Exception(l10n.mosqueFetchError);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 Future<TimeOfDay?> showCustomTimePicker({
   required BuildContext context,
@@ -64,6 +65,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
 
     return Padding(
@@ -86,7 +88,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
           ),
           const SizedBox(height: AppSpacing.xxl),
           Text(
-            'اختيار الوقت',
+            l10n.customTimePickerTitle,
             style: TextStyle(
               fontFamily: 'Amiri',
               fontSize: 22,
@@ -172,7 +174,7 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                     ),
                   ),
                   child: Text(
-                    'إلغاء',
+                    l10n.commonCancel,
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 16,
@@ -203,9 +205,9 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'تأكيد',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.customTimePickerConfirmButton,
+                    style: const TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
