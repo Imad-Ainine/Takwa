@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:math' as math;
 import '../../features/settings/data/user_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import 'adhkar_progress_repository.dart';
 import 'shared_preferences_provider.dart';
 
@@ -451,22 +452,28 @@ class AdhkarNotificationService {
   static const _sleepId = 314;
   static const _dhikrId = 315;
 
-  static Future<void> rescheduleAll(UserPreferences prefs) async {
+  static Future<void> rescheduleAll(
+    UserPreferences prefs, {
+    required AppLocalizations l10n,
+  }) async {
     await cancelAll();
 
     if (prefs.adhkarNotifEnabled) {
       if (prefs.morningAdhkarReminder) {
-        await scheduleMorning(prefs.morningAdhkarTime);
+        await scheduleMorning(prefs.morningAdhkarTime, l10n: l10n);
       }
       if (prefs.eveningAdhkarReminder) {
-        await scheduleEvening(prefs.eveningAdhkarTime);
+        await scheduleEvening(prefs.eveningAdhkarTime, l10n: l10n);
       }
       // Assuming sleep reminders are global if adhkarNotifEnabled is true
-      await _scheduleSleep(prefs.sleepAdhkarTime);
+      await _scheduleSleep(prefs.sleepAdhkarTime, l10n: l10n);
     }
   }
 
-  static Future<void> _scheduleSleep(TimeOfDay time) async {
+  static Future<void> _scheduleSleep(
+    TimeOfDay time, {
+    required AppLocalizations l10n,
+  }) async {
     await _cancelId(_sleepId);
     final now = DateTime.now();
     var scheduled = DateTime(
@@ -483,18 +490,19 @@ class AdhkarNotificationService {
     final dhikr = _randomDhikr(AdhkarCategory.sleep);
     await _plugin.zonedSchedule(
       _sleepId,
-      '🌙 حان وقت أذكار النوم',
+      '🌙 ${l10n.notifAdhkarSleepTitle}',
       dhikr.arabic
           .replaceAll('\n', ' ')
           .substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
       tz.TZDateTime.from(scheduled, tz.local),
       _buildDetails(
         channelId: 'adhkar_sleep',
-        channelName: 'أذكار النوم',
+        channelName: l10n.notifAdhkarSleepChannelName,
+        channelDesc: l10n.notifAdhkarChannelDesc,
         actions: [
-          const AndroidNotificationAction(
+          AndroidNotificationAction(
             'read_sleep',
-            'قرأت الأذكار ✓',
+            l10n.notifAdhkarActionRead,
             showsUserInterface: false,
             cancelNotification: true,
           ),
@@ -508,7 +516,10 @@ class AdhkarNotificationService {
     );
   }
 
-  static Future<void> scheduleMorning(TimeOfDay time) async {
+  static Future<void> scheduleMorning(
+    TimeOfDay time, {
+    required AppLocalizations l10n,
+  }) async {
     await _cancelId(_morningId);
 
     final now = DateTime.now();
@@ -527,24 +538,25 @@ class AdhkarNotificationService {
 
     await _plugin.zonedSchedule(
       _morningId,
-      '🌅 حان وقت أذكار الصباح',
+      '🌅 ${l10n.notifAdhkarMorningTitle}',
       dhikr.arabic
           .replaceAll('\n', ' ')
           .substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
       tz.TZDateTime.from(scheduled, tz.local),
       _buildDetails(
         channelId: 'adhkar_morning',
-        channelName: 'أذكار الصباح',
+        channelName: l10n.notifAdhkarMorningChannelName,
+        channelDesc: l10n.notifAdhkarChannelDesc,
         actions: [
-          const AndroidNotificationAction(
+          AndroidNotificationAction(
             'read_morning',
-            'قرأت الأذكار ✓',
+            l10n.notifAdhkarActionRead,
             showsUserInterface: false,
             cancelNotification: true,
           ),
-          const AndroidNotificationAction(
+          AndroidNotificationAction(
             'open_morning',
-            'فتح الأذكار',
+            l10n.notifAdhkarActionOpen,
             showsUserInterface: true,
             cancelNotification: false,
           ),
@@ -558,7 +570,10 @@ class AdhkarNotificationService {
     );
   }
 
-  static Future<void> scheduleEvening(TimeOfDay time) async {
+  static Future<void> scheduleEvening(
+    TimeOfDay time, {
+    required AppLocalizations l10n,
+  }) async {
     await _cancelId(_eveningId);
 
     final now = DateTime.now();
@@ -577,24 +592,25 @@ class AdhkarNotificationService {
 
     await _plugin.zonedSchedule(
       _eveningId,
-      '🌆 حان وقت أذكار المساء',
+      '🌆 ${l10n.notifAdhkarEveningTitle}',
       dhikr.arabic
           .replaceAll('\n', ' ')
           .substring(0, dhikr.arabic.length > 80 ? 80 : dhikr.arabic.length),
       tz.TZDateTime.from(scheduled, tz.local),
       _buildDetails(
         channelId: 'adhkar_evening',
-        channelName: 'أذكار المساء',
+        channelName: l10n.notifAdhkarEveningChannelName,
+        channelDesc: l10n.notifAdhkarChannelDesc,
         actions: [
-          const AndroidNotificationAction(
+          AndroidNotificationAction(
             'read_evening',
-            'قرأت الأذكار ✓',
+            l10n.notifAdhkarActionRead,
             showsUserInterface: false,
             cancelNotification: true,
           ),
-          const AndroidNotificationAction(
+          AndroidNotificationAction(
             'open_evening',
-            'فتح الأذكار',
+            l10n.notifAdhkarActionOpen,
             showsUserInterface: true,
             cancelNotification: false,
           ),
@@ -715,6 +731,11 @@ class AdhkarNotificationService {
   static NotificationDetails _buildDetails({
     required String channelId,
     required String channelName,
+    // Defaults to the old hardcoded Arabic description for
+    // scheduleDailyDhikr()/showDhikrNow(), which aren't called from
+    // anywhere in the app today (dead code) and so weren't threaded a
+    // locale — see the i18n audit note on this class.
+    String channelDesc = 'أذكار وأدعية من حصن المسلم',
     String? bigText,
     List<AndroidNotificationAction>? actions,
   }) {
@@ -722,7 +743,7 @@ class AdhkarNotificationService {
       android: AndroidNotificationDetails(
         channelId,
         channelName,
-        channelDescription: 'أذكار وأدعية من حصن المسلم',
+        channelDescription: channelDesc,
         importance: Importance.high,
         priority: Priority.high,
         color: const Color(0xFFC8A96E),

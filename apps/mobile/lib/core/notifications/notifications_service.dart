@@ -12,8 +12,10 @@ import 'package:hijri/hijri_calendar.dart';
 
 import 'package:takwa/features/duas/data/duas_data.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
+import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/app/main_shell.dart' show currentTabProvider;
 import 'package:takwa/l10n/app_localizations.dart';
@@ -81,6 +83,16 @@ class NotifIds {
 //  NOTIFICATION CHANNELS (Android)
 // ─────────────────────────────────────────
 class NotifChannels {
+  // Deliberately still hardcoded to Arabic, unlike the scheduled
+  // notification title/body text below (see NotificationsManager /
+  // AdhkarNotificationService) — these channel names/descriptions are
+  // baked into an Android notification channel at creation time via
+  // initialize(), and Android ignores a channel's display name being
+  // changed after that: a locale-aware rewrite here would need a
+  // channel-ID bump to actually take effect, which would need its own
+  // migration so users don't lose their per-channel sound/vibration
+  // overrides. Scoped out of this pass; see the i18n audit for the
+  // full reasoning.
   static final AppLocalizations _l10n = lookupAppLocalizations(
     const Locale('ar'),
   );
@@ -323,6 +335,7 @@ class NotificationsService {
   // ── جدولة إشعارات الصلاة الكاملة ──
   static Future<void> schedulePrayerNotifications({
     required List<PrayerTimeInfo> prayers,
+    required AppLocalizations l10n,
     bool preAdhanEnabled = true,
     bool iqamaEnabled = true,
     String adhanMode = 'sound',
@@ -349,6 +362,10 @@ class NotificationsService {
 
     for (int i = 0; i < prayers.length; i++) {
       final prayer = prayers[i];
+      // Localized display name for whatever the user's locale is — the
+      // notification itself used to always say prayer.nameAr regardless
+      // (see the i18n audit's notification-text finding).
+      final prayerName = prayerLocalizedName(l10n, prayer.name);
 
       // 1. تنبيه قبل الأذان بـ 15 دقيقة
       if (preAdhanEnabled) {
@@ -356,8 +373,8 @@ class NotificationsService {
         if (preTime.isAfter(now)) {
           await _scheduleExact(
             id: 110 + i,
-            title: '⏳ اقترب وقت ${prayer.nameAr}',
-            body: '15 دقيقة على أذان ${prayer.nameAr}، استعدَّ للصلاة',
+            title: l10n.notifPreAdhanTitle(prayerName),
+            body: l10n.notifPreAdhanBody(prayerName),
             scheduledTime: preTime,
             channelId: NotifChannels.alert.id,
             payload: 'pre_prayer:${prayer.name}',
@@ -380,8 +397,11 @@ class NotificationsService {
 
         await _scheduleExact(
           id: prayer.notifId,
-          title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
-          body: 'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح',
+          title: '${prayer.emoji} ${l10n.notifAdhanTitle(prayerName)}',
+          // The Takbir/call-to-prayer phrase itself stays as-is in both
+          // languages (transliterated for English) — it's the Adhan's own
+          // wording, not app chrome, so it isn't a straight translation.
+          body: l10n.notifAdhanBody,
           scheduledTime: prayer.time,
           channelId: selectedChannel.id,
           sound: soundAsset,
@@ -398,8 +418,8 @@ class NotificationsService {
         if (iqamaTime.isAfter(now)) {
           await _scheduleExact(
             id: 120 + i,
-            title: '🤲 وقت الإقامة — ${prayer.nameAr}',
-            body: 'حان وقت إقامة صلاة ${prayer.nameAr}، الله أكبر الله أكبر',
+            title: l10n.notifIqamaTitle(prayerName),
+            body: l10n.notifIqamaBody(prayerName),
             scheduledTime: iqamaTime,
             channelId: NotifChannels.alert.id,
             payload: 'iqama:${prayer.name}',
@@ -410,7 +430,10 @@ class NotificationsService {
   }
 
   // ── جدولة محاسبة مسائية يومية ──
-  static Future<void> scheduleEveningMuhasaba({required TimeOfDay time}) async {
+  static Future<void> scheduleEveningMuhasaba({
+    required TimeOfDay time,
+    required AppLocalizations l10n,
+  }) async {
     await _plugin.cancel(NotifIds.eveningMuhasaba);
 
     final now = DateTime.now();
@@ -425,11 +448,12 @@ class NotificationsService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    final msg = _eveningMessages[now.weekday % _eveningMessages.length];
+    final eveningMessages = _eveningMessages(l10n);
+    final msg = eveningMessages[now.weekday % eveningMessages.length];
 
     await _plugin.zonedSchedule(
       NotifIds.eveningMuhasaba,
-      '📝 وقت محاسبة النفس',
+      '📝 ${l10n.notifMuhasabaTitle}',
       msg,
       tz.TZDateTime.from(scheduled, tz.local),
       NotificationDetails(
@@ -454,6 +478,12 @@ class NotificationsService {
   }
 
   // ── جدولة أذكار الصباح والمساء يومياً ──
+  // Not called from anywhere in the app — AdhkarNotificationService in
+  // adhkar_providers.dart is the notifier actually wired up via
+  // NotificationsManager.scheduleAll(). Left as hardcoded Arabic
+  // (unlike the live methods above) rather than localized, since
+  // spending effort on unreachable code isn't worth the risk of a typo
+  // no one would ever see fire.
   static Future<void> scheduleAdhkarReminders({
     required TimeOfDay morningTime,
     required TimeOfDay eveningTime,
@@ -499,13 +529,13 @@ class NotificationsService {
   }
 
   // ── جدولة أدعية يومية ──
-  static Future<void> scheduleDailyDuas() async {
+  static Future<void> scheduleDailyDuas({required AppLocalizations l10n}) async {
     // دعاء الصباح (9:00)
     final morningDua = _getTimedDua(DuaCategory.morning);
     if (morningDua != null) {
       await _scheduleDailyAt(
         id: NotifIds.dailyDuaMorning,
-        title: '${morningDua.emoji} دعاء الصباح',
+        title: '${morningDua.emoji} ${l10n.notifDuaMorningTitle}',
         body: _truncate(morningDua.arabic, 150),
         time: const TimeOfDay(hour: 9, minute: 0),
         channelId: NotifChannels.duas.id,
@@ -522,7 +552,7 @@ class NotificationsService {
     if (eveningDua != null) {
       await _scheduleDailyAt(
         id: NotifIds.dailyDuaEvening,
-        title: '${eveningDua.emoji} دعاء المساء',
+        title: '${eveningDua.emoji} ${l10n.notifDuaEveningTitle}',
         body: _truncate(eveningDua.arabic, 150),
         time: const TimeOfDay(hour: 21, minute: 0),
         channelId: NotifChannels.duas.id,
@@ -535,7 +565,7 @@ class NotificationsService {
     if (distressDua != null) {
       await _scheduleDailyAt(
         id: NotifIds.distressDua,
-        title: '${distressDua.emoji} دعاء اليوم',
+        title: '${distressDua.emoji} ${l10n.notifDuaTodayTitle}',
         body: _truncate(distressDua.arabic, 150),
         time: const TimeOfDay(hour: 12, minute: 0),
         channelId: NotifChannels.duas.id,
@@ -548,6 +578,7 @@ class NotificationsService {
   static Future<void> scheduleSpecialReminders({
     required bool fridayReminders,
     required bool fastingReminders,
+    required AppLocalizations l10n,
   }) async {
     final ids = [
       NotifIds.fridayKahf,
@@ -562,8 +593,8 @@ class NotificationsService {
     if (fridayReminders) {
       await _scheduleWeekly(
         id: NotifIds.fridayKahf,
-        title: '📖 سورة الكهف',
-        body: 'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين',
+        title: '📖 ${l10n.notifFridayKahfTitle}',
+        body: l10n.notifFridayKahfBody,
         day: DateTime.friday,
         hour: 9,
         minute: 0,
@@ -571,8 +602,8 @@ class NotificationsService {
       );
       await _scheduleWeekly(
         id: NotifIds.fridaySalawat,
-        title: '💛 الصلاة على النبي ﷺ',
-        body: 'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة',
+        title: '💛 ${l10n.notifFridaySalawatTitle}',
+        body: l10n.notifFridaySalawatBody,
         day: DateTime.friday,
         hour: 13,
         minute: 0,
@@ -583,8 +614,8 @@ class NotificationsService {
     if (fastingReminders) {
       await _scheduleWeekly(
         id: NotifIds.fastingMonday,
-        title: '🥘 تذكير بصيام الاثنين',
-        body: 'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم',
+        title: '🥘 ${l10n.notifFastingMondayTitle}',
+        body: l10n.notifFastingMondayBody,
         day: DateTime.sunday,
         hour: 21,
         minute: 0,
@@ -592,8 +623,8 @@ class NotificationsService {
       );
       await _scheduleWeekly(
         id: NotifIds.fastingThursday,
-        title: '🥘 تذكير بصيام الخميس',
-        body: 'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام',
+        title: '🥘 ${l10n.notifFastingThursdayTitle}',
+        body: l10n.notifFastingThursdayBody,
         day: DateTime.wednesday,
         hour: 21,
         minute: 0,
@@ -601,14 +632,18 @@ class NotificationsService {
       );
 
       // الأيام البيض
-      await _scheduleWhiteDays();
+      await _scheduleWhiteDays(l10n);
     }
   }
 
   // ── جدولة رمضان (السحور والإفطار) ──
+  // Also not called from anywhere yet (no Ramadan-mode screen wires it
+  // up today) — localized anyway since it was a small addition while
+  // already in this file, so it's ready the day something does call it.
   static Future<void> scheduleRamadanNotifications({
     required DateTime suhoorTime,
     required DateTime iftarTime,
+    required AppLocalizations l10n,
   }) async {
     await _plugin.cancel(NotifIds.ramadanSuhoor);
     await _plugin.cancel(NotifIds.ramadanIftar);
@@ -618,8 +653,8 @@ class NotificationsService {
     if (suhoorAlert.isAfter(now)) {
       await _scheduleExact(
         id: NotifIds.ramadanSuhoor,
-        title: '🌙 تنبيه السحور',
-        body: 'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك',
+        title: '🌙 ${l10n.notifSuhoorTitle}',
+        body: l10n.notifSuhoorBody,
         scheduledTime: suhoorAlert,
         channelId: NotifChannels.ramadan.id,
         payload: 'ramadan:suhoor',
@@ -628,8 +663,8 @@ class NotificationsService {
     if (iftarTime.isAfter(now)) {
       await _scheduleExact(
         id: NotifIds.ramadanIftar,
-        title: '🌅 حان وقت الإفطار',
-        body: 'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك',
+        title: '🌅 ${l10n.notifIftarTitle}',
+        body: l10n.notifIftarBody,
         scheduledTime: iftarTime,
         channelId: NotifChannels.ramadan.id,
         sound: 'adhan',
@@ -639,7 +674,10 @@ class NotificationsService {
   }
 
   // ── المنبه / الاستيقاظ ──
-  static Future<void> scheduleWakeUpAlarm({required TimeOfDay time}) async {
+  static Future<void> scheduleWakeUpAlarm({
+    required TimeOfDay time,
+    required AppLocalizations l10n,
+  }) async {
     for (int i = 0; i < 7; i++) {
       await _plugin.cancel(NotifIds.wakeUpAlarm + i);
     }
@@ -660,8 +698,8 @@ class NotificationsService {
 
       await _scheduleExact(
         id: NotifIds.wakeUpAlarm + i,
-        title: '🌙 حان وقت الاستيقاظ',
-        body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
+        title: '🌙 ${l10n.notifWakeUpTitle}',
+        body: l10n.notifWakeUpBody,
         scheduledTime: scheduled,
         channelId: NotifChannels.wakeUpAlarm.id,
         sound: 'adhan',
@@ -671,12 +709,15 @@ class NotificationsService {
     }
   }
 
-  static Future<void> scheduleSnooze({required int minutes}) async {
+  static Future<void> scheduleSnooze({
+    required int minutes,
+    required AppLocalizations l10n,
+  }) async {
     final snoozeTime = DateTime.now().add(Duration(minutes: minutes));
     await _scheduleExact(
       id: NotifIds.wakeUpAlarm,
-      title: '🌙 حان وقت الاستيقاظ (غفوة)',
-      body: 'الصلاة خير من النوم — استيقظ لصلاة الفجر',
+      title: '🌙 ${l10n.notifWakeUpSnoozeTitle}',
+      body: l10n.notifWakeUpBody,
       scheduledTime: snoozeTime,
       channelId: NotifChannels.wakeUpAlarm.id,
       sound: 'adhan',
@@ -691,11 +732,12 @@ class NotificationsService {
     required String body,
     required String emoji,
     required int points,
+    required AppLocalizations l10n,
   }) async {
     await _plugin.show(
       NotifIds.achievement,
-      '$emoji إنجاز جديد: $title',
-      '$body — +$points نقطة تقوى 🌟',
+      '$emoji ${l10n.notifAchievementNewPrefix(title)}',
+      '$body — ${l10n.notifAchievementPointsSuffix(points)}',
       NotificationDetails(
         android: AndroidNotificationDetails(
           NotifChannels.achievement.id,
@@ -703,7 +745,7 @@ class NotificationsService {
           importance: Importance.high,
           priority: Priority.high,
           styleInformation: BigTextStyleInformation(
-            '$body\n✨ +$points نقطة تقوى',
+            '$body\n✨ ${l10n.notifAchievementPointsShort(points)}',
           ),
           color: const Color(0xFFC8A96E),
         ),
@@ -914,7 +956,7 @@ class NotificationsService {
     );
   }
 
-  static Future<void> _scheduleWhiteDays() async {
+  static Future<void> _scheduleWhiteDays(AppLocalizations l10n) async {
     for (int monthOffset = 0; monthOffset <= 1; monthOffset++) {
       final h = HijriCalendar.now();
       if (monthOffset > 0) {
@@ -931,9 +973,10 @@ class NotificationsService {
         if (notify.isAfter(DateTime.now())) {
           await _scheduleExact(
             id: NotifIds.fastingWhiteDays + (monthOffset * 3) + (day - 12),
-            title: '⚪ غداً من الأيام البيض',
-            body:
-                'غداً يوم ${day + 1} من ${h.getLongMonthName()} الهجري — صيام الأيام البيض سنّة مؤكدة',
+            title: '⚪ ${l10n.notifWhiteDaysTitle}',
+            // getLongMonthName() already follows HijriCalendar.language,
+            // which locale_provider.dart keeps in sync with the app locale.
+            body: l10n.notifWhiteDaysBody(day + 1, h.getLongMonthName()),
             scheduledTime: notify,
             channelId: NotifChannels.reminders.id,
             payload: 'reminder:white_days',
@@ -978,14 +1021,14 @@ class NotificationsService {
     NotificationRouter.route(response.payload ?? '');
   }
 
-  static const _eveningMessages = [
-    'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙',
-    '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا" — عمر بن الخطاب',
-    'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝',
-    'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟',
-    'لا تنم قبل أن تحاسب نفسك على يومك 💫',
-    'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲',
-    'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏',
+  static List<String> _eveningMessages(AppLocalizations l10n) => [
+    l10n.notifMuhasabaMsg1,
+    l10n.notifMuhasabaMsg2,
+    l10n.notifMuhasabaMsg3,
+    l10n.notifMuhasabaMsg4,
+    l10n.notifMuhasabaMsg5,
+    l10n.notifMuhasabaMsg6,
+    l10n.notifMuhasabaMsg7,
   ];
 }
 
@@ -1248,16 +1291,26 @@ class NotificationsManager {
   final Ref _ref;
   NotificationsManager(this._ref);
 
+  /// Resolved once per scheduling pass rather than per-notification — every
+  /// method below that builds notification text takes this instead of
+  /// reaching for a hardcoded locale, so scheduled titles/bodies actually
+  /// follow the app's current language instead of always being Arabic
+  /// (the i18n audit's notification-text finding).
+  AppLocalizations _currentL10n() =>
+      lookupAppLocalizations(_ref.read(localeProvider));
+
   Future<void> scheduleAll() async {
     if (!await NotificationsService.checkPermissions()) return;
 
     final prefs = await _ref.read(userPreferencesProvider.future);
+    final l10n = _currentL10n();
 
     // أوقات الصلاة
     if (prefs.prayerReminder) {
       final prayers = await _ref.read(prayerTimesProvider.future);
       await NotificationsService.schedulePrayerNotifications(
         prayers: prayers,
+        l10n: l10n,
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
         adhanMode: prefs.adhanMode,
@@ -1266,7 +1319,10 @@ class NotificationsManager {
 
     // تنبيه اليقظة قبل الفجر
     if (prefs.wakeUpBeforeFajr) {
-      await NotificationsService.scheduleWakeUpAlarm(time: prefs.wakeUpTime);
+      await NotificationsService.scheduleWakeUpAlarm(
+        time: prefs.wakeUpTime,
+        l10n: l10n,
+      );
     } else {
       await NotificationsService.cancel(NotifIds.wakeUpAlarm);
     }
@@ -1275,19 +1331,23 @@ class NotificationsManager {
     if (prefs.muhasabaReminder) {
       await NotificationsService.scheduleEveningMuhasaba(
         time: prefs.muhasabaTime,
+        l10n: l10n,
       );
     }
 
     // الأذكار
-    await AdhkarNotificationService.rescheduleAll(prefs);
+    await AdhkarNotificationService.rescheduleAll(prefs, l10n: l10n);
 
     // الأدعية
-    if (prefs.dailyDuasOn) await NotificationsService.scheduleDailyDuas();
+    if (prefs.dailyDuasOn) {
+      await NotificationsService.scheduleDailyDuas(l10n: l10n);
+    }
 
     // التذكيرات الخاصة
     await NotificationsService.scheduleSpecialReminders(
       fridayReminders: prefs.specialRemindersOn,
       fastingReminders: prefs.fastingRemindersOn,
+      l10n: l10n,
     );
   }
 
@@ -1340,10 +1400,12 @@ class NotificationsManager {
 
     final prefs = await _ref.read(userPreferencesProvider.future);
     final prayers = await _ref.read(prayerTimesProvider.future);
+    final l10n = _currentL10n();
 
     if (prefs.prayerReminder) {
       await NotificationsService.schedulePrayerNotifications(
         prayers: prayers,
+        l10n: l10n,
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
         adhanMode: prefs.adhanMode,
@@ -1351,14 +1413,17 @@ class NotificationsManager {
     }
 
     if (prefs.wakeUpBeforeFajr) {
-      await NotificationsService.scheduleWakeUpAlarm(time: prefs.wakeUpTime);
+      await NotificationsService.scheduleWakeUpAlarm(
+        time: prefs.wakeUpTime,
+        l10n: l10n,
+      );
     }
   }
 
   Future<void> _rescheduleAdhkar() async {
     // Adhkar IDs are handled internally by AdhkarNotificationService.rescheduleAll
     final prefs = await _ref.read(userPreferencesProvider.future);
-    await AdhkarNotificationService.rescheduleAll(prefs);
+    await AdhkarNotificationService.rescheduleAll(prefs, l10n: _currentL10n());
   }
 
   Future<void> _rescheduleReminders() async {
@@ -1376,18 +1441,23 @@ class NotificationsManager {
     }
 
     final prefs = await _ref.read(userPreferencesProvider.future);
+    final l10n = _currentL10n();
 
     if (prefs.muhasabaReminder) {
       await NotificationsService.scheduleEveningMuhasaba(
         time: prefs.muhasabaTime,
+        l10n: l10n,
       );
     }
 
-    if (prefs.dailyDuasOn) await NotificationsService.scheduleDailyDuas();
+    if (prefs.dailyDuasOn) {
+      await NotificationsService.scheduleDailyDuas(l10n: l10n);
+    }
 
     await NotificationsService.scheduleSpecialReminders(
       fridayReminders: prefs.specialRemindersOn,
       fastingReminders: prefs.fastingRemindersOn,
+      l10n: l10n,
     );
   }
 }

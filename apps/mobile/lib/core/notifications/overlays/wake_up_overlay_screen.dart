@@ -371,6 +371,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
                               onTap: () async {
                                 await NotificationsService.scheduleSnooze(
                                   minutes: 10,
+                                  l10n: l10n,
                                 );
                                 _close();
                               },

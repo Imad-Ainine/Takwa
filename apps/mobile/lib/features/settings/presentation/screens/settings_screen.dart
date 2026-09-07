@@ -428,6 +428,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   body: l10n.settingsTestNotifBody,
                   emoji: '✅',
                   points: 0,
+                  l10n: l10n,
                 );
               },
             ),
