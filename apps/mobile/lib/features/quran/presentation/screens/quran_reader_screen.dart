@@ -67,10 +67,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   // thing that currently surfaces reading-time stats.
   late final DateTime _sessionStart;
 
+  // Captured in initState rather than read via `ref` inside dispose():
+  // Riverpod's ConsumerStatefulElement tears down its ref-handling before
+  // State.dispose() runs, so `ref.read(...)` there throws "Cannot use
+  // 'ref' after the widget was disposed." Reading the notifier once,
+  // early, and calling straight into it in dispose() sidesteps that.
+  late final KhatmaExNotifier _khatmaNotifier;
+
   @override
   void initState() {
     super.initState();
     _sessionStart = DateTime.now();
+    _khatmaNotifier = ref.read(khatmaExProvider.notifier);
 
     int startPage = 1;
     if (widget.initialPage != null) {
@@ -113,8 +121,10 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     if (widget.startFromKhatma) {
       final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
       // Fire-and-forget: the notifier persists to SharedPreferences, and
-      // this widget is already gone by the time that completes.
-      ref.read(khatmaExProvider.notifier).addReadingTime(elapsed);
+      // this widget is already gone by the time that completes. Uses the
+      // notifier captured in initState — see _khatmaNotifier's doc comment
+      // for why `ref.read(...)` can't be called here directly.
+      _khatmaNotifier.addReadingTime(elapsed);
     }
     _toolbarAnim.dispose();
     super.dispose();
@@ -138,7 +148,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     ref.read(quranStateProvider.notifier).setPage(p);
 
     if (widget.startFromKhatma) {
-      ref.read(khatmaExProvider.notifier).advancePage(p);
+      _khatmaNotifier.advancePage(p);
     }
 
     final surahNum = _surahForPage(p);
