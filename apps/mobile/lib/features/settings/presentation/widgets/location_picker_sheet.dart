@@ -555,9 +555,10 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   ),
                 ),
                 Icon(
-                  Icons.chevron_right_rounded,
+                  Directionality.of(context) == TextDirection.rtl
+                      ? Icons.chevron_left_rounded
+                      : Icons.chevron_right_rounded,
                   color: Colors.white.withValues(alpha: 0.8),
-                  matchTextDirection: true,
                 ),
               ],
             ),

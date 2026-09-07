@@ -984,7 +984,7 @@ class _AddAdhkarSheetState extends ConsumerState<AddAdhkarSheet> {
                   Switch(
                     value: _shareWithCommunity,
                     onChanged: (v) => setState(() => _shareWithCommunity = v),
-                    activeColor: context.colors.teal,
+                    activeThumbColor: context.colors.teal,
                     activeTrackColor: context.colors.teal.withValues(alpha: 0.3),
                     inactiveTrackColor: context.colors.border,
                     inactiveThumbColor: context.colors.textDim,

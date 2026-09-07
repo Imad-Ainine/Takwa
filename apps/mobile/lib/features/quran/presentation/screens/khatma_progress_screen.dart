@@ -192,7 +192,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
             Icon(
               Icons.menu_book_rounded,
               size: 72,
-              color: style.textDim.withOpacity(0.15),
+              color: style.textDim.withValues(alpha: 0.15),
             ),
             const SizedBox(height: AppSpacing.xl),
             Text(
@@ -203,7 +203,7 @@ class KhatmaProgressScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               l.khatmaProgressEmptySubtitle,
-              style: style.naskh(13, color: style.textSec.withOpacity(0.5)),
+              style: style.naskh(13, color: style.textSec.withValues(alpha: 0.5)),
               textAlign: TextAlign.center,
             ),
           ],
@@ -543,7 +543,7 @@ class _StatusCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: style.gold.withOpacity(0.14),
+              color: style.gold.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
@@ -691,11 +691,11 @@ class _ReadingDaysCalendar extends StatelessWidget {
   Color _colorFor(_DayState s) {
     switch (s) {
       case _DayState.future:
-        return style.border.withOpacity(0.4);
+        return style.border.withValues(alpha: 0.4);
       case _DayState.missed:
-        return Colors.redAccent.withOpacity(0.35);
+        return Colors.redAccent.withValues(alpha: 0.35);
       case _DayState.partial:
-        return Colors.orangeAccent.withOpacity(0.55);
+        return Colors.orangeAccent.withValues(alpha: 0.55);
       case _DayState.complete:
         return style.gold;
     }
@@ -762,7 +762,7 @@ class _ReadingDaysCalendar extends StatelessWidget {
                   style: style.naskh(
                     10,
                     color: s == _DayState.complete
-                        ? Colors.black.withOpacity(0.75)
+                        ? Colors.black.withValues(alpha: 0.75)
                         : style.text,
                     weight: FontWeight.w600,
                   ),

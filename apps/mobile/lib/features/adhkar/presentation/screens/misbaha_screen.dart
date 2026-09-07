@@ -257,10 +257,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                         // home cards, checklist) uses chevron_right, so this
                         // was the one inconsistent one (audit §H5).
                         Icon(
-                          Icons.chevron_right_rounded,
+                          Directionality.of(context) == TextDirection.rtl
+                              ? Icons.chevron_left_rounded
+                              : Icons.chevron_right_rounded,
                           color: style.gold,
                           size: 20,
-                          matchTextDirection: true,
                         ),
                     ],
                   ),

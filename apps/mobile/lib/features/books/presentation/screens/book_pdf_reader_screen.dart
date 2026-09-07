@@ -627,7 +627,9 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
             accentColor: accentColor,
             onTap: () {
               if (_selectedText.isNotEmpty) {
-                Share.share(_selectedText);
+                SharePlus.instance.share(
+                  ShareParams(text: _selectedText),
+                );
               }
               _clearSelection();
             },

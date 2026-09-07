@@ -24,7 +24,7 @@ class PrimarySwitch extends StatelessWidget {
         HapticFeedback.selectionClick();
         onChanged(val);
       },
-      activeColor: activeColor,
+      activeThumbColor: activeColor,
       activeTrackColor: activeColor.withValues(alpha: 0.3),
       inactiveTrackColor: context.colors.border,
       inactiveThumbColor: context.colors.textDim,

@@ -733,8 +733,10 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _handleLocationUpdate() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 12),
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 12),
+        ),
       );
 
       final lat = pos.latitude;

@@ -907,7 +907,7 @@ class _AdhkarNotifSheet extends ConsumerWidget {
                     // Immediately cancel all adhkar notifications when disabled
                     if (!v) AdhkarNotificationService.cancelAll();
                   },
-                  activeColor: context.colors.gold,
+                  activeThumbColor: context.colors.gold,
                   activeTrackColor: context.colors.gold.withValues(alpha: 0.3),
                   inactiveTrackColor: context.colors.border,
                   inactiveThumbColor: context.colors.textDim,
@@ -1135,7 +1135,7 @@ class _ToggleRow extends StatelessWidget {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: context.colors.teal,
+          activeThumbColor: context.colors.teal,
           activeTrackColor: context.colors.teal.withValues(alpha: 0.3),
           inactiveTrackColor: context.colors.border,
           inactiveThumbColor: context.colors.textDim,

@@ -268,18 +268,31 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _typeOption(
-                  KhatmaType.muyassara,
-                  l10n.createKhatmaTypeMuyassaraTitle,
-                  l10n.createKhatmaTypeMuyassaraDesc,
-                  style,
-                ),
-                const SizedBox(height: 10),
-                _typeOption(
-                  KhatmaType.multazima,
-                  l10n.createKhatmaTypeMultazimaTitle,
-                  l10n.createKhatmaTypeMultazimaDesc,
-                  style,
+                // Radio(groupValue:, onChanged:) is deprecated in favor of a
+                // RadioGroup ancestor managing the group value — wrap both
+                // options so their Radio children can drop those params.
+                RadioGroup<KhatmaType>(
+                  groupValue: _type,
+                  onChanged: (v) {
+                    if (v != null) setState(() => _type = v);
+                  },
+                  child: Column(
+                    children: [
+                      _typeOption(
+                        KhatmaType.muyassara,
+                        l10n.createKhatmaTypeMuyassaraTitle,
+                        l10n.createKhatmaTypeMuyassaraDesc,
+                        style,
+                      ),
+                      const SizedBox(height: 10),
+                      _typeOption(
+                        KhatmaType.multazima,
+                        l10n.createKhatmaTypeMultazimaTitle,
+                        l10n.createKhatmaTypeMultazimaDesc,
+                        style,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -306,11 +319,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
         children: [
           Radio<KhatmaType>(
             value: type,
-            groupValue: _type,
             activeColor: style.isRamadan ? style.gold : style.teal,
-            onChanged: (v) {
-              if (v != null) setState(() => _type = v);
-            },
           ),
           Expanded(
             child: Column(
@@ -477,7 +486,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   children: [
                     Switch(
                       value: _notificationsEnabled,
-                      activeColor: style.isRamadan ? style.gold : style.teal,
+                      activeThumbColor: style.isRamadan ? style.gold : style.teal,
                       activeTrackColor:
                           (style.isRamadan ? style.gold : style.teal)
                               .withValues(alpha: 0.3),

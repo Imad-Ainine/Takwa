@@ -259,10 +259,11 @@ class _SurahRow extends StatelessWidget {
           children: [
             // Arrow
             Icon(
-              Icons.chevron_right,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               color: style.textDim,
               size: 20,
-              matchTextDirection: true,
             ),
             const SizedBox(width: AppSpacing.sm),
             // Arabic calligraphic name (left side)
@@ -368,10 +369,11 @@ class _ReviewTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  Icons.chevron_right,
+                  Directionality.of(context) == TextDirection.rtl
+                      ? Icons.chevron_left
+                      : Icons.chevron_right,
                   color: style.textDim,
                   size: 20,
-                  matchTextDirection: true,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -565,11 +567,12 @@ class _JuzTab extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
-                  Icons.chevron_right,
+                Icon(
+                  Directionality.of(context) == TextDirection.rtl
+                      ? Icons.chevron_left
+                      : Icons.chevron_right,
                   color: Colors.white30,
                   size: 20,
-                  matchTextDirection: true,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(

@@ -211,10 +211,11 @@ class _AddReminderBottomSheetState
                         ),
                         const Spacer(),
                         Icon(
-                          Icons.chevron_right_rounded,
+                          Directionality.of(context) == TextDirection.rtl
+                              ? Icons.chevron_left_rounded
+                              : Icons.chevron_right_rounded,
                           color: context.colors.textDim,
                           size: 20,
-                          matchTextDirection: true,
                         ),
                       ],
                     ),

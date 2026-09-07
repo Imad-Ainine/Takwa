@@ -22,7 +22,9 @@ class SupabaseConfig {
   static SupabaseClient get client => Supabase.instance.client;
 
   static Future<void> initialize() async {
-    await Supabase.initialize(url: url, anonKey: anonKey);
+    // anonKey is deprecated in favor of publishableKey in this
+    // supabase_flutter version.
+    await Supabase.initialize(url: url, publishableKey: anonKey);
   }
 
   static User? get currentUser => client.auth.currentUser;

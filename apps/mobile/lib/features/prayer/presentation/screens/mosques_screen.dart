@@ -40,7 +40,9 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
   Future<void> _loadLocation() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+        ),
       );
       if (mounted) {
         setState(() {

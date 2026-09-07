@@ -226,10 +226,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     ),
                   ),
                   child: Icon(
-                    Icons.chevron_right,
+                    Directionality.of(context) == TextDirection.rtl
+                        ? Icons.chevron_left
+                        : Icons.chevron_right,
                     color: style.textDim,
                     size: 22,
-                    matchTextDirection: true,
                   ),
                 ),
                 const Spacer(),
@@ -336,11 +337,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Row(
           children: [
             _circleBtn(
-              Icons.chevron_right,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const KhatmaHistoryScreen()),
-              matchTextDirection: true,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -418,11 +420,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Row(
           children: [
             _circleBtn(
-              Icons.chevron_right,
+              Directionality.of(context) == TextDirection.rtl
+                  ? Icons.chevron_left
+                  : Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const FreeReadingScreen()),
-              matchTextDirection: true,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -460,28 +463,18 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  // matchTextDirection defaults false: two of this helper's callers pass
-  // play_arrow_rounded/add, universal media/action glyphs that should NOT
-  // flip in RTL (a mirrored "play" triangle reads as "previous/rewind").
-  // The chevron_right drill-in callers below pass true explicitly.
-  Widget _circleBtn(
-    IconData icon,
-    Color bg,
-    Color fg,
-    VoidCallback f, {
-    bool matchTextDirection = false,
-  }) => GestureDetector(
+  // Callers resolve the correct chevron direction themselves (Icon has no
+  // matchTextDirection param) before passing `icon` in — this helper just
+  // paints whatever IconData it's given, directional or not (the other two
+  // callers pass play_arrow_rounded/add, which should never flip).
+  Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
+      GestureDetector(
     onTap: f,
     child: Container(
       width: 44,
       height: 44,
       decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-      child: Icon(
-        icon,
-        color: fg,
-        size: 22,
-        matchTextDirection: matchTextDirection,
-      ),
+      child: Icon(icon, color: fg, size: 22),
     ),
   );
 
