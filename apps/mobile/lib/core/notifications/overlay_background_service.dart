@@ -733,9 +733,9 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _handleLocationUpdate() async {
     try {
       final pos = await Geolocator.getCurrentPosition(
-        locationSettings: LocationSettings(
+        locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
-          timeLimit: const Duration(seconds: 12),
+          timeLimit: Duration(seconds: 12),
         ),
       );
 
