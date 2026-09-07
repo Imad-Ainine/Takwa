@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -307,46 +306,41 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     final visual = _kPrayerVisuals[prayerKey]!;
     _animateSkyIfNeeded(prayerKey);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      style.bg.withOpacity(0.3),
-                      style.bg.withOpacity(0.95),
-                    ],
-                  ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    style.bg.withOpacity(0.3),
+                    style.bg.withOpacity(0.95),
+                  ],
                 ),
               ),
             ),
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+          ),
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
 
-            // ── Floating Particles ──
-            Positioned.fill(child: _FloatingParticles(visual: visual)),
+          // ── Floating Particles ──
+          Positioned.fill(child: _FloatingParticles(visual: visual)),
 
-            // ── Content ──
-            state.loading
-                ? _LoadingOverlay(style: style)
-                : state.error != null
-                ? _ErrorView(
-                    onRetry: () =>
-                        ref.read(prayerScreenProvider.notifier).refresh(),
-                  )
-                : _buildContent(context, state, visual, style),
-          ],
-        ),
+          // ── Content ──
+          state.loading
+              ? _LoadingOverlay(style: style)
+              : state.error != null
+              ? _ErrorView(
+                  onRetry: () =>
+                      ref.read(prayerScreenProvider.notifier).refresh(),
+                )
+              : _buildContent(context, state, visual, style),
+        ],
       ),
     );
   }

@@ -7387,6 +7387,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'قوة كلمة المرور: {strength}'**
   String authPasswordStrengthLabel(String strength);
+
+  /// Title of the fallback screen shown for an unknown route
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة غير متاحة'**
+  String get routeNotFoundTitle;
+
+  /// Unknown-route detail line naming the route that failed
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فتح المسار «{route}».'**
+  String routeNotFoundMessage(String route);
+
+  /// Unknown-route action when there is nothing to pop back to
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة للرئيسية'**
+  String get routeNotFoundGoHome;
+
+  /// Unknown-route action when the previous screen can be popped back to
+  ///
+  /// In ar, this message translates to:
+  /// **'رجوع'**
+  String get routeNotFoundGoBack;
+
+  /// Generic word for a prayer, used when no specific prayer is known
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة'**
+  String get prayerGenericLabel;
+
+  /// Title of the overlay shown when a guest opens a sync-only feature
+  ///
+  /// In ar, this message translates to:
+  /// **'ميزة سحابية'**
+  String get guestGuardTitle;
+
+  /// Explanation shown when a guest opens a sync-only feature
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.'**
+  String get guestGuardMessage;
+
+  /// Primary action on the guest-mode overlay
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل دخول / إنشاء حساب'**
+  String get guestGuardSignIn;
+
+  /// Secondary action on the guest-mode overlay
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة'**
+  String get guestGuardBack;
+
+  /// Hadith shown under the app name on the splash screen
+  ///
+  /// In ar, this message translates to:
+  /// **'"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"'**
+  String get splashQuote;
 }
 
 class _AppLocalizationsDelegate

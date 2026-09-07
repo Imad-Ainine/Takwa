@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+
+import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/features/books/presentation/screens/books_library_screen.dart';
 import 'package:takwa/features/books/presentation/screens/books_chapter_screen.dart';
 import 'package:takwa/features/books/presentation/screens/book_pdf_reader_screen.dart';
@@ -114,54 +118,59 @@ class AppRoutes {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case Routes.splash:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const SplashScreen());
       case Routes.home:
-        return MaterialPageRoute(builder: (_) => const MainShell());
+        return MaterialPageRoute(settings: settings, builder: (_) => const MainShell());
       case Routes.checklist:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const MainShell(initialIndex: 2),
         );
       case Routes.statistics:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const MainShell(initialIndex: 3),
         );
       case Routes.settings:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const MainShell(initialIndex: 5),
         );
       case Routes.accountSettings:
-        return MaterialPageRoute(builder: (_) => const AccountSettingsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AccountSettingsScreen());
       case Routes.aboutMe:
-        return MaterialPageRoute(builder: (_) => const AboutMeScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AboutMeScreen());
       case Routes.onboarding:
-        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const OnboardingScreen());
       case Routes.prayer:
-        return MaterialPageRoute(builder: (_) => const PrayerScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const PrayerScreen());
       case Routes.adhkar:
         final args = settings.arguments;
         final index = args is int ? args : 0;
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => AdhkarScreen(initialCategoryIndex: index),
         );
       case Routes.qibla:
-        return MaterialPageRoute(builder: (_) => const QiblaScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiblaScreen());
       case Routes.duas:
-        return MaterialPageRoute(builder: (_) => const DuasScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const DuasScreen());
       case Routes.asma:
-        return MaterialPageRoute(builder: (_) => const AsmaScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AsmaScreen());
       case Routes.auth:
-        return MaterialPageRoute(builder: (_) => const AuthScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AuthScreen());
       case Routes.achievements:
-        return MaterialPageRoute(builder: (_) => const AchievementsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AchievementsScreen());
       case Routes.authChoice:
-        return MaterialPageRoute(builder: (_) => const AuthChoiceScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AuthChoiceScreen());
       case Routes.profile:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const ProfileScreen());
       case Routes.quran:
-        return MaterialPageRoute(builder: (_) => const QuranScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QuranScreen());
       case Routes.quranReader:
         final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => QuranReaderScreen(
             startFromKhatma: args?['startFromKhatma'] ?? false,
             initialSurah: args?['initialSurah'],
@@ -169,107 +178,188 @@ class AppRoutes {
           ),
         );
       case Routes.aiMemorize:
-        return MaterialPageRoute(builder: (_) => const AiMemorizeScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const AiMemorizeScreen());
       case Routes.createKhatma:
-        return MaterialPageRoute(builder: (_) => const CreateKhatmaScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const CreateKhatmaScreen());
       case Routes.freeReading:
-        return MaterialPageRoute(builder: (_) => const FreeReadingScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const FreeReadingScreen());
       case Routes.khatmaHistory:
-        return MaterialPageRoute(builder: (_) => const KhatmaHistoryScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const KhatmaHistoryScreen());
       case Routes.khatmaProgress:
-        return MaterialPageRoute(builder: (_) => const KhatmaProgressScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const KhatmaProgressScreen());
       case Routes.khatmaProgressSettings:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const KhatmaProgressSettingsScreen(),
         );
       case Routes.khatmaExtendedSettings:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const KhatmaExtendedSettingsScreen(),
         );
       case Routes.khatmaSettings:
-        return MaterialPageRoute(builder: (_) => const KhatmaSettingsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const KhatmaSettingsScreen());
       case Routes.adhan:
-        final prayerName = (settings.arguments as String?) ?? 'الصلاة';
+        // No BuildContext here, so no localizations: pass null and let the
+        // screen fall back to a localized generic label.
+        final prayerName = settings.arguments as String?;
         return MaterialPageRoute(
+          settings: settings,
           fullscreenDialog: true,
           builder: (_) => AdhanOverlayScreen(prayerName: prayerName),
         );
       case Routes.wakeUpOverlay:
         return MaterialPageRoute(
+          settings: settings,
           fullscreenDialog: true,
           builder: (_) => const WakeUpOverlayScreen(),
         );
       case Routes.terms:
-        return MaterialPageRoute(builder: (_) => const TermsPrivacyScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const TermsPrivacyScreen());
       case Routes.reminders:
-        return MaterialPageRoute(builder: (_) => const RemindersListScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const RemindersListScreen());
       case Routes.favoriteAdhkar:
-        return MaterialPageRoute(builder: (_) => const FavoriteAdhkarScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const FavoriteAdhkarScreen());
       case Routes.favoriteDuas:
-        return MaterialPageRoute(builder: (_) => const FavoriteDuasScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const FavoriteDuasScreen());
       case Routes.mosques:
-        return MaterialPageRoute(builder: (_) => const MosquesScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const MosquesScreen());
       case Routes.misbaha:
-        return MaterialPageRoute(builder: (_) => const MisbahaScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const MisbahaScreen());
       case Routes.manageCustomIbadah:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const ManageCustomIbadahScreen(),
         );
       case Routes.subscription:
-        return MaterialPageRoute(builder: (_) => const SubscriptionScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const SubscriptionScreen());
       case Routes.paymentMethods:
-        return MaterialPageRoute(builder: (_) => const PaymentMethodsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const PaymentMethodsScreen());
       case Routes.qiyam:
-        return MaterialPageRoute(builder: (_) => const QiyamDashboardScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiyamDashboardScreen());
       case Routes.qiyamCalculator:
-        return MaterialPageRoute(builder: (_) => const QiyamCalculatorScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiyamCalculatorScreen());
       case Routes.qiyamStories:
-        return MaterialPageRoute(builder: (_) => const QiyamStoriesScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiyamStoriesScreen());
       case Routes.qiyamWird:
-        return MaterialPageRoute(builder: (_) => const QiyamWirdScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiyamWirdScreen());
       case Routes.qiyamVirtues:
-        return MaterialPageRoute(builder: (_) => const QiyamVirtuesScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const QiyamVirtuesScreen());
       case Routes.qiyamSleepCalculator:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const QiyamSleepCalculatorScreen(),
         );
       case Routes.qiyamBeginnerGuide:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const QiyamBeginnerGuideScreen(),
         );
       case Routes.qiyamSunnahGuide:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const QiyamSunnahGuideScreen(),
         );
       case Routes.emailConfirmation:
         final email = settings.arguments as String? ?? '';
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => EmailConfirmationScreen(email: email),
         );
       case Routes.forgotPassword:
         final email = settings.arguments as String?;
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ForgotPasswordScreen(initialEmail: email),
         );
       case Routes.updatePassword:
-        return MaterialPageRoute(builder: (_) => const UpdatePasswordScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const UpdatePasswordScreen());
       case Routes.books:
-        return MaterialPageRoute(builder: (_) => const BooksLibraryScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const BooksLibraryScreen());
       case Routes.booksChapter:
         final book = settings.arguments as IslamicBook;
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => BooksChapterScreen(book: book),
         );
       case Routes.booksPdf:
         final book = settings.arguments as IslamicBook;
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => BookPdfReaderScreen(book: book),
         );
       default:
         return MaterialPageRoute(
-          builder: (_) =>
-              const Scaffold(body: Center(child: Text('Route not found'))),
+          settings: settings,
+          builder: (_) => _RouteNotFoundScreen(routeName: settings.name),
         );
     }
+  }
+}
+
+/// Shown when [AppRoutes.onGenerateRoute] is handed a name it doesn't know.
+/// Replaces a bare, unthemed, unlocalized `Text('Route not found')` that also
+/// left the user with no way back.
+class _RouteNotFoundScreen extends StatelessWidget {
+  const _RouteNotFoundScreen({this.routeName});
+
+  final String? routeName;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final canPop = Navigator.of(context).canPop();
+
+    return Scaffold(
+      backgroundColor: colors.background,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xxl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.explore_off_rounded,
+                  size: 48,
+                  color: colors.textDim,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  l10n.routeNotFoundTitle,
+                  textAlign: TextAlign.center,
+                  style: context.typography.headingMedium,
+                ),
+                if (routeName != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    l10n.routeNotFoundMessage(routeName!),
+                    textAlign: TextAlign.center,
+                    style: context.typography.bodySmall,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.xxl),
+                PrimaryButton(
+                  label: canPop
+                      ? l10n.routeNotFoundGoBack
+                      : l10n.routeNotFoundGoHome,
+                  icon: Icons.home_rounded,
+                  onTap: () {
+                    if (canPop) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil(Routes.home, (r) => false);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

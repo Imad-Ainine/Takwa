@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
@@ -51,38 +50,35 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     final khatma = ref.watch(khatmaExProvider);
     final dailyVerse = ref.watch(dailyVerseProvider);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            FadeTransition(
-              opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(child: _buildTopBar(style)),
-                  SliverToBoxAdapter(child: _buildDatePill(style)),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: AppSpacing.md),
-                  ),
-                  SliverToBoxAdapter(child: _buildVerseCard(dailyVerse, style)),
-                  const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                  SliverToBoxAdapter(child: _buildKhatmaButton(khatma, style)),
-                  const SliverToBoxAdapter(child: SizedBox(height: 10)),
-                  SliverToBoxAdapter(child: _buildFreeReadingButton(style)),
-                  const SliverToBoxAdapter(child: SizedBox(height: 18)),
-                  SliverToBoxAdapter(child: _buildGrid(style)),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: AppSpacing.xxxl),
-                  ),
-                ],
-              ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          const CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          FadeTransition(
+            opacity: CurvedAnimation(parent: _ctrl, curve: Curves.easeOut),
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(child: _buildTopBar(style)),
+                SliverToBoxAdapter(child: _buildDatePill(style)),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: AppSpacing.md),
+                ),
+                SliverToBoxAdapter(child: _buildVerseCard(dailyVerse, style)),
+                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                SliverToBoxAdapter(child: _buildKhatmaButton(khatma, style)),
+                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                SliverToBoxAdapter(child: _buildFreeReadingButton(style)),
+                const SliverToBoxAdapter(child: SizedBox(height: 18)),
+                SliverToBoxAdapter(child: _buildGrid(style)),
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: AppSpacing.xxxl),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -52,6 +52,18 @@ class _PrimaryButtonState extends State<PrimaryButton>
     super.dispose();
   }
 
+  Future<void> _run() async {
+    if (_loading) return;
+    setState(() => _loading = true);
+    try {
+      await widget.onTap!();
+    } finally {
+      // Without the finally a throwing handler left the spinner up forever
+      // and the button permanently disabled.
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -70,109 +82,134 @@ class _PrimaryButtonState extends State<PrimaryButton>
               .toColor()
         : colors.goldDark;
 
-    // Content text/icon color: on filled → white (always contrasts the gradient).
-    // On outline or disabled → use theme tokens.
+    // Content text/icon color. White on the default gold gradient was only
+    // 2.24:1, so a filled button uses the same near-black the theme uses for
+    // `onPrimary` — unless the caller supplied a base color dark enough that
+    // white is the better choice.
+    final onFilled =
+        ThemeData.estimateBrightnessForColor(primaryColor) == Brightness.dark
+        ? Colors.white
+        : const Color(0xFF241B05);
     final contentColor = disabled
-        ? colors.textDim
+        ? colors.textSecondary
         : widget.isOutline
-        ? primaryColor
-        : (widget.isBg ? Colors.white : colors.textPrimary);
+        ? (widget.baseColor ?? colors.goldText)
+        : (widget.isBg ? onFilled : colors.textPrimary);
 
-    return GestureDetector(
-      onTapDown: disabled
-          ? null
-          : (_) {
-              _ctrl.forward();
-              HapticFeedback.mediumImpact();
-            },
-      onTapUp: disabled
-          ? null
-          : (_) async {
-              _ctrl.reverse();
-              setState(() => _loading = true);
-              await widget.onTap!();
-              if (mounted) setState(() => _loading = false);
-            },
-      onTapCancel: () => _ctrl.reverse(),
-      child: ScaleTransition(
-        scale: Tween<double>(
-          begin: 1,
-          end: 0.96,
-        ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: double.infinity,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            gradient: (disabled || widget.isOutline)
-                ? null
-                : LinearGradient(colors: [primaryColor, endColor]),
-            color: disabled
-                ? colors.border
-                : widget.isOutline
-                ? Colors.transparent
-                : null,
-            borderRadius: BorderRadius.circular(24),
-            border: widget.isOutline
-                ? Border.all(color: primaryColor.withOpacity(0.5), width: 1.5)
-                : null,
-            boxShadow: (disabled || widget.isOutline)
-                ? null
-                : [
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.30),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+    // The action MUST hang off onTap, not onTapUp: GestureDetector only
+    // contributes SemanticsAction.tap when onTap is non-null, so with the old
+    // onTapUp-only wiring TalkBack/VoiceOver double-tap did nothing on the
+    // app's primary control. Semantics is explicit so the label and the
+    // disabled state are announced too.
+    return Semantics(
+      button: true,
+      enabled: !disabled,
+      label: widget.label,
+      onTap: disabled ? null : _run,
+      // One coherent "label, button" stop instead of the icon and text each
+      // being their own node — same pattern as _PrayerRow / _BottomNav.
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTapDown: disabled
+            ? null
+            : (_) {
+                _ctrl.forward();
+                // lightImpact, not mediumImpact: a button press is a
+                // selection, not a commit.
+                HapticFeedback.lightImpact();
+              },
+        onTapUp: disabled ? null : (_) => _ctrl.reverse(),
+        onTapCancel: () => _ctrl.reverse(),
+        onTap: disabled ? null : _run,
+        child: ScaleTransition(
+          scale: Tween<double>(
+            begin: 1,
+            end: 0.96,
+          ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut)),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: double.infinity,
+            // 12pt padding + a 15px line box came to ~44dp, under the 48dp
+            // minimum touch target on both platforms.
+            constraints: const BoxConstraints(minHeight: 48),
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              gradient: (disabled || widget.isOutline)
+                  ? null
+                  : LinearGradient(colors: [primaryColor, endColor]),
+              color: disabled
+                  ? colors.border
+                  : widget.isOutline
+                  ? Colors.transparent
+                  : null,
+              borderRadius: AppRadius.button,
+              border: widget.isOutline
+                  ? Border.all(color: primaryColor.withOpacity(0.5), width: 1.5)
+                  : null,
+              boxShadow: (disabled || widget.isOutline)
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.30),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (!disabled && !widget.isOutline)
+                  if (widget.isBg)
+                    const Positioned.fill(
+                      child: CustomPatternBackground(
+                        pattern: BackgroundPattern.adhkar,
+                      ),
                     ),
-                  ],
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              if (!disabled && !widget.isOutline)
-                if (widget.isBg)
-                  const Positioned.fill(
-                    child: CustomPatternBackground(
-                      pattern: BackgroundPattern.adhkar,
-                    ),
-                  ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                child: _loading
-                    ? Center(
-                        child: TakwaLoadingIndicator(
-                          size: 20,
-                          // On a gradient surface the indicator should always be white.
-                          color: widget.isBg
-                              ? Colors.white
-                              : colors.textPrimary,
-                        ),
-                      )
-                    : widget.customContent ??
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (widget.icon != null) ...[
-                                Icon(
-                                  widget.icon,
-                                  size: 18,
-                                  color: contentColor,
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                              ],
-                              Text(
-                                widget.label,
-                                style: TextStyle(
-                                  fontFamily: 'NotoNaskhArabic',
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: contentColor,
-                                ),
-                              ),
-                            ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  child: _loading
+                      ? Center(
+                          child: TakwaLoadingIndicator(
+                            size: 20,
+                            // Match the label, so the spinner is legible on
+                            // whatever the button is actually filled with.
+                            color: widget.isBg ? onFilled : colors.textPrimary,
                           ),
-              ),
-            ],
+                        )
+                      : widget.customContent ??
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (widget.icon != null) ...[
+                                  Icon(
+                                    widget.icon,
+                                    size: 18,
+                                    color: contentColor,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                ],
+                                Flexible(
+                                  child: Text(
+                                    widget.label,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.center,
+                                    // Was hardcoded to NotoNaskhArabic, which
+                                    // rendered every button label in an Arabic
+                                    // naskh face in the English UI.
+                                    style: context.typography.labelMedium
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: contentColor,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

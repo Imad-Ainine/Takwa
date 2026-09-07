@@ -110,160 +110,155 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       languageCode,
     ).format(DateTime.now());
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            // ── Dynamic Background ──
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          // ── Dynamic Background ──
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
 
-            CustomScrollView(
-              controller: _scrollCtrl,
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                // ── SliverAppBar ──
-                SliverAppBar(
-                  backgroundColor: Colors.transparent,
-                  expandedHeight: 130,
-                  collapsedHeight: 64,
-                  pinned: true,
-                  elevation: 0,
-                  surfaceTintColor: Colors.transparent,
-                  leading: const Padding(
-                    padding: EdgeInsets.all(AppSpacing.sm),
-                    child: DrawerMenuButton(),
+          CustomScrollView(
+            controller: _scrollCtrl,
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              // ── SliverAppBar ──
+              SliverAppBar(
+                backgroundColor: Colors.transparent,
+                expandedHeight: 130,
+                collapsedHeight: 64,
+                pinned: true,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                leading: const Padding(
+                  padding: EdgeInsets.all(AppSpacing.sm),
+                  child: DrawerMenuButton(),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  background: _anim(
+                    0,
+                    _HomeHeader(
+                      hijriStr: hijriStr,
+                      miladiStr: miladi,
+                      style: style,
+                      isRamadan: isRamadan,
+                    ),
                   ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    collapseMode: CollapseMode.pin,
-                    background: _anim(
-                      0,
-                      _HomeHeader(
-                        hijriStr: hijriStr,
-                        miladiStr: miladi,
-                        style: style,
-                        isRamadan: isRamadan,
+                  title: AnimatedOpacity(
+                    opacity: _headerCollapsed ? 1 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Text(
+                      hijriStr,
+                      style: style.amiri(14, color: style.gold),
+                    ),
+                  ),
+                  centerTitle: true,
+                ),
+              ),
+
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    const SizedBox(height: AppSpacing.xs),
+
+                    // ① Ramadan Banner
+                    if (hijri.hMonth == 9 || isRamadan)
+                      _anim(
+                        0,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _RamadanBanner(
+                            style: style,
+                            day: hijri.hDay,
+                            isRamadan: isRamadan,
+                          ),
+                        ),
+                      ),
+
+                    // ② Next Prayer Card
+                    if (prayerState.next != null)
+                      _anim(
+                        1,
+                        _NextPrayerCardMerged(
+                          style: style,
+                          prayerState: prayerState,
+                        ),
+                      ),
+                    if (prayerState.next != null) const SizedBox(height: 14),
+
+                    // ③ Prayer Times Mosque Section
+                    if (prayerState.prayers.isNotEmpty)
+                      _anim(
+                        2,
+                        _MosquePrayerSection(
+                          style: style,
+                          prayers: prayerState.prayers,
+                          currentKey: prayerState.next?.name ?? '',
+                        ),
+                      ),
+                    if (prayerState.prayers.isNotEmpty)
+                      const SizedBox(height: 14),
+
+                    // ④ Taqwa Ring
+                    _anim(
+                      3,
+                      todayAsync.when(
+                        loading: () => _Skeleton(style: style, height: 110),
+                        error: (_, _) => const SizedBox(),
+                        data: (r) => _TaqwaSectionMerged(
+                          record: r,
+                          streakAsync: streakAsync,
+                          style: style,
+                        ),
                       ),
                     ),
-                    title: AnimatedOpacity(
-                      opacity: _headerCollapsed ? 1 : 0,
-                      duration: const Duration(milliseconds: 180),
-                      child: Text(
-                        hijriStr,
-                        style: style.amiri(14, color: style.gold),
+                    const SizedBox(height: 14),
+
+                    // ⑤ Quick Ibadah Grid
+                    _anim(
+                      4,
+                      todayAsync.when(
+                        loading: () => _Skeleton(style: style, height: 180),
+                        error: (_, _) => const SizedBox(),
+                        data: (r) =>
+                            _QuickIbadahGridMerged(record: r, style: style),
                       ),
                     ),
-                    centerTitle: true,
-                  ),
+                    const SizedBox(height: 14),
+
+                    // ⑥ Features Row
+                    _anim(5, _FeatureRow(style: style)),
+                    const SizedBox(height: 14),
+
+                    // ⑦ Books Section
+                    _anim(6, _BooksSection(style: style)),
+                    const SizedBox(height: 14),
+
+                    // ⑧ Verse Card
+                    _anim(
+                      7,
+                      _VerseCardMerged(style: style, isRamadan: isRamadan),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // ⑨ Ramadan Iftar
+                    if (isRamadan)
+                      _anim(8, _RamadanIftar(style: style, hijri: hijri)),
+
+                    // ⑩ Daily Dhikr
+                    _anim(9, _DailyDhikrCard(style: style)),
+                    const SizedBox(height: 100),
+                  ]),
                 ),
-
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const SizedBox(height: AppSpacing.xs),
-
-                      // ① Ramadan Banner
-                      if (hijri.hMonth == 9 || isRamadan)
-                        _anim(
-                          0,
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _RamadanBanner(
-                              style: style,
-                              day: hijri.hDay,
-                              isRamadan: isRamadan,
-                            ),
-                          ),
-                        ),
-
-                      // ② Next Prayer Card
-                      if (prayerState.next != null)
-                        _anim(
-                          1,
-                          _NextPrayerCardMerged(
-                            style: style,
-                            prayerState: prayerState,
-                          ),
-                        ),
-                      if (prayerState.next != null) const SizedBox(height: 14),
-
-                      // ③ Prayer Times Mosque Section
-                      if (prayerState.prayers.isNotEmpty)
-                        _anim(
-                          2,
-                          _MosquePrayerSection(
-                            style: style,
-                            prayers: prayerState.prayers,
-                            currentKey: prayerState.next?.name ?? '',
-                          ),
-                        ),
-                      if (prayerState.prayers.isNotEmpty)
-                        const SizedBox(height: 14),
-
-                      // ④ Taqwa Ring
-                      _anim(
-                        3,
-                        todayAsync.when(
-                          loading: () => _Skeleton(style: style, height: 110),
-                          error: (_, _) => const SizedBox(),
-                          data: (r) => _TaqwaSectionMerged(
-                            record: r,
-                            streakAsync: streakAsync,
-                            style: style,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // ⑤ Quick Ibadah Grid
-                      _anim(
-                        4,
-                        todayAsync.when(
-                          loading: () => _Skeleton(style: style, height: 180),
-                          error: (_, _) => const SizedBox(),
-                          data: (r) =>
-                              _QuickIbadahGridMerged(record: r, style: style),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // ⑥ Features Row
-                      _anim(5, _FeatureRow(style: style)),
-                      const SizedBox(height: 14),
-
-                      // ⑦ Books Section
-                      _anim(6, _BooksSection(style: style)),
-                      const SizedBox(height: 14),
-
-                      // ⑧ Verse Card
-                      _anim(
-                        7,
-                        _VerseCardMerged(style: style, isRamadan: isRamadan),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // ⑨ Ramadan Iftar
-                      if (isRamadan)
-                        _anim(8, _RamadanIftar(style: style, hijri: hijri)),
-
-                      // ⑩ Daily Dhikr
-                      _anim(9, _DailyDhikrCard(style: style)),
-                      const SizedBox(height: 100),
-                    ]),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

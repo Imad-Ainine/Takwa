@@ -75,39 +75,34 @@ class _AdhkarScreenState extends ConsumerState<AdhkarScreen>
     final style = AdaptiveStyle(context, isRamadan);
     final l10n = AppLocalizations.of(context)!;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            Column(
-              children: [
-                _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs(l10n)),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabCtrl,
-                    children: [
-                      ...AdhkarCategory.values.map(
-                        (cat) => _AdhkarCategoryView(
-                          category: cat,
-                          entryCtrl: _entryCtrl,
-                        ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          Column(
+            children: [
+              _AdhkarTopBar(tabCtrl: _tabCtrl, tabs: _tabs(l10n)),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabCtrl,
+                  children: [
+                    ...AdhkarCategory.values.map(
+                      (cat) => _AdhkarCategoryView(
+                        category: cat,
+                        entryCtrl: _entryCtrl,
                       ),
-                      _UserAdhkarTabView(entryCtrl: _entryCtrl),
-                      _CommunityAdhkarTabView(entryCtrl: _entryCtrl),
-                    ],
-                  ),
+                    ),
+                    _UserAdhkarTabView(entryCtrl: _entryCtrl),
+                    _CommunityAdhkarTabView(entryCtrl: _entryCtrl),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -1723,5 +1723,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "routeNotFoundTitle": "Page not available",
+  "routeNotFoundMessage": "Couldn’t open “{route}”.",
+  "@routeNotFoundMessage": {
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
+  "routeNotFoundGoHome": "Back to home",
+  "routeNotFoundGoBack": "Go back",
+  "prayerGenericLabel": "Prayer",
+  "guestGuardTitle": "Cloud feature",
+  "guestGuardMessage": "Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.",
+  "guestGuardSignIn": "Sign in / Create account",
+  "guestGuardBack": "Back",
+  "splashQuote": "“Take account of yourselves before you are brought to account”"
 }

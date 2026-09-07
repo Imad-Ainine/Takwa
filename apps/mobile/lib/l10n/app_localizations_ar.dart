@@ -4041,4 +4041,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String authPasswordStrengthLabel(String strength) {
     return 'قوة كلمة المرور: $strength';
   }
+
+  @override
+  String get routeNotFoundTitle => 'الصفحة غير متاحة';
+
+  @override
+  String routeNotFoundMessage(String route) {
+    return 'تعذّر فتح المسار «$route».';
+  }
+
+  @override
+  String get routeNotFoundGoHome => 'العودة للرئيسية';
+
+  @override
+  String get routeNotFoundGoBack => 'رجوع';
+
+  @override
+  String get prayerGenericLabel => 'الصلاة';
+
+  @override
+  String get guestGuardTitle => 'ميزة سحابية';
+
+  @override
+  String get guestGuardMessage => 'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.';
+
+  @override
+  String get guestGuardSignIn => 'تسجيل دخول / إنشاء حساب';
+
+  @override
+  String get guestGuardBack => 'العودة';
+
+  @override
+  String get splashQuote => '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"';
 }

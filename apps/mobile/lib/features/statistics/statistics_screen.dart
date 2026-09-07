@@ -163,106 +163,99 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
       StatsPeriod.ramadan => l10n.statsPeriodRamadan,
     };
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value:
-          (Theme.of(context).brightness == Brightness.dark
-                  ? SystemUiOverlayStyle.light
-                  : SystemUiOverlayStyle.dark)
-              .copyWith(statusBarColor: Colors.transparent),
-      child: Scaffold(
-        backgroundColor: context.colors.background,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            GuestModeGuard(
-              child: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  // ── AppBar ──
-                  SliverAppBar(
-                    backgroundColor: Colors.transparent,
-                    expandedHeight: 120,
-                    leading: const CustomLeadingButton(),
-                    flexibleSpace: FlexibleSpaceBar(
-                      collapseMode: CollapseMode.pin,
-                      background: _StatsTopBar(hijri: hijri),
-                    ),
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          GuestModeGuard(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                // ── AppBar ──
+                SliverAppBar(
+                  backgroundColor: Colors.transparent,
+                  expandedHeight: 120,
+                  leading: const CustomLeadingButton(),
+                  flexibleSpace: FlexibleSpaceBar(
+                    collapseMode: CollapseMode.pin,
+                    background: _StatsTopBar(hijri: hijri),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                    ),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        const SizedBox(height: AppSpacing.sm),
-                        // ① Period Selector
-                        _anim(0, _PeriodSelector()),
-                        const SizedBox(height: AppSpacing.lg),
-                        // ② Taqwa Score Hero Card
-                        _anim(
-                          1,
-                          statsAsync.when(
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      const SizedBox(height: AppSpacing.sm),
+                      // ① Period Selector
+                      _anim(0, _PeriodSelector()),
+                      const SizedBox(height: AppSpacing.lg),
+                      // ② Taqwa Score Hero Card
+                      _anim(
+                        1,
+                        statsAsync.when(
+                          loading: () =>
+                              const Center(child: TakwaLoadingIndicator()),
+                          error: (_, _) => const SizedBox(),
+                          data: (s) => streakAsync.when(
                             loading: () =>
                                 const Center(child: TakwaLoadingIndicator()),
                             error: (_, _) => const SizedBox(),
-                            data: (s) => streakAsync.when(
-                              loading: () =>
-                                  const Center(child: TakwaLoadingIndicator()),
-                              error: (_, _) => const SizedBox(),
-                              data: (streak) =>
-                                  _TaqwaHeroCard(stats: s, streak: streak),
-                            ),
+                            data: (streak) =>
+                                _TaqwaHeroCard(stats: s, streak: streak),
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        // ③ Bar Chart (period-aware)
-                        _anim(
-                          2,
-                          weekAsync.when(
-                            loading: () => const _StatSkeleton(height: 180),
-                            error: (_, _) => const SizedBox(),
-                            data: (pts) => _WeeklyChart(
-                              points: pts,
-                              periodLabel: chartLabel,
-                            ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      // ③ Bar Chart (period-aware)
+                      _anim(
+                        2,
+                        weekAsync.when(
+                          loading: () => const _StatSkeleton(height: 180),
+                          error: (_, _) => const SizedBox(),
+                          data: (pts) => _WeeklyChart(
+                            points: pts,
+                            periodLabel: chartLabel,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        // ④ Stats Cards Grid
-                        _anim(
-                          3,
-                          statsAsync.when(
-                            loading: () => const _StatSkeleton(height: 120),
-                            error: (_, _) => const SizedBox(),
-                            data: (s) => _StatsCardsGrid(stats: s),
-                          ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      // ④ Stats Cards Grid
+                      _anim(
+                        3,
+                        statsAsync.when(
+                          loading: () => const _StatSkeleton(height: 120),
+                          error: (_, _) => const SizedBox(),
+                          data: (s) => _StatsCardsGrid(stats: s),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        // ⑤ Prayer Attendance (real data)
-                        _anim(4, _PrayerAttendanceCard(range: range)),
-                        const SizedBox(height: AppSpacing.lg),
-                        // ⑥ Achievements
-                        _anim(5, _AchievementsSection()),
-                        const SizedBox(height: 100),
-                      ]),
-                    ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      // ⑤ Prayer Attendance (real data)
+                      _anim(4, _PrayerAttendanceCard(range: range)),
+                      const SizedBox(height: AppSpacing.lg),
+                      // ⑥ Achievements
+                      _anim(5, _AchievementsSection()),
+                      const SizedBox(height: 100),
+                    ]),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
 
-            // ── Unseen Achievement Overlay ──
-            unseenAsync.when(
-              loading: () => const SizedBox(),
-              error: (_, _) => const SizedBox(),
-              data: (list) => list.isNotEmpty
-                  ? _AchievementToast(achievement: list.first)
-                  : const SizedBox(),
-            ),
-          ],
-        ),
+          // ── Unseen Achievement Overlay ──
+          unseenAsync.when(
+            loading: () => const SizedBox(),
+            error: (_, _) => const SizedBox(),
+            data: (list) => list.isNotEmpty
+                ? _AchievementToast(achievement: list.first)
+                : const SizedBox(),
+          ),
+        ],
       ),
     );
   }

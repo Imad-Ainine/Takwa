@@ -118,50 +118,45 @@ class _DuasScreenState extends ConsumerState<DuasScreen>
     ref.watch(_duaSearchProvider);
     ref.watch(_selectedCatProvider);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
 
-            Column(
-              children: [
-                _DuasTopBar(
-                  style: style,
-                  searchCtrl: _searchCtrl,
-                  tabCtrl: _tabCtrl,
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabCtrl,
-                    children: [
-                      Column(
-                        children: [
-                          _CategoryFilter(style: style),
-                          Expanded(
-                            child: _DuasList(
-                              duas: _filteredDuas,
-                              style: style,
-                              entryCtrl: _entryCtrl,
-                            ),
+          Column(
+            children: [
+              _DuasTopBar(
+                style: style,
+                searchCtrl: _searchCtrl,
+                tabCtrl: _tabCtrl,
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabCtrl,
+                  children: [
+                    Column(
+                      children: [
+                        _CategoryFilter(style: style),
+                        Expanded(
+                          child: _DuasList(
+                            duas: _filteredDuas,
+                            style: style,
+                            entryCtrl: _entryCtrl,
                           ),
-                        ],
-                      ),
-                      _UserDuasTabView(style: style),
-                      _CommunityDuasTabView(style: style),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    _UserDuasTabView(style: style),
+                    _CommunityDuasTabView(style: style),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class GuestModeGuard extends ConsumerWidget {
   final Widget child;
@@ -13,6 +14,7 @@ class GuestModeGuard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authStatus = ref.watch(authStatusProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (authStatus == AuthStatus.authenticated) {
       return child;
@@ -20,8 +22,12 @@ class GuestModeGuard extends ConsumerWidget {
 
     return Stack(
       children: [
-        // The actual screen content blur/darkened
-        Opacity(opacity: 0.3, child: AbsorbPointer(child: child)),
+        // The actual screen content blur/darkened. ExcludeSemantics matters as
+        // much as AbsorbPointer: without it a screen reader still walks the
+        // locked screen behind the overlay.
+        ExcludeSemantics(
+          child: Opacity(opacity: 0.3, child: AbsorbPointer(child: child)),
+        ),
 
         // Restricted access overlay
         Center(
@@ -63,7 +69,7 @@ class GuestModeGuard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   Text(
-                    'ميزة سحابية',
+                    l10n.guestGuardTitle,
                     style: context.typography.headingLarge.copyWith(
                       color: context.colors.gold,
                       fontWeight: FontWeight.w800,
@@ -71,7 +77,7 @@ class GuestModeGuard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.',
+                    l10n.guestGuardMessage,
                     textAlign: TextAlign.center,
                     style: context.typography.bodyMedium.copyWith(
                       color: context.colors.textSecondary,
@@ -80,7 +86,7 @@ class GuestModeGuard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxxl),
                   PrimaryButton(
-                    label: 'تسجيل دخول / إنشاء حساب',
+                    label: l10n.guestGuardSignIn,
                     icon: Icons.login_rounded,
                     onTap: () async {
                       ref.read(guestModeProvider.notifier).state = false;
@@ -91,7 +97,7 @@ class GuestModeGuard extends ConsumerWidget {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(
-                      'العودة',
+                      l10n.guestGuardBack,
                       style: context.typography.labelLarge.copyWith(
                         color: context.colors.textDim,
                         decoration: TextDecoration.underline,

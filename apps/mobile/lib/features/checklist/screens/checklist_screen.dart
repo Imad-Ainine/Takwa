@@ -101,39 +101,34 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
     final hijriStr =
         '${hijri.hDay} ${_hijriMonth(context, hijri.hMonth)} ${hijri.hYear}';
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: context.colors.background,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          todayAsync.when(
+            loading: () => Center(
+              child: TakwaLoadingIndicator(
+                color: context.colors.gold,
+                strokeWidth: 2,
+              ),
             ),
-            todayAsync.when(
-              loading: () => Center(
-                child: TakwaLoadingIndicator(
-                  color: context.colors.gold,
-                  strokeWidth: 2,
+            error: (e, _) => Center(
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                )!.checklistErrorPrefix(e.toString()),
+                style: context.typography.bodyMedium.copyWith(
+                  color: context.colors.danger,
                 ),
               ),
-              error: (e, _) => Center(
-                child: Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.checklistErrorPrefix(e.toString()),
-                  style: context.typography.bodyMedium.copyWith(
-                    color: context.colors.danger,
-                  ),
-                ),
-              ),
-              data: (record) =>
-                  GuestModeGuard(child: _buildBody(context, record, hijriStr)),
             ),
-          ],
-        ),
+            data: (record) =>
+                GuestModeGuard(child: _buildBody(context, record, hijriStr)),
+          ),
+        ],
       ),
     );
   }

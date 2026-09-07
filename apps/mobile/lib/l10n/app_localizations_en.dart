@@ -4080,4 +4080,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String authPasswordStrengthLabel(String strength) {
     return 'Password strength: $strength';
   }
+
+  @override
+  String get routeNotFoundTitle => 'Page not available';
+
+  @override
+  String routeNotFoundMessage(String route) {
+    return 'Couldn’t open “$route”.';
+  }
+
+  @override
+  String get routeNotFoundGoHome => 'Back to home';
+
+  @override
+  String get routeNotFoundGoBack => 'Go back';
+
+  @override
+  String get prayerGenericLabel => 'Prayer';
+
+  @override
+  String get guestGuardTitle => 'Cloud feature';
+
+  @override
+  String get guestGuardMessage => 'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
+
+  @override
+  String get guestGuardSignIn => 'Sign in / Create account';
+
+  @override
+  String get guestGuardBack => 'Back';
+
+  @override
+  String get splashQuote => '“Take account of yourselves before you are brought to account”';
 }

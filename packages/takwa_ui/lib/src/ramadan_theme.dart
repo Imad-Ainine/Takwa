@@ -91,9 +91,18 @@ class RamadanTheme {
       danger: RamadanColors.rubyLight,
       dangerDim: RamadanColors.rubyLight.withOpacity(0.1),
       warning: RamadanColors.goldenAura,
+      // On-surface accent ramp — see AppColorsExtension. On deep lapis the
+      // gold/emerald fills already clear AA as foregrounds; rubyLight does
+      // not (2.89:1), so error text gets a lifted tint.
+      goldText: RamadanColors.goldenAura,
+      tealText: RamadanColors.emeraldLight,
+      successText: RamadanColors.emeraldLight,
+      warningText: RamadanColors.goldenAura,
+      dangerText: const Color(0xFFE0808C), // 6.59:1 on deepLapis
       textPrimary: RamadanColors.ivory,
       textSecondary: RamadanColors.ivoryDim,
-      textDim: RamadanColors.ivoryDim.withOpacity(0.5),
+      // 0.5 opacity landed at 3.49:1 on deepLapis; 0.72 clears AA.
+      textDim: RamadanColors.ivoryDim.withOpacity(0.72),
       backgroundGradient: RamadanColors.nightSky,
       cardGradient: RamadanColors.cardGlow,
       goldGradient: AppColorsExtension.dark.goldGradient,
@@ -111,7 +120,8 @@ class RamadanTheme {
       extensions: [colors, typography, shadows, decorations],
       colorScheme: const ColorScheme.dark(
         primary: RamadanColors.goldenAura,
-        onPrimary: RamadanColors.deepLapis,
+        onPrimary: Color(0xFF241B05), // 7.68:1 on goldenAura
+        onError: Colors.white,
         secondary: RamadanColors.emeraldLight,
         onSecondary: RamadanColors.deepLapis,
         surface: RamadanColors.lapisCard,
@@ -168,9 +178,17 @@ class RamadanTheme {
       danger: RamadanColors.ruby,
       dangerDim: RamadanColors.ruby.withOpacity(0.1),
       warning: RamadanColors.goldenAura,
+      // goldenDeep (#A07820) is only 3.84:1 on the ivory ground, so the
+      // on-surface gold is darkened further; emerald and ruby already pass.
+      goldText: const Color(0xFF6E5110), // 7.01:1 on ivoryLight
+      tealText: RamadanColors.emerald,
+      successText: RamadanColors.emerald,
+      warningText: const Color(0xFF6E5110),
+      dangerText: RamadanColors.ruby,
       textPrimary: RamadanColors.deepLapis,
       textSecondary: RamadanColors.deepLapis.withOpacity(0.7),
-      textDim: RamadanColors.deepLapis.withOpacity(0.4),
+      // 0.4 opacity landed at 2.56:1 on the ivory ground; 0.65 clears AA.
+      textDim: RamadanColors.deepLapis.withOpacity(0.65),
       backgroundGradient: RamadanColors.daySky,
       cardGradient: RamadanColors.cardGlowLight,
       goldGradient: AppColorsExtension.light.goldGradient,
@@ -188,7 +206,9 @@ class RamadanTheme {
       extensions: [colors, typography, shadows, decorations],
       colorScheme: const ColorScheme.light(
         primary: RamadanColors.goldenAura,
-        onPrimary: Colors.white,
+        // white on goldenAura is 2.0:1 — the same defect as the base theme.
+        onPrimary: Color(0xFF241B05), // 7.68:1
+        onError: Colors.white,
         secondary: RamadanColors.emerald,
         onSecondary: Colors.white,
         surface: Colors.white,
@@ -214,7 +234,8 @@ class RamadanTheme {
       ),
       elevatedButtonTheme: _buildButtonTheme(
         RamadanColors.goldenAura,
-        Colors.white,
+        // white on goldenAura is 2.21:1
+        const Color(0xFF241B05), // 7.68:1
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.white,

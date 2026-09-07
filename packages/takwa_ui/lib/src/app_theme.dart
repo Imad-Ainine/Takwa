@@ -27,6 +27,20 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final Color dangerDim;
   final Color warning;
 
+  // ── On-surface accent ramp ──
+  // `gold`/`teal`/`success`/`warning`/`danger` above are FILL colors: they are
+  // tuned to sit *behind* content. Using them as foregrounds on a light surface
+  // fails WCAG badly (gold on white is 2.24:1). These `*Text` roles are the
+  // same hues darkened until they clear AA (>=4.5:1) on the light surfaces, and
+  // in dark mode they simply alias the bright fills, which already pass there.
+  // Rule of thumb: filling a shape -> use `gold`; drawing text or an icon on a
+  // theme surface -> use `goldText`.
+  final Color goldText;
+  final Color tealText;
+  final Color successText;
+  final Color warningText;
+  final Color dangerText;
+
   final Color textPrimary;
   final Color textSecondary;
   final Color textDim;
@@ -54,6 +68,11 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.danger,
     required this.dangerDim,
     required this.warning,
+    required this.goldText,
+    required this.tealText,
+    required this.successText,
+    required this.warningText,
+    required this.dangerText,
     required this.textPrimary,
     required this.textSecondary,
     required this.textDim,
@@ -92,6 +111,11 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
       warning: Color.lerp(warning, other.warning, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
+      goldText: Color.lerp(goldText, other.goldText, t)!,
+      tealText: Color.lerp(tealText, other.tealText, t)!,
+      successText: Color.lerp(successText, other.successText, t)!,
+      warningText: Color.lerp(warningText, other.warningText, t)!,
+      dangerText: Color.lerp(dangerText, other.dangerText, t)!,
       textDim: Color.lerp(textDim, other.textDim, t)!,
       backgroundGradient: LinearGradient.lerp(
         backgroundGradient,
@@ -127,9 +151,19 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     danger: Color(0xFFE07070),
     dangerDim: Color(0x1FE07070),
     warning: Color(0xFFE0A044),
+    // On dark surfaces the bright fills already clear AA as foregrounds
+    // (>=5:1 on `card`), so the on-surface ramp aliases them.
+    goldText: Color(0xFFC8A96E),
+    tealText: Color(0xFF3AAFA9),
+    successText: Color(0xFF4CAF7D),
+    warningText: Color(0xFFE0A044),
+    dangerText: Color(0xFFE07070),
     textPrimary: Color(0xFFE8EDF3),
     textSecondary: Color(0xFF8FA3BB),
-    textDim: Color(0xFF4A6070),
+    // Was 0xFF4A6070 — only 2.40:1 on `card`, i.e. failing AA everywhere it
+    // was used as text (nav labels, captions, chevrons). 0xFF8299B2 clears
+    // 4.5:1 on card / card2 / background / deep.
+    textDim: Color(0xFF8299B2),
     backgroundGradient: LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -171,6 +205,12 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     danger: Color(0xFFE07070),
     dangerDim: Color(0x1FE07070),
     warning: Color(0xFFE0A044),
+    // Darkened hues so accents are legible as text/icons on white & near-white.
+    goldText: Color(0xFF6B5320), // 7.28:1 on #FFFFFF (fill gold was 2.24:1)
+    tealText: Color(0xFF0F5C57), // 7.81:1 (fill teal was 2.66:1)
+    successText: Color(0xFF197045), // 6.10:1 (fill success was 2.71:1)
+    warningText: Color(0xFF7A5210), // 6.90:1 (fill warning was 2.26:1)
+    dangerText: Color(0xFFA81E17), // 7.33:1 (fill danger was 3.12:1)
     textPrimary: Color(0xFF111827),
     textSecondary: Color(0xFF4B5563),
     textDim: Color(0xFF6B7280),
@@ -636,16 +676,43 @@ class AppTheme {
       colorScheme: ColorScheme(
         brightness: brightness,
         primary: colors.gold,
-        onPrimary: colors.background,
+        // NOT colors.background: in light mode that put #F9FAFB on gold
+        // (2.15:1) on every ElevatedButton. This near-black clears 7.5:1 on
+        // `gold` and 5.8:1 on `goldDark`, so it also works on the gold
+        // gradient PrimaryButton paints.
+        onPrimary: const Color(0xFF241B05),
         secondary: colors.teal,
-        onSecondary: colors.background,
+        onSecondary: brightness == Brightness.dark
+            ? colors.background
+            : Colors.white,
         surface: colors.card,
         onSurface: colors.textPrimary,
-        error: colors.danger,
+        onSurfaceVariant: colors.textSecondary,
+        error: brightness == Brightness.dark
+            ? colors.danger
+            : colors.dangerText,
         onError: Colors.white,
         outline: colors.border,
         primaryContainer: colors.goldDim,
+        onPrimaryContainer: colors.goldText,
         secondaryContainer: colors.tealDim,
+        onSecondaryContainer: colors.tealText,
+        tertiary: colors.success,
+        onTertiary: Colors.white,
+        // Explicit container ramp: unset M3 roles fall back to the baseline
+        // (purple-tinted) scheme, which clashes with this palette on any
+        // stock component — NavigationBar, SearchBar, Badge, DatePicker.
+        surfaceContainerLowest: colors.background,
+        surfaceContainerLow: colors.deep,
+        surfaceContainer: colors.card,
+        surfaceContainerHigh: colors.card2,
+        surfaceContainerHighest: colors.card2,
+        outlineVariant: colors.border,
+        shadow: Colors.black,
+        scrim: Colors.black,
+        inverseSurface: colors.textPrimary,
+        onInverseSurface: colors.background,
+        surfaceTint: Colors.transparent,
       ),
       scaffoldBackgroundColor: colors.background,
       appBarTheme: AppBarTheme(
@@ -657,14 +724,23 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: typography.headingMedium,
-        iconTheme: IconThemeData(color: colors.gold),
-        systemOverlayStyle: brightness == Brightness.dark
-            ? SystemUiOverlayStyle.light.copyWith(
-                statusBarColor: Colors.transparent,
-              )
-            : SystemUiOverlayStyle.dark.copyWith(
-                statusBarColor: Colors.transparent,
-              ),
+        iconTheme: IconThemeData(color: colors.goldText),
+        // Spelled out rather than using the SystemUiOverlayStyle.light/.dark
+        // presets: those carry systemNavigationBarColor: black, which would
+        // fight the theme-derived nav bar set in TakwaApp.builder wherever an
+        // AppBar is present.
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+          statusBarBrightness: brightness, // iOS: inverse convention
+          systemNavigationBarColor: colors.background,
+          systemNavigationBarIconBrightness: brightness == Brightness.dark
+              ? Brightness.light
+              : Brightness.dark,
+          systemNavigationBarDividerColor: Colors.transparent,
+        ),
       ),
       cardTheme: CardThemeData(
         color: colors.card,
@@ -677,10 +753,10 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colors.card,
-        selectedItemColor: colors.gold,
+        selectedItemColor: colors.goldText,
         unselectedItemColor: colors.textDim,
         elevation: 0,
-        selectedLabelStyle: typography.caption.copyWith(color: colors.gold),
+        selectedLabelStyle: typography.caption.copyWith(color: colors.goldText),
         unselectedLabelStyle: typography.caption,
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -688,13 +764,13 @@ class AppTheme {
         indicatorColor: colors.goldDim,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return IconThemeData(color: colors.gold, size: 24);
+            return IconThemeData(color: colors.goldText, size: 24);
           }
           return IconThemeData(color: colors.textDim, size: 24);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return typography.caption.copyWith(color: colors.gold);
+            return typography.caption.copyWith(color: colors.goldText);
           }
           return typography.caption;
         }),
@@ -702,7 +778,8 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colors.gold,
-          foregroundColor: colors.background,
+          // Was colors.background — 2.15:1 in light mode.
+          foregroundColor: const Color(0xFF241B05),
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
@@ -713,8 +790,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colors.gold,
-          side: BorderSide(color: colors.gold, width: 1),
+          foregroundColor: colors.goldText,
+          side: BorderSide(color: colors.goldText, width: 1),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
           textStyle: typography.labelLarge,
@@ -722,15 +799,19 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: colors.teal,
-          textStyle: typography.labelMedium.copyWith(color: colors.teal),
+          foregroundColor: colors.tealText,
+          textStyle: typography.labelMedium.copyWith(color: colors.tealText),
         ),
       ),
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return colors.success;
+          if (states.contains(WidgetState.selected)) {
+            return colors.successText;
+          }
           return Colors.transparent;
         }),
+        // White on the successText fill is 6.10:1; on the lighter `success`
+        // fill it was only 2.71:1.
         checkColor: WidgetStateProperty.all(Colors.white),
         side: BorderSide(color: colors.border, width: 2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -741,7 +822,7 @@ class AppTheme {
           return colors.textDim;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return colors.success;
+          if (states.contains(WidgetState.selected)) return colors.successText;
           return colors.border;
         }),
       ),
@@ -762,7 +843,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.input,
-          borderSide: BorderSide(color: colors.gold, width: 1.5),
+          borderSide: BorderSide(color: colors.goldText, width: 1.5),
         ),
         hintStyle: typography.bodyMedium.copyWith(color: colors.textDim),
         labelStyle: typography.labelMedium,
@@ -780,7 +861,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppRadius.chip),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: colors.gold,
+        color: colors.goldText,
         linearTrackColor: colors.border,
         circularTrackColor: colors.border,
       ),
@@ -793,9 +874,9 @@ class AppTheme {
       tabBarTheme: TabBarThemeData(
         splashFactory: NoSplash.splashFactory,
         overlayColor: WidgetStateProperty.all(Colors.transparent),
-        labelColor: colors.gold,
+        labelColor: colors.goldText,
         unselectedLabelColor: colors.textDim,
-        indicatorColor: colors.gold,
+        indicatorColor: colors.goldText,
         indicatorSize: TabBarIndicatorSize.label,
         labelStyle: typography.labelLarge,
         unselectedLabelStyle: typography.labelMedium,
@@ -847,9 +928,12 @@ class TaqwaBadge extends StatelessWidget {
   }
 }
 
+/// takwa_ui has no localizations of its own, so the caller passes the already
+/// localized text (e.g. `l10n.homeStreakDaysLabel(days)`) rather than this
+/// package hardcoding one language.
 class StreakBadge extends StatelessWidget {
-  final int days;
-  const StreakBadge({super.key, required this.days});
+  final String label;
+  const StreakBadge({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -866,9 +950,9 @@ class StreakBadge extends StatelessWidget {
           const Text('🔥', style: TextStyle(fontSize: 12)),
           const SizedBox(width: 4),
           Text(
-            '$days يوم متواصل',
+            label,
             style: context.typography.caption.copyWith(
-              color: context.colors.success,
+              color: context.colors.successText,
             ),
           ),
         ],

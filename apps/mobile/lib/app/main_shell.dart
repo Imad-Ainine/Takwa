@@ -67,6 +67,14 @@ class _MainShellState extends ConsumerState<MainShell>
 
     // جدولة الإشعارات عند أول تشغيل (بعد استكمال التهيئة فقط)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // The PageController starts on initialIndex, but currentTabProvider
+      // defaulted to 0 — so entering via e.g. Routes.settings showed the
+      // Settings page with Home highlighted in the bottom nav, and the
+      // ref.listen below never fired to correct it.
+      if (ref.read(currentTabProvider) != widget.initialIndex) {
+        ref.read(currentTabProvider.notifier).state = widget.initialIndex;
+      }
+
       final done = await ref.read(onboardingDoneProvider.future);
       if (done) {
         _initializePostOnboardingServices();
@@ -407,6 +415,7 @@ class _SplashScreenState extends State<_SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Center(
@@ -446,7 +455,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 ),
                 const SizedBox(height: AppSpacing.xxl),
                 Text(
-                  'تقوى',
+                  l10n.appTitle,
                   style: context.typography.displayMedium.copyWith(
                     fontSize: 32,
                     color: context.colors.gold,
@@ -455,7 +464,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"',
+                  l10n.splashQuote,
                   style: context.typography.quranicVerse.copyWith(
                     fontSize: 14,
                     color: context.colors.textSecondary,

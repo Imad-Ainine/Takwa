@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -234,74 +233,69 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            // ② Scroll content
-            CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  expandedHeight: 280,
-                  pinned: true,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: _AuthHeader(style: s, entryCtrl: _entryCtrl),
-                    collapseMode: CollapseMode.pin,
-                  ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          // ② Scroll content
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 280,
+                pinned: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: _AuthHeader(style: s, entryCtrl: _entryCtrl),
+                  collapseMode: CollapseMode.pin,
                 ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-                    child: Column(
-                      children: [
-                        _anim(0, _buildGlassCard(s)),
-                        const SizedBox(height: AppSpacing.xl),
-                        _anim(1, _buildSeparator(s)),
-                        const SizedBox(height: AppSpacing.lg),
-                        _anim(2, _buildGoogleBtn(s)),
-                        const SizedBox(height: 28),
-                        _anim(
-                          3,
-                          GestureDetector(
-                            onTap: () =>
-                                Navigator.pushReplacementNamed(context, '/'),
-                            child: Text(
-                              l10n.authContinueAsGuest,
-                              style: s.naskh(
-                                13,
-                                color: s.textSec,
-                                weight: FontWeight.w600,
-                              ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  child: Column(
+                    children: [
+                      _anim(0, _buildGlassCard(s)),
+                      const SizedBox(height: AppSpacing.xl),
+                      _anim(1, _buildSeparator(s)),
+                      const SizedBox(height: AppSpacing.lg),
+                      _anim(2, _buildGoogleBtn(s)),
+                      const SizedBox(height: 28),
+                      _anim(
+                        3,
+                        GestureDetector(
+                          onTap: () =>
+                              Navigator.pushReplacementNamed(context, '/'),
+                          child: Text(
+                            l10n.authContinueAsGuest,
+                            style: s.naskh(
+                              13,
+                              color: s.textSec,
+                              weight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-
-            // ③ Loading overlay
-            if (_loading)
-              BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                child: Container(
-                  color: Colors.black38,
-                  child: const TakwaLoadingIndicator(),
-                ),
               ),
-          ],
-        ),
+            ],
+          ),
+
+          // ③ Loading overlay
+          if (_loading)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+              child: Container(
+                color: Colors.black38,
+                child: const TakwaLoadingIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }
