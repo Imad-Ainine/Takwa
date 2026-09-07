@@ -174,7 +174,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     // rather than rebuilt on every flip.
                     child: Text(
                       hijriStr,
-                      style: style.amiri(14, color: style.gold),
+                      // amiri()'s default weight is bold; bodyMedium's
+                      // isn't, so it's passed explicitly to preserve the
+                      // original rendering.
+                      style: style.bodyMedium(
+                        color: style.gold,
+                        weight: FontWeight.bold,
+                      ),
                     ),
                     builder: (context, collapsed, child) => AnimatedOpacity(
                       opacity: collapsed ? 1 : 0,
@@ -478,7 +484,9 @@ class _RamadanBannerState extends State<_RamadanBanner>
                 children: [
                   Text(
                     l10n.homeRamadanBannerTitle,
-                    style: s.amiri(18, color: s.goldLight),
+                    // headingMedium's default weight is already bold,
+                    // matching amiri()'s — no explicit weight needed.
+                    style: s.headingMedium(color: s.goldLight),
                   ),
                   Text(
                     l10n.homeRamadanBannerSubtitle(widget.day),
@@ -489,10 +497,15 @@ class _RamadanBannerState extends State<_RamadanBanner>
             ),
             Column(
               children: [
-                Text('${30 - widget.day}', style: s.amiri(22, color: s.gold)),
+                Text(
+                  '${30 - widget.day}',
+                  // headingLarge's default weight is already bold,
+                  // matching amiri()'s — no explicit weight needed.
+                  style: s.headingLarge(color: s.gold),
+                ),
                 Text(
                   l10n.homeRamadanDaysRemaining,
-                  style: s.naskh(9, color: s.textSec),
+                  style: s.caption(color: s.textSec, bodyFont: true),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -618,7 +631,7 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                 children: [
                   Text(
                     l10n.homeNextPrayerLabel,
-                    style: s.naskh(10, color: s.textSec),
+                    style: s.caption(color: s.textSec, bodyFont: true),
                   ),
                   Text(
                     l10n.checklistPrayerSheetTitle(
@@ -628,7 +641,7 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                   ),
                   Text(
                     DateFormat('HH:mm').format(next.time),
-                    style: s.naskh(12, color: s.textSec),
+                    style: s.caption(color: s.textSec, bodyFont: true),
                   ),
                 ],
               ),
@@ -693,7 +706,7 @@ class _MosquePrayerSection extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.homePrayerTimesTitle,
-                style: style.amiri(15, color: style.gold),
+                style: style.labelLarge(color: style.gold, weight: FontWeight.bold),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -862,11 +875,13 @@ class _MihrabPrayerChip extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               timeStr,
-              style: style.amiri(
-                13,
+              // amiri()'s default weight is bold; labelMedium's isn't, so
+              // it's passed explicitly to preserve the original rendering.
+              style: style.labelMedium(
                 color: isActive
                     ? style.goldLight
                     : style.textSec.withValues(alpha: 0.8),
+                weight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -946,7 +961,12 @@ class _TaqwaSectionMerged extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_msg(l10n, pct), style: s.amiri(15)),
+                Text(
+                  _msg(l10n, pct),
+                  // amiri()'s defaults (bold, gold) preserved explicitly —
+                  // labelLarge's own defaults differ on both.
+                  style: s.labelLarge(color: s.gold, weight: FontWeight.bold),
+                ),
                 const SizedBox(height: 3),
                 Text(
                   l10n.homeIbadahProgressLabel((pct * 10).round()),
@@ -1111,7 +1131,7 @@ class _RingWidgetState extends State<_RingWidget>
                 ),
                 Text(
                   AppLocalizations.of(context)!.homeRingTodayLabel,
-                  style: widget.style.naskh(9, color: widget.style.textSec),
+                  style: widget.style.caption(color: widget.style.textSec, bodyFont: true),
                 ),
               ],
             ),
@@ -1224,7 +1244,12 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Text(l10n.homeTodayIbadahTitle, style: s.amiri(15)),
+            Text(
+              l10n.homeTodayIbadahTitle,
+              // amiri()'s defaults (bold, gold) preserved explicitly —
+              // labelLarge's own defaults differ on both.
+              style: s.labelLarge(color: s.gold, weight: FontWeight.bold),
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Container(height: 1, color: s.border.withValues(alpha: 0.3)),
@@ -1347,8 +1372,8 @@ class _IbadahChipMerged extends ConsumerWidget {
             const SizedBox(height: 5),
             Text(
               label,
-              style: s.naskh(
-                10,
+              style: s.caption(
+                bodyFont: true,
                 color: done ? s.success : s.textSec,
                 weight: done ? FontWeight.w600 : FontWeight.w400,
               ),
@@ -1389,7 +1414,10 @@ class _FeatureRow extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(l10n.homeFeaturesTitle, style: s.amiri(15, color: s.gold)),
+            Text(
+              l10n.homeFeaturesTitle,
+              style: s.labelLarge(color: s.gold, weight: FontWeight.bold),
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Container(height: 1, color: s.gold.withValues(alpha: 0.2)),
@@ -1464,14 +1492,10 @@ class _FeatureItem extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+                // Both 9.0 and 8.5 were below the 12px accessibility
+                // floor — caption is the scale's smallest role, at 12.
                 style: s
-                    .naskh(
-                      Localizations.localeOf(context).languageCode == 'ar'
-                          ? 9.0
-                          : 8.5,
-                      color: s.text,
-                      weight: FontWeight.w600,
-                    )
+                    .caption(bodyFont: true, color: s.text, weight: FontWeight.w600)
                     .copyWith(height: 1.15),
               ),
             ),
@@ -1554,7 +1578,7 @@ class _VerseCardMerged extends StatelessWidget {
             isRamadan
                 ? verse.$2
                 : AppLocalizations.of(context)!.homeVerseOfDayLabel(verse.$2),
-            style: s.naskh(10, color: s.textSec),
+            style: s.caption(color: s.textSec, bodyFont: true),
           ),
         ],
       ),
@@ -1624,7 +1648,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
             children: [
               Text(
                 l10n.homeRamadanTimesTitle,
-                style: s.amiri(15, color: s.gold),
+                style: s.labelLarge(color: s.gold, weight: FontWeight.bold),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -1696,7 +1720,7 @@ class _IftarCard extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           countdown,
-          style: style.naskh(16, color: color, weight: FontWeight.w700),
+          style: style.bodyLarge(bodyFont: true, color: color, weight: FontWeight.w700),
         ),
       ],
     ),
@@ -1737,13 +1761,13 @@ class _DailyDhikrCard extends StatelessWidget {
                 children: [
                   Text(
                     AppLocalizations.of(context)!.homeDailyDhikrLabel,
-                    style: s.naskh(10, color: s.textSec),
+                    style: s.caption(color: s.textSec, bodyFont: true),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     _dhikrs[idx],
                     style: s
-                        .amiri(14, color: s.text, weight: FontWeight.w400)
+                        .bodyMedium(color: s.text, weight: FontWeight.w400)
                         .copyWith(height: 1.8),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -1806,7 +1830,7 @@ class _BooksSection extends ConsumerWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.homeBooksLibraryTitle,
-                style: s.amiri(16, color: s.gold),
+                style: s.bodyLarge(color: s.gold, weight: FontWeight.bold),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -1962,18 +1986,14 @@ class _BookCard extends StatelessWidget {
                       book.titleAr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: s.amiri(
-                        13,
-                        color: s.text,
-                        weight: FontWeight.w700,
-                      ),
+                      style: s.labelMedium(color: s.text, weight: FontWeight.w700),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       book.authorAr,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: s.naskh(9, color: s.textSec),
+                      style: s.caption(color: s.textSec, bodyFont: true),
                     ),
                     const Spacer(),
                     Row(
@@ -1984,7 +2004,9 @@ class _BookCard extends StatelessWidget {
                           AppLocalizations.of(
                             context,
                           )!.homeMinutesLabel(book.estimatedReadingMinutes),
-                          style: s.naskh(8, color: s.textDim),
+                          // 8px was below the 12px accessibility floor —
+                          // caption is the scale's smallest role, at 12.
+                          style: s.caption(color: s.textDim, bodyFont: true),
                         ),
                       ],
                     ),
