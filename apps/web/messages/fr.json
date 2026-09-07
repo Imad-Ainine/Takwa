@@ -159,5 +159,23 @@
       "placeholderMessage": "Dites-nous comment nous pouvons vous aider...",
       "submit": "Envoyer le Message"
     }
+  },
+  "Auth": {
+    "title": "Connexion",
+    "subtitle": "Utilisez le même compte que celui créé dans l'application Takwa.",
+    "email": "E-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Votre mot de passe",
+    "submit": "Se connecter",
+    "signingIn": "Connexion en cours…",
+    "errorInvalidCredentials": "E-mail ou mot de passe incorrect. Veuillez réessayer.",
+    "mobileAccountNote": "Ceci vous connecte au même compte que l'application mobile Takwa."
+  },
+  "Dashboard": {
+    "title": "Votre Tableau de Bord",
+    "welcome": "Connecté en tant que {email}.",
+    "placeholderNote": "Ceci est une page de base — vos statistiques de prière et vos réussites apparaîtront ici dans une future mise à jour.",
+    "signOut": "Se déconnecter"
   }
 }

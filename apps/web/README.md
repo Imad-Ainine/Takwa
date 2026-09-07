@@ -19,7 +19,7 @@
 
 Takwa Web brings the powerful spiritual tracking of the mobile app to your browser:
 
-- **Unified Dashboard**: View your Taqwa level, streaks, and daily progress at a glance.
+- **Unified Dashboard**: View your Taqwa level, streaks, and daily progress at a glance. *(Auth foundation shipped — sign in at `/login` with the same account as the mobile app; the actual stats/achievements views are the next step, reading the same RLS-scoped Supabase tables mobile already syncs.)*
 - **Detailed History**: Explore your past performance with interactive charts and calendars.
 - **Settings Management**: Configure your profile and preferences (Planned Supabase Sync).
 - **Responsive Design**: optimized for desktop and mobile browsers.
@@ -46,6 +46,25 @@ npm run dev
 ```
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
+
+### Environment variables
+
+`/login` and `/dashboard` need a Supabase project to talk to — the same
+one the mobile app uses. Create `apps/web/.env.local` (gitignored, never
+commit it) with:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+```
+
+Both values are also in `apps/mobile/.env` (`SUPABASE_URL`/`SUPABASE_ANON_KEY`)
+under different variable names — it's the same Supabase project either
+way. The `NEXT_PUBLIC_` prefix is required so Next.js exposes these to
+the browser; that's expected for the anon key, which is meant to be
+public (every table it can reach is protected by Row Level Security
+server-side, not by keeping this key secret — see the mobile app's
+`supabase/audit/table_checklist.md`).
 
 ---
 
