@@ -4,6 +4,7 @@ import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import '../../utils/quran_helpers.dart';
 import '../../utils/quran_painters.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 // Styles are managed via AdaptiveStyle for consistent theming.
 
@@ -87,7 +88,7 @@ class DailyVerseCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  _ayahBadge(verse['ayahNumber'] as int, style),
+                  _ayahBadge(context, verse['ayahNumber'] as int, style),
                 ],
               ),
             ),
@@ -130,7 +131,8 @@ class DailyVerseCard extends StatelessWidget {
         ),
       );
 
-  Widget _ayahBadge(int ayah, AdaptiveStyle style) => Container(
+  Widget _ayahBadge(BuildContext context, int ayah, AdaptiveStyle style) =>
+      Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
       color: style.text.withOpacity(0.06),
@@ -139,7 +141,12 @@ class DailyVerseCard extends StatelessWidget {
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('آية ${ar(ayah)}', style: style.amiri(13, color: style.textSec)),
+        Text(
+          AppLocalizations.of(
+            context,
+          )!.quranScreenAyahLabel(localizedNumeral(context, ayah)),
+          style: style.amiri(13, color: style.textSec),
+        ),
         const SizedBox(width: AppSpacing.xs),
         Text('»»', style: TextStyle(color: style.textDim, fontSize: 11)),
       ],
@@ -365,7 +372,7 @@ class KhatmaProgressRing extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                ar(pagesRead),
+                localizedNumeral(context, pagesRead),
                 style: style.amiri(
                   32,
                   weight: FontWeight.bold,
@@ -373,7 +380,9 @@ class KhatmaProgressRing extends StatelessWidget {
                 ),
               ),
               Text(
-                'من ${ar(totalPages)} صفحة',
+                AppLocalizations.of(context)!.khatmaRingOfPagesLabel(
+                  localizedNumeral(context, totalPages),
+                ),
                 style: style.naskh(12, color: style.textDim),
               ),
             ],
@@ -437,6 +446,7 @@ class QuranSurahRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final c = surahColor(s.number);
     return InkWell(
       onTap: onTap,
@@ -469,7 +479,7 @@ class QuranSurahRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${s.revelationType == 'Meccan' ? 'مكية' : 'مدنية'} • ${s.ayahsNumber} آية',
+                    '${s.revelationType == 'Meccan' ? l10n.quranReaderMeccan : l10n.quranReaderMedinan} • ${l10n.quranReaderAyahCountBadge(s.ayahsNumber)}',
                     style: style.naskh(12, color: style.textDim),
                   ),
                 ],
@@ -506,6 +516,7 @@ class QuranJuzCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final c = surahColor(n);
     return InkWell(
       onTap: onTap,
@@ -527,7 +538,7 @@ class QuranJuzCard extends StatelessWidget {
                   painter: JuzRingPainter(progress, c),
                 ),
                 Text(
-                  ar(n),
+                  localizedNumeral(context, n),
                   style: style.amiri(
                     14,
                     weight: FontWeight.bold,
@@ -542,7 +553,7 @@ class QuranJuzCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'الجزء $name',
+                    l10n.quranJuzLabel(name),
                     style: style.amiri(
                       18,
                       weight: FontWeight.bold,
@@ -550,7 +561,9 @@ class QuranJuzCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${(progress * 100).toInt()}% مكتمل',
+                    l10n.quranJuzPercentComplete(
+                      localizedNumeral(context, (progress * 100).toInt()),
+                    ),
                     style: style.naskh(12, color: style.textSec),
                   ),
                 ],

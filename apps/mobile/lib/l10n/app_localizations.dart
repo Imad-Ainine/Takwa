@@ -7249,6 +7249,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ابحث في السور'**
   String get aiMemorizeSurahSearchHint;
+
+  /// No description provided for @khatmaRingOfPagesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'من {total} صفحة'**
+  String khatmaRingOfPagesLabel(String total);
+
+  /// No description provided for @quranJuzLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزء {name}'**
+  String quranJuzLabel(String name);
+
+  /// No description provided for @quranJuzPercentComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'{percent}% مكتمل'**
+  String quranJuzPercentComplete(String percent);
 }
 
 class _AppLocalizationsDelegate

@@ -1665,5 +1665,29 @@
   "aiMemorizeTabPages": "Pages",
   "aiMemorizeTabSurahs": "Surahs",
   "aiMemorizePageSearchHint": "Enter a page number (1-604)",
-  "aiMemorizeSurahSearchHint": "Search surahs"
+  "aiMemorizeSurahSearchHint": "Search surahs",
+  "khatmaRingOfPagesLabel": "of {total} pages",
+  "@khatmaRingOfPagesLabel": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzLabel": "Juz {name}",
+  "@quranJuzLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzPercentComplete": "{percent}% complete",
+  "@quranJuzPercentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -2168,5 +2168,29 @@
   "aiMemorizeTabPages": "الصفحات",
   "aiMemorizeTabSurahs": "السور",
   "aiMemorizePageSearchHint": "أدخل رقم الصفحة (1-604)",
-  "aiMemorizeSurahSearchHint": "ابحث في السور"
+  "aiMemorizeSurahSearchHint": "ابحث في السور",
+  "khatmaRingOfPagesLabel": "من {total} صفحة",
+  "@khatmaRingOfPagesLabel": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzLabel": "الجزء {name}",
+  "@quranJuzLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzPercentComplete": "{percent}% مكتمل",
+  "@quranJuzPercentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
 }

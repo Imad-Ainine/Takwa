@@ -3953,4 +3953,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiMemorizeSurahSearchHint => 'ابحث في السور';
+
+  @override
+  String khatmaRingOfPagesLabel(String total) {
+    return 'من $total صفحة';
+  }
+
+  @override
+  String quranJuzLabel(String name) {
+    return 'الجزء $name';
+  }
+
+  @override
+  String quranJuzPercentComplete(String percent) {
+    return '$percent% مكتمل';
+  }
 }
