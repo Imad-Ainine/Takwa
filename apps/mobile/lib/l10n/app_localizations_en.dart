@@ -2268,6 +2268,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordHint => 'Password';
 
   @override
+  String get authShowPasswordTooltip => 'Show password';
+
+  @override
+  String get authHidePasswordTooltip => 'Hide password';
+
+  @override
   String get authForgotPassword => 'Forgot password?';
 
   @override

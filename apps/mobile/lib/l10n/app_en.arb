@@ -1014,6 +1014,8 @@
   "authUsernameHint": "Username",
   "authEmailHint": "Email",
   "authPasswordHint": "Password",
+  "authShowPasswordTooltip": "Show password",
+  "authHidePasswordTooltip": "Hide password",
   "authForgotPassword": "Forgot password?",
   "authSecureSignInButton": "Secure Sign In",
   "authCreateAccountButton": "Create Account",

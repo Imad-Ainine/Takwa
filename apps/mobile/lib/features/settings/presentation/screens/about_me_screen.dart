@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -281,7 +282,8 @@ class AboutMeScreen extends StatelessWidget {
   }) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
+      child: TakwaTappable(
+        borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () async {
           HapticFeedback.lightImpact();
           if (url != null) {

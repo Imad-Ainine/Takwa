@@ -4214,6 +4214,18 @@ abstract class AppLocalizations {
   /// **'كلمة المرور'**
   String get authPasswordHint;
 
+  /// No description provided for @authShowPasswordTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'إظهار كلمة المرور'**
+  String get authShowPasswordTooltip;
+
+  /// No description provided for @authHidePasswordTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء كلمة المرور'**
+  String get authHidePasswordTooltip;
+
   /// No description provided for @authForgotPassword.
   ///
   /// In ar, this message translates to:

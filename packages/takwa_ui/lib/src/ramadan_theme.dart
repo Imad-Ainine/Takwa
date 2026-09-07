@@ -585,4 +585,82 @@ class AdaptiveStyle {
     fontWeight: weight ?? FontWeight.w400,
     height: height,
   );
+
+  // ── Role-based styles ─────────────────────────────────────────────
+  //
+  // The three methods above take a raw pixel `size` — which is exactly how
+  // this class ended up behind 266 call sites passing 19 different literal
+  // values (down to 8px), because reaching for a number was always easier
+  // than fighting a type scale that didn't fit real usage (see the "display
+  // sizes masquerading as body sizes" note on AppTypographyExtension's own
+  // fromColors). These return the SAME TextStyle Theme.of(context) already
+  // carries on AppTypographyExtension, one role at a time, instead of
+  // resolving a font/size themselves — and since RamadanTheme now shares
+  // AppTheme's builder rather than hand-rolling its own type scale, that
+  // resolved style is already correct for whichever of the four themes
+  // (base/Ramadan × dark/light) is active, with no extra logic needed here.
+  //
+  // Not a mechanical migration of the 266 existing call sites: this adds
+  // the accessors the fix calls for and moves this file itself, but sweeping
+  // every call site means picking, for each one, which of these 12 roles
+  // its current raw size was *supposed* to mean — a judgment call per site
+  // that needs a visual pass this environment (no Flutter SDK) can't do
+  // safely. New call sites, and any call site touched for other reasons,
+  // should reach for one of these instead of `.naskh(11)`.
+  AppTypographyExtension get _type =>
+      Theme.of(context).extension<AppTypographyExtension>()!;
+
+  // The old amiri()'s Ramadan-only glow, ported by role instead of by a
+  // `size > 20` threshold: displayLarge/displayMedium/headingLarge are the
+  // roles that used to sit above that threshold.
+  TextStyle _withRamadanGlow(TextStyle style, {required bool strong}) {
+    if (!isRamadan) return style;
+    return style.copyWith(
+      shadows: [
+        Shadow(
+          color: gold.withValues(alpha: strong ? 0.4 : 0.2),
+          blurRadius: strong ? 12 : 8,
+        ),
+      ],
+    );
+  }
+
+  TextStyle _override(TextStyle style, {Color? color, FontWeight? weight, double? height}) =>
+      style.copyWith(color: color, fontWeight: weight, height: height);
+
+  TextStyle displayLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.displayLarge, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle displayMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.displayMedium, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle headingLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.headingLarge, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle headingMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.headingMedium, strong: false), color: color, weight: weight, height: height);
+
+  TextStyle bodyLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodyLarge, color: color, weight: weight, height: height);
+
+  TextStyle bodyMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodyMedium, color: color, weight: weight, height: height);
+
+  TextStyle bodySmall({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodySmall, color: color, weight: weight, height: height);
+
+  TextStyle labelLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.labelLarge, color: color, weight: weight, height: height);
+
+  TextStyle labelMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.labelMedium, color: color, weight: weight, height: height);
+
+  TextStyle caption({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.caption, color: color, weight: weight, height: height);
+
+  TextStyle quranicVerse({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.quranicVerse, color: color, weight: weight, height: height);
+
+  TextStyle taqwaScore({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.taqwaScore, color: color, weight: weight, height: height);
 }

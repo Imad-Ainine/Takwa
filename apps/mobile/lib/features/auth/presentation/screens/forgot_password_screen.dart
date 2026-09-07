@@ -23,6 +23,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
   final _otpCtrl = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _otpFocus = FocusNode();
 
   bool _loading = false;
   bool _codeSent = false;
@@ -45,7 +47,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     _timer?.cancel();
     _emailCtrl.dispose();
     _otpCtrl.dispose();
+    _emailFocus.dispose();
+    _otpFocus.dispose();
     super.dispose();
+  }
+
+  void _submit() {
+    if (_loading) return;
+    if (_codeSent) {
+      _verifyOtp();
+    } else {
+      _sendResetCode();
+    }
   }
 
   void _startCountdown() {
@@ -259,34 +272,50 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           ),
                           const SizedBox(height: AppSpacing.xxxl),
 
-                          // Email field
-                          AuthField(
-                            ctrl: _emailCtrl,
-                            hint: l10n.authEmailHint,
-                            icon: Icons.alternate_email_rounded,
-                            style: s,
-                            keyboardType: TextInputType.emailAddress,
-                            onChanged: (_) {
-                              if (_error != null) setState(() => _error = null);
-                            },
-                          ),
+                          // Email + OTP fields, grouped so a password
+                          // manager can see them together.
+                          AutofillGroup(
+                            child: Column(
+                              children: [
+                                AuthField(
+                                  ctrl: _emailCtrl,
+                                  hint: l10n.authEmailHint,
+                                  icon: Icons.alternate_email_rounded,
+                                  style: s,
+                                  keyboardType: TextInputType.emailAddress,
+                                  focusNode: _emailFocus,
+                                  isLast: !_codeSent,
+                                  onSubmit: !_codeSent ? _submit : null,
+                                  onChanged: (_) {
+                                    if (_error != null) {
+                                      setState(() => _error = null);
+                                    }
+                                  },
+                                ),
 
-                          // OTP field (shown when code is sent)
-                          if (_codeSent) ...[
-                            const SizedBox(height: AppSpacing.lg),
-                            AuthField(
-                              ctrl: _otpCtrl,
-                              hint: l10n.forgotPasswordOtpHint,
-                              icon: Icons.pin_outlined,
-                              style: s,
-                              keyboardType: TextInputType.number,
-                              onChanged: (_) {
-                                if (_error != null) {
-                                  setState(() => _error = null);
-                                }
-                              },
+                                // OTP field (shown when code is sent)
+                                if (_codeSent) ...[
+                                  const SizedBox(height: AppSpacing.lg),
+                                  AuthField(
+                                    ctrl: _otpCtrl,
+                                    hint: l10n.forgotPasswordOtpHint,
+                                    icon: Icons.pin_outlined,
+                                    style: s,
+                                    keyboardType: TextInputType.number,
+                                    focusNode: _otpFocus,
+                                    isLast: true,
+                                    onSubmit: _submit,
+                                    autofillHints: const [AutofillHints.oneTimeCode],
+                                    onChanged: (_) {
+                                      if (_error != null) {
+                                        setState(() => _error = null);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ],
                             ),
-                          ],
+                          ),
 
                           // Success Message Banner
                           if (_successMessage != null) ...[
@@ -364,15 +393,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
                           // Main Action Button
                           PrimaryButton(
-                            onTap: _loading
-                                ? null
-                                : () async {
-                                    if (_codeSent) {
-                                      await _verifyOtp();
-                                    } else {
-                                      await _sendResetCode();
-                                    }
-                                  },
+                            onTap: _loading ? null : _submit,
                             label: _loading
                                 ? l10n.forgotPasswordProcessing
                                 : (_codeSent

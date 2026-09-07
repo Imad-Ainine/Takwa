@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 final activePositiveIbadahProvider = StreamProvider(
@@ -292,8 +293,13 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
       ),
       child: Row(
         children: [
-          GestureDetector(
+          TakwaTappable(
             onTap: _toggle,
+            // Inline in a Row alongside the ibadah name — a forced 48dp
+            // minimum here would blow out the row's height instead of
+            // meaningfully growing the tap target.
+            minTapSize: null,
+            borderRadius: BorderRadius.circular(AppRadius.xs),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 26,
@@ -338,8 +344,10 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
             ),
           ),
           if (_committed) ...[
-            GestureDetector(
+            TakwaTappable(
               onTap: isPos ? null : _increment,
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,

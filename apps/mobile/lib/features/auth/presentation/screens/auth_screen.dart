@@ -29,6 +29,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
+  final _userFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passFocus = FocusNode();
   bool _loading = false;
   String? _error;
   double _passStrength = 0;
@@ -67,7 +70,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _userCtrl.dispose();
+    _userFocus.dispose();
+    _emailFocus.dispose();
+    _passFocus.dispose();
     super.dispose();
+  }
+
+  void _submitActiveTab() {
+    if (_loading) return;
+    if (_tabs.index == 0) {
+      _signIn();
+    } else {
+      _signUp();
+    }
   }
 
   Future<void> _syncGender() async {
@@ -344,6 +359,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               ),
             ],
           ),
+          // Groups the username/email/password fields so a password
+          // manager can see and fill them together (autofillHints alone
+          // does nothing without this — see AuthField).
+          child: AutofillGroup(
           child: Column(
             children: [
               // ── Tab bar ──
@@ -397,6 +416,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       hint: l10n.authUsernameHint,
                       icon: Icons.person_outline_rounded,
                       style: s,
+                      focusNode: _userFocus,
+                      autofillHints: const [AutofillHints.username],
                     ),
                     const SizedBox(height: 14),
                   ],
@@ -410,6 +431,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 icon: Icons.alternate_email_rounded,
                 style: s,
                 keyboardType: TextInputType.emailAddress,
+                focusNode: _emailFocus,
               ),
               const SizedBox(height: 14),
 
@@ -420,6 +442,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 icon: Icons.lock_outline_rounded,
                 style: s,
                 isPassword: true,
+                focusNode: _passFocus,
+                isLast: true,
+                onSubmit: _submitActiveTab,
               ),
 
               // ── Password strength (sign-up only) ──
@@ -453,20 +478,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
               // ── Submit ──
               PrimaryButton(
-                onTap: _loading
-                    ? null
-                    : () async {
-                        if (_tabs.index == 0) {
-                          await _signIn();
-                        } else {
-                          await _signUp();
-                        }
-                      },
+                onTap: _loading ? null : _submitActiveTab,
                 label: _tabs.index == 0
                     ? l10n.authSecureSignInButton
                     : l10n.authCreateAccountButton,
               ),
             ],
+          ),
           ),
         ),
       ),

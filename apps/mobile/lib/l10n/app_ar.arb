@@ -1333,6 +1333,8 @@
   "authUsernameHint": "اسم المستخدم",
   "authEmailHint": "البريد الإلكتروني",
   "authPasswordHint": "كلمة المرور",
+  "authShowPasswordTooltip": "إظهار كلمة المرور",
+  "authHidePasswordTooltip": "إخفاء كلمة المرور",
   "authForgotPassword": "نسيت كلمة المرور؟",
   "authSecureSignInButton": "دخول آمن",
   "authCreateAccountButton": "إنشاء حساب",

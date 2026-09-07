@@ -4,6 +4,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class PaymentMethodsScreen extends ConsumerStatefulWidget {
@@ -97,8 +98,10 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
     required String icon,
   }) {
     final isSelected = _selectedMethod == index;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () => setState(() => _selectedMethod = index),
+      semanticLabel: '$title. $subtitle',
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(AppSpacing.lg),

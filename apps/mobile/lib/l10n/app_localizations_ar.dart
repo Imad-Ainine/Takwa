@@ -2238,6 +2238,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordHint => 'كلمة المرور';
 
   @override
+  String get authShowPasswordTooltip => 'إظهار كلمة المرور';
+
+  @override
+  String get authHidePasswordTooltip => 'إخفاء كلمة المرور';
+
+  @override
   String get authForgotPassword => 'نسيت كلمة المرور؟';
 
   @override

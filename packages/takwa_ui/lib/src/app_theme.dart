@@ -966,6 +966,32 @@ class AppTheme {
         inverseSurface: colors.textPrimary,
         onInverseSurface: colors.background,
         surfaceTint: Colors.transparent,
+        // The remaining M3 roles this scheme was missing — same motivation
+        // as the container ramp above: any adopted component that reaches
+        // for these (error banners/M3 SnackBar actions/FilledButton.tonal
+        // with a tertiary scheme) would otherwise fall back to baseline
+        // purple. Mapped onto existing tokens rather than inventing new
+        // ones: error/tertiary containers reuse the "Dim"/"Text" pairs the
+        // fill ramp already has, inversePrimary is a saturated gold that
+        // reads on the (light-in-dark-mode) inverseSurface, and
+        // surfaceDim/surfaceBright extend the existing surface-container
+        // ramp one step past its current ends.
+        errorContainer: colors.dangerDim,
+        onErrorContainer: colors.dangerText,
+        tertiaryContainer: colors.successDim,
+        onTertiaryContainer: colors.successText,
+        inversePrimary: colors.goldDark,
+        surfaceDim: colors.night,
+        surfaceBright: colors.card2,
+      ),
+      // Was on stock platform transitions across all ~55 routes. One shared,
+      // platform-appropriate transition instead of the default M3 fade for
+      // Android and iOS's native slide.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
       ),
       scaffoldBackgroundColor: colors.background,
       appBarTheme: AppBarTheme(

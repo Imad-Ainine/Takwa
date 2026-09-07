@@ -20,6 +20,8 @@ class UpdatePasswordScreen extends ConsumerStatefulWidget {
 class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
   final _passCtrl = TextEditingController();
   final _confirmPassCtrl = TextEditingController();
+  final _passFocus = FocusNode();
+  final _confirmPassFocus = FocusNode();
   bool _loading = false;
   String? _error;
   double _passStrength = 0;
@@ -44,6 +46,8 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
   void dispose() {
     _passCtrl.dispose();
     _confirmPassCtrl.dispose();
+    _passFocus.dispose();
+    _confirmPassFocus.dispose();
     super.dispose();
   }
 
@@ -195,6 +199,11 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                     ),
                     const SizedBox(height: AppSpacing.xxxl),
 
+                    // Password + confirm fields, grouped so a password
+                    // manager can see them together.
+                    AutofillGroup(
+                      child: Column(
+                        children: [
                     // Password Field
                     AuthField(
                       ctrl: _passCtrl,
@@ -202,6 +211,8 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       icon: Icons.lock_outline_rounded,
                       isPassword: true,
                       style: s,
+                      focusNode: _passFocus,
+                      autofillHints: const [AutofillHints.newPassword],
                       onChanged: (_) {
                         if (_error != null) setState(() => _error = null);
                       },
@@ -230,9 +241,16 @@ class _UpdatePasswordScreenState extends ConsumerState<UpdatePasswordScreen> {
                       icon: Icons.lock_clock_outlined,
                       isPassword: true,
                       style: s,
+                      focusNode: _confirmPassFocus,
+                      isLast: true,
+                      onSubmit: _loading ? null : _updatePassword,
+                      autofillHints: const [AutofillHints.newPassword],
                       onChanged: (_) {
                         if (_error != null) setState(() => _error = null);
                       },
+                    ),
+                        ],
+                      ),
                     ),
 
                     // Error banner
