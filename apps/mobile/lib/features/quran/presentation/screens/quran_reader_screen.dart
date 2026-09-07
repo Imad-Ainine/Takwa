@@ -302,8 +302,10 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                 // fight the page's internal ayah-selection gestures the
                 // way an overlaid GestureDetector would.
                 onPagePress: _toggleToolbar,
-                onAyahLongPress: (details, ayah) =>
-                    _showAyahOptions(ayah.surahNumber ?? surahNum, ayah.ayahNumber),
+                onAyahLongPress: (details, ayah) => _showAyahOptions(
+                  ayah.surahNumber ?? surahNum,
+                  ayah.ayahNumber,
+                ),
               ),
             ),
 
@@ -557,12 +559,7 @@ class _BottomBar extends StatelessWidget {
   final int juz, currentPage, totalPages, surahNum, pagesRead;
   final bool isDark;
   final QuranAudioState audio;
-  final VoidCallback
-  onTogglePlay,
-  onStop,
-  onSpeedTap,
-  onPageNav,
-  onFullscreen;
+  final VoidCallback onTogglePlay, onStop, onSpeedTap, onPageNav, onFullscreen;
 
   const _BottomBar({
     required this.juz,
@@ -683,7 +680,11 @@ class _BottomBar extends StatelessWidget {
                     const SizedBox(width: AppSpacing.xs),
                     _audioIcon(Icons.download_outlined, textDim, () {}),
                     const SizedBox(width: AppSpacing.xs),
-                    _audioIcon(Icons.fit_screen_outlined, textDim, onFullscreen),
+                    _audioIcon(
+                      Icons.fit_screen_outlined,
+                      textDim,
+                      onFullscreen,
+                    ),
                     const Spacer(),
 
                     // Play/pause button
