@@ -252,7 +252,7 @@ class _SurahRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: style.border.withOpacity(0.4)),
+            bottom: BorderSide(color: style.border.withValues(alpha: 0.4)),
           ),
         ),
         child: Row(
@@ -299,8 +299,8 @@ class _SurahRow extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: c.withOpacity(0.12),
-                border: Border.all(color: c.withOpacity(0.4)),
+                color: c.withValues(alpha: 0.12),
+                border: Border.all(color: c.withValues(alpha: 0.4)),
               ),
               child: Center(
                 child: Text(
@@ -391,7 +391,7 @@ class _ReviewTab extends StatelessWidget {
                   height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: style.gold.withOpacity(0.15),
+                    color: style.gold.withValues(alpha: 0.15),
                   ),
                   child: Center(
                     child: Text(
@@ -584,8 +584,8 @@ class _JuzTab extends StatelessWidget {
                   height: 32,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: style.gold.withOpacity(0.2),
-                    border: Border.all(color: style.gold.withOpacity(0.4)),
+                    color: style.gold.withValues(alpha: 0.2),
+                    border: Border.all(color: style.gold.withValues(alpha: 0.4)),
                   ),
                   child: Center(
                     child: Text(

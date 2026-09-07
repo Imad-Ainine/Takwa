@@ -182,7 +182,7 @@ class _BookReaderScreenState extends ConsumerState<BookReaderScreen>
                         style: TextStyle(
                           fontFamily: 'Amiri',
                           fontSize: 16,
-                          color: accentColor.withOpacity(0.8),
+                          color: accentColor.withValues(alpha: 0.8),
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -326,8 +326,8 @@ class _HadithCard extends StatelessWidget {
     final typography = context.typography;
 
     final cardBg = theme == ReaderTheme.dark
-        ? Colors.white.withOpacity(0.05)
-        : accentColor.withOpacity(0.05);
+        ? Colors.white.withValues(alpha: 0.05)
+        : accentColor.withValues(alpha: 0.05);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -342,7 +342,7 @@ class _HadithCard extends StatelessWidget {
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.1),
+                  color: accentColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
                 ),
                 child: Text(
@@ -362,12 +362,12 @@ class _HadithCard extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [accentColor, accentColor.withOpacity(0.8)],
+                  colors: [accentColor, accentColor.withValues(alpha: 0.8)],
                 ),
                 borderRadius: BorderRadius.circular(AppRadius.xl),
                 boxShadow: [
                   BoxShadow(
-                    color: accentColor.withOpacity(0.3),
+                    color: accentColor.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -405,7 +405,7 @@ class _HadithCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: cardBg,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: accentColor.withOpacity(0.2)),
+            border: Border.all(color: accentColor.withValues(alpha: 0.2)),
           ),
           child: Text(
             page.content,
@@ -460,7 +460,7 @@ class _TopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [barBg, barBg.withOpacity(0.0)],
+          colors: [barBg, barBg.withValues(alpha: 0.0)],
         ),
       ),
       child: SafeArea(
@@ -564,7 +564,7 @@ class _SettingsSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -615,7 +615,7 @@ class _SettingsSheet extends StatelessWidget {
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: accentColor.withOpacity(0.3),
+                                  color: accentColor.withValues(alpha: 0.3),
                                   blurRadius: 10,
                                 ),
                               ]
@@ -717,7 +717,7 @@ class _SizeBtn extends StatelessWidget {
         height: 48,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? colors.gold.withOpacity(0.1) : colors.background,
+          color: isSelected ? colors.gold.withValues(alpha: 0.1) : colors.background,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: isSelected ? colors.gold : colors.border,
@@ -789,7 +789,7 @@ class _BottomNav extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-          colors: [colors.background, colors.background.withOpacity(0.0)],
+          colors: [colors.background, colors.background.withValues(alpha: 0.0)],
         ),
       ),
       child: SafeArea(
@@ -803,7 +803,7 @@ class _BottomNav extends StatelessWidget {
                   height: 6,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: colors.border.withOpacity(0.5),
+                    color: colors.border.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -813,7 +813,7 @@ class _BottomNav extends StatelessWidget {
                     height: 6,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [accentColor, accentColor.withOpacity(0.7)],
+                        colors: [accentColor, accentColor.withValues(alpha: 0.7)],
                       ),
                       borderRadius: BorderRadius.circular(3),
                     ),
@@ -898,9 +898,9 @@ class _NavButton extends StatelessWidget {
           vertical: 10,
         ),
         decoration: BoxDecoration(
-          color: accentColor.withOpacity(0.1),
+          color: accentColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: accentColor.withOpacity(0.2)),
+          border: Border.all(color: accentColor.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -954,10 +954,10 @@ class _IconBtn extends StatelessWidget {
         height: 46,
         decoration: BoxDecoration(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.05),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.05),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Center(child: child),
       ),

@@ -939,6 +939,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerNavStatistics => 'Statistics';
 
   @override
+  String get drawerNavAsma => 'Names of Allah';
+
+  @override
   String get drawerNavAchievements => 'Achievements';
 
   @override
@@ -2266,6 +2269,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authPasswordHint => 'Password';
+
+  @override
+  String get authShowPasswordTooltip => 'Show password';
+
+  @override
+  String get authHidePasswordTooltip => 'Hide password';
 
   @override
   String get authForgotPassword => 'Forgot password?';
@@ -4408,6 +4417,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestGuardBack => 'Back';
 
   @override
+  String get splashQuote => '“Take account of yourselves before you are brought to account”';
+
+  @override
+  String get genericErrorMessage => 'Something went wrong. Please try again.';
+
+  @override
+  String get retryButtonLabel => 'Retry';
+
+  @override
+  String get inlineErrorRetryLabel => 'Couldn’t load, tap to retry';
+
+  @override
+  String statsChartBarSemanticLabel(String day, int points) {
+    return '$day: $points points';
+  }
+
+  @override
+  String get drawerSyncOffline => 'Offline';
+
+  @override
+  String get drawerSyncSynced => 'Synced';
+
+  @override
+  String get checklistSaveError => 'Couldn\'t save — please try again';
+
+  @override
+  String get checklistSyncError => 'Saved on this device — it\'ll sync once you\'re back online';
   String get splashQuote =>
       '“Take account of yourselves before you are brought to account”';
 }

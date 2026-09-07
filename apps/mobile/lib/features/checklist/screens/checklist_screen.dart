@@ -30,6 +30,64 @@ String _signedPoints(BuildContext context, int points) {
   return '$sign${_localizedDigits(context, points.abs())}';
 }
 
+/// Runs a local database write, then best-effort pushes the result to
+/// Supabase — the shared shape behind every prayer/ibadah/prohibition toggle
+/// on this screen. Previously each of those ~11 call sites awaited its DAO
+/// write and `syncManagerProvider.syncDailyRecord(...)` back to back with no
+/// error handling at all: a failed local write (disk full, DB lock) or a
+/// failed sync (offline, timeout) threw an unhandled exception out of a bare
+/// async tap handler, silently, with nothing shown to the user — and reading
+/// the record back for sync with a `!` null-assertion could crash outright
+/// on a null.
+///
+/// [save] performs the local write and returns the record to sync (usually
+/// via `getOrCreateToday()`/`getRecordByDate()` again, since the DAO writes
+/// here don't return the updated row themselves). A null result — or a
+/// failed sync leg — is not re-thrown: the local write already reached the
+/// DB, which is what todayRecordProvider and the checkbox above already
+/// reflect, so a sync problem is surfaced without being treated as data loss
+/// or left to crash the tap handler.
+///
+/// Returns whether the local save succeeded — most callers ignore it (a
+/// failure already got its own SnackBar here), but one (_DayNoteField, which
+/// has its own success toast) needs to know not to show "saved" on top of
+/// this method's own "couldn't save".
+Future<bool> _saveAndSync(
+  WidgetRef ref,
+  BuildContext context,
+  Future<DailyRecord?> Function() save, {
+  // For a caller that already applied an optimistic setState before the
+  // write (e.g. _ProhibitionRow) — undoes it so the UI stops claiming
+  // something was saved that wasn't, instead of drifting out of sync with
+  // the DB until the next full reload.
+  VoidCallback? onSaveError,
+}) async {
+  final l10n = AppLocalizations.of(context)!;
+  DailyRecord? record;
+  try {
+    record = await save();
+  } catch (_) {
+    onSaveError?.call();
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.checklistSaveError)));
+    }
+    return false;
+  }
+  if (record == null) return true;
+  try {
+    await ref.read(syncManagerProvider).syncDailyRecord(record);
+  } catch (_) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.checklistSyncError)));
+    }
+  }
+  return true;
+}
+
 class ChecklistScreen extends ConsumerStatefulWidget {
   const ChecklistScreen({super.key});
 
@@ -38,7 +96,12 @@ class ChecklistScreen extends ConsumerStatefulWidget {
 }
 
 class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  // Matters more here than most — without it, in-progress text in
+  // _DayNoteField was discarded on every tab switch away and back.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _entryCtrl;
   late final List<Animation<double>> _fadeAnims;
   late final List<Animation<Offset>> _slideAnims;
@@ -95,6 +158,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final todayAsync = ref.watch(todayRecordProvider);
 
     final hijri = HijriCalendar.now();
@@ -235,7 +299,7 @@ class _TopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [context.colors.gold.withOpacity(0.12), Colors.transparent],
+          colors: [context.colors.gold.withValues(alpha: 0.12), Colors.transparent],
         ),
       ),
       child: Row(
@@ -322,9 +386,9 @@ class _PointsPill extends StatelessWidget {
         vertical: small ? 3 : 5,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(
         '$label$value${AppLocalizations.of(context)!.checklistPointsSuffix}',
@@ -495,7 +559,7 @@ class _AnimatedProgressBarState extends State<_AnimatedProgressBar>
                 borderRadius: BorderRadius.circular(AppRadius.xs),
                 boxShadow: [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.3),
+                    color: context.colors.gold.withValues(alpha: 0.3),
                     blurRadius: 6,
                   ),
                 ],
@@ -560,21 +624,16 @@ class _PrayersGroup extends ConsumerWidget {
           status: status,
           onStatusChange: (newStatus) async {
             HapticFeedback.selectionClick();
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref
-                .read(dailyRecordDaoProvider)
-                .updatePrayerStatus(
-                  recordId: rec.id,
-                  prayerName: p.$2,
-                  status: newStatus,
-                );
-            // Sync to Supabase
-            final updatedRec = await ref
-                .read(dailyRecordDaoProvider)
-                .getRecordByDate(DateTime.now());
-            await ref.read(syncManagerProvider).syncDailyRecord(updatedRec!);
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.updatePrayerStatus(
+                recordId: rec.id,
+                prayerName: p.$2,
+                status: newStatus,
+              );
+              return dao.getRecordByDate(DateTime.now());
+            });
           },
         );
       }).toList(),
@@ -639,20 +698,20 @@ class _PrayerRow extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isDone
-                ? context.colors.success.withOpacity(0.08)
+                ? context.colors.success.withValues(alpha: 0.08)
                 : isQadaa
-                ? context.colors.warning.withOpacity(0.07)
+                ? context.colors.warning.withValues(alpha: 0.07)
                 : isMissed
-                ? context.colors.danger.withOpacity(0.07)
+                ? context.colors.danger.withValues(alpha: 0.07)
                 : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: isDone
-                  ? context.colors.success.withOpacity(0.25)
+                  ? context.colors.success.withValues(alpha: 0.25)
                   : isQadaa
-                  ? context.colors.warning.withOpacity(0.22)
+                  ? context.colors.warning.withValues(alpha: 0.22)
                   : isMissed
-                  ? context.colors.danger.withOpacity(0.22)
+                  ? context.colors.danger.withValues(alpha: 0.22)
                   : context.colors.border,
             ),
           ),
@@ -842,10 +901,10 @@ class _StatusOption extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.12) : context.colors.card,
+          color: isSelected ? color.withValues(alpha: 0.12) : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: isSelected ? color.withOpacity(0.4) : context.colors.border,
+            color: isSelected ? color.withValues(alpha: 0.4) : context.colors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -898,17 +957,12 @@ class _IbadahGroup extends ConsumerWidget {
           points: _signedPoints(context, 5),
           value: record?.morningAdhkar ?? false,
           onChanged: (v) async {
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref
-                .read(dailyRecordDaoProvider)
-                .updateAdhkar(recordId: rec.id, morning: v);
-            await ref
-                .read(syncManagerProvider)
-                .syncDailyRecord(
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.updateAdhkar(recordId: rec.id, morning: v);
+              return dao.getOrCreateToday();
+            });
           },
         ),
 
@@ -919,17 +973,12 @@ class _IbadahGroup extends ConsumerWidget {
           points: _signedPoints(context, 5),
           value: record?.eveningAdhkar ?? false,
           onChanged: (v) async {
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref
-                .read(dailyRecordDaoProvider)
-                .updateAdhkar(recordId: rec.id, evening: v);
-            await ref
-                .read(syncManagerProvider)
-                .syncDailyRecord(
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.updateAdhkar(recordId: rec.id, evening: v);
+              return dao.getOrCreateToday();
+            });
           },
         ),
 
@@ -940,15 +989,12 @@ class _IbadahGroup extends ConsumerWidget {
           points: _signedPoints(context, 15),
           value: record?.nightPrayer ?? false,
           onChanged: (v) async {
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref.read(dailyRecordDaoProvider).toggleNightPrayer(rec.id, v);
-            await ref
-                .read(syncManagerProvider)
-                .syncDailyRecord(
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.toggleNightPrayer(rec.id, v);
+              return dao.getOrCreateToday();
+            });
           },
         ),
 
@@ -961,15 +1007,12 @@ class _IbadahGroup extends ConsumerWidget {
           points: _signedPoints(context, 10),
           value: record?.sadaqah ?? false,
           onChanged: (v) async {
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref.read(dailyRecordDaoProvider).toggleSadaqah(rec.id, v);
-            await ref
-                .read(syncManagerProvider)
-                .syncDailyRecord(
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.toggleSadaqah(rec.id, v);
+              return dao.getOrCreateToday();
+            });
           },
         ),
         _ToggleRow(
@@ -979,15 +1022,12 @@ class _IbadahGroup extends ConsumerWidget {
           points: _signedPoints(context, 10),
           value: record?.ghadhBasar ?? false,
           onChanged: (v) async {
-            final rec = await ref
-                .read(dailyRecordDaoProvider)
-                .getOrCreateToday();
-            await ref.read(dailyRecordDaoProvider).toggleGhadhBasar(rec.id, v);
-            await ref
-                .read(syncManagerProvider)
-                .syncDailyRecord(
-                  await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                );
+            await _saveAndSync(ref, context, () async {
+              final dao = ref.read(dailyRecordDaoProvider);
+              final rec = await dao.getOrCreateToday();
+              await dao.toggleGhadhBasar(rec.id, v);
+              return dao.getOrCreateToday();
+            });
           },
         ),
       ],
@@ -1011,12 +1051,12 @@ class _QuranInput extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: hasPages
-            ? context.colors.teal.withOpacity(0.07)
+            ? context.colors.teal.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: hasPages
-              ? context.colors.teal.withOpacity(0.3)
+              ? context.colors.teal.withValues(alpha: 0.3)
               : context.colors.border,
         ),
       ),
@@ -1086,17 +1126,12 @@ class _QuranInput extends ConsumerWidget {
               ),
               onChanged: (v) async {
                 final pages = int.tryParse(v) ?? 0;
-                final rec = await ref
-                    .read(dailyRecordDaoProvider)
-                    .getOrCreateToday();
-                await ref
-                    .read(dailyRecordDaoProvider)
-                    .updateQuran(recordId: rec.id, pages: pages);
-                await ref
-                    .read(syncManagerProvider)
-                    .syncDailyRecord(
-                      await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-                    );
+                await _saveAndSync(ref, context, () async {
+                  final dao = ref.read(dailyRecordDaoProvider);
+                  final rec = await dao.getOrCreateToday();
+                  await dao.updateQuran(recordId: rec.id, pages: pages);
+                  return dao.getOrCreateToday();
+                });
               },
             ),
           ),
@@ -1163,12 +1198,12 @@ class _ToggleRow extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: value
-                ? context.colors.success.withOpacity(0.08)
+                ? context.colors.success.withValues(alpha: 0.08)
                 : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
               color: value
-                  ? context.colors.success.withOpacity(0.25)
+                  ? context.colors.success.withValues(alpha: 0.25)
                   : context.colors.border,
             ),
           ),
@@ -1249,12 +1284,12 @@ class _FastingSelector extends ConsumerWidget {
       ),
       decoration: BoxDecoration(
         color: current != FastingType.none
-            ? context.colors.teal.withOpacity(0.07)
+            ? context.colors.teal.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: current != FastingType.none
-              ? context.colors.teal.withOpacity(0.25)
+              ? context.colors.teal.withValues(alpha: 0.25)
               : context.colors.border,
         ),
       ),
@@ -1329,22 +1364,21 @@ class _FastingSelector extends ConsumerWidget {
       child: GestureDetector(
         onTap: () async {
           HapticFeedback.selectionClick();
-          final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
-          await ref.read(dailyRecordDaoProvider).updateFasting(rec.id, value);
-          await ref
-              .read(syncManagerProvider)
-              .syncDailyRecord(
-                await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-              );
+          await _saveAndSync(ref, context, () async {
+            final dao = ref.read(dailyRecordDaoProvider);
+            final rec = await dao.getOrCreateToday();
+            await dao.updateFasting(rec.id, value);
+            return dao.getOrCreateToday();
+          });
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
-            color: selected ? color.withOpacity(0.15) : context.colors.card,
+            color: selected ? color.withValues(alpha: 0.15) : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
-              color: selected ? color.withOpacity(0.4) : context.colors.border,
+              color: selected ? color.withValues(alpha: 0.4) : context.colors.border,
               width: selected ? 1.5 : 1,
             ),
           ),
@@ -1409,9 +1443,9 @@ class _ProhibitionsGroup extends ConsumerWidget {
           ),
           margin: const EdgeInsets.only(bottom: 10),
           decoration: BoxDecoration(
-            color: context.colors.danger.withOpacity(0.07),
+            color: context.colors.danger.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
+            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
@@ -1422,7 +1456,7 @@ class _ProhibitionsGroup extends ConsumerWidget {
                   l10n.checklistProhibitionsSubtitle,
                   style: context.typography.caption.copyWith(
                     fontSize: 11,
-                    color: context.colors.danger.withOpacity(0.8),
+                    color: context.colors.danger.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -1469,43 +1503,58 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
     if (widget.recordId == null) return;
     HapticFeedback.selectionClick();
     final newVal = !_committed;
+    final prevCount = _count;
     setState(() {
       _committed = newVal;
       if (!newVal) _count = 0;
     });
 
-    await ref
-        .read(dailyRecordDaoProvider)
-        .logProhibition(
+    await _saveAndSync(
+      ref,
+      context,
+      () async {
+        final dao = ref.read(dailyRecordDaoProvider);
+        await dao.logProhibition(
           recordId: widget.recordId!,
           category: widget.category,
           committed: newVal,
           timesCount: newVal ? (_count == 0 ? 1 : _count) : 0,
         );
-    await ref
-        .read(syncManagerProvider)
-        .syncDailyRecord(
-          await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-        );
+        return dao.getOrCreateToday();
+      },
+      onSaveError: () {
+        if (mounted) {
+          setState(() {
+            _committed = !newVal;
+            _count = prevCount;
+          });
+        }
+      },
+    );
   }
 
   Future<void> _increment() async {
     if (!_committed || widget.recordId == null) return;
     HapticFeedback.selectionClick();
+    final prevCount = _count;
     setState(() => _count++);
-    await ref
-        .read(dailyRecordDaoProvider)
-        .logProhibition(
+    await _saveAndSync(
+      ref,
+      context,
+      () async {
+        final dao = ref.read(dailyRecordDaoProvider);
+        await dao.logProhibition(
           recordId: widget.recordId!,
           category: widget.category,
           committed: true,
           timesCount: _count,
         );
-    await ref
-        .read(syncManagerProvider)
-        .syncDailyRecord(
-          await ref.read(dailyRecordDaoProvider).getOrCreateToday(),
-        );
+        return dao.getOrCreateToday();
+      },
+      onSaveError: () {
+        if (mounted) setState(() => _count = prevCount);
+      },
+    );
   }
 
   @override
@@ -1519,12 +1568,12 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
       ),
       decoration: BoxDecoration(
         color: _committed
-            ? context.colors.danger.withOpacity(0.07)
+            ? context.colors.danger.withValues(alpha: 0.07)
             : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: _committed
-              ? context.colors.danger.withOpacity(0.25)
+              ? context.colors.danger.withValues(alpha: 0.25)
               : context.colors.border,
         ),
       ),
@@ -1610,10 +1659,10 @@ class _ProhibitionRowState extends ConsumerState<_ProhibitionRow> {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.danger.withOpacity(0.12),
+                    color: context.colors.danger.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                     border: Border.all(
-                      color: context.colors.danger.withOpacity(0.3),
+                      color: context.colors.danger.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Row(
@@ -1727,21 +1776,31 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
   Future<void> _save() async {
     setState(() => _saving = true);
     HapticFeedback.mediumImpact();
-    final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
-    final db = ref.read(appDatabaseProvider);
-    await (db.update(db.dailyRecords)..where((r) => r.id.equals(rec.id))).write(
-      DailyRecordsCompanion(
-        notes: Value(_ctrl.text.trim()),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-    // Sync to Supabase
-    final updatedRec = await ref
-        .read(dailyRecordDaoProvider)
-        .getOrCreateToday();
-    await ref.read(syncManagerProvider).syncDailyRecord(updatedRec);
-    setState(() => _saving = false);
-    if (mounted) {
+    final bool saved;
+    try {
+      saved = await _saveAndSync(ref, context, () async {
+        final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
+        final db = ref.read(appDatabaseProvider);
+        await (db.update(db.dailyRecords)
+              ..where((r) => r.id.equals(rec.id)))
+            .write(
+              DailyRecordsCompanion(
+                notes: Value(_ctrl.text.trim()),
+                updatedAt: Value(DateTime.now()),
+              ),
+            );
+        return ref.read(dailyRecordDaoProvider).getOrCreateToday();
+      });
+    } finally {
+      // In a finally, not right after the await: without it, a save that
+      // throws left the button stuck showing its loading state forever —
+      // the same defect PrimaryButton itself had before it grew a
+      // try/finally around its own tap handler.
+      if (mounted) setState(() => _saving = false);
+    }
+    // _saveAndSync already showed its own SnackBar on failure; only add this
+    // one on top when the local write actually succeeded.
+    if (saved && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1831,9 +1890,9 @@ class _MiniPts extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.12),
+      color: color.withValues(alpha: 0.12),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: color.withOpacity(0.3)),
+      border: Border.all(color: color.withValues(alpha: 0.3)),
     ),
     child: Text(
       label,

@@ -5,12 +5,12 @@ import 'package:takwa/features/checklist/screens/checklist_screen.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 import '../core/theme/app_theme.dart';
+import '../core/widgets/takwa_error_state.dart';
 import '../core/providers/database_providers.dart';
 import '../core/notifications/notifications_service.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
-import '../features/asma/presentation/screens/asma_screen.dart';
 import '../features/qiyam/presentation/screens/qiyam_dashboard_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
@@ -40,13 +40,17 @@ class _MainShellState extends ConsumerState<MainShell>
   late final PageController _pageCtrl;
   late List<AnimationController> _tabAnims;
 
+  // Was 6 destinations (audit §C10: "exceeds Material's 3-5 destination
+  // guidance; at 375pt that's 62pt per tab"). Names of Allah moved to the
+  // drawer (_DrawerNav in animated_drawer.dart) — a reference/browse screen
+  // fits better as an occasional lookup than a persistent bottom-nav slot,
+  // unlike Qiyam which is a daily-tracked habit like the other four.
   static List<_TabInfo> _getTabs(AppLocalizations l10n) => [
     _TabInfo('🏠', l10n.bottomNavHome, 0),
     _TabInfo('🌙', l10n.bottomNavQiyam, 1),
     _TabInfo('✅', l10n.bottomNavMuhasaba, 2),
     _TabInfo('📊', l10n.bottomNavStatistics, 3),
-    _TabInfo('✨', l10n.bottomNavAsma, 4),
-    _TabInfo('⚙️', l10n.bottomNavSettings, 5),
+    _TabInfo('⚙️', l10n.bottomNavSettings, 4),
   ];
 
   @override
@@ -55,7 +59,7 @@ class _MainShellState extends ConsumerState<MainShell>
     _pageCtrl = PageController(initialPage: widget.initialIndex);
 
     _tabAnims = List.generate(
-      6,
+      5,
       (i) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
@@ -148,7 +152,13 @@ class _MainShellState extends ConsumerState<MainShell>
 
     return onboardAsync.when(
       loading: () => const _SplashScreen(),
-      error: (_, _) => const _SplashScreen(),
+      // Was const _SplashScreen() — onboardingDoneProvider reads the local
+      // DB, so a failure here (corrupt/unreadable database) used to strand
+      // the user on a permanently-spinning splash with no way out. Now it
+      // surfaces the failure with a way to retry the read.
+      error: (_, _) => _SplashErrorScreen(
+        onRetry: () => ref.invalidate(onboardingDoneProvider),
+      ),
       data: (done) {
         if (!done) {
           return const OnboardingScreen();
@@ -167,7 +177,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
   Widget _buildShell() {
     // Robustness check: If tabs were added/removed during hot reload, re-initialize controllers
-    const tabCount = 6;
+    const tabCount = 5;
     if (_tabAnims.length != tabCount) {
       for (final a in _tabAnims) {
         a.dispose();
@@ -200,7 +210,6 @@ class _MainShellState extends ConsumerState<MainShell>
             QiyamDashboardScreen(),
             ChecklistScreen(),
             StatisticsScreen(),
-            AsmaScreen(),
             SettingsScreen(),
           ],
           onPageChanged: (idx) {
@@ -243,13 +252,13 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.colors.card.withOpacity(0.95),
+        color: context.colors.card.withValues(alpha: 0.95),
         border: Border(
           top: BorderSide(color: context.colors.border, width: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -310,7 +319,7 @@ class _BottomNav extends StatelessWidget {
                                         ? [
                                             BoxShadow(
                                               color: context.colors.gold
-                                                  .withOpacity(0.3),
+                                                  .withValues(alpha: 0.3),
                                               blurRadius: 8,
                                             ),
                                           ]
@@ -329,7 +338,7 @@ class _BottomNav extends StatelessWidget {
                                           ? [
                                               Shadow(
                                                 color: context.colors.gold
-                                                    .withOpacity(0.6 * t),
+                                                    .withValues(alpha: 0.6 * t),
                                                 blurRadius: 10,
                                               ),
                                             ]
@@ -378,6 +387,27 @@ class _BottomNav extends StatelessWidget {
 
 // ─────────────────────────────────────────
 //  SPLASH SCREEN
+// ─────────────────────────────────────────
+//  SPLASH ERROR SCREEN
+// ─────────────────────────────────────────
+/// Shown in place of [_SplashScreen] when onboardingDoneProvider — the very
+/// first read this app does — fails. Without this the user was stuck on a
+/// spinning splash forever with no signal anything was wrong and no way
+/// back in.
+class _SplashErrorScreen extends StatelessWidget {
+  const _SplashErrorScreen({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: TakwaErrorState(onRetry: onRetry),
+    );
+  }
+}
+
 // ─────────────────────────────────────────
 class _SplashScreen extends StatefulWidget {
   const _SplashScreen();
@@ -441,9 +471,7 @@ class _SplashScreenState extends State<_SplashScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: context.colors.gold.withOpacity(
-                                0.3 - i * 0.08,
-                              ),
+                              color: context.colors.gold.withValues(alpha: 0.3 - i * 0.08),
                               width: 1,
                             ),
                           ),

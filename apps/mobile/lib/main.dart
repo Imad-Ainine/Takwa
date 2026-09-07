@@ -265,9 +265,7 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
                   ? Brightness.light
                   : Brightness.dark,
               // iOS uses the inverse convention
-              statusBarBrightness: isDark
-                  ? Brightness.dark
-                  : Brightness.light,
+              statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
               systemNavigationBarColor: surface,
               systemNavigationBarIconBrightness: isDark
                   ? Brightness.light

@@ -13,6 +13,7 @@ import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
@@ -27,12 +28,24 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // Kept alive because this is one of six PageView tabs in MainShell: without
+  // this, PageView disposes an off-screen tab's State once it scrolls past
+  // the cache extent, so switching Home -> Statistics -> Home lost scroll
+  // position and re-ran the 1.5s entry-stagger animation on every return.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _staggerCtrl;
   late final List<Animation<double>> _fadeAnims;
   late final List<Animation<Offset>> _slideAnims;
   final _scrollCtrl = ScrollController();
-  bool _headerCollapsed = false;
+  // ValueNotifier, not a plain bool behind setState: this flips at most
+  // twice per scroll session (crossing the 70px threshold each way), but
+  // setState() on _HomeScreenState re-ran the build() that lays out all 11
+  // sections below just to update the one AnimatedOpacity that actually
+  // depends on it. A ValueListenableBuilder around only that AnimatedOpacity
+  // (see the SliverAppBar title below) rebuilds just that subtree instead.
+  final _headerCollapsed = ValueNotifier<bool>(false);
   static const _sectionCount = 11;
 
   @override
@@ -77,14 +90,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _onScroll() {
-    final c = _scrollCtrl.offset > 70;
-    if (c != _headerCollapsed) setState(() => _headerCollapsed = c);
+    // No setState: ValueNotifier notifies its own listener directly, which
+    // is exactly the one small AnimatedOpacity that needs to know.
+    _headerCollapsed.value = _scrollCtrl.offset > 70;
   }
 
   @override
   void dispose() {
     _staggerCtrl.dispose();
     _scrollCtrl.dispose();
+    _headerCollapsed.dispose();
     super.dispose();
   }
 
@@ -95,6 +110,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final todayAsync = ref.watch(todayRecordProvider);
     final streakAsync = ref.watch(currentStreakProvider);
@@ -146,12 +162,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       isRamadan: isRamadan,
                     ),
                   ),
-                  title: AnimatedOpacity(
-                    opacity: _headerCollapsed ? 1 : 0,
-                    duration: const Duration(milliseconds: 180),
+                  // ValueListenableBuilder instead of reading
+                  // _headerCollapsed straight off the State: this way only
+                  // this small subtree rebuilds when it flips, not the
+                  // whole 11-section build() below.
+                  title: ValueListenableBuilder<bool>(
+                    valueListenable: _headerCollapsed,
+                    // Static — depends on hijriStr/style, not on the
+                    // collapsed flag — so it's hoisted out as `child`
+                    // rather than rebuilt on every flip.
                     child: Text(
                       hijriStr,
                       style: style.amiri(14, color: style.gold),
+                    ),
+                    builder: (context, collapsed, child) => AnimatedOpacity(
+                      opacity: collapsed ? 1 : 0,
+                      duration: AppMotion.fast,
+                      child: child,
                     ),
                   ),
                   centerTitle: true,
@@ -209,7 +236,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       3,
                       todayAsync.when(
                         loading: () => _Skeleton(style: style, height: 110),
-                        error: (_, _) => const SizedBox(),
+                        error: (_, _) => TakwaErrorState(
+                          compact: true,
+                          onRetry: () => ref.invalidate(todayRecordProvider),
+                        ),
                         data: (r) => _TaqwaSectionMerged(
                           record: r,
                           streakAsync: streakAsync,
@@ -224,7 +254,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       4,
                       todayAsync.when(
                         loading: () => _Skeleton(style: style, height: 180),
-                        error: (_, _) => const SizedBox(),
+                        error: (_, _) => TakwaErrorState(
+                          compact: true,
+                          onRetry: () => ref.invalidate(todayRecordProvider),
+                        ),
                         data: (r) =>
                             _QuickIbadahGridMerged(record: r, style: style),
                       ),
@@ -313,7 +346,7 @@ class _HomeHeader extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            style.gold.withOpacity(isRamadan ? 0.15 : 0.08),
+            style.gold.withValues(alpha: isRamadan ? 0.15 : 0.08),
             Colors.transparent,
           ],
         ),
@@ -343,7 +376,7 @@ class _HomeHeader extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: style.goldDim,
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: style.gold.withOpacity(0.2)),
+                  border: Border.all(color: style.gold.withValues(alpha: 0.2)),
                 ),
                 child: Text(g, style: style.naskh(11, color: style.goldLight)),
               ),
@@ -409,18 +442,18 @@ class _RamadanBannerState extends State<_RamadanBanner>
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              s.gold.withOpacity(0.15 + 0.05 * _ctrl.value),
-              s.success.withOpacity(0.08),
+              s.gold.withValues(alpha: 0.15 + 0.05 * _ctrl.value),
+              s.success.withValues(alpha: 0.08),
             ],
           ),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: s.gold.withOpacity(0.25 + 0.15 * _ctrl.value),
+            color: s.gold.withValues(alpha: 0.25 + 0.15 * _ctrl.value),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: s.gold.withOpacity(0.08 * _ctrl.value),
+              color: s.gold.withValues(alpha: 0.08 * _ctrl.value),
               blurRadius: 16,
             ),
           ],
@@ -518,17 +551,17 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             colors: [
-              s.gold.withOpacity(0.15 + 0.05 * _pulse.value),
-              s.teal.withOpacity(0.07),
+              s.gold.withValues(alpha: 0.15 + 0.05 * _pulse.value),
+              s.teal.withValues(alpha: 0.07),
             ],
           ),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: s.gold.withOpacity(0.2 + 0.1 * _pulse.value),
+            color: s.gold.withValues(alpha: 0.2 + 0.1 * _pulse.value),
           ),
           boxShadow: [
             BoxShadow(
-              color: s.gold.withOpacity(0.06 + 0.06 * _pulse.value),
+              color: s.gold.withValues(alpha: 0.06 + 0.06 * _pulse.value),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -543,11 +576,11 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                 color: s.goldDim,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: s.gold.withOpacity(0.2 + 0.15 * _pulse.value),
+                  color: s.gold.withValues(alpha: 0.2 + 0.15 * _pulse.value),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: s.gold.withOpacity(0.12 * _pulse.value),
+                    color: s.gold.withValues(alpha: 0.12 * _pulse.value),
                     blurRadius: 10,
                   ),
                 ],
@@ -589,9 +622,9 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                   vertical: AppSpacing.sm,
                 ),
                 decoration: BoxDecoration(
-                  color: s.gold.withOpacity(0.1),
+                  color: s.gold.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: s.gold.withOpacity(0.25)),
+                  border: Border.all(color: s.gold.withValues(alpha: 0.25)),
                 ),
                 child: Text(
                   countdown,
@@ -640,7 +673,7 @@ class _MosquePrayerSection extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Container(height: 1, color: style.gold.withOpacity(0.2)),
+                child: Container(height: 1, color: style.gold.withValues(alpha: 0.2)),
               ),
             ],
           ),
@@ -653,7 +686,7 @@ class _MosquePrayerSection extends StatelessWidget {
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: style.gold.withOpacity(0.1),
+                  color: style.gold.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -676,8 +709,8 @@ class _MosquePrayerSection extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          style.bg.withOpacity(0.4),
-                          style.bg.withOpacity(0.85),
+                          style.bg.withValues(alpha: 0.4),
+                          style.bg.withValues(alpha: 0.85),
                         ],
                       ),
                     ),
@@ -754,8 +787,8 @@ class _MihrabPrayerChip extends StatelessWidget {
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
           color: isActive
-              ? style.gold.withOpacity(0.15)
-              : style.card.withOpacity(0.4),
+              ? style.gold.withValues(alpha: 0.15)
+              : style.card.withValues(alpha: 0.4),
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(35),
             topRight: Radius.circular(35),
@@ -764,14 +797,14 @@ class _MihrabPrayerChip extends StatelessWidget {
           ),
           border: Border.all(
             color: isActive
-                ? style.gold.withOpacity(0.6)
-                : style.border.withOpacity(0.3),
+                ? style.gold.withValues(alpha: 0.6)
+                : style.border.withValues(alpha: 0.3),
             width: isActive ? 1.5 : 1,
           ),
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: style.gold.withOpacity(0.2),
+                    color: style.gold.withValues(alpha: 0.2),
                     blurRadius: 10,
                     spreadRadius: 1,
                   ),
@@ -803,7 +836,7 @@ class _MihrabPrayerChip extends StatelessWidget {
                 13,
                 color: isActive
                     ? style.goldLight
-                    : style.textSec.withOpacity(0.8),
+                    : style.textSec.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -855,7 +888,7 @@ class MosqueClipper extends CustomClipper<Path> {
 // ─────────────────────────────────────────
 //  TAQWA SECTION MERGED
 // ─────────────────────────────────────────
-class _TaqwaSectionMerged extends StatelessWidget {
+class _TaqwaSectionMerged extends ConsumerWidget {
   final DailyRecord? record;
   final AsyncValue<int> streakAsync;
   final AdaptiveStyle style;
@@ -866,7 +899,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = style;
     final l10n = AppLocalizations.of(context)!;
     final net = record?.netPoints ?? 0;
@@ -901,7 +934,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: s.goldDim,
                         borderRadius: BorderRadius.circular(AppRadius.xl),
-                        border: Border.all(color: s.gold.withOpacity(0.2)),
+                        border: Border.all(color: s.gold.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         _level(l10n, net),
@@ -916,7 +949,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: s.gold.withOpacity(0.1),
+                          color: s.gold.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -931,7 +964,10 @@ class _TaqwaSectionMerged extends StatelessWidget {
                 const SizedBox(height: 6),
                 streakAsync.when(
                   loading: () => const SizedBox(height: 22),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 22,
+                    onRetry: () => ref.invalidate(currentStreakProvider),
+                  ),
                   data: (n) => n > 0
                       ? Container(
                           padding: const EdgeInsets.symmetric(
@@ -939,10 +975,10 @@ class _TaqwaSectionMerged extends StatelessWidget {
                             vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: s.success.withOpacity(0.12),
+                            color: s.success.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
-                              color: s.success.withOpacity(0.3),
+                              color: s.success.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Row(
@@ -1073,7 +1109,7 @@ class _RingPainterV2 extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = gold.withOpacity(0.12)
+        ..color = gold.withValues(alpha: 0.12)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7,
     );
@@ -1161,7 +1197,7 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
             Text(l10n.homeTodayIbadahTitle, style: s.amiri(15)),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
-              child: Container(height: 1, color: s.border.withOpacity(0.3)),
+              child: Container(height: 1, color: s.border.withValues(alpha: 0.3)),
             ),
             const SizedBox(width: AppSpacing.sm),
             GestureDetector(
@@ -1236,18 +1272,18 @@ class _IbadahChipMerged extends ConsumerWidget {
           gradient: done
               ? LinearGradient(
                   colors: [
-                    s.teal.withOpacity(0.12),
-                    s.success.withOpacity(0.08),
+                    s.teal.withValues(alpha: 0.12),
+                    s.success.withValues(alpha: 0.08),
                   ],
                 )
               : null,
           color: done ? null : s.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: done ? s.success.withOpacity(0.3) : s.border,
+            color: done ? s.success.withValues(alpha: 0.3) : s.border,
           ),
           boxShadow: done
-              ? [BoxShadow(color: s.success.withOpacity(0.1), blurRadius: 8)]
+              ? [BoxShadow(color: s.success.withValues(alpha: 0.1), blurRadius: 8)]
               : null,
         ),
         child: Column(
@@ -1323,7 +1359,7 @@ class _FeatureRow extends StatelessWidget {
             Text(l10n.homeFeaturesTitle, style: s.amiri(15, color: s.gold)),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
-              child: Container(height: 1, color: s.gold.withOpacity(0.2)),
+              child: Container(height: 1, color: s.gold.withValues(alpha: 0.2)),
             ),
           ],
         ),
@@ -1363,13 +1399,13 @@ class _FeatureItem extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [s.gold.withOpacity(0.12), s.teal.withOpacity(0.05)],
+            colors: [s.gold.withValues(alpha: 0.12), s.teal.withValues(alpha: 0.05)],
           ),
           borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: s.gold.withOpacity(0.25), width: 1.2),
+          border: Border.all(color: s.gold.withValues(alpha: 0.25), width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: s.gold.withOpacity(0.05),
+              color: s.gold.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -1381,7 +1417,7 @@ class _FeatureItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: s.gold.withOpacity(0.08),
+                color: s.gold.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Text(f.$1, style: const TextStyle(fontSize: 22)),
@@ -1445,14 +1481,14 @@ class _VerseCardMerged extends StatelessWidget {
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: [
-            s.gold.withOpacity(isRamadan ? 0.18 : 0.1),
-            s.teal.withOpacity(isRamadan ? 0.1 : 0.05),
+            s.gold.withValues(alpha: isRamadan ? 0.18 : 0.1),
+            s.teal.withValues(alpha: isRamadan ? 0.1 : 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: s.gold.withOpacity(isRamadan ? 0.3 : 0.18)),
+        border: Border.all(color: s.gold.withValues(alpha: isRamadan ? 0.3 : 0.18)),
         boxShadow: isRamadan
-            ? [BoxShadow(color: s.gold.withOpacity(0.08), blurRadius: 16)]
+            ? [BoxShadow(color: s.gold.withValues(alpha: 0.08), blurRadius: 16)]
             : null,
       ),
       child: Column(
@@ -1460,11 +1496,11 @@ class _VerseCardMerged extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(width: 24, height: 1, color: s.gold.withOpacity(0.3)),
+              Container(width: 24, height: 1, color: s.gold.withValues(alpha: 0.3)),
               const SizedBox(width: AppSpacing.sm),
               Text('❁', style: TextStyle(color: s.gold, fontSize: 14)),
               const SizedBox(width: AppSpacing.sm),
-              Container(width: 24, height: 1, color: s.gold.withOpacity(0.3)),
+              Container(width: 24, height: 1, color: s.gold.withValues(alpha: 0.3)),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -1558,7 +1594,7 @@ class _RamadanIftarState extends ConsumerState<_RamadanIftar> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Container(height: 1, color: s.gold.withOpacity(0.2)),
+                child: Container(height: 1, color: s.gold.withValues(alpha: 0.2)),
               ),
             ],
           ),
@@ -1612,11 +1648,11 @@ class _IftarCard extends StatelessWidget {
     ),
     decoration: BoxDecoration(
       gradient: LinearGradient(
-        colors: [color.withOpacity(0.12), color.withOpacity(0.05)],
+        colors: [color.withValues(alpha: 0.12), color.withValues(alpha: 0.05)],
       ),
       borderRadius: BorderRadius.circular(AppRadius.lg),
-      border: Border.all(color: color.withOpacity(0.3)),
-      boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 8)],
+      border: Border.all(color: color.withValues(alpha: 0.3)),
+      boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 8)],
     ),
     child: Column(
       children: [
@@ -1733,7 +1769,7 @@ class _BooksSection extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Container(height: 1, color: s.gold.withOpacity(0.15)),
+                child: Container(height: 1, color: s.gold.withValues(alpha: 0.15)),
               ),
               const SizedBox(width: 10),
               GestureDetector(
@@ -1756,7 +1792,10 @@ class _BooksSection extends ConsumerWidget {
               separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
               itemBuilder: (_, __) => _Skeleton(style: s, height: 180),
             ),
-            error: (_, __) => const SizedBox(),
+            error: (_, __) => TakwaErrorState(
+              compact: true,
+              onRetry: () => ref.invalidate(booksListProvider),
+            ),
             data: (books) => ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -1792,7 +1831,7 @@ class _BookCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -1814,8 +1853,8 @@ class _BookCard extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      color.withOpacity(0.8),
-                      Color(int.parse(book.coverColor2)).withOpacity(0.6),
+                      color.withValues(alpha: 0.8),
+                      Color(int.parse(book.coverColor2)).withValues(alpha: 0.6),
                     ],
                   ),
                 ),
@@ -1851,7 +1890,7 @@ class _BookCard extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.black.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
                         child: Text(

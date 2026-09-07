@@ -5,6 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/takwa_error_state.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
@@ -41,11 +42,11 @@ class ProfileScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       // Profile Header Card
-                      _buildProfileHeader(context, profileAsync),
+                      _buildProfileHeader(context, ref, profileAsync),
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Stats Row
-                      _buildStatsGrid(context, statsAsync, streakAsync),
+                      _buildStatsGrid(context, ref, statsAsync, streakAsync),
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Quick Actions / Menu
@@ -87,18 +88,16 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildProfileHeader(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<Map<String, dynamic>?> profileAsync,
   ) {
-    final l10n = AppLocalizations.of(context)!;
     return profileAsync.when(
       loading: () => const Center(child: TakwaLoadingIndicator()),
-      error: (e, _) => Center(
-        child: Text(
-          l10n.profileLoadError,
-          style: context.typography.bodySmall,
-        ),
+      error: (e, _) => TakwaErrorState(
+        onRetry: () => ref.invalidate(userProfileProvider),
       ),
       data: (profile) {
+        final l10n = AppLocalizations.of(context)!;
         final username = profile?['username'] ?? l10n.profileDefaultUsername;
         final avatar = profile?['avatar_emoji'] ?? '🌙';
 
@@ -106,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.xxl),
           decoration: context.decorations.goldCard.copyWith(
-            color: context.colors.card.withOpacity(0.8),
+            color: context.colors.card.withValues(alpha: 0.8),
           ),
           child: Column(
             children: [
@@ -118,12 +117,12 @@ class ProfileScreen extends ConsumerWidget {
                   shape: BoxShape.circle,
                   color: context.colors.goldDim,
                   border: Border.all(
-                    color: context.colors.gold.withOpacity(0.5),
+                    color: context.colors.gold.withValues(alpha: 0.5),
                     width: 2,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: context.colors.gold.withOpacity(0.2),
+                      color: context.colors.gold.withValues(alpha: 0.2),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -149,10 +148,10 @@ class ProfileScreen extends ConsumerWidget {
                     vertical: AppSpacing.xs,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colors.gold.withOpacity(0.15),
+                    color: context.colors.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppRadius.xs),
                     border: Border.all(
-                      color: context.colors.gold.withOpacity(0.4),
+                      color: context.colors.gold.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Text(
@@ -185,6 +184,7 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildStatsGrid(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<MonthStats> statsAsync,
     AsyncValue<int> streakAsync,
   ) {
@@ -200,7 +200,10 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.gold,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaInlineError(
+              height: 100,
+              onRetry: () => ref.invalidate(monthStatsProvider),
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -213,7 +216,10 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.success,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaInlineError(
+              height: 100,
+              onRetry: () => ref.invalidate(currentStreakProvider),
+            ),
           ),
         ),
       ],
@@ -297,7 +303,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: context.decorations.card.copyWith(
-        color: context.colors.card.withOpacity(0.9),
+        color: context.colors.card.withValues(alpha: 0.9),
       ),
       child: Column(
         children: [
@@ -338,7 +344,7 @@ class _MenuTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: context.decorations.card.copyWith(
-        color: context.colors.card.withOpacity(0.6),
+        color: context.colors.card.withValues(alpha: 0.6),
       ),
       child: ListTile(
         onTap: onTap,

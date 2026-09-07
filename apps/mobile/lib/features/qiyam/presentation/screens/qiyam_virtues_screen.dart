@@ -111,7 +111,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -138,7 +138,7 @@ class QiyamVirtuesScreen extends StatelessWidget {
               border: Border.all(color: context.colors.border),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

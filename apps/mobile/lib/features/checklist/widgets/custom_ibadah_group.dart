@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 final activePositiveIbadahProvider = StreamProvider(
@@ -145,7 +146,7 @@ class CustomIbadahGroup extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -284,16 +285,21 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
         vertical: 11,
       ),
       decoration: BoxDecoration(
-        color: _committed ? color.withOpacity(0.07) : context.colors.card,
+        color: _committed ? color.withValues(alpha: 0.07) : context.colors.card,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: _committed ? color.withOpacity(0.25) : context.colors.border,
+          color: _committed ? color.withValues(alpha: 0.25) : context.colors.border,
         ),
       ),
       child: Row(
         children: [
-          GestureDetector(
+          TakwaTappable(
             onTap: _toggle,
+            // Inline in a Row alongside the ibadah name — a forced 48dp
+            // minimum here would blow out the row's height instead of
+            // meaningfully growing the tap target.
+            minTapSize: null,
+            borderRadius: BorderRadius.circular(AppRadius.xs),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 26,
@@ -338,17 +344,19 @@ class _CustomIbadahRowState extends ConsumerState<_CustomIbadahRow> {
             ),
           ),
           if (_committed) ...[
-            GestureDetector(
+            TakwaTappable(
               onTap: isPos ? null : _increment,
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: AppSpacing.xs,
                 ),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: color.withOpacity(0.3)),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

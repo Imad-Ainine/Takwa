@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -24,7 +25,10 @@ class OverlayNotificationSettings extends ConsumerWidget {
         height: 48,
         child: Center(child: TakwaLoadingIndicator()),
       ),
-      error: (_, __) => const SizedBox(),
+      error: (_, __) => TakwaErrorState(
+        compact: true,
+        onRetry: () => ref.invalidate(userPreferencesProvider),
+      ),
       data: (prefs) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -99,10 +103,10 @@ class OverlayNotificationSettings extends ConsumerWidget {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: context.colors.teal.withOpacity(0.08),
+                          color: context.colors.teal.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
-                            color: context.colors.teal.withOpacity(0.15),
+                            color: context.colors.teal.withValues(alpha: 0.15),
                           ),
                         ),
                         child: Row(
@@ -199,13 +203,13 @@ class _IntervalSelector extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? context.colors.gold.withOpacity(0.12)
-                      : context.colors.card.withOpacity(0.4),
+                      ? context.colors.gold.withValues(alpha: 0.12)
+                      : context.colors.card.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(
                     color: isSelected
                         ? context.colors.gold
-                        : context.colors.border.withOpacity(0.5),
+                        : context.colors.border.withValues(alpha: 0.5),
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),

@@ -39,14 +39,14 @@ class AuthChoiceScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.3),
+                        color: context.colors.gold.withValues(alpha: 0.3),
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: context.colors.gold.withOpacity(0.1),
+                          color: context.colors.gold.withValues(alpha: 0.1),
                           blurRadius: 30,
                           spreadRadius: 5,
                         ),

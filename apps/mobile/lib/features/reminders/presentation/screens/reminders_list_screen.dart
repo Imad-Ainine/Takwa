@@ -108,10 +108,10 @@ class RemindersListScreen extends ConsumerWidget {
           horizontal: AppSpacing.lg,
         ),
         decoration: BoxDecoration(
-          color: context.colors.card.withOpacity(0.85),
+          color: context.colors.card.withValues(alpha: 0.85),
           borderRadius: AppRadius.card,
           border: Border.all(
-            color: context.colors.teal.withOpacity(0.35),
+            color: context.colors.teal.withValues(alpha: 0.35),
             width: 1.5,
           ),
         ),
@@ -210,7 +210,7 @@ class RemindersListScreen extends ConsumerWidget {
                   color: context.colors.dangerDim,
                   borderRadius: AppRadius.card,
                   border: Border.all(
-                    color: context.colors.danger.withOpacity(0.3),
+                    color: context.colors.danger.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Icon(

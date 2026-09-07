@@ -66,7 +66,7 @@ class FavoriteAdhkarScreen extends ConsumerWidget {
 
               Container(
                 height: 1,
-                color: context.colors.border.withOpacity(0.5),
+                color: context.colors.border.withValues(alpha: 0.5),
               ),
               const SizedBox(height: AppSpacing.xs),
 
@@ -168,8 +168,8 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
           gradient: _expanded
               ? LinearGradient(
                   colors: [
-                    context.colors.gold.withOpacity(0.12),
-                    context.colors.teal.withOpacity(0.06),
+                    context.colors.gold.withValues(alpha: 0.12),
+                    context.colors.teal.withValues(alpha: 0.06),
                   ],
                 )
               : null,
@@ -177,14 +177,14 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: _expanded
-                ? context.colors.gold.withOpacity(0.4)
+                ? context.colors.gold.withValues(alpha: 0.4)
                 : context.colors.border,
             width: _expanded ? 1.5 : 1,
           ),
           boxShadow: _expanded
               ? [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.1),
+                    color: context.colors.gold.withValues(alpha: 0.1),
                     blurRadius: 12,
                   ),
                 ]
@@ -213,10 +213,10 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.2),
+                        color: context.colors.gold.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(
@@ -328,10 +328,10 @@ class _FavDhikrCardState extends ConsumerState<_FavDhikrCard> {
                           vertical: 7,
                         ),
                         decoration: BoxDecoration(
-                          color: context.colors.gold.withOpacity(0.1),
+                          color: context.colors.gold.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: context.colors.gold.withOpacity(0.15),
+                            color: context.colors.gold.withValues(alpha: 0.15),
                           ),
                         ),
                         child: Row(

@@ -575,6 +575,10 @@
   "@drawerNavStatistics": {
     "description": "Drawer navigation item: Statistics"
   },
+  "drawerNavAsma": "Names of Allah",
+  "@drawerNavAsma": {
+    "description": "Drawer navigation item: The 99 Names of Allah"
+  },
   "drawerNavAchievements": "Achievements",
   "@drawerNavAchievements": {
     "description": "Drawer navigation item: Achievements"
@@ -1014,6 +1018,8 @@
   "authUsernameHint": "Username",
   "authEmailHint": "Email",
   "authPasswordHint": "Password",
+  "authShowPasswordTooltip": "Show password",
+  "authHidePasswordTooltip": "Hide password",
   "authForgotPassword": "Forgot password?",
   "authSecureSignInButton": "Secure Sign In",
   "authCreateAccountButton": "Create Account",

@@ -107,9 +107,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: style.gold.withOpacity(0.18),
+                    color: style.gold.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: style.gold.withOpacity(0.45)),
+                    border: Border.all(color: style.gold.withValues(alpha: 0.45)),
                   ),
                   child: Text(
                     l10n.quranScreenTitle,
@@ -124,9 +124,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: style.gold.withOpacity(0.15),
+                color: style.gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: style.gold.withOpacity(0.35)),
+                border: Border.all(color: style.gold.withValues(alpha: 0.35)),
               ),
               child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
             ),
@@ -143,7 +143,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: style.text.withOpacity(0.07),
+            color: style.text.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: style.border),
           ),
@@ -160,7 +160,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           vertical: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          color: style.text.withOpacity(0.06),
+          color: style.text.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: style.border),
         ),
@@ -238,7 +238,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: style.text.withOpacity(0.06),
+                    color: style.text.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                   child: Row(
@@ -269,9 +269,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   Widget _surahChip(String name, AdaptiveStyle style) => Container(
     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 5),
     decoration: BoxDecoration(
-      color: style.gold.withOpacity(0.2),
+      color: style.gold.withValues(alpha: 0.2),
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: style.gold.withOpacity(0.4)),
+      border: Border.all(color: style.gold.withValues(alpha: 0.4)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -292,7 +292,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Container(
           padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-            color: style.text.withOpacity(0.07),
+            color: style.text.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: style.textSec, size: 16),
@@ -322,13 +322,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           vertical: 18,
         ),
         decoration: BoxDecoration(
-          color: style.isRamadan ? style.gold.withOpacity(0.9) : style.teal,
+          color: style.isRamadan ? style.gold.withValues(alpha: 0.9) : style.teal,
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: (style.isRamadan ? style.gold : style.teal).withOpacity(
-                0.4,
-              ),
+              color: (style.isRamadan ? style.gold : style.teal).withValues(alpha: 0.4),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -338,7 +336,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           children: [
             _circleBtn(
               Icons.chevron_left,
-              style.text.withOpacity(0.15),
+              style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const KhatmaHistoryScreen()),
             ),
@@ -365,7 +363,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                         : l10n.quranScreenChooseKhatmaOptions,
                     style: style.naskh(
                       12,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -374,7 +372,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(width: 14),
             _circleBtn(
               hasActive ? Icons.play_arrow_rounded : Icons.add,
-              style.text.withOpacity(0.2),
+              style.text.withValues(alpha: 0.2),
               Colors.white,
               () => hasActive
                   ? _push(
@@ -404,12 +402,12 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         decoration: BoxDecoration(
           color: style.isRamadan
               ? style.goldDim
-              : style.success.withOpacity(0.8),
+              : style.success.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
               color: (style.isRamadan ? style.goldDim : style.success)
-                  .withOpacity(0.35),
+                  .withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 5),
             ),
@@ -419,7 +417,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           children: [
             _circleBtn(
               Icons.chevron_left,
-              style.text.withOpacity(0.15),
+              style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const FreeReadingScreen()),
             ),
@@ -440,7 +438,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     l10n.quranScreenFreeReadingSubtitle,
                     style: style.naskh(
                       12,
-                      color: Colors.white.withOpacity(0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -449,7 +447,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             const SizedBox(width: 14),
             _circleBtn(
               Icons.menu_book_rounded,
-              style.text.withOpacity(0.2),
+              style.text.withValues(alpha: 0.2),
               Colors.white,
               () => _push(const FreeReadingScreen()),
             ),
@@ -478,7 +476,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         title: l10n.khatmaHistoryTitle,
         subtitle: l10n.quranScreenHistoryGridSubtitle,
         color: style.isRamadan
-            ? style.gold.withOpacity(0.7)
+            ? style.gold.withValues(alpha: 0.7)
             : const Color(0xFF7A6833),
         onTap: () => _push(const KhatmaHistoryScreen()),
       ),
@@ -487,7 +485,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         title: l10n.khatmaProgressScreenTitle,
         subtitle: l10n.quranScreenProgressGridSubtitle,
         color: style.isRamadan
-            ? style.goldDark.withOpacity(0.7)
+            ? style.goldDark.withValues(alpha: 0.7)
             : const Color(0xFF1A5C3A),
         onTap: () => _push(const KhatmaProgressScreen()),
       ),
@@ -496,7 +494,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         title: l10n.settingsScreenTitle,
         subtitle: l10n.quranScreenSettingsGridSubtitle,
         color: style.isRamadan
-            ? style.gold.withOpacity(0.7)
+            ? style.gold.withValues(alpha: 0.7)
             : const Color(0xFF7A6833),
         onTap: () => _push(const KhatmaSettingsScreen()),
       ),
@@ -505,7 +503,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         title: l10n.quranScreenAiMemorizeTitle,
         subtitle: l10n.quranScreenAiMemorizeSubtitle,
         color: style.isRamadan
-            ? style.teal.withOpacity(0.7)
+            ? style.teal.withValues(alpha: 0.7)
             : const Color(0xFF1A4060),
         onTap: () => _push(const AiMemorizeScreen()),
       ),

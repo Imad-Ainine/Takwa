@@ -5,84 +5,23 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'background_painters.dart';
 
+// Was 41 variants (§M15) — GeometricPainter, DuasBgPainter, AsmaBgPainter,
+// pattern1-18, and P02-P18 were declared, painted, and switched on below,
+// but auditing every CustomPatternBackground(pattern: ...) call site in the
+// app found none of them actually used anywhere: every screen reaches for
+// `adhkar` except the Qibla screen (`qibla`) and the Misbaha counter's accent
+// (`twelveFoldStar`). Curated down to those three real ones; see
+// background_painters.dart for where the other 38 painter classes went.
 enum BackgroundPattern {
-  geometric,
-  duas,
+  /// The app-wide default — used on nearly every screen.
   adhkar,
+
+  /// The Qibla compass screen's background.
   qibla,
-  asma,
-  pattern1,
-  pattern2,
-  pattern3,
-  pattern4,
-  pattern5,
-  pattern6,
-  pattern7,
-  pattern8,
-  pattern9,
-  pattern10,
-  pattern11,
-  pattern12,
-  pattern13,
-  pattern14,
-  pattern15,
-  pattern16,
-  pattern17,
-  pattern18,
 
-  /// P01 · 12-fold star on hexagonal grid (Moroccan / Andalusian)
+  /// P01 · 12-fold star on hexagonal grid (Moroccan / Andalusian) — the
+  /// Misbaha counter's accent pattern.
   twelveFoldStar,
-
-  /// P02 · 8-pt star with square-cross fillers (Girih tile style)
-  eightWithCrosses,
-
-  /// P03 · Dense close-packed 8-pt stars
-  denseEightStar,
-
-  /// P04 · 8-pt star with curved petal / arc interlace
-  curvedPetals,
-
-  /// P05 · 10-fold decagonal star with pentagon fillers
-  tenFoldStar,
-
-  /// P06 · 8-pt star cluster with satellite diamond motifs
-  starCluster,
-
-  /// P07 · Floral rosette — 6-petal flowers on hexagonal grid
-  floralRosette,
-
-  /// P08 · Diamond interlace weave — offset rhombus grid
-  diamondWeave,
-
-  /// P09 · Chain-mail lattice — octagon + square tessellation
-  chainLattice,
-
-  /// P10 · Organic lattice — 6-pt star with bulging arc connectors
-  organicLattice,
-
-  /// P11 · Arrow-kite star — 8 angular kite motifs around a centre
-  arrowKite,
-
-  /// P12 · Micro dense stars — small 8-pt grid with square fillers
-  microStar,
-
-  /// P13 · Elongated star — stretched 8-pt with rectangular bands
-  elongatedStar,
-
-  /// P14 · Crystal facets — cut-gem rhombus / hexagon pattern
-  crystalFacets,
-
-  /// P15 · Kaleidoscope — nested 12-pt rings with fine radial spokes
-  kaleidoscope,
-
-  /// P16 · Kite-leaf star — curved kite petals, Arabesque style
-  kiteLeaf,
-
-  /// P17 · Multi-ring weave — segmented concentric rings + spokes
-  multiRing,
-
-  /// P18 · Polygon mosaic — hexagons with outward triangle satellites
-  polygonMosaic,
 }
 
 class CustomPatternBackground extends ConsumerStatefulWidget {
@@ -125,28 +64,39 @@ class _CustomPatternBackgroundState
   @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
+    // This drives a purely decorative starfield twinkle + lantern flicker
+    // (see RamadanBgPainter) — exactly the ambient motion the platform's
+    // reduce-motion setting exists to suppress. The painter still renders
+    // its static content at whatever frame the controller is parked on;
+    // only the animation itself stops.
+    final reduceMotion = prefersReducedMotion(context);
 
-    // Optimization: Stop animation if not in Ramadan mode to save resources
-    if (!isRamadan && _ctrl.isAnimating) {
+    // Optimization: stop the animation outside Ramadan mode, or when the
+    // user prefers reduced motion, to save resources.
+    if ((!isRamadan || reduceMotion) && _ctrl.isAnimating) {
       _ctrl.stop();
-    } else if (isRamadan && !_ctrl.isAnimating) {
+    } else if (isRamadan && !reduceMotion && !_ctrl.isAnimating) {
       _ctrl.repeat();
     }
 
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
+      // No AnimatedBuilder here on purpose: RamadanBgPainter is constructed
+      // with `repaint: _ctrl` (see its constructor), so the render object
+      // calls paint() again on this SAME painter instance every animation
+      // tick without rebuilding this subtree or constructing a new painter.
+      // That's what lets the painter's internal Picture/star caches (see
+      // that class) actually get reused instead of being rebuilt from
+      // scratch ~15 times a second.
       return SizedBox.expand(
         child: Stack(
           children: [
             Positioned.fill(
               child: RepaintBoundary(
-                child: AnimatedBuilder(
-                  animation: _ctrl,
-                  builder: (context, _) => CustomPaint(
-                    painter: RamadanBgPainter(
-                      animT: _ctrl.value,
-                      brightness: brightness,
-                    ),
+                child: CustomPaint(
+                  painter: RamadanBgPainter(
+                    animation: _ctrl,
+                    brightness: brightness,
                   ),
                 ),
               ),
@@ -166,112 +116,13 @@ class _CustomPatternBackgroundState
     switch (widget.pattern) {
       case BackgroundPattern.twelveFoldStar:
         painter = IslamicP01Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.eightWithCrosses:
-        painter = IslamicP02Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.denseEightStar:
-        painter = IslamicP03Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.curvedPetals:
-        painter = IslamicP04Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.tenFoldStar:
-        painter = IslamicP05Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.starCluster:
-        painter = IslamicP06Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.floralRosette:
-        painter = IslamicP07Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.diamondWeave:
-        painter = IslamicP08Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.chainLattice:
-        painter = IslamicP09Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.organicLattice:
-        painter = IslamicP10Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.arrowKite:
-        painter = IslamicP11Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.microStar:
-        painter = IslamicP12Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.elongatedStar:
-        painter = IslamicP13Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.crystalFacets:
-        painter = IslamicP14Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.kaleidoscope:
-        painter = IslamicP15Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.kiteLeaf:
-        painter = IslamicP16Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.multiRing:
-        painter = IslamicP17Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.polygonMosaic:
-        painter = IslamicP18Painter(color: baseColor, opacity: baseOpacity);
-      case BackgroundPattern.geometric:
-        painter = GeometricPainter(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.duas:
-        painter = DuasBgPainter(goldColor: baseColor);
-        break;
       case BackgroundPattern.adhkar:
         painter = AdhkarBgPainter(
           goldColor: baseColor,
           nightColor: colors.background,
         );
-        break;
       case BackgroundPattern.qibla:
         painter = QiblaBgPainter(goldColor: baseColor);
-        break;
-      case BackgroundPattern.asma:
-        painter = AsmaBgPainter(goldColor: baseColor);
-        break;
-      case BackgroundPattern.pattern1:
-        painter = IslamicPattern1(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern2:
-        painter = IslamicPattern2(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern3:
-        painter = IslamicPattern3(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern4:
-        painter = IslamicPattern4(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern5:
-        painter = IslamicPattern5(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern6:
-        painter = IslamicPattern6(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern7:
-        painter = IslamicPattern7(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern8:
-        painter = IslamicPattern8(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern9:
-        painter = IslamicPattern9(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern10:
-        painter = IslamicPattern10(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern11:
-        painter = IslamicPattern11(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern12:
-        painter = IslamicPattern12(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern13:
-        painter = IslamicPattern13(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern14:
-        painter = IslamicPattern14(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern15:
-        painter = IslamicPattern15(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern16:
-        painter = IslamicPattern16(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern17:
-        painter = IslamicPattern17(color: baseColor, opacity: baseOpacity);
-        break;
-      case BackgroundPattern.pattern18:
-        painter = IslamicPattern18(color: baseColor, opacity: baseOpacity);
-        break;
     }
 
     return SizedBox.expand(

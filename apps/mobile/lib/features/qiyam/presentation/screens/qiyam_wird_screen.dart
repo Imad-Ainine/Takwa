@@ -139,9 +139,9 @@ class QiyamWirdScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Container(
           decoration: BoxDecoration(
-            color: context.colors.gold.withOpacity(0.05),
+            color: context.colors.gold.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+            border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
           ),
           child: Stack(
             children: [
@@ -157,7 +157,7 @@ class QiyamWirdScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: context.colors.gold.withOpacity(0.1),
+                        color: context.colors.gold.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(icon, color: context.colors.gold),
@@ -237,7 +237,7 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: isCompleted
-              ? context.colors.gold.withOpacity(0.5)
+              ? context.colors.gold.withValues(alpha: 0.5)
               : context.colors.border,
           width: isCompleted ? 2 : 1,
         ),
@@ -271,7 +271,7 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                             vertical: AppSpacing.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: context.colors.gold.withOpacity(0.1),
+                            color: context.colors.gold.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -299,8 +299,8 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                     onPressed: _increment,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isCompleted
-                          ? context.colors.gold.withOpacity(0.2)
-                          : context.colors.gold.withOpacity(0.1),
+                          ? context.colors.gold.withValues(alpha: 0.2)
+                          : context.colors.gold.withValues(alpha: 0.1),
                       foregroundColor: context.colors.gold,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -308,7 +308,7 @@ class _WirdCardWidgetState extends State<WirdCardWidget> {
                         side: BorderSide(
                           color: isCompleted
                               ? context.colors.gold
-                              : context.colors.gold.withOpacity(0.3),
+                              : context.colors.gold.withValues(alpha: 0.3),
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(

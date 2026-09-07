@@ -15,6 +15,7 @@ import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
 import '../core/utils/taqwa_level_display.dart';
 import 'main_shell.dart' show currentTabProvider;
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
@@ -143,7 +144,7 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
                       ? GestureDetector(
                           onTap: _close,
                           child: Container(
-                            color: Colors.black.withOpacity(_fade.value),
+                            color: Colors.black.withValues(alpha: _fade.value),
                           ),
                         )
                       : const SizedBox(),
@@ -198,6 +199,7 @@ class _DrawerContent extends ConsumerWidget {
                   hijri: hijri,
                   statsAsync: statsAsync,
                   streakAsync: streakAsync,
+                  onClose: onClose,
                 ),
 
                 const SizedBox(height: AppSpacing.sm),
@@ -206,6 +208,23 @@ class _DrawerContent extends ConsumerWidget {
 
                 // ── قائمة التنقل ──
                 Expanded(child: _DrawerNav(onClose: onClose)),
+
+                // ── حالة الاتصال والمزامنة ──
+                // Was surfaced nowhere except a buried Settings row (and only
+                // ever as "syncing"/"synced", never "offline" —
+                // connectivityProvider itself was read in exactly one place
+                // in the whole app, favorites_providers.dart). The drawer is
+                // reachable from every tab, so it's the one place this is
+                // guaranteed visible without adding a chip to all ~50
+                // screens' app bars.
+                if (ref.watch(authStatusProvider) == AuthStatus.authenticated)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: _ConnectivityStatusRow(),
+                  ),
 
                 // ── تسجيل الخروج ──
                 if (ref.watch(authStatusProvider) == AuthStatus.authenticated)
@@ -227,11 +246,13 @@ class _DrawerHeader extends ConsumerWidget {
   final HijriCalendar hijri;
   final AsyncValue<MonthStats> statsAsync;
   final AsyncValue<int> streakAsync;
+  final VoidCallback onClose;
 
   const _DrawerHeader({
     required this.hijri,
     required this.statsAsync,
     required this.streakAsync,
+    required this.onClose,
   });
 
   static String _hijriMonth(AppLocalizations l10n, int m) => [
@@ -268,10 +289,12 @@ class _DrawerHeader extends ConsumerWidget {
               final avatar = profile?['avatar_emoji'] ?? '🌙';
               return GestureDetector(
                 onTap: () {
-                  Navigator.pop(context); // Close drawer
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    Navigator.pushNamed(context, Routes.profile);
-                  });
+                  // Was Navigator.pop(context) — this drawer is a Stack
+                  // layer (DrawerScaffold), not a pushed route, so that
+                  // popped the actual page underneath instead of closing
+                  // the drawer. onClose() is the drawer's own animation.
+                  onClose();
+                  Navigator.of(context).pushNamed(Routes.profile);
                 },
                 child: Row(
                   children: [
@@ -282,12 +305,12 @@ class _DrawerHeader extends ConsumerWidget {
                         shape: BoxShape.circle,
                         color: context.colors.goldDim,
                         border: Border.all(
-                          color: context.colors.gold.withOpacity(0.4),
+                          color: context.colors.gold.withValues(alpha: 0.4),
                           width: 1.5,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: context.colors.gold.withOpacity(0.1),
+                            color: context.colors.gold.withValues(alpha: 0.1),
                             blurRadius: 10,
                           ),
                         ],
@@ -327,12 +350,10 @@ class _DrawerHeader extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: context.colors.gold.withOpacity(0.1),
+                                    color: context.colors.gold.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
-                                      color: context.colors.gold.withOpacity(
-                                        0.3,
-                                      ),
+                                      color: context.colors.gold.withValues(alpha: 0.3),
                                     ),
                                   ),
                                   child: Text(
@@ -377,7 +398,12 @@ class _DrawerHeader extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(height: 52),
-            error: (_, _) => const SizedBox(height: 52),
+            error: (_, _) => SizedBox(
+              height: 52,
+              child: TakwaInlineError(
+                onRetry: () => ref.invalidate(userProfileProvider),
+              ),
+            ),
           ),
 
           const SizedBox(height: AppSpacing.xl),
@@ -391,7 +417,7 @@ class _DrawerHeader extends ConsumerWidget {
             decoration: BoxDecoration(
               color: context.colors.goldDim,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: context.colors.gold.withOpacity(0.15)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.15)),
             ),
             child: Row(
               children: [
@@ -415,7 +441,10 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: statsAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 48,
+                    onRetry: () => ref.invalidate(monthStatsProvider),
+                  ),
                   data: (s) => _MiniStatCard(
                     value: '${s.totalPoints}',
                     label: AppLocalizations.of(context)!.drawerStatTaqwaPoints,
@@ -428,7 +457,10 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: streakAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 48,
+                    onRetry: () => ref.invalidate(currentStreakProvider),
+                  ),
                   data: (s) => _MiniStatCard(
                     value: '$s',
                     label: AppLocalizations.of(context)!.drawerStatStreakDays,
@@ -444,7 +476,11 @@ class _DrawerHeader extends ConsumerWidget {
           // Level & Progress
           statsAsync.when(
             loading: () => const SizedBox(),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaErrorState(
+              compact: true,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              onRetry: () => ref.invalidate(monthStatsProvider),
+            ),
             data: (s) => Column(
               children: [
                 Row(
@@ -473,7 +509,7 @@ class _DrawerHeader extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: (s.totalPoints / 600).clamp(0, 1),
-                    backgroundColor: context.colors.gold.withOpacity(0.1),
+                    backgroundColor: context.colors.gold.withValues(alpha: 0.1),
                     color: context.colors.gold,
                     minHeight: 4,
                   ),
@@ -504,9 +540,9 @@ class _MiniStatCard extends StatelessWidget {
       horizontal: 10,
     ),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.08),
+      color: color.withValues(alpha: 0.08),
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: color.withOpacity(0.18)),
+      border: Border.all(color: color.withValues(alpha: 0.18)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -558,9 +594,15 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     _NavItem('🕌', l.drawerNavPrayer, '/prayer', 2),
     _NavItem('📚', l.drawerNavBooks, '/books', 3),
     _NavItem('📊', l.drawerNavStatistics, '/statistics', 4),
-    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 5),
-    _NavItem('👤', l.drawerNavProfile, '/profile', 6),
-    _NavItem('⚙️', l.drawerNavSettings, '/settings', 7),
+    // Moved out of the bottom nav (main_shell.dart §C10: 6 destinations was
+    // one over Material's guidance) — a reference/browse screen fits an
+    // occasional-lookup drawer entry better than a persistent tab. '/asma'
+    // isn't in shellRouteToTab below, so this pushes AsmaScreen as its own
+    // route rather than switching a shell tab.
+    _NavItem('✨', l.drawerNavAsma, '/asma', 5),
+    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 6),
+    _NavItem('👤', l.drawerNavProfile, '/profile', 7),
+    _NavItem('⚙️', l.drawerNavSettings, '/settings', 8),
   ];
 
   @override
@@ -634,12 +676,15 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
               isActive: currentRoute == item.route,
               onTap: () {
                 widget.onClose();
-                // Routes embedded in the PageView shell → switch tab
+                // Routes embedded in the PageView shell → switch tab. '/asma'
+                // deliberately isn't here — it moved out of the shell (see
+                // _buildItems above) and falls through to the pushNamed
+                // branch below like '/prayer'/'/books'/etc already did.
                 const shellRouteToTab = <String, int>{
                   '/home': 0,
                   '/checklist': 2,
                   '/statistics': 3,
-                  '/settings': 5,
+                  '/settings': 4,
                 };
                 final tabIdx = shellRouteToTab[item.route];
                 if (tabIdx != null) {
@@ -721,8 +766,8 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
               gradient: widget.isActive
                   ? LinearGradient(
                       colors: [
-                        context.colors.gold.withOpacity(0.15),
-                        context.colors.teal.withOpacity(0.08),
+                        context.colors.gold.withValues(alpha: 0.15),
+                        context.colors.teal.withValues(alpha: 0.08),
                       ],
                     )
                   : null,
@@ -730,7 +775,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: widget.isActive
-                    ? context.colors.gold.withOpacity(0.25)
+                    ? context.colors.gold.withValues(alpha: 0.25)
                     : Colors.transparent,
               ),
             ),
@@ -759,7 +804,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                     shadows: widget.isActive
                         ? [
                             Shadow(
-                              color: context.colors.gold.withOpacity(0.5),
+                              color: context.colors.gold.withValues(alpha: 0.5),
                               blurRadius: 8,
                             ),
                           ]
@@ -774,7 +819,7 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
                       fontSize: 14,
                       color: widget.isActive
                           ? context.colors.gold
-                          : context.colors.textPrimary.withOpacity(0.75),
+                          : context.colors.textPrimary.withValues(alpha: 0.75),
                       fontWeight: widget.isActive
                           ? FontWeight.w600
                           : FontWeight.w400,
@@ -858,12 +903,12 @@ class DrawerMenuButton extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isOpen
               ? context.colors.goldDim
-              : Colors.white.withOpacity(0.08),
+              : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isOpen
-                ? context.colors.gold.withOpacity(0.3)
-                : Colors.white.withOpacity(0.12),
+                ? context.colors.gold.withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.12),
           ),
         ),
         child: Center(
@@ -970,6 +1015,60 @@ class _NavItem {
   const _NavItem(this.emoji, this.label, this.route, this.index);
 }
 
+// ── حالة الاتصال والمزامنة ──
+/// Connectivity + sync state, compact enough for one drawer row. Three
+/// states only — offline always wins the display regardless of whether a
+/// sync happens to be mid-flight, since it's the more actionable thing for
+/// the user to know.
+class _ConnectivityStatusRow extends ConsumerWidget {
+  const _ConnectivityStatusRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    // Defaults to true before the stream's first emission so the row doesn't
+    // flash "offline" on every cold start while connectivity_plus is still
+    // reporting its initial status.
+    final isOnline = ref.watch(connectivityProvider).valueOrNull ?? true;
+    final isSyncing = ref.watch(isSyncingProvider);
+
+    final IconData icon;
+    final Color color;
+    final String label;
+    if (!isOnline) {
+      icon = Icons.cloud_off_rounded;
+      color = context.colors.dangerText;
+      label = l10n.drawerSyncOffline;
+    } else if (isSyncing) {
+      icon = Icons.sync_rounded;
+      color = context.colors.tealText;
+      label = l10n.syncStatusSyncing;
+    } else {
+      icon = Icons.cloud_done_rounded;
+      color = context.colors.successText;
+      label = l10n.drawerSyncSynced;
+    }
+
+    return Semantics(
+      label: label,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: context.typography.caption.copyWith(
+              color: color,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LogoutButton extends ConsumerWidget {
   final VoidCallback onClose;
   const _LogoutButton({required this.onClose});
@@ -987,9 +1086,9 @@ class _LogoutButton extends ConsumerWidget {
             vertical: 10,
           ),
           decoration: BoxDecoration(
-            color: context.colors.danger.withOpacity(0.08),
+            color: context.colors.danger.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: context.colors.danger.withOpacity(0.2)),
+            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [

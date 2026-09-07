@@ -22,7 +22,7 @@ class QuranBgPainter extends CustomPainter {
     );
     for (int i = 0; i < _s!.length; i++) {
       final op = 0.03 + 0.1 * ((math.sin(t * 2 * math.pi + i) + 1) / 2);
-      canvas.drawCircle(_s![i], 0.9, Paint()..color = kGold.withOpacity(op));
+      canvas.drawCircle(_s![i], 0.9, Paint()..color = kGold.withValues(alpha: op));
     }
     canvas.drawCircle(
       Offset(size.width / 2, -40),
@@ -30,13 +30,13 @@ class QuranBgPainter extends CustomPainter {
       Paint()
         ..shader =
             RadialGradient(
-              colors: [kGold.withOpacity(0.05), Colors.transparent],
+              colors: [kGold.withValues(alpha: 0.05), Colors.transparent],
             ).createShader(
               Rect.fromCircle(center: Offset(size.width / 2, -40), radius: 180),
             ),
     );
     final p = Paint()
-      ..color = kGold.withOpacity(0.035)
+      ..color = kGold.withValues(alpha: 0.035)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
     for (double x = 0; x < size.width + 50; x += 50) {
@@ -65,12 +65,12 @@ class SurahBadgePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final cx = Offset(size.width / 2, size.height / 2), r = size.width / 2 - 1;
-    canvas.drawCircle(cx, r, Paint()..color = c.withOpacity(0.08));
+    canvas.drawCircle(cx, r, Paint()..color = c.withValues(alpha: 0.08));
     canvas.drawCircle(
       cx,
       r,
       Paint()
-        ..color = c.withOpacity(0.3)
+        ..color = c.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5,
     );
@@ -79,7 +79,7 @@ class SurahBadgePainter extends CustomPainter {
       canvas.drawCircle(
         Offset(cx.dx + (r - 3) * math.cos(a), cx.dy + (r - 3) * math.sin(a)),
         1.1,
-        Paint()..color = c.withOpacity(0.35),
+        Paint()..color = c.withValues(alpha: 0.35),
       );
     }
     final tp = TextPainter(
@@ -149,11 +149,11 @@ class VerseMarkerPaint extends CustomPainter {
       i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
     }
     path.close();
-    canvas.drawPath(path, Paint()..color = c.withOpacity(0.08));
+    canvas.drawPath(path, Paint()..color = c.withValues(alpha: 0.08));
     canvas.drawPath(
       path,
       Paint()
-        ..color = c.withOpacity(0.5)
+        ..color = c.withValues(alpha: 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 0.9,
     );
@@ -182,7 +182,7 @@ class CornerDeco extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..color = c.withOpacity(0.5)
+      ..color = c.withValues(alpha: 0.5)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -191,7 +191,7 @@ class CornerDeco extends CustomPainter {
     canvas.drawCircle(
       const Offset(3, 3),
       1.5,
-      Paint()..color = c.withOpacity(0.5),
+      Paint()..color = c.withValues(alpha: 0.5),
     );
   }
 

@@ -12,6 +12,29 @@ class AuthField extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
 
+  /// External focus node, so a screen can chain fields with
+  /// `FocusScope.of(context).nextFocus()` from [onSubmit] below. When null,
+  /// this widget manages (and disposes) its own.
+  final FocusNode? focusNode;
+
+  /// The last field in its group: switches [textInputAction] from `next` to
+  /// `done` and routes the keyboard's submit action to [onSubmit] instead of
+  /// advancing focus.
+  final bool isLast;
+
+  /// Called when the keyboard's "done" action fires on the last field in a
+  /// chain (see [isLast]) — wire this to the screen's submit handler.
+  final VoidCallback? onSubmit;
+
+  /// Defaults to `[AutofillHints.password]` when [isPassword], otherwise
+  /// `[AutofillHints.email]`. Pass e.g. `[AutofillHints.username]` /
+  /// `[AutofillHints.newPassword]` explicitly where that's a better fit —
+  /// wrap the surrounding fields in an `AutofillGroup` for this to reach a
+  /// password manager at all.
+  final Iterable<String>? autofillHints;
+
+  final bool autofocus;
+
   const AuthField({
     super.key,
     required this.ctrl,
@@ -22,6 +45,11 @@ class AuthField extends StatefulWidget {
     this.keyboardType,
     this.validator,
     this.onChanged,
+    this.focusNode,
+    this.isLast = false,
+    this.onSubmit,
+    this.autofillHints,
+    this.autofocus = false,
   });
 
   @override
@@ -31,73 +59,165 @@ class AuthField extends StatefulWidget {
 class _AuthFieldState extends State<AuthField> {
   bool _obscure = true;
   bool _focused = false;
+  late final FocusNode _focusNode;
+  bool _ownsFocusNode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final external = widget.focusNode;
+    if (external != null) {
+      _focusNode = external;
+    } else {
+      _focusNode = FocusNode();
+      _ownsFocusNode = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_ownsFocusNode) _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final s = widget.style;
-    return Focus(
-      onFocusChange: (val) => setState(() => _focused = val),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-        decoration: BoxDecoration(
-          color: _focused ? s.card.withOpacity(0.6) : s.bg.withOpacity(0.55),
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(
-            color: _focused ? s.gold : s.border.withOpacity(0.5),
-            width: _focused ? 2 : 1.5,
-          ),
-          boxShadow: _focused
-              ? [
-                  BoxShadow(
-                    color: s.gold.withOpacity(0.15),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+    final l10n = AppLocalizations.of(context)!;
+
+    // A raw TextField wrapped in our own FormField<String> rather than
+    // TextFormField: TextFormField hides its FormFieldState from callers, so
+    // there was no way to read "is this field currently invalid" back out to
+    // drive the AnimatedContainer border below — which is exactly why a
+    // failed validator used to have zero visual effect (WCAG 3.3.1/3.3.2).
+    // autovalidateMode: onUserInteraction means this works even though none
+    // of the three screens that use AuthField wrap it in a Form or ever call
+    // formKey.currentState.validate().
+    return FormField<String>(
+      validator: widget.validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      builder: (field) {
+        final hasError = field.hasError;
+        final borderColor = hasError
+            ? s.danger
+            : (_focused ? s.gold : s.border.withValues(alpha: 0.5));
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Focus(
+              onFocusChange: (val) => setState(() => _focused = val),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: _focused
+                      ? s.card.withValues(alpha: 0.6)
+                      : s.bg.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                  border: Border.all(
+                    color: borderColor,
+                    width: (_focused || hasError) ? 2 : 1.5,
                   ),
-                ]
-              : [],
-        ),
-        child: TextFormField(
-          controller: widget.ctrl,
-          obscureText: widget.isPassword ? _obscure : false,
-          keyboardType: widget.keyboardType,
-          validator: widget.validator,
-          onChanged: widget.onChanged,
-          style: s.naskh(15, weight: FontWeight.w600),
-          cursorColor: s.gold,
-          decoration: InputDecoration(
-            filled: false,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            hintText: widget.hint,
-            hintStyle: s.naskh(13, color: s.textDim),
-            prefixIcon: Icon(
-              widget.icon,
-              color: _focused ? s.gold : s.textSec,
-              size: 20,
-            ),
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    onPressed: () => setState(() => _obscure = !_obscure),
-                    icon: Icon(
-                      _obscure
-                          ? Icons.visibility_rounded
-                          : Icons.visibility_off_rounded,
-                      color: s.textSec,
+                  boxShadow: _focused
+                      ? [
+                          BoxShadow(
+                            color: (hasError ? s.danger : s.gold).withValues(
+                              alpha: 0.15,
+                            ),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : [],
+                ),
+                child: TextField(
+                  controller: widget.ctrl,
+                  focusNode: _focusNode,
+                  autofocus: widget.autofocus,
+                  obscureText: widget.isPassword ? _obscure : false,
+                  keyboardType: widget.keyboardType,
+                  textInputAction: widget.isLast
+                      ? TextInputAction.done
+                      : TextInputAction.next,
+                  autofillHints:
+                      widget.autofillHints ??
+                      (widget.isPassword
+                          ? const [AutofillHints.password]
+                          : const [AutofillHints.email]),
+                  onChanged: (v) {
+                    field.didChange(v);
+                    widget.onChanged?.call(v);
+                  },
+                  onSubmitted: (_) {
+                    if (widget.isLast) {
+                      widget.onSubmit?.call();
+                    } else {
+                      FocusScope.of(context).nextFocus();
+                    }
+                  },
+                  style: s.naskh(15, weight: FontWeight.w600),
+                  cursorColor: s.gold,
+                  decoration: InputDecoration(
+                    filled: false,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    // Was hintText only, which — per WCAG 3.3.2 — disappears
+                    // the instant the user types, leaving an unlabeled
+                    // field. labelText floats above the value once there is
+                    // one instead of being replaced by it.
+                    labelText: widget.hint,
+                    labelStyle: s.naskh(13, color: s.textDim),
+                    floatingLabelStyle: s.naskh(
+                      12,
+                      color: hasError
+                          ? s.danger
+                          : (_focused ? s.gold : s.textSec),
+                    ),
+                    prefixIcon: Icon(
+                      widget.icon,
+                      color: hasError
+                          ? s.danger
+                          : (_focused ? s.gold : s.textSec),
                       size: 20,
                     ),
-                  )
-                : null,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.lg,
+                    suffixIcon: widget.isPassword
+                        ? IconButton(
+                            onPressed: () =>
+                                setState(() => _obscure = !_obscure),
+                            tooltip: _obscure
+                                ? l10n.authShowPasswordTooltip
+                                : l10n.authHidePasswordTooltip,
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility_rounded
+                                  : Icons.visibility_off_rounded,
+                              color: s.textSec,
+                              size: 20,
+                            ),
+                          )
+                        : null,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.lg,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
+            if (hasError) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Padding(
+                padding: const EdgeInsetsDirectional.only(start: AppSpacing.md),
+                child: Text(field.errorText!, style: s.naskh(12, color: s.danger)),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
@@ -136,7 +256,7 @@ class PasswordStrengthBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: Stack(
             children: [
-              Container(height: 4, color: style.border.withOpacity(0.3)),
+              Container(height: 4, color: style.border.withValues(alpha: 0.3)),
               AnimatedFractionallySizedBox(
                 duration: const Duration(milliseconds: 300),
                 widthFactor: strength.clamp(0.05, 1.0),
@@ -147,7 +267,7 @@ class PasswordStrengthBar extends StatelessWidget {
                     color: color,
                     borderRadius: BorderRadius.circular(4),
                     boxShadow: [
-                      BoxShadow(color: color.withOpacity(0.4), blurRadius: 6),
+                      BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 6),
                     ],
                   ),
                 ),

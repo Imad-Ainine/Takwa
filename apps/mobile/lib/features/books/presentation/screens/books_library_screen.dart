@@ -22,6 +22,13 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
   String _searchQuery = '';
   BookCategory? _selectedCategory;
   bool _isGridView = false;
+  final _scrollCtrl = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +42,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
       appBar: AppBarWidget(
         title: l10n.booksLibraryTitle,
         leading: const CustomLeadingButton(),
+        scrollController: _scrollCtrl,
         actions: [
           IconButton(
             onPressed: () => setState(() => _isGridView = !_isGridView),
@@ -56,6 +64,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
           } catch (_) {}
         },
         child: CustomScrollView(
+          controller: _scrollCtrl,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // ── Search Bar ────────────────────────────────────────
@@ -164,7 +173,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
                       Icon(
                         Icons.wifi_off_rounded,
                         size: 80,
-                        color: colors.textSecondary.withOpacity(0.3),
+                        color: colors.textSecondary.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
@@ -244,7 +253,7 @@ class _SearchBar extends StatelessWidget {
         border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -255,7 +264,7 @@ class _SearchBar extends StatelessWidget {
         textAlign: TextAlign.right,
         decoration: InputDecoration(
           hintText: l10n.booksSearchHint,
-          hintStyle: TextStyle(color: colors.textSecondary.withOpacity(0.5)),
+          hintStyle: TextStyle(color: colors.textSecondary.withValues(alpha: 0.5)),
           prefixIcon: Icon(Icons.search, color: colors.gold),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -305,7 +314,7 @@ class _CategorySelector extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => onSelect(cat),
               backgroundColor: colors.card,
-              selectedColor: colors.gold.withOpacity(0.2),
+              selectedColor: colors.gold.withValues(alpha: 0.2),
               labelStyle: TextStyle(
                 color: isSelected ? colors.gold : colors.textSecondary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -390,7 +399,7 @@ class _BookCard extends ConsumerWidget {
                   border: Border.all(color: colors.border),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -407,7 +416,7 @@ class _BookCard extends ConsumerWidget {
                           Icon(
                             Icons.arrow_back_ios_new,
                             size: 14,
-                            color: colors.textSecondary.withOpacity(0.3),
+                            color: colors.textSecondary.withValues(alpha: 0.3),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -415,7 +424,7 @@ class _BookCard extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: c1.withOpacity(0.1),
+                              color: c1.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Text(
@@ -484,7 +493,7 @@ class _BookCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(AppRadius.md),
                     boxShadow: [
                       BoxShadow(
-                        color: c1.withOpacity(0.4),
+                        color: c1.withValues(alpha: 0.4),
                         blurRadius: 15,
                         offset: const Offset(4, 4),
                       ),
@@ -529,7 +538,7 @@ class _BookCard extends ConsumerWidget {
                               begin: Alignment.topLeft,
                               end: const Alignment(-0.5, -0.5),
                               colors: [
-                                Colors.white.withOpacity(0.2),
+                                Colors.white.withValues(alpha: 0.2),
                                 Colors.transparent,
                               ],
                             ),
@@ -582,7 +591,7 @@ class _BookGridCard extends StatelessWidget {
           border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -709,12 +718,12 @@ class _InfoChip extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-            color: colors.textSecondary.withOpacity(0.7),
+            color: colors.textSecondary.withValues(alpha: 0.7),
             fontSize: 11,
           ),
         ),
         const SizedBox(width: AppSpacing.xs),
-        Icon(icon, size: 12, color: colors.gold.withOpacity(0.6)),
+        Icon(icon, size: 12, color: colors.gold.withValues(alpha: 0.6)),
       ],
     );
   }
@@ -741,7 +750,7 @@ class _BooksSkeleton extends StatelessWidget {
           border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

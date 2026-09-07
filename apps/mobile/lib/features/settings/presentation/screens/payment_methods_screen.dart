@@ -4,6 +4,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class PaymentMethodsScreen extends ConsumerStatefulWidget {
@@ -97,14 +98,16 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
     required String icon,
   }) {
     final isSelected = _selectedMethod == index;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () => setState(() => _selectedMethod = index),
+      semanticLabel: '$title. $subtitle',
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: isSelected
-              ? context.colors.gold.withOpacity(0.08)
+              ? context.colors.gold.withValues(alpha: 0.08)
               : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
@@ -114,7 +117,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: context.colors.gold.withOpacity(0.15),
+                    color: context.colors.gold.withValues(alpha: 0.15),
                     blurRadius: 12,
                     spreadRadius: 2,
                   ),
@@ -157,10 +160,10 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
               width: 54,
               height: 54,
               decoration: BoxDecoration(
-                color: context.colors.background.withOpacity(0.5),
+                color: context.colors.background.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
-                  color: context.colors.border.withOpacity(0.5),
+                  color: context.colors.border.withValues(alpha: 0.5),
                 ),
               ),
               child: Center(
@@ -180,15 +183,15 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            context.colors.gold.withOpacity(0.12),
-            context.colors.gold.withOpacity(0.02),
+            context.colors.gold.withValues(alpha: 0.12),
+            context.colors.gold.withValues(alpha: 0.02),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: context.colors.gold.withOpacity(0.2),
+          color: context.colors.gold.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
@@ -199,7 +202,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: context.colors.gold.withOpacity(0.15),
+                  color: context.colors.gold.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -223,7 +226,7 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           Text(
             l10n.paymentSupportMessage,
             style: context.typography.bodyMedium.copyWith(
-              color: context.colors.textPrimary.withOpacity(0.9),
+              color: context.colors.textPrimary.withValues(alpha: 0.9),
               height: 1.6,
               fontWeight: FontWeight.w500,
             ),

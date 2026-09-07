@@ -17,7 +17,12 @@ class AsmaScreen extends ConsumerStatefulWidget {
 }
 
 class _AsmaScreenState extends ConsumerState<AsmaScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  // Matters more here than most — without it, the search query and expanded
+  // name were both reset on every tab switch away and back.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _entryCtrl;
   final _searchCtrl = TextEditingController();
   String _query = '';
@@ -52,6 +57,7 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
     final filtered = _filtered;
@@ -259,17 +265,17 @@ class _AsmaCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: isExpanded
               ? LinearGradient(
-                  colors: [s.gold.withOpacity(0.12), s.teal.withOpacity(0.06)],
+                  colors: [s.gold.withValues(alpha: 0.12), s.teal.withValues(alpha: 0.06)],
                 )
               : null,
           color: isExpanded ? null : s.card,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isExpanded ? s.gold.withOpacity(0.4) : s.border,
+            color: isExpanded ? s.gold.withValues(alpha: 0.4) : s.border,
             width: isExpanded ? 1.5 : 1,
           ),
           boxShadow: isExpanded
-              ? [BoxShadow(color: s.gold.withOpacity(0.1), blurRadius: 12)]
+              ? [BoxShadow(color: s.gold.withValues(alpha: 0.1), blurRadius: 12)]
               : null,
         ),
         child: Padding(
@@ -333,7 +339,7 @@ class _AsmaCard extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   fontSize: 10,
-                  color: s.textSec.withOpacity(0.7),
+                  color: s.textSec.withValues(alpha: 0.7),
                   letterSpacing: 1.2,
                 ),
               ),
@@ -371,7 +377,7 @@ class _AsmaCard extends StatelessWidget {
                               color: s.goldDim,
                               borderRadius: BorderRadius.circular(AppRadius.md),
                               border: Border.all(
-                                color: s.gold.withOpacity(0.2),
+                                color: s.gold.withValues(alpha: 0.2),
                               ),
                             ),
                             child: Text(
@@ -431,7 +437,7 @@ class _NumberBadge extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: LinearGradient(colors: [style.gold, style.teal]),
         boxShadow: [
-          BoxShadow(color: style.gold.withOpacity(0.3), blurRadius: 4),
+          BoxShadow(color: style.gold.withValues(alpha: 0.3), blurRadius: 4),
         ],
       ),
       child: Center(

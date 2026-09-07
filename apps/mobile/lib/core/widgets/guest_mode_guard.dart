@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/app/main_shell.dart' show currentTabProvider;
 import 'package:takwa/core/providers/auth_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -36,12 +37,12 @@ class GuestModeGuard extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: context.colors.card.withOpacity(0.95),
+                color: context.colors.card.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: context.colors.gold.withOpacity(0.2)),
+                border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     blurRadius: 30,
                     spreadRadius: -5,
                   ),
@@ -55,9 +56,9 @@ class GuestModeGuard extends ConsumerWidget {
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.2),
+                        color: context.colors.gold.withValues(alpha: 0.2),
                         width: 2,
                       ),
                     ),
@@ -95,7 +96,15 @@ class GuestModeGuard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   TextButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      // Was Navigator.pop(context): this guard only ever
+                      // wraps a MainShell tab (Checklist, Statistics), not a
+                      // pushed route, so pop() popped the shell itself off
+                      // the navigator instead of taking the user anywhere
+                      // sensible. Switching to Home is always available,
+                      // guest or not.
+                      ref.read(currentTabProvider.notifier).state = 0;
+                    },
                     child: Text(
                       l10n.guestGuardBackButton,
                       style: context.typography.labelLarge.copyWith(

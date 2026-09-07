@@ -28,11 +28,11 @@ class ReminderCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: context.colors.card.withOpacity(0.7),
+          color: context.colors.card.withValues(alpha: 0.7),
           borderRadius: AppRadius.card,
           border: Border.all(
             color: isEnabled
-                ? context.colors.teal.withOpacity(0.25)
+                ? context.colors.teal.withValues(alpha: 0.25)
                 : context.colors.border,
           ),
         ),

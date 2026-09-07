@@ -250,7 +250,7 @@ class _AddReminderBottomSheetState
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: context.colors.teal.withOpacity(0.3),
+                                    color: context.colors.teal.withValues(alpha: 0.3),
                                     blurRadius: 12,
                                     spreadRadius: 0,
                                   ),

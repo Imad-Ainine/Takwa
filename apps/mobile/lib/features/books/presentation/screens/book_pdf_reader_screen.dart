@@ -563,7 +563,7 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
                           activeTrackColor: accentColor,
                           inactiveTrackColor: Colors.white24,
                           thumbColor: accentColor,
-                          overlayColor: accentColor.withOpacity(0.2),
+                          overlayColor: accentColor.withValues(alpha: 0.2),
                         ),
                         child: Slider(
                           min: 1,
@@ -609,8 +609,8 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
           colors: [
-            Colors.black.withOpacity(0.92),
-            Colors.black.withOpacity(0.70),
+            Colors.black.withValues(alpha: 0.92),
+            Colors.black.withValues(alpha: 0.70),
           ],
         ),
         border: const Border(
@@ -771,9 +771,9 @@ class _SelectionActionButton extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.15),
+                color: accentColor.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
-                border: Border.all(color: accentColor.withOpacity(0.4)),
+                border: Border.all(color: accentColor.withValues(alpha: 0.4)),
               ),
               child: Icon(icon, color: accentColor, size: 20),
             ),

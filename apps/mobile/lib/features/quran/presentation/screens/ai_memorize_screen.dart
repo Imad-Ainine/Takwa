@@ -98,7 +98,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
         indicatorColor: style.gold,
         indicatorWeight: 2.5,
         labelColor: style.gold,
-        unselectedLabelColor: style.textSec.withOpacity(0.5),
+        unselectedLabelColor: style.textSec.withValues(alpha: 0.5),
         dividerColor: Colors.transparent,
         tabs: [
           Tab(
@@ -153,10 +153,10 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
           hintText: _tab.index == 0
               ? l10n.aiMemorizePageSearchHint
               : l10n.aiMemorizeSurahSearchHint,
-          hintStyle: style.naskh(13, color: style.textSec.withOpacity(0.5)),
+          hintStyle: style.naskh(13, color: style.textSec.withValues(alpha: 0.5)),
           suffixIcon: Icon(
             Icons.search,
-            color: style.textSec.withOpacity(0.5),
+            color: style.textSec.withValues(alpha: 0.5),
             size: 20,
           ),
           border: InputBorder.none,
@@ -243,14 +243,14 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: style.border.withOpacity(0.4)),
+                bottom: BorderSide(color: style.border.withValues(alpha: 0.4)),
               ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.chevron_left,
-                  color: style.textSec.withOpacity(0.3),
+                  color: style.textSec.withValues(alpha: 0.3),
                   size: 20,
                 ),
                 const SizedBox(width: 10),
@@ -260,8 +260,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                   height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: c.withOpacity(0.12),
-                    border: Border.all(color: c.withOpacity(0.4)),
+                    color: c.withValues(alpha: 0.12),
+                    border: Border.all(color: c.withValues(alpha: 0.4)),
                   ),
                   child: Center(
                     child: Text(
@@ -289,7 +289,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                         )!.quranReaderAyahCountBadge(s.ayahsNumber),
                         style: style.naskh(
                           12,
-                          color: style.textSec.withOpacity(0.6),
+                          color: style.textSec.withValues(alpha: 0.6),
                         ),
                       ),
                     ],

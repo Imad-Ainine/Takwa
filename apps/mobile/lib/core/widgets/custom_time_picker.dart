@@ -107,9 +107,9 @@ class _CustomTimePickerWidgetState extends State<_CustomTimePickerWidget> {
                   height: 48,
                   margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   decoration: BoxDecoration(
-                    color: colors.teal.withOpacity(0.08),
+                    color: colors.teal.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(AppRadius.md),
-                    border: Border.all(color: colors.teal.withOpacity(0.25)),
+                    border: Border.all(color: colors.teal.withValues(alpha: 0.25)),
                   ),
                 ),
                 Directionality(

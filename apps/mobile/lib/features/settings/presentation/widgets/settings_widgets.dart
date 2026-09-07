@@ -64,12 +64,12 @@ class SettingsCard extends StatelessWidget {
         Container(
           padding: padding ?? const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: context.colors.card.withOpacity(0.8),
+            color: context.colors.card.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: context.colors.border.withOpacity(0.5)),
+            border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -91,7 +91,7 @@ class SettingsDivider extends StatelessWidget {
       height: 1,
       indent: 52,
       endIndent: 16,
-      color: context.colors.border.withOpacity(0.5),
+      color: context.colors.border.withValues(alpha: 0.5),
     );
   }
 }
@@ -120,7 +120,7 @@ class ToggleSetting extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         // color: value
-        //     ? (accentColor ?? context.colors.teal).withOpacity(0.05)
+        //     ? (accentColor ?? context.colors.teal).withValues(alpha: 0.05)
         //     : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
@@ -138,12 +138,10 @@ class ToggleSetting extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: (accentColor ?? context.colors.gold).withOpacity(0.12),
+                  color: (accentColor ?? context.colors.gold).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
-                    color: (accentColor ?? context.colors.gold).withOpacity(
-                      0.1,
-                    ),
+                    color: (accentColor ?? context.colors.gold).withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -240,7 +238,7 @@ class ActionSetting extends StatelessWidget {
                     (isDestructive
                             ? context.colors.danger
                             : context.colors.gold)
-                        .withOpacity(0.12),
+                        .withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -317,7 +315,7 @@ class SelectSetting extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: context.colors.teal.withOpacity(0.12),
+                color: context.colors.teal.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -431,13 +429,13 @@ class SelectSetting extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? context.colors.gold.withOpacity(0.08)
-                                : context.colors.card.withOpacity(0.4),
+                                ? context.colors.gold.withValues(alpha: 0.08)
+                                : context.colors.card.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(AppRadius.lg),
                             border: Border.all(
                               color: isSelected
-                                  ? context.colors.gold.withOpacity(0.3)
-                                  : context.colors.border.withOpacity(0.5),
+                                  ? context.colors.gold.withValues(alpha: 0.3)
+                                  : context.colors.border.withValues(alpha: 0.5),
                               width: isSelected ? 1.5 : 1,
                             ),
                           ),
@@ -568,9 +566,9 @@ class SyncStatusIndicator extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: context.colors.card.withOpacity(0.5),
+        color: context.colors.card.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.colors.border.withOpacity(0.5)),
+        border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -651,7 +649,7 @@ class TimeSetting extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: context.colors.gold.withOpacity(0.12),
+                color: context.colors.gold.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -677,7 +675,7 @@ class TimeSetting extends StatelessWidget {
                 color: context.colors.goldDim,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: context.colors.gold.withOpacity(0.25),
+                  color: context.colors.gold.withValues(alpha: 0.25),
                 ),
               ),
               child: Text(
@@ -743,7 +741,7 @@ class SliderSetting extends StatelessWidget {
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
               activeTrackColor: context.colors.gold,
-              inactiveTrackColor: context.colors.border.withOpacity(0.5),
+              inactiveTrackColor: context.colors.border.withValues(alpha: 0.5),
               thumbColor: context.colors.gold,
             ),
             child: Slider(
