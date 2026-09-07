@@ -3978,4 +3978,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscriptionUseFreeButton => 'I want to use the app for free';
+
+  @override
+  String get aiMemorizeScreenTitle => 'Smart Memorization';
+
+  @override
+  String get aiMemorizeTabPages => 'Pages';
+
+  @override
+  String get aiMemorizeTabSurahs => 'Surahs';
+
+  @override
+  String get aiMemorizePageSearchHint => 'Enter a page number (1-604)';
+
+  @override
+  String get aiMemorizeSurahSearchHint => 'Search surahs';
 }

@@ -1660,5 +1660,10 @@
   "subscriptionFreeAccessNote": "Anyone who can't afford the subscription is welcome to use the app for free.",
   "subscriptionHonorSystemNote": "Unless stated otherwise, we don't verify that a user has paid the subscription fee — this is intentionally left to the user's discretion.",
   "subscriptionPayMonthlyButton": "I can pay monthly",
-  "subscriptionUseFreeButton": "I want to use the app for free"
+  "subscriptionUseFreeButton": "I want to use the app for free",
+  "aiMemorizeScreenTitle": "Smart Memorization",
+  "aiMemorizeTabPages": "Pages",
+  "aiMemorizeTabSurahs": "Surahs",
+  "aiMemorizePageSearchHint": "Enter a page number (1-604)",
+  "aiMemorizeSurahSearchHint": "Search surahs"
 }

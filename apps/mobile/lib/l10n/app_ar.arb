@@ -2163,5 +2163,10 @@
   "subscriptionFreeAccessNote": "كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.",
   "subscriptionHonorSystemNote": "ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.",
   "subscriptionPayMonthlyButton": "بإمكاني الدفع شهرياً",
-  "subscriptionUseFreeButton": "أريد استخدام التطبيق مجاناً"
+  "subscriptionUseFreeButton": "أريد استخدام التطبيق مجاناً",
+  "aiMemorizeScreenTitle": "التحفيظ الذكي",
+  "aiMemorizeTabPages": "الصفحات",
+  "aiMemorizeTabSurahs": "السور",
+  "aiMemorizePageSearchHint": "أدخل رقم الصفحة (1-604)",
+  "aiMemorizeSurahSearchHint": "ابحث في السور"
 }

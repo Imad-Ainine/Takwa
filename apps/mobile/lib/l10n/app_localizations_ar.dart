@@ -3938,4 +3938,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subscriptionUseFreeButton => 'أريد استخدام التطبيق مجاناً';
+
+  @override
+  String get aiMemorizeScreenTitle => 'التحفيظ الذكي';
+
+  @override
+  String get aiMemorizeTabPages => 'الصفحات';
+
+  @override
+  String get aiMemorizeTabSurahs => 'السور';
+
+  @override
+  String get aiMemorizePageSearchHint => 'أدخل رقم الصفحة (1-604)';
+
+  @override
+  String get aiMemorizeSurahSearchHint => 'ابحث في السور';
 }

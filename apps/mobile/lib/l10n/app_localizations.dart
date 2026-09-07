@@ -7219,6 +7219,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أريد استخدام التطبيق مجاناً'**
   String get subscriptionUseFreeButton;
+
+  /// No description provided for @aiMemorizeScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحفيظ الذكي'**
+  String get aiMemorizeScreenTitle;
+
+  /// No description provided for @aiMemorizeTabPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات'**
+  String get aiMemorizeTabPages;
+
+  /// No description provided for @aiMemorizeTabSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'السور'**
+  String get aiMemorizeTabSurahs;
+
+  /// No description provided for @aiMemorizePageSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقم الصفحة (1-604)'**
+  String get aiMemorizePageSearchHint;
+
+  /// No description provided for @aiMemorizeSurahSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في السور'**
+  String get aiMemorizeSurahSearchHint;
 }
 
 class _AppLocalizationsDelegate
