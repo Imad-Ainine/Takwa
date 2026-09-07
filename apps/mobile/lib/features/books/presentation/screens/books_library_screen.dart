@@ -22,6 +22,13 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
   String _searchQuery = '';
   BookCategory? _selectedCategory;
   bool _isGridView = false;
+  final _scrollCtrl = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +42,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
       appBar: AppBarWidget(
         title: l10n.booksLibraryTitle,
         leading: const CustomLeadingButton(),
+        scrollController: _scrollCtrl,
         actions: [
           IconButton(
             onPressed: () => setState(() => _isGridView = !_isGridView),
@@ -56,6 +64,7 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
           } catch (_) {}
         },
         child: CustomScrollView(
+          controller: _scrollCtrl,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // ── Search Bar ────────────────────────────────────────
