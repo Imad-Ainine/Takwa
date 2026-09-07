@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
@@ -176,14 +177,13 @@ class _BookPdfReaderScreenState extends ConsumerState<BookPdfReaderScreen>
     if (widget.book.pdfUrl == null) {
       return Scaffold(
         backgroundColor: colors.background,
-        appBar: AppBar(
+        // AppBarWidget instead of a plain AppBar — consistent with the
+        // rest of the app's app bars (audit item 29). Its default
+        // headingMedium style already renders in Amiri for Arabic, so the
+        // explicit fontFamily override here was redundant.
+        appBar: AppBarWidget(
           leading: const CustomLeadingButton(),
-          title: Text(
-            widget.book.titleAr,
-            style: const TextStyle(fontFamily: 'Amiri'),
-          ),
-          backgroundColor: colors.deep,
-          foregroundColor: Colors.white,
+          title: widget.book.titleAr,
         ),
         body: Center(
           child: Column(
