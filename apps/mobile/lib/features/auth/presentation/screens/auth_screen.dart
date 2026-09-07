@@ -48,8 +48,17 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _bgCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 30),
-    )..repeat();
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
     _passCtrl.addListener(_updatePassStrength);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative rotating star field — respects reduce-motion.
+    _bgCtrl.repeatUnlessReducedMotion(context);
   }
 
   void _updatePassStrength() {
@@ -743,7 +752,16 @@ class _GlowPulseState extends State<_GlowPulse>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative glow pulse — respects reduce-motion.
+    _ctrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override

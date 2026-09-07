@@ -29,11 +29,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 1800),
     );
 
-    // Continuous controller for the background shapes/orbs
+    // Continuous controller for the background shapes/orbs. repeat() is
+    // started from didChangeDependencies below, gated on reduce-motion.
     _bgController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
-    )..repeat();
+    );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -52,6 +53,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _mainController.forward();
 
     _navigateWhenReady();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative background shapes/orbs — respects reduce-motion.
+    _bgController.repeatUnlessReducedMotion(context);
   }
 
   /// Was a flat `Timer(3000ms)` regardless of whether the app was actually

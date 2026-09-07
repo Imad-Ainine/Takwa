@@ -302,7 +302,17 @@ class _GoldProgressBarState extends State<_GoldProgressBar>
     _shimmer = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat();
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion. The actual progress is the TweenAnimationBuilder
+    // below, driven by widget.duration — this is a decorative sheen
+    // layered on top of it, so gating it loses no information.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _shimmer.repeatUnlessReducedMotion(context);
   }
 
   @override
@@ -397,7 +407,9 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     _glowCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
     _glowAnim = Tween<double>(
       begin: 0.3,
       end: 0.7,
@@ -427,6 +439,13 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         _pickRandom(animate: true);
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative glow pulse — respects reduce-motion.
+    _glowCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   void _startCloseTimer() {

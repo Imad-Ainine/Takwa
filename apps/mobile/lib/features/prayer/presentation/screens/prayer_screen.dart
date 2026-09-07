@@ -266,7 +266,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
     _pulse = Tween<double>(
       begin: 0.85,
       end: 1.0,
@@ -276,6 +278,13 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative breathing pulse — respects reduce-motion.
+    _pulseCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override
@@ -467,7 +476,16 @@ class _FloatingParticlesState extends State<_FloatingParticles>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
-    )..repeat();
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative floating particles — respects reduce-motion.
+    _ctrl.repeatUnlessReducedMotion(context);
   }
 
   @override
@@ -1860,11 +1878,20 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1100),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion. The skeleton *shapes* already convey the loading
+    // state on their own, so the shimmer pulse on top is decorative.
     _pulse = Tween<double>(
       begin: 0.35,
       end: 0.75,
     ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _ctrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override

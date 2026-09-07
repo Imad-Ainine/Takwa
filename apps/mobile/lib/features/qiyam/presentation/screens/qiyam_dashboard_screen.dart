@@ -38,7 +38,10 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, so it can be
+    // gated on reduce-motion (needs a BuildContext, not meaningfully
+    // available yet at this point in initState).
     _pulse = Tween<double>(
       begin: 0.95,
       end: 1.05,
@@ -52,6 +55,13 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         setState(() => _showBanner = true);
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative breathing pulse — respects reduce-motion.
+    _pulseCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   Future<void> _playWelcomeSound() async {

@@ -47,7 +47,9 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
     _pulse = Tween<double>(
       begin: 0.92,
       end: 1.0,
@@ -56,6 +58,13 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative breathing pulse — respects reduce-motion.
+    _pulseCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override

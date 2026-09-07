@@ -833,12 +833,15 @@ extension ReducedMotionRepeat on AnimationController {
     BuildContext context, {
     bool reverse = false,
     double restingValue = 0,
+    double? min,
+    double? max,
+    Duration? period,
   }) {
     if (prefersReducedMotion(context)) {
       if (isAnimating) stop();
       value = restingValue;
     } else if (!isAnimating) {
-      repeat(reverse: reverse);
+      repeat(reverse: reverse, min: min, max: max, period: period);
     }
   }
 }
