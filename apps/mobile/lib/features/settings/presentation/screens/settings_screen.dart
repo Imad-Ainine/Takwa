@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
@@ -51,6 +52,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29).
+      appBar: AppBarWidget(
+        leading: const CustomLeadingButton(),
+        title: l10n.settingsScreenTitle,
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: SyncStatusIndicator(isSyncing: isSyncing),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           // Background Pattern
@@ -61,30 +76,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              SliverAppBar(
-                backgroundColor: Colors.transparent,
-                pinned: true,
-                leading: const CustomLeadingButton(),
-                title: Text(
-                  l10n.settingsScreenTitle,
-                  style: context.typography.headingMedium.copyWith(
-                    color: context.colors.gold,
-                  ),
-                ),
-                actions: [
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.lg,
-                      ),
-                      child: SyncStatusIndicator(isSyncing: isSyncing),
-                    ),
-                  ),
-                ],
-                centerTitle: true,
-                elevation: 0,
-                surfaceTintColor: Colors.transparent,
-              ),
               SliverPadding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,

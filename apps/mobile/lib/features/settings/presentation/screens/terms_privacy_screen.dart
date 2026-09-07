@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -12,6 +13,9 @@ class TermsPrivacyScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off SliverAppBar — consistent with
+      // the rest of the app's app bars (audit item 29).
+      appBar: _buildAppBar(context),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -20,7 +24,6 @@ class TermsPrivacyScreen extends StatelessWidget {
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
-              _buildAppBar(context),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -59,20 +62,11 @@ class TermsPrivacyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  AppBarWidget _buildAppBar(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return SliverAppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      pinned: true,
+    return AppBarWidget(
       leading: const CustomLeadingButton(),
-      title: Text(
-        l10n.termsPrivacyScreenTitle,
-        style: context.typography.headingMedium.copyWith(
-          color: context.colors.gold,
-        ),
-      ),
-      centerTitle: true,
+      title: l10n.termsPrivacyScreenTitle,
     );
   }
 
