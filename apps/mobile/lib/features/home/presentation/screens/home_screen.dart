@@ -417,7 +417,16 @@ class _RamadanBannerState extends State<_RamadanBanner>
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative banner glow — respects reduce-motion.
+    _ctrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override
@@ -516,7 +525,16 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative breathing pulse — respects reduce-motion.
+    _pulse.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override

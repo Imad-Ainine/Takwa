@@ -47,12 +47,13 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-
+    );
     _starsCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 20),
-    )..repeat();
+    );
+    // Both repeat()s are started from didChangeDependencies below, gated
+    // on reduce-motion.
 
     _entryCtrl = AnimationController(
       vsync: this,
@@ -61,6 +62,14 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
 
     _player = AudioPlayer();
     _initAudio();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative pulse/starfield — respects reduce-motion.
+    _pulseCtrl.repeatUnlessReducedMotion(context, reverse: true);
+    _starsCtrl.repeatUnlessReducedMotion(context);
   }
 
   Future<void> _initAudio() async {

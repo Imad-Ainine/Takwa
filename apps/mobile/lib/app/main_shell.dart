@@ -379,7 +379,10 @@ class _BottomNav extends StatelessWidget {
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
                                   style: context.typography.caption.copyWith(
-                                    fontSize: 9.5,
+                                    // 11 is Material's smallest label size /
+                                    // the iOS HIG floor — this used to be
+                                    // 9.5, below both platforms' minimums.
+                                    fontSize: 11,
                                     color: isActive
                                         ? context.colors.gold
                                         : context.colors.textDim,

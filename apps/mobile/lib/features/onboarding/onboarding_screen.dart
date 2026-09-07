@@ -449,7 +449,21 @@ class _NotificationsStepState extends State<_NotificationsStep>
     _bellCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
-    )..repeat(min: 0, max: 1, period: const Duration(seconds: 3));
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative ringing-bell wiggle — respects reduce-motion.
+    _bellCtrl.repeatUnlessReducedMotion(
+      context,
+      min: 0,
+      max: 1,
+      period: const Duration(seconds: 3),
+    );
   }
 
   @override
@@ -1708,7 +1722,16 @@ class _OverlayStepState extends State<_OverlayStep>
     _floatCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative floating illustration — respects reduce-motion.
+    _floatCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override
@@ -1853,7 +1876,16 @@ class _BackgroundStepState extends State<_BackgroundStep>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
+    // repeat() is started from didChangeDependencies below, gated on
+    // reduce-motion.
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Purely decorative breathing pulse — respects reduce-motion.
+    _pulseCtrl.repeatUnlessReducedMotion(context, reverse: true);
   }
 
   @override
