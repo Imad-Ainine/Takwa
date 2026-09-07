@@ -6673,6 +6673,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تقدم القراءة'**
   String get booksChapterReadingProgressLabel;
+
+  /// No description provided for @asmaScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسماء الله الحسنى'**
+  String get asmaScreenTitle;
+
+  /// No description provided for @asmaScreenSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'٩٩ اسماً مباركاً'**
+  String get asmaScreenSubtitle;
+
+  /// No description provided for @asmaSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في الأسماء...'**
+  String get asmaSearchHint;
+
+  /// No description provided for @asmaNoResultsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد نتائج'**
+  String get asmaNoResultsLabel;
+
+  /// No description provided for @asmaDuaLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء'**
+  String get asmaDuaLabel;
+
+  /// No description provided for @asmaDetailExplanationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشرح والبيان'**
+  String get asmaDetailExplanationTitle;
+
+  /// No description provided for @asmaDetailQuranTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'من القرآن الكريم'**
+  String get asmaDetailQuranTitle;
+
+  /// No description provided for @asmaDetailDuaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء بهذا الاسم'**
+  String get asmaDetailDuaTitle;
 }
 
 class _AppLocalizationsDelegate

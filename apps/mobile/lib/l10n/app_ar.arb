@@ -2027,5 +2027,13 @@
   "booksChapterReadPdfButton": "قراءة نسخة PDF",
   "booksChapterStartReadingButton": "ابدأ القراءة",
   "booksChapterContinueReadingButton": "متابعة القراءة",
-  "booksChapterReadingProgressLabel": "تقدم القراءة"
+  "booksChapterReadingProgressLabel": "تقدم القراءة",
+  "asmaScreenTitle": "أسماء الله الحسنى",
+  "asmaScreenSubtitle": "٩٩ اسماً مباركاً",
+  "asmaSearchHint": "ابحث في الأسماء...",
+  "asmaNoResultsLabel": "لا توجد نتائج",
+  "asmaDuaLabel": "الدعاء",
+  "asmaDetailExplanationTitle": "الشرح والبيان",
+  "asmaDetailQuranTitle": "من القرآن الكريم",
+  "asmaDetailDuaTitle": "الدعاء بهذا الاسم"
 }

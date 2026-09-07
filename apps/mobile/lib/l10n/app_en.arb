@@ -1524,5 +1524,13 @@
   "booksChapterReadPdfButton": "Read PDF Version",
   "booksChapterStartReadingButton": "Start Reading",
   "booksChapterContinueReadingButton": "Continue Reading",
-  "booksChapterReadingProgressLabel": "Reading Progress"
+  "booksChapterReadingProgressLabel": "Reading Progress",
+  "asmaScreenTitle": "The 99 Names of Allah",
+  "asmaScreenSubtitle": "99 Blessed Names",
+  "asmaSearchHint": "Search the names...",
+  "asmaNoResultsLabel": "No results found",
+  "asmaDuaLabel": "Dua",
+  "asmaDetailExplanationTitle": "Explanation",
+  "asmaDetailQuranTitle": "From the Noble Quran",
+  "asmaDetailDuaTitle": "Supplication with this Name"
 }

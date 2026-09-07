@@ -3676,4 +3676,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get booksChapterReadingProgressLabel => 'Reading Progress';
+
+  @override
+  String get asmaScreenTitle => 'The 99 Names of Allah';
+
+  @override
+  String get asmaScreenSubtitle => '99 Blessed Names';
+
+  @override
+  String get asmaSearchHint => 'Search the names...';
+
+  @override
+  String get asmaNoResultsLabel => 'No results found';
+
+  @override
+  String get asmaDuaLabel => 'Dua';
+
+  @override
+  String get asmaDetailExplanationTitle => 'Explanation';
+
+  @override
+  String get asmaDetailQuranTitle => 'From the Noble Quran';
+
+  @override
+  String get asmaDetailDuaTitle => 'Supplication with this Name';
 }

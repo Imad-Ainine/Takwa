@@ -3644,4 +3644,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get booksChapterReadingProgressLabel => 'تقدم القراءة';
+
+  @override
+  String get asmaScreenTitle => 'أسماء الله الحسنى';
+
+  @override
+  String get asmaScreenSubtitle => '٩٩ اسماً مباركاً';
+
+  @override
+  String get asmaSearchHint => 'ابحث في الأسماء...';
+
+  @override
+  String get asmaNoResultsLabel => 'لا توجد نتائج';
+
+  @override
+  String get asmaDuaLabel => 'الدعاء';
+
+  @override
+  String get asmaDetailExplanationTitle => 'الشرح والبيان';
+
+  @override
+  String get asmaDetailQuranTitle => 'من القرآن الكريم';
+
+  @override
+  String get asmaDetailDuaTitle => 'الدعاء بهذا الاسم';
 }
