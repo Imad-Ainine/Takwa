@@ -2249,5 +2249,14 @@
   "guestGuardBackButton": "العودة",
   "customTimePickerTitle": "اختيار الوقت",
   "customTimePickerConfirmButton": "تأكيد",
-  "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية"
+  "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية",
+  "achievementPointsRewardLabel": "+{points} نقطة",
+  "@achievementPointsRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementPendingLabel": "قيد الانتظار"
 }

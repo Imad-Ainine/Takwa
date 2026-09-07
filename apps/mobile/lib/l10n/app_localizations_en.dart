@@ -4135,4 +4135,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quranReaderBookmarkSaved => 'Bookmark saved';
+
+  @override
+  String achievementPointsRewardLabel(int points) {
+    return '+$points pts';
+  }
+
+  @override
+  String get achievementPendingLabel => 'Pending';
 }

@@ -7483,6 +7483,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم حفظ العلامة المرجعية'**
   String get quranReaderBookmarkSaved;
+
+  /// No description provided for @achievementPointsRewardLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة'**
+  String achievementPointsRewardLabel(int points);
+
+  /// No description provided for @achievementPendingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد الانتظار'**
+  String get achievementPendingLabel;
 }
 
 class _AppLocalizationsDelegate

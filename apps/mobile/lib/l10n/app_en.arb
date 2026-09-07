@@ -1746,5 +1746,14 @@
   "guestGuardBackButton": "Back",
   "customTimePickerTitle": "Select Time",
   "customTimePickerConfirmButton": "Confirm",
-  "quranReaderBookmarkSaved": "Bookmark saved"
+  "quranReaderBookmarkSaved": "Bookmark saved",
+  "achievementPointsRewardLabel": "+{points} pts",
+  "@achievementPointsRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementPendingLabel": "Pending"
 }

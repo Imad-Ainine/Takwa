@@ -4096,4 +4096,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quranReaderBookmarkSaved => 'تم حفظ العلامة المرجعية';
+
+  @override
+  String achievementPointsRewardLabel(int points) {
+    return '+$points نقطة';
+  }
+
+  @override
+  String get achievementPendingLabel => 'قيد الانتظار';
 }
