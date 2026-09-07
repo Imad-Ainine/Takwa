@@ -15,6 +15,7 @@ import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
@@ -632,8 +633,13 @@ class _NextPrayerCardMergedState extends State<_NextPrayerCardMerged>
                 ],
               ),
             ),
-            GestureDetector(
+            TakwaTappable(
               onTap: () => Navigator.pushNamed(context, '/prayer'),
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              // Inline chip alongside the prayer name/time in this Row —
+              // 48dp here would blow out the row's height, not the tap
+              // target.
+              minTapSize: null,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
@@ -797,8 +803,14 @@ class _MihrabPrayerChip extends StatelessWidget {
     );
     final timeStr = DateFormat('HH:mm').format(prayer.time);
 
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () => Navigator.pushNamed(context, '/prayer'),
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(35),
+        topRight: Radius.circular(35),
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(12),
+      ),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 350),
         width: 70,
@@ -1218,11 +1230,13 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
               child: Container(height: 1, color: s.border.withValues(alpha: 0.3)),
             ),
             const SizedBox(width: AppSpacing.sm),
-            GestureDetector(
+            TakwaTappable(
               onTap: () {
                 Navigator.popUntil(context, (route) => route.isFirst);
                 ref.read(currentTabProvider.notifier).state = 2;
               },
+              borderRadius: BorderRadius.zero,
+              minTapSize: null,
               child: Text(
                 l10n.homeViewAllLabel,
                 style: s.naskh(11, color: s.teal),
@@ -1270,7 +1284,7 @@ class _IbadahChipMerged extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = style;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () {
         switch (id) {
           case 'adhkar':
@@ -1284,6 +1298,7 @@ class _IbadahChipMerged extends ConsumerWidget {
             HapticFeedback.lightImpact();
         }
       },
+      borderRadius: BorderRadius.circular(14),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
@@ -1406,11 +1421,12 @@ class _FeatureItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = style;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () {
         HapticFeedback.selectionClick();
         Navigator.pushNamed(context, f.$3);
       },
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
@@ -1705,8 +1721,9 @@ class _DailyDhikrCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = style;
     final idx = DateTime.now().hour % _dhikrs.length;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () => Navigator.pushNamed(context, '/adhkar'),
+      borderRadius: AppRadius.card,
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: s.cardDeco,
@@ -1796,8 +1813,10 @@ class _BooksSection extends ConsumerWidget {
                 child: Container(height: 1, color: s.gold.withValues(alpha: 0.15)),
               ),
               const SizedBox(width: 10),
-              GestureDetector(
+              TakwaTappable(
                 onTap: () => Navigator.pushNamed(context, '/books'),
+                borderRadius: BorderRadius.zero,
+                minTapSize: null,
                 child: Text(
                   AppLocalizations.of(context)!.homeViewAllLabel,
                   style: s.naskh(11, color: s.goldLight),
@@ -1845,9 +1864,10 @@ class _BookCard extends StatelessWidget {
     final s = style;
     final color = Color(int.parse(book.coverColor));
 
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () =>
           Navigator.pushNamed(context, '/books/chapter', arguments: book),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: Container(
         width: 130,
         decoration: BoxDecoration(
