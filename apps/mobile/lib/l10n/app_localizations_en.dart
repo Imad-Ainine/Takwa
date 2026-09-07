@@ -4098,4 +4098,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mosqueDefaultAddress => 'No specific address';
+
+  @override
+  String get emailConfirmationTitle => 'Confirm Your Email';
+
+  @override
+  String emailConfirmationLinkSentLabel(String email) {
+    return 'A confirmation link was sent to:\n$email';
+  }
+
+  @override
+  String get emailConfirmationInstructions =>
+      'Please check your email and tap the link to activate your account and begin your journey with Takwa.';
+
+  @override
+  String get emailConfirmationBackToSignInButton => 'Back to Sign In';
 }

@@ -7417,6 +7417,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'بدون عنوان محدد'**
   String get mosqueDefaultAddress;
+
+  /// No description provided for @emailConfirmationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد البريد الإلكتروني'**
+  String get emailConfirmationTitle;
+
+  /// No description provided for @emailConfirmationLinkSentLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال رابط التأكيد إلى:\n{email}'**
+  String emailConfirmationLinkSentLabel(String email);
+
+  /// No description provided for @emailConfirmationInstructions.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.'**
+  String get emailConfirmationInstructions;
+
+  /// No description provided for @emailConfirmationBackToSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة لتسجيل الدخول'**
+  String get emailConfirmationBackToSignInButton;
 }
 
 class _AppLocalizationsDelegate

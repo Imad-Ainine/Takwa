@@ -2231,5 +2231,16 @@
   "mosqueErrorLocationPermissionForever": "يجب تفعيل صلاحيات الموقع من إعدادات الجهاز",
   "mosqueFetchError": "تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً",
   "mosqueDefaultName": "مسجد قريب",
-  "mosqueDefaultAddress": "بدون عنوان محدد"
+  "mosqueDefaultAddress": "بدون عنوان محدد",
+  "emailConfirmationTitle": "تأكيد البريد الإلكتروني",
+  "emailConfirmationLinkSentLabel": "تم إرسال رابط التأكيد إلى:\n{email}",
+  "@emailConfirmationLinkSentLabel": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "emailConfirmationInstructions": "يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.",
+  "emailConfirmationBackToSignInButton": "العودة لتسجيل الدخول"
 }

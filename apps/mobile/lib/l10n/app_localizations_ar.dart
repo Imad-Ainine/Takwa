@@ -4059,4 +4059,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mosqueDefaultAddress => 'بدون عنوان محدد';
+
+  @override
+  String get emailConfirmationTitle => 'تأكيد البريد الإلكتروني';
+
+  @override
+  String emailConfirmationLinkSentLabel(String email) {
+    return 'تم إرسال رابط التأكيد إلى:\n$email';
+  }
+
+  @override
+  String get emailConfirmationInstructions =>
+      'يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.';
+
+  @override
+  String get emailConfirmationBackToSignInButton => 'العودة لتسجيل الدخول';
 }
