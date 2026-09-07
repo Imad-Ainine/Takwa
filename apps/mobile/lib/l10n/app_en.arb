@@ -1654,5 +1654,11 @@
   "qiyamOnboardingStep2": "Recite the verses of Allah with reflection",
   "qiyamOnboardingStep3": "Converse with your Lord through prayer and dua",
   "qiyamOnboardingStep4": "Conclude with istighfar in the last hours of the night",
-  "qiyamOnboardingStartButton": "Begin the Journey Now"
+  "qiyamOnboardingStartButton": "Begin the Journey Now",
+  "subscriptionScreenTitle": "Subscription",
+  "subscriptionIntroText": "Subscriptions help keep the project going.",
+  "subscriptionFreeAccessNote": "Anyone who can't afford the subscription is welcome to use the app for free.",
+  "subscriptionHonorSystemNote": "Unless stated otherwise, we don't verify that a user has paid the subscription fee — this is intentionally left to the user's discretion.",
+  "subscriptionPayMonthlyButton": "I can pay monthly",
+  "subscriptionUseFreeButton": "I want to use the app for free"
 }

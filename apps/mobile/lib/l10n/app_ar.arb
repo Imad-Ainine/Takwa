@@ -2157,5 +2157,11 @@
   "qiyamOnboardingStep2": "رتل آيات الله بتدبر",
   "qiyamOnboardingStep3": "ناجِ ربك بالصلاة والدعاء",
   "qiyamOnboardingStep4": "اختم بالاستغفار والأسحار",
-  "qiyamOnboardingStartButton": "ابدأ الرحلة الآن"
+  "qiyamOnboardingStartButton": "ابدأ الرحلة الآن",
+  "subscriptionScreenTitle": "الاشتراك",
+  "subscriptionIntroText": "الاشتراكات لاستمرار المشروع.",
+  "subscriptionFreeAccessNote": "كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.",
+  "subscriptionHonorSystemNote": "ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.",
+  "subscriptionPayMonthlyButton": "بإمكاني الدفع شهرياً",
+  "subscriptionUseFreeButton": "أريد استخدام التطبيق مجاناً"
 }

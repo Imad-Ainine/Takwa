@@ -3957,4 +3957,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qiyamOnboardingStartButton => 'Begin the Journey Now';
+
+  @override
+  String get subscriptionScreenTitle => 'Subscription';
+
+  @override
+  String get subscriptionIntroText =>
+      'Subscriptions help keep the project going.';
+
+  @override
+  String get subscriptionFreeAccessNote =>
+      'Anyone who can\'t afford the subscription is welcome to use the app for free.';
+
+  @override
+  String get subscriptionHonorSystemNote =>
+      'Unless stated otherwise, we don\'t verify that a user has paid the subscription fee — this is intentionally left to the user\'s discretion.';
+
+  @override
+  String get subscriptionPayMonthlyButton => 'I can pay monthly';
+
+  @override
+  String get subscriptionUseFreeButton => 'I want to use the app for free';
 }

@@ -3918,4 +3918,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get qiyamOnboardingStartButton => 'ابدأ الرحلة الآن';
+
+  @override
+  String get subscriptionScreenTitle => 'الاشتراك';
+
+  @override
+  String get subscriptionIntroText => 'الاشتراكات لاستمرار المشروع.';
+
+  @override
+  String get subscriptionFreeAccessNote =>
+      'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.';
+
+  @override
+  String get subscriptionHonorSystemNote =>
+      'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.';
+
+  @override
+  String get subscriptionPayMonthlyButton => 'بإمكاني الدفع شهرياً';
+
+  @override
+  String get subscriptionUseFreeButton => 'أريد استخدام التطبيق مجاناً';
 }

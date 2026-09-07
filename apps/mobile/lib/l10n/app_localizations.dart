@@ -7183,6 +7183,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ابدأ الرحلة الآن'**
   String get qiyamOnboardingStartButton;
+
+  /// No description provided for @subscriptionScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاشتراك'**
+  String get subscriptionScreenTitle;
+
+  /// No description provided for @subscriptionIntroText.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاشتراكات لاستمرار المشروع.'**
+  String get subscriptionIntroText;
+
+  /// No description provided for @subscriptionFreeAccessNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.'**
+  String get subscriptionFreeAccessNote;
+
+  /// No description provided for @subscriptionHonorSystemNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.'**
+  String get subscriptionHonorSystemNote;
+
+  /// No description provided for @subscriptionPayMonthlyButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'بإمكاني الدفع شهرياً'**
+  String get subscriptionPayMonthlyButton;
+
+  /// No description provided for @subscriptionUseFreeButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'أريد استخدام التطبيق مجاناً'**
+  String get subscriptionUseFreeButton;
 }
 
 class _AppLocalizationsDelegate

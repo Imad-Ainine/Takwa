@@ -5,6 +5,7 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class SubscriptionScreen extends ConsumerWidget {
   const SubscriptionScreen({super.key});
@@ -64,10 +65,11 @@ class SubscriptionScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Text(
-          'الاشتراك',
+          l10n.subscriptionScreenTitle,
           style: context.typography.displayMedium.copyWith(
             color: context.colors.gold,
             fontWeight: FontWeight.w800,
@@ -87,10 +89,11 @@ class SubscriptionScreen extends ConsumerWidget {
   }
 
   Widget _buildContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Text(
-          'الاشتراكات لاستمرار المشروع.',
+          l10n.subscriptionIntroText,
           textAlign: TextAlign.center,
           style: context.typography.headingMedium.copyWith(
             color: context.colors.textPrimary,
@@ -99,7 +102,7 @@ class SubscriptionScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.xxl),
         Text(
-          'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.',
+          l10n.subscriptionFreeAccessNote,
           textAlign: TextAlign.center,
           style: context.typography.bodyLarge.copyWith(
             color: context.colors.textSecondary,
@@ -108,7 +111,7 @@ class SubscriptionScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.xxxl),
         Text(
-          'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.',
+          l10n.subscriptionHonorSystemNote,
           textAlign: TextAlign.center,
           style: context.typography.bodyMedium.copyWith(
             color: context.colors.textDim,
@@ -121,17 +124,18 @@ class SubscriptionScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
       child: Column(
         children: [
           PrimaryButton(
-            label: 'بإمكاني الدفع شهرياً',
+            label: l10n.subscriptionPayMonthlyButton,
             onTap: () => Navigator.pushNamed(context, Routes.paymentMethods),
           ),
           const SizedBox(height: AppSpacing.lg),
           PrimaryButton(
-            label: 'أريد استخدام التطبيق مجاناً',
+            label: l10n.subscriptionUseFreeButton,
             isOutline: true,
             onTap: () => Navigator.pop(context),
           ),
