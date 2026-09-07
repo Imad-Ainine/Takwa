@@ -11,6 +11,7 @@ import '../providers/database_providers.dart';
 import 'notifications_service.dart';
 import '../utils/timezone_resolver.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class LocationPrayerManager {
@@ -146,6 +147,7 @@ class LocationPrayerManager {
 
     await NotificationsService.schedulePrayerNotifications(
       prayers: prayers,
+      l10n: lookupAppLocalizations(ref.read(localeProvider)),
       preAdhanEnabled: prefs.preAdhanNotif,
       iqamaEnabled: prefs.iqamaNotif,
       adhanMode: prefs.adhanMode,

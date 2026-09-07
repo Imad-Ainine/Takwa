@@ -8,6 +8,7 @@ import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/features/books/presentation/screens/book_reader_screen.dart';
 import 'package:takwa/features/books/presentation/screens/book_pdf_reader_screen.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class BooksChapterScreen extends ConsumerWidget {
   final IslamicBook book;
@@ -28,6 +29,7 @@ class BooksChapterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
     final c1 = _parseColor(book.coverColor);
@@ -109,12 +111,14 @@ class BooksChapterScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   _StatChip(
-                    label: '${book.totalPages} صفحة',
+                    label: l10n.booksChapterPagesCount(book.totalPages),
                     icon: Icons.menu_book_rounded,
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   _StatChip(
-                    label: '~${book.estimatedReadingMinutes} د',
+                    label: l10n.booksChapterMinutesAbbrev(
+                      book.estimatedReadingMinutes,
+                    ),
                     icon: Icons.schedule_rounded,
                   ),
                 ],
@@ -140,7 +144,7 @@ class BooksChapterScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'عن الكتاب',
+                      l10n.booksChapterAboutTitle,
                       style: typography.headingMedium.copyWith(
                         color: c1,
                         fontWeight: FontWeight.bold,
@@ -194,11 +198,11 @@ class BooksChapterScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${book.chapters.length} فصل',
+                    l10n.booksChapterChaptersCount(book.chapters.length),
                     style: typography.caption.copyWith(color: colors.textDim),
                   ),
                   Text(
-                    'الفصول المحتواة',
+                    l10n.booksChapterTocTitle,
                     style: typography.labelLarge.copyWith(
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Amiri',
@@ -294,16 +298,19 @@ class _PrimaryActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final isPdf = book.pdfUrl != null;
 
-    String label = isPdf ? 'قراءة نسخة PDF' : 'ابدأ القراءة';
+    String label = isPdf
+        ? l10n.booksChapterReadPdfButton
+        : l10n.booksChapterStartReadingButton;
     IconData icon = isPdf
         ? Icons.picture_as_pdf_outlined
         : Icons.menu_book_rounded;
 
     if (!isPdf && savedProgress != null) {
-      label = 'متابعة القراءة';
+      label = l10n.booksChapterContinueReadingButton;
       icon = Icons.play_arrow_rounded;
     }
 
@@ -382,6 +389,7 @@ class _ChapterItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     final typography = context.typography;
 
@@ -422,7 +430,7 @@ class _ChapterItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        '${chapter.totalPages} صفحة',
+                        l10n.booksChapterPagesCount(chapter.totalPages),
                         style: typography.caption,
                       ),
                       const SizedBox(width: AppSpacing.sm),
@@ -434,7 +442,7 @@ class _ChapterItem extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        '~${chapter.estimatedMinutes} دقيقة',
+                        '~${l10n.homeMinutesLabel(chapter.estimatedMinutes)}',
                         style: typography.caption,
                       ),
                     ],
@@ -488,6 +496,7 @@ class _ReadingProgressBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = ref
         .watch(readingProgressProvider.notifier)
         .getProgress(book.id, book.totalPages);
@@ -507,9 +516,9 @@ class _ReadingProgressBar extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Text(
-              'تقدم القراءة',
-              style: TextStyle(
+            Text(
+              l10n.booksChapterReadingProgressLabel,
+              style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 12,
                 fontFamily: 'Amiri',

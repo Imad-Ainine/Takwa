@@ -3334,4 +3334,409 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get favoriteAdhkarCopiedToast => 'تم النسخ ✓';
+
+  @override
+  String get qiyamSleepCalcTitle => 'حاسبة النوم الذكية';
+
+  @override
+  String get qiyamSleepCalcHeaderTitle => 'استيقظ نشيطاً لقيام الليل';
+
+  @override
+  String get qiyamSleepCalcHeaderSubtitle =>
+      'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.';
+
+  @override
+  String get qiyamSleepCalcWakeupQuestion => 'متى تريد الاستيقاظ؟';
+
+  @override
+  String get qiyamSleepCalcBestTimesLabel => 'أفضل أوقات النوم:';
+
+  @override
+  String get qiyamSleepCycle9h => '9 ساعات (مثالي)';
+
+  @override
+  String get qiyamSleepCycle75h => '7.5 ساعات (ممتاز)';
+
+  @override
+  String get qiyamSleepCycle6h => '6 ساعات (جيد)';
+
+  @override
+  String get qiyamSleepCycle45h => '4.5 ساعات (كافٍ)';
+
+  @override
+  String get qiyamSleepCycle15h => '1.5 ساعة (غفوة)';
+
+  @override
+  String get qiyamSleepCalcSleepAtLabel => 'يجب أن تنام الساعة';
+
+  @override
+  String get bookPdfNoUrlError =>
+      'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.';
+
+  @override
+  String get bookPdfDownloadingLabel => 'جاري التحميل...';
+
+  @override
+  String bookPdfDownloadingPercentLabel(int pct) {
+    return 'جاري التحميل... $pct%';
+  }
+
+  @override
+  String get bookPdfLoadFailedTitle => 'تعذّر تحميل الملف';
+
+  @override
+  String get bookPdfShareAction => 'مشاركة';
+
+  @override
+  String get bookPdfCopiedToast => 'تم النسخ';
+
+  @override
+  String get bookPdfHighlightAction => 'تحديد';
+
+  @override
+  String get bookPdfHighlightedToast => 'تم تحديد النص';
+
+  @override
+  String notifPreAdhanTitle(String prayerName) {
+    return '⏳ اقترب وقت $prayerName';
+  }
+
+  @override
+  String notifPreAdhanBody(String prayerName) {
+    return '15 دقيقة على أذان $prayerName، استعدَّ للصلاة';
+  }
+
+  @override
+  String notifAdhanTitle(String prayerName) {
+    return 'حان وقت $prayerName';
+  }
+
+  @override
+  String get notifAdhanBody =>
+      'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح';
+
+  @override
+  String notifIqamaTitle(String prayerName) {
+    return 'وقت الإقامة — $prayerName';
+  }
+
+  @override
+  String notifIqamaBody(String prayerName) {
+    return 'حان وقت إقامة صلاة $prayerName، الله أكبر الله أكبر';
+  }
+
+  @override
+  String get notifMuhasabaTitle => 'وقت محاسبة النفس';
+
+  @override
+  String get notifMuhasabaMsg1 =>
+      'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙';
+
+  @override
+  String get notifMuhasabaMsg2 =>
+      '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\" — عمر بن الخطاب';
+
+  @override
+  String get notifMuhasabaMsg3 => 'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝';
+
+  @override
+  String get notifMuhasabaMsg4 =>
+      'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟';
+
+  @override
+  String get notifMuhasabaMsg5 => 'لا تنم قبل أن تحاسب نفسك على يومك 💫';
+
+  @override
+  String get notifMuhasabaMsg6 =>
+      'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲';
+
+  @override
+  String get notifMuhasabaMsg7 =>
+      'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏';
+
+  @override
+  String get notifDuaMorningTitle => 'دعاء الصباح';
+
+  @override
+  String get notifDuaEveningTitle => 'دعاء المساء';
+
+  @override
+  String get notifDuaTodayTitle => 'دعاء اليوم';
+
+  @override
+  String get notifFridayKahfTitle => 'سورة الكهف';
+
+  @override
+  String get notifFridayKahfBody =>
+      'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين';
+
+  @override
+  String get notifFridaySalawatTitle => 'الصلاة على النبي ﷺ';
+
+  @override
+  String get notifFridaySalawatBody =>
+      'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة';
+
+  @override
+  String get notifFastingMondayTitle => 'تذكير بصيام الاثنين';
+
+  @override
+  String get notifFastingMondayBody =>
+      'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم';
+
+  @override
+  String get notifFastingThursdayTitle => 'تذكير بصيام الخميس';
+
+  @override
+  String get notifFastingThursdayBody =>
+      'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام';
+
+  @override
+  String get notifWhiteDaysTitle => 'غداً من الأيام البيض';
+
+  @override
+  String notifWhiteDaysBody(int day, String month) {
+    return 'غداً يوم $day من $month الهجري — صيام الأيام البيض سنّة مؤكدة';
+  }
+
+  @override
+  String get notifSuhoorTitle => 'تنبيه السحور';
+
+  @override
+  String get notifSuhoorBody =>
+      'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك';
+
+  @override
+  String get notifIftarTitle => 'حان وقت الإفطار';
+
+  @override
+  String get notifIftarBody => 'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك';
+
+  @override
+  String get notifWakeUpTitle => 'حان وقت الاستيقاظ';
+
+  @override
+  String get notifWakeUpBody => 'الصلاة خير من النوم — استيقظ لصلاة الفجر';
+
+  @override
+  String get notifWakeUpSnoozeTitle => 'حان وقت الاستيقاظ (غفوة)';
+
+  @override
+  String notifAchievementNewPrefix(String title) {
+    return 'إنجاز جديد: $title';
+  }
+
+  @override
+  String notifAchievementPointsSuffix(int points) {
+    return '+$points نقطة تقوى 🌟';
+  }
+
+  @override
+  String notifAchievementPointsShort(int points) {
+    return '+$points نقطة تقوى';
+  }
+
+  @override
+  String get notifAdhkarMorningTitle => 'حان وقت أذكار الصباح';
+
+  @override
+  String get notifAdhkarEveningTitle => 'حان وقت أذكار المساء';
+
+  @override
+  String get notifAdhkarSleepTitle => 'حان وقت أذكار النوم';
+
+  @override
+  String get notifAdhkarMorningChannelName => 'أذكار الصباح';
+
+  @override
+  String get notifAdhkarEveningChannelName => 'أذكار المساء';
+
+  @override
+  String get notifAdhkarSleepChannelName => 'أذكار النوم';
+
+  @override
+  String get notifAdhkarChannelDesc => 'أذكار وأدعية من حصن المسلم';
+
+  @override
+  String get notifAdhkarActionRead => 'قرأت الأذكار ✓';
+
+  @override
+  String get notifAdhkarActionOpen => 'فتح الأذكار';
+
+  @override
+  String get silentModeSettingsTitle => 'إعدادات الوضع الصامت';
+
+  @override
+  String get silentModeEnableLabel => 'تفعيل وضع الصامت';
+
+  @override
+  String get silentModeEnableSublabel =>
+      'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم';
+
+  @override
+  String get silentModeVibrationLabel => 'إهتزاز';
+
+  @override
+  String get silentModeVibrationSublabel => 'تفعيل الإهتزاز أثناء الوضع الصامت';
+
+  @override
+  String get silentModeAlertStyleLabel => 'التنبيه عند التحويل';
+
+  @override
+  String get silentModeAlertNone => 'بدون تنبيه';
+
+  @override
+  String get silentModeAlertVibrateOnly => 'اهتزاز فقط';
+
+  @override
+  String get silentModeAlertToneOnly => 'نغمة بدون اهتزاز';
+
+  @override
+  String get silentModeAlertToneVibrate => 'نغمة مع اهتزاز';
+
+  @override
+  String get booksChapterAboutTitle => 'عن الكتاب';
+
+  @override
+  String get booksChapterTocTitle => 'الفصول المحتواة';
+
+  @override
+  String booksChapterPagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة',
+      many: '$count صفحة',
+      few: '$count صفحات',
+      two: 'صفحتان',
+      one: 'صفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterChaptersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count فصل',
+      many: '$count فصلاً',
+      few: '$count فصول',
+      two: 'فصلان',
+      one: 'فصل واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String booksChapterMinutesAbbrev(int minutes) {
+    return '~$minutes د';
+  }
+
+  @override
+  String get booksChapterReadPdfButton => 'قراءة نسخة PDF';
+
+  @override
+  String get booksChapterStartReadingButton => 'ابدأ القراءة';
+
+  @override
+  String get booksChapterContinueReadingButton => 'متابعة القراءة';
+
+  @override
+  String get booksChapterReadingProgressLabel => 'تقدم القراءة';
+
+  @override
+  String get asmaScreenTitle => 'أسماء الله الحسنى';
+
+  @override
+  String get asmaScreenSubtitle => '٩٩ اسماً مباركاً';
+
+  @override
+  String get asmaSearchHint => 'ابحث في الأسماء...';
+
+  @override
+  String get asmaNoResultsLabel => 'لا توجد نتائج';
+
+  @override
+  String get asmaDuaLabel => 'الدعاء';
+
+  @override
+  String get asmaDetailExplanationTitle => 'الشرح والبيان';
+
+  @override
+  String get asmaDetailQuranTitle => 'من القرآن الكريم';
+
+  @override
+  String get asmaDetailDuaTitle => 'الدعاء بهذا الاسم';
+
+  @override
+  String get achievementsScreenTitle => 'إنجازاتي';
+
+  @override
+  String get achievementsProgressLabel => 'التقدم المحرز';
+
+  @override
+  String get achievementsCategoryDaily => 'إنجازات يومية';
+
+  @override
+  String get achievementsCategoryMilestone => 'محطات رئيسية';
+
+  @override
+  String get achievementsCategoryIbadah => 'العبادات والذكر';
+
+  @override
+  String get achievementsCategorySpecial => 'إنجازات خاصة';
+
+  @override
+  String achievementsAchievedOnLabel(String date) {
+    return 'تم التحقيق في $date';
+  }
+
+  @override
+  String get achievementsEncourageMessage =>
+      'استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨';
+
+  @override
+  String get achievementsGotItButton => 'فهمت';
+
+  @override
+  String get prayerJumuah => 'الجمعة';
+
+  @override
+  String get prayerSelectionSunriseAlertsLabel => 'تنبيهات الشروق';
+
+  @override
+  String prayerSelectionAdhanLabel(String name) {
+    return 'أذان $name';
+  }
+
+  @override
+  String get termsPrivacyScreenTitle => 'الشروط والخصوصية';
+
+  @override
+  String get termsPrivacyAppName => 'تطبيق تقوى';
+
+  @override
+  String get termsPrivacySubtitle => 'الشروط وسياسة الخصوصية';
+
+  @override
+  String get termsPrivacyTermsSectionTitle => 'شروط الاستخدام';
+
+  @override
+  String get termsPrivacyPolicySectionTitle => 'سياسة الخصوصية';
+
+  @override
+  String get termsPrivacyTermsBody =>
+      'أهلاً بك في تطبيق \"تقوى\". باستخدامك لهذا التطبيق، فإنك توافق على شروط وأحكام الاستخدام الموضحة. نهدف من خلال هذا التطبيق لتقديم خدمات إسلامية من أذكار، مواقيت الصلاة، والقيم الإسلامية بما ينفع أمتنا الإسلامية. يرجى استخدام التطبيق وفق الغرض المخصص له، وعدم إساءة استخدام الخدمات أو المحتوى.';
+
+  @override
+  String get termsPrivacyPolicyBody =>
+      'نحن نحترم خصوصيتك ونهتم بحماية بياناتك الشخصية. التطبيق قد يحتاج إلى الوصول لموقعك الجغرافي فقط لتحديد أوقات الصلاة بدقة. لا نقوم بمشاركة أو بيع بياناتك الشخصية لأي جهة خارجية. بياناتك تُستخدم محلياً داخل جهازك لتوفير تجربة مستخدم أفضل.';
+
+  @override
+  String get termsPrivacyFooterThanks => 'شكراً لثقتكم بتطبيق تقوى';
+
+  @override
+  String get termsPrivacyFooterDua =>
+      'نسأل الله أن ينفعنا وإياكم بما فيه الخير';
 }

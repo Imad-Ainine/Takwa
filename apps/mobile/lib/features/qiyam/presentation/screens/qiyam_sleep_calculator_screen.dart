@@ -3,6 +3,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_time_picker.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamSleepCalculatorScreen extends StatefulWidget {
   const QiyamSleepCalculatorScreen({super.key});
@@ -18,6 +19,7 @@ class _QiyamSleepCalculatorScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
@@ -40,7 +42,7 @@ class _QiyamSleepCalculatorScreenState
                         _buildWakeupSelector(context),
                         const SizedBox(height: AppSpacing.xxxl),
                         Text(
-                          'أفضل أوقات النوم:',
+                          l10n.qiyamSleepCalcBestTimesLabel,
                           style: context.typography.displayMedium.copyWith(
                             fontSize: 20,
                             color: context.colors.textPrimary,
@@ -62,6 +64,7 @@ class _QiyamSleepCalculatorScreenState
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.xl,
@@ -72,7 +75,7 @@ class _QiyamSleepCalculatorScreenState
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'حاسبة النوم الذكية',
+            l10n.qiyamSleepCalcTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 20,
               color: context.colors.gold,
@@ -87,11 +90,12 @@ class _QiyamSleepCalculatorScreenState
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Center(
           child: Text(
-            'استيقظ نشيطاً لقيام الليل',
+            l10n.qiyamSleepCalcHeaderTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 24,
               color: context.colors.gold,
@@ -102,7 +106,7 @@ class _QiyamSleepCalculatorScreenState
         const SizedBox(height: AppSpacing.md),
         Center(
           child: Text(
-            'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.',
+            l10n.qiyamSleepCalcHeaderSubtitle,
             style: context.typography.bodyLarge.copyWith(
               color: context.colors.textSecondary,
               height: 1.5,
@@ -115,6 +119,7 @@ class _QiyamSleepCalculatorScreenState
   }
 
   Widget _buildWakeupSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.xxl),
@@ -133,7 +138,7 @@ class _QiyamSleepCalculatorScreenState
         child: Column(
           children: [
             Text(
-              'متى تريد الاستيقاظ؟',
+              l10n.qiyamSleepCalcWakeupQuestion,
               style: context.typography.bodyLarge.copyWith(
                 color: context.colors.textPrimary,
                 fontWeight: FontWeight.bold,
@@ -208,12 +213,21 @@ class _QiyamSleepCalculatorScreenState
   }
 
   List<Widget> _buildCycleCards(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cycles = [
-      {'label': '9 ساعات (مثالي)', 'hours': 9.0, 'color': Colors.green},
-      {'label': '7.5 ساعات (ممتاز)', 'hours': 7.5, 'color': Colors.lightGreen},
-      {'label': '6 ساعات (جيد)', 'hours': 6.0, 'color': Colors.orange},
-      {'label': '4.5 ساعات (كافٍ)', 'hours': 4.5, 'color': Colors.deepOrange},
-      {'label': '1.5 ساعة (غفوة)', 'hours': 1.5, 'color': Colors.red},
+      {'label': l10n.qiyamSleepCycle9h, 'hours': 9.0, 'color': Colors.green},
+      {
+        'label': l10n.qiyamSleepCycle75h,
+        'hours': 7.5,
+        'color': Colors.lightGreen,
+      },
+      {'label': l10n.qiyamSleepCycle6h, 'hours': 6.0, 'color': Colors.orange},
+      {
+        'label': l10n.qiyamSleepCycle45h,
+        'hours': 4.5,
+        'color': Colors.deepOrange,
+      },
+      {'label': l10n.qiyamSleepCycle15h, 'hours': 1.5, 'color': Colors.red},
     ];
 
     return cycles.map((cycle) {
@@ -264,7 +278,7 @@ class _QiyamSleepCalculatorScreenState
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            _formatTime(sleepTime),
+                            _formatTime(context, sleepTime),
                             style: context.typography.displayMedium.copyWith(
                               fontSize: 22,
                               color: color,
@@ -272,7 +286,7 @@ class _QiyamSleepCalculatorScreenState
                             ),
                           ),
                           Text(
-                            'يجب أن تنام الساعة',
+                            l10n.qiyamSleepCalcSleepAtLabel,
                             style: context.typography.caption.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -310,10 +324,11 @@ class _QiyamSleepCalculatorScreenState
     return wakeup.subtract(Duration(minutes: totalMinutes));
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(BuildContext context, DateTime dt) {
+    final l10n = AppLocalizations.of(context)!;
     final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final m = dt.minute.toString().padLeft(2, '0');
-    final ampm = dt.hour < 12 ? 'AM' : 'PM';
+    final ampm = dt.hour < 12 ? l10n.timePeriodAm : l10n.timePeriodPm;
     return '$ampm $h:$m';
   }
 }

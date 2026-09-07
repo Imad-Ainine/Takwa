@@ -8,6 +8,7 @@ import '../../../../core/providers/database_providers.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AsmaScreen extends ConsumerStatefulWidget {
   const AsmaScreen({super.key});
@@ -109,6 +110,7 @@ class _AsmaTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final s = style;
     return SafeArea(
       bottom: false,
@@ -125,11 +127,11 @@ class _AsmaTopBar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'أسماء الله الحسنى',
+                        l10n.asmaScreenTitle,
                         style: s.amiri(22, color: s.gold),
                       ),
                       Text(
-                        '٩٩ اسماً مباركاً',
+                        l10n.asmaScreenSubtitle,
                         style: s.naskh(11, color: s.textSec),
                       ),
                     ],
@@ -151,7 +153,7 @@ class _AsmaTopBar extends StatelessWidget {
                 style: s.naskh(13),
                 onChanged: onSearch,
                 decoration: InputDecoration(
-                  hintText: 'ابحث في الأسماء...',
+                  hintText: l10n.asmaSearchHint,
                   hintStyle: s.naskh(12, color: s.textSec),
                   prefixIcon: Icon(
                     Icons.search_rounded,
@@ -191,13 +193,14 @@ class _AsmaList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('🔍', style: TextStyle(fontSize: 36)),
             const SizedBox(height: 10),
-            Text('لا توجد نتائج', style: style.amiri(16)),
+            Text(l10n.asmaNoResultsLabel, style: style.amiri(16)),
           ],
         ),
       );
@@ -247,6 +250,7 @@ class _AsmaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final s = style;
 
     return GestureDetector(
@@ -295,9 +299,9 @@ class _AsmaCard extends StatelessWidget {
                       HapticFeedback.mediumImpact();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
-                            'تم النسخ ✓',
-                            style: TextStyle(
+                          content: Text(
+                            l10n.favoriteAdhkarCopiedToast,
+                            style: const TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 12,
                             ),
@@ -376,7 +380,7 @@ class _AsmaCard extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'الدعاء: ${item.dua}',
+                              '${l10n.asmaDuaLabel}: ${item.dua}',
                               style: s.naskh(
                                 11,
                                 color: s.gold,
@@ -458,6 +462,7 @@ class _AsmaDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final s = style;
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -489,20 +494,20 @@ class _AsmaDetailSheet extends StatelessWidget {
             Text(item.meaning, style: s.naskh(16, color: s.textDim)),
             const SizedBox(height: AppSpacing.xxxl),
             _DetailSection(
-              title: 'الشرح والبيان',
+              title: l10n.asmaDetailExplanationTitle,
               content: item.explanation,
               style: s,
             ),
             const SizedBox(height: AppSpacing.xl),
             _DetailSection(
-              title: 'من القرآن الكريم',
+              title: l10n.asmaDetailQuranTitle,
               content: item.quranRef,
               style: s,
               isVerse: true,
             ),
             const SizedBox(height: AppSpacing.xl),
             _DetailSection(
-              title: 'الدعاء بهذا الاسم',
+              title: l10n.asmaDetailDuaTitle,
               content: item.dua,
               style: s,
               isDua: true,
@@ -510,7 +515,7 @@ class _AsmaDetailSheet extends StatelessWidget {
             const SizedBox(height: AppSpacing.xxxl),
             PrimaryButton(
               onTap: () async => Navigator.pop(context),
-              label: 'إغلاق',
+              label: l10n.adhanOverlayCloseButton,
             ),
           ],
         ),

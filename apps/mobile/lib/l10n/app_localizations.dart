@@ -6169,6 +6169,684 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم النسخ ✓'**
   String get favoriteAdhkarCopiedToast;
+
+  /// No description provided for @qiyamSleepCalcTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة النوم الذكية'**
+  String get qiyamSleepCalcTitle;
+
+  /// No description provided for @qiyamSleepCalcHeaderTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'استيقظ نشيطاً لقيام الليل'**
+  String get qiyamSleepCalcHeaderTitle;
+
+  /// No description provided for @qiyamSleepCalcHeaderSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعتمد الحاسبة على دورات النوم (90 دقيقة) لتحديد أفضل وقت للنوم حتى تستيقظ في قمة نشاطك.'**
+  String get qiyamSleepCalcHeaderSubtitle;
+
+  /// No description provided for @qiyamSleepCalcWakeupQuestion.
+  ///
+  /// In ar, this message translates to:
+  /// **'متى تريد الاستيقاظ؟'**
+  String get qiyamSleepCalcWakeupQuestion;
+
+  /// No description provided for @qiyamSleepCalcBestTimesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أفضل أوقات النوم:'**
+  String get qiyamSleepCalcBestTimesLabel;
+
+  /// No description provided for @qiyamSleepCycle9h.
+  ///
+  /// In ar, this message translates to:
+  /// **'9 ساعات (مثالي)'**
+  String get qiyamSleepCycle9h;
+
+  /// No description provided for @qiyamSleepCycle75h.
+  ///
+  /// In ar, this message translates to:
+  /// **'7.5 ساعات (ممتاز)'**
+  String get qiyamSleepCycle75h;
+
+  /// No description provided for @qiyamSleepCycle6h.
+  ///
+  /// In ar, this message translates to:
+  /// **'6 ساعات (جيد)'**
+  String get qiyamSleepCycle6h;
+
+  /// No description provided for @qiyamSleepCycle45h.
+  ///
+  /// In ar, this message translates to:
+  /// **'4.5 ساعات (كافٍ)'**
+  String get qiyamSleepCycle45h;
+
+  /// No description provided for @qiyamSleepCycle15h.
+  ///
+  /// In ar, this message translates to:
+  /// **'1.5 ساعة (غفوة)'**
+  String get qiyamSleepCycle15h;
+
+  /// No description provided for @qiyamSleepCalcSleepAtLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب أن تنام الساعة'**
+  String get qiyamSleepCalcSleepAtLabel;
+
+  /// No description provided for @bookPdfNoUrlError.
+  ///
+  /// In ar, this message translates to:
+  /// **'عذراً، لم يتم العثور على رابط PDF لهذا الكتاب.'**
+  String get bookPdfNoUrlError;
+
+  /// No description provided for @bookPdfDownloadingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري التحميل...'**
+  String get bookPdfDownloadingLabel;
+
+  /// No description provided for @bookPdfDownloadingPercentLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري التحميل... {pct}%'**
+  String bookPdfDownloadingPercentLabel(int pct);
+
+  /// No description provided for @bookPdfLoadFailedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل الملف'**
+  String get bookPdfLoadFailedTitle;
+
+  /// No description provided for @bookPdfShareAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة'**
+  String get bookPdfShareAction;
+
+  /// No description provided for @bookPdfCopiedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم النسخ'**
+  String get bookPdfCopiedToast;
+
+  /// No description provided for @bookPdfHighlightAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد'**
+  String get bookPdfHighlightAction;
+
+  /// No description provided for @bookPdfHighlightedToast.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديد النص'**
+  String get bookPdfHighlightedToast;
+
+  /// No description provided for @notifPreAdhanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'⏳ اقترب وقت {prayerName}'**
+  String notifPreAdhanTitle(String prayerName);
+
+  /// No description provided for @notifPreAdhanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'15 دقيقة على أذان {prayerName}، استعدَّ للصلاة'**
+  String notifPreAdhanBody(String prayerName);
+
+  /// No description provided for @notifAdhanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت {prayerName}'**
+  String notifAdhanTitle(String prayerName);
+
+  /// No description provided for @notifAdhanBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهُ أكبر، اللهُ أكبر — حيَّ على الصلاة، حيَّ على الفلاح'**
+  String get notifAdhanBody;
+
+  /// No description provided for @notifIqamaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت الإقامة — {prayerName}'**
+  String notifIqamaTitle(String prayerName);
+
+  /// No description provided for @notifIqamaBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت إقامة صلاة {prayerName}، الله أكبر الله أكبر'**
+  String notifIqamaBody(String prayerName);
+
+  /// No description provided for @notifMuhasabaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت محاسبة النفس'**
+  String get notifMuhasabaTitle;
+
+  /// No description provided for @notifMuhasabaMsg1.
+  ///
+  /// In ar, this message translates to:
+  /// **'كيف كان يومك مع الله؟ حاسب نفسك قبل أن تنام 🌙'**
+  String get notifMuhasabaMsg1;
+
+  /// No description provided for @notifMuhasabaMsg2.
+  ///
+  /// In ar, this message translates to:
+  /// **'\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\" — عمر بن الخطاب'**
+  String get notifMuhasabaMsg2;
+
+  /// No description provided for @notifMuhasabaMsg3.
+  ///
+  /// In ar, this message translates to:
+  /// **'ماذا قدَّمتَ اليوم؟ سجِّل عباداتك الآن 📝'**
+  String get notifMuhasabaMsg3;
+
+  /// No description provided for @notifMuhasabaMsg4.
+  ///
+  /// In ar, this message translates to:
+  /// **'الليل ينادي: أيها المؤمن، ماذا عملتَ اليوم؟ 🌟'**
+  String get notifMuhasabaMsg4;
+
+  /// No description provided for @notifMuhasabaMsg5.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنم قبل أن تحاسب نفسك على يومك 💫'**
+  String get notifMuhasabaMsg5;
+
+  /// No description provided for @notifMuhasabaMsg6.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثلاث دقائق لمحاسبة النفس خير من ساعات الندم 🤲'**
+  String get notifMuhasabaMsg6;
+
+  /// No description provided for @notifMuhasabaMsg7.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنجزتَ شيئاً جيداً اليوم؟ دوِّنه واشكر الله 🙏'**
+  String get notifMuhasabaMsg7;
+
+  /// No description provided for @notifDuaMorningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء الصباح'**
+  String get notifDuaMorningTitle;
+
+  /// No description provided for @notifDuaEveningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء المساء'**
+  String get notifDuaEveningTitle;
+
+  /// No description provided for @notifDuaTodayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'دعاء اليوم'**
+  String get notifDuaTodayTitle;
+
+  /// No description provided for @notifFridayKahfTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة الكهف'**
+  String get notifFridayKahfTitle;
+
+  /// No description provided for @notifFridayKahfBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا تنس قراءة سورة الكهف اليوم — نور ما بين الجمعتين'**
+  String get notifFridayKahfBody;
+
+  /// No description provided for @notifFridaySalawatTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة على النبي ﷺ'**
+  String get notifFridaySalawatTitle;
+
+  /// No description provided for @notifFridaySalawatBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم صلِّ وسلِّم على سيدنا محمد — أكثِر من الصلاة يوم الجمعة'**
+  String get notifFridaySalawatBody;
+
+  /// No description provided for @notifFastingMondayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير بصيام الاثنين'**
+  String get notifFastingMondayTitle;
+
+  /// No description provided for @notifFastingMondayBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً الاثنين — تُعرض فيه الأعمال، فليكن عملك وأنت صائم'**
+  String get notifFastingMondayBody;
+
+  /// No description provided for @notifFastingThursdayTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير بصيام الخميس'**
+  String get notifFastingThursdayTitle;
+
+  /// No description provided for @notifFastingThursdayBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً الخميس — تُرفع فيه الأعمال، هنيئاً لمن صام'**
+  String get notifFastingThursdayBody;
+
+  /// No description provided for @notifWhiteDaysTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً من الأيام البيض'**
+  String get notifWhiteDaysTitle;
+
+  /// No description provided for @notifWhiteDaysBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'غداً يوم {day} من {month} الهجري — صيام الأيام البيض سنّة مؤكدة'**
+  String notifWhiteDaysBody(int day, String month);
+
+  /// No description provided for @notifSuhoorTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه السحور'**
+  String get notifSuhoorTitle;
+
+  /// No description provided for @notifSuhoorBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'بقي 30 دقيقة على الإمساك — استيقظ للسحور وبارك الله لك'**
+  String get notifSuhoorBody;
+
+  /// No description provided for @notifIftarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الإفطار'**
+  String get notifIftarTitle;
+
+  /// No description provided for @notifIftarBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللهم لك صمت وعلى رزقك أفطرت — رمضان مبارك'**
+  String get notifIftarBody;
+
+  /// No description provided for @notifWakeUpTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الاستيقاظ'**
+  String get notifWakeUpTitle;
+
+  /// No description provided for @notifWakeUpBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصلاة خير من النوم — استيقظ لصلاة الفجر'**
+  String get notifWakeUpBody;
+
+  /// No description provided for @notifWakeUpSnoozeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت الاستيقاظ (غفوة)'**
+  String get notifWakeUpSnoozeTitle;
+
+  /// No description provided for @notifAchievementNewPrefix.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجاز جديد: {title}'**
+  String notifAchievementNewPrefix(String title);
+
+  /// No description provided for @notifAchievementPointsSuffix.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة تقوى 🌟'**
+  String notifAchievementPointsSuffix(int points);
+
+  /// No description provided for @notifAchievementPointsShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة تقوى'**
+  String notifAchievementPointsShort(int points);
+
+  /// No description provided for @notifAdhkarMorningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار الصباح'**
+  String get notifAdhkarMorningTitle;
+
+  /// No description provided for @notifAdhkarEveningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار المساء'**
+  String get notifAdhkarEveningTitle;
+
+  /// No description provided for @notifAdhkarSleepTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت أذكار النوم'**
+  String get notifAdhkarSleepTitle;
+
+  /// No description provided for @notifAdhkarMorningChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get notifAdhkarMorningChannelName;
+
+  /// No description provided for @notifAdhkarEveningChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار المساء'**
+  String get notifAdhkarEveningChannelName;
+
+  /// No description provided for @notifAdhkarSleepChannelName.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار النوم'**
+  String get notifAdhkarSleepChannelName;
+
+  /// No description provided for @notifAdhkarChannelDesc.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار وأدعية من حصن المسلم'**
+  String get notifAdhkarChannelDesc;
+
+  /// No description provided for @notifAdhkarActionRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'قرأت الأذكار ✓'**
+  String get notifAdhkarActionRead;
+
+  /// No description provided for @notifAdhkarActionOpen.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح الأذكار'**
+  String get notifAdhkarActionOpen;
+
+  /// No description provided for @silentModeSettingsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الوضع الصامت'**
+  String get silentModeSettingsTitle;
+
+  /// No description provided for @silentModeEnableLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل وضع الصامت'**
+  String get silentModeEnableLabel;
+
+  /// No description provided for @silentModeEnableSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ننصح بتفعيل هذه الخاصية إذا كان الأذان لا يشتغل بشكل منتظم في هاتفكم'**
+  String get silentModeEnableSublabel;
+
+  /// No description provided for @silentModeVibrationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إهتزاز'**
+  String get silentModeVibrationLabel;
+
+  /// No description provided for @silentModeVibrationSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل الإهتزاز أثناء الوضع الصامت'**
+  String get silentModeVibrationSublabel;
+
+  /// No description provided for @silentModeAlertStyleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنبيه عند التحويل'**
+  String get silentModeAlertStyleLabel;
+
+  /// No description provided for @silentModeAlertNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون تنبيه'**
+  String get silentModeAlertNone;
+
+  /// No description provided for @silentModeAlertVibrateOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'اهتزاز فقط'**
+  String get silentModeAlertVibrateOnly;
+
+  /// No description provided for @silentModeAlertToneOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'نغمة بدون اهتزاز'**
+  String get silentModeAlertToneOnly;
+
+  /// No description provided for @silentModeAlertToneVibrate.
+  ///
+  /// In ar, this message translates to:
+  /// **'نغمة مع اهتزاز'**
+  String get silentModeAlertToneVibrate;
+
+  /// No description provided for @booksChapterAboutTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عن الكتاب'**
+  String get booksChapterAboutTitle;
+
+  /// No description provided for @booksChapterTocTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الفصول المحتواة'**
+  String get booksChapterTocTitle;
+
+  /// No description provided for @booksChapterPagesCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{صفحة واحدة} two{صفحتان} few{{count} صفحات} many{{count} صفحة} other{{count} صفحة}}'**
+  String booksChapterPagesCount(int count);
+
+  /// No description provided for @booksChapterChaptersCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{فصل واحد} two{فصلان} few{{count} فصول} many{{count} فصلاً} other{{count} فصل}}'**
+  String booksChapterChaptersCount(int count);
+
+  /// No description provided for @booksChapterMinutesAbbrev.
+  ///
+  /// In ar, this message translates to:
+  /// **'~{minutes} د'**
+  String booksChapterMinutesAbbrev(int minutes);
+
+  /// No description provided for @booksChapterReadPdfButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'قراءة نسخة PDF'**
+  String get booksChapterReadPdfButton;
+
+  /// No description provided for @booksChapterStartReadingButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ القراءة'**
+  String get booksChapterStartReadingButton;
+
+  /// No description provided for @booksChapterContinueReadingButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة القراءة'**
+  String get booksChapterContinueReadingButton;
+
+  /// No description provided for @booksChapterReadingProgressLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقدم القراءة'**
+  String get booksChapterReadingProgressLabel;
+
+  /// No description provided for @asmaScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أسماء الله الحسنى'**
+  String get asmaScreenTitle;
+
+  /// No description provided for @asmaScreenSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'٩٩ اسماً مباركاً'**
+  String get asmaScreenSubtitle;
+
+  /// No description provided for @asmaSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في الأسماء...'**
+  String get asmaSearchHint;
+
+  /// No description provided for @asmaNoResultsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد نتائج'**
+  String get asmaNoResultsLabel;
+
+  /// No description provided for @asmaDuaLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء'**
+  String get asmaDuaLabel;
+
+  /// No description provided for @asmaDetailExplanationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشرح والبيان'**
+  String get asmaDetailExplanationTitle;
+
+  /// No description provided for @asmaDetailQuranTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'من القرآن الكريم'**
+  String get asmaDetailQuranTitle;
+
+  /// No description provided for @asmaDetailDuaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء بهذا الاسم'**
+  String get asmaDetailDuaTitle;
+
+  /// No description provided for @achievementsScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازاتي'**
+  String get achievementsScreenTitle;
+
+  /// No description provided for @achievementsProgressLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'التقدم المحرز'**
+  String get achievementsProgressLabel;
+
+  /// No description provided for @achievementsCategoryDaily.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازات يومية'**
+  String get achievementsCategoryDaily;
+
+  /// No description provided for @achievementsCategoryMilestone.
+  ///
+  /// In ar, this message translates to:
+  /// **'محطات رئيسية'**
+  String get achievementsCategoryMilestone;
+
+  /// No description provided for @achievementsCategoryIbadah.
+  ///
+  /// In ar, this message translates to:
+  /// **'العبادات والذكر'**
+  String get achievementsCategoryIbadah;
+
+  /// No description provided for @achievementsCategorySpecial.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنجازات خاصة'**
+  String get achievementsCategorySpecial;
+
+  /// No description provided for @achievementsAchievedOnLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم التحقيق في {date}'**
+  String achievementsAchievedOnLabel(String date);
+
+  /// No description provided for @achievementsEncourageMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمر لمضاعفة جهودك وتحقيق هذا الإنجاز! ✨'**
+  String get achievementsEncourageMessage;
+
+  /// No description provided for @achievementsGotItButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهمت'**
+  String get achievementsGotItButton;
+
+  /// No description provided for @prayerJumuah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجمعة'**
+  String get prayerJumuah;
+
+  /// No description provided for @prayerSelectionSunriseAlertsLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيهات الشروق'**
+  String get prayerSelectionSunriseAlertsLabel;
+
+  /// No description provided for @prayerSelectionAdhanLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذان {name}'**
+  String prayerSelectionAdhanLabel(String name);
+
+  /// No description provided for @termsPrivacyScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشروط والخصوصية'**
+  String get termsPrivacyScreenTitle;
+
+  /// No description provided for @termsPrivacyAppName.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطبيق تقوى'**
+  String get termsPrivacyAppName;
+
+  /// No description provided for @termsPrivacySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشروط وسياسة الخصوصية'**
+  String get termsPrivacySubtitle;
+
+  /// No description provided for @termsPrivacyTermsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الاستخدام'**
+  String get termsPrivacyTermsSectionTitle;
+
+  /// No description provided for @termsPrivacyPolicySectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية'**
+  String get termsPrivacyPolicySectionTitle;
+
+  /// No description provided for @termsPrivacyTermsBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أهلاً بك في تطبيق \"تقوى\". باستخدامك لهذا التطبيق، فإنك توافق على شروط وأحكام الاستخدام الموضحة. نهدف من خلال هذا التطبيق لتقديم خدمات إسلامية من أذكار، مواقيت الصلاة، والقيم الإسلامية بما ينفع أمتنا الإسلامية. يرجى استخدام التطبيق وفق الغرض المخصص له، وعدم إساءة استخدام الخدمات أو المحتوى.'**
+  String get termsPrivacyTermsBody;
+
+  /// No description provided for @termsPrivacyPolicyBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نحن نحترم خصوصيتك ونهتم بحماية بياناتك الشخصية. التطبيق قد يحتاج إلى الوصول لموقعك الجغرافي فقط لتحديد أوقات الصلاة بدقة. لا نقوم بمشاركة أو بيع بياناتك الشخصية لأي جهة خارجية. بياناتك تُستخدم محلياً داخل جهازك لتوفير تجربة مستخدم أفضل.'**
+  String get termsPrivacyPolicyBody;
+
+  /// No description provided for @termsPrivacyFooterThanks.
+  ///
+  /// In ar, this message translates to:
+  /// **'شكراً لثقتكم بتطبيق تقوى'**
+  String get termsPrivacyFooterThanks;
+
+  /// No description provided for @termsPrivacyFooterDua.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسأل الله أن ينفعنا وإياكم بما فيه الخير'**
+  String get termsPrivacyFooterDua;
 }
 
 class _AppLocalizationsDelegate

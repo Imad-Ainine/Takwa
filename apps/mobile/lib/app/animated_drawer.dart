@@ -234,24 +234,25 @@ class _DrawerHeader extends ConsumerWidget {
     required this.streakAsync,
   });
 
-  static String _hijriMonth(int m) => const [
-    'محرم',
-    'صفر',
-    'ربيع الأول',
-    'ربيع الآخر',
-    'جمادى الأولى',
-    'جمادى الآخرة',
-    'رجب',
-    'شعبان',
-    'رمضان',
-    'شوال',
-    'ذو القعدة',
-    'ذو الحجة',
+  static String _hijriMonth(AppLocalizations l10n, int m) => [
+    l10n.hijriMuharram,
+    l10n.hijriSafar,
+    l10n.hijriRabiAlAwwal,
+    l10n.hijriRabiAlThani,
+    l10n.hijriJumadaAlAwwal,
+    l10n.hijriJumadaAlThani,
+    l10n.hijriRajab,
+    l10n.hijriShaban,
+    l10n.hijriRamadan,
+    l10n.hijriShawwal,
+    l10n.hijriDhulQadah,
+    l10n.hijriDhulHijjah,
   ][m - 1];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isRamadan = hijri.hMonth == 9;
+    final l10n = AppLocalizations.of(context)!;
     final profileAsync = ref.watch(userProfileProvider);
 
     return Padding(
@@ -397,7 +398,7 @@ class _DrawerHeader extends ConsumerWidget {
                 const Text('📅', style: TextStyle(fontSize: 14)),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  '${hijri.hDay} ${_hijriMonth(hijri.hMonth)} ${hijri.hYear}',
+                  '${hijri.hDay} ${_hijriMonth(l10n, hijri.hMonth)} ${hijri.hYear}',
                   style: context.typography.headingMedium.copyWith(
                     fontSize: 14,
                     color: context.colors.goldLight,

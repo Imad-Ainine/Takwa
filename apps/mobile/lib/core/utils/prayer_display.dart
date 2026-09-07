@@ -18,6 +18,7 @@ String prayerLocalizedName(AppLocalizations l10n, String key) => switch (key) {
   'fajr' => l10n.prayerFajr,
   'sunrise' => l10n.prayerSunrise,
   'dhuhr' => l10n.prayerDhuhr,
+  'jumuah' => l10n.prayerJumuah,
   'asr' => l10n.prayerAsr,
   'maghrib' => l10n.prayerMaghrib,
   'isha' => l10n.prayerIsha,
