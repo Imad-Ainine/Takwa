@@ -3863,4 +3863,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get misbahaChooseDhikrTitle => 'Choose a Dhikr';
+
+  @override
+  String qiyamCalcLoadError(String error) {
+    return 'Error loading prayer times: $error';
+  }
+
+  @override
+  String get qiyamCalcScreenTitle => 'Night Calculator';
+
+  @override
+  String get qiyamCalcMidnightTitle => 'Islamic Midnight';
+
+  @override
+  String get qiyamCalcMidnightSubtitle => 'The optional Isha window ends here';
+
+  @override
+  String get qiyamCalcLastThirdTitle => 'Start of the Last Third';
+
+  @override
+  String get qiyamCalcLastThirdSubtitle =>
+      'The best time for Qiyam and Witr prayer';
 }

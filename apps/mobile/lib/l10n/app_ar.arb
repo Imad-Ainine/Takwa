@@ -2122,5 +2122,18 @@
   "misbahaTapOrHoldHint": "انقر أو اضغط مطولاً",
   "misbahaResetButton": "إعادة",
   "misbahaSoundButton": "الصوت",
-  "misbahaChooseDhikrTitle": "اختر ذكراً"
+  "misbahaChooseDhikrTitle": "اختر ذكراً",
+  "qiyamCalcLoadError": "خطأ في تحميل الأوقات: {error}",
+  "@qiyamCalcLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "qiyamCalcScreenTitle": "حاسبة الليل",
+  "qiyamCalcMidnightTitle": "منتصف الليل الشرعي",
+  "qiyamCalcMidnightSubtitle": "ينتهي فيه وقت العشاء الاختياري",
+  "qiyamCalcLastThirdTitle": "بداية الثلث الأخير",
+  "qiyamCalcLastThirdSubtitle": "أفضل وقت لصلاة القيام والوتر"
 }

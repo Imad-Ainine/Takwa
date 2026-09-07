@@ -7015,6 +7015,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اختر ذكراً'**
   String get misbahaChooseDhikrTitle;
+
+  /// No description provided for @qiyamCalcLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ في تحميل الأوقات: {error}'**
+  String qiyamCalcLoadError(String error);
+
+  /// No description provided for @qiyamCalcScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة الليل'**
+  String get qiyamCalcScreenTitle;
+
+  /// No description provided for @qiyamCalcMidnightTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتصف الليل الشرعي'**
+  String get qiyamCalcMidnightTitle;
+
+  /// No description provided for @qiyamCalcMidnightSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ينتهي فيه وقت العشاء الاختياري'**
+  String get qiyamCalcMidnightSubtitle;
+
+  /// No description provided for @qiyamCalcLastThirdTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بداية الثلث الأخير'**
+  String get qiyamCalcLastThirdTitle;
+
+  /// No description provided for @qiyamCalcLastThirdSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أفضل وقت لصلاة القيام والوتر'**
+  String get qiyamCalcLastThirdSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -1619,5 +1619,18 @@
   "misbahaTapOrHoldHint": "Tap or press and hold",
   "misbahaResetButton": "Reset",
   "misbahaSoundButton": "Sound",
-  "misbahaChooseDhikrTitle": "Choose a Dhikr"
+  "misbahaChooseDhikrTitle": "Choose a Dhikr",
+  "qiyamCalcLoadError": "Error loading prayer times: {error}",
+  "@qiyamCalcLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "qiyamCalcScreenTitle": "Night Calculator",
+  "qiyamCalcMidnightTitle": "Islamic Midnight",
+  "qiyamCalcMidnightSubtitle": "The optional Isha window ends here",
+  "qiyamCalcLastThirdTitle": "Start of the Last Third",
+  "qiyamCalcLastThirdSubtitle": "The best time for Qiyam and Witr prayer"
 }

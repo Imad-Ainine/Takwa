@@ -3830,4 +3830,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get misbahaChooseDhikrTitle => 'اختر ذكراً';
+
+  @override
+  String qiyamCalcLoadError(String error) {
+    return 'خطأ في تحميل الأوقات: $error';
+  }
+
+  @override
+  String get qiyamCalcScreenTitle => 'حاسبة الليل';
+
+  @override
+  String get qiyamCalcMidnightTitle => 'منتصف الليل الشرعي';
+
+  @override
+  String get qiyamCalcMidnightSubtitle => 'ينتهي فيه وقت العشاء الاختياري';
+
+  @override
+  String get qiyamCalcLastThirdTitle => 'بداية الثلث الأخير';
+
+  @override
+  String get qiyamCalcLastThirdSubtitle => 'أفضل وقت لصلاة القيام والوتر';
 }
