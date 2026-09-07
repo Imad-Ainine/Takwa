@@ -1660,5 +1660,68 @@
   "subscriptionFreeAccessNote": "Anyone who can't afford the subscription is welcome to use the app for free.",
   "subscriptionHonorSystemNote": "Unless stated otherwise, we don't verify that a user has paid the subscription fee — this is intentionally left to the user's discretion.",
   "subscriptionPayMonthlyButton": "I can pay monthly",
-  "subscriptionUseFreeButton": "I want to use the app for free"
+  "subscriptionUseFreeButton": "I want to use the app for free",
+  "aiMemorizeScreenTitle": "Smart Memorization",
+  "aiMemorizeTabPages": "Pages",
+  "aiMemorizeTabSurahs": "Surahs",
+  "aiMemorizePageSearchHint": "Enter a page number (1-604)",
+  "aiMemorizeSurahSearchHint": "Search surahs",
+  "khatmaRingOfPagesLabel": "of {total} pages",
+  "@khatmaRingOfPagesLabel": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzLabel": "Juz {name}",
+  "@quranJuzLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzPercentComplete": "{percent}% complete",
+  "@quranJuzPercentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "favoriteDuasScreenTitle": "My Favorite Duas",
+  "favoriteDuasCountLabel": "{count, plural, one{1 saved dua} other{{count} saved duas}}",
+  "@favoriteDuasCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteDuasEmptyTitle": "No favorite duas yet",
+  "favoriteDuasEmptySubtitle": "Tap ❤️ on any dua to save it here",
+  "quranReaderMushafModeTitle": "Mushaf",
+  "quranReaderMushafModeTooltip": "Mushaf Mode",
+  "customIbadahGroupTitle": "My Habits & Additions",
+  "customIbadahAddButton": "Add and customize your habits",
+  "customIbadahPositiveHeader": "Positive Habits",
+  "customIbadahNegativeHeader": "Negative Habits (custom prohibitions)",
+  "authChoiceAppName": "Takwa",
+  "authChoiceTagline": "Your companion toward a life full of faith",
+  "authChoiceSignInButton": "Sign In",
+  "authChoiceGuestButton": "Continue as Guest",
+  "authChoiceSyncNote": "Signing in ensures your data is saved across all your devices",
+  "authPasswordStrengthWeak": "Weak",
+  "authPasswordStrengthMedium": "Medium",
+  "authPasswordStrengthGood": "Good",
+  "authPasswordStrengthStrong": "Strong ✓",
+  "authPasswordStrengthLabel": "Password strength: {strength}",
+  "@authPasswordStrengthLabel": {
+    "placeholders": {
+      "strength": {
+        "type": "String"
+      }
+    }
+  }
 }

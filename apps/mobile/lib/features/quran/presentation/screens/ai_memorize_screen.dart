@@ -6,6 +6,7 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import '../../utils/quran_helpers.dart';
 import '../../data/quran_data.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 import 'quran_reader_screen.dart';
 
 class AiMemorizeScreen extends ConsumerStatefulWidget {
@@ -65,6 +66,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
   }
 
   Widget _buildHeader(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
@@ -72,7 +74,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
           const CustomLeadingButton(),
           const Spacer(),
           Text(
-            'التحفيظ الذكي',
+            l10n.aiMemorizeScreenTitle,
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
           const Spacer(),
@@ -83,6 +85,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
   }
 
   Widget _buildTabBar(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
@@ -97,16 +100,16 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
         labelColor: style.gold,
         unselectedLabelColor: style.textSec.withOpacity(0.5),
         dividerColor: Colors.transparent,
-        tabs: const [
+        tabs: [
           Tab(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.format_list_bulleted_rounded, size: 18),
-                SizedBox(width: 6),
+                const Icon(Icons.format_list_bulleted_rounded, size: 18),
+                const SizedBox(width: 6),
                 Text(
-                  'الصفحات',
-                  style: TextStyle(fontFamily: 'Amiri', fontSize: 16),
+                  l10n.aiMemorizeTabPages,
+                  style: const TextStyle(fontFamily: 'Amiri', fontSize: 16),
                 ),
               ],
             ),
@@ -115,11 +118,11 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.menu_book_rounded, size: 18),
-                SizedBox(width: 6),
+                const Icon(Icons.menu_book_rounded, size: 18),
+                const SizedBox(width: 6),
                 Text(
-                  'السور',
-                  style: TextStyle(fontFamily: 'Amiri', fontSize: 16),
+                  l10n.aiMemorizeTabSurahs,
+                  style: const TextStyle(fontFamily: 'Amiri', fontSize: 16),
                 ),
               ],
             ),
@@ -130,6 +133,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
   }
 
   Widget _buildSearch(AdaptiveStyle style) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       decoration: BoxDecoration(
@@ -147,8 +151,8 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
         style: TextStyle(color: style.text),
         decoration: InputDecoration(
           hintText: _tab.index == 0
-              ? 'أدخل رقم الصفحة (1-604)'
-              : 'ابحث في السور',
+              ? l10n.aiMemorizePageSearchHint
+              : l10n.aiMemorizeSurahSearchHint,
           hintStyle: style.naskh(13, color: style.textSec.withOpacity(0.5)),
           suffixIcon: Icon(
             Icons.search,
@@ -261,7 +265,7 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                   ),
                   child: Center(
                     child: Text(
-                      ar(s.number),
+                      localizedNumeral(context, s.number),
                       style: style.amiri(12, color: c, weight: FontWeight.bold),
                     ),
                   ),
@@ -280,7 +284,9 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
                         ),
                       ),
                       Text(
-                        '${ar(s.ayahsNumber)} آية',
+                        AppLocalizations.of(
+                          context,
+                        )!.quranReaderAyahCountBadge(s.ayahsNumber),
                         style: style.naskh(
                           12,
                           color: style.textSec.withOpacity(0.6),
@@ -336,7 +342,7 @@ class _PageItem extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            ar(page),
+            localizedNumeral(context, page),
             style: style.amiri(22, color: style.text, weight: FontWeight.w500),
           ),
         ),

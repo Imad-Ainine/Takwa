@@ -3978,4 +3978,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscriptionUseFreeButton => 'I want to use the app for free';
+
+  @override
+  String get aiMemorizeScreenTitle => 'Smart Memorization';
+
+  @override
+  String get aiMemorizeTabPages => 'Pages';
+
+  @override
+  String get aiMemorizeTabSurahs => 'Surahs';
+
+  @override
+  String get aiMemorizePageSearchHint => 'Enter a page number (1-604)';
+
+  @override
+  String get aiMemorizeSurahSearchHint => 'Search surahs';
+
+  @override
+  String khatmaRingOfPagesLabel(String total) {
+    return 'of $total pages';
+  }
+
+  @override
+  String quranJuzLabel(String name) {
+    return 'Juz $name';
+  }
+
+  @override
+  String quranJuzPercentComplete(String percent) {
+    return '$percent% complete';
+  }
+
+  @override
+  String get favoriteDuasScreenTitle => 'My Favorite Duas';
+
+  @override
+  String favoriteDuasCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count saved duas',
+      one: '1 saved dua',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteDuasEmptyTitle => 'No favorite duas yet';
+
+  @override
+  String get favoriteDuasEmptySubtitle => 'Tap ❤️ on any dua to save it here';
+
+  @override
+  String get quranReaderMushafModeTitle => 'Mushaf';
+
+  @override
+  String get quranReaderMushafModeTooltip => 'Mushaf Mode';
+
+  @override
+  String get customIbadahGroupTitle => 'My Habits & Additions';
+
+  @override
+  String get customIbadahAddButton => 'Add and customize your habits';
+
+  @override
+  String get customIbadahPositiveHeader => 'Positive Habits';
+
+  @override
+  String get customIbadahNegativeHeader =>
+      'Negative Habits (custom prohibitions)';
+
+  @override
+  String get authChoiceAppName => 'Takwa';
+
+  @override
+  String get authChoiceTagline => 'Your companion toward a life full of faith';
+
+  @override
+  String get authChoiceSignInButton => 'Sign In';
+
+  @override
+  String get authChoiceGuestButton => 'Continue as Guest';
+
+  @override
+  String get authChoiceSyncNote =>
+      'Signing in ensures your data is saved across all your devices';
+
+  @override
+  String get authPasswordStrengthWeak => 'Weak';
+
+  @override
+  String get authPasswordStrengthMedium => 'Medium';
+
+  @override
+  String get authPasswordStrengthGood => 'Good';
+
+  @override
+  String get authPasswordStrengthStrong => 'Strong ✓';
+
+  @override
+  String authPasswordStrengthLabel(String strength) {
+    return 'Password strength: $strength';
+  }
 }

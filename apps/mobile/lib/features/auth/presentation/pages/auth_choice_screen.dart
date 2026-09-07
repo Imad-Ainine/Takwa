@@ -7,12 +7,14 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AuthChoiceScreen extends ConsumerWidget {
   const AuthChoiceScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
 
@@ -58,7 +60,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                       colors: [style.gold, style.gold],
                     ).createShader(bounds),
                     child: Text(
-                      'تقوى',
+                      l10n.authChoiceAppName,
                       style: style
                           .amiri(48, weight: FontWeight.w800)
                           .copyWith(color: Colors.white),
@@ -66,7 +68,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'رفيقك نحو حياة مليئة بالإيمان',
+                    l10n.authChoiceTagline,
                     textAlign: TextAlign.center,
                     style: context.typography.bodyLarge.copyWith(
                       color: context.colors.textSecondary,
@@ -79,14 +81,14 @@ class AuthChoiceScreen extends ConsumerWidget {
                   Column(
                     children: [
                       PrimaryButton(
-                        label: 'تسجيل الدخول',
+                        label: l10n.authChoiceSignInButton,
                         icon: Icons.login_rounded,
                         onTap: () async =>
                             Navigator.pushNamed(context, Routes.auth),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       PrimaryButton(
-                        label: 'المتابعة كضيف',
+                        label: l10n.authChoiceGuestButton,
                         icon: Icons.person_outline_rounded,
                         isOutline: true,
                         onTap: () async {
@@ -101,7 +103,7 @@ class AuthChoiceScreen extends ConsumerWidget {
                   const SizedBox(height: 40),
 
                   Text(
-                    'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك',
+                    l10n.authChoiceSyncNote,
                     textAlign: TextAlign.center,
                     style: context.typography.caption.copyWith(
                       color: context.colors.textDim,

@@ -3938,4 +3938,107 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subscriptionUseFreeButton => 'أريد استخدام التطبيق مجاناً';
+
+  @override
+  String get aiMemorizeScreenTitle => 'التحفيظ الذكي';
+
+  @override
+  String get aiMemorizeTabPages => 'الصفحات';
+
+  @override
+  String get aiMemorizeTabSurahs => 'السور';
+
+  @override
+  String get aiMemorizePageSearchHint => 'أدخل رقم الصفحة (1-604)';
+
+  @override
+  String get aiMemorizeSurahSearchHint => 'ابحث في السور';
+
+  @override
+  String khatmaRingOfPagesLabel(String total) {
+    return 'من $total صفحة';
+  }
+
+  @override
+  String quranJuzLabel(String name) {
+    return 'الجزء $name';
+  }
+
+  @override
+  String quranJuzPercentComplete(String percent) {
+    return '$percent% مكتمل';
+  }
+
+  @override
+  String get favoriteDuasScreenTitle => 'أدعيتي المفضلة';
+
+  @override
+  String favoriteDuasCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count دعاء محفوظ',
+      many: '$count دعاءً محفوظاً',
+      few: '$count أدعية محفوظة',
+      two: 'دعاءان محفوظان',
+      one: 'دعاء واحد محفوظ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favoriteDuasEmptyTitle => 'لا توجد أدعية مفضلة بعد';
+
+  @override
+  String get favoriteDuasEmptySubtitle => 'اضغط على ❤️ داخل أي دعاء لحفظه هنا';
+
+  @override
+  String get quranReaderMushafModeTitle => 'المصحف';
+
+  @override
+  String get quranReaderMushafModeTooltip => 'وضع المصحف';
+
+  @override
+  String get customIbadahGroupTitle => 'عاداتي وإضافاتي';
+
+  @override
+  String get customIbadahAddButton => 'إضافة وتخصيص عاداتك';
+
+  @override
+  String get customIbadahPositiveHeader => 'العادات الإيجابية';
+
+  @override
+  String get customIbadahNegativeHeader => 'العادات السلبية (محظورات مخصصة)';
+
+  @override
+  String get authChoiceAppName => 'تقوى';
+
+  @override
+  String get authChoiceTagline => 'رفيقك نحو حياة مليئة بالإيمان';
+
+  @override
+  String get authChoiceSignInButton => 'تسجيل الدخول';
+
+  @override
+  String get authChoiceGuestButton => 'المتابعة كضيف';
+
+  @override
+  String get authChoiceSyncNote => 'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك';
+
+  @override
+  String get authPasswordStrengthWeak => 'ضعيفة';
+
+  @override
+  String get authPasswordStrengthMedium => 'متوسطة';
+
+  @override
+  String get authPasswordStrengthGood => 'جيدة';
+
+  @override
+  String get authPasswordStrengthStrong => 'قوية ✓';
+
+  @override
+  String authPasswordStrengthLabel(String strength) {
+    return 'قوة كلمة المرور: $strength';
+  }
 }

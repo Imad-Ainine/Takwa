@@ -6,6 +6,7 @@ import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/routes/app_routes.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 final activePositiveIbadahProvider = StreamProvider(
   (ref) => ref.watch(customIbadahDaoProvider).watchActiveIbadat(true),
@@ -31,6 +32,7 @@ class CustomIbadahGroup extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (record == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context)!;
 
     final positiveAsync = ref.watch(activePositiveIbadahProvider);
     final negativeAsync = ref.watch(activeNegativeIbadahProvider);
@@ -44,15 +46,15 @@ class CustomIbadahGroup extends ConsumerWidget {
       return _buildCard(
         context,
         icon: '✨',
-        title: 'عاداتي وإضافاتي',
+        title: l10n.customIbadahGroupTitle,
         children: [
           Center(
             child: TextButton.icon(
               onPressed: () => _manageCustomIbadah(context),
               icon: const Icon(Icons.add_circle_outline, size: 20),
-              label: const Text(
-                'إضافة وتخصيص عاداتك',
-                style: TextStyle(
+              label: Text(
+                l10n.customIbadahAddButton,
+                style: const TextStyle(
                   fontFamily: 'Tajawal',
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
@@ -67,7 +69,7 @@ class CustomIbadahGroup extends ConsumerWidget {
     return _buildCard(
       context,
       icon: '✨',
-      title: 'عاداتي وإضافاتي',
+      title: l10n.customIbadahGroupTitle,
       trailingWidget: InkWell(
         onTap: () => _manageCustomIbadah(context),
         borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -81,7 +83,7 @@ class CustomIbadahGroup extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 4),
             child: Text(
-              'العادات الإيجابية',
+              l10n.customIbadahPositiveHeader,
               style: context.typography.caption.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -104,7 +106,7 @@ class CustomIbadahGroup extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0, right: 4),
             child: Text(
-              'العادات السلبية (محظورات مخصصة)',
+              l10n.customIbadahNegativeHeader,
               style: context.typography.caption.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,

@@ -7219,6 +7219,174 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'أريد استخدام التطبيق مجاناً'**
   String get subscriptionUseFreeButton;
+
+  /// No description provided for @aiMemorizeScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التحفيظ الذكي'**
+  String get aiMemorizeScreenTitle;
+
+  /// No description provided for @aiMemorizeTabPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات'**
+  String get aiMemorizeTabPages;
+
+  /// No description provided for @aiMemorizeTabSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'السور'**
+  String get aiMemorizeTabSurahs;
+
+  /// No description provided for @aiMemorizePageSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقم الصفحة (1-604)'**
+  String get aiMemorizePageSearchHint;
+
+  /// No description provided for @aiMemorizeSurahSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في السور'**
+  String get aiMemorizeSurahSearchHint;
+
+  /// No description provided for @khatmaRingOfPagesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'من {total} صفحة'**
+  String khatmaRingOfPagesLabel(String total);
+
+  /// No description provided for @quranJuzLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزء {name}'**
+  String quranJuzLabel(String name);
+
+  /// No description provided for @quranJuzPercentComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'{percent}% مكتمل'**
+  String quranJuzPercentComplete(String percent);
+
+  /// No description provided for @favoriteDuasScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدعيتي المفضلة'**
+  String get favoriteDuasScreenTitle;
+
+  /// No description provided for @favoriteDuasCountLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{دعاء واحد محفوظ} two{دعاءان محفوظان} few{{count} أدعية محفوظة} many{{count} دعاءً محفوظاً} other{{count} دعاء محفوظ}}'**
+  String favoriteDuasCountLabel(int count);
+
+  /// No description provided for @favoriteDuasEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أدعية مفضلة بعد'**
+  String get favoriteDuasEmptyTitle;
+
+  /// No description provided for @favoriteDuasEmptySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على ❤️ داخل أي دعاء لحفظه هنا'**
+  String get favoriteDuasEmptySubtitle;
+
+  /// No description provided for @quranReaderMushafModeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المصحف'**
+  String get quranReaderMushafModeTitle;
+
+  /// No description provided for @quranReaderMushafModeTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع المصحف'**
+  String get quranReaderMushafModeTooltip;
+
+  /// No description provided for @customIbadahGroupTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'عاداتي وإضافاتي'**
+  String get customIbadahGroupTitle;
+
+  /// No description provided for @customIbadahAddButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة وتخصيص عاداتك'**
+  String get customIbadahAddButton;
+
+  /// No description provided for @customIbadahPositiveHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادات الإيجابية'**
+  String get customIbadahPositiveHeader;
+
+  /// No description provided for @customIbadahNegativeHeader.
+  ///
+  /// In ar, this message translates to:
+  /// **'العادات السلبية (محظورات مخصصة)'**
+  String get customIbadahNegativeHeader;
+
+  /// No description provided for @authChoiceAppName.
+  ///
+  /// In ar, this message translates to:
+  /// **'تقوى'**
+  String get authChoiceAppName;
+
+  /// No description provided for @authChoiceTagline.
+  ///
+  /// In ar, this message translates to:
+  /// **'رفيقك نحو حياة مليئة بالإيمان'**
+  String get authChoiceTagline;
+
+  /// No description provided for @authChoiceSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول'**
+  String get authChoiceSignInButton;
+
+  /// No description provided for @authChoiceGuestButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتابعة كضيف'**
+  String get authChoiceGuestButton;
+
+  /// No description provided for @authChoiceSyncNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك'**
+  String get authChoiceSyncNote;
+
+  /// No description provided for @authPasswordStrengthWeak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيفة'**
+  String get authPasswordStrengthWeak;
+
+  /// No description provided for @authPasswordStrengthMedium.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسطة'**
+  String get authPasswordStrengthMedium;
+
+  /// No description provided for @authPasswordStrengthGood.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيدة'**
+  String get authPasswordStrengthGood;
+
+  /// No description provided for @authPasswordStrengthStrong.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوية ✓'**
+  String get authPasswordStrengthStrong;
+
+  /// No description provided for @authPasswordStrengthLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوة كلمة المرور: {strength}'**
+  String authPasswordStrengthLabel(String strength);
 }
 
 class _AppLocalizationsDelegate

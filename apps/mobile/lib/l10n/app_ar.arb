@@ -2163,5 +2163,68 @@
   "subscriptionFreeAccessNote": "كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.",
   "subscriptionHonorSystemNote": "ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.",
   "subscriptionPayMonthlyButton": "بإمكاني الدفع شهرياً",
-  "subscriptionUseFreeButton": "أريد استخدام التطبيق مجاناً"
+  "subscriptionUseFreeButton": "أريد استخدام التطبيق مجاناً",
+  "aiMemorizeScreenTitle": "التحفيظ الذكي",
+  "aiMemorizeTabPages": "الصفحات",
+  "aiMemorizeTabSurahs": "السور",
+  "aiMemorizePageSearchHint": "أدخل رقم الصفحة (1-604)",
+  "aiMemorizeSurahSearchHint": "ابحث في السور",
+  "khatmaRingOfPagesLabel": "من {total} صفحة",
+  "@khatmaRingOfPagesLabel": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzLabel": "الجزء {name}",
+  "@quranJuzLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quranJuzPercentComplete": "{percent}% مكتمل",
+  "@quranJuzPercentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "favoriteDuasScreenTitle": "أدعيتي المفضلة",
+  "favoriteDuasCountLabel": "{count, plural, one{دعاء واحد محفوظ} two{دعاءان محفوظان} few{{count} أدعية محفوظة} many{{count} دعاءً محفوظاً} other{{count} دعاء محفوظ}}",
+  "@favoriteDuasCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favoriteDuasEmptyTitle": "لا توجد أدعية مفضلة بعد",
+  "favoriteDuasEmptySubtitle": "اضغط على ❤️ داخل أي دعاء لحفظه هنا",
+  "quranReaderMushafModeTitle": "المصحف",
+  "quranReaderMushafModeTooltip": "وضع المصحف",
+  "customIbadahGroupTitle": "عاداتي وإضافاتي",
+  "customIbadahAddButton": "إضافة وتخصيص عاداتك",
+  "customIbadahPositiveHeader": "العادات الإيجابية",
+  "customIbadahNegativeHeader": "العادات السلبية (محظورات مخصصة)",
+  "authChoiceAppName": "تقوى",
+  "authChoiceTagline": "رفيقك نحو حياة مليئة بالإيمان",
+  "authChoiceSignInButton": "تسجيل الدخول",
+  "authChoiceGuestButton": "المتابعة كضيف",
+  "authChoiceSyncNote": "تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك",
+  "authPasswordStrengthWeak": "ضعيفة",
+  "authPasswordStrengthMedium": "متوسطة",
+  "authPasswordStrengthGood": "جيدة",
+  "authPasswordStrengthStrong": "قوية ✓",
+  "authPasswordStrengthLabel": "قوة كلمة المرور: {strength}",
+  "@authPasswordStrengthLabel": {
+    "placeholders": {
+      "strength": {
+        "type": "String"
+      }
+    }
+  }
 }

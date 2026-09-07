@@ -10,6 +10,7 @@ import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
+import 'mushaf_reader_screen.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 // ── Color constants ──────────────────────────────────────────
@@ -205,6 +206,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     );
   }
 
+  void _openMushafMode() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MushafReaderScreen(
+          initialPage: _currentPage,
+          startFromKhatma: widget.startFromKhatma,
+        ),
+      ),
+    );
+  }
+
   // ── Build ───────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
@@ -274,6 +287,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                     onNightMode: _showSettings,
                     onBookmark: () {},
                     onGuide: _showReadingGuide,
+                    onMushafMode: _openMushafMode,
                   ),
                 ),
               ),
@@ -704,7 +718,12 @@ class _AyahNumberBadge extends StatelessWidget {
 class _TopBar extends StatelessWidget {
   final int surahNum;
   final bool isDark;
-  final VoidCallback onBack, onAudio, onNightMode, onBookmark, onGuide;
+  final VoidCallback onBack,
+      onAudio,
+      onNightMode,
+      onBookmark,
+      onGuide,
+      onMushafMode;
 
   const _TopBar({
     required this.surahNum,
@@ -714,6 +733,7 @@ class _TopBar extends StatelessWidget {
     required this.onNightMode,
     required this.onBookmark,
     required this.onGuide,
+    required this.onMushafMode,
   });
 
   @override
@@ -763,6 +783,14 @@ class _TopBar extends StatelessWidget {
                 icon: Icons.help_outline_rounded,
                 color: fg,
                 onTap: onGuide,
+              ),
+              Tooltip(
+                message: l10n.quranReaderMushafModeTooltip,
+                child: _TapIcon(
+                  icon: Icons.auto_stories_rounded,
+                  color: fg,
+                  onTap: onMushafMode,
+                ),
               ),
               const Spacer(),
               // Surah name
