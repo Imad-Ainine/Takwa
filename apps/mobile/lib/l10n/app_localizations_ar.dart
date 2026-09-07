@@ -4104,4 +4104,241 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get achievementPendingLabel => 'قيد الانتظار';
+
+  @override
+  String get khatmaMenuMarkFinished => 'تحديد كمنتهية';
+
+  @override
+  String get khatmaMenuCancelKhatma => 'إلغاء الختمة';
+
+  @override
+  String get khatmaMarkFinishedDialogTitle => 'تحديد كمنتهية';
+
+  @override
+  String get khatmaMarkFinishedDialogBody =>
+      'هل أنت متأكد من تحديد هذه الختمة كمنتهية؟';
+
+  @override
+  String get khatmaMarkFinishedDialogNote =>
+      'هذا الخيار مناسب إذا كنت قد أنهيت قراءة القرآن من مصدر آخر.';
+
+  @override
+  String get khatmaMarkFinishedConfirm => 'تأكيد';
+
+  @override
+  String get khatmaCancelDialogTitle => 'إلغاء الختمة';
+
+  @override
+  String get khatmaCancelDialogBody => 'هل أنت متأكد من إلغاء هذه الختمة؟';
+
+  @override
+  String get khatmaCancelDialogWarning =>
+      'تنبيه: سيتم حفظ تقدمك في التاريخ ولكن لن تتمكن من استرجاع الختمة الملغاة مرة أخرى.';
+
+  @override
+  String get khatmaCancelConfirmFinal => 'إلغاء الختمة نهائياً';
+
+  @override
+  String get khatmaDialogGoBack => 'تراجع';
+
+  @override
+  String get khatmaInfoSectionTitle => 'معلومات الختمة';
+
+  @override
+  String get khatmaInfoNameLabel => 'اسم الختمة';
+
+  @override
+  String get khatmaInfoTypeLabel => 'نوع الختمة';
+
+  @override
+  String get khatmaInfoStartDateLabel => 'تاريخ البداية';
+
+  @override
+  String get khatmaInfoCompletedDaysLabel => 'الأيام المكتملة';
+
+  @override
+  String khatmaInfoCompletedDaysValue(String n) {
+    return '$n يوم';
+  }
+
+  @override
+  String get khatmaInfoEndTypeLabel => 'مدة الختمة';
+
+  @override
+  String get khatmaInfoEndTypeNoLimit => 'بدون وقت محدد للانتهاء';
+
+  @override
+  String khatmaInfoEndTypeTarget(String date) {
+    return 'حتى $date';
+  }
+
+  @override
+  String get khatmaTypeMuyassaraLabel => 'ختمة ميسرة';
+
+  @override
+  String get khatmaTypeMultazimaLabel => 'ختمة ملتزمة';
+
+  @override
+  String get khatmaOverallProgressTitle => 'التقدم الإجمالي';
+
+  @override
+  String get khatmaReachedPageLabel => 'وصلت إلى صفحة';
+
+  @override
+  String khatmaReachedPageValue(String current, String total) {
+    return '$current من $total';
+  }
+
+  @override
+  String get khatmaCurrentPageLabel => 'الصفحة الحالية';
+
+  @override
+  String khatmaCurrentPageValue(String n) {
+    return 'صفحة $n';
+  }
+
+  @override
+  String get khatmaRemainingPagesLabel => 'الصفحات المتبقية';
+
+  @override
+  String khatmaRemainingPagesValue(String n) {
+    return '$n صفحة';
+  }
+
+  @override
+  String get khatmaEstimatedHasanatLabel => 'الحسنات المقدرة';
+
+  @override
+  String khatmaEstimatedHasanatValue(String n) {
+    return '$n حسنة';
+  }
+
+  @override
+  String get khatmaStatusMuyassaraBadge => 'ختمة ميسرة - بدون ضغط زمني';
+
+  @override
+  String khatmaStatusMultazimaBadge(String n) {
+    return 'ختمة ملتزمة - $n صفحة/يوم';
+  }
+
+  @override
+  String get khatmaAvgPagesPerDayLabel => 'متوسط الصفحات/اليوم';
+
+  @override
+  String get khatmaTypeDescriptionLabel => 'نوع الختمة';
+
+  @override
+  String get khatmaTypeDescriptionFree => 'بدون ضغط زمني أو ورد يومي محدد';
+
+  @override
+  String khatmaTypeDescriptionTarget(String n) {
+    return 'ورد يومي محدد: $n صفحة';
+  }
+
+  @override
+  String get khatmaExtraStatsTitle => 'إحصائيات إضافية';
+
+  @override
+  String get khatmaTotalReadingTimeLabel => 'إجمالي وقت القراءة';
+
+  @override
+  String get khatmaAvgReadingTimeLabel => 'متوسط وقت القراءة';
+
+  @override
+  String get khatmaCurrentStreakLabel => 'السلسلة الحالية';
+
+  @override
+  String get khatmaLongestStreakLabel => 'أطول سلسلة';
+
+  @override
+  String get khatmaLastReadLabel => 'آخر قراءة';
+
+  @override
+  String khatmaStreakDaysValue(String n) {
+    return '$n أيام';
+  }
+
+  @override
+  String get khatmaNoDataValue => '—';
+
+  @override
+  String get khatmaReadingDaysTitle => 'أيام القراءة';
+
+  @override
+  String get khatmaReadingDaysSubtitle => 'الأيام التي قرأت فيها القرآن الكريم';
+
+  @override
+  String get khatmaLegendFuture => 'مستقبلي';
+
+  @override
+  String get khatmaLegendMissed => 'فائت';
+
+  @override
+  String get khatmaLegendPartial => 'ناقص';
+
+  @override
+  String get khatmaLegendComplete => 'مكتمل';
+
+  @override
+  String khatmaDurationHoursMinutes(String hours, String minutes) {
+    return '$hoursس $minutesد';
+  }
+
+  @override
+  String khatmaDurationMinutesSeconds(String minutes, String seconds) {
+    return '$minutesد $secondsث';
+  }
+
+  @override
+  String khatmaDurationSecondsOnly(String seconds) {
+    return '$secondsث';
+  }
+
+  @override
+  String get khatmaHistorySortMenuTooltip => 'ترتيب وعرض';
+
+  @override
+  String get khatmaHistorySortByDate => 'ترتيب حسب التاريخ';
+
+  @override
+  String get khatmaHistorySortByName => 'ترتيب حسب الاسم';
+
+  @override
+  String get khatmaHistorySortByDuration => 'ترتيب حسب المدة';
+
+  @override
+  String get khatmaHistorySortByProgress => 'ترتيب حسب نسبة الإنجاز';
+
+  @override
+  String get khatmaHistoryShowStats => 'عرض الإحصائيات';
+
+  @override
+  String get khatmaHistoryViewDetails => 'عرض التفاصيل';
+
+  @override
+  String get khatmaHistoryDetailsTitle => 'تفاصيل الختمة';
+
+  @override
+  String get khatmaHistoryStatsTitle => 'إحصائيات الختمات';
+
+  @override
+  String get khatmaHistoryStatsTotal => 'إجمالي الختمات';
+
+  @override
+  String get khatmaHistoryStatsCompleted => 'ختمات مكتملة';
+
+  @override
+  String get khatmaHistoryStatsCancelled => 'ختمات ملغاة';
+
+  @override
+  String get khatmaHistoryStatsTotalPages => 'إجمالي الصفحات المقروءة';
+
+  @override
+  String get khatmaHistoryCloseButton => 'إغلاق';
+
+  @override
+  String get khatmaProgressEmptyTitle => 'لا توجد ختمة نشطة حالياً';
+
+  @override
+  String get khatmaProgressEmptySubtitle => 'ابدأ ختمة جديدة لتتبع تقدمك هنا';
 }

@@ -12,6 +12,8 @@ import 'package:takwa/l10n/app_localizations.dart';
 
 // Styles are managed via AdaptiveStyle
 
+enum _SortBy { date, name, duration, progress }
+
 class KhatmaHistoryScreen extends ConsumerStatefulWidget {
   const KhatmaHistoryScreen({super.key});
   @override
@@ -23,6 +25,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
   String? _toastMsg;
+  _SortBy _sortBy = _SortBy.date;
 
   @override
   void initState() {
@@ -36,6 +39,31 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     _tab.dispose();
     super.dispose();
   }
+
+  List<KhatmaSessionEx> _sorted(List<KhatmaSessionEx> list) {
+    final sorted = [...list];
+    switch (_sortBy) {
+      case _SortBy.date:
+        sorted.sort((a, b) => b.startDate.compareTo(a.startDate));
+        break;
+      case _SortBy.name:
+        sorted.sort((a, b) => a.label.compareTo(b.label));
+        break;
+      case _SortBy.duration:
+        sorted.sort((a, b) => _daysOf(b).compareTo(_daysOf(a)));
+        break;
+      case _SortBy.progress:
+        sorted.sort((a, b) => b.progress.compareTo(a.progress));
+        break;
+    }
+    return sorted;
+  }
+
+  int _daysOf(KhatmaSessionEx s) =>
+      (s.completedDate ?? s.cancelledDate ?? DateTime.now())
+          .difference(s.startDate)
+          .inDays +
+      1;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +83,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(style, l10n),
+            _buildHeader(style, l10n, completed.value, cancelled.value),
             _buildTabBar(style, l10n, completedCount, cancelledCount),
             Expanded(
               child: TabBarView(
@@ -72,7 +100,12 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  Widget _buildHeader(AdaptiveStyle style, AppLocalizations l10n) {
+  Widget _buildHeader(
+    AdaptiveStyle style,
+    AppLocalizations l10n,
+    List<KhatmaSessionEx>? completed,
+    List<KhatmaSessionEx>? cancelled,
+  ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Row(
@@ -84,7 +117,79 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             style: style.amiri(22, color: style.text, weight: FontWeight.bold),
           ),
           const Spacer(),
-          const SizedBox(width: 28),
+          PopupMenuButton<Object>(
+            tooltip: l10n.khatmaHistorySortMenuTooltip,
+            icon: Icon(Icons.sort_rounded, color: style.text),
+            color: style.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              side: BorderSide(color: style.border),
+            ),
+            onSelected: (v) {
+              if (v is _SortBy) {
+                setState(() => _sortBy = v);
+              } else if (v == 'stats') {
+                _showStats(style, l10n, completed ?? [], cancelled ?? []);
+              }
+            },
+            itemBuilder: (_) => [
+              _sortMenuItem(style, _SortBy.date, l10n.khatmaHistorySortByDate),
+              _sortMenuItem(style, _SortBy.name, l10n.khatmaHistorySortByName),
+              _sortMenuItem(
+                style,
+                _SortBy.duration,
+                l10n.khatmaHistorySortByDuration,
+              ),
+              _sortMenuItem(
+                style,
+                _SortBy.progress,
+                l10n.khatmaHistorySortByProgress,
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: 'stats',
+                child: Row(
+                  children: [
+                    Icon(Icons.bar_chart_rounded, size: 18, color: style.gold),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      l10n.khatmaHistoryShowStats,
+                      style: style.naskh(14, color: style.text),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<Object> _sortMenuItem(
+    AdaptiveStyle style,
+    _SortBy value,
+    String label,
+  ) {
+    final selected = _sortBy == value;
+    return PopupMenuItem<Object>(
+      value: value,
+      child: Row(
+        children: [
+          Icon(
+            selected ? Icons.radio_button_checked : Icons.radio_button_off,
+            size: 16,
+            color: selected ? style.gold : style.textDim,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(
+            label,
+            style: style.naskh(
+              14,
+              color: selected ? style.gold : style.text,
+              weight: selected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
@@ -161,11 +266,20 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             subtitle: l10n.khatmaHistoryEmptyCompletedSubtitle,
           );
         }
+        final sorted = _sorted(list);
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          itemCount: list.length,
-          itemBuilder: (_, i) =>
-              _KhatmaCard(session: list[i], onDelete: null, style: style),
+          itemCount: sorted.length,
+          itemBuilder: (_, i) => _KhatmaCard(
+            session: sorted[i],
+            onDelete: () => _showDeleteConfirm(
+              style,
+              sorted[i],
+              khatmaCompletedProvider,
+            ),
+            onDetails: () => _showDetails(style, l10n, sorted[i]),
+            style: style,
+          ),
         );
       },
     );
@@ -190,12 +304,18 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             subtitle: l10n.khatmaHistoryEmptyCancelledSubtitle,
           );
         }
+        final sorted = _sorted(list);
         return ListView.builder(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          itemCount: list.length,
+          itemCount: sorted.length,
           itemBuilder: (_, i) => _KhatmaCard(
-            session: list[i],
-            onDelete: () => _showDeleteConfirm(style, list[i]),
+            session: sorted[i],
+            onDelete: () => _showDeleteConfirm(
+              style,
+              sorted[i],
+              khatmaCancelledProvider,
+            ),
+            onDetails: () => _showDetails(style, l10n, sorted[i]),
             style: style,
           ),
         );
@@ -234,7 +354,13 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
     );
   }
 
-  void _showDeleteConfirm(AdaptiveStyle style, KhatmaSessionEx session) {
+  void _showDeleteConfirm(
+    AdaptiveStyle style,
+    KhatmaSessionEx session,
+    // The provider whose list [session] belongs to, so we invalidate the
+    // right one after deleting (completed vs. cancelled history).
+    FutureProvider<List<KhatmaSessionEx>> ownerProvider,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
@@ -263,14 +389,164 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
+              await ref.read(khatmaDeleteHistoryProvider)(session.id);
+              ref.invalidate(ownerProvider);
               _showToast(l10n.khatmaHistoryDeletedToast);
-              ref.invalidate(khatmaCancelledProvider);
             },
             child: Text(
               l10n.adhkarDeleteTooltip,
               style: const TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDetails(
+    AdaptiveStyle style,
+    AppLocalizations l10n,
+    KhatmaSessionEx session,
+  ) {
+    final fmt = DateFormat('d/M/yyyy');
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: style.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          side: BorderSide(color: style.border),
+        ),
+        title: Text(
+          l10n.khatmaHistoryDetailsTitle,
+          textAlign: TextAlign.right,
+          style: style.amiri(20, color: style.text, weight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _detailRow(style, l10n.khatmaInfoNameLabel, session.label),
+            _detailRow(
+              style,
+              l10n.khatmaInfoTypeLabel,
+              session.type == KhatmaType.muyassara
+                  ? l10n.khatmaTypeMuyassaraLabel
+                  : l10n.khatmaTypeMultazimaLabel,
+            ),
+            _detailRow(
+              style,
+              l10n.khatmaInfoStartDateLabel,
+              fmt.format(session.startDate),
+            ),
+            if (session.completedDate != null)
+              _detailRow(
+                style,
+                l10n.khatmaHistoryStatusCompleted,
+                fmt.format(session.completedDate!),
+              ),
+            if (session.cancelledDate != null)
+              _detailRow(
+                style,
+                l10n.khatmaHistoryStatusCancelled,
+                fmt.format(session.cancelledDate!),
+              ),
+            _detailRow(
+              style,
+              l10n.khatmaHistoryPagesProgress(
+                localizedNumeral(context, session.pagesRead),
+                localizedNumeral(context, KhatmaSessionEx.totalPages),
+              ),
+              '${(session.progress * 100).toStringAsFixed(1)}%',
+            ),
+            _detailRow(
+              style,
+              l10n.khatmaEstimatedHasanatLabel,
+              localizedNumeral(context, session.estimatedHasanat),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              l10n.khatmaHistoryCloseButton,
+              style: style.naskh(14, color: style.gold, weight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailRow(AdaptiveStyle style, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(value, style: style.naskh(13, color: style.text, weight: FontWeight.w600)),
+          Text(label, style: style.naskh(13, color: style.textSec)),
+        ],
+      ),
+    );
+  }
+
+  void _showStats(
+    AdaptiveStyle style,
+    AppLocalizations l10n,
+    List<KhatmaSessionEx> completed,
+    List<KhatmaSessionEx> cancelled,
+  ) {
+    final totalPages = [...completed, ...cancelled]
+        .fold<int>(0, (sum, s) => sum + s.pagesRead);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: style.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          side: BorderSide(color: style.border),
+        ),
+        title: Text(
+          l10n.khatmaHistoryStatsTitle,
+          textAlign: TextAlign.right,
+          style: style.amiri(20, color: style.text, weight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _detailRow(
+              style,
+              l10n.khatmaHistoryStatsTotal,
+              localizedNumeral(context, completed.length + cancelled.length),
+            ),
+            _detailRow(
+              style,
+              l10n.khatmaHistoryStatsCompleted,
+              localizedNumeral(context, completed.length),
+            ),
+            _detailRow(
+              style,
+              l10n.khatmaHistoryStatsCancelled,
+              localizedNumeral(context, cancelled.length),
+            ),
+            _detailRow(
+              style,
+              l10n.khatmaHistoryStatsTotalPages,
+              localizedNumeral(context, totalPages),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              l10n.khatmaHistoryCloseButton,
+              style: style.naskh(14, color: style.gold, weight: FontWeight.bold),
             ),
           ),
         ],
@@ -305,10 +581,12 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
 class _KhatmaCard extends StatelessWidget {
   final KhatmaSessionEx session;
   final VoidCallback? onDelete;
+  final VoidCallback? onDetails;
   final AdaptiveStyle style;
   const _KhatmaCard({
     required this.session,
     required this.onDelete,
+    required this.onDetails,
     required this.style,
   });
 
@@ -421,6 +699,25 @@ class _KhatmaCard extends StatelessWidget {
               ),
             ],
           ),
+          if (onDetails != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: onDetails,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: Icon(Icons.visibility_outlined, size: 15, color: style.gold),
+                label: Text(
+                  l10n.khatmaHistoryViewDetails,
+                  style: style.naskh(12, color: style.gold, weight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

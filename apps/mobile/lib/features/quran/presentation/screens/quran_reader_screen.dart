@@ -61,9 +61,16 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   int _sessionPagesRead = 0;
   int _sessionStartPage = 1;
 
+  // Wall-clock time this reading session started, for the Khatma
+  // "reading time" stats — only accumulated (in dispose()) when this
+  // screen was opened from an active Khatma, since a Khatma is the only
+  // thing that currently surfaces reading-time stats.
+  late final DateTime _sessionStart;
+
   @override
   void initState() {
     super.initState();
+    _sessionStart = DateTime.now();
 
     int startPage = 1;
     if (widget.initialPage != null) {
@@ -103,6 +110,12 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
 
   @override
   void dispose() {
+    if (widget.startFromKhatma) {
+      final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
+      // Fire-and-forget: the notifier persists to SharedPreferences, and
+      // this widget is already gone by the time that completes.
+      ref.read(khatmaExProvider.notifier).addReadingTime(elapsed);
+    }
     _toolbarAnim.dispose();
     super.dispose();
   }

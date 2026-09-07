@@ -99,4 +99,22 @@ class QuranPrefsRepository {
     list.add(jsonEncode(session.toJson()));
     await _prefs.setStringList(_kKhatmaHistory, list);
   }
+
+  /// Permanently removes one entry from history by id. The delete button
+  /// on a cancelled/completed Khatma card in the history screen used to
+  /// just show a "deleted" toast and refresh the list without actually
+  /// calling anything like this — the entry would silently reappear on
+  /// the next read since nothing was ever removed from storage.
+  Future<void> deleteFromHistory(String id) async {
+    final list = _prefs.getStringList(_kKhatmaHistory) ?? [];
+    list.removeWhere((item) {
+      try {
+        final m = jsonDecode(item) as Map;
+        return m['id'] == id;
+      } catch (_) {
+        return false;
+      }
+    });
+    await _prefs.setStringList(_kKhatmaHistory, list);
+  }
 }

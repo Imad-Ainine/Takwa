@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import '../../../core/providers/database_providers.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
 import '../data/quran_models.dart';
 import '../data/quran_prefs_repository.dart';
@@ -238,6 +239,33 @@ class KhatmaExNotifier extends StateNotifier<KhatmaSessionEx?> {
     state = null;
     await _repo.clearActiveKhatma();
   }
+
+  /// Marks the active Khatma as finished regardless of pagesRead —
+  /// distinct from the automatic completion in [advancePage] (which
+  /// triggers only once every page has actually been read through the
+  /// app). This is the "I finished reading from another source" path:
+  /// user-declared, not derived from tracked pages.
+  Future<void> markAsFinished() async {
+    if (state == null) return;
+    final finished = state!.copyWith(completedDate: DateTime.now());
+    await _repo.archiveKhatma(finished);
+    state = null;
+    await _repo.clearActiveKhatma();
+  }
+
+  /// Accumulates time spent actively reading toward this Khatma. Called
+  /// once per reading session (see QuranReaderScreen's dispose), not per
+  /// page, so "average reading time" means "average per sitting" rather
+  /// than some fraction of a page.
+  Future<void> addReadingTime(int seconds) async {
+    if (state == null || seconds <= 0) return;
+    final updated = state!.copyWith(
+      totalReadingSeconds: state!.totalReadingSeconds + seconds,
+      readingSessionsCount: state!.readingSessionsCount + 1,
+    );
+    state = updated;
+    await _repo.setActiveKhatma(updated);
+  }
 }
 
 // History providers
@@ -253,6 +281,93 @@ final khatmaCancelledProvider = FutureProvider<List<KhatmaSessionEx>>((
 ) async {
   final history = ref.watch(quranPrefsRepositoryProvider).getKhatmaHistory();
   return history.where((s) => s.isCancelled).toList().reversed.toList();
+});
+
+/// Permanently deletes one history entry (completed or cancelled) by id.
+/// Callers must invalidate khatmaCompletedProvider/khatmaCancelledProvider
+/// themselves afterward to see the change — this is a plain repository
+/// call, not a StateNotifier, since history entries aren't the "current
+/// state" of anything.
+final khatmaDeleteHistoryProvider = Provider<Future<void> Function(String)>(
+  (ref) => (id) => ref.read(quranPrefsRepositoryProvider).deleteFromHistory(id),
+);
+
+// ─────────────────────────────────────────────────────────────
+// Reading-habit stats (from real daily_records rows)
+// ─────────────────────────────────────────────────────────────
+
+/// Aggregated reading-habit stats derived from real `daily_records` rows
+/// (the same table the Stats/Prayer screens read), scoped to whatever a
+/// Khatma progress screen needs: which recent days had Quran reading
+/// logged (for the reading-days calendar), and the streaks/last-read date
+/// that follow from that. Computed fresh on every watch rather than
+/// cached — cheap (≤60 rows) and must reflect today's just-logged pages
+/// immediately.
+class KhatmaReadingStats {
+  final Map<DateTime, int> pagesByDay; // date-only keys
+  final int currentStreak;
+  final int longestStreak;
+  final DateTime? lastReadDate;
+
+  const KhatmaReadingStats({
+    required this.pagesByDay,
+    required this.currentStreak,
+    required this.longestStreak,
+    required this.lastReadDate,
+  });
+
+  static DateTime dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+}
+
+final khatmaReadingStatsProvider = FutureProvider<KhatmaReadingStats>((
+  ref,
+) async {
+  final records = await ref.watch(dailyRecordDaoProvider).getLastNDays(60);
+  final byDay = <DateTime, int>{
+    for (final r in records)
+      KhatmaReadingStats.dayOnly(r.date): r.quranPages,
+  };
+
+  final today = KhatmaReadingStats.dayOnly(DateTime.now());
+
+  // Current streak: walk back from today, or from yesterday if today
+  // simply hasn't been read yet — a day still in progress shouldn't zero
+  // out an otherwise-intact streak.
+  int currentStreak = 0;
+  var cursor = (byDay[today] ?? 0) > 0
+      ? today
+      : today.subtract(const Duration(days: 1));
+  while ((byDay[cursor] ?? 0) > 0) {
+    currentStreak++;
+    cursor = cursor.subtract(const Duration(days: 1));
+  }
+
+  // Longest streak within the fetched 60-day window.
+  int longestStreak = 0;
+  int running = 0;
+  for (int i = 59; i >= 0; i--) {
+    final d = today.subtract(Duration(days: i));
+    if ((byDay[d] ?? 0) > 0) {
+      running++;
+      if (running > longestStreak) longestStreak = running;
+    } else {
+      running = 0;
+    }
+  }
+
+  DateTime? lastRead;
+  for (final entry in byDay.entries) {
+    if (entry.value > 0 && (lastRead == null || entry.key.isAfter(lastRead))) {
+      lastRead = entry.key;
+    }
+  }
+
+  return KhatmaReadingStats(
+    pagesByDay: byDay,
+    currentStreak: currentStreak,
+    longestStreak: longestStreak,
+    lastReadDate: lastRead,
+  );
 });
 
 // ─────────────────────────────────────────────────────────────
