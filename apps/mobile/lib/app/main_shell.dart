@@ -45,12 +45,38 @@ class _MainShellState extends ConsumerState<MainShell>
   // drawer (_DrawerNav in animated_drawer.dart) — a reference/browse screen
   // fits better as an occasional lookup than a persistent bottom-nav slot,
   // unlike Qiyam which is a daily-tracked habit like the other four.
+  // Emoji → real icons (audit §H2): emoji can't be tinted
+  // (`Text('🌙', style: TextStyle(color: ...))` was a no-op — see the old
+  // shadow-only "selected" hack this replaced) and render differently per
+  // platform/OS version. Outlined for unselected, filled for selected —
+  // the standard Material way to show selection without relying on color
+  // in the (rare but real) case an icon renders in grayscale.
   static List<_TabInfo> _getTabs(AppLocalizations l10n) => [
-    _TabInfo('🏠', l10n.bottomNavHome, 0),
-    _TabInfo('🌙', l10n.bottomNavQiyam, 1),
-    _TabInfo('✅', l10n.bottomNavMuhasaba, 2),
-    _TabInfo('📊', l10n.bottomNavStatistics, 3),
-    _TabInfo('⚙️', l10n.bottomNavSettings, 4),
+    _TabInfo(Icons.home_outlined, Icons.home_rounded, l10n.bottomNavHome, 0),
+    _TabInfo(
+      Icons.nightlight_outlined,
+      Icons.nightlight_rounded,
+      l10n.bottomNavQiyam,
+      1,
+    ),
+    _TabInfo(
+      Icons.checklist_outlined,
+      Icons.checklist_rounded,
+      l10n.bottomNavMuhasaba,
+      2,
+    ),
+    _TabInfo(
+      Icons.bar_chart_outlined,
+      Icons.bar_chart_rounded,
+      l10n.bottomNavStatistics,
+      3,
+    ),
+    _TabInfo(
+      Icons.settings_outlined,
+      Icons.settings_rounded,
+      l10n.bottomNavSettings,
+      4,
+    ),
   ];
 
   @override
@@ -330,20 +356,21 @@ class _BottomNav extends StatelessWidget {
                                 // Icon with scale bounce
                                 Transform.scale(
                                   scale: isActive ? 1.0 + 0.15 * t : 1.0,
-                                  child: Text(
-                                    tab.emoji,
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      shadows: isActive
-                                          ? [
-                                              Shadow(
-                                                color: context.colors.gold
-                                                    .withValues(alpha: 0.6 * t),
-                                                blurRadius: 10,
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
+                                  child: Icon(
+                                    isActive ? tab.activeIcon : tab.icon,
+                                    size: 22,
+                                    color: isActive
+                                        ? context.colors.gold
+                                        : context.colors.textDim,
+                                    shadows: isActive
+                                        ? [
+                                            Shadow(
+                                              color: context.colors.gold
+                                                  .withValues(alpha: 0.6 * t),
+                                              blurRadius: 10,
+                                            ),
+                                          ]
+                                        : null,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
@@ -512,7 +539,9 @@ class _SplashScreenState extends State<_SplashScreen>
 //  DATA CLASSES
 // ─────────────────────────────────────────
 class _TabInfo {
-  final String emoji, label;
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
   final int index;
-  const _TabInfo(this.emoji, this.label, this.index);
+  const _TabInfo(this.icon, this.activeIcon, this.label, this.index);
 }

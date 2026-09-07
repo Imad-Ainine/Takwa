@@ -183,7 +183,11 @@ class QiyamWirdScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Icon(Icons.chevron_right, color: context.colors.gold),
+                    Icon(
+                      Icons.chevron_right,
+                      color: context.colors.gold,
+                      matchTextDirection: true,
+                    ),
                   ],
                 ),
               ),

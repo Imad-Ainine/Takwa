@@ -81,10 +81,15 @@ class DailyVerseCard extends StatelessWidget {
                 children: [
                   GestureDetector(
                     onTap: onNavigate,
+                    // chevron_right + matchTextDirection points toward
+                    // "forward" regardless of layout position — right in
+                    // LTR, left in RTL — which is what a drill-in affordance
+                    // needs whether it sits leading or trailing in its Row.
                     child: Icon(
-                      Icons.chevron_left,
+                      Icons.chevron_right,
                       color: style.textDim,
                       size: 22,
+                      matchTextDirection: true,
                     ),
                   ),
                   const Spacer(),
@@ -254,7 +259,10 @@ class KhatmaActionCard extends StatelessWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-          child: Icon(icon, color: fg, size: 22),
+          // matchTextDirection is a no-op for the symmetric icons this also
+          // renders (e.g. an action/share glyph) and is the fix for the one
+          // directional icon it does render — the back-arrow chevron above.
+          child: Icon(icon, color: fg, size: 22, matchTextDirection: true),
         ),
       );
 }
@@ -569,7 +577,7 @@ class QuranJuzCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: style.textDim),
+            Icon(Icons.chevron_right, color: style.textDim, matchTextDirection: true),
           ],
         ),
       ),

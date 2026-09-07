@@ -249,9 +249,10 @@ class _AiMemorizeScreenState extends ConsumerState<AiMemorizeScreen>
             child: Row(
               children: [
                 Icon(
-                  Icons.chevron_left,
+                  Icons.chevron_right,
                   color: style.textSec.withValues(alpha: 0.3),
                   size: 20,
+                  matchTextDirection: true,
                 ),
                 const SizedBox(width: 10),
                 // Badge number on left

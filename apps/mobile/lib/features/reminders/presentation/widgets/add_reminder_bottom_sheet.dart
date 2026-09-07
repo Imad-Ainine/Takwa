@@ -214,6 +214,7 @@ class _AddReminderBottomSheetState
                           Icons.chevron_right_rounded,
                           color: context.colors.textDim,
                           size: 20,
+                          matchTextDirection: true,
                         ),
                       ],
                     ),

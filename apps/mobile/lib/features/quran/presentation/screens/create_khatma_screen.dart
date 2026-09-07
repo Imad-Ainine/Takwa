@@ -329,7 +329,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 Text(
                   desc,
                   style: style.naskh(12, color: style.textDim),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               ],
             ),
@@ -525,7 +525,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                         Expanded(
                           child: Text(
                             l10n.createKhatmaNotificationsDisabledWarning,
-                            textAlign: TextAlign.right,
+                            textAlign: TextAlign.start,
                             style: style.naskh(12, color: style.danger),
                           ),
                         ),
@@ -648,7 +648,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     _type == KhatmaType.muyassara
                         ? l10n.createKhatmaTypeMuyassaraDesc
                         : l10n.createKhatmaTypeMultazimaDesc,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     style: style.naskh(
                       11,
                       color: (style.isRamadan ? style.gold : style.teal)
@@ -696,7 +696,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   Expanded(
                     child: Text(
                       l10n.createKhatmaStartReadingHint,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: style.naskh(
                         12,
                         color: style.isRamadan ? style.gold : style.teal,
