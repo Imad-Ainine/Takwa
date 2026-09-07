@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -24,7 +25,10 @@ class OverlayNotificationSettings extends ConsumerWidget {
         height: 48,
         child: Center(child: TakwaLoadingIndicator()),
       ),
-      error: (_, __) => const SizedBox(),
+      error: (_, __) => TakwaErrorState(
+        compact: true,
+        onRetry: () => ref.invalidate(userPreferencesProvider),
+      ),
       data: (prefs) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

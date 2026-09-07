@@ -5,6 +5,7 @@ import 'package:takwa/features/checklist/screens/checklist_screen.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 import '../core/theme/app_theme.dart';
+import '../core/widgets/takwa_error_state.dart';
 import '../core/providers/database_providers.dart';
 import '../core/notifications/notifications_service.dart';
 import '../features/home/presentation/screens/home_screen.dart';
@@ -148,7 +149,13 @@ class _MainShellState extends ConsumerState<MainShell>
 
     return onboardAsync.when(
       loading: () => const _SplashScreen(),
-      error: (_, _) => const _SplashScreen(),
+      // Was const _SplashScreen() — onboardingDoneProvider reads the local
+      // DB, so a failure here (corrupt/unreadable database) used to strand
+      // the user on a permanently-spinning splash with no way out. Now it
+      // surfaces the failure with a way to retry the read.
+      error: (_, _) => _SplashErrorScreen(
+        onRetry: () => ref.invalidate(onboardingDoneProvider),
+      ),
       data: (done) {
         if (!done) {
           return const OnboardingScreen();
@@ -378,6 +385,27 @@ class _BottomNav extends StatelessWidget {
 
 // ─────────────────────────────────────────
 //  SPLASH SCREEN
+// ─────────────────────────────────────────
+//  SPLASH ERROR SCREEN
+// ─────────────────────────────────────────
+/// Shown in place of [_SplashScreen] when onboardingDoneProvider — the very
+/// first read this app does — fails. Without this the user was stuck on a
+/// spinning splash forever with no signal anything was wrong and no way
+/// back in.
+class _SplashErrorScreen extends StatelessWidget {
+  const _SplashErrorScreen({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: TakwaErrorState(onRetry: onRetry),
+    );
+  }
+}
+
 // ─────────────────────────────────────────
 class _SplashScreen extends StatefulWidget {
   const _SplashScreen();

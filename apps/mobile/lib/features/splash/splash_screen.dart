@@ -1,16 +1,18 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _mainController;
   late AnimationController _bgController;
@@ -49,12 +51,26 @@ class _SplashScreenState extends State<SplashScreen>
 
     _mainController.forward();
 
-    // Navigate to home after 3 seconds
-    Timer(const Duration(milliseconds: 3000), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
-    });
+    _navigateWhenReady();
+  }
+
+  /// Was a flat `Timer(3000ms)` regardless of whether the app was actually
+  /// ready — meaning a slow cold start (DB init, migrations) still handed
+  /// the user off to a half-ready MainShell after exactly 3s, while a fast
+  /// one made them wait out 3s for nothing. Gate on the same read MainShell
+  /// itself waits on (onboardingDoneProvider), with a floor no longer than
+  /// the entry animation so the brand moment isn't cut short on a fast
+  /// device, and no explicit ceiling — if it's still not ready, the user
+  /// sees the (branded) splash animation continue rather than a jump into
+  /// broken content.
+  Future<void> _navigateWhenReady() async {
+    await Future.wait<bool>([
+      ref.read(onboardingDoneProvider.future).catchError((_) => false),
+      Future.delayed(_mainController.duration!, () => false),
+    ]);
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed(Routes.home);
+    }
   }
 
   @override

@@ -13,6 +13,7 @@ import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
@@ -27,7 +28,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // Kept alive because this is one of six PageView tabs in MainShell: without
+  // this, PageView disposes an off-screen tab's State once it scrolls past
+  // the cache extent, so switching Home -> Statistics -> Home lost scroll
+  // position and re-ran the 1.5s entry-stagger animation on every return.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _staggerCtrl;
   late final List<Animation<double>> _fadeAnims;
   late final List<Animation<Offset>> _slideAnims;
@@ -95,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final todayAsync = ref.watch(todayRecordProvider);
     final streakAsync = ref.watch(currentStreakProvider);
@@ -209,7 +217,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       3,
                       todayAsync.when(
                         loading: () => _Skeleton(style: style, height: 110),
-                        error: (_, _) => const SizedBox(),
+                        error: (_, _) => TakwaErrorState(
+                          compact: true,
+                          onRetry: () => ref.invalidate(todayRecordProvider),
+                        ),
                         data: (r) => _TaqwaSectionMerged(
                           record: r,
                           streakAsync: streakAsync,
@@ -224,7 +235,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       4,
                       todayAsync.when(
                         loading: () => _Skeleton(style: style, height: 180),
-                        error: (_, _) => const SizedBox(),
+                        error: (_, _) => TakwaErrorState(
+                          compact: true,
+                          onRetry: () => ref.invalidate(todayRecordProvider),
+                        ),
                         data: (r) =>
                             _QuickIbadahGridMerged(record: r, style: style),
                       ),
@@ -855,7 +869,7 @@ class MosqueClipper extends CustomClipper<Path> {
 // ─────────────────────────────────────────
 //  TAQWA SECTION MERGED
 // ─────────────────────────────────────────
-class _TaqwaSectionMerged extends StatelessWidget {
+class _TaqwaSectionMerged extends ConsumerWidget {
   final DailyRecord? record;
   final AsyncValue<int> streakAsync;
   final AdaptiveStyle style;
@@ -866,7 +880,7 @@ class _TaqwaSectionMerged extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = style;
     final l10n = AppLocalizations.of(context)!;
     final net = record?.netPoints ?? 0;
@@ -931,7 +945,10 @@ class _TaqwaSectionMerged extends StatelessWidget {
                 const SizedBox(height: 6),
                 streakAsync.when(
                   loading: () => const SizedBox(height: 22),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 22,
+                    onRetry: () => ref.invalidate(currentStreakProvider),
+                  ),
                   data: (n) => n > 0
                       ? Container(
                           padding: const EdgeInsets.symmetric(
@@ -1756,7 +1773,10 @@ class _BooksSection extends ConsumerWidget {
               separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
               itemBuilder: (_, __) => _Skeleton(style: s, height: 180),
             ),
-            error: (_, __) => const SizedBox(),
+            error: (_, __) => TakwaErrorState(
+              compact: true,
+              onRetry: () => ref.invalidate(booksListProvider),
+            ),
             data: (books) => ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),

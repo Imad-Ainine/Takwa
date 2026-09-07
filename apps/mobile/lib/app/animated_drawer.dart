@@ -15,6 +15,7 @@ import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
 import '../core/utils/taqwa_level_display.dart';
 import 'main_shell.dart' show currentTabProvider;
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 // ─────────────────────────────────────────
@@ -198,6 +199,7 @@ class _DrawerContent extends ConsumerWidget {
                   hijri: hijri,
                   statsAsync: statsAsync,
                   streakAsync: streakAsync,
+                  onClose: onClose,
                 ),
 
                 const SizedBox(height: AppSpacing.sm),
@@ -206,6 +208,23 @@ class _DrawerContent extends ConsumerWidget {
 
                 // ── قائمة التنقل ──
                 Expanded(child: _DrawerNav(onClose: onClose)),
+
+                // ── حالة الاتصال والمزامنة ──
+                // Was surfaced nowhere except a buried Settings row (and only
+                // ever as "syncing"/"synced", never "offline" —
+                // connectivityProvider itself was read in exactly one place
+                // in the whole app, favorites_providers.dart). The drawer is
+                // reachable from every tab, so it's the one place this is
+                // guaranteed visible without adding a chip to all ~50
+                // screens' app bars.
+                if (ref.watch(authStatusProvider) == AuthStatus.authenticated)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: _ConnectivityStatusRow(),
+                  ),
 
                 // ── تسجيل الخروج ──
                 if (ref.watch(authStatusProvider) == AuthStatus.authenticated)
@@ -227,11 +246,13 @@ class _DrawerHeader extends ConsumerWidget {
   final HijriCalendar hijri;
   final AsyncValue<MonthStats> statsAsync;
   final AsyncValue<int> streakAsync;
+  final VoidCallback onClose;
 
   const _DrawerHeader({
     required this.hijri,
     required this.statsAsync,
     required this.streakAsync,
+    required this.onClose,
   });
 
   static String _hijriMonth(AppLocalizations l10n, int m) => [
@@ -268,10 +289,12 @@ class _DrawerHeader extends ConsumerWidget {
               final avatar = profile?['avatar_emoji'] ?? '🌙';
               return GestureDetector(
                 onTap: () {
-                  Navigator.pop(context); // Close drawer
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    Navigator.pushNamed(context, Routes.profile);
-                  });
+                  // Was Navigator.pop(context) — this drawer is a Stack
+                  // layer (DrawerScaffold), not a pushed route, so that
+                  // popped the actual page underneath instead of closing
+                  // the drawer. onClose() is the drawer's own animation.
+                  onClose();
+                  Navigator.of(context).pushNamed(Routes.profile);
                 },
                 child: Row(
                   children: [
@@ -377,7 +400,12 @@ class _DrawerHeader extends ConsumerWidget {
               );
             },
             loading: () => const SizedBox(height: 52),
-            error: (_, _) => const SizedBox(height: 52),
+            error: (_, _) => SizedBox(
+              height: 52,
+              child: TakwaInlineError(
+                onRetry: () => ref.invalidate(userProfileProvider),
+              ),
+            ),
           ),
 
           const SizedBox(height: AppSpacing.xl),
@@ -415,7 +443,10 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: statsAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 48,
+                    onRetry: () => ref.invalidate(monthStatsProvider),
+                  ),
                   data: (s) => _MiniStatCard(
                     value: '${s.totalPoints}',
                     label: AppLocalizations.of(context)!.drawerStatTaqwaPoints,
@@ -428,7 +459,10 @@ class _DrawerHeader extends ConsumerWidget {
               Expanded(
                 child: streakAsync.when(
                   loading: () => const SizedBox(height: 48),
-                  error: (_, _) => const SizedBox(),
+                  error: (_, _) => TakwaInlineError(
+                    height: 48,
+                    onRetry: () => ref.invalidate(currentStreakProvider),
+                  ),
                   data: (s) => _MiniStatCard(
                     value: '$s',
                     label: AppLocalizations.of(context)!.drawerStatStreakDays,
@@ -444,7 +478,11 @@ class _DrawerHeader extends ConsumerWidget {
           // Level & Progress
           statsAsync.when(
             loading: () => const SizedBox(),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaErrorState(
+              compact: true,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              onRetry: () => ref.invalidate(monthStatsProvider),
+            ),
             data: (s) => Column(
               children: [
                 Row(
@@ -968,6 +1006,60 @@ class _NavItem {
   final String emoji, label, route;
   final int index;
   const _NavItem(this.emoji, this.label, this.route, this.index);
+}
+
+// ── حالة الاتصال والمزامنة ──
+/// Connectivity + sync state, compact enough for one drawer row. Three
+/// states only — offline always wins the display regardless of whether a
+/// sync happens to be mid-flight, since it's the more actionable thing for
+/// the user to know.
+class _ConnectivityStatusRow extends ConsumerWidget {
+  const _ConnectivityStatusRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    // Defaults to true before the stream's first emission so the row doesn't
+    // flash "offline" on every cold start while connectivity_plus is still
+    // reporting its initial status.
+    final isOnline = ref.watch(connectivityProvider).valueOrNull ?? true;
+    final isSyncing = ref.watch(isSyncingProvider);
+
+    final IconData icon;
+    final Color color;
+    final String label;
+    if (!isOnline) {
+      icon = Icons.cloud_off_rounded;
+      color = context.colors.dangerText;
+      label = l10n.drawerSyncOffline;
+    } else if (isSyncing) {
+      icon = Icons.sync_rounded;
+      color = context.colors.tealText;
+      label = l10n.syncStatusSyncing;
+    } else {
+      icon = Icons.cloud_done_rounded;
+      color = context.colors.successText;
+      label = l10n.drawerSyncSynced;
+    }
+
+    return Semantics(
+      label: label,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: color),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: context.typography.caption.copyWith(
+              color: color,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _LogoutButton extends ConsumerWidget {

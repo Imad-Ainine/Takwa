@@ -7447,6 +7447,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"'**
   String get splashQuote;
+
+  /// Generic fallback error message when a section fails to load
+  ///
+  /// In ar, this message translates to:
+  /// **'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'**
+  String get genericErrorMessage;
+
+  /// Generic retry action button label
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة المحاولة'**
+  String get retryButtonLabel;
+
+  /// Semantic label for a compact inline retry affordance (a small area that failed to load, e.g. a stat tile)
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التحميل، اضغط لإعادة المحاولة'**
+  String get inlineErrorRetryLabel;
+
+  /// Screen-reader label for one bar in the weekly/period performance chart
+  ///
+  /// In ar, this message translates to:
+  /// **'{day}: {points} نقطة'**
+  String statsChartBarSemanticLabel(String day, int points);
+
+  /// Compact connectivity/sync status label shown in the drawer: no network
+  ///
+  /// In ar, this message translates to:
+  /// **'غير متصل'**
+  String get drawerSyncOffline;
+
+  /// Compact connectivity/sync status label shown in the drawer: idle, up to date
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت المزامنة'**
+  String get drawerSyncSynced;
+
+  /// Shown when a prayer/ibadah status write to the local database fails
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر الحفظ، حاول مرة أخرى'**
+  String get checklistSaveError;
+
+  /// Shown when the local save succeeded but pushing it to the cloud failed
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال'**
+  String get checklistSyncError;
 }
 
 class _AppLocalizationsDelegate

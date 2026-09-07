@@ -13,6 +13,7 @@ import 'package:takwa/core/utils/taqwa_level_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -47,7 +48,10 @@ class StatisticsScreen extends ConsumerStatefulWidget {
 }
 
 class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _entryCtrl;
   late final List<Animation<double>> _fadeAnims;
   late final List<Animation<Offset>> _slideAnims;
@@ -145,6 +149,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final period = ref.watch(_statsPeriodProvider);
     final range = _dateRange(period);
 
@@ -200,11 +205,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         statsAsync.when(
                           loading: () =>
                               const Center(child: TakwaLoadingIndicator()),
-                          error: (_, _) => const SizedBox(),
+                          error: (_, _) => TakwaErrorState(
+                            compact: true,
+                            onRetry: () =>
+                                ref.invalidate(periodStatsProvider(range)),
+                          ),
                           data: (s) => streakAsync.when(
                             loading: () =>
                                 const Center(child: TakwaLoadingIndicator()),
-                            error: (_, _) => const SizedBox(),
+                            error: (_, _) => TakwaErrorState(
+                              compact: true,
+                              onRetry: () =>
+                                  ref.invalidate(currentStreakProvider),
+                            ),
                             data: (streak) =>
                                 _TaqwaHeroCard(stats: s, streak: streak),
                           ),
@@ -216,7 +229,12 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         2,
                         weekAsync.when(
                           loading: () => const _StatSkeleton(height: 180),
-                          error: (_, _) => const SizedBox(),
+                          error: (_, _) => TakwaErrorState(
+                            compact: true,
+                            onRetry: () => ref.invalidate(
+                              periodChartPointsProvider(range),
+                            ),
+                          ),
                           data: (pts) => _WeeklyChart(
                             points: pts,
                             periodLabel: chartLabel,
@@ -229,7 +247,11 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                         3,
                         statsAsync.when(
                           loading: () => const _StatSkeleton(height: 120),
-                          error: (_, _) => const SizedBox(),
+                          error: (_, _) => TakwaErrorState(
+                            compact: true,
+                            onRetry: () =>
+                                ref.invalidate(periodStatsProvider(range)),
+                          ),
                           data: (s) => _StatsCardsGrid(stats: s),
                         ),
                       ),
@@ -248,6 +270,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
           ),
 
           // ── Unseen Achievement Overlay ──
+          // A purely decorative toast: no content is hidden if this fails,
+          // so unlike the sections above there's nothing for a retry button
+          // to be anchored to. Staying silent here is deliberate, not a
+          // leftover instance of the SizedBox-on-error pattern.
           unseenAsync.when(
             loading: () => const SizedBox(),
             error: (_, _) => const SizedBox(),
@@ -792,7 +818,13 @@ class _WeeklyChartState extends State<_WeeklyChart>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late Animation<double> _anim;
-  int? _hoveredIdx;
+  // Which bar's tooltip is showing, if any. Was tracked as onTapDown/onTapUp
+  // hover state, which meant the value only appeared while a finger held the
+  // bar down and vanished the instant it lifted — readable by no one — and
+  // had no onTapCancel, so a drag that left the bar stuck the tooltip open.
+  // A tap-to-select toggle fixes both: the value stays up until the user
+  // taps it again or picks a different bar.
+  int? _selectedIdx;
 
   @override
   void initState() {
@@ -855,93 +887,117 @@ class _WeeklyChartState extends State<_WeeklyChart>
                       ? (pt.points / maxPts) * _anim.value
                       : 0.0;
                   final isToday = i == widget.points.length - 1;
-                  final isHovered = _hoveredIdx == i;
+                  final isSelected = _selectedIdx == i;
+                  final dayName = isWeekly ? pt.fullDayName : pt.shortDayName;
 
                   return Expanded(
-                    child: GestureDetector(
-                      onTapDown: (_) => setState(() => _hoveredIdx = i),
-                      onTapUp: (_) => setState(() => _hoveredIdx = null),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            // Tooltip
-                            AnimatedOpacity(
-                              opacity: isHovered ? 1 : 0,
-                              duration: const Duration(milliseconds: 150),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 3,
+                    child: Semantics(
+                      label: AppLocalizations.of(
+                        context,
+                      )!.statsChartBarSemanticLabel(pt.fullDayName, pt.points),
+                      button: true,
+                      selected: isSelected,
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => setState(
+                          () => _selectedIdx = isSelected ? null : i,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // Tooltip
+                              AnimatedOpacity(
+                                opacity: isSelected ? 1 : 0,
+                                duration: const Duration(milliseconds: 150),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.card2,
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadius.xs,
+                                    ),
+                                    border: Border.all(
+                                      color: context.colors.border,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${pt.points}',
+                                    style: context.typography.caption.copyWith(
+                                      color: context.colors.goldText,
+                                    ),
+                                  ),
                                 ),
-                                margin: const EdgeInsets.only(bottom: 4),
+                              ),
+
+                              // Bar
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                height: (100 * ratio).clamp(4.0, 100.0),
                                 decoration: BoxDecoration(
-                                  color: context.colors.card2,
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadius.xs,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: isToday
+                                        ? [
+                                            context.colors.gold,
+                                            context.colors.goldLight,
+                                          ]
+                                        : isSelected
+                                        ? [
+                                            context.colors.teal,
+                                            context.colors.teal.withOpacity(
+                                              0.6,
+                                            ),
+                                          ]
+                                        // Was colors.border -> colors.card2:
+                                        // a hairline-border color used as a
+                                        // fill was ~1.3:1 against the card,
+                                        // i.e. every non-today bar was
+                                        // effectively invisible. textDim
+                                        // reads clearly while still staying
+                                        // visually secondary to gold/teal.
+                                        : [
+                                            context.colors.textDim,
+                                            context.colors.textDim
+                                                .withOpacity(0.4),
+                                          ],
                                   ),
-                                  border: Border.all(
-                                    color: context.colors.border,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(6),
                                   ),
-                                ),
-                                child: Text(
-                                  '${pt.points}',
-                                  style: context.typography.caption.copyWith(
-                                    color: context.colors.gold,
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // Bar
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 150),
-                              height: (100 * ratio).clamp(4.0, 100.0),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: isToday
+                                  boxShadow: isToday
                                       ? [
-                                          context.colors.gold,
-                                          context.colors.goldLight,
+                                          BoxShadow(
+                                            color: context.colors.gold
+                                                .withOpacity(0.3),
+                                            blurRadius: 8,
+                                          ),
                                         ]
-                                      : isHovered
-                                      ? [
-                                          context.colors.teal,
-                                          context.colors.teal.withOpacity(0.6),
-                                        ]
-                                      : [
-                                          context.colors.border,
-                                          context.colors.card2,
-                                        ],
+                                      : null,
                                 ),
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(6),
-                                ),
-                                boxShadow: isToday
-                                    ? [
-                                        BoxShadow(
-                                          color: context.colors.gold
-                                              .withOpacity(0.3),
-                                          blurRadius: 8,
-                                        ),
-                                      ]
-                                    : null,
                               ),
-                            ),
 
-                            const SizedBox(height: 6),
-                            Text(
-                              isWeekly ? pt.fullDayName : pt.shortDayName,
-                              style: context.typography.caption.copyWith(
-                                color: isToday
-                                    ? context.colors.gold
-                                    : context.colors.textDim,
+                              const SizedBox(height: 6),
+                              Text(
+                                dayName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: context.typography.caption.copyWith(
+                                  color: isToday
+                                      ? context.colors.goldText
+                                      : context.colors.textDim,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -956,12 +1012,14 @@ class _WeeklyChartState extends State<_WeeklyChart>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _ChartLegend(
-                color: context.colors.gold,
+                color: context.colors.goldText,
                 label: AppLocalizations.of(context)!.homeRingTodayLabel,
               ),
               const SizedBox(width: AppSpacing.lg),
+              // Was colors.border — the same near-invisible swatch as the
+              // bars it describes; matches the textDim fix above.
               _ChartLegend(
-                color: context.colors.border,
+                color: context.colors.textDim,
                 label: AppLocalizations.of(context)!.statsPreviousDaysLabel,
               ),
             ],
@@ -1170,7 +1228,11 @@ class _PrayerAttendanceCard extends ConsumerWidget {
                 child: TakwaLoadingIndicator(strokeWidth: 2),
               ),
             ),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaErrorState(
+              compact: true,
+              onRetry: () =>
+                  ref.invalidate(periodPrayerRatesProvider(range)),
+            ),
             data: (rates) => Column(
               children: rates
                   .map(
@@ -1330,6 +1392,9 @@ class _AchievementsSection extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
+              // Silent on error: the content area below surfaces this same
+              // failure with a retry action, so this count badge doesn't
+              // need to duplicate it.
               allAsync.when(
                 loading: () => const SizedBox(),
                 error: (_, _) => const SizedBox(),
@@ -1351,7 +1416,10 @@ class _AchievementsSection extends ConsumerWidget {
                 strokeWidth: 2,
               ),
             ),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaErrorState(
+              compact: true,
+              onRetry: () => ref.invalidate(_allAchievementsProvider),
+            ),
             data: (list) => list.isEmpty
                 ? _EmptyAchievements()
                 : Wrap(

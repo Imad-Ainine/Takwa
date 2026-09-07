@@ -1740,5 +1740,23 @@
   "guestGuardMessage": "Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.",
   "guestGuardSignIn": "Sign in / Create account",
   "guestGuardBack": "Back",
-  "splashQuote": "“Take account of yourselves before you are brought to account”"
+  "splashQuote": "“Take account of yourselves before you are brought to account”",
+  "genericErrorMessage": "Something went wrong. Please try again.",
+  "retryButtonLabel": "Retry",
+  "inlineErrorRetryLabel": "Couldn’t load, tap to retry",
+  "statsChartBarSemanticLabel": "{day}: {points} points",
+  "@statsChartBarSemanticLabel": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "drawerSyncOffline": "Offline",
+  "drawerSyncSynced": "Synced",
+  "checklistSaveError": "Couldn't save — please try again",
+  "checklistSyncError": "Saved on this device — it'll sync once you're back online"
 }

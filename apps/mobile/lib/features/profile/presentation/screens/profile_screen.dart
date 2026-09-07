@@ -5,6 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/takwa_error_state.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/providers/database_providers.dart';
 import '../../../../core/database/daos.dart';
@@ -41,11 +42,11 @@ class ProfileScreen extends ConsumerWidget {
                   child: Column(
                     children: [
                       // Profile Header Card
-                      _buildProfileHeader(context, profileAsync),
+                      _buildProfileHeader(context, ref, profileAsync),
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Stats Row
-                      _buildStatsGrid(context, statsAsync, streakAsync),
+                      _buildStatsGrid(context, ref, statsAsync, streakAsync),
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Quick Actions / Menu
@@ -87,18 +88,16 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildProfileHeader(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<Map<String, dynamic>?> profileAsync,
   ) {
-    final l10n = AppLocalizations.of(context)!;
     return profileAsync.when(
       loading: () => const Center(child: TakwaLoadingIndicator()),
-      error: (e, _) => Center(
-        child: Text(
-          l10n.profileLoadError,
-          style: context.typography.bodySmall,
-        ),
+      error: (e, _) => TakwaErrorState(
+        onRetry: () => ref.invalidate(userProfileProvider),
       ),
       data: (profile) {
+        final l10n = AppLocalizations.of(context)!;
         final username = profile?['username'] ?? l10n.profileDefaultUsername;
         final avatar = profile?['avatar_emoji'] ?? '🌙';
 
@@ -185,6 +184,7 @@ class ProfileScreen extends ConsumerWidget {
 
   Widget _buildStatsGrid(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<MonthStats> statsAsync,
     AsyncValue<int> streakAsync,
   ) {
@@ -200,7 +200,10 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.gold,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaInlineError(
+              height: 100,
+              onRetry: () => ref.invalidate(monthStatsProvider),
+            ),
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -213,7 +216,10 @@ class ProfileScreen extends ConsumerWidget {
               color: context.colors.success,
             ),
             loading: () => const SizedBox(height: 100),
-            error: (_, _) => const SizedBox(),
+            error: (_, _) => TakwaInlineError(
+              height: 100,
+              onRetry: () => ref.invalidate(currentStreakProvider),
+            ),
           ),
         ),
       ],

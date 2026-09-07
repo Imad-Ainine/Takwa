@@ -2271,5 +2271,45 @@
   "splashQuote": "\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"",
   "@splashQuote": {
     "description": "Hadith shown under the app name on the splash screen"
+  },
+  "genericErrorMessage": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+  "@genericErrorMessage": {
+    "description": "Generic fallback error message when a section fails to load"
+  },
+  "retryButtonLabel": "إعادة المحاولة",
+  "@retryButtonLabel": {
+    "description": "Generic retry action button label"
+  },
+  "inlineErrorRetryLabel": "تعذّر التحميل، اضغط لإعادة المحاولة",
+  "@inlineErrorRetryLabel": {
+    "description": "Semantic label for a compact inline retry affordance (a small area that failed to load, e.g. a stat tile)"
+  },
+  "statsChartBarSemanticLabel": "{day}: {points} نقطة",
+  "@statsChartBarSemanticLabel": {
+    "description": "Screen-reader label for one bar in the weekly/period performance chart",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "drawerSyncOffline": "غير متصل",
+  "@drawerSyncOffline": {
+    "description": "Compact connectivity/sync status label shown in the drawer: no network"
+  },
+  "drawerSyncSynced": "تمت المزامنة",
+  "@drawerSyncSynced": {
+    "description": "Compact connectivity/sync status label shown in the drawer: idle, up to date"
+  },
+  "checklistSaveError": "تعذّر الحفظ، حاول مرة أخرى",
+  "@checklistSaveError": {
+    "description": "Shown when a prayer/ibadah status write to the local database fails"
+  },
+  "checklistSyncError": "تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال",
+  "@checklistSyncError": {
+    "description": "Shown when the local save succeeded but pushing it to the cloud failed"
   }
 }

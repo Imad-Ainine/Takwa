@@ -17,7 +17,12 @@ class AsmaScreen extends ConsumerStatefulWidget {
 }
 
 class _AsmaScreenState extends ConsumerState<AsmaScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  // Matters more here than most — without it, the search query and expanded
+  // name were both reset on every tab switch away and back.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _entryCtrl;
   final _searchCtrl = TextEditingController();
   String _query = '';
@@ -52,6 +57,7 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final s = AdaptiveStyle(context, isRamadan);
     final filtered = _filtered;

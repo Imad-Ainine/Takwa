@@ -22,7 +22,10 @@ class QiyamDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  @override
+  bool get wantKeepAlive => true;
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulse;
   late final AudioPlayer _audioPlayer;
@@ -69,6 +72,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     // Listen to tab changes
     ref.listen(currentTabProvider, (prev, next) {
       if (next == 1) {
