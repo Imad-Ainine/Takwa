@@ -407,6 +407,7 @@ class _SplashScreenState extends State<_SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Center(
@@ -446,7 +447,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 ),
                 const SizedBox(height: AppSpacing.xxl),
                 Text(
-                  'تقوى',
+                  l10n.authChoiceAppName,
                   style: context.typography.displayMedium.copyWith(
                     fontSize: 32,
                     color: context.colors.gold,
