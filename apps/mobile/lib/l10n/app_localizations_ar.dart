@@ -916,6 +916,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerNavStatistics => 'الإحصائيات';
 
   @override
+  String get drawerNavAsma => 'أسماء الله الحسنى';
+
+  @override
   String get drawerNavAchievements => 'الإنجازات';
 
   @override
@@ -2236,6 +2239,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authPasswordHint => 'كلمة المرور';
+
+  @override
+  String get authShowPasswordTooltip => 'إظهار كلمة المرور';
+
+  @override
+  String get authHidePasswordTooltip => 'إخفاء كلمة المرور';
 
   @override
   String get authForgotPassword => 'نسيت كلمة المرور؟';
@@ -4366,5 +4375,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestGuardBack => 'العودة';
 
   @override
+  String get splashQuote => '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"';
+
+  @override
+  String get genericErrorMessage => 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get retryButtonLabel => 'إعادة المحاولة';
+
+  @override
+  String get inlineErrorRetryLabel => 'تعذّر التحميل، اضغط لإعادة المحاولة';
+
+  @override
+  String statsChartBarSemanticLabel(String day, int points) {
+    return '$day: $points نقطة';
+  }
+
+  @override
+  String get drawerSyncOffline => 'غير متصل';
+
+  @override
+  String get drawerSyncSynced => 'تمت المزامنة';
+
+  @override
+  String get checklistSaveError => 'تعذّر الحفظ، حاول مرة أخرى';
+
+  @override
+  String get checklistSyncError => 'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال';
   String get splashQuote => '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
 }

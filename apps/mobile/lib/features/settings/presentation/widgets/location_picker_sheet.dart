@@ -251,7 +251,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               height: 150,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: context.colors.teal.withOpacity(0.15),
+                color: context.colors.teal.withValues(alpha: 0.15),
               ),
             ).blurred(blur: 50),
           ),
@@ -263,7 +263,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: context.colors.gold.withOpacity(0.08),
+                color: context.colors.gold.withValues(alpha: 0.08),
               ),
             ).blurred(blur: 70),
           ),
@@ -296,10 +296,10 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: context.colors.teal.withOpacity(0.1),
+                        color: context.colors.teal.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: context.colors.teal.withOpacity(0.2),
+                          color: context.colors.teal.withValues(alpha: 0.2),
                         ),
                       ),
                       child: const Center(
@@ -338,7 +338,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         color: context.colors.textDim,
                       ),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.white.withOpacity(0.05),
+                        backgroundColor: Colors.white.withValues(alpha: 0.05),
                       ),
                     ),
                   ],
@@ -365,7 +365,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                       children: [
                         Expanded(
                           child: Divider(
-                            color: context.colors.border.withOpacity(0.5),
+                            color: context.colors.border.withValues(alpha: 0.5),
                           ),
                         ),
                         Padding(
@@ -383,7 +383,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                         ),
                         Expanded(
                           child: Divider(
-                            color: context.colors.border.withOpacity(0.5),
+                            color: context.colors.border.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -496,10 +496,10 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: context.colors.teal.withOpacity(0.5)),
+              border: Border.all(color: context.colors.teal.withValues(alpha: 0.5)),
               boxShadow: [
                 BoxShadow(
-                  color: context.colors.teal.withOpacity(0.15),
+                  color: context.colors.teal.withValues(alpha: 0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -511,7 +511,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -548,7 +548,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 12,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -556,7 +556,7 @@ class _AutoDetectCardState extends State<_AutoDetectCard>
                 ),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ],
             ),
@@ -625,7 +625,7 @@ class _CityCard extends StatelessWidget {
                 vertical: AppSpacing.xs,
               ),
               decoration: BoxDecoration(
-                color: context.colors.textDim.withOpacity(0.1),
+                color: context.colors.textDim.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Text(

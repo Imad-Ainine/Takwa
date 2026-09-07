@@ -17,10 +17,10 @@ class QiyamStyle {
     return BoxDecoration(
       color: context.colors.card,
       borderRadius: BorderRadius.circular(AppRadius.xl),
-      border: Border.all(color: highlightColor.withOpacity(0.5), width: 2),
+      border: Border.all(color: highlightColor.withValues(alpha: 0.5), width: 2),
       boxShadow: [
         BoxShadow(
-          color: highlightColor.withOpacity(0.1),
+          color: highlightColor.withValues(alpha: 0.1),
           blurRadius: 15,
           spreadRadius: 2,
         ),

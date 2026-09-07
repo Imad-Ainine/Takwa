@@ -116,7 +116,7 @@ class _IslamicPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = _IGold.gold1.withOpacity(opacity)
+      ..color = _IGold.gold1.withValues(alpha: opacity)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.6;
 
@@ -129,7 +129,7 @@ class _IslamicPatternPainter extends CustomPainter {
     }
     // خطوط الشبكة الهندسية
     final gridPaint = Paint()
-      ..color = _IGold.gold1.withOpacity(opacity * 0.5)
+      ..color = _IGold.gold1.withValues(alpha: opacity * 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.3;
     for (double x = 0; x < size.width; x += step) {
@@ -263,7 +263,7 @@ class _GoldDivider extends StatelessWidget {
           child: Text(
             '✦',
             style: TextStyle(
-              color: _IGold.gold1.withOpacity(0.8),
+              color: _IGold.gold1.withValues(alpha: 0.8),
               fontSize: 10,
             ),
           ),
@@ -528,19 +528,19 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
           // ── Multi-layer glow ──
           boxShadow: [
             BoxShadow(
-              color: _IGold.gold2.withOpacity(_glowAnim.value * 0.2),
+              color: _IGold.gold2.withValues(alpha: _glowAnim.value * 0.2),
               blurRadius: 15,
               spreadRadius: 0.5,
               offset: const Offset(-3, 0),
             ),
             BoxShadow(
-              color: _IGold.gold1.withOpacity(_glowAnim.value * 0.05),
+              color: _IGold.gold1.withValues(alpha: _glowAnim.value * 0.05),
               blurRadius: 25,
               spreadRadius: 1,
               offset: const Offset(-6, 0),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(0.55),
+              color: Colors.black.withValues(alpha: 0.55),
               blurRadius: 20,
               offset: const Offset(2, 6),
             ),
@@ -584,7 +584,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        _IGold.gold3.withOpacity(0.18),
+                        _IGold.gold3.withValues(alpha: 0.18),
                         Colors.transparent,
                       ],
                     ),
@@ -598,7 +598,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: _IGold.gold2.withOpacity(0.5),
+                      color: _IGold.gold2.withValues(alpha: 0.5),
                       width: 1.0,
                     ),
                   ),
@@ -615,7 +615,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: _IGold.gold1.withOpacity(0.08),
+                      color: _IGold.gold1.withValues(alpha: 0.08),
                       width: 0.8,
                     ),
                   ),
@@ -687,12 +687,12 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
               colors: [Color(0xFF2A1F00), Color(0xFF0D1220)],
             ),
             border: Border.all(
-              color: _IGold.gold2.withOpacity(0.6),
+              color: _IGold.gold2.withValues(alpha: 0.6),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: _IGold.gold2.withOpacity(0.15),
+                color: _IGold.gold2.withValues(alpha: 0.15),
                 blurRadius: 6,
                 spreadRadius: 0.5,
               ),
@@ -735,7 +735,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                     style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 10,
-                      color: _IGold.teal.withOpacity(0.85),
+                      color: _IGold.teal.withValues(alpha: 0.85),
                       letterSpacing: 0.3,
                     ),
                   ),
@@ -767,16 +767,16 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
             height: 30,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: _IGold.gold3.withOpacity(0.25),
+              color: _IGold.gold3.withValues(alpha: 0.25),
               border: Border.all(
-                color: _IGold.gold2.withOpacity(0.4),
+                color: _IGold.gold2.withValues(alpha: 0.4),
                 width: 0.8,
               ),
             ),
             alignment: Alignment.center,
             child: Icon(
               Icons.close_rounded,
-              color: _IGold.gold1.withOpacity(0.8),
+              color: _IGold.gold1.withValues(alpha: 0.8),
               size: 14,
             ),
           ),
@@ -805,7 +805,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 13,
-                  color: _IGold.gold2.withOpacity(0.55),
+                  color: _IGold.gold2.withValues(alpha: 0.55),
                   height: 1.0,
                 ),
                 textAlign: TextAlign.center,
@@ -845,11 +845,11 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
           borderRadius: BorderRadius.circular(AppRadius.xl),
           gradient: LinearGradient(
             colors: [
-              _IGold.gold3.withOpacity(0.3),
-              _IGold.gold3.withOpacity(0.15),
+              _IGold.gold3.withValues(alpha: 0.3),
+              _IGold.gold3.withValues(alpha: 0.15),
             ],
           ),
-          border: Border.all(color: _IGold.gold2.withOpacity(0.35), width: 0.8),
+          border: Border.all(color: _IGold.gold2.withValues(alpha: 0.35), width: 0.8),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -868,7 +868,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
                 style: TextStyle(
                   fontFamily: 'Amiri',
                   fontSize: 11,
-                  color: _IGold.gold1.withOpacity(0.85),
+                  color: _IGold.gold1.withValues(alpha: 0.85),
                   letterSpacing: 0.2,
                 ),
               ),

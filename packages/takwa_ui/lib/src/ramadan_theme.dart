@@ -89,7 +89,7 @@ class RamadanTheme {
       success: RamadanColors.emeraldLight,
       successDim: RamadanColors.emeraldDim,
       danger: RamadanColors.rubyLight,
-      dangerDim: RamadanColors.rubyLight.withOpacity(0.1),
+      dangerDim: RamadanColors.rubyLight.withValues(alpha: 0.1),
       warning: RamadanColors.goldenAura,
       // On-surface accent ramp — see AppColorsExtension. On deep lapis the
       // gold/emerald fills already clear AA as foregrounds; rubyLight does
@@ -102,60 +102,35 @@ class RamadanTheme {
       textPrimary: RamadanColors.ivory,
       textSecondary: RamadanColors.ivoryDim,
       // 0.5 opacity landed at 3.49:1 on deepLapis; 0.72 clears AA.
-      textDim: RamadanColors.ivoryDim.withOpacity(0.72),
+      textDim: RamadanColors.ivoryDim.withValues(alpha: 0.72),
       backgroundGradient: RamadanColors.nightSky,
       cardGradient: RamadanColors.cardGlow,
       goldGradient: AppColorsExtension.dark.goldGradient,
       tealGoldGradient: AppColorsExtension.dark.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors, locale);
-    final shadows = AppShadowsExtension.fromColors(colors);
-    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      fontFamily: appFontFamily(locale),
-      extensions: [colors, typography, shadows, decorations],
-      colorScheme: const ColorScheme.dark(
-        primary: RamadanColors.goldenAura,
-        onPrimary: Color(0xFF241B05), // 7.68:1 on goldenAura
-        onError: Colors.white,
-        secondary: RamadanColors.emeraldLight,
-        onSecondary: RamadanColors.deepLapis,
-        surface: RamadanColors.lapisCard,
-        onSurface: RamadanColors.ivory,
-        error: RamadanColors.rubyLight,
-        outline: RamadanColors.border,
-        primaryContainer: RamadanColors.goldenDim,
-        secondaryContainer: RamadanColors.emeraldDim,
-      ),
-      scaffoldBackgroundColor: RamadanColors.deepLapis,
-      cardTheme: CardThemeData(
-        color: RamadanColors.lapisCard,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: RamadanColors.border, width: 1),
-        ),
-      ),
-      textTheme: _buildTextTheme(
-        RamadanColors.ivory,
-        RamadanColors.goldenAura,
-        locale,
-      ),
-      elevatedButtonTheme: _buildButtonTheme(
-        RamadanColors.goldenAura,
-        RamadanColors.deepLapis,
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: RamadanColors.lapis,
-        selectedItemColor: RamadanColors.goldenAura,
-        unselectedItemColor: RamadanColors.ivoryDim.withOpacity(0.4),
-      ),
-      dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenAura, locale),
+    // Delegates to the shared builder behind AppTheme.dark/light instead of
+    // hand-rolling a second ThemeData here. That used to mean this theme
+    // only got 6 of the 17 component themes AppTheme builds (no
+    // navigationBarTheme, inputDecorationTheme, chipTheme, dialogTheme,
+    // snackBarTheme, sliderTheme, tabBarTheme, checkbox/switch themes, ...),
+    // a hand-built ColorScheme with ~11 roles instead of the ~20 AppTheme
+    // fills out (so e.g. NavigationBar/SearchBar/Badge fell back to the
+    // stock purple-tinted M3 defaults), and its own type scale that
+    // disagreed with AppTheme's on every role's size by 2-6px. The one
+    // deliberate divergence — a transparent app bar so RamadanBgPainter
+    // shows through behind it, instead of the base theme's opaque
+    // `colors.deep` — is preserved via `appBarBackground`.
+    //
+    // Visible side effect: card corner radius moves from this theme's
+    // previous 24px to AppTheme's 16px (`AppRadius.card`) — the two had
+    // silently diverged and there was no reason for Ramadan cards alone to
+    // be rounder.
+    return AppTheme.fromColors(
+      colors,
+      Brightness.dark,
+      locale,
+      Colors.transparent,
     );
   }
 
@@ -176,7 +151,7 @@ class RamadanTheme {
       success: RamadanColors.emerald,
       successDim: RamadanColors.emeraldDim,
       danger: RamadanColors.ruby,
-      dangerDim: RamadanColors.ruby.withOpacity(0.1),
+      dangerDim: RamadanColors.ruby.withValues(alpha: 0.1),
       warning: RamadanColors.goldenAura,
       // goldenDeep (#A07820) is only 3.84:1 on the ivory ground, so the
       // on-surface gold is darkened further; emerald and ruby already pass.
@@ -186,157 +161,23 @@ class RamadanTheme {
       warningText: const Color(0xFF6E5110),
       dangerText: RamadanColors.ruby,
       textPrimary: RamadanColors.deepLapis,
-      textSecondary: RamadanColors.deepLapis.withOpacity(0.7),
+      textSecondary: RamadanColors.deepLapis.withValues(alpha: 0.7),
       // 0.4 opacity landed at 2.56:1 on the ivory ground; 0.65 clears AA.
-      textDim: RamadanColors.deepLapis.withOpacity(0.65),
+      textDim: RamadanColors.deepLapis.withValues(alpha: 0.65),
       backgroundGradient: RamadanColors.daySky,
       cardGradient: RamadanColors.cardGlowLight,
       goldGradient: AppColorsExtension.light.goldGradient,
       tealGoldGradient: AppColorsExtension.light.tealGoldGradient,
     );
 
-    final typography = AppTypographyExtension.fromColors(colors, locale);
-    final shadows = AppShadowsExtension.fromColors(colors);
-    final decorations = AppDecorationsExtension.fromColors(colors, shadows);
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      fontFamily: appFontFamily(locale),
-      extensions: [colors, typography, shadows, decorations],
-      colorScheme: const ColorScheme.light(
-        primary: RamadanColors.goldenAura,
-        // white on goldenAura is 2.0:1 — the same defect as the base theme.
-        onPrimary: Color(0xFF241B05), // 7.68:1
-        onError: Colors.white,
-        secondary: RamadanColors.emerald,
-        onSecondary: Colors.white,
-        surface: Colors.white,
-        onSurface: RamadanColors.deepLapis,
-        error: RamadanColors.ruby,
-        outline: RamadanColors.border,
-        primaryContainer: RamadanColors.goldenDim,
-        secondaryContainer: RamadanColors.emeraldDim,
-      ),
-      scaffoldBackgroundColor: RamadanColors.ivoryLight,
-      cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: const BorderSide(color: RamadanColors.border, width: 1),
-        ),
-      ),
-      textTheme: _buildTextTheme(
-        RamadanColors.deepLapis,
-        RamadanColors.goldenDeep,
-        locale,
-      ),
-      elevatedButtonTheme: _buildButtonTheme(
-        RamadanColors.goldenAura,
-        // white on goldenAura is 2.21:1
-        const Color(0xFF241B05), // 7.68:1
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: Colors.white,
-        selectedItemColor: RamadanColors.goldenDeep,
-        unselectedItemColor: RamadanColors.deepLapis.withOpacity(0.4),
-      ),
-      dividerTheme: const DividerThemeData(color: RamadanColors.border),
-      appBarTheme: _buildAppBarTheme(RamadanColors.goldenDeep, locale),
+    // See the comment in dark() above — same collapse, same caveats.
+    return AppTheme.fromColors(
+      colors,
+      Brightness.light,
+      locale,
+      Colors.transparent,
     );
   }
-
-  static TextTheme _buildTextTheme(Color main, Color accent, Locale locale) {
-    final displayFont = appFontFamily(locale);
-    final bodyFont = appBodyFontFamily(locale);
-    final fallback = appFontFamilyFallback(locale);
-    return TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 36,
-        fontWeight: FontWeight.w700,
-        color: accent,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      headlineLarge: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: displayFont,
-        fontFamilyFallback: fallback,
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: main,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 16,
-        color: main,
-        height: 1.9,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 14,
-        color: main,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 12,
-        color: main.withOpacity(0.7),
-      ),
-      labelLarge: TextStyle(
-        fontFamily: bodyFont,
-        fontFamilyFallback: fallback,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: main,
-      ),
-    );
-  }
-
-  static ElevatedButtonThemeData _buildButtonTheme(Color bg, Color fg) =>
-      ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          foregroundColor: fg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-        ),
-      );
-
-  static AppBarTheme _buildAppBarTheme(Color accent, Locale locale) =>
-      AppBarTheme(
-        // Removes the shadow/elevation for all AppBars
-        scrolledUnderElevation: 0.0,
-        // Removes the color tint highlight for all AppBars
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        titleTextStyle: TextStyle(
-          fontFamily: appFontFamily(locale),
-          fontSize: 20,
-          color: accent,
-          fontWeight: FontWeight.w700,
-        ),
-        iconTheme: IconThemeData(color: accent),
-      );
 }
 
 class RamadanDecorations {
@@ -346,7 +187,7 @@ class RamadanDecorations {
     border: Border.all(color: RamadanColors.border),
     boxShadow: [
       BoxShadow(
-        color: RamadanColors.goldenAura.withOpacity(0.06),
+        color: RamadanColors.goldenAura.withValues(alpha: 0.06),
         blurRadius: 16,
         offset: const Offset(0, 4),
       ),
@@ -359,7 +200,7 @@ class RamadanDecorations {
     border: Border.all(color: RamadanColors.borderLight),
     boxShadow: [
       BoxShadow(
-        color: RamadanColors.goldenAura.withOpacity(0.15),
+        color: RamadanColors.goldenAura.withValues(alpha: 0.15),
         blurRadius: 24,
         offset: const Offset(0, 6),
       ),
@@ -377,15 +218,37 @@ class RamadanDecorations {
 }
 
 class RamadanBgPainter extends CustomPainter {
-  final double animT;
+  // Was a plain `final double animT` set from a caller-read `_ctrl.value`,
+  // with CustomPatternBackground rebuilding via AnimatedBuilder and
+  // constructing a BRAND NEW RamadanBgPainter every animation tick (~15/s).
+  // That made every field below pointless as a cache: a fresh instance
+  // starts with everything null, so the whole arabesque tiling — nested
+  // loops over the viewport, a 20-segment star plus 10 béziers per cell —
+  // was re-recorded from scratch on every frame, and being `static` on top
+  // of that meant every differently-sized CustomPatternBackground on
+  // screen (there are dozens, including one inside every PrimaryButton)
+  // stomped on the one shared cache.
+  //
+  // Passing `animation` straight to `super(repaint: animation)` fixes the
+  // root cause: the render object now calls paint() again on this SAME
+  // painter instance whenever the controller ticks, without rebuilding the
+  // widget tree or constructing a new painter — see
+  // CustomPatternBackground's Ramadan branch, which no longer wraps this in
+  // AnimatedBuilder. That makes the caches below instance fields that
+  // actually get reused, keyed by (size, brightness) as before.
+  final Animation<double> animation;
   final Brightness brightness;
-  RamadanBgPainter({this.animT = 0, this.brightness = Brightness.dark});
+  RamadanBgPainter({required this.animation, this.brightness = Brightness.dark})
+    : super(repaint: animation);
 
-  static final _rng = math.Random(7);
-  static List<Offset>? _stars;
-  static Picture? _cachedArabesque;
-  static Size? _cachedArabesqueSize;
-  static Brightness? _cachedBrightness;
+  double get animT => animation.value;
+
+  final math.Random _rng = math.Random(7);
+  List<Offset>? _stars;
+  Size? _starsSize;
+  Picture? _cachedArabesque;
+  Size? _cachedArabesqueSize;
+  Brightness? _cachedBrightness;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -410,6 +273,10 @@ class RamadanBgPainter extends CustomPainter {
     if (_cachedArabesque == null ||
         _cachedArabesqueSize != size ||
         _cachedBrightness != brightness) {
+      // Dispose the outgoing recording before replacing it — a Picture
+      // holds a native (Skia) resource that isn't freed just because the
+      // Dart reference is overwritten.
+      _cachedArabesque?.dispose();
       _cachedArabesqueSize = size;
       _cachedBrightness = brightness;
       final recorder = PictureRecorder();
@@ -425,20 +292,27 @@ class RamadanBgPainter extends CustomPainter {
   }
 
   void _drawNightElements(Canvas canvas, Size size) {
-    _stars ??= List.generate(
-      120,
-      (_) => Offset(
-        _rng.nextDouble() * size.width,
-        _rng.nextDouble() * size.height * 0.7,
-      ),
-    );
+    // Also now keyed by size, not just "has this ever run": the old
+    // `_stars ??= ...` generated the field once for whatever size happened
+    // to paint first and never regenerated it, so a later resize (rotation,
+    // a different screen) left stars scattered to fit stale dimensions.
+    if (_stars == null || _starsSize != size) {
+      _starsSize = size;
+      _stars = List.generate(
+        120,
+        (_) => Offset(
+          _rng.nextDouble() * size.width,
+          _rng.nextDouble() * size.height * 0.7,
+        ),
+      );
+    }
     for (int i = 0; i < _stars!.length; i++) {
       final t = (math.sin(animT * 2 * math.pi + i * 0.4) + 1) / 2;
       final r = 0.5 + _rng.nextDouble() * 1.2;
       canvas.drawCircle(
         _stars![i],
         r,
-        Paint()..color = RamadanColors.ivory.withOpacity(0.1 + 0.5 * t),
+        Paint()..color = RamadanColors.ivory.withValues(alpha: 0.1 + 0.5 * t),
       );
     }
     _drawCrescent(canvas, Offset(size.width * 0.82, size.height * 0.09), true);
@@ -453,7 +327,7 @@ class RamadanBgPainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           colors: [
-            RamadanColors.goldenAura.withOpacity(0.15),
+            RamadanColors.goldenAura.withValues(alpha: 0.15),
             Colors.transparent,
           ],
         ).createShader(Rect.fromCircle(center: sunCenter, radius: 40)),
@@ -463,14 +337,12 @@ class RamadanBgPainter extends CustomPainter {
   void _drawLantern(Canvas canvas, Offset pos, double scale, bool isDark) {
     final flicker = (math.sin(animT * 2 * math.pi * 1.5) + 1) / 2;
     final p = Paint()
-      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.8 : 0.6)
+      ..color = RamadanColors.goldenAura.withValues(alpha: isDark ? 0.8 : 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
     final glowP = Paint()
-      ..color = RamadanColors.goldenLight.withOpacity(
-        isDark ? 0.3 * flicker : 0.15 * flicker,
-      )
+      ..color = RamadanColors.goldenLight.withValues(alpha: isDark ? 0.3 * flicker : 0.15 * flicker)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
 
     canvas.drawCircle(pos + const Offset(0, 15), 15 * scale, glowP);
@@ -505,9 +377,7 @@ class RamadanBgPainter extends CustomPainter {
 
     // Inner light
     final innerP = Paint()
-      ..color = RamadanColors.goldenLight.withOpacity(
-        isDark ? 0.5 * flicker : 0.3 * flicker,
-      )
+      ..color = RamadanColors.goldenLight.withValues(alpha: isDark ? 0.5 * flicker : 0.3 * flicker)
       ..style = PaintingStyle.fill;
     canvas.drawRect(
       Rect.fromCenter(
@@ -525,7 +395,7 @@ class RamadanBgPainter extends CustomPainter {
       center,
       r + 8,
       Paint()
-        ..color = RamadanColors.goldenAura.withOpacity(0.08)
+        ..color = RamadanColors.goldenAura.withValues(alpha: 0.08)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
     );
     canvas.drawCircle(center, r, Paint()..color = const Color(0xFFFFF0B3));
@@ -538,7 +408,7 @@ class RamadanBgPainter extends CustomPainter {
 
   void _drawArabesque(Canvas canvas, Size size, bool isDark) {
     final p = Paint()
-      ..color = RamadanColors.goldenAura.withOpacity(isDark ? 0.07 : 0.05)
+      ..color = RamadanColors.goldenAura.withValues(alpha: isDark ? 0.07 : 0.05)
       ..strokeWidth = 0.9
       ..style = PaintingStyle.stroke;
     const s = 100.0;
@@ -609,8 +479,23 @@ class RamadanBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(RamadanBgPainter old) =>
-      old.animT != animT || old.brightness != brightness;
+  void dispose() {
+    // Called when this painter is finally discarded (the widget is removed,
+    // or a same-runtimeType painter replaces it) — releases the cached
+    // Picture's native resources instead of leaking them.
+    _cachedArabesque?.dispose();
+    super.dispose();
+  }
+
+  @override
+  bool shouldRepaint(covariant RamadanBgPainter old) =>
+      // Per-frame repaints are driven by `repaint: animation` above, not by
+      // this — Flutter calls paint() again on tick regardless of what this
+      // returns. This only matters on the rarer occasion a NEW painter
+      // instance replaces this one (e.g. a brightness flip rebuilds
+      // CustomPatternBackground), where a differing controller identity or
+      // brightness is the real signal to repaint.
+      old.animation != animation || old.brightness != brightness;
 }
 
 /// Theme-aware style helper used across screens that need to react to
@@ -663,7 +548,7 @@ class AdaptiveStyle {
     shadows: isRamadan
         ? [
             Shadow(
-              color: gold.withOpacity(size > 20 ? 0.4 : 0.2),
+              color: gold.withValues(alpha: size > 20 ? 0.4 : 0.2),
               blurRadius: size > 20 ? 12 : 8,
             ),
           ]
@@ -700,4 +585,82 @@ class AdaptiveStyle {
     fontWeight: weight ?? FontWeight.w400,
     height: height,
   );
+
+  // ── Role-based styles ─────────────────────────────────────────────
+  //
+  // The three methods above take a raw pixel `size` — which is exactly how
+  // this class ended up behind 266 call sites passing 19 different literal
+  // values (down to 8px), because reaching for a number was always easier
+  // than fighting a type scale that didn't fit real usage (see the "display
+  // sizes masquerading as body sizes" note on AppTypographyExtension's own
+  // fromColors). These return the SAME TextStyle Theme.of(context) already
+  // carries on AppTypographyExtension, one role at a time, instead of
+  // resolving a font/size themselves — and since RamadanTheme now shares
+  // AppTheme's builder rather than hand-rolling its own type scale, that
+  // resolved style is already correct for whichever of the four themes
+  // (base/Ramadan × dark/light) is active, with no extra logic needed here.
+  //
+  // Not a mechanical migration of the 266 existing call sites: this adds
+  // the accessors the fix calls for and moves this file itself, but sweeping
+  // every call site means picking, for each one, which of these 12 roles
+  // its current raw size was *supposed* to mean — a judgment call per site
+  // that needs a visual pass this environment (no Flutter SDK) can't do
+  // safely. New call sites, and any call site touched for other reasons,
+  // should reach for one of these instead of `.naskh(11)`.
+  AppTypographyExtension get _type =>
+      Theme.of(context).extension<AppTypographyExtension>()!;
+
+  // The old amiri()'s Ramadan-only glow, ported by role instead of by a
+  // `size > 20` threshold: displayLarge/displayMedium/headingLarge are the
+  // roles that used to sit above that threshold.
+  TextStyle _withRamadanGlow(TextStyle style, {required bool strong}) {
+    if (!isRamadan) return style;
+    return style.copyWith(
+      shadows: [
+        Shadow(
+          color: gold.withValues(alpha: strong ? 0.4 : 0.2),
+          blurRadius: strong ? 12 : 8,
+        ),
+      ],
+    );
+  }
+
+  TextStyle _override(TextStyle style, {Color? color, FontWeight? weight, double? height}) =>
+      style.copyWith(color: color, fontWeight: weight, height: height);
+
+  TextStyle displayLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.displayLarge, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle displayMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.displayMedium, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle headingLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.headingLarge, strong: true), color: color, weight: weight, height: height);
+
+  TextStyle headingMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_withRamadanGlow(_type.headingMedium, strong: false), color: color, weight: weight, height: height);
+
+  TextStyle bodyLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodyLarge, color: color, weight: weight, height: height);
+
+  TextStyle bodyMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodyMedium, color: color, weight: weight, height: height);
+
+  TextStyle bodySmall({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.bodySmall, color: color, weight: weight, height: height);
+
+  TextStyle labelLarge({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.labelLarge, color: color, weight: weight, height: height);
+
+  TextStyle labelMedium({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.labelMedium, color: color, weight: weight, height: height);
+
+  TextStyle caption({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.caption, color: color, weight: weight, height: height);
+
+  TextStyle quranicVerse({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.quranicVerse, color: color, weight: weight, height: height);
+
+  TextStyle taqwaScore({Color? color, FontWeight? weight, double? height}) =>
+      _override(_type.taqwaScore, color: color, weight: weight, height: height);
 }

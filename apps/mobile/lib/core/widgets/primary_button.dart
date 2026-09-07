@@ -144,13 +144,13 @@ class _PrimaryButtonState extends State<PrimaryButton>
                   : null,
               borderRadius: AppRadius.button,
               border: widget.isOutline
-                  ? Border.all(color: primaryColor.withOpacity(0.5), width: 1.5)
+                  ? Border.all(color: primaryColor.withValues(alpha: 0.5), width: 1.5)
                   : null,
               boxShadow: (disabled || widget.isOutline)
                   ? null
                   : [
                       BoxShadow(
-                        color: primaryColor.withOpacity(0.30),
+                        color: primaryColor.withValues(alpha: 0.30),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),

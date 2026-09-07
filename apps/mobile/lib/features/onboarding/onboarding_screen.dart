@@ -315,7 +315,7 @@ class _StepIndicator extends StatelessWidget {
                 boxShadow: active
                     ? [
                         BoxShadow(
-                          color: AppColors.gold.withOpacity(0.4),
+                          color: AppColors.gold.withValues(alpha: 0.4),
                           blurRadius: 8,
                         ),
                       ]
@@ -562,7 +562,7 @@ class _GenderStep extends StatelessWidget {
                       color: AppColors.goldDim,
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.gold.withOpacity(0.2),
+                        color: AppColors.gold.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -671,14 +671,14 @@ class _GenderCardState extends State<_GenderCard>
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: widget.selected
-                  ? AppColors.gold.withOpacity(0.6)
+                  ? AppColors.gold.withValues(alpha: 0.6)
                   : AppColors.border,
               width: widget.selected ? 2.5 : 1,
             ),
             boxShadow: widget.selected
                 ? [
                     BoxShadow(
-                      color: AppColors.gold.withOpacity(0.2),
+                      color: AppColors.gold.withValues(alpha: 0.2),
                       blurRadius: 16,
                       spreadRadius: 2,
                     ),
@@ -697,15 +697,15 @@ class _GenderCardState extends State<_GenderCard>
                   gradient: widget.selected
                       ? RadialGradient(
                           colors: [
-                            AppColors.gold.withOpacity(0.25),
-                            AppColors.gold.withOpacity(0.05),
+                            AppColors.gold.withValues(alpha: 0.25),
+                            AppColors.gold.withValues(alpha: 0.05),
                           ],
                         )
                       : null,
                   color: widget.selected ? null : AppColors.card2,
                   border: Border.all(
                     color: widget.selected
-                        ? AppColors.gold.withOpacity(0.5)
+                        ? AppColors.gold.withValues(alpha: 0.5)
                         : AppColors.border,
                     width: widget.selected ? 2.5 : 1.5,
                   ),
@@ -743,7 +743,7 @@ class _GenderCardState extends State<_GenderCard>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.gold.withOpacity(0.4),
+                        color: AppColors.gold.withValues(alpha: 0.4),
                         blurRadius: 8,
                       ),
                     ],
@@ -843,12 +843,12 @@ class _AuthStepState extends State<_AuthStep>
                       colors: [Color(0x30C8A96E), Color(0x10C8A96E)],
                     ),
                     border: Border.all(
-                      color: AppColors.gold.withOpacity(0.4),
+                      color: AppColors.gold.withValues(alpha: 0.4),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.gold.withOpacity(0.2),
+                        color: AppColors.gold.withValues(alpha: 0.2),
                         blurRadius: 20,
                       ),
                     ],
@@ -1140,8 +1140,8 @@ class _PlanCard extends StatelessWidget {
           gradient: selected
               ? LinearGradient(
                   colors: [
-                    AppColors.gold.withOpacity(0.12),
-                    AppColors.teal.withOpacity(0.06),
+                    AppColors.gold.withValues(alpha: 0.12),
+                    AppColors.teal.withValues(alpha: 0.06),
                   ],
                 )
               : null,
@@ -1149,14 +1149,14 @@ class _PlanCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: selected
-                ? AppColors.gold.withOpacity(0.5)
+                ? AppColors.gold.withValues(alpha: 0.5)
                 : AppColors.border,
             width: selected ? 2 : 1,
           ),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: AppColors.gold.withOpacity(0.15),
+                    color: AppColors.gold.withValues(alpha: 0.15),
                     blurRadius: 12,
                   ),
                 ]
@@ -1208,10 +1208,10 @@ class _PlanCard extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: (badgeColor ?? AppColors.gold).withOpacity(0.15),
+                      color: (badgeColor ?? AppColors.gold).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: (badgeColor ?? AppColors.gold).withOpacity(0.3),
+                        color: (badgeColor ?? AppColors.gold).withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
@@ -1281,14 +1281,14 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
       decoration: BoxDecoration(
-        color: AppColors.card.withOpacity(0.95),
+        color: AppColors.card.withValues(alpha: 0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         border: const Border(
           top: BorderSide(color: AppColors.border, width: 1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -1435,7 +1435,7 @@ class _OnboardBgPainter extends CustomPainter {
       canvas.drawCircle(
         _stars![i],
         0.8 + _rng.nextDouble(),
-        Paint()..color = AppColors.gold.withOpacity(op),
+        Paint()..color = AppColors.gold.withValues(alpha: op),
       );
     }
 
@@ -1457,7 +1457,7 @@ class _OnboardBgPainter extends CustomPainter {
       Paint()
         ..shader =
             RadialGradient(
-              colors: [AppColors.gold.withOpacity(0.06), Colors.transparent],
+              colors: [AppColors.gold.withValues(alpha: 0.06), Colors.transparent],
             ).createShader(
               Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 200),
             ),
@@ -1480,7 +1480,7 @@ class _LocationIllustration extends CustomPainter {
     canvas.drawRRect(
       phone,
       Paint()
-        ..color = AppColors.gold.withOpacity(0.3)
+        ..color = AppColors.gold.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1501,7 +1501,7 @@ class _LocationIllustration extends CustomPainter {
     canvas.drawCircle(
       Offset(cx + 60, cy + 20),
       30,
-      Paint()..color = AppColors.teal.withOpacity(0.15),
+      Paint()..color = AppColors.teal.withValues(alpha: 0.15),
     );
     canvas.drawCircle(
       Offset(cx + 60, cy + 20),
@@ -1534,14 +1534,14 @@ class _LocationIllustration extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = AppColors.gold.withOpacity(0.5)
+        ..color = AppColors.gold.withValues(alpha: 0.5)
         ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke,
     );
   }
 
   void _drawPin(Canvas canvas, Offset pos, double r, Color color) {
-    canvas.drawCircle(pos, r, Paint()..color = color.withOpacity(0.2));
+    canvas.drawCircle(pos, r, Paint()..color = color.withValues(alpha: 0.2));
     canvas.drawCircle(pos, r - 4, Paint()..color = color);
     canvas.drawCircle(pos, r - 8, Paint()..color = AppColors.night);
   }
@@ -1559,7 +1559,7 @@ class _BellIllustration extends CustomPainter {
       canvas.drawCircle(
         Offset(cx, cy),
         40.0 + i * 12,
-        Paint()..color = AppColors.gold.withOpacity(0.03 + i * 0.02),
+        Paint()..color = AppColors.gold.withValues(alpha: 0.03 + i * 0.02),
       );
     }
 
@@ -1572,7 +1572,7 @@ class _BellIllustration extends CustomPainter {
     bell.quadraticBezierTo(cx - 55, cy - 40, cx, cy - 55);
     bell.close();
 
-    canvas.drawPath(bell, Paint()..color = AppColors.gold.withOpacity(0.85));
+    canvas.drawPath(bell, Paint()..color = AppColors.gold.withValues(alpha: 0.85));
     canvas.drawPath(
       bell,
       Paint()
@@ -1630,7 +1630,7 @@ class _BellIllustration extends CustomPainter {
         -math.pi / 2,
         false,
         Paint()
-          ..color = AppColors.teal.withOpacity(0.4 - i * 0.1)
+          ..color = AppColors.teal.withValues(alpha: 0.4 - i * 0.1)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2,
       );
@@ -1657,12 +1657,12 @@ class _PlanIllustration extends CustomPainter {
       canvas.drawCircle(
         Offset(cx + 70 * math.cos(angle), cy + 30 * math.sin(angle)),
         12,
-        Paint()..color = AppColors.gold.withOpacity(0.8),
+        Paint()..color = AppColors.gold.withValues(alpha: 0.8),
       );
       canvas.drawCircle(
         Offset(cx + 70 * math.cos(angle), cy + 30 * math.sin(angle)),
         8,
-        Paint()..color = AppColors.goldLight.withOpacity(0.5),
+        Paint()..color = AppColors.goldLight.withValues(alpha: 0.5),
       );
     }
     _drawStar(canvas, Offset(cx, cy - 50), 20, AppColors.gold);
@@ -1779,7 +1779,7 @@ class _OverlayIllustration extends CustomPainter {
       canvas.drawLine(
         Offset(cx - 50, cy - 10 + i * 15),
         Offset(cx + 50, cy - 10 + i * 15),
-        Paint()..color = AppColors.border.withOpacity(0.3),
+        Paint()..color = AppColors.border.withValues(alpha: 0.3),
       );
     }
 
@@ -1795,7 +1795,7 @@ class _OverlayIllustration extends CustomPainter {
       overlayRect.inflate(8),
       Paint()
         ..shader = RadialGradient(
-          colors: [AppColors.gold.withOpacity(0.15), Colors.transparent],
+          colors: [AppColors.gold.withValues(alpha: 0.15), Colors.transparent],
         ).createShader(Rect.fromCircle(center: Offset(cx, floatY), radius: 60)),
     );
 
@@ -1803,7 +1803,7 @@ class _OverlayIllustration extends CustomPainter {
     canvas.drawRRect(
       overlayRect,
       Paint()
-        ..color = AppColors.gold.withOpacity(0.6)
+        ..color = AppColors.gold.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1916,7 +1916,7 @@ class _BackgroundIllustration extends CustomPainter {
       canvas.drawCircle(
         Offset(cx, cy),
         r,
-        Paint()..color = AppColors.teal.withOpacity(opacity),
+        Paint()..color = AppColors.teal.withValues(alpha: opacity),
       );
     }
 
@@ -1936,7 +1936,7 @@ class _BackgroundIllustration extends CustomPainter {
       phoneRect.inflate(10),
       Paint()
         ..shader = RadialGradient(
-          colors: [AppColors.teal.withOpacity(0.2), Colors.transparent],
+          colors: [AppColors.teal.withValues(alpha: 0.2), Colors.transparent],
         ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 100)),
     );
 
@@ -1944,7 +1944,7 @@ class _BackgroundIllustration extends CustomPainter {
     canvas.drawRRect(
       phoneRect,
       Paint()
-        ..color = AppColors.teal.withOpacity(0.3)
+        ..color = AppColors.teal.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1955,7 +1955,7 @@ class _BackgroundIllustration extends CustomPainter {
       width: 30,
       height: 50,
     );
-    final batteryPaint = Paint()..color = AppColors.teal.withOpacity(0.7);
+    final batteryPaint = Paint()..color = AppColors.teal.withValues(alpha: 0.7);
     canvas.drawRRect(
       RRect.fromRectAndRadius(batteryRect, const Radius.circular(4)),
       batteryPaint
@@ -1984,7 +1984,7 @@ class _BackgroundIllustration extends CustomPainter {
         ),
         const Radius.circular(2),
       ),
-      batteryPaint..color = AppColors.teal.withOpacity(0.5 + (0.5 * progress)),
+      batteryPaint..color = AppColors.teal.withValues(alpha: 0.5 + (0.5 * progress)),
     );
 
     // Gear icons around signifying background services
@@ -1999,7 +1999,7 @@ class _BackgroundIllustration extends CustomPainter {
     double rotation,
   ) {
     final paint = Paint()
-      ..color = AppColors.gold.withOpacity(0.6)
+      ..color = AppColors.gold.withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.save();

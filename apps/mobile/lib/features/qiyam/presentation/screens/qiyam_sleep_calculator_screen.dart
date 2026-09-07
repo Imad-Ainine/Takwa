@@ -126,10 +126,10 @@ class _QiyamSleepCalculatorScreenState
         decoration: BoxDecoration(
           color: context.colors.card,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: context.colors.gold.withOpacity(0.3)),
+          border: Border.all(color: context.colors.gold.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
-              color: context.colors.gold.withOpacity(0.05),
+              color: context.colors.gold.withValues(alpha: 0.05),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -171,10 +171,10 @@ class _QiyamSleepCalculatorScreenState
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                       border: Border.all(
-                        color: context.colors.gold.withOpacity(0.5),
+                        color: context.colors.gold.withValues(alpha: 0.5),
                       ),
                     ),
                     child: Stack(
@@ -243,7 +243,7 @@ class _QiyamSleepCalculatorScreenState
             decoration: BoxDecoration(
               color: context.colors.card,
               borderRadius: BorderRadius.circular(AppRadius.xl),
-              border: Border.all(color: color.withOpacity(0.3)),
+              border: Border.all(color: color.withValues(alpha: 0.3)),
             ),
             child: Stack(
               children: [
@@ -262,7 +262,7 @@ class _QiyamSleepCalculatorScreenState
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(

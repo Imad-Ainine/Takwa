@@ -188,7 +188,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         vertical: AppSpacing.sm,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppRadius.xl),
                       ),
                       child: Row(
@@ -222,10 +222,10 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       height: 120,
                       width: 200,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Stack(
@@ -329,7 +329,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
         border: Border.all(color: style.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -552,7 +552,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             'متفق عليه',
             style: style.naskh(
               12,
-              color: const Color(0xFF8B7322).withOpacity(0.8),
+              color: const Color(0xFF8B7322).withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -580,7 +580,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             Icon(
               Icons.location_off_rounded,
               size: 48,
-              color: AppColors.gold.withOpacity(0.5),
+              color: AppColors.gold.withValues(alpha: 0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(

@@ -1,16 +1,18 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with TickerProviderStateMixin {
   late AnimationController _mainController;
   late AnimationController _bgController;
@@ -49,12 +51,26 @@ class _SplashScreenState extends State<SplashScreen>
 
     _mainController.forward();
 
-    // Navigate to home after 3 seconds
-    Timer(const Duration(milliseconds: 3000), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      }
-    });
+    _navigateWhenReady();
+  }
+
+  /// Was a flat `Timer(3000ms)` regardless of whether the app was actually
+  /// ready — meaning a slow cold start (DB init, migrations) still handed
+  /// the user off to a half-ready MainShell after exactly 3s, while a fast
+  /// one made them wait out 3s for nothing. Gate on the same read MainShell
+  /// itself waits on (onboardingDoneProvider), with a floor no longer than
+  /// the entry animation so the brand moment isn't cut short on a fast
+  /// device, and no explicit ceiling — if it's still not ready, the user
+  /// sees the (branded) splash animation continue rather than a jump into
+  /// broken content.
+  Future<void> _navigateWhenReady() async {
+    await Future.wait<bool>([
+      ref.read(onboardingDoneProvider.future).catchError((_) => false),
+      Future.delayed(_mainController.duration!, () => false),
+    ]);
+    if (mounted) {
+      Navigator.of(context).pushReplacementNamed(Routes.home);
+    }
   }
 
   @override
@@ -84,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    context.colors.teal.withOpacity(0.1),
+                    context.colors.teal.withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),
@@ -101,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    context.colors.gold.withOpacity(0.12),
+                    context.colors.gold.withValues(alpha: 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -133,9 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: context.colors.gold.withOpacity(
-                                      0.25,
-                                    ),
+                                    color: context.colors.gold.withValues(alpha: 0.25),
                                     blurRadius: 60,
                                     spreadRadius: 10,
                                   ),
@@ -193,7 +207,7 @@ class _VerseCard extends StatelessWidget {
           colors: [Color(0x1CC8A96E), Color(0x0E3AAFA9)],
         ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: context.colors.gold.withOpacity(0.18)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.18)),
       ),
       child: Column(
         children: [
@@ -203,7 +217,7 @@ class _VerseCard extends StatelessWidget {
               Container(
                 width: 28,
                 height: 1,
-                color: context.colors.gold.withOpacity(0.3),
+                color: context.colors.gold.withValues(alpha: 0.3),
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
@@ -214,7 +228,7 @@ class _VerseCard extends StatelessWidget {
               Container(
                 width: 28,
                 height: 1,
-                color: context.colors.gold.withOpacity(0.3),
+                color: context.colors.gold.withValues(alpha: 0.3),
               ),
             ],
           ),

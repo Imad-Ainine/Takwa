@@ -82,7 +82,7 @@ class BooksChapterScreen extends ConsumerWidget {
                           style: TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.right,
@@ -261,9 +261,9 @@ class _StatChip extends StatelessWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -338,12 +338,12 @@ class _PrimaryActionButton extends StatelessWidget {
         height: 64,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [accentColor, accentColor.withOpacity(0.8)],
+            colors: [accentColor, accentColor.withValues(alpha: 0.8)],
           ),
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: accentColor.withOpacity(0.3),
+              color: accentColor.withValues(alpha: 0.3),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -399,10 +399,10 @@ class _ChapterItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: isCurrent ? accentColor.withOpacity(0.05) : colors.card,
+          color: isCurrent ? accentColor.withValues(alpha: 0.05) : colors.card,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isCurrent ? accentColor.withOpacity(0.3) : colors.border,
+            color: isCurrent ? accentColor.withValues(alpha: 0.3) : colors.border,
             width: isCurrent ? 2 : 1,
           ),
         ),
@@ -453,7 +453,7 @@ class _ChapterItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: (currentPage + 1) / chapter.totalPages,
-                        backgroundColor: accentColor.withOpacity(0.1),
+                        backgroundColor: accentColor.withValues(alpha: 0.1),
                         color: accentColor,
                         minHeight: 4,
                       ),
@@ -531,7 +531,7 @@ class _ReadingProgressBar extends ConsumerWidget {
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
             value: progress,
-            backgroundColor: Colors.white.withOpacity(0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(accentColor),
             minHeight: 6,
           ),

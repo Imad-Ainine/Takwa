@@ -29,6 +29,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
+  final _userFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _passFocus = FocusNode();
   bool _loading = false;
   String? _error;
   double _passStrength = 0;
@@ -67,7 +70,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     _emailCtrl.dispose();
     _passCtrl.dispose();
     _userCtrl.dispose();
+    _userFocus.dispose();
+    _emailFocus.dispose();
+    _passFocus.dispose();
     super.dispose();
+  }
+
+  void _submitActiveTab() {
+    if (_loading) return;
+    if (_tabs.index == 0) {
+      _signIn();
+    } else {
+      _signUp();
+    }
   }
 
   Future<void> _syncGender() async {
@@ -333,17 +348,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         child: Container(
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
-            color: s.bg.withOpacity(0.72),
+            color: s.bg.withValues(alpha: 0.72),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: s.gold.withOpacity(0.22), width: 1.2),
+            border: Border.all(color: s.gold.withValues(alpha: 0.22), width: 1.2),
             boxShadow: [
               BoxShadow(
-                color: s.gold.withOpacity(0.07),
+                color: s.gold.withValues(alpha: 0.07),
                 blurRadius: 30,
                 spreadRadius: 2,
               ),
             ],
           ),
+          // Groups the username/email/password fields so a password
+          // manager can see and fill them together (autofillHints alone
+          // does nothing without this — see AuthField).
+          child: AutofillGroup(
           child: Column(
             children: [
               // ── Tab bar ──
@@ -353,7 +372,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 decoration: BoxDecoration(
                   color: s.bg,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: s.border.withOpacity(0.5)),
+                  border: Border.all(color: s.border.withValues(alpha: 0.5)),
                 ),
                 child: TabBar(
                   // 1. Removes the ink ripple on click
@@ -367,7 +386,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                     gradient: LinearGradient(colors: [s.goldDark, s.gold]),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
-                      BoxShadow(color: s.gold.withOpacity(0.3), blurRadius: 8),
+                      BoxShadow(color: s.gold.withValues(alpha: 0.3), blurRadius: 8),
                     ],
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -397,6 +416,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       hint: l10n.authUsernameHint,
                       icon: Icons.person_outline_rounded,
                       style: s,
+                      focusNode: _userFocus,
+                      autofillHints: const [AutofillHints.username],
                     ),
                     const SizedBox(height: 14),
                   ],
@@ -410,6 +431,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 icon: Icons.alternate_email_rounded,
                 style: s,
                 keyboardType: TextInputType.emailAddress,
+                focusNode: _emailFocus,
               ),
               const SizedBox(height: 14),
 
@@ -420,6 +442,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 icon: Icons.lock_outline_rounded,
                 style: s,
                 isPassword: true,
+                focusNode: _passFocus,
+                isLast: true,
+                onSubmit: _submitActiveTab,
               ),
 
               // ── Password strength (sign-up only) ──
@@ -453,20 +478,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
               // ── Submit ──
               PrimaryButton(
-                onTap: _loading
-                    ? null
-                    : () async {
-                        if (_tabs.index == 0) {
-                          await _signIn();
-                        } else {
-                          await _signUp();
-                        }
-                      },
+                onTap: _loading ? null : _submitActiveTab,
                 label: _tabs.index == 0
                     ? l10n.authSecureSignInButton
                     : l10n.authCreateAccountButton,
               ),
             ],
+          ),
           ),
         ),
       ),
@@ -480,9 +498,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.08),
+          color: Colors.red.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
+          border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -505,7 +523,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
-        Expanded(child: Divider(color: s.border.withOpacity(0.5))),
+        Expanded(child: Divider(color: s.border.withValues(alpha: 0.5))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Text(
@@ -513,7 +531,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             style: s.naskh(12, color: s.textDim),
           ),
         ),
-        Expanded(child: Divider(color: s.border.withOpacity(0.5))),
+        Expanded(child: Divider(color: s.border.withValues(alpha: 0.5))),
       ],
     );
   }
@@ -533,9 +551,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               horizontal: AppSpacing.xxl,
             ),
             decoration: BoxDecoration(
-              color: s.bg.withOpacity(0.65),
+              color: s.bg.withValues(alpha: 0.65),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: s.border.withOpacity(0.5)),
+              border: Border.all(color: s.border.withValues(alpha: 0.5)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -596,13 +614,13 @@ class _StarsPainter extends CustomPainter {
       final opacity = (0.2 + 0.5 * ((twinkle + 1) / 2)).clamp(0.0, 0.8);
       final radius = 1.0 + rng.nextDouble() * 1.4;
 
-      paint.color = (i % 7 == 0 ? gold : Colors.white).withOpacity(opacity);
+      paint.color = (i % 7 == 0 ? gold : Colors.white).withValues(alpha: opacity);
       canvas.drawCircle(Offset(x, baseY), radius, paint);
     }
 
     // Mosque silhouette hint at bottom of header
     final mPaint = Paint()
-      ..color = gold.withOpacity(0.05)
+      ..color = gold.withValues(alpha: 0.05)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -635,7 +653,7 @@ class _AuthHeader extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Colors.transparent, style.bg.withOpacity(0.95)],
+          colors: [Colors.transparent, style.bg.withValues(alpha: 0.95)],
         ),
       ),
       child: SafeArea(
@@ -661,13 +679,13 @@ class _AuthHeader extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: style.gold.withOpacity(0.4 * entryCtrl.value),
+                          color: style.gold.withValues(alpha: 0.4 * entryCtrl.value),
                           blurRadius: 28,
                           spreadRadius: 4,
                         ),
                       ],
                       border: Border.all(
-                        color: style.gold.withOpacity(0.5),
+                        color: style.gold.withValues(alpha: 0.5),
                         width: 1.5,
                       ),
                     ),
@@ -744,7 +762,7 @@ class _GlowPulseState extends State<_GlowPulse>
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFD4AF37).withOpacity(0.3 * _ctrl.value),
+              color: const Color(0xFFD4AF37).withValues(alpha: 0.3 * _ctrl.value),
               blurRadius: 30,
               spreadRadius: 10,
             ),

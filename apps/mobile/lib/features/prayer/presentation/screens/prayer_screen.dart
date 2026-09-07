@@ -317,8 +317,8 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    style.bg.withOpacity(0.3),
-                    style.bg.withOpacity(0.95),
+                    style.bg.withValues(alpha: 0.3),
+                    style.bg.withValues(alpha: 0.95),
                   ],
                 ),
               ),
@@ -530,7 +530,7 @@ class _ParticlePainter extends CustomPainter {
         Offset(p.x * size.width + dx, dy),
         p.size,
         Paint()
-          ..color = color.withOpacity(opacity)
+          ..color = color.withValues(alpha: opacity)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
       );
     }
@@ -581,8 +581,8 @@ class _PrayerHeader extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            style.gold.withOpacity(0.3),
-                            style.gold.withOpacity(0.05),
+                            style.gold.withValues(alpha: 0.3),
+                            style.gold.withValues(alpha: 0.05),
                           ],
                         ),
                       ),
@@ -641,12 +641,12 @@ class _PrayerHeader extends StatelessWidget {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: style.card.withOpacity(0.8),
+                              color: style.card.withValues(alpha: 0.8),
                               shape: BoxShape.circle,
                               border: Border.all(color: style.border),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -744,7 +744,7 @@ class _MainPrayerCard extends StatelessWidget {
               border: Border.all(color: style.bg),
               boxShadow: [
                 BoxShadow(
-                  color: style.bg.withOpacity(0.4),
+                  color: style.bg.withValues(alpha: 0.4),
                   blurRadius: 40,
                   offset: const Offset(0, 20),
                 ),
@@ -812,11 +812,11 @@ class _PrayerNameBadge extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: style.gold.withOpacity(0.1),
-              border: Border.all(color: style.gold.withOpacity(0.2)),
+              color: style.gold.withValues(alpha: 0.1),
+              border: Border.all(color: style.gold.withValues(alpha: 0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: style.gold.withOpacity(0.1),
+                  color: style.gold.withValues(alpha: 0.1),
                   blurRadius: 20,
                   spreadRadius: 2,
                 ),
@@ -839,7 +839,7 @@ class _PrayerNameBadge extends StatelessWidget {
           isIqama
               ? l10n.prayerScreenEstablishPrayer
               : l10n.prayerScreenNextPrayerLabel,
-          style: style.naskh(13, color: Colors.white.withOpacity(0.6)),
+          style: style.naskh(13, color: Colors.white.withValues(alpha: 0.6)),
         ),
       ],
     );
@@ -897,7 +897,7 @@ class _CountdownRing extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: visual.secondaryColor.withOpacity(0.06 + i * 0.04),
+                    color: visual.secondaryColor.withValues(alpha: 0.06 + i * 0.04),
                     width: 1,
                   ),
                 ),
@@ -924,12 +924,12 @@ class _CountdownRing extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    visual.primaryColor.withOpacity(0.8),
-                    visual.primaryColor.withOpacity(0.4),
+                    visual.primaryColor.withValues(alpha: 0.8),
+                    visual.primaryColor.withValues(alpha: 0.4),
                   ],
                 ),
                 border: Border.all(
-                  color: visual.secondaryColor.withOpacity(0.2),
+                  color: visual.secondaryColor.withValues(alpha: 0.2),
                 ),
               ),
               child: Column(
@@ -942,7 +942,7 @@ class _CountdownRing extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -955,7 +955,7 @@ class _CountdownRing extends StatelessWidget {
                       color: Colors.white,
                       shadows: [
                         Shadow(
-                          color: visual.secondaryColor.withOpacity(0.5),
+                          color: visual.secondaryColor.withValues(alpha: 0.5),
                           blurRadius: 12,
                         ),
                       ],
@@ -968,9 +968,9 @@ class _CountdownRing extends StatelessWidget {
                       vertical: AppSpacing.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
+                      color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: Colors.white.withOpacity(0.12)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                     ),
                     child: Text(
                       isIqama
@@ -979,7 +979,7 @@ class _CountdownRing extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 11,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ),
@@ -1019,7 +1019,7 @@ class _CountdownArcPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = Colors.white.withOpacity(0.08)
+        ..color = Colors.white.withValues(alpha: 0.08)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 10,
     );
@@ -1038,7 +1038,7 @@ class _CountdownArcPainter extends CustomPainter {
           endAngle: 3 * math.pi / 2,
           colors: isIqama
               ? [successColor, tealColor, successColor]
-              : [primaryColor, Colors.white.withOpacity(0.9), primaryColor],
+              : [primaryColor, Colors.white.withValues(alpha: 0.9), primaryColor],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 16
@@ -1169,17 +1169,17 @@ class _TimeCard extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: isActive
-            ? color.withOpacity(0.15)
-            : Colors.white.withOpacity(0.06),
+            ? color.withValues(alpha: 0.15)
+            : Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: isActive
-              ? color.withOpacity(0.4)
-              : Colors.white.withOpacity(0.1),
+              ? color.withValues(alpha: 0.4)
+              : Colors.white.withValues(alpha: 0.1),
           width: isActive ? 1.5 : 1,
         ),
         boxShadow: isActive
-            ? [BoxShadow(color: color.withOpacity(0.2), blurRadius: 12)]
+            ? [BoxShadow(color: color.withValues(alpha: 0.2), blurRadius: 12)]
             : null,
       ),
       child: Column(
@@ -1191,7 +1191,7 @@ class _TimeCard extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 10,
-              color: Colors.white.withOpacity(0.55),
+              color: Colors.white.withValues(alpha: 0.55),
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -1215,8 +1215,8 @@ class _TimeCard extends StatelessWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     color: isActive
-                        ? color.withOpacity(0.85)
-                        : Colors.white.withOpacity(0.45),
+                        ? color.withValues(alpha: 0.85)
+                        : Colors.white.withValues(alpha: 0.45),
                   ),
                 ),
               ],
@@ -1229,7 +1229,7 @@ class _TimeCard extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 9,
-                color: color.withOpacity(0.7),
+                color: color.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -1283,7 +1283,7 @@ class _DailyPrayersTable extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(color: style.bg),
             boxShadow: [
-              BoxShadow(color: style.bg.withOpacity(0.3), blurRadius: 20),
+              BoxShadow(color: style.bg.withValues(alpha: 0.3), blurRadius: 20),
             ],
           ),
           child: Column(
@@ -1317,10 +1317,10 @@ class _DailyPrayersTable extends StatelessWidget {
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.07),
+                        color: Colors.white.withValues(alpha: 0.07),
                         borderRadius: BorderRadius.circular(AppRadius.xl),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Text(
@@ -1328,14 +1328,14 @@ class _DailyPrayersTable extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 10,
-                          color: Colors.white.withOpacity(0.5),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(height: 1, color: Colors.white.withOpacity(0.06)),
+              Container(height: 1, color: Colors.white.withValues(alpha: 0.06)),
 
               ...prayers.asMap().entries.map((e) {
                 final i = e.key;
@@ -1387,7 +1387,7 @@ class _PrayerTableRow extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
         color: isNext
-            ? visual.secondaryColor.withOpacity(0.12)
+            ? visual.secondaryColor.withValues(alpha: 0.12)
             : Colors.transparent,
         borderRadius: isLast
             ? const BorderRadius.vertical(bottom: Radius.circular(20))
@@ -1417,8 +1417,8 @@ class _PrayerTableRow extends StatelessWidget {
                           color: isNext
                               ? Colors.white
                               : isPast
-                              ? Colors.white.withOpacity(0.35)
-                              : Colors.white.withOpacity(0.75),
+                              ? Colors.white.withValues(alpha: 0.35)
+                              : Colors.white.withValues(alpha: 0.75),
                           fontWeight: isNext
                               ? FontWeight.w600
                               : FontWeight.w400,
@@ -1449,8 +1449,8 @@ class _PrayerTableRow extends StatelessWidget {
                         color: isNext
                             ? Colors.white
                             : isPast
-                            ? Colors.white.withOpacity(0.3)
-                            : Colors.white.withOpacity(0.65),
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : Colors.white.withValues(alpha: 0.65),
                         fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
                       ),
                     ),
@@ -1460,7 +1460,7 @@ class _PrayerTableRow extends StatelessWidget {
                           : l10n.prayerScreenAdhanBadge,
                       color: isNext
                           ? visual.secondaryColor
-                          : Colors.white.withOpacity(0.3),
+                          : Colors.white.withValues(alpha: 0.3),
                       isActive: isNext,
                     ),
                   ],
@@ -1473,7 +1473,7 @@ class _PrayerTableRow extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                     ),
-                    color: Colors.white.withOpacity(0.08),
+                    color: Colors.white.withValues(alpha: 0.08),
                   ),
 
                   // وقت الإقامة
@@ -1488,8 +1488,8 @@ class _PrayerTableRow extends StatelessWidget {
                           color: isNext
                               ? context.colors.success
                               : isPast
-                              ? Colors.white.withOpacity(0.25)
-                              : Colors.white.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.25)
+                              : Colors.white.withValues(alpha: 0.5),
                           fontWeight: isNext
                               ? FontWeight.w700
                               : FontWeight.w400,
@@ -1499,7 +1499,7 @@ class _PrayerTableRow extends StatelessWidget {
                         label: l10n.prayerScreenIqamaBadge,
                         color: isNext
                             ? context.colors.success
-                            : Colors.white.withOpacity(0.2),
+                            : Colors.white.withValues(alpha: 0.2),
                         isActive: isNext,
                       ),
                     ],
@@ -1512,14 +1512,14 @@ class _PrayerTableRow extends StatelessWidget {
                   Icon(
                     Icons.check_circle_rounded,
                     size: 16,
-                    color: context.colors.success.withOpacity(0.4),
+                    color: context.colors.success.withValues(alpha: 0.4),
                   ),
                 ],
               ],
             ),
           ),
           if (!isLast)
-            Container(height: 1, color: Colors.white.withOpacity(0.04)),
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.04)),
         ],
       ),
     );
@@ -1543,16 +1543,16 @@ class _MihrabPrayerChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(isActive ? 0.15 : 0.05),
+        color: color.withValues(alpha: isActive ? 0.15 : 0.05),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border.all(color: color.withOpacity(isActive ? 0.3 : 0.1)),
+        border: Border.all(color: color.withValues(alpha: isActive ? 0.3 : 0.1)),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontFamily: 'NotoNaskhArabic',
           fontSize: 9,
-          color: color.withOpacity(isActive ? 1.0 : 0.6),
+          color: color.withValues(alpha: isActive ? 1.0 : 0.6),
           fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
         ),
       ),
@@ -1609,12 +1609,12 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
             vertical: 14,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
+            color: Colors.white.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(0.09)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.18),
+                color: Colors.black.withValues(alpha: 0.18),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -1662,7 +1662,7 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
                     fontFamily: 'NotoNaskhArabic',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white.withOpacity(0.35),
+                    color: Colors.white.withValues(alpha: 0.35),
                   ),
                 ),
               ),
@@ -1686,7 +1686,7 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
-                      color: Colors.white.withOpacity(0.45),
+                      color: Colors.white.withValues(alpha: 0.45),
                     ),
                   ),
                 ],
@@ -1786,9 +1786,9 @@ class _SunChip extends StatelessWidget {
         horizontal: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.22)),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -1800,7 +1800,7 @@ class _SunChip extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 10,
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
             ),
           ),
           const SizedBox(height: 3),
@@ -1823,7 +1823,7 @@ class _SunChip extends StatelessWidget {
                     fontFamily: 'NotoNaskhArabic',
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
-                    color: color.withOpacity(0.7),
+                    color: color.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -1881,9 +1881,9 @@ class _LoadingOverlayState extends State<_LoadingOverlay>
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: style.gold.withOpacity(_pulse.value * 0.12),
+          color: style.gold.withValues(alpha: _pulse.value * 0.12),
           borderRadius: BorderRadius.circular(radius),
-          border: Border.all(color: style.border.withOpacity(0.5)),
+          border: Border.all(color: style.border.withValues(alpha: 0.5)),
         ),
       ),
     );

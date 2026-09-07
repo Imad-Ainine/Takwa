@@ -70,12 +70,12 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           Positioned(
             top: -100,
             right: -100,
-            child: _buildGlow(style.gold.withOpacity(0.15), 300),
+            child: _buildGlow(style.gold.withValues(alpha: 0.15), 300),
           ),
           Positioned(
             bottom: -50,
             left: -50,
-            child: _buildGlow(style.teal.withOpacity(0.1), 250),
+            child: _buildGlow(style.teal.withValues(alpha: 0.1), 250),
           ),
 
           SafeArea(
@@ -170,14 +170,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           color: style.bg,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: hasDhikr ? style.gold.withOpacity(0.6) : style.border,
+            color: hasDhikr ? style.gold.withValues(alpha: 0.6) : style.border,
             width: hasDhikr ? 1.5 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: hasDhikr
-                  ? style.gold.withOpacity(0.12)
-                  : Colors.black.withOpacity(0.05),
+                  ? style.gold.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               spreadRadius: 2,
               offset: const Offset(0, 8),
@@ -209,7 +209,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       Container(
                         padding: const EdgeInsets.all(AppSpacing.sm),
                         decoration: BoxDecoration(
-                          color: style.gold.withOpacity(0.1),
+                          color: style.gold.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -241,7 +241,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           child: Container(
                             padding: const EdgeInsets.all(AppSpacing.xs),
                             decoration: BoxDecoration(
-                              color: style.textDim.withOpacity(0.1),
+                              color: style.textDim.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -292,7 +292,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     if (state.selectedDhikr!.arabic.length > 50)
                       Icon(
                         Icons.keyboard_arrow_down_rounded,
-                        color: style.gold.withOpacity(0.3),
+                        color: style.gold.withValues(alpha: 0.3),
                         size: 20,
                       ),
                   ] else
@@ -335,7 +335,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 child: TakwaLoadingIndicator(
                   size: size,
                   strokeWidth: 4 * scale,
-                  color: style.gold.withOpacity(0.6),
+                  color: style.gold.withValues(alpha: 0.6),
                 ),
               ),
             Column(
@@ -355,7 +355,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     '/ ${localizedNumeral(context, state.selectedDhikr!.count)}',
                     style: style.naskh(
                       16 * scale,
-                      color: style.gold.withOpacity(0.7),
+                      color: style.gold.withValues(alpha: 0.7),
                     ),
                   ),
               ],
@@ -400,7 +400,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: state.isListening
-                          ? [style.teal, style.teal.withOpacity(0.7)]
+                          ? [style.teal, style.teal.withValues(alpha: 0.7)]
                           : [style.gold, style.goldDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -408,7 +408,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     boxShadow: [
                       BoxShadow(
                         color: (state.isListening ? style.teal : style.gold)
-                            .withOpacity(0.4),
+                            .withValues(alpha: 0.4),
                         blurRadius: 30 * scale,
                         spreadRadius: 5 * scale,
                         offset: Offset(0, 10 * scale),
@@ -421,9 +421,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       height: innerSize,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 1.5,
                         ),
                       ),
@@ -444,7 +444,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                                 : l10n.misbahaTapOrHoldHint,
                             style: style.naskh(
                               12 * scale,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                         ],
@@ -507,7 +507,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 24),
@@ -541,7 +541,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             color: style.bg,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 20),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20),
             ],
           ),
           child: DraggableScrollableSheet(
@@ -614,7 +614,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           border: Border.all(color: style.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -635,7 +635,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 vertical: 6,
               ),
               decoration: BoxDecoration(
-                color: style.gold.withOpacity(0.1),
+                color: style.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
@@ -701,7 +701,7 @@ class _ListeningRippleState extends State<_ListeningRipple>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: widget.color.withOpacity(0.5),
+                        color: widget.color.withValues(alpha: 0.5),
                         width: 2,
                       ),
                     ),

@@ -367,6 +367,50 @@ class _Card extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
+            l.khatmaWeeklyChartTitle,
+            style: style.amiri(18, color: style.text, weight: FontWeight.bold),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: style.card,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: style.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: List.generate(7, (i) {
+                final h = (values[i] / max) * 100;
+                return Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        ar(values[i].toInt()),
+                        style: style.naskh(10, color: style.textDim),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 600 + i * 80),
+                        width: 16,
+                        height: h,
+                        decoration: BoxDecoration(
+                          color: i == 3
+                              ? style.gold
+                              : style.gold.withValues(alpha: 0.4),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        days[i].substring(0, 2),
+                        style: style.naskh(10, color: style.textDim),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
             title,
             textAlign: TextAlign.right,
             style: style.amiri(16, color: style.text, weight: FontWeight.bold),

@@ -287,9 +287,7 @@ class _QiblaCompassPainter extends CustomPainter {
         c,
         r - i * 18,
         Paint()
-          ..color = (isAligned ? primaryColor : tealColor).withOpacity(
-            0.03 + i * 0.02,
-          )
+          ..color = (isAligned ? primaryColor : tealColor).withValues(alpha: 0.03 + i * 0.02)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1,
       );
@@ -301,8 +299,8 @@ class _QiblaCompassPainter extends CustomPainter {
       r,
       Paint()
         ..color = isRamadan
-            ? primaryColor.withOpacity(0.05)
-            : tealColor.withOpacity(0.05)
+            ? primaryColor.withValues(alpha: 0.05)
+            : tealColor.withValues(alpha: 0.05)
         ..style = PaintingStyle.fill,
     );
 
@@ -310,7 +308,7 @@ class _QiblaCompassPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = primaryColor.withOpacity(isAligned ? 0.5 : 0.2)
+        ..color = primaryColor.withValues(alpha: isAligned ? 0.5 : 0.2)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -338,8 +336,8 @@ class _QiblaCompassPainter extends CustomPainter {
         p2,
         Paint()
           ..color = isMajor
-              ? primaryColor.withOpacity(isAligned ? 0.9 : 0.6)
-              : primaryColor.withOpacity(0.3)
+              ? primaryColor.withValues(alpha: isAligned ? 0.9 : 0.6)
+              : primaryColor.withValues(alpha: 0.3)
           ..strokeWidth = isMajor ? 2 : 0.8,
       );
     }
@@ -357,7 +355,7 @@ class _QiblaCompassPainter extends CustomPainter {
         style: TextStyle(
           fontFamily: 'Amiri',
           fontSize: 13,
-          color: d.$1 == north ? primaryColor : primaryColor.withOpacity(0.4),
+          color: d.$1 == north ? primaryColor : primaryColor.withValues(alpha: 0.4),
         ),
       );
       tp.layout();
@@ -373,7 +371,7 @@ class _QiblaCompassPainter extends CustomPainter {
           c.dy - (r - 30) * math.cos(needleAngle),
         ),
         Paint()
-          ..color = primaryColor.withOpacity(0.3)
+          ..color = primaryColor.withValues(alpha: 0.3)
           ..strokeWidth = 30
           ..strokeCap = StrokeCap.round
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
@@ -455,18 +453,18 @@ class _CompassCenter extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: RadialGradient(
           colors: [
-            style.gold.withOpacity(isAligned ? 0.25 : 0.1),
+            style.gold.withValues(alpha: isAligned ? 0.25 : 0.1),
             Colors.transparent,
           ],
         ),
         border: Border.all(
-          color: style.gold.withOpacity(isAligned ? 0.5 : 0.2),
+          color: style.gold.withValues(alpha: isAligned ? 0.5 : 0.2),
           width: isAligned ? 2 : 1,
         ),
         boxShadow: isAligned
             ? [
                 BoxShadow(
-                  color: style.gold.withOpacity(0.3),
+                  color: style.gold.withValues(alpha: 0.3),
                   blurRadius: 20,
                   spreadRadius: 4,
                 ),
@@ -569,10 +567,10 @@ class _InfoCard extends StatelessWidget {
       horizontal: AppSpacing.sm,
     ),
     decoration: BoxDecoration(
-      color: isActive ? style.gold.withOpacity(0.12) : style.card,
+      color: isActive ? style.gold.withValues(alpha: 0.12) : style.card,
       borderRadius: BorderRadius.circular(14),
       border: Border.all(
-        color: isActive ? style.gold.withOpacity(0.4) : style.border,
+        color: isActive ? style.gold.withValues(alpha: 0.4) : style.border,
       ),
     ),
     child: Column(
@@ -621,15 +619,15 @@ class _QiblaHint extends StatelessWidget {
           gradient: isAligned
               ? LinearGradient(
                   colors: [
-                    style.teal.withOpacity(0.15),
-                    style.gold.withOpacity(0.1),
+                    style.teal.withValues(alpha: 0.15),
+                    style.gold.withValues(alpha: 0.1),
                   ],
                 )
               : null,
           color: isAligned ? null : style.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isAligned ? style.teal.withOpacity(0.4) : style.border,
+            color: isAligned ? style.teal.withValues(alpha: 0.4) : style.border,
           ),
         ),
         child: Row(

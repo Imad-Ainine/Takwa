@@ -145,7 +145,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             Container(
                               decoration: context.decorations.card.copyWith(
-                                color: context.colors.card.withOpacity(0.8),
+                                color: context.colors.card.withValues(alpha: 0.8),
                               ),
                               padding: const EdgeInsets.all(AppSpacing.xl),
                               child: Column(
@@ -178,7 +178,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                     decoration: _getInputDecoration(context, '')
                                         .copyWith(
                                           fillColor: context.colors.card
-                                              .withOpacity(0.3),
+                                              .withValues(alpha: 0.3),
                                         ),
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
@@ -209,7 +209,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             Container(
                               decoration: context.decorations.card.copyWith(
-                                color: context.colors.card.withOpacity(0.8),
+                                color: context.colors.card.withValues(alpha: 0.8),
                               ),
                               child: ListTile(
                                 leading: Icon(
@@ -261,14 +261,14 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
         color: context.colors.textDim,
       ),
       filled: true,
-      fillColor: context.colors.card.withOpacity(0.5),
+      fillColor: context.colors.card.withValues(alpha: 0.5),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        borderSide: BorderSide(color: context.colors.border.withOpacity(0.3)),
+        borderSide: BorderSide(color: context.colors.border.withValues(alpha: 0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),

@@ -26,7 +26,12 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen>
+    with AutomaticKeepAliveClientMixin {
+  // See HomeScreen's _HomeScreenState for why: one of six MainShell tabs.
+  @override
+  bool get wantKeepAlive => true;
+
   Future<void> _updatePref(
     String key,
     dynamic value, {
@@ -39,6 +44,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // required by AutomaticKeepAliveClientMixin
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
     final l10n = AppLocalizations.of(context)!;

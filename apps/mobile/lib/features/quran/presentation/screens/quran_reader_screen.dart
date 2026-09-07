@@ -413,7 +413,7 @@ class _QuranBgPainter extends CustomPainter {
 
     // Top glow
     final topGlow = RadialGradient(
-      colors: [_kGreenHdr.withOpacity(0.12), Colors.transparent],
+      colors: [_kGreenHdr.withValues(alpha: 0.12), Colors.transparent],
     );
     canvas.drawCircle(
       Offset(size.width / 2, 0),
@@ -448,6 +448,314 @@ class _QuranBgPainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
+class _QuranPageView extends StatelessWidget {
+  final int page;
+  final int Function(int) surahForPage;
+  final double fontSize;
+  final Color textColor, bgColor;
+  final bool isDark;
+  final QuranAudioState audio;
+  final void Function(int, int) onAyahTap;
+
+  const _QuranPageView({
+    required this.page,
+    required this.surahForPage,
+    required this.fontSize,
+    required this.textColor,
+    required this.bgColor,
+    required this.isDark,
+    required this.audio,
+    required this.onAyahTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pageAyahs = ql.QuranLibrary.quranCtrl.getPageAyahsByIndex(page - 1);
+    if (pageAyahs.isEmpty) return const SizedBox();
+
+    // Group ayahs by surah number
+    final groups = <int, List<ql.AyahModel>>{};
+    for (final a in pageAyahs) {
+      final sNum = a.surahNumber ?? 1;
+      groups.putIfAbsent(sNum, () => []).add(a);
+    }
+    final sortedSurahNums = groups.keys.toList()..sort();
+
+    return Container(
+      color: bgColor,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 76, bottom: 96),
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            children: sortedSurahNums.map((sNum) {
+              final surahAyahs = groups[sNum]!;
+              final surahIdx = sNum - 1;
+              final isSurahStart = kSurahData[surahIdx].startPage == page;
+              final noBasmala = sNum == 9; // At-Tawbah is index 9 (1-based)
+
+              return Column(
+                children: [
+                  if (isSurahStart) ...[
+                    _SurahHeader(surahMeta: kSurahData[surahIdx]),
+                    if (!noBasmala)
+                      _BasmalaLine(textColor: textColor, isDark: isDark),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
+                  _PageContent(
+                    surahNum: sNum,
+                    ayahs: surahAyahs,
+                    fontSize: fontSize,
+                    textColor: textColor,
+                    audio: audio,
+                    isDark: isDark,
+                    onAyahTap: onAyahTap,
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Surah Header (matches reference screenshots) ────────────
+class _SurahHeader extends StatelessWidget {
+  final SurahMeta surahMeta;
+  const _SurahHeader({required this.surahMeta});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final name = isArabic ? surahMeta.nameAr : surahMeta.nameEn;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1B5E3B), Color(0xFF0E3D26)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+        border: Border.all(color: _kGold.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: _kGreenHdr.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Corner decorations
+          const Positioned(
+            top: 4,
+            right: 8,
+            child: _CornerOrnament(flip: false),
+          ),
+          const Positioned(top: 4, left: 8, child: _CornerOrnament(flip: true)),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: AppSpacing.lg,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  surahMeta.type == 'meccan'
+                      ? l10n.quranReaderMeccan
+                      : l10n.quranReaderMedinan,
+                  style: const TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 12,
+                    color: _kGoldLight,
+                  ),
+                ),
+                Text(
+                  l10n.quranReaderSurahHeaderTitle(name),
+                  style: const TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 22,
+                    color: _kGold,
+                    fontWeight: FontWeight.bold,
+                    shadows: [Shadow(color: Color(0x40C8A96E), blurRadius: 8)],
+                  ),
+                ),
+                Text(
+                  l10n.quranReaderAyahCountBadge(surahMeta.ayahCount),
+                  style: const TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: 12,
+                    color: _kGoldLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CornerOrnament extends StatelessWidget {
+  final bool flip;
+  const _CornerOrnament({required this.flip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.scale(
+      scaleX: flip ? -1 : 1,
+      child: const Text(
+        '﴾',
+        style: TextStyle(fontFamily: 'Amiri', fontSize: 20, color: _kGold),
+      ),
+    );
+  }
+}
+
+// ── Basmala ─────────────────────────────────────────────────
+class _BasmalaLine extends StatelessWidget {
+  final Color textColor;
+  final bool isDark;
+  const _BasmalaLine({required this.textColor, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: AppSpacing.xxl,
+      ),
+      child: Text(
+        'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontFamily: 'Amiri',
+          fontSize: 22,
+          color: isDark ? _kGoldLight : textColor,
+          height: 1.8,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Page Content ─────────────────────────────────────────────
+class _PageContent extends StatelessWidget {
+  final int surahNum;
+  final List<ql.AyahModel> ayahs;
+  final double fontSize;
+  final Color textColor;
+  final QuranAudioState audio;
+  final bool isDark;
+  final void Function(int, int) onAyahTap;
+
+  const _PageContent({
+    required this.surahNum,
+    required this.ayahs,
+    required this.fontSize,
+    required this.textColor,
+    required this.audio,
+    required this.isDark,
+    required this.onAyahTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: Text.rich(
+        TextSpan(
+          children: ayahs.map<InlineSpan>((a) {
+            final ayahNum = a.ayahNumber;
+            final isPlaying =
+                audio.isPlaying &&
+                audio.surah == surahNum &&
+                audio.ayah == ayahNum;
+
+            return TextSpan(
+              children: [
+                TextSpan(
+                  text: '${a.text} ',
+                  style: TextStyle(
+                    fontFamily: 'Amiri',
+                    fontSize: fontSize,
+                    color: isPlaying ? _kGold : textColor,
+                    height: 2.1,
+                  ),
+                ),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: GestureDetector(
+                    onTap: () => onAyahTap(surahNum, ayahNum),
+                    onLongPress: () => onAyahTap(surahNum, ayahNum),
+                    child: _AyahNumberBadge(
+                      num: ayahNum,
+                      isPlaying: isPlaying,
+                      isDark: isDark,
+                    ),
+                  ),
+                ),
+                const TextSpan(text: '  '),
+              ],
+            );
+          }).toList(),
+        ),
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.rtl,
+      ),
+    );
+  }
+}
+
+// ── Ayah number badge ────────────────────────────────────────
+class _AyahNumberBadge extends StatelessWidget {
+  final int num;
+  final bool isPlaying, isDark;
+  const _AyahNumberBadge({
+    required this.num,
+    required this.isPlaying,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ring = isPlaying
+        ? _kGold
+        : (isDark ? Colors.white24 : Colors.black26);
+    final txt = isPlaying ? _kGold : (isDark ? Colors.white54 : Colors.black45);
+
+    return Container(
+      width: 26,
+      height: 26,
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isPlaying ? _kGold.withValues(alpha: 0.15) : Colors.transparent,
+        border: Border.all(color: ring, width: 0.8),
+      ),
+      child: Center(
+        child: Text(
+          ar(num),
+          style: TextStyle(
+            fontFamily: 'Amiri',
+            fontSize: 9,
+            color: txt,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _TopBar extends StatelessWidget {
   final int surahNum;
   final bool isDark;
@@ -468,7 +776,7 @@ class _TopBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final overlay = isDark
         ? const Color(0xD00A2818)
-        : Colors.white.withOpacity(0.92);
+        : Colors.white.withValues(alpha: 0.92);
     final fg = isDark ? Colors.white70 : Colors.black54;
     final divider = isDark ? Colors.white12 : Colors.black12;
 
@@ -581,7 +889,7 @@ class _BottomBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final bg = isDark
         ? const Color(0xF00A2818)
-        : Colors.white.withOpacity(0.95);
+        : Colors.white.withValues(alpha: 0.95);
     final textDim = isDark ? Colors.white54 : Colors.black45;
     final border = isDark ? Colors.white10 : Colors.black12;
 
@@ -647,7 +955,7 @@ class _BottomBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
                 child: LinearProgressIndicator(
                   value: readCount / khatmaPages,
-                  backgroundColor: Colors.white.withOpacity(0.08),
+                  backgroundColor: Colors.white.withValues(alpha: 0.08),
                   valueColor: const AlwaysStoppedAnimation<Color>(_kGreenHdr),
                   minHeight: 3,
                 ),
@@ -664,12 +972,12 @@ class _BottomBar extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.black.withOpacity(0.35)
-                      : Colors.grey.withOpacity(0.1),
+                      ? Colors.black.withValues(alpha: 0.35)
+                      : Colors.grey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
+                        ? Colors.white.withValues(alpha: 0.08)
                         : Colors.black12,
                   ),
                 ),
@@ -698,7 +1006,7 @@ class _BottomBar extends StatelessWidget {
                           color: audio.isLoading ? Colors.white24 : _kGreenHdr,
                           boxShadow: [
                             BoxShadow(
-                              color: _kGreenHdr.withOpacity(0.4),
+                              color: _kGreenHdr.withValues(alpha: 0.4),
                               blurRadius: 8,
                             ),
                           ],
@@ -772,7 +1080,7 @@ class _BottomBar extends StatelessWidget {
                         height: 28,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadius.xs),
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                         ),
                         child: Icon(
                           Icons.stop_rounded,
@@ -818,7 +1126,7 @@ class _ReadingGuideDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withValues(alpha: 0.4),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),
@@ -1020,7 +1328,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
         decoration: BoxDecoration(
           color: const Color(0xFF1A2D3E),
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1089,7 +1397,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                 ),
                 hintStyle: const TextStyle(color: Colors.white24),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.07),
+                fillColor: Colors.white.withValues(alpha: 0.07),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   borderSide: BorderSide.none,
@@ -1116,7 +1424,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                         vertical: AppSpacing.md,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: Colors.white12),
                       ),
@@ -1147,7 +1455,7 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
                         borderRadius: BorderRadius.circular(AppRadius.md),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF1A5234).withOpacity(0.4),
+                            color: const Color(0xFF1A5234).withValues(alpha: 0.4),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),

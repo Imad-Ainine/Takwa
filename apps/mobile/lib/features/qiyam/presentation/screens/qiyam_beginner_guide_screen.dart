@@ -144,7 +144,7 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: context.colors.gold.withOpacity(0.1),
+                      color: context.colors.gold.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: context.colors.gold),
@@ -205,9 +205,9 @@ class QiyamBeginnerGuideScreen extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: context.colors.gold.withOpacity(0.05),
+              color: context.colors.gold.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: context.colors.gold.withOpacity(0.1)),
+              border: Border.all(color: context.colors.gold.withValues(alpha: 0.1)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

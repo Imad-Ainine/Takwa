@@ -25,7 +25,7 @@ class PrimarySwitch extends StatelessWidget {
         onChanged(val);
       },
       activeColor: activeColor,
-      activeTrackColor: activeColor.withOpacity(0.3),
+      activeTrackColor: activeColor.withValues(alpha: 0.3),
       inactiveTrackColor: context.colors.border,
       inactiveThumbColor: context.colors.textDim,
     );

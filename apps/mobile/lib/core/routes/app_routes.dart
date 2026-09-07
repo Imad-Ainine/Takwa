@@ -134,7 +134,9 @@ class AppRoutes {
       case Routes.settings:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const MainShell(initialIndex: 5),
+          // Was 5 — Names of Allah (the old index-4 shell tab) moved to the
+          // drawer, shifting Settings down one slot.
+          builder: (_) => const MainShell(initialIndex: 4),
         );
       case Routes.accountSettings:
         return MaterialPageRoute(settings: settings, builder: (_) => const AccountSettingsScreen());

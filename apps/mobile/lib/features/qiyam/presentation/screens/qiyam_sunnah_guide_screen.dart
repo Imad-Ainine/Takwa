@@ -101,9 +101,9 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xxl),
       decoration: BoxDecoration(
-        color: context.colors.gold.withOpacity(0.1),
+        color: context.colors.gold.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: context.colors.gold.withOpacity(0.3)),
+        border: Border.all(color: context.colors.gold.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -210,9 +210,9 @@ class QiyamSunnahGuideScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: context.colors.teal.withOpacity(0.05),
+        color: context.colors.teal.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: context.colors.teal.withOpacity(0.2)),
+        border: Border.all(color: context.colors.teal.withValues(alpha: 0.2)),
       ),
       child: Text(
         'عن عائشة رضي الله عنها قالت: "كان النبي ﷺ يصلي من الليل إحدى عشرة ركعة، يوتر منها بواحدة".',

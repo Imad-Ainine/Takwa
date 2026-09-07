@@ -137,7 +137,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
         color: active
             ? (style.isRamadan ? style.gold : style.teal)
             : done
-            ? (style.isRamadan ? style.gold : style.teal).withOpacity(0.7)
+            ? (style.isRamadan ? style.gold : style.teal).withValues(alpha: 0.7)
             : style.card,
         border: Border.all(
           color: active || done
@@ -164,7 +164,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
   Widget _stepLine(int s, AdaptiveStyle style) => Container(
     height: 2,
     color: s < _step
-        ? (style.isRamadan ? style.gold : style.teal).withOpacity(0.6)
+        ? (style.isRamadan ? style.gold : style.teal).withValues(alpha: 0.6)
         : style.border,
   );
 
@@ -480,7 +480,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       activeColor: style.isRamadan ? style.gold : style.teal,
                       activeTrackColor:
                           (style.isRamadan ? style.gold : style.teal)
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                       inactiveTrackColor: style.border,
                       inactiveThumbColor: style.textDim,
                       onChanged: (v) =>
@@ -515,9 +515,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                       vertical: AppSpacing.sm,
                     ),
                     decoration: BoxDecoration(
-                      color: style.danger.withOpacity(0.1),
+                      color: style.danger.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: style.danger.withOpacity(0.3)),
+                      border: Border.all(color: style.danger.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -583,7 +583,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   height: 28,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: style.gold.withOpacity(0.2),
+                    color: style.gold.withValues(alpha: 0.2),
                   ),
                   child: Icon(Icons.check_rounded, color: style.gold, size: 16),
                 ),
@@ -603,12 +603,12 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: style.isRamadan
-                    ? style.gold.withOpacity(0.1)
-                    : style.teal.withOpacity(0.1),
+                    ? style.gold.withValues(alpha: 0.1)
+                    : style.teal.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
                   color: (style.isRamadan ? style.gold : style.teal)
-                      .withOpacity(0.3),
+                      .withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -652,7 +652,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                     style: style.naskh(
                       11,
                       color: (style.isRamadan ? style.gold : style.teal)
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -683,13 +683,11 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: (style.isRamadan ? style.gold : style.teal).withOpacity(
-                  0.15,
-                ),
+                color: (style.isRamadan ? style.gold : style.teal).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: (style.isRamadan ? style.gold : style.teal)
-                      .withOpacity(0.4),
+                      .withValues(alpha: 0.4),
                 ),
               ),
               child: Row(
@@ -775,7 +773,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: (style.isRamadan ? style.gold : style.teal)
-                          .withOpacity(0.35),
+                          .withValues(alpha: 0.35),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
