@@ -129,6 +129,8 @@ class KhatmaSessionEx {
   final int pagesRead;
   final bool notificationsEnabled;
   final int? dailyPages; // for multazima
+  final int totalReadingSeconds;
+  final int readingSessionsCount;
   static const int totalPages = 604;
 
   const KhatmaSessionEx({
@@ -144,6 +146,8 @@ class KhatmaSessionEx {
     this.pagesRead = 0,
     this.notificationsEnabled = false,
     this.dailyPages,
+    this.totalReadingSeconds = 0,
+    this.readingSessionsCount = 0,
   });
 
   double get progress => pagesRead / totalPages;
@@ -151,12 +155,25 @@ class KhatmaSessionEx {
   bool get isCancelled => cancelledDate != null;
   bool get isActive => !isCompleted && !isCancelled;
 
+  /// Rough estimate of the reward ("حسنات") this Khatma's progress is
+  /// worth, following the same "10 hasanat per letter" convention other
+  /// Quran apps use for this kind of estimator — the Quran is
+  /// conventionally cited at ~334,343 hasanat-bearing units for that
+  /// calculation, scaled here per page (604 total) and by pages actually
+  /// read. Explicitly an estimate, labeled as such in the UI — not a
+  /// precise count.
+  static const int _estimatedTotalHasanat = 3343430;
+  int get estimatedHasanat =>
+      (pagesRead * _estimatedTotalHasanat / totalPages).round();
+
   KhatmaSessionEx copyWith({
     int? currentPage,
     int? pagesRead,
     DateTime? completedDate,
     DateTime? cancelledDate,
     String? label,
+    int? totalReadingSeconds,
+    int? readingSessionsCount,
   }) => KhatmaSessionEx(
     id: id,
     label: label ?? this.label,
@@ -170,6 +187,8 @@ class KhatmaSessionEx {
     pagesRead: pagesRead ?? this.pagesRead,
     notificationsEnabled: notificationsEnabled,
     dailyPages: dailyPages,
+    totalReadingSeconds: totalReadingSeconds ?? this.totalReadingSeconds,
+    readingSessionsCount: readingSessionsCount ?? this.readingSessionsCount,
   );
 
   Map<String, dynamic> toJson() => {
@@ -185,6 +204,8 @@ class KhatmaSessionEx {
     'pagesRead': pagesRead,
     'notificationsEnabled': notificationsEnabled,
     'dailyPages': dailyPages,
+    'totalReadingSeconds': totalReadingSeconds,
+    'readingSessionsCount': readingSessionsCount,
   };
 
   factory KhatmaSessionEx.fromJson(Map<String, dynamic> j) => KhatmaSessionEx(
@@ -209,6 +230,8 @@ class KhatmaSessionEx {
     pagesRead: j['pagesRead'] as int? ?? 0,
     notificationsEnabled: j['notificationsEnabled'] as bool? ?? false,
     dailyPages: j['dailyPages'] as int?,
+    totalReadingSeconds: j['totalReadingSeconds'] as int? ?? 0,
+    readingSessionsCount: j['readingSessionsCount'] as int? ?? 0,
   );
 }
 

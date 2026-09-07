@@ -10,7 +10,6 @@ import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
-import 'mushaf_reader_screen.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 // ── Color constants ──────────────────────────────────────────
@@ -41,7 +40,6 @@ class QuranReaderScreen extends ConsumerStatefulWidget {
 
 class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     with TickerProviderStateMixin {
-  late PageController _pageCtrl;
   late AnimationController _toolbarAnim;
   late Animation<double> _topFade;
   late Animation<Offset> _topSlide, _bottomSlide;
@@ -50,13 +48,29 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   bool _toolbarVisible = true;
   static const int _totalPages = 604;
 
+  // Passed to QuranLibraryScreen exactly once at mount and never changed —
+  // the widget re-applies pageIndex to the shared QuranCtrl singleton on
+  // every rebuild it goes through (its own internal behavior, not
+  // something this screen controls), so a reactive value here would
+  // fight the user's own swipes/jumps on every unrelated rebuild (e.g.
+  // audio state ticking). _currentPage below is the one that actually
+  // tracks "where we are now", updated via onPageChanged.
+  late final int _initialPageIndex;
+
   // Tracks how many pages read in this session
   int _sessionPagesRead = 0;
   int _sessionStartPage = 1;
 
+  // Wall-clock time this reading session started, for the Khatma
+  // "reading time" stats — only accumulated (in dispose()) when this
+  // screen was opened from an active Khatma, since a Khatma is the only
+  // thing that currently surfaces reading-time stats.
+  late final DateTime _sessionStart;
+
   @override
   void initState() {
     super.initState();
+    _sessionStart = DateTime.now();
 
     int startPage = 1;
     if (widget.initialPage != null) {
@@ -73,6 +87,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
 
     _currentPage = startPage;
     _sessionStartPage = startPage;
+    _initialPageIndex = startPage - 1;
 
     _toolbarAnim = AnimationController(
       vsync: this,
@@ -89,18 +104,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
           CurvedAnimation(parent: _toolbarAnim, curve: Curves.easeOutCubic),
         );
 
-    _pageCtrl = PageController(initialPage: _currentPage - 1);
-    _pageCtrl.addListener(_onPageChange);
-
     // Show reading guide on first launch
     //WidgetsBinding.instance.addPostFrameCallback((_) => _checkShowGuide());
   }
 
   @override
   void dispose() {
-    _pageCtrl
-      ..removeListener(_onPageChange)
-      ..dispose();
+    if (widget.startFromKhatma) {
+      final elapsed = DateTime.now().difference(_sessionStart).inSeconds;
+      // Fire-and-forget: the notifier persists to SharedPreferences, and
+      // this widget is already gone by the time that completes.
+      ref.read(khatmaExProvider.notifier).addReadingTime(elapsed);
+    }
     _toolbarAnim.dispose();
     super.dispose();
   }
@@ -113,8 +128,8 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     return 1;
   }
 
-  void _onPageChange() {
-    final p = (_pageCtrl.page?.round() ?? 0) + 1;
+  void _onPageChanged(int pageIndex) {
+    final p = pageIndex + 1;
     if (p == _currentPage || p < 1 || p > _totalPages) return;
     setState(() {
       _sessionPagesRead = (p - _sessionStartPage).abs();
@@ -162,13 +177,11 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
       builder: (_) => _PageNavigationDialog(
         currentPage: _currentPage,
         totalPages: _totalPages,
-        onNavigate: (page) {
-          _pageCtrl.animateToPage(
-            page - 1,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        },
+        // QuranLibraryScreen owns its own PageView internally (via the
+        // QuranCtrl singleton) rather than exposing a Flutter
+        // PageController we could drive directly — jumpToPage is the
+        // package's own public API for exactly this.
+        onNavigate: (page) => ql.QuranLibrary().jumpToPage(page),
       ),
     );
   }
@@ -196,24 +209,32 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _SettingsSheet(
-        fontSize: state.fontSize,
         theme: state.theme,
-        onFontSizeChanged: (v) =>
-            ref.read(quranStateProvider.notifier).setFontSize(v),
         onThemeChanged: (t) =>
             ref.read(quranStateProvider.notifier).setTheme(t),
       ),
     );
   }
 
-  void _openMushafMode() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MushafReaderScreen(
-          initialPage: _currentPage,
-          startFromKhatma: widget.startFromKhatma,
-        ),
+  void _saveBookmark() {
+    final surahNum = _surahForPage(_currentPage);
+    final surahName = ql.QuranLibrary.quranCtrl.surahs[surahNum - 1].arabicName;
+    ref
+        .read(quranBookmarksProvider.notifier)
+        .add(
+          QuranBookmark(
+            surahNum: surahNum,
+            ayahNum: 1,
+            page: _currentPage,
+            surahName: surahName,
+            savedAt: DateTime.now(),
+          ),
+        );
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.quranReaderBookmarkSaved),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -248,23 +269,31 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
             // ── Background pattern ───────────────────────────
             if (isDark) Positioned.fill(child: _QuranBgDecor()),
 
-            // ── Page viewer (horizontal swipe) ───────────────
-            GestureDetector(
-              onTap: _toggleToolbar,
-              behavior: HitTestBehavior.opaque,
-              child: PageView.builder(
-                controller: _pageCtrl,
-                itemCount: _totalPages,
-                itemBuilder: (_, i) => _QuranPageView(
-                  page: i + 1,
-                  surahForPage: _surahForPage,
-                  fontSize: state.fontSize,
-                  textColor: textColor,
-                  bgColor: bgColor,
-                  isDark: isDark,
-                  audio: audio,
-                  onAyahTap: _showAyahOptions,
-                ),
+            // ── Page viewer — real Mushaf pages (roadmap §8 item #4),
+            // now the reader itself rather than a separate mode. Padded
+            // so its content doesn't sit under the floating top/bottom
+            // bars below, matching how the previous custom page view
+            // reserved the same space.
+            Padding(
+              padding: const EdgeInsets.only(top: 76, bottom: 190),
+              child: ql.QuranLibraryScreen(
+                parentContext: context,
+                pageIndex: _initialPageIndex,
+                isDark: isDark,
+                backgroundColor: bgColor,
+                textColor: textColor,
+                useDefaultAppBar: false,
+                isShowTabBar: false,
+                isShowDisplayModeBar: false,
+                isShowAudioSlider: false,
+                onPageChanged: _onPageChanged,
+                // Tapping empty page space toggles the toolbars — the
+                // package's own hook for exactly this, so it doesn't
+                // fight the page's internal ayah-selection gestures the
+                // way an overlaid GestureDetector would.
+                onPagePress: _toggleToolbar,
+                onAyahLongPress: (details, ayah) =>
+                    _showAyahOptions(ayah.surahNumber ?? surahNum, ayah.ayahNumber),
               ),
             ),
 
@@ -285,9 +314,8 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                         .read(quranAudioProvider.notifier)
                         .togglePlay(surahNum, 1),
                     onNightMode: _showSettings,
-                    onBookmark: () {},
+                    onBookmark: _saveBookmark,
                     onGuide: _showReadingGuide,
-                    onMushafMode: _openMushafMode,
                   ),
                 ),
               ),
@@ -322,6 +350,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                           .setSpeed(speeds[(idx + 1) % speeds.length]);
                     },
                     onPageNav: _showPageNavigation,
+                    onFullscreen: _toggleToolbar,
                   ),
                 ),
               ),
@@ -407,323 +436,10 @@ class _QuranBgPainter extends CustomPainter {
   bool shouldRepaint(_) => false;
 }
 
-class _QuranPageView extends StatelessWidget {
-  final int page;
-  final int Function(int) surahForPage;
-  final double fontSize;
-  final Color textColor, bgColor;
-  final bool isDark;
-  final QuranAudioState audio;
-  final void Function(int, int) onAyahTap;
-
-  const _QuranPageView({
-    required this.page,
-    required this.surahForPage,
-    required this.fontSize,
-    required this.textColor,
-    required this.bgColor,
-    required this.isDark,
-    required this.audio,
-    required this.onAyahTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final pageAyahs = ql.QuranLibrary.quranCtrl.getPageAyahsByIndex(page - 1);
-    if (pageAyahs.isEmpty) return const SizedBox();
-
-    // Group ayahs by surah number
-    final groups = <int, List<ql.AyahModel>>{};
-    for (final a in pageAyahs) {
-      final sNum = a.surahNumber ?? 1;
-      groups.putIfAbsent(sNum, () => []).add(a);
-    }
-    final sortedSurahNums = groups.keys.toList()..sort();
-
-    return Container(
-      color: bgColor,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 76, bottom: 96),
-        child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: Column(
-            children: sortedSurahNums.map((sNum) {
-              final surahAyahs = groups[sNum]!;
-              final surahIdx = sNum - 1;
-              final isSurahStart = kSurahData[surahIdx].startPage == page;
-              final noBasmala = sNum == 9; // At-Tawbah is index 9 (1-based)
-
-              return Column(
-                children: [
-                  if (isSurahStart) ...[
-                    _SurahHeader(surahMeta: kSurahData[surahIdx]),
-                    if (!noBasmala)
-                      _BasmalaLine(textColor: textColor, isDark: isDark),
-                    const SizedBox(height: AppSpacing.sm),
-                  ],
-                  _PageContent(
-                    surahNum: sNum,
-                    ayahs: surahAyahs,
-                    fontSize: fontSize,
-                    textColor: textColor,
-                    audio: audio,
-                    isDark: isDark,
-                    onAyahTap: onAyahTap,
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Surah Header (matches reference screenshots) ────────────
-class _SurahHeader extends StatelessWidget {
-  final SurahMeta surahMeta;
-  const _SurahHeader({required this.surahMeta});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    final name = isArabic ? surahMeta.nameAr : surahMeta.nameEn;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 10, 20, 12),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1B5E3B), Color(0xFF0E3D26)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.xs),
-        border: Border.all(color: _kGold.withOpacity(0.5), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: _kGreenHdr.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Corner decorations
-          const Positioned(
-            top: 4,
-            right: 8,
-            child: _CornerOrnament(flip: false),
-          ),
-          const Positioned(top: 4, left: 8, child: _CornerOrnament(flip: true)),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: AppSpacing.lg,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  surahMeta.type == 'meccan'
-                      ? l10n.quranReaderMeccan
-                      : l10n.quranReaderMedinan,
-                  style: const TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 12,
-                    color: _kGoldLight,
-                  ),
-                ),
-                Text(
-                  l10n.quranReaderSurahHeaderTitle(name),
-                  style: const TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 22,
-                    color: _kGold,
-                    fontWeight: FontWeight.bold,
-                    shadows: [Shadow(color: Color(0x40C8A96E), blurRadius: 8)],
-                  ),
-                ),
-                Text(
-                  l10n.quranReaderAyahCountBadge(surahMeta.ayahCount),
-                  style: const TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 12,
-                    color: _kGoldLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CornerOrnament extends StatelessWidget {
-  final bool flip;
-  const _CornerOrnament({required this.flip});
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.scale(
-      scaleX: flip ? -1 : 1,
-      child: const Text(
-        '﴾',
-        style: TextStyle(fontFamily: 'Amiri', fontSize: 20, color: _kGold),
-      ),
-    );
-  }
-}
-
-// ── Basmala ─────────────────────────────────────────────────
-class _BasmalaLine extends StatelessWidget {
-  final Color textColor;
-  final bool isDark;
-  const _BasmalaLine({required this.textColor, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: AppSpacing.xxl,
-      ),
-      child: Text(
-        'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontFamily: 'Amiri',
-          fontSize: 22,
-          color: isDark ? _kGoldLight : textColor,
-          height: 1.8,
-        ),
-      ),
-    );
-  }
-}
-
-// ── Page Content ─────────────────────────────────────────────
-class _PageContent extends StatelessWidget {
-  final int surahNum;
-  final List<ql.AyahModel> ayahs;
-  final double fontSize;
-  final Color textColor;
-  final QuranAudioState audio;
-  final bool isDark;
-  final void Function(int, int) onAyahTap;
-
-  const _PageContent({
-    required this.surahNum,
-    required this.ayahs,
-    required this.fontSize,
-    required this.textColor,
-    required this.audio,
-    required this.isDark,
-    required this.onAyahTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Text.rich(
-        TextSpan(
-          children: ayahs.map<InlineSpan>((a) {
-            final ayahNum = a.ayahNumber;
-            final isPlaying =
-                audio.isPlaying &&
-                audio.surah == surahNum &&
-                audio.ayah == ayahNum;
-
-            return TextSpan(
-              children: [
-                TextSpan(
-                  text: '${a.text} ',
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: fontSize,
-                    color: isPlaying ? _kGold : textColor,
-                    height: 2.1,
-                  ),
-                ),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: GestureDetector(
-                    onTap: () => onAyahTap(surahNum, ayahNum),
-                    onLongPress: () => onAyahTap(surahNum, ayahNum),
-                    child: _AyahNumberBadge(
-                      num: ayahNum,
-                      isPlaying: isPlaying,
-                      isDark: isDark,
-                    ),
-                  ),
-                ),
-                const TextSpan(text: '  '),
-              ],
-            );
-          }).toList(),
-        ),
-        textAlign: TextAlign.center,
-        textDirection: TextDirection.rtl,
-      ),
-    );
-  }
-}
-
-// ── Ayah number badge ────────────────────────────────────────
-class _AyahNumberBadge extends StatelessWidget {
-  final int num;
-  final bool isPlaying, isDark;
-  const _AyahNumberBadge({
-    required this.num,
-    required this.isPlaying,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final ring = isPlaying
-        ? _kGold
-        : (isDark ? Colors.white24 : Colors.black26);
-    final txt = isPlaying ? _kGold : (isDark ? Colors.white54 : Colors.black45);
-
-    return Container(
-      width: 26,
-      height: 26,
-      margin: const EdgeInsets.symmetric(horizontal: 3),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isPlaying ? _kGold.withOpacity(0.15) : Colors.transparent,
-        border: Border.all(color: ring, width: 0.8),
-      ),
-      child: Center(
-        child: Text(
-          ar(num),
-          style: TextStyle(
-            fontFamily: 'Amiri',
-            fontSize: 9,
-            color: txt,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _TopBar extends StatelessWidget {
   final int surahNum;
   final bool isDark;
-  final VoidCallback onBack,
-      onAudio,
-      onNightMode,
-      onBookmark,
-      onGuide,
-      onMushafMode;
+  final VoidCallback onBack, onAudio, onNightMode, onBookmark, onGuide;
 
   const _TopBar({
     required this.surahNum,
@@ -733,7 +449,6 @@ class _TopBar extends StatelessWidget {
     required this.onNightMode,
     required this.onBookmark,
     required this.onGuide,
-    required this.onMushafMode,
   });
 
   @override
@@ -784,14 +499,6 @@ class _TopBar extends StatelessWidget {
                 color: fg,
                 onTap: onGuide,
               ),
-              Tooltip(
-                message: l10n.quranReaderMushafModeTooltip,
-                child: _TapIcon(
-                  icon: Icons.auto_stories_rounded,
-                  color: fg,
-                  onTap: onMushafMode,
-                ),
-              ),
               const Spacer(),
               // Surah name
               Text(
@@ -840,7 +547,12 @@ class _BottomBar extends StatelessWidget {
   final int juz, currentPage, totalPages, surahNum, pagesRead;
   final bool isDark;
   final QuranAudioState audio;
-  final VoidCallback onTogglePlay, onStop, onSpeedTap, onPageNav;
+  final VoidCallback
+  onTogglePlay,
+  onStop,
+  onSpeedTap,
+  onPageNav,
+  onFullscreen;
 
   const _BottomBar({
     required this.juz,
@@ -854,6 +566,7 @@ class _BottomBar extends StatelessWidget {
     required this.onStop,
     required this.onSpeedTap,
     required this.onPageNav,
+    required this.onFullscreen,
   });
 
   @override
@@ -960,7 +673,7 @@ class _BottomBar extends StatelessWidget {
                     const SizedBox(width: AppSpacing.xs),
                     _audioIcon(Icons.download_outlined, textDim, () {}),
                     const SizedBox(width: AppSpacing.xs),
-                    _audioIcon(Icons.fit_screen_outlined, textDim, () {}),
+                    _audioIcon(Icons.fit_screen_outlined, textDim, onFullscreen),
                     const Spacer(),
 
                     // Play/pause button
@@ -1571,31 +1284,11 @@ class _OptionRow extends StatelessWidget {
   }
 }
 
-class _SettingsSheet extends StatefulWidget {
-  final double fontSize;
+class _SettingsSheet extends StatelessWidget {
   final ReaderTheme theme;
-  final ValueChanged<double> onFontSizeChanged;
   final ValueChanged<ReaderTheme> onThemeChanged;
 
-  const _SettingsSheet({
-    required this.fontSize,
-    required this.theme,
-    required this.onFontSizeChanged,
-    required this.onThemeChanged,
-  });
-
-  @override
-  State<_SettingsSheet> createState() => _SettingsSheetState();
-}
-
-class _SettingsSheetState extends State<_SettingsSheet> {
-  late double _fontSize;
-
-  @override
-  void initState() {
-    super.initState();
-    _fontSize = widget.fontSize;
-  }
+  const _SettingsSheet({required this.theme, required this.onThemeChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -1628,59 +1321,11 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                localizedNumeral(context, _fontSize.toInt()),
-                style: const TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  color: _kGold,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                l10n.quranReaderFontSizeLabel,
-                style: const TextStyle(
-                  fontFamily: 'NotoNaskhArabic',
-                  color: Colors.white60,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-          Slider(
-            value: _fontSize,
-            min: 16,
-            max: 36,
-            activeColor: _kGold,
-            inactiveColor: Colors.white12,
-            onChanged: (v) {
-              setState(() => _fontSize = v);
-              widget.onFontSizeChanged(v);
-            },
-          ),
-          // Preview
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: Colors.black26,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ',
-                style: TextStyle(
-                  fontFamily: 'Amiri',
-                  fontSize: _fontSize,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
+          // Font size is no longer adjustable here — the Mushaf page
+          // rendering (roadmap §8 item #4) uses quran_library's fixed
+          // QPC v4 glyph layout, matching a printed Mushaf line-for-line,
+          // so a user-set font size has no page to apply to anymore.
+          // Pinch-to-zoom on the page itself is the equivalent now.
           Align(
             alignment: Alignment.centerRight,
             child: Text(
@@ -1700,10 +1345,10 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                 'sepia': l10n.quranReaderThemeSepia,
                 'white': l10n.quranReaderThemeWhite,
               };
-              final selected = widget.theme == t;
+              final selected = theme == t;
               return Expanded(
                 child: GestureDetector(
-                  onTap: () => widget.onThemeChanged(t),
+                  onTap: () => onThemeChanged(t),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.symmetric(

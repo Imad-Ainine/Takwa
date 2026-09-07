@@ -1747,4 +1747,177 @@
   "customTimePickerTitle": "Select Time",
   "customTimePickerConfirmButton": "Confirm",
   "quranReaderBookmarkSaved": "Bookmark saved"
+  "quranReaderBookmarkSaved": "Bookmark saved",
+  "achievementPointsRewardLabel": "+{points} pts",
+  "@achievementPointsRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementPendingLabel": "Pending",
+  "khatmaMenuMarkFinished": "Mark as Finished",
+  "khatmaMenuCancelKhatma": "Cancel Khatma",
+  "khatmaMarkFinishedDialogTitle": "Mark as Finished",
+  "khatmaMarkFinishedDialogBody": "Are you sure you want to mark this Khatma as finished?",
+  "khatmaMarkFinishedDialogNote": "This is appropriate if you finished reading the Quran from another source.",
+  "khatmaMarkFinishedConfirm": "Confirm",
+  "khatmaCancelDialogTitle": "Cancel Khatma",
+  "khatmaCancelDialogBody": "Are you sure you want to cancel this Khatma?",
+  "khatmaCancelDialogWarning": "Warning: your progress will be saved in history, but you won't be able to restore a cancelled Khatma again.",
+  "khatmaCancelConfirmFinal": "Cancel Khatma Permanently",
+  "khatmaDialogGoBack": "Go Back",
+  "khatmaInfoSectionTitle": "Khatma Information",
+  "khatmaInfoNameLabel": "Khatma Name",
+  "khatmaInfoTypeLabel": "Khatma Type",
+  "khatmaInfoStartDateLabel": "Start Date",
+  "khatmaInfoCompletedDaysLabel": "Completed Days",
+  "khatmaInfoCompletedDaysValue": "{n} days",
+  "@khatmaInfoCompletedDaysValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaInfoEndTypeLabel": "Khatma Duration",
+  "khatmaInfoEndTypeNoLimit": "No set end time",
+  "khatmaInfoEndTypeTarget": "Until {date}",
+  "@khatmaInfoEndTypeTarget": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaTypeMuyassaraLabel": "Easy Khatma",
+  "khatmaTypeMultazimaLabel": "Committed Khatma",
+  "khatmaOverallProgressTitle": "Overall Progress",
+  "khatmaReachedPageLabel": "Reached Page",
+  "khatmaReachedPageValue": "{current} of {total}",
+  "@khatmaReachedPageValue": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaCurrentPageLabel": "Current Page",
+  "khatmaCurrentPageValue": "Page {n}",
+  "@khatmaCurrentPageValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaRemainingPagesLabel": "Remaining Pages",
+  "khatmaRemainingPagesValue": "{n} pages",
+  "@khatmaRemainingPagesValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaEstimatedHasanatLabel": "Estimated Rewards",
+  "khatmaEstimatedHasanatValue": "{n} hasanat",
+  "@khatmaEstimatedHasanatValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaStatusMuyassaraBadge": "Easy Khatma - No time pressure",
+  "khatmaStatusMultazimaBadge": "Committed Khatma - {n} pages/day",
+  "@khatmaStatusMultazimaBadge": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaAvgPagesPerDayLabel": "Average Pages/Day",
+  "khatmaTypeDescriptionLabel": "Khatma Type",
+  "khatmaTypeDescriptionFree": "No time pressure or set daily portion",
+  "khatmaTypeDescriptionTarget": "Set daily portion: {n} pages",
+  "@khatmaTypeDescriptionTarget": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaExtraStatsTitle": "Additional Statistics",
+  "khatmaTotalReadingTimeLabel": "Total Reading Time",
+  "khatmaAvgReadingTimeLabel": "Average Reading Time",
+  "khatmaCurrentStreakLabel": "Current Streak",
+  "khatmaLongestStreakLabel": "Longest Streak",
+  "khatmaLastReadLabel": "Last Read",
+  "khatmaStreakDaysValue": "{n} days",
+  "@khatmaStreakDaysValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaNoDataValue": "—",
+  "khatmaReadingDaysTitle": "Reading Days",
+  "khatmaReadingDaysSubtitle": "Days you read the Holy Quran",
+  "khatmaLegendFuture": "Upcoming",
+  "khatmaLegendMissed": "Missed",
+  "khatmaLegendPartial": "Partial",
+  "khatmaLegendComplete": "Complete",
+  "khatmaDurationHoursMinutes": "{hours}h {minutes}m",
+  "@khatmaDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDurationMinutesSeconds": "{minutes}m {seconds}s",
+  "@khatmaDurationMinutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaDurationSecondsOnly": "{seconds}s",
+  "@khatmaDurationSecondsOnly": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "khatmaHistorySortMenuTooltip": "Sort & View",
+  "khatmaHistorySortByDate": "Sort by Date",
+  "khatmaHistorySortByName": "Sort by Name",
+  "khatmaHistorySortByDuration": "Sort by Duration",
+  "khatmaHistorySortByProgress": "Sort by Progress",
+  "khatmaHistoryShowStats": "Show Statistics",
+  "khatmaHistoryViewDetails": "View Details",
+  "khatmaHistoryDetailsTitle": "Khatma Details",
+  "khatmaHistoryStatsTitle": "Khatma Statistics",
+  "khatmaHistoryStatsTotal": "Total Khatmas",
+  "khatmaHistoryStatsCompleted": "Completed Khatmas",
+  "khatmaHistoryStatsCancelled": "Cancelled Khatmas",
+  "khatmaHistoryStatsTotalPages": "Total Pages Read",
+  "khatmaHistoryCloseButton": "Close",
+  "khatmaProgressEmptyTitle": "No active Khatma right now",
+  "khatmaProgressEmptySubtitle": "Start a new Khatma to track your progress here"
 }
