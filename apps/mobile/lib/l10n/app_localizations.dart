@@ -7387,6 +7387,534 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'قوة كلمة المرور: {strength}'**
   String authPasswordStrengthLabel(String strength);
+
+  /// No description provided for @mosqueErrorLocationPermission.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى تفعيل صلاحية الموقع لرؤية المساجد القريبة'**
+  String get mosqueErrorLocationPermission;
+
+  /// No description provided for @mosqueErrorLocationPermissionForever.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب تفعيل صلاحيات الموقع من إعدادات الجهاز'**
+  String get mosqueErrorLocationPermissionForever;
+
+  /// No description provided for @mosqueFetchError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تحميل المساجد (ضغط على السيرفر). يرجى المحاولة لاحقاً'**
+  String get mosqueFetchError;
+
+  /// No description provided for @mosqueDefaultName.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسجد قريب'**
+  String get mosqueDefaultName;
+
+  /// No description provided for @mosqueDefaultAddress.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون عنوان محدد'**
+  String get mosqueDefaultAddress;
+
+  /// No description provided for @emailConfirmationTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد البريد الإلكتروني'**
+  String get emailConfirmationTitle;
+
+  /// No description provided for @emailConfirmationLinkSentLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال رابط التأكيد إلى:\n{email}'**
+  String emailConfirmationLinkSentLabel(String email);
+
+  /// No description provided for @emailConfirmationInstructions.
+  ///
+  /// In ar, this message translates to:
+  /// **'يرجى التحقق من بريدك الإلكتروني والضغط على الرابط لتفعيل حسابك والبدء في رحلتك مع تقوى.'**
+  String get emailConfirmationInstructions;
+
+  /// No description provided for @emailConfirmationBackToSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة لتسجيل الدخول'**
+  String get emailConfirmationBackToSignInButton;
+
+  /// No description provided for @guestGuardTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ميزة سحابية'**
+  String get guestGuardTitle;
+
+  /// No description provided for @guestGuardMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.'**
+  String get guestGuardMessage;
+
+  /// No description provided for @guestGuardSignInButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل دخول / إنشاء حساب'**
+  String get guestGuardSignInButton;
+
+  /// No description provided for @guestGuardBackButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'العودة'**
+  String get guestGuardBackButton;
+
+  /// No description provided for @customTimePickerTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختيار الوقت'**
+  String get customTimePickerTitle;
+
+  /// No description provided for @customTimePickerConfirmButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get customTimePickerConfirmButton;
+
+  /// No description provided for @quranReaderBookmarkSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ العلامة المرجعية'**
+  String get quranReaderBookmarkSaved;
+
+  /// No description provided for @achievementPointsRewardLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'+{points} نقطة'**
+  String achievementPointsRewardLabel(int points);
+
+  /// No description provided for @achievementPendingLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قيد الانتظار'**
+  String get achievementPendingLabel;
+
+  /// No description provided for @khatmaMenuMarkFinished.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد كمنتهية'**
+  String get khatmaMenuMarkFinished;
+
+  /// No description provided for @khatmaMenuCancelKhatma.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الختمة'**
+  String get khatmaMenuCancelKhatma;
+
+  /// No description provided for @khatmaMarkFinishedDialogTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديد كمنتهية'**
+  String get khatmaMarkFinishedDialogTitle;
+
+  /// No description provided for @khatmaMarkFinishedDialogBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من تحديد هذه الختمة كمنتهية؟'**
+  String get khatmaMarkFinishedDialogBody;
+
+  /// No description provided for @khatmaMarkFinishedDialogNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الخيار مناسب إذا كنت قد أنهيت قراءة القرآن من مصدر آخر.'**
+  String get khatmaMarkFinishedDialogNote;
+
+  /// No description provided for @khatmaMarkFinishedConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get khatmaMarkFinishedConfirm;
+
+  /// No description provided for @khatmaCancelDialogTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الختمة'**
+  String get khatmaCancelDialogTitle;
+
+  /// No description provided for @khatmaCancelDialogBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد من إلغاء هذه الختمة؟'**
+  String get khatmaCancelDialogBody;
+
+  /// No description provided for @khatmaCancelDialogWarning.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه: سيتم حفظ تقدمك في التاريخ ولكن لن تتمكن من استرجاع الختمة الملغاة مرة أخرى.'**
+  String get khatmaCancelDialogWarning;
+
+  /// No description provided for @khatmaCancelConfirmFinal.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء الختمة نهائياً'**
+  String get khatmaCancelConfirmFinal;
+
+  /// No description provided for @khatmaDialogGoBack.
+  ///
+  /// In ar, this message translates to:
+  /// **'تراجع'**
+  String get khatmaDialogGoBack;
+
+  /// No description provided for @khatmaInfoSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'معلومات الختمة'**
+  String get khatmaInfoSectionTitle;
+
+  /// No description provided for @khatmaInfoNameLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم الختمة'**
+  String get khatmaInfoNameLabel;
+
+  /// No description provided for @khatmaInfoTypeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع الختمة'**
+  String get khatmaInfoTypeLabel;
+
+  /// No description provided for @khatmaInfoStartDateLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ البداية'**
+  String get khatmaInfoStartDateLabel;
+
+  /// No description provided for @khatmaInfoCompletedDaysLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأيام المكتملة'**
+  String get khatmaInfoCompletedDaysLabel;
+
+  /// No description provided for @khatmaInfoCompletedDaysValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} يوم'**
+  String khatmaInfoCompletedDaysValue(String n);
+
+  /// No description provided for @khatmaInfoEndTypeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة الختمة'**
+  String get khatmaInfoEndTypeLabel;
+
+  /// No description provided for @khatmaInfoEndTypeNoLimit.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون وقت محدد للانتهاء'**
+  String get khatmaInfoEndTypeNoLimit;
+
+  /// No description provided for @khatmaInfoEndTypeTarget.
+  ///
+  /// In ar, this message translates to:
+  /// **'حتى {date}'**
+  String khatmaInfoEndTypeTarget(String date);
+
+  /// No description provided for @khatmaTypeMuyassaraLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة ميسرة'**
+  String get khatmaTypeMuyassaraLabel;
+
+  /// No description provided for @khatmaTypeMultazimaLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة ملتزمة'**
+  String get khatmaTypeMultazimaLabel;
+
+  /// No description provided for @khatmaOverallProgressTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التقدم الإجمالي'**
+  String get khatmaOverallProgressTitle;
+
+  /// No description provided for @khatmaReachedPageLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'وصلت إلى صفحة'**
+  String get khatmaReachedPageLabel;
+
+  /// No description provided for @khatmaReachedPageValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'{current} من {total}'**
+  String khatmaReachedPageValue(String current, String total);
+
+  /// No description provided for @khatmaCurrentPageLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة الحالية'**
+  String get khatmaCurrentPageLabel;
+
+  /// No description provided for @khatmaCurrentPageValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة {n}'**
+  String khatmaCurrentPageValue(String n);
+
+  /// No description provided for @khatmaRemainingPagesLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحات المتبقية'**
+  String get khatmaRemainingPagesLabel;
+
+  /// No description provided for @khatmaRemainingPagesValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} صفحة'**
+  String khatmaRemainingPagesValue(String n);
+
+  /// No description provided for @khatmaEstimatedHasanatLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحسنات المقدرة'**
+  String get khatmaEstimatedHasanatLabel;
+
+  /// No description provided for @khatmaEstimatedHasanatValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} حسنة'**
+  String khatmaEstimatedHasanatValue(String n);
+
+  /// No description provided for @khatmaStatusMuyassaraBadge.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة ميسرة - بدون ضغط زمني'**
+  String get khatmaStatusMuyassaraBadge;
+
+  /// No description provided for @khatmaStatusMultazimaBadge.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة ملتزمة - {n} صفحة/يوم'**
+  String khatmaStatusMultazimaBadge(String n);
+
+  /// No description provided for @khatmaAvgPagesPerDayLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط الصفحات/اليوم'**
+  String get khatmaAvgPagesPerDayLabel;
+
+  /// No description provided for @khatmaTypeDescriptionLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع الختمة'**
+  String get khatmaTypeDescriptionLabel;
+
+  /// No description provided for @khatmaTypeDescriptionFree.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون ضغط زمني أو ورد يومي محدد'**
+  String get khatmaTypeDescriptionFree;
+
+  /// No description provided for @khatmaTypeDescriptionTarget.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد يومي محدد: {n} صفحة'**
+  String khatmaTypeDescriptionTarget(String n);
+
+  /// No description provided for @khatmaExtraStatsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إحصائيات إضافية'**
+  String get khatmaExtraStatsTitle;
+
+  /// No description provided for @khatmaTotalReadingTimeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجمالي وقت القراءة'**
+  String get khatmaTotalReadingTimeLabel;
+
+  /// No description provided for @khatmaAvgReadingTimeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسط وقت القراءة'**
+  String get khatmaAvgReadingTimeLabel;
+
+  /// No description provided for @khatmaCurrentStreakLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'السلسلة الحالية'**
+  String get khatmaCurrentStreakLabel;
+
+  /// No description provided for @khatmaLongestStreakLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'أطول سلسلة'**
+  String get khatmaLongestStreakLabel;
+
+  /// No description provided for @khatmaLastReadLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر قراءة'**
+  String get khatmaLastReadLabel;
+
+  /// No description provided for @khatmaStreakDaysValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'{n} أيام'**
+  String khatmaStreakDaysValue(String n);
+
+  /// No description provided for @khatmaNoDataValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'—'**
+  String get khatmaNoDataValue;
+
+  /// No description provided for @khatmaReadingDaysTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أيام القراءة'**
+  String get khatmaReadingDaysTitle;
+
+  /// No description provided for @khatmaReadingDaysSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأيام التي قرأت فيها القرآن الكريم'**
+  String get khatmaReadingDaysSubtitle;
+
+  /// No description provided for @khatmaLegendFuture.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستقبلي'**
+  String get khatmaLegendFuture;
+
+  /// No description provided for @khatmaLegendMissed.
+  ///
+  /// In ar, this message translates to:
+  /// **'فائت'**
+  String get khatmaLegendMissed;
+
+  /// No description provided for @khatmaLegendPartial.
+  ///
+  /// In ar, this message translates to:
+  /// **'ناقص'**
+  String get khatmaLegendPartial;
+
+  /// No description provided for @khatmaLegendComplete.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتمل'**
+  String get khatmaLegendComplete;
+
+  /// No description provided for @khatmaDurationHoursMinutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{hours}س {minutes}د'**
+  String khatmaDurationHoursMinutes(String hours, String minutes);
+
+  /// No description provided for @khatmaDurationMinutesSeconds.
+  ///
+  /// In ar, this message translates to:
+  /// **'{minutes}د {seconds}ث'**
+  String khatmaDurationMinutesSeconds(String minutes, String seconds);
+
+  /// No description provided for @khatmaDurationSecondsOnly.
+  ///
+  /// In ar, this message translates to:
+  /// **'{seconds}ث'**
+  String khatmaDurationSecondsOnly(String seconds);
+
+  /// No description provided for @khatmaHistorySortMenuTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب وعرض'**
+  String get khatmaHistorySortMenuTooltip;
+
+  /// No description provided for @khatmaHistorySortByDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب حسب التاريخ'**
+  String get khatmaHistorySortByDate;
+
+  /// No description provided for @khatmaHistorySortByName.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب حسب الاسم'**
+  String get khatmaHistorySortByName;
+
+  /// No description provided for @khatmaHistorySortByDuration.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب حسب المدة'**
+  String get khatmaHistorySortByDuration;
+
+  /// No description provided for @khatmaHistorySortByProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترتيب حسب نسبة الإنجاز'**
+  String get khatmaHistorySortByProgress;
+
+  /// No description provided for @khatmaHistoryShowStats.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الإحصائيات'**
+  String get khatmaHistoryShowStats;
+
+  /// No description provided for @khatmaHistoryViewDetails.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض التفاصيل'**
+  String get khatmaHistoryViewDetails;
+
+  /// No description provided for @khatmaHistoryDetailsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفاصيل الختمة'**
+  String get khatmaHistoryDetailsTitle;
+
+  /// No description provided for @khatmaHistoryStatsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إحصائيات الختمات'**
+  String get khatmaHistoryStatsTitle;
+
+  /// No description provided for @khatmaHistoryStatsTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجمالي الختمات'**
+  String get khatmaHistoryStatsTotal;
+
+  /// No description provided for @khatmaHistoryStatsCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمات مكتملة'**
+  String get khatmaHistoryStatsCompleted;
+
+  /// No description provided for @khatmaHistoryStatsCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمات ملغاة'**
+  String get khatmaHistoryStatsCancelled;
+
+  /// No description provided for @khatmaHistoryStatsTotalPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'إجمالي الصفحات المقروءة'**
+  String get khatmaHistoryStatsTotalPages;
+
+  /// No description provided for @khatmaHistoryCloseButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get khatmaHistoryCloseButton;
+
+  /// No description provided for @khatmaProgressEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد ختمة نشطة حالياً'**
+  String get khatmaProgressEmptyTitle;
+
+  /// No description provided for @khatmaProgressEmptySubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ ختمة جديدة لتتبع تقدمك هنا'**
+  String get khatmaProgressEmptySubtitle;
 }
 
 class _AppLocalizationsDelegate

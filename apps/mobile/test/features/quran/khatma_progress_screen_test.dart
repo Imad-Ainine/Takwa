@@ -7,11 +7,13 @@
 //
 // See the "Testing Strategy" section of the engineering audit for context.
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/providers/shared_preferences_provider.dart';
 import 'package:takwa/core/theme/app_theme.dart';
@@ -21,8 +23,19 @@ import 'package:takwa/features/quran/providers/quran_providers.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 void main() {
+  late AppDatabase db;
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    // The screen now also reads khatmaReadingStatsProvider (for the
+    // reading-days calendar / streaks), which needs a real DailyRecordDao
+    // — an in-memory Drift DB, same pattern as prayer_screen_test.dart,
+    // rather than a real sqlite3 native binding that isn't available here.
+    db = AppDatabase.forTesting(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await db.close();
   });
 
   Future<void> pumpScreen(WidgetTester tester) async {
@@ -31,6 +44,7 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
+          appDatabaseProvider.overrideWithValue(db),
           // Not under test here, and overriding it avoids exercising a real
           // Drift watch-stream (with its own async teardown timing) for a
           // screen that doesn't otherwise touch the database.
@@ -61,8 +75,9 @@ void main() {
     expect(tester.takeException(), isNull);
     // khatmaScreenTitle (AR)
     expect(find.text('تقدم الختمة'), findsOneWidget);
-    // khatmaProgressPercent('0.0') (AR) → '0.0٪ مكتملة'
-    expect(find.text('0.0٪ مكتملة'), findsOneWidget);
+    // With no active khatma, the screen now shows a dedicated empty state
+    // (khatmaProgressEmptyTitle, AR) instead of a misleading 0% ring.
+    expect(find.text('لا توجد ختمة نشطة حالياً'), findsOneWidget);
   });
 
   testWidgets(
