@@ -76,14 +76,22 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
   }
   final _player = AudioPlayer();
   StreamSubscription<PlayerState>? _playerStateSub;
-  static const _base =
-      'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
+  String _reciterBaseUrl(String reciterId) =>
+      'https://cdn.islamic.network/quran/audio/128/$reciterId/';
+
+  Future<void> setReciter(String reciterId) async {
+    state = state.copyWith(reciterId: reciterId);
+    if (state.isPlaying) {
+      await playAyah(state.surah, state.ayah);
+    }
+  }
 
   Future<void> playAyah(int surah, int ayah) async {
     state = state.copyWith(isLoading: true, surah: surah, ayah: ayah);
     try {
       final absAyah = _absoluteAyah(surah, ayah);
-      await _player.setUrl('$_base$absAyah.mp3');
+      final base = _reciterBaseUrl(state.reciterId);
+      await _player.setUrl('$base$absAyah.mp3');
       await _player.setSpeed(state.speed);
       await _player.play();
       state = state.copyWith(isLoading: false, isPlaying: true);

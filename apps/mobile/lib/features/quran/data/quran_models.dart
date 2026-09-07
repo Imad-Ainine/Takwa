@@ -55,17 +55,79 @@ class QuranReadingState {
   );
 }
 
+// ─── Reciter Model ───────────────────────────────────────────
+class QuranReciter {
+  final String id;
+  final String nameAr;
+  final String nameEn;
+  final String subfolder;
+
+  const QuranReciter({
+    required this.id,
+    required this.nameAr,
+    required this.nameEn,
+    required this.subfolder,
+  });
+}
+
+const kDefaultReciters = <QuranReciter>[
+  QuranReciter(
+    id: 'ar.alafasy',
+    nameAr: 'مشاري راشد العفاسي',
+    nameEn: 'Mishary Alafasy',
+    subfolder: 'ar.alafasy',
+  ),
+  QuranReciter(
+    id: 'ar.abdulbasitmurattal',
+    nameAr: 'عبد الباسط عبد الصمد (مرتل)',
+    nameEn: 'Abdul Basit (Murattal)',
+    subfolder: 'ar.abdulbasitmurattal',
+  ),
+  QuranReciter(
+    id: 'ar.husary',
+    nameAr: 'محمود خليل الحصري',
+    nameEn: 'Mahmoud Khalil Al-Husary',
+    subfolder: 'ar.husary',
+  ),
+  QuranReciter(
+    id: 'ar.minshawi',
+    nameAr: 'محمد صديق المنشاوي (مرتل)',
+    nameEn: 'Mohamed Siddiq Al-Minshawi',
+    subfolder: 'ar.minshawi',
+  ),
+  QuranReciter(
+    id: 'ar.mahermuaiqly',
+    nameAr: 'ماهر المعيقلي',
+    nameEn: 'Maher Al-Muaiqly',
+    subfolder: 'ar.mahermuaiqly',
+  ),
+  QuranReciter(
+    id: 'ar.saadalghamidi',
+    nameAr: 'سعد الغامدي',
+    nameEn: 'Saad Al-Ghamdi',
+    subfolder: 'ar.saadalghamidi',
+  ),
+  QuranReciter(
+    id: 'ar.shaatree',
+    nameAr: 'أبو بكر الشاطري',
+    nameEn: 'Abu Bakr Al-Shatri',
+    subfolder: 'ar.shaatree',
+  ),
+];
+
 // ─── Audio State ─────────────────────────────────────────────
 class QuranAudioState {
   final bool isPlaying, isLoading;
   final int surah, ayah;
   final double speed;
+  final String reciterId;
   const QuranAudioState({
     this.isPlaying = false,
     this.isLoading = false,
     this.surah = 1,
     this.ayah = 1,
     this.speed = 1.0,
+    this.reciterId = 'ar.alafasy',
   });
   QuranAudioState copyWith({
     bool? isPlaying,
@@ -73,12 +135,14 @@ class QuranAudioState {
     int? surah,
     int? ayah,
     double? speed,
+    String? reciterId,
   }) => QuranAudioState(
     isPlaying: isPlaying ?? this.isPlaying,
     isLoading: isLoading ?? this.isLoading,
     surah: surah ?? this.surah,
     ayah: ayah ?? this.ayah,
     speed: speed ?? this.speed,
+    reciterId: reciterId ?? this.reciterId,
   );
 }
 
