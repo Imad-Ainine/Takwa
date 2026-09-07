@@ -594,9 +594,15 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     _NavItem('🕌', l.drawerNavPrayer, '/prayer', 2),
     _NavItem('📚', l.drawerNavBooks, '/books', 3),
     _NavItem('📊', l.drawerNavStatistics, '/statistics', 4),
-    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 5),
-    _NavItem('👤', l.drawerNavProfile, '/profile', 6),
-    _NavItem('⚙️', l.drawerNavSettings, '/settings', 7),
+    // Moved out of the bottom nav (main_shell.dart §C10: 6 destinations was
+    // one over Material's guidance) — a reference/browse screen fits an
+    // occasional-lookup drawer entry better than a persistent tab. '/asma'
+    // isn't in shellRouteToTab below, so this pushes AsmaScreen as its own
+    // route rather than switching a shell tab.
+    _NavItem('✨', l.drawerNavAsma, '/asma', 5),
+    _NavItem('🏆', l.drawerNavAchievements, '/achievements', 6),
+    _NavItem('👤', l.drawerNavProfile, '/profile', 7),
+    _NavItem('⚙️', l.drawerNavSettings, '/settings', 8),
   ];
 
   @override
@@ -670,12 +676,15 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
               isActive: currentRoute == item.route,
               onTap: () {
                 widget.onClose();
-                // Routes embedded in the PageView shell → switch tab
+                // Routes embedded in the PageView shell → switch tab. '/asma'
+                // deliberately isn't here — it moved out of the shell (see
+                // _buildItems above) and falls through to the pushNamed
+                // branch below like '/prayer'/'/books'/etc already did.
                 const shellRouteToTab = <String, int>{
                   '/home': 0,
                   '/checklist': 2,
                   '/statistics': 3,
-                  '/settings': 5,
+                  '/settings': 4,
                 };
                 final tabIdx = shellRouteToTab[item.route];
                 if (tabIdx != null) {

@@ -1796,6 +1796,12 @@ abstract class AppLocalizations {
   /// **'الإحصائيات'**
   String get drawerNavStatistics;
 
+  /// Drawer navigation item: The 99 Names of Allah
+  ///
+  /// In ar, this message translates to:
+  /// **'أسماء الله الحسنى'**
+  String get drawerNavAsma;
+
   /// Drawer navigation item: Achievements
   ///
   /// In ar, this message translates to:

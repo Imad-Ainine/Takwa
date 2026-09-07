@@ -11,7 +11,6 @@ import '../core/notifications/notifications_service.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/statistics/statistics_screen.dart';
 import '../features/settings/presentation/screens/settings_screen.dart';
-import '../features/asma/presentation/screens/asma_screen.dart';
 import '../features/qiyam/presentation/screens/qiyam_dashboard_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../app/animated_drawer.dart';
@@ -41,13 +40,17 @@ class _MainShellState extends ConsumerState<MainShell>
   late final PageController _pageCtrl;
   late List<AnimationController> _tabAnims;
 
+  // Was 6 destinations (audit §C10: "exceeds Material's 3-5 destination
+  // guidance; at 375pt that's 62pt per tab"). Names of Allah moved to the
+  // drawer (_DrawerNav in animated_drawer.dart) — a reference/browse screen
+  // fits better as an occasional lookup than a persistent bottom-nav slot,
+  // unlike Qiyam which is a daily-tracked habit like the other four.
   static List<_TabInfo> _getTabs(AppLocalizations l10n) => [
     _TabInfo('🏠', l10n.bottomNavHome, 0),
     _TabInfo('🌙', l10n.bottomNavQiyam, 1),
     _TabInfo('✅', l10n.bottomNavMuhasaba, 2),
     _TabInfo('📊', l10n.bottomNavStatistics, 3),
-    _TabInfo('✨', l10n.bottomNavAsma, 4),
-    _TabInfo('⚙️', l10n.bottomNavSettings, 5),
+    _TabInfo('⚙️', l10n.bottomNavSettings, 4),
   ];
 
   @override
@@ -56,7 +59,7 @@ class _MainShellState extends ConsumerState<MainShell>
     _pageCtrl = PageController(initialPage: widget.initialIndex);
 
     _tabAnims = List.generate(
-      6,
+      5,
       (i) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 300),
@@ -174,7 +177,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
   Widget _buildShell() {
     // Robustness check: If tabs were added/removed during hot reload, re-initialize controllers
-    const tabCount = 6;
+    const tabCount = 5;
     if (_tabAnims.length != tabCount) {
       for (final a in _tabAnims) {
         a.dispose();
@@ -207,7 +210,6 @@ class _MainShellState extends ConsumerState<MainShell>
             QiyamDashboardScreen(),
             ChecklistScreen(),
             StatisticsScreen(),
-            AsmaScreen(),
             SettingsScreen(),
           ],
           onPageChanged: (idx) {

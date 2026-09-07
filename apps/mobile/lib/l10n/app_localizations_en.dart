@@ -939,6 +939,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerNavStatistics => 'Statistics';
 
   @override
+  String get drawerNavAsma => 'Names of Allah';
+
+  @override
   String get drawerNavAchievements => 'Achievements';
 
   @override

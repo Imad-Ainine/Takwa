@@ -916,6 +916,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerNavStatistics => 'الإحصائيات';
 
   @override
+  String get drawerNavAsma => 'أسماء الله الحسنى';
+
+  @override
   String get drawerNavAchievements => 'الإنجازات';
 
   @override

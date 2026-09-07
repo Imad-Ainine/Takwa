@@ -575,6 +575,10 @@
   "@drawerNavStatistics": {
     "description": "Drawer navigation item: Statistics"
   },
+  "drawerNavAsma": "أسماء الله الحسنى",
+  "@drawerNavAsma": {
+    "description": "Drawer navigation item: The 99 Names of Allah"
+  },
   "drawerNavAchievements": "الإنجازات",
   "@drawerNavAchievements": {
     "description": "Drawer navigation item: Achievements"
