@@ -4091,6 +4091,309 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get mosqueErrorLocationPermission =>
+      'Please enable location permission to see nearby mosques';
+
+  @override
+  String get mosqueErrorLocationPermissionForever =>
+      'You must enable location permissions from device settings';
+
+  @override
+  String get mosqueFetchError =>
+      'Could not load mosques (server is busy). Please try again later';
+
+  @override
+  String get mosqueDefaultName => 'Nearby Mosque';
+
+  @override
+  String get mosqueDefaultAddress => 'No specific address';
+
+  @override
+  String get emailConfirmationTitle => 'Confirm Your Email';
+
+  @override
+  String emailConfirmationLinkSentLabel(String email) {
+    return 'A confirmation link was sent to:\n$email';
+  }
+
+  @override
+  String get emailConfirmationInstructions =>
+      'Please check your email and tap the link to activate your account and begin your journey with Takwa.';
+
+  @override
+  String get emailConfirmationBackToSignInButton => 'Back to Sign In';
+
+  @override
+  String get guestGuardTitle => 'Cloud feature';
+
+  @override
+  String get guestGuardMessage =>
+      'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
+
+  @override
+  String get guestGuardSignInButton => 'Sign In / Create Account';
+
+  @override
+  String get guestGuardBackButton => 'Back';
+
+  @override
+  String get customTimePickerTitle => 'Select Time';
+
+  @override
+  String get customTimePickerConfirmButton => 'Confirm';
+
+  @override
+  String get quranReaderBookmarkSaved => 'Bookmark saved';
+
+  @override
+  String achievementPointsRewardLabel(int points) {
+    return '+$points pts';
+  }
+
+  @override
+  String get achievementPendingLabel => 'Pending';
+
+  @override
+  String get khatmaMenuMarkFinished => 'Mark as Finished';
+
+  @override
+  String get khatmaMenuCancelKhatma => 'Cancel Khatma';
+
+  @override
+  String get khatmaMarkFinishedDialogTitle => 'Mark as Finished';
+
+  @override
+  String get khatmaMarkFinishedDialogBody =>
+      'Are you sure you want to mark this Khatma as finished?';
+
+  @override
+  String get khatmaMarkFinishedDialogNote =>
+      'This is appropriate if you finished reading the Quran from another source.';
+
+  @override
+  String get khatmaMarkFinishedConfirm => 'Confirm';
+
+  @override
+  String get khatmaCancelDialogTitle => 'Cancel Khatma';
+
+  @override
+  String get khatmaCancelDialogBody =>
+      'Are you sure you want to cancel this Khatma?';
+
+  @override
+  String get khatmaCancelDialogWarning =>
+      'Warning: your progress will be saved in history, but you won\'t be able to restore a cancelled Khatma again.';
+
+  @override
+  String get khatmaCancelConfirmFinal => 'Cancel Khatma Permanently';
+
+  @override
+  String get khatmaDialogGoBack => 'Go Back';
+
+  @override
+  String get khatmaInfoSectionTitle => 'Khatma Information';
+
+  @override
+  String get khatmaInfoNameLabel => 'Khatma Name';
+
+  @override
+  String get khatmaInfoTypeLabel => 'Khatma Type';
+
+  @override
+  String get khatmaInfoStartDateLabel => 'Start Date';
+
+  @override
+  String get khatmaInfoCompletedDaysLabel => 'Completed Days';
+
+  @override
+  String khatmaInfoCompletedDaysValue(String n) {
+    return '$n days';
+  }
+
+  @override
+  String get khatmaInfoEndTypeLabel => 'Khatma Duration';
+
+  @override
+  String get khatmaInfoEndTypeNoLimit => 'No set end time';
+
+  @override
+  String khatmaInfoEndTypeTarget(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get khatmaTypeMuyassaraLabel => 'Easy Khatma';
+
+  @override
+  String get khatmaTypeMultazimaLabel => 'Committed Khatma';
+
+  @override
+  String get khatmaOverallProgressTitle => 'Overall Progress';
+
+  @override
+  String get khatmaReachedPageLabel => 'Reached Page';
+
+  @override
+  String khatmaReachedPageValue(String current, String total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get khatmaCurrentPageLabel => 'Current Page';
+
+  @override
+  String khatmaCurrentPageValue(String n) {
+    return 'Page $n';
+  }
+
+  @override
+  String get khatmaRemainingPagesLabel => 'Remaining Pages';
+
+  @override
+  String khatmaRemainingPagesValue(String n) {
+    return '$n pages';
+  }
+
+  @override
+  String get khatmaEstimatedHasanatLabel => 'Estimated Rewards';
+
+  @override
+  String khatmaEstimatedHasanatValue(String n) {
+    return '$n hasanat';
+  }
+
+  @override
+  String get khatmaStatusMuyassaraBadge => 'Easy Khatma - No time pressure';
+
+  @override
+  String khatmaStatusMultazimaBadge(String n) {
+    return 'Committed Khatma - $n pages/day';
+  }
+
+  @override
+  String get khatmaAvgPagesPerDayLabel => 'Average Pages/Day';
+
+  @override
+  String get khatmaTypeDescriptionLabel => 'Khatma Type';
+
+  @override
+  String get khatmaTypeDescriptionFree =>
+      'No time pressure or set daily portion';
+
+  @override
+  String khatmaTypeDescriptionTarget(String n) {
+    return 'Set daily portion: $n pages';
+  }
+
+  @override
+  String get khatmaExtraStatsTitle => 'Additional Statistics';
+
+  @override
+  String get khatmaTotalReadingTimeLabel => 'Total Reading Time';
+
+  @override
+  String get khatmaAvgReadingTimeLabel => 'Average Reading Time';
+
+  @override
+  String get khatmaCurrentStreakLabel => 'Current Streak';
+
+  @override
+  String get khatmaLongestStreakLabel => 'Longest Streak';
+
+  @override
+  String get khatmaLastReadLabel => 'Last Read';
+
+  @override
+  String khatmaStreakDaysValue(String n) {
+    return '$n days';
+  }
+
+  @override
+  String get khatmaNoDataValue => '—';
+
+  @override
+  String get khatmaReadingDaysTitle => 'Reading Days';
+
+  @override
+  String get khatmaReadingDaysSubtitle => 'Days you read the Holy Quran';
+
+  @override
+  String get khatmaLegendFuture => 'Upcoming';
+
+  @override
+  String get khatmaLegendMissed => 'Missed';
+
+  @override
+  String get khatmaLegendPartial => 'Partial';
+
+  @override
+  String get khatmaLegendComplete => 'Complete';
+
+  @override
+  String khatmaDurationHoursMinutes(String hours, String minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String khatmaDurationMinutesSeconds(String minutes, String seconds) {
+    return '${minutes}m ${seconds}s';
+  }
+
+  @override
+  String khatmaDurationSecondsOnly(String seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String get khatmaHistorySortMenuTooltip => 'Sort & View';
+
+  @override
+  String get khatmaHistorySortByDate => 'Sort by Date';
+
+  @override
+  String get khatmaHistorySortByName => 'Sort by Name';
+
+  @override
+  String get khatmaHistorySortByDuration => 'Sort by Duration';
+
+  @override
+  String get khatmaHistorySortByProgress => 'Sort by Progress';
+
+  @override
+  String get khatmaHistoryShowStats => 'Show Statistics';
+
+  @override
+  String get khatmaHistoryViewDetails => 'View Details';
+
+  @override
+  String get khatmaHistoryDetailsTitle => 'Khatma Details';
+
+  @override
+  String get khatmaHistoryStatsTitle => 'Khatma Statistics';
+
+  @override
+  String get khatmaHistoryStatsTotal => 'Total Khatmas';
+
+  @override
+  String get khatmaHistoryStatsCompleted => 'Completed Khatmas';
+
+  @override
+  String get khatmaHistoryStatsCancelled => 'Cancelled Khatmas';
+
+  @override
+  String get khatmaHistoryStatsTotalPages => 'Total Pages Read';
+
+  @override
+  String get khatmaHistoryCloseButton => 'Close';
+
+  @override
+  String get khatmaProgressEmptyTitle => 'No active Khatma right now';
+
+  @override
+  String get khatmaProgressEmptySubtitle =>
+      'Start a new Khatma to track your progress here';
+
+  @override
   String get routeNotFoundTitle => 'Page not available';
 
   @override
@@ -4106,12 +4409,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get prayerGenericLabel => 'Prayer';
-
-  @override
-  String get guestGuardTitle => 'Cloud feature';
-
-  @override
-  String get guestGuardMessage => 'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
 
   @override
   String get guestGuardSignIn => 'Sign in / Create account';
@@ -4147,4 +4444,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checklistSyncError => 'Saved on this device — it\'ll sync once you\'re back online';
+  String get splashQuote =>
+      '“Take account of yourselves before you are brought to account”';
 }

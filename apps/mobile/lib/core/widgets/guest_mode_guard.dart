@@ -14,8 +14,8 @@ class GuestModeGuard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authStatus = ref.watch(authStatusProvider);
     final l10n = AppLocalizations.of(context)!;
+    final authStatus = ref.watch(authStatusProvider);
 
     if (authStatus == AuthStatus.authenticated) {
       return child;
@@ -87,7 +87,7 @@ class GuestModeGuard extends ConsumerWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxxl),
                   PrimaryButton(
-                    label: l10n.guestGuardSignIn,
+                    label: l10n.guestGuardSignInButton,
                     icon: Icons.login_rounded,
                     onTap: () async {
                       ref.read(guestModeProvider.notifier).state = false;
@@ -106,7 +106,7 @@ class GuestModeGuard extends ConsumerWidget {
                       ref.read(currentTabProvider.notifier).state = 0;
                     },
                     child: Text(
-                      l10n.guestGuardBack,
+                      l10n.guestGuardBackButton,
                       style: context.typography.labelLarge.copyWith(
                         color: context.colors.textDim,
                         decoration: TextDecoration.underline,

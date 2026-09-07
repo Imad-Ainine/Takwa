@@ -483,7 +483,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 ),
                 const SizedBox(height: AppSpacing.xxl),
                 Text(
-                  l10n.appTitle,
+                  l10n.authChoiceAppName,
                   style: context.typography.displayMedium.copyWith(
                     fontSize: 32,
                     color: context.colors.gold,
