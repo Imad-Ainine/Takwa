@@ -7445,7 +7445,7 @@ abstract class AppLocalizations {
   /// Hadith shown under the app name on the splash screen
   ///
   /// In ar, this message translates to:
-  /// **'"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"'**
+  /// **'\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"'**
   String get splashQuote;
 }
 

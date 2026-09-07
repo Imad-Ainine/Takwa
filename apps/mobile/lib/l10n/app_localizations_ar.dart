@@ -4063,7 +4063,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestGuardTitle => 'ميزة سحابية';
 
   @override
-  String get guestGuardMessage => 'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.';
+  String get guestGuardMessage =>
+      'هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.';
 
   @override
   String get guestGuardSignIn => 'تسجيل دخول / إنشاء حساب';
@@ -4072,5 +4073,5 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestGuardBack => 'العودة';
 
   @override
-  String get splashQuote => '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"';
+  String get splashQuote => '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
 }

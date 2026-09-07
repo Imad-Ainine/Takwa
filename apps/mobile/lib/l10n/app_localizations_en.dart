@@ -4102,7 +4102,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestGuardTitle => 'Cloud feature';
 
   @override
-  String get guestGuardMessage => 'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
+  String get guestGuardMessage =>
+      'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
 
   @override
   String get guestGuardSignIn => 'Sign in / Create account';
@@ -4111,5 +4112,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestGuardBack => 'Back';
 
   @override
-  String get splashQuote => '“Take account of yourselves before you are brought to account”';
+  String get splashQuote =>
+      '“Take account of yourselves before you are brought to account”';
 }
