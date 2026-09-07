@@ -4341,4 +4341,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get khatmaProgressEmptySubtitle => 'ابدأ ختمة جديدة لتتبع تقدمك هنا';
+
+  @override
+  String get routeNotFoundTitle => 'الصفحة غير متاحة';
+
+  @override
+  String routeNotFoundMessage(String route) {
+    return 'تعذّر فتح المسار «$route».';
+  }
+
+  @override
+  String get routeNotFoundGoHome => 'العودة للرئيسية';
+
+  @override
+  String get routeNotFoundGoBack => 'رجوع';
+
+  @override
+  String get prayerGenericLabel => 'الصلاة';
+
+  @override
+  String get guestGuardSignIn => 'تسجيل دخول / إنشاء حساب';
+
+  @override
+  String get guestGuardBack => 'العودة';
+
+  @override
+  String get splashQuote => '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
 }

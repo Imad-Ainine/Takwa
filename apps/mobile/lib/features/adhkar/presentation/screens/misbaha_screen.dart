@@ -58,64 +58,59 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     final style = AdaptiveStyle(context, isRamadan);
     final state = ref.watch(misbahaProvider);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
 
-            // Decorative Glows
-            Positioned(
-              top: -100,
-              right: -100,
-              child: _buildGlow(style.gold.withOpacity(0.15), 300),
-            ),
-            Positioned(
-              bottom: -50,
-              left: -50,
-              child: _buildGlow(style.teal.withOpacity(0.1), 250),
-            ),
+          // Decorative Glows
+          Positioned(
+            top: -100,
+            right: -100,
+            child: _buildGlow(style.gold.withOpacity(0.15), 300),
+          ),
+          Positioned(
+            bottom: -50,
+            left: -50,
+            child: _buildGlow(style.teal.withOpacity(0.1), 250),
+          ),
 
-            SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final availableHeight = constraints.maxHeight;
-                  // Adjusted scale factor to maintain aesthetics on smaller screens
-                  final scale = (availableHeight / 780).clamp(0.7, 1.0);
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final availableHeight = constraints.maxHeight;
+                // Adjusted scale factor to maintain aesthetics on smaller screens
+                final scale = (availableHeight / 780).clamp(0.7, 1.0);
 
-                  return SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: availableHeight),
-                      child: IntrinsicHeight(
-                        child: Column(
-                          children: [
-                            _buildHeader(style, context),
-                            const Spacer(),
-                            _buildDhikrSelector(l10n, state, style, context),
-                            SizedBox(height: 32 * scale),
-                            _buildCounterDisplay(context, state, style, scale),
-                            const Spacer(),
-                            _buildMainBead(l10n, state, style, scale),
-                            const Spacer(),
-                            _buildBottomControls(l10n, state, style),
-                            SizedBox(height: 32 * scale),
-                          ],
-                        ),
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: availableHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        children: [
+                          _buildHeader(style, context),
+                          const Spacer(),
+                          _buildDhikrSelector(l10n, state, style, context),
+                          SizedBox(height: 32 * scale),
+                          _buildCounterDisplay(context, state, style, scale),
+                          const Spacer(),
+                          _buildMainBead(l10n, state, style, scale),
+                          const Spacer(),
+                          _buildBottomControls(l10n, state, style),
+                          SizedBox(height: 32 * scale),
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

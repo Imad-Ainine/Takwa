@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
@@ -44,345 +43,340 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isSyncing = ref.watch(isSyncingProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: context.colors.background,
-        body: Stack(
-          children: [
-            // Background Pattern
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: Stack(
+        children: [
+          // Background Pattern
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
 
-            CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverAppBar(
-                  backgroundColor: Colors.transparent,
-                  pinned: true,
-                  leading: const CustomLeadingButton(),
-                  title: Text(
-                    l10n.settingsScreenTitle,
-                    style: context.typography.headingMedium.copyWith(
-                      color: context.colors.gold,
-                    ),
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Colors.transparent,
+                pinned: true,
+                leading: const CustomLeadingButton(),
+                title: Text(
+                  l10n.settingsScreenTitle,
+                  style: context.typography.headingMedium.copyWith(
+                    color: context.colors.gold,
                   ),
-                  actions: [
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                        ),
-                        child: SyncStatusIndicator(isSyncing: isSyncing),
-                      ),
-                    ),
-                  ],
-                  centerTitle: true,
-                  elevation: 0,
-                  surfaceTintColor: Colors.transparent,
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
+                actions: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                      ),
+                      child: SyncStatusIndicator(isSyncing: isSyncing),
+                    ),
                   ),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const SizedBox(height: AppSpacing.sm),
-                      prefsAsync.when(
-                        loading: () => const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(AppSpacing.xxxl),
-                            child: TakwaLoadingIndicator(size: 32),
-                          ),
-                        ),
-                        error: (err, st) => Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.xxxl),
-                            child: Text('Error loading settings: $err'),
-                          ),
-                        ),
-                        data: (prefs) => Column(
-                          children: [
-                            // ── التذكيرات ──
-                            SectionHeader(
-                              title: l10n.settingsAdhanSectionTitle,
-                              icon: '🔔',
-                            ),
-                            SettingsCard(
-                              children: [
-                                ActionSetting(
-                                  icon: '🕌',
-                                  label: l10n.settingsAdhanNotificationsLabel,
-                                  sublabel:
-                                      l10n.settingsAdhanNotificationsSublabel,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          const AdhanNotificationSettingsScreen(),
-                                    ),
-                                  ),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '🌙',
-                                  label: l10n.settingsWakeBeforeFajrLabel,
-                                  sublabel: l10n.settingsWakeBeforeFajrSublabel,
-                                  value: prefs.wakeUpBeforeFajr,
-                                  onChanged: (v) => _updatePref(
-                                    'wake_up_before_fajr',
-                                    v,
-                                    category: NotificationCategory.prayer,
-                                  ),
-                                ),
-                                if (prefs.wakeUpBeforeFajr) ...[
-                                  const SettingsDivider(),
-                                  TimeSetting(
-                                    icon: '⏰',
-                                    label: l10n.settingsWakeTimeLabel,
-                                    time: prefs.wakeUpTime,
-                                    onChanged: (t) async {
-                                      final str =
-                                          '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                      await _updatePref(
-                                        'wake_up_time',
-                                        str,
-                                        category: NotificationCategory.prayer,
-                                      );
-                                    },
-                                  ),
-                                ],
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '☀️',
-                                  label: l10n.settingsMorningAdhkarLabel,
-                                  sublabel: l10n.settingsMorningAdhkarSublabel,
-                                  value: prefs.morningAdhkarReminder,
-                                  onChanged: (v) =>
-                                      _updatePref('morning_adhkar_reminder', v),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '🌆',
-                                  label: l10n.settingsEveningAdhkarLabel,
-                                  sublabel: l10n.settingsEveningAdhkarSublabel,
-                                  value: prefs.eveningAdhkarReminder,
-                                  onChanged: (v) =>
-                                      _updatePref('evening_adhkar_reminder', v),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '📝',
-                                  label: l10n.settingsMuhasabaLabel,
-                                  sublabel: l10n.settingsMuhasabaSublabel,
-                                  value: prefs.muhasabaReminder,
-                                  onChanged: (v) => _updatePref(
-                                    'muhasaba_reminder',
-                                    v,
-                                    category: NotificationCategory.reminders,
-                                  ),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '🤲',
-                                  label: l10n.settingsDailyDuasLabel,
-                                  sublabel: l10n.settingsDailyDuasSublabel,
-                                  value: prefs.dailyDuasOn,
-                                  onChanged: (v) =>
-                                      _updatePref('daily_duas_on', v),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '🕌',
-                                  label: l10n.settingsFridaySunnahLabel,
-                                  sublabel: l10n.settingsFridaySunnahSublabel,
-                                  value: prefs.specialRemindersOn,
-                                  onChanged: (v) =>
-                                      _updatePref('special_reminders_on', v),
-                                ),
-                                const SettingsDivider(),
-                                ToggleSetting(
-                                  icon: '🥘',
-                                  label: l10n.settingsFastingRemindersLabel,
-                                  sublabel:
-                                      l10n.settingsFastingRemindersSublabel,
-                                  value: prefs.fastingRemindersOn,
-                                  onChanged: (v) =>
-                                      _updatePref('fasting_reminders_on', v),
-                                ),
-                                if (prefs.muhasabaReminder) ...[
-                                  const SettingsDivider(),
-                                  TimeSetting(
-                                    icon: '⏰',
-                                    label: l10n.settingsMuhasabaTimeLabel,
-                                    time: prefs.muhasabaTime,
-                                    onChanged: (t) async {
-                                      final str =
-                                          '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
-                                      await _updatePref(
-                                        'evening_reminder_time',
-                                        str,
-                                        category:
-                                            NotificationCategory.reminders,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const OverlayNotificationSettings(),
-
-                            // ── المظهر ──
-                            SectionHeader(
-                              title: l10n.settingsAppearanceSectionTitle,
-                              icon: '🎨',
-                            ),
-                            SettingsCard(
-                              children: [
-                                SelectSetting(
-                                  icon: '🌓',
-                                  label: l10n.settingsThemeModeLabel,
-                                  value: ref.watch(themeModeProvider).name,
-                                  options: {
-                                    'system': l10n.themeModeSystem,
-                                    'light': l10n.themeModeLight,
-                                    'dark': l10n.themeModeDark,
-                                  },
-                                  onChanged: (v) {
-                                    final mode = ThemeMode.values.firstWhere(
-                                      (e) => e.name == v,
-                                    );
-                                    ref
-                                        .read(themeModeProvider.notifier)
-                                        .setTheme(mode);
-                                  },
-                                ),
-                                const SettingsDivider(),
-                                SelectSetting(
-                                  icon: '🌐',
-                                  label: l10n.settingsLanguageLabel,
-                                  value: ref.watch(localeProvider).languageCode,
-                                  options: {
-                                    'ar': l10n.languageArabic,
-                                    'en': l10n.languageEnglish,
-                                  },
-                                  onChanged: (v) {
-                                    ref
-                                        .read(localeProvider.notifier)
-                                        .setLocale(Locale(v));
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-
-                            // ── وضع رمضان ──
-                            SectionHeader(
-                              title: l10n.settingsRamadanSectionTitle,
-                              icon: '🌙',
-                            ),
-                            SettingsCard(
-                              children: [
-                                ToggleSetting(
-                                  icon: '🌙',
-                                  label: l10n.settingsRamadanSectionTitle,
-                                  sublabel: l10n.settingsRamadanModeSublabel,
-                                  value: prefs.ramadanMode,
-                                  onChanged: (v) =>
-                                      _updatePref('ramadan_mode', v),
-                                  accentColor: context.colors.gold,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.xxxl),
-                          ],
+                ],
+                centerTitle: true,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    const SizedBox(height: AppSpacing.sm),
+                    prefsAsync.when(
+                      loading: () => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.xxxl),
+                          child: TakwaLoadingIndicator(size: 32),
                         ),
                       ),
-
-                      // ── معلومات ──
-                      SectionHeader(
-                        title: l10n.settingsAppSectionTitle,
-                        icon: 'ℹ️',
+                      error: (err, st) => Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.xxxl),
+                          child: Text('Error loading settings: $err'),
+                        ),
                       ),
-                      SettingsCard(
+                      data: (prefs) => Column(
                         children: [
-                          ActionSetting(
+                          // ── التذكيرات ──
+                          SectionHeader(
+                            title: l10n.settingsAdhanSectionTitle,
                             icon: '🔔',
-                            label: l10n.settingsTestNotifLabel,
-                            sublabel: l10n.settingsTestNotifSublabel,
-                            onTap: _showTestMenu,
                           ),
-                          const SettingsDivider(),
-                          ActionSetting(
-                            icon: '💎',
-                            label: l10n.settingsSubscriptionLabel,
-                            sublabel: l10n.settingsSubscriptionSublabel,
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              Routes.subscription,
-                            ),
+                          SettingsCard(
+                            children: [
+                              ActionSetting(
+                                icon: '🕌',
+                                label: l10n.settingsAdhanNotificationsLabel,
+                                sublabel:
+                                    l10n.settingsAdhanNotificationsSublabel,
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const AdhanNotificationSettingsScreen(),
+                                  ),
+                                ),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '🌙',
+                                label: l10n.settingsWakeBeforeFajrLabel,
+                                sublabel: l10n.settingsWakeBeforeFajrSublabel,
+                                value: prefs.wakeUpBeforeFajr,
+                                onChanged: (v) => _updatePref(
+                                  'wake_up_before_fajr',
+                                  v,
+                                  category: NotificationCategory.prayer,
+                                ),
+                              ),
+                              if (prefs.wakeUpBeforeFajr) ...[
+                                const SettingsDivider(),
+                                TimeSetting(
+                                  icon: '⏰',
+                                  label: l10n.settingsWakeTimeLabel,
+                                  time: prefs.wakeUpTime,
+                                  onChanged: (t) async {
+                                    final str =
+                                        '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
+                                    await _updatePref(
+                                      'wake_up_time',
+                                      str,
+                                      category: NotificationCategory.prayer,
+                                    );
+                                  },
+                                ),
+                              ],
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '☀️',
+                                label: l10n.settingsMorningAdhkarLabel,
+                                sublabel: l10n.settingsMorningAdhkarSublabel,
+                                value: prefs.morningAdhkarReminder,
+                                onChanged: (v) =>
+                                    _updatePref('morning_adhkar_reminder', v),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '🌆',
+                                label: l10n.settingsEveningAdhkarLabel,
+                                sublabel: l10n.settingsEveningAdhkarSublabel,
+                                value: prefs.eveningAdhkarReminder,
+                                onChanged: (v) =>
+                                    _updatePref('evening_adhkar_reminder', v),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '📝',
+                                label: l10n.settingsMuhasabaLabel,
+                                sublabel: l10n.settingsMuhasabaSublabel,
+                                value: prefs.muhasabaReminder,
+                                onChanged: (v) => _updatePref(
+                                  'muhasaba_reminder',
+                                  v,
+                                  category: NotificationCategory.reminders,
+                                ),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '🤲',
+                                label: l10n.settingsDailyDuasLabel,
+                                sublabel: l10n.settingsDailyDuasSublabel,
+                                value: prefs.dailyDuasOn,
+                                onChanged: (v) =>
+                                    _updatePref('daily_duas_on', v),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '🕌',
+                                label: l10n.settingsFridaySunnahLabel,
+                                sublabel: l10n.settingsFridaySunnahSublabel,
+                                value: prefs.specialRemindersOn,
+                                onChanged: (v) =>
+                                    _updatePref('special_reminders_on', v),
+                              ),
+                              const SettingsDivider(),
+                              ToggleSetting(
+                                icon: '🥘',
+                                label: l10n.settingsFastingRemindersLabel,
+                                sublabel:
+                                    l10n.settingsFastingRemindersSublabel,
+                                value: prefs.fastingRemindersOn,
+                                onChanged: (v) =>
+                                    _updatePref('fasting_reminders_on', v),
+                              ),
+                              if (prefs.muhasabaReminder) ...[
+                                const SettingsDivider(),
+                                TimeSetting(
+                                  icon: '⏰',
+                                  label: l10n.settingsMuhasabaTimeLabel,
+                                  time: prefs.muhasabaTime,
+                                  onChanged: (t) async {
+                                    final str =
+                                        '${t.hour.toString().padLeft(2, "0")}:${t.minute.toString().padLeft(2, "0")}';
+                                    await _updatePref(
+                                      'evening_reminder_time',
+                                      str,
+                                      category:
+                                          NotificationCategory.reminders,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ],
                           ),
-                          const SettingsDivider(),
-                          ActionSetting(
-                            icon: '👨‍💻',
-                            label: l10n.settingsAboutDevLabel,
-                            sublabel: l10n.settingsAboutDevSublabel,
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/about-me'),
+                          const OverlayNotificationSettings(),
+
+                          // ── المظهر ──
+                          SectionHeader(
+                            title: l10n.settingsAppearanceSectionTitle,
+                            icon: '🎨',
                           ),
-                          const SettingsDivider(),
-                          ActionSetting(
-                            icon: '📜',
-                            label: l10n.settingsTermsLabel,
-                            sublabel: l10n.settingsTermsSublabel,
-                            onTap: () => Navigator.pushNamed(context, '/terms'),
+                          SettingsCard(
+                            children: [
+                              SelectSetting(
+                                icon: '🌓',
+                                label: l10n.settingsThemeModeLabel,
+                                value: ref.watch(themeModeProvider).name,
+                                options: {
+                                  'system': l10n.themeModeSystem,
+                                  'light': l10n.themeModeLight,
+                                  'dark': l10n.themeModeDark,
+                                },
+                                onChanged: (v) {
+                                  final mode = ThemeMode.values.firstWhere(
+                                    (e) => e.name == v,
+                                  );
+                                  ref
+                                      .read(themeModeProvider.notifier)
+                                      .setTheme(mode);
+                                },
+                              ),
+                              const SettingsDivider(),
+                              SelectSetting(
+                                icon: '🌐',
+                                label: l10n.settingsLanguageLabel,
+                                value: ref.watch(localeProvider).languageCode,
+                                options: {
+                                  'ar': l10n.languageArabic,
+                                  'en': l10n.languageEnglish,
+                                },
+                                onChanged: (v) {
+                                  ref
+                                      .read(localeProvider.notifier)
+                                      .setLocale(Locale(v));
+                                },
+                              ),
+                            ],
                           ),
-                          if (ref.watch(authStatusProvider) ==
-                              AuthStatus.authenticated)
-                            ActionSetting(
-                              icon: '🚪',
-                              label: l10n.settingsLogoutLabel,
-                              sublabel: l10n.settingsLogoutSublabel,
-                              onTap: _handleLogout,
-                              isDestructive: true,
-                            ),
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // ── وضع رمضان ──
+                          SectionHeader(
+                            title: l10n.settingsRamadanSectionTitle,
+                            icon: '🌙',
+                          ),
+                          SettingsCard(
+                            children: [
+                              ToggleSetting(
+                                icon: '🌙',
+                                label: l10n.settingsRamadanSectionTitle,
+                                sublabel: l10n.settingsRamadanModeSublabel,
+                                value: prefs.ramadanMode,
+                                onChanged: (v) =>
+                                    _updatePref('ramadan_mode', v),
+                                accentColor: context.colors.gold,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xxxl),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.lg),
+                    ),
 
-                      // App version
-                      Center(
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n.settingsBismillah,
-                              style: context.typography.quranicVerse.copyWith(
-                                fontSize: 14,
-                                color: context.colors.gold,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              l10n.settingsAppVersionLabel,
-                              style: context.typography.caption.copyWith(
-                                fontSize: 11,
-                                color: context.colors.textDim,
-                              ),
-                            ),
-                          ],
+                    // ── معلومات ──
+                    SectionHeader(
+                      title: l10n.settingsAppSectionTitle,
+                      icon: 'ℹ️',
+                    ),
+                    SettingsCard(
+                      children: [
+                        ActionSetting(
+                          icon: '🔔',
+                          label: l10n.settingsTestNotifLabel,
+                          sublabel: l10n.settingsTestNotifSublabel,
+                          onTap: _showTestMenu,
                         ),
+                        const SettingsDivider(),
+                        ActionSetting(
+                          icon: '💎',
+                          label: l10n.settingsSubscriptionLabel,
+                          sublabel: l10n.settingsSubscriptionSublabel,
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            Routes.subscription,
+                          ),
+                        ),
+                        const SettingsDivider(),
+                        ActionSetting(
+                          icon: '👨‍💻',
+                          label: l10n.settingsAboutDevLabel,
+                          sublabel: l10n.settingsAboutDevSublabel,
+                          onTap: () =>
+                              Navigator.pushNamed(context, '/about-me'),
+                        ),
+                        const SettingsDivider(),
+                        ActionSetting(
+                          icon: '📜',
+                          label: l10n.settingsTermsLabel,
+                          sublabel: l10n.settingsTermsSublabel,
+                          onTap: () => Navigator.pushNamed(context, '/terms'),
+                        ),
+                        if (ref.watch(authStatusProvider) ==
+                            AuthStatus.authenticated)
+                          ActionSetting(
+                            icon: '🚪',
+                            label: l10n.settingsLogoutLabel,
+                            sublabel: l10n.settingsLogoutSublabel,
+                            onTap: _handleLogout,
+                            isDestructive: true,
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+
+                    // App version
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.settingsBismillah,
+                            style: context.typography.quranicVerse.copyWith(
+                              fontSize: 14,
+                              color: context.colors.gold,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.settingsAppVersionLabel,
+                            style: context.typography.caption.copyWith(
+                              fontSize: 11,
+                              color: context.colors.textDim,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 80),
-                    ]),
-                  ),
+                    ),
+                    const SizedBox(height: 80),
+                  ]),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

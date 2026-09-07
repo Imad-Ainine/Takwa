@@ -4115,11 +4115,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailConfirmationBackToSignInButton => 'Back to Sign In';
 
   @override
-  String get guestGuardTitle => 'Cloud Feature';
+  String get guestGuardTitle => 'Cloud feature';
 
   @override
   String get guestGuardMessage =>
-      'This feature (checklist and statistics) requires cloud sync to save your progress. Please sign in to enable it.';
+      'Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.';
 
   @override
   String get guestGuardSignInButton => 'Sign In / Create Account';
@@ -4383,4 +4383,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get khatmaProgressEmptySubtitle =>
       'Start a new Khatma to track your progress here';
+
+  @override
+  String get routeNotFoundTitle => 'Page not available';
+
+  @override
+  String routeNotFoundMessage(String route) {
+    return 'Couldn’t open “$route”.';
+  }
+
+  @override
+  String get routeNotFoundGoHome => 'Back to home';
+
+  @override
+  String get routeNotFoundGoBack => 'Go back';
+
+  @override
+  String get prayerGenericLabel => 'Prayer';
+
+  @override
+  String get guestGuardSignIn => 'Sign in / Create account';
+
+  @override
+  String get guestGuardBack => 'Back';
+
+  @override
+  String get splashQuote =>
+      '“Take account of yourselves before you are brought to account”';
 }

@@ -104,10 +104,20 @@ class _AppBarWidgetState extends State<AppBarWidget>
                   ],
                 ));
 
-    // Title is always white when shown on a gradient for maximum contrast.
-    // When there is no background, fall back to the theme's text primary.
+    // Pick the title color from the gradient it actually sits on. It used to
+    // be hardcoded white whenever showBackground was true, which in light mode
+    // put white text over the near-white end of the default gradient (~1.05:1)
+    // and leaned on a drop shadow to stay readable.
+    // The gradient stops are translucent, so composite them over the surface
+    // they are painted on before judging brightness.
+    final gradientMid = Color.alphaBlend(
+      Color.lerp(gradient.colors.first, gradient.colors.last, 0.5)!,
+      colors.background,
+    );
     final titleColor = widget.showBackground
-        ? Colors.white
+        ? (ThemeData.estimateBrightnessForColor(gradientMid) == Brightness.dark
+              ? Colors.white
+              : colors.textPrimary)
         : colors.textPrimary;
 
     // Decorative circle opacities adapt to brightness so they stay subtle in
@@ -196,11 +206,17 @@ class _AppBarWidgetState extends State<AppBarWidget>
                         elevation: 0,
                         title: Text(
                           widget.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: typography.headingMedium.copyWith(
                             color: titleColor,
                             fontSize: 22,
                             letterSpacing: 0.5,
-                            shadows: widget.showBackground
+                            // Shadow only where it is a legibility aid (light
+                            // text on a busy gradient), never as a substitute
+                            // for contrast.
+                            shadows: widget.showBackground &&
+                                    titleColor == Colors.white
                                 ? [
                                     Shadow(
                                       color: Colors.black.withOpacity(

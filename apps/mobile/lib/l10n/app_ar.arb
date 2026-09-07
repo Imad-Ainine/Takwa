@@ -2249,7 +2249,6 @@
   "guestGuardBackButton": "العودة",
   "customTimePickerTitle": "اختيار الوقت",
   "customTimePickerConfirmButton": "تأكيد",
-  "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية"
   "quranReaderBookmarkSaved": "تم حفظ العلامة المرجعية",
   "achievementPointsRewardLabel": "+{points} نقطة",
   "@achievementPointsRewardLabel": {
@@ -2422,5 +2421,50 @@
   "khatmaHistoryStatsTotalPages": "إجمالي الصفحات المقروءة",
   "khatmaHistoryCloseButton": "إغلاق",
   "khatmaProgressEmptyTitle": "لا توجد ختمة نشطة حالياً",
-  "khatmaProgressEmptySubtitle": "ابدأ ختمة جديدة لتتبع تقدمك هنا"
+  "khatmaProgressEmptySubtitle": "ابدأ ختمة جديدة لتتبع تقدمك هنا",
+  "routeNotFoundTitle": "الصفحة غير متاحة",
+  "@routeNotFoundTitle": {
+    "description": "Title of the fallback screen shown for an unknown route"
+  },
+  "routeNotFoundMessage": "تعذّر فتح المسار «{route}».",
+  "@routeNotFoundMessage": {
+    "description": "Unknown-route detail line naming the route that failed",
+    "placeholders": {
+      "route": {
+        "type": "String"
+      }
+    }
+  },
+  "routeNotFoundGoHome": "العودة للرئيسية",
+  "@routeNotFoundGoHome": {
+    "description": "Unknown-route action when there is nothing to pop back to"
+  },
+  "routeNotFoundGoBack": "رجوع",
+  "@routeNotFoundGoBack": {
+    "description": "Unknown-route action when the previous screen can be popped back to"
+  },
+  "prayerGenericLabel": "الصلاة",
+  "@prayerGenericLabel": {
+    "description": "Generic word for a prayer, used when no specific prayer is known"
+  },
+  "guestGuardTitle": "ميزة سحابية",
+  "@guestGuardTitle": {
+    "description": "Title of the overlay shown when a guest opens a sync-only feature"
+  },
+  "guestGuardMessage": "هذه الميزة (المحاسبة والإحصائيات) تتطلب مزامنة سحابية لحفظ تقدمك. يرجى تسجيل الدخول لتفعيلها.",
+  "@guestGuardMessage": {
+    "description": "Explanation shown when a guest opens a sync-only feature"
+  },
+  "guestGuardSignIn": "تسجيل دخول / إنشاء حساب",
+  "@guestGuardSignIn": {
+    "description": "Primary action on the guest-mode overlay"
+  },
+  "guestGuardBack": "العودة",
+  "@guestGuardBack": {
+    "description": "Secondary action on the guest-mode overlay"
+  },
+  "splashQuote": "\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"",
+  "@splashQuote": {
+    "description": "Hadith shown under the app name on the splash screen"
+  }
 }

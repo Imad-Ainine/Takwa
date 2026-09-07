@@ -15,14 +15,13 @@ import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class AdhanOverlayScreen extends ConsumerStatefulWidget {
-  final String prayerName;
+  /// Null when the route was opened without a prayer argument — the screen
+  /// then falls back to a localized generic label. Route generation has no
+  /// BuildContext, so it cannot localize the fallback itself.
+  final String? prayerName;
   final bool autoPlay;
 
-  const AdhanOverlayScreen({
-    super.key,
-    required this.prayerName,
-    this.autoPlay = true,
-  });
+  const AdhanOverlayScreen({super.key, this.prayerName, this.autoPlay = true});
 
   @override
   ConsumerState<AdhanOverlayScreen> createState() => _AdhanOverlayScreenState();
@@ -344,7 +343,9 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                           ],
                         ).createShader(bounds),
                         child: Text(
-                          l10n.adhanOverlayPrayerTimeTitle(widget.prayerName),
+                          l10n.adhanOverlayPrayerTimeTitle(
+                            widget.prayerName ?? l10n.prayerGenericLabel,
+                          ),
                           style: const TextStyle(
                             fontFamily: 'Amiri',
                             fontSize: 34,
@@ -394,7 +395,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
-                        _prayerHadith(widget.prayerName),
+                        _prayerHadith(widget.prayerName ?? ''),
                         style: TextStyle(
                           fontFamily: 'Amiri',
                           fontSize: 16,

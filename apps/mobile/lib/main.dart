@@ -105,14 +105,9 @@ void main() async {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFF0A0E1A),
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
-    );
+    // The system bars are NOT styled here: main() runs before any ThemeData
+    // exists, so anything set now is a guess that is wrong in one brightness.
+    // TakwaApp.builder below derives the real style from the resolved theme.
   } catch (e) {
     debugPrint('SystemChrome error: $e');
   }
@@ -251,6 +246,37 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
         // directions as the user switches language.
         initialRoute: Routes.splash,
         onGenerateRoute: AppRoutes.onGenerateRoute,
+        // Single source of truth for the system bars. Screens must NOT
+        // re-assert their own AnnotatedRegion: 16 of them used to hardcode
+        // SystemUiOverlayStyle.light, which put white status-bar icons on the
+        // near-white light-theme background. Where a screen has an AppBar,
+        // appBarTheme.systemOverlayStyle refines this per-screen.
+        builder: (context, child) {
+          final theme = Theme.of(context);
+          final isDark = theme.brightness == Brightness.dark;
+          final surface =
+              theme.extension<AppColorsExtension>()?.background ??
+              theme.scaffoldBackgroundColor;
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              // Android
+              statusBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+              // iOS uses the inverse convention
+              statusBarBrightness: isDark
+                  ? Brightness.dark
+                  : Brightness.light,
+              systemNavigationBarColor: surface,
+              systemNavigationBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+              systemNavigationBarDividerColor: Colors.transparent,
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       ),
     );
   }

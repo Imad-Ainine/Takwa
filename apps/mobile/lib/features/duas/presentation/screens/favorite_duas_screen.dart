@@ -19,72 +19,67 @@ class FavoriteDuasScreen extends ConsumerWidget {
     final allDuas = kDuasData.values.expand((l) => l).toList();
     final favDuas = allDuas.where((d) => favIds.contains(d.id)).toList();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: context.colors.background,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            Column(
-              children: [
-                // ── Top Bar ──
-                SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                    child: Row(
-                      children: [
-                        const CustomLeadingButton(),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.favoriteDuasScreenTitle,
-                                style: context.typography.headingMedium
-                                    .copyWith(
-                                      fontSize: 20,
-                                      color: context.colors.gold,
-                                    ),
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          Column(
+            children: [
+              // ── Top Bar ──
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: Row(
+                    children: [
+                      const CustomLeadingButton(),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.favoriteDuasScreenTitle,
+                              style: context.typography.headingMedium
+                                  .copyWith(
+                                    fontSize: 20,
+                                    color: context.colors.gold,
+                                  ),
+                            ),
+                            Text(
+                              l10n.favoriteDuasCountLabel(favDuas.length),
+                              style: context.typography.caption.copyWith(
+                                color: context.colors.textSecondary,
                               ),
-                              Text(
-                                l10n.favoriteDuasCountLabel(favDuas.length),
-                                style: context.typography.caption.copyWith(
-                                  color: context.colors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        const Text('❤️', style: TextStyle(fontSize: 22)),
-                      ],
-                    ),
+                      ),
+                      const Text('❤️', style: TextStyle(fontSize: 22)),
+                    ],
                   ),
                 ),
+              ),
 
-                // ── Divider ──
-                Container(
-                  height: 1,
-                  color: context.colors.border.withOpacity(0.5),
-                ),
-                const SizedBox(height: AppSpacing.xs),
+              // ── Divider ──
+              Container(
+                height: 1,
+                color: context.colors.border.withOpacity(0.5),
+              ),
+              const SizedBox(height: AppSpacing.xs),
 
-                // ── Content ──
-                Expanded(
-                  child: favDuas.isEmpty
-                      ? _EmptyFavs(colors: context.colors)
-                      : _FavDuasList(duas: favDuas),
-                ),
-              ],
-            ),
-          ],
-        ),
+              // ── Content ──
+              Expanded(
+                child: favDuas.isEmpty
+                    ? _EmptyFavs(colors: context.colors)
+                    : _FavDuasList(duas: favDuas),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -22,8 +22,12 @@ class GuestModeGuard extends ConsumerWidget {
 
     return Stack(
       children: [
-        // The actual screen content blur/darkened
-        Opacity(opacity: 0.3, child: AbsorbPointer(child: child)),
+        // The actual screen content blur/darkened. ExcludeSemantics matters as
+        // much as AbsorbPointer: without it a screen reader still walks the
+        // locked screen behind the overlay.
+        ExcludeSemantics(
+          child: Opacity(opacity: 0.3, child: AbsorbPointer(child: child)),
+        ),
 
         // Restricted access overlay
         Center(

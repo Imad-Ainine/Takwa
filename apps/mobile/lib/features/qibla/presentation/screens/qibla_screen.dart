@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:adhan/adhan.dart' as adhan;
@@ -73,65 +72,60 @@ class _QiblaScreenState extends ConsumerState<QiblaScreen>
     final qiblaAsync = ref.watch(qiblaProvider);
     final compassAsync = ref.watch(compassProvider);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            // Background
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.qibla),
-            ),
-            SafeArea(
-              child: Column(
-                children: [
-                  // ── Top bar ──
-                  _QiblaTopBar(style: style),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          // Background
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.qibla),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                // ── Top bar ──
+                _QiblaTopBar(style: style),
 
-                  Expanded(
-                    child: qiblaAsync.when(
+                Expanded(
+                  child: qiblaAsync.when(
+                    loading: () => const _QiblaLoading(),
+                    error: (_, _) => _QiblaLocationError(style: style),
+                    data: (qiblaDir) => compassAsync.when(
                       loading: () => const _QiblaLoading(),
-                      error: (_, _) => _QiblaLocationError(style: style),
-                      data: (qiblaDir) => compassAsync.when(
-                        loading: () => const _QiblaLoading(),
-                        error: (e, _) =>
-                            _QiblaCompassError(style: style, error: e),
-                        data: (heading) {
-                          // Smooth heading
-                          double diff = heading - _smoothHeading;
-                          while (diff > 180) {
-                            diff -= 360;
-                          }
-                          while (diff < -180) {
-                            diff += 360;
-                          }
-                          _smoothHeading += diff * 0.2;
+                      error: (e, _) =>
+                          _QiblaCompassError(style: style, error: e),
+                      data: (heading) {
+                        // Smooth heading
+                        double diff = heading - _smoothHeading;
+                        while (diff > 180) {
+                          diff -= 360;
+                        }
+                        while (diff < -180) {
+                          diff += 360;
+                        }
+                        _smoothHeading += diff * 0.2;
 
-                          final needleAngle =
-                              (qiblaDir - _smoothHeading) * math.pi / 180;
-                          final isAligned = (diff.abs() % 360) < 5;
+                        final needleAngle =
+                            (qiblaDir - _smoothHeading) * math.pi / 180;
+                        final isAligned = (diff.abs() % 360) < 5;
 
-                          return _QiblaContent(
-                            style: style,
-                            qiblaDir: qiblaDir,
-                            heading: _smoothHeading,
-                            needleAngle: needleAngle,
-                            isAligned: isAligned,
-                            pulseAnim: _pulse,
-                            entryCtrl: _entryCtrl,
-                          );
-                        },
-                      ),
+                        return _QiblaContent(
+                          style: style,
+                          qiblaDir: qiblaDir,
+                          heading: _smoothHeading,
+                          needleAngle: needleAngle,
+                          isAligned: isAligned,
+                          pulseAnim: _pulse,
+                          entryCtrl: _entryCtrl,
+                        );
+                      },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

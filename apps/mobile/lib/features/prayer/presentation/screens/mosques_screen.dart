@@ -140,168 +140,163 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
       }
     });
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: style.bg,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            Column(
-              children: [
-                AppBarWidget(
-                  title: l10n.mosquesNearbyTitle,
-                  height: 380,
-                  showBackground: true,
-                  child: Column(
-                    children: [
-                      // AppBar replacement
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const CustomLeadingButton(),
-                            Text(
-                              l10n.mosquesNearbyTitle,
-                              style: style.amiri(
-                                22,
-                                color: Colors.white,
-                                weight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 40),
-                          ],
-                        ),
+    return Scaffold(
+      backgroundColor: style.bg,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          Column(
+            children: [
+              AppBarWidget(
+                title: l10n.mosquesNearbyTitle,
+                height: 380,
+                showBackground: true,
+                child: Column(
+                  children: [
+                    // AppBar replacement
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
                       ),
-                      // Current Location Indicator
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.sm,
-                        ),
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xxl,
-                          vertical: AppSpacing.sm,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(AppRadius.xl),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.location_on_rounded,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const CustomLeadingButton(),
+                          Text(
+                            l10n.mosquesNearbyTitle,
+                            style: style.amiri(
+                              22,
                               color: Colors.white,
-                              size: 18,
+                              weight: FontWeight.bold,
                             ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              l10n.mosquesCurrentLocationLabel(_cityName),
-                              style: style.naskh(
-                                14,
-                                color: Colors.white,
-                                weight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Hero Map Section
-                      Container(
-                        margin: const EdgeInsets.only(
-                          left: 24,
-                          right: 24,
-                          top: 8,
-                          bottom: 24,
-                        ),
-                        height: 120,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
                           ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(
-                              Icons.map_outlined,
-                              size: 80,
-                              color: Colors.white24,
-                            ),
-                            const Icon(
-                              Icons.location_on_rounded,
-                              size: 48,
+                          const SizedBox(width: 40),
+                        ],
+                      ),
+                    ),
+                    // Current Location Indicator
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.sm,
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xxl,
+                        vertical: AppSpacing.sm,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.location_on_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            l10n.mosquesCurrentLocationLabel(_cityName),
+                            style: style.naskh(
+                              14,
                               color: Colors.white,
+                              weight: FontWeight.w600,
                             ),
-                            Positioned(
-                              bottom: 4,
-                              left: 12,
-                              child: SizedBox(
-                                width: 180,
-                                child: PrimaryButton(
-                                  onTap: () async => _openMap(0, 0),
-                                  label: l10n.mosquesViewOnMapButton,
-                                  isBg: true,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Hero Map Section
+                    Container(
+                      margin: const EdgeInsets.only(
+                        left: 24,
+                        right: 24,
+                        top: 8,
+                        bottom: 24,
+                      ),
+                      height: 120,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
                         ),
                       ),
-                    ],
-                  ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Icon(
+                            Icons.map_outlined,
+                            size: 80,
+                            color: Colors.white24,
+                          ),
+                          const Icon(
+                            Icons.location_on_rounded,
+                            size: 48,
+                            color: Colors.white,
+                          ),
+                          Positioned(
+                            bottom: 4,
+                            left: 12,
+                            child: SizedBox(
+                              width: 180,
+                              child: PrimaryButton(
+                                onTap: () async => _openMap(0, 0),
+                                label: l10n.mosquesViewOnMapButton,
+                                isBg: true,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: mosquesAsyncValue.when(
-                    data: (mosques) {
-                      if (mosques.isEmpty) {
-                        return _buildEmptyState(style, l10n);
-                      }
-                      return ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(
-                          top: 8,
-                          bottom: 24,
-                          left: 16,
-                          right: 16,
-                        ),
-                        itemCount:
-                            mosques.length + 1, // +1 for the Hadith footer
-                        itemBuilder: (context, index) {
-                          if (index == mosques.length) {
-                            return _buildHadithFooter(style, l10n);
-                          }
-                          final mosque = mosques[index];
-                          return _buildEnhancedMosqueCard(
-                            mosque,
-                            index + 1,
-                            nextPrayerTime,
-                            style,
-                            l10n,
-                          );
-                        },
-                      );
-                    },
-                    loading: () => const Center(child: TakwaLoadingIndicator()),
-                    error: (err, stack) => _buildErrorState(err, style, l10n),
-                  ),
+              ),
+              Expanded(
+                child: mosquesAsyncValue.when(
+                  data: (mosques) {
+                    if (mosques.isEmpty) {
+                      return _buildEmptyState(style, l10n);
+                    }
+                    return ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                        bottom: 24,
+                        left: 16,
+                        right: 16,
+                      ),
+                      itemCount:
+                          mosques.length + 1, // +1 for the Hadith footer
+                      itemBuilder: (context, index) {
+                        if (index == mosques.length) {
+                          return _buildHadithFooter(style, l10n);
+                        }
+                        final mosque = mosques[index];
+                        return _buildEnhancedMosqueCard(
+                          mosque,
+                          index + 1,
+                          nextPrayerTime,
+                          style,
+                          l10n,
+                        );
+                      },
+                    );
+                  },
+                  loading: () => const Center(child: TakwaLoadingIndicator()),
+                  error: (err, stack) => _buildErrorState(err, style, l10n),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -56,40 +56,35 @@ class _AsmaScreenState extends ConsumerState<AsmaScreen>
     final s = AdaptiveStyle(context, isRamadan);
     final filtered = _filtered;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: s.bg,
-        body: Stack(
-          children: [
-            const Positioned.fill(
-              child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
-            ),
-            Column(
-              children: [
-                _AsmaTopBar(
+    return Scaffold(
+      backgroundColor: s.bg,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
+          ),
+          Column(
+            children: [
+              _AsmaTopBar(
+                style: s,
+                query: _query,
+                searchCtrl: _searchCtrl,
+                onSearch: (v) => setState(() => _query = v),
+              ),
+              Expanded(
+                child: _AsmaList(
+                  items: filtered,
                   style: s,
-                  query: _query,
-                  searchCtrl: _searchCtrl,
-                  onSearch: (v) => setState(() => _query = v),
-                ),
-                Expanded(
-                  child: _AsmaList(
-                    items: filtered,
-                    style: s,
-                    entryCtrl: _entryCtrl,
-                    expanded: _expandedIdx,
-                    onExpand: (i) => setState(
-                      () => _expandedIdx = _expandedIdx == i ? null : i,
-                    ),
+                  entryCtrl: _entryCtrl,
+                  expanded: _expandedIdx,
+                  onExpand: (i) => setState(
+                    () => _expandedIdx = _expandedIdx == i ? null : i,
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
