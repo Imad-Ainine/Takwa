@@ -7357,6 +7357,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك'**
   String get authChoiceSyncNote;
+
+  /// No description provided for @authPasswordStrengthWeak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيفة'**
+  String get authPasswordStrengthWeak;
+
+  /// No description provided for @authPasswordStrengthMedium.
+  ///
+  /// In ar, this message translates to:
+  /// **'متوسطة'**
+  String get authPasswordStrengthMedium;
+
+  /// No description provided for @authPasswordStrengthGood.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيدة'**
+  String get authPasswordStrengthGood;
+
+  /// No description provided for @authPasswordStrengthStrong.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوية ✓'**
+  String get authPasswordStrengthStrong;
+
+  /// No description provided for @authPasswordStrengthLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوة كلمة المرور: {strength}'**
+  String authPasswordStrengthLabel(String strength);
 }
 
 class _AppLocalizationsDelegate

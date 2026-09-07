@@ -4024,4 +4024,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authChoiceSyncNote => 'تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك';
+
+  @override
+  String get authPasswordStrengthWeak => 'ضعيفة';
+
+  @override
+  String get authPasswordStrengthMedium => 'متوسطة';
+
+  @override
+  String get authPasswordStrengthGood => 'جيدة';
+
+  @override
+  String get authPasswordStrengthStrong => 'قوية ✓';
+
+  @override
+  String authPasswordStrengthLabel(String strength) {
+    return 'قوة كلمة المرور: $strength';
+  }
 }

@@ -1711,5 +1711,17 @@
   "authChoiceTagline": "Your companion toward a life full of faith",
   "authChoiceSignInButton": "Sign In",
   "authChoiceGuestButton": "Continue as Guest",
-  "authChoiceSyncNote": "Signing in ensures your data is saved across all your devices"
+  "authChoiceSyncNote": "Signing in ensures your data is saved across all your devices",
+  "authPasswordStrengthWeak": "Weak",
+  "authPasswordStrengthMedium": "Medium",
+  "authPasswordStrengthGood": "Good",
+  "authPasswordStrengthStrong": "Strong ✓",
+  "authPasswordStrengthLabel": "Password strength: {strength}",
+  "@authPasswordStrengthLabel": {
+    "placeholders": {
+      "strength": {
+        "type": "String"
+      }
+    }
+  }
 }

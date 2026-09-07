@@ -4063,4 +4063,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authChoiceSyncNote =>
       'Signing in ensures your data is saved across all your devices';
+
+  @override
+  String get authPasswordStrengthWeak => 'Weak';
+
+  @override
+  String get authPasswordStrengthMedium => 'Medium';
+
+  @override
+  String get authPasswordStrengthGood => 'Good';
+
+  @override
+  String get authPasswordStrengthStrong => 'Strong ✓';
+
+  @override
+  String authPasswordStrengthLabel(String strength) {
+    return 'Password strength: $strength';
+  }
 }

@@ -2214,5 +2214,17 @@
   "authChoiceTagline": "رفيقك نحو حياة مليئة بالإيمان",
   "authChoiceSignInButton": "تسجيل الدخول",
   "authChoiceGuestButton": "المتابعة كضيف",
-  "authChoiceSyncNote": "تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك"
+  "authChoiceSyncNote": "تسجيلك يضمن لك حفظ بياناتك عبر جميع أجهزتك",
+  "authPasswordStrengthWeak": "ضعيفة",
+  "authPasswordStrengthMedium": "متوسطة",
+  "authPasswordStrengthGood": "جيدة",
+  "authPasswordStrengthStrong": "قوية ✓",
+  "authPasswordStrengthLabel": "قوة كلمة المرور: {strength}",
+  "@authPasswordStrengthLabel": {
+    "placeholders": {
+      "strength": {
+        "type": "String"
+      }
+    }
+  }
 }

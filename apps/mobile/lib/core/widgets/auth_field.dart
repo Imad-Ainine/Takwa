@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/ramadan_theme.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class AuthField extends StatefulWidget {
   final TextEditingController ctrl;
@@ -112,13 +113,14 @@ class PasswordStrengthBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final label = strength < 0.26
-        ? 'ضعيفة'
+        ? l10n.authPasswordStrengthWeak
         : strength < 0.51
-        ? 'متوسطة'
+        ? l10n.authPasswordStrengthMedium
         : strength < 0.76
-        ? 'جيدة'
-        : 'قوية ✓';
+        ? l10n.authPasswordStrengthGood
+        : l10n.authPasswordStrengthStrong;
     final color = strength < 0.26
         ? Colors.redAccent
         : strength < 0.51
@@ -154,7 +156,10 @@ class PasswordStrengthBar extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
-        Text('قوة كلمة المرور: $label', style: style.naskh(11, color: color)),
+        Text(
+          l10n.authPasswordStrengthLabel(label),
+          style: style.naskh(11, color: color),
+        ),
       ],
     );
   }
