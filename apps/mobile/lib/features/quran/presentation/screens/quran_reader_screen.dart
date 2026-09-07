@@ -1227,7 +1227,7 @@ class _GuideItem extends StatelessWidget {
               if (subItems != null)
                 ...subItems!.map(
                   (s) => Padding(
-                    padding: const EdgeInsets.only(top: 3, right: 8),
+                    padding: const EdgeInsetsDirectional.only(top: 3, end: 8),
                     child: Text(
                       s,
                       style: const TextStyle(
@@ -1552,7 +1552,12 @@ class _OptionRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.chevron_left, color: Colors.white24, size: 18),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.white24,
+              size: 18,
+              matchTextDirection: true,
+            ),
             const Spacer(),
             Text(
               label,

@@ -772,6 +772,7 @@ class _PrayerRow extends StatelessWidget {
                 Icons.chevron_right_rounded,
                 size: 18,
                 color: context.colors.textDim,
+                matchTextDirection: true,
               ),
             ],
           ),

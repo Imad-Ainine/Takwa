@@ -226,9 +226,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                     ),
                   ),
                   child: Icon(
-                    Icons.chevron_left,
+                    Icons.chevron_right,
                     color: style.textDim,
                     size: 22,
+                    matchTextDirection: true,
                   ),
                 ),
                 const Spacer(),
@@ -335,10 +336,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Row(
           children: [
             _circleBtn(
-              Icons.chevron_left,
+              Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const KhatmaHistoryScreen()),
+              matchTextDirection: true,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -416,10 +418,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
         child: Row(
           children: [
             _circleBtn(
-              Icons.chevron_left,
+              Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
               style.textSec,
               () => _push(const FreeReadingScreen()),
+              matchTextDirection: true,
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -457,16 +460,30 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     );
   }
 
-  Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
-      GestureDetector(
-        onTap: f,
-        child: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-          child: Icon(icon, color: fg, size: 22),
-        ),
-      );
+  // matchTextDirection defaults false: two of this helper's callers pass
+  // play_arrow_rounded/add, universal media/action glyphs that should NOT
+  // flip in RTL (a mirrored "play" triangle reads as "previous/rewind").
+  // The chevron_right drill-in callers below pass true explicitly.
+  Widget _circleBtn(
+    IconData icon,
+    Color bg,
+    Color fg,
+    VoidCallback f, {
+    bool matchTextDirection = false,
+  }) => GestureDetector(
+    onTap: f,
+    child: Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+      child: Icon(
+        icon,
+        color: fg,
+        size: 22,
+        matchTextDirection: matchTextDirection,
+      ),
+    ),
+  );
 
   Widget _buildGrid(AdaptiveStyle style) {
     final l10n = AppLocalizations.of(context)!;

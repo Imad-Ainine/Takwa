@@ -246,12 +246,12 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
         ),
         title: Text(
           l10n.khatmaHistoryDeleteTitle,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           style: style.amiri(20, color: style.text, weight: FontWeight.bold),
         ),
         content: Text(
           l10n.khatmaHistoryDeleteConfirm,
-          textAlign: TextAlign.right,
+          textAlign: TextAlign.start,
           style: style.naskh(14, color: style.textSec),
         ),
         actions: [
@@ -295,7 +295,7 @@ class _KhatmaHistoryScreenState extends ConsumerState<KhatmaHistoryScreen>
       color: style.gold.withValues(alpha: 0.9),
       child: Text(
         _toastMsg ?? '',
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
         style: style.naskh(14, color: Colors.white, weight: FontWeight.bold),
       ),
     );

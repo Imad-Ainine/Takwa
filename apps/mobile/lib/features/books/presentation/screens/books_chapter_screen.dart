@@ -72,7 +72,7 @@ class BooksChapterScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -85,7 +85,7 @@ class BooksChapterScreen extends ConsumerWidget {
                             color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w500,
                           ),
-                          textAlign: TextAlign.right,
+                          textAlign: TextAlign.start,
                         ),
                       ],
                     ),
@@ -171,7 +171,7 @@ class BooksChapterScreen extends ConsumerWidget {
                     color: colors.textSecondary,
                     height: 1.8,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               ],
             ),
@@ -408,7 +408,12 @@ class _ChapterItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.chevron_left, color: colors.textDim, size: 20),
+            Icon(
+              Icons.chevron_right,
+              color: colors.textDim,
+              size: 20,
+              matchTextDirection: true,
+            ),
             const Spacer(),
             Expanded(
               flex: 8,
@@ -423,7 +428,7 @@ class _ChapterItem extends StatelessWidget {
                       color: isCurrent ? accentColor : colors.textPrimary,
                       fontFamily: 'Amiri',
                     ),
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Row(

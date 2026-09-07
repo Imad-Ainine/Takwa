@@ -71,7 +71,7 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                 actions: [
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 16),
+                      padding: const EdgeInsetsDirectional.only(start: 16),
                       child: SyncStatusIndicator(isSyncing: isSyncing),
                     ),
                   ),

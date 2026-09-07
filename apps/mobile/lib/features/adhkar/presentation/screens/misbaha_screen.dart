@@ -252,10 +252,15 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           ),
                         )
                       else
+                        // Was chevron_left — every other "tap to pick/drill
+                        // in" trailing chevron in the app (settings rows,
+                        // home cards, checklist) uses chevron_right, so this
+                        // was the one inconsistent one (audit §H5).
                         Icon(
-                          Icons.chevron_left_rounded,
+                          Icons.chevron_right_rounded,
                           color: style.gold,
                           size: 20,
+                          matchTextDirection: true,
                         ),
                     ],
                   ),

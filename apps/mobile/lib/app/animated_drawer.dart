@@ -106,15 +106,26 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
 
   @override
   Widget build(BuildContext context) {
+    // Was hardcoded to the left edge regardless of locale (audit §H5): in
+    // Arabic (RTL, this app's default) Material's convention puts the nav
+    // drawer on the *start* edge — the right — so a fixed-left drawer opened
+    // from the wrong side for the app's primary language.
+    // PositionedDirectional resolves `start` per Directionality.of(context)
+    // for the drawer's own position; the slide distance the main content
+    // translates by needs its sign flipped by hand for the same reason
+    // (Transform has no directional "translate", only a raw Offset), and
+    // the scale/rotate pivot moves from centerLeft to centerStart so the
+    // "push back" hinges on the same edge the drawer actually opens from.
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     return Scaffold(
       backgroundColor: context.colors.background,
       body: Stack(
         children: [
           // ── الـ Drawer (خلف الشاشة) ──
-          Positioned(
+          PositionedDirectional(
             top: 0,
             bottom: 0,
-            left: 0,
+            start: 0,
             width: _drawerWidth,
             child: _DrawerContent(onClose: _close),
           ),
@@ -124,10 +135,10 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
             animation: _ctrl,
             builder: (_, child) => Transform(
               transform: Matrix4.identity()
-                ..translate(_slide.value, 0.0)
+                ..translate(isRtl ? -_slide.value : _slide.value, 0.0)
                 ..scale(_scale.value)
-                ..rotateZ(_rotate.value),
-              alignment: Alignment.centerLeft,
+                ..rotateZ(isRtl ? -_rotate.value : _rotate.value),
+              alignment: AlignmentDirectional.centerStart,
               child: ClipRRect(
                 borderRadius: _radius.value ?? BorderRadius.zero,
                 child: child,

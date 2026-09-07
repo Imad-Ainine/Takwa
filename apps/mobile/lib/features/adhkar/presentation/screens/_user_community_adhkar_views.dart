@@ -265,11 +265,11 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
                           ),
                           title: Text(
                             l10n.adhkarDeleteConfirmTitle,
-                            textAlign: TextAlign.right,
+                            textAlign: TextAlign.start,
                           ),
                           content: Text(
                             l10n.adhkarDeleteConfirmBody,
-                            textAlign: TextAlign.right,
+                            textAlign: TextAlign.start,
                           ),
                           actions: [
                             TextButton(
