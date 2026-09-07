@@ -1688,9 +1688,8 @@ class _BottomBar extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadius.xs),
                           color: isDark
-                              ? Colors.white.withOpacity(0.08)
-                              : Colors.black.withOpacity(0.05),
-                          color: Colors.white.withValues(alpha: 0.08),
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.black.withValues(alpha: 0.05),
                         ),
                         child: Icon(
                           Icons.stop_rounded,

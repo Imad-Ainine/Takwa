@@ -183,7 +183,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       // adhan audio as a side effect of the pop, never to actually block
       // navigation — so canPop: true (always allow) preserves that.
       canPop: true,
-      onPopInvokedWithPop: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) AdhanAudioPlayer.stop();
       },
       child: Scaffold(

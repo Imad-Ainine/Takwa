@@ -479,15 +479,6 @@ class RamadanBgPainter extends CustomPainter {
   }
 
   @override
-  void dispose() {
-    // Called when this painter is finally discarded (the widget is removed,
-    // or a same-runtimeType painter replaces it) — releases the cached
-    // Picture's native resources instead of leaking them.
-    _cachedArabesque?.dispose();
-    super.dispose();
-  }
-
-  @override
   bool shouldRepaint(covariant RamadanBgPainter old) =>
       // Per-frame repaints are driven by `repaint: animation` above, not by
       // this — Flutter calls paint() again on tick regardless of what this

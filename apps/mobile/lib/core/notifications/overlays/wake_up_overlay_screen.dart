@@ -124,7 +124,7 @@ class _WakeUpOverlayScreenState extends ConsumerState<WakeUpOverlayScreen>
       // player as a side effect of the pop, never to actually block
       // navigation — so canPop: true (always allow) preserves that.
       canPop: true,
-      onPopInvokedWithPop: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) _player.stop();
       },
       child: Scaffold(

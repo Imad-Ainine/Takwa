@@ -4417,33 +4417,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestGuardBack => 'Back';
 
   @override
-  String get splashQuote => '“Take account of yourselves before you are brought to account”';
+  String get splashQuote =>
+      '“Take account of yourselves before you are brought to account”';
 
   @override
-  String get genericErrorMessage => 'Something went wrong. Please try again.';
+  String get genericErrorMessage =>
+      'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get retryButtonLabel => 'Retry';
+  String get retryButtonLabel => 'إعادة المحاولة';
 
   @override
-  String get inlineErrorRetryLabel => 'Couldn’t load, tap to retry';
+  String get inlineErrorRetryLabel => 'تعذّر التحميل، اضغط لإعادة المحاولة';
 
   @override
   String statsChartBarSemanticLabel(String day, int points) {
-    return '$day: $points points';
+    return '$day: $points نقطة';
   }
 
   @override
-  String get drawerSyncOffline => 'Offline';
+  String get drawerSyncOffline => 'غير متصل';
 
   @override
-  String get drawerSyncSynced => 'Synced';
+  String get drawerSyncSynced => 'تمت المزامنة';
 
   @override
-  String get checklistSaveError => 'Couldn\'t save — please try again';
+  String get checklistSaveError => 'تعذّر الحفظ، حاول مرة أخرى';
 
   @override
-  String get checklistSyncError => 'Saved on this device — it\'ll sync once you\'re back online';
-  String get splashQuote =>
-      '“Take account of yourselves before you are brought to account”';
+  String get checklistSyncError =>
+      'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال';
 }

@@ -4375,10 +4375,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestGuardBack => 'العودة';
 
   @override
-  String get splashQuote => '"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا"';
+  String get splashQuote => '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
 
   @override
-  String get genericErrorMessage => 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+  String get genericErrorMessage =>
+      'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
 
   @override
   String get retryButtonLabel => 'إعادة المحاولة';
@@ -4401,6 +4402,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checklistSaveError => 'تعذّر الحفظ، حاول مرة أخرى';
 
   @override
-  String get checklistSyncError => 'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال';
-  String get splashQuote => '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
+  String get checklistSyncError =>
+      'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال';
 }
