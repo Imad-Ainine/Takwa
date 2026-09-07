@@ -1610,5 +1610,55 @@
         "type": "String"
       }
     }
-  }
+  },
+  "misbahaScreenTitle": "Digital Tasbih",
+  "misbahaSelectedDhikrLabel": "Selected Dhikr",
+  "misbahaChooseDhikrPrompt": "Choose a dhikr to count",
+  "misbahaTapToChooseHint": "Tap here to choose a dhikr from the list to focus your worship",
+  "misbahaListeningLabel": "Listening...",
+  "misbahaTapOrHoldHint": "Tap or press and hold",
+  "misbahaResetButton": "Reset",
+  "misbahaSoundButton": "Sound",
+  "misbahaChooseDhikrTitle": "Choose a Dhikr",
+  "qiyamCalcLoadError": "Error loading prayer times: {error}",
+  "@qiyamCalcLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "qiyamCalcScreenTitle": "Night Calculator",
+  "qiyamCalcMidnightTitle": "Islamic Midnight",
+  "qiyamCalcMidnightSubtitle": "The optional Isha window ends here",
+  "qiyamCalcLastThirdTitle": "Start of the Last Third",
+  "qiyamCalcLastThirdSubtitle": "The best time for Qiyam and Witr prayer",
+  "qiyamStageIstighfarTitle": "Istighfar",
+  "qiyamStageIstighfarSubtitle": "Purifying the heart and soul",
+  "qiyamStageDuaTitle": "Dua",
+  "qiyamStageDuaSubtitle": "Intimate supplication in the last part of the night",
+  "qiyamStageSalahTitle": "Qiyam Prayer",
+  "qiyamStageSalahSubtitle": "Lengthening the qunut and ruku",
+  "qiyamStageWitrTitle": "Witr",
+  "qiyamStageWitrSubtitle": "The closing prayer of the night",
+  "paymentMethodsScreenTitle": "Payment Method",
+  "paymentMethodEdahabiaTitle": "Edahabia / CIB",
+  "paymentMethodVisaTitle": "Visa / Mastercard",
+  "paymentSupportTitle": "Ongoing Charity",
+  "paymentSupportMessage": "With your small contribution, you help make \"Takwa\" available to millions of Muslims as an ongoing charity (sadaqah jariyah) on your behalf and your parents'. 100 DZD or €10 a month ensures this work continues and keeps improving.",
+  "paymentContinueButton": "Continue to Payment",
+  "paymentComingSoonMessage": "Payment will be enabled soon, insha'Allah",
+  "qiyamOnboardingTitle": "Welcome to Qiyam al-Layl",
+  "qiyamOnboardingDescription": "A calm spiritual journey in the depth of the night — beginning with dhikr, passing through the Quran, and completed with prayer and istighfar.",
+  "qiyamOnboardingStep1": "Prepare with dhikr and praise",
+  "qiyamOnboardingStep2": "Recite the verses of Allah with reflection",
+  "qiyamOnboardingStep3": "Converse with your Lord through prayer and dua",
+  "qiyamOnboardingStep4": "Conclude with istighfar in the last hours of the night",
+  "qiyamOnboardingStartButton": "Begin the Journey Now",
+  "subscriptionScreenTitle": "Subscription",
+  "subscriptionIntroText": "Subscriptions help keep the project going.",
+  "subscriptionFreeAccessNote": "Anyone who can't afford the subscription is welcome to use the app for free.",
+  "subscriptionHonorSystemNote": "Unless stated otherwise, we don't verify that a user has paid the subscription fee — this is intentionally left to the user's discretion.",
+  "subscriptionPayMonthlyButton": "I can pay monthly",
+  "subscriptionUseFreeButton": "I want to use the app for free"
 }

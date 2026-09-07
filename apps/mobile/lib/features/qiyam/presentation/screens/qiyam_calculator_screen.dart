@@ -5,12 +5,14 @@ import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/notifications/notifications_service.dart';
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamCalculatorScreen extends ConsumerWidget {
   const QiyamCalculatorScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final prayersAsync = ref.watch(prayerTimesProvider);
 
     return Scaffold(
@@ -24,7 +26,8 @@ class QiyamCalculatorScreen extends ConsumerWidget {
             child: prayersAsync.when(
               data: (prayers) => _buildContent(context, prayers),
               loading: () => const Center(child: TakwaLoadingIndicator()),
-              error: (e, _) => Center(child: Text('خطأ في تحميل الأوقات: $e')),
+              error: (e, _) =>
+                  Center(child: Text(l10n.qiyamCalcLoadError('$e'))),
             ),
           ),
         ],
@@ -33,6 +36,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
   }
 
   Widget _buildContent(BuildContext context, List<PrayerTimeInfo> prayers) {
+    final l10n = AppLocalizations.of(context)!;
     final maghrib = prayers.firstWhere((p) => p.name == 'maghrib').time;
     final fajr = prayers.firstWhere((p) => p.name == 'fajr').time;
 
@@ -57,18 +61,18 @@ class QiyamCalculatorScreen extends ConsumerWidget {
               children: [
                 _buildTimeCard(
                   context,
-                  title: 'منتصف الليل الشرعي',
+                  title: l10n.qiyamCalcMidnightTitle,
                   time: midnight,
-                  subtitle: 'ينتهي فيه وقت العشاء الاختياري',
+                  subtitle: l10n.qiyamCalcMidnightSubtitle,
                   icon: Icons.brightness_3,
                   color: context.colors.teal,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 _buildTimeCard(
                   context,
-                  title: 'بداية الثلث الأخير',
+                  title: l10n.qiyamCalcLastThirdTitle,
                   time: lastThirdStart,
-                  subtitle: 'أفضل وقت لصلاة القيام والوتر',
+                  subtitle: l10n.qiyamCalcLastThirdSubtitle,
                   icon: Icons.auto_awesome,
                   color: context.colors.gold,
                   isHighlight: true,
@@ -84,6 +88,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
   }
 
   Widget _buildAppTopBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.xl),
       child: Row(
@@ -91,7 +96,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
           const CustomLeadingButton(),
           const SizedBox(width: AppSpacing.md),
           Text(
-            'حاسبة الليل',
+            l10n.qiyamCalcScreenTitle,
             style: context.typography.displayMedium.copyWith(
               fontSize: 22,
               color: context.colors.gold,
@@ -171,7 +176,7 @@ class QiyamCalculatorScreen extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    _formatTime(time),
+                    _formatTime(context, time),
                     style: context.typography.displayMedium.copyWith(
                       fontSize: 20,
                       color: color,
@@ -213,10 +218,11 @@ class QiyamCalculatorScreen extends ConsumerWidget {
     );
   }
 
-  String _formatTime(DateTime dt) {
+  String _formatTime(BuildContext context, DateTime dt) {
+    final l10n = AppLocalizations.of(context)!;
     final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
     final m = dt.minute.toString().padLeft(2, '0');
-    final ampm = dt.hour < 12 ? 'ص' : 'م';
+    final ampm = dt.hour < 12 ? l10n.timePeriodAm : l10n.timePeriodPm;
     return '$h:$m $ampm';
   }
 }

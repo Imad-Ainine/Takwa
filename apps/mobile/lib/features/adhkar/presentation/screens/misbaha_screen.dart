@@ -8,6 +8,8 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/features/adhkar/providers/misbaha_provider.dart';
+import 'package:takwa/features/quran/utils/quran_helpers.dart' show localizedNumeral;
+import 'package:takwa/l10n/app_localizations.dart';
 
 class MisbahaScreen extends ConsumerStatefulWidget {
   const MisbahaScreen({super.key});
@@ -51,6 +53,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final state = ref.watch(misbahaProvider);
@@ -95,13 +98,13 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           children: [
                             _buildHeader(style, context),
                             const Spacer(),
-                            _buildDhikrSelector(state, style, context),
+                            _buildDhikrSelector(l10n, state, style, context),
                             SizedBox(height: 32 * scale),
-                            _buildCounterDisplay(state, style, scale),
+                            _buildCounterDisplay(context, state, style, scale),
                             const Spacer(),
-                            _buildMainBead(state, style, scale),
+                            _buildMainBead(l10n, state, style, scale),
                             const Spacer(),
-                            _buildBottomControls(state, style),
+                            _buildBottomControls(l10n, state, style),
                             SizedBox(height: 32 * scale),
                           ],
                         ),
@@ -131,6 +134,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   }
 
   Widget _buildHeader(AdaptiveStyle style, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Row(
@@ -140,7 +144,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           Column(
             children: [
               Text(
-                'المسبحة الإلكترونية',
+                l10n.misbahaScreenTitle,
                 style: style.amiri(22, color: style.gold),
               ),
               Text(
@@ -156,13 +160,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   }
 
   Widget _buildDhikrSelector(
+    AppLocalizations l10n,
     MisbahaState state,
     AdaptiveStyle style,
     BuildContext context,
   ) {
     final hasDhikr = state.selectedDhikr != null;
     return GestureDetector(
-      onTap: () => _showDhikrListModal(style, context),
+      onTap: () => _showDhikrListModal(l10n, style, context),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
@@ -222,7 +227,9 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Text(
-                        hasDhikr ? 'الذكر المختار' : 'اختر ذكراً للتسبيح',
+                        hasDhikr
+                            ? l10n.misbahaSelectedDhikrLabel
+                            : l10n.misbahaChooseDhikrPrompt,
                         style: style.naskh(
                           13,
                           color: style.gold,
@@ -299,7 +306,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                         vertical: AppSpacing.md,
                       ),
                       child: Text(
-                        'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك',
+                        l10n.misbahaTapToChooseHint,
                         style: style.naskh(12, color: style.textDim),
                         textAlign: TextAlign.center,
                       ),
@@ -314,6 +321,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   }
 
   Widget _buildCounterDisplay(
+    BuildContext context,
     MisbahaState state,
     AdaptiveStyle style,
     double scale,
@@ -338,7 +346,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             Column(
               children: [
                 Text(
-                  '${state.count}',
+                  localizedNumeral(context, state.count),
                   style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 90 * scale,
@@ -349,7 +357,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 ),
                 if (state.selectedDhikr != null)
                   Text(
-                    '/ ${state.selectedDhikr!.count}',
+                    '/ ${localizedNumeral(context, state.selectedDhikr!.count)}',
                     style: style.naskh(
                       16 * scale,
                       color: style.gold.withOpacity(0.7),
@@ -363,7 +371,12 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-  Widget _buildMainBead(MisbahaState state, AdaptiveStyle style, double scale) {
+  Widget _buildMainBead(
+    AppLocalizations l10n,
+    MisbahaState state,
+    AdaptiveStyle style,
+    double scale,
+  ) {
     final size = 220.0 * scale;
     final innerSize = 190.0 * scale;
 
@@ -432,8 +445,8 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                           SizedBox(height: 8 * scale),
                           Text(
                             state.isListening
-                                ? 'جاري الاستماع...'
-                                : 'انقر أو اضغط مطولاً',
+                                ? l10n.misbahaListeningLabel
+                                : l10n.misbahaTapOrHoldHint,
                             style: style.naskh(
                               12 * scale,
                               color: Colors.white.withOpacity(0.9),
@@ -452,7 +465,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-  Widget _buildBottomControls(MisbahaState state, AdaptiveStyle style) {
+  Widget _buildBottomControls(
+    AppLocalizations l10n,
+    MisbahaState state,
+    AdaptiveStyle style,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Row(
@@ -461,7 +478,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
           // Reset Button
           _buildActionButton(
             icon: Icons.refresh_rounded,
-            label: 'إعادة',
+            label: l10n.misbahaResetButton,
             color: style.textSec,
             onTap: () => ref.read(misbahaProvider.notifier).reset(),
           ),
@@ -471,7 +488,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
             icon: state.isSpeaking
                 ? Icons.volume_up_rounded
                 : Icons.volume_off_rounded,
-            label: 'الصوت',
+            label: l10n.misbahaSoundButton,
             color: state.selectedDhikr == null ? style.textDim : style.gold,
             onTap: state.selectedDhikr == null
                 ? null
@@ -514,7 +531,11 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
     );
   }
 
-  void _showDhikrListModal(AdaptiveStyle style, BuildContext context) {
+  void _showDhikrListModal(
+    AppLocalizations l10n,
+    AdaptiveStyle style,
+    BuildContext context,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -549,7 +570,10 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
-                  Text('اختر ذكراً', style: style.amiri(24, color: style.gold)),
+                  Text(
+                    l10n.misbahaChooseDhikrTitle,
+                    style: style.amiri(24, color: style.gold),
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   Expanded(
                     child: ListView.separated(
@@ -620,7 +644,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
-                '${dhikr.count}',
+                localizedNumeral(context, dhikr.count),
                 style: style.naskh(
                   14,
                   color: style.gold,

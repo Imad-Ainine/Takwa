@@ -3835,4 +3835,147 @@ class AppLocalizationsEn extends AppLocalizations {
   String freeReadingHizbLabel(String number) {
     return 'Hizb $number';
   }
+
+  @override
+  String get misbahaScreenTitle => 'Digital Tasbih';
+
+  @override
+  String get misbahaSelectedDhikrLabel => 'Selected Dhikr';
+
+  @override
+  String get misbahaChooseDhikrPrompt => 'Choose a dhikr to count';
+
+  @override
+  String get misbahaTapToChooseHint =>
+      'Tap here to choose a dhikr from the list to focus your worship';
+
+  @override
+  String get misbahaListeningLabel => 'Listening...';
+
+  @override
+  String get misbahaTapOrHoldHint => 'Tap or press and hold';
+
+  @override
+  String get misbahaResetButton => 'Reset';
+
+  @override
+  String get misbahaSoundButton => 'Sound';
+
+  @override
+  String get misbahaChooseDhikrTitle => 'Choose a Dhikr';
+
+  @override
+  String qiyamCalcLoadError(String error) {
+    return 'Error loading prayer times: $error';
+  }
+
+  @override
+  String get qiyamCalcScreenTitle => 'Night Calculator';
+
+  @override
+  String get qiyamCalcMidnightTitle => 'Islamic Midnight';
+
+  @override
+  String get qiyamCalcMidnightSubtitle => 'The optional Isha window ends here';
+
+  @override
+  String get qiyamCalcLastThirdTitle => 'Start of the Last Third';
+
+  @override
+  String get qiyamCalcLastThirdSubtitle =>
+      'The best time for Qiyam and Witr prayer';
+
+  @override
+  String get qiyamStageIstighfarTitle => 'Istighfar';
+
+  @override
+  String get qiyamStageIstighfarSubtitle => 'Purifying the heart and soul';
+
+  @override
+  String get qiyamStageDuaTitle => 'Dua';
+
+  @override
+  String get qiyamStageDuaSubtitle =>
+      'Intimate supplication in the last part of the night';
+
+  @override
+  String get qiyamStageSalahTitle => 'Qiyam Prayer';
+
+  @override
+  String get qiyamStageSalahSubtitle => 'Lengthening the qunut and ruku';
+
+  @override
+  String get qiyamStageWitrTitle => 'Witr';
+
+  @override
+  String get qiyamStageWitrSubtitle => 'The closing prayer of the night';
+
+  @override
+  String get paymentMethodsScreenTitle => 'Payment Method';
+
+  @override
+  String get paymentMethodEdahabiaTitle => 'Edahabia / CIB';
+
+  @override
+  String get paymentMethodVisaTitle => 'Visa / Mastercard';
+
+  @override
+  String get paymentSupportTitle => 'Ongoing Charity';
+
+  @override
+  String get paymentSupportMessage =>
+      'With your small contribution, you help make \"Takwa\" available to millions of Muslims as an ongoing charity (sadaqah jariyah) on your behalf and your parents\'. 100 DZD or €10 a month ensures this work continues and keeps improving.';
+
+  @override
+  String get paymentContinueButton => 'Continue to Payment';
+
+  @override
+  String get paymentComingSoonMessage =>
+      'Payment will be enabled soon, insha\'Allah';
+
+  @override
+  String get qiyamOnboardingTitle => 'Welcome to Qiyam al-Layl';
+
+  @override
+  String get qiyamOnboardingDescription =>
+      'A calm spiritual journey in the depth of the night — beginning with dhikr, passing through the Quran, and completed with prayer and istighfar.';
+
+  @override
+  String get qiyamOnboardingStep1 => 'Prepare with dhikr and praise';
+
+  @override
+  String get qiyamOnboardingStep2 =>
+      'Recite the verses of Allah with reflection';
+
+  @override
+  String get qiyamOnboardingStep3 =>
+      'Converse with your Lord through prayer and dua';
+
+  @override
+  String get qiyamOnboardingStep4 =>
+      'Conclude with istighfar in the last hours of the night';
+
+  @override
+  String get qiyamOnboardingStartButton => 'Begin the Journey Now';
+
+  @override
+  String get subscriptionScreenTitle => 'Subscription';
+
+  @override
+  String get subscriptionIntroText =>
+      'Subscriptions help keep the project going.';
+
+  @override
+  String get subscriptionFreeAccessNote =>
+      'Anyone who can\'t afford the subscription is welcome to use the app for free.';
+
+  @override
+  String get subscriptionHonorSystemNote =>
+      'Unless stated otherwise, we don\'t verify that a user has paid the subscription fee — this is intentionally left to the user\'s discretion.';
+
+  @override
+  String get subscriptionPayMonthlyButton => 'I can pay monthly';
+
+  @override
+  String get subscriptionUseFreeButton => 'I want to use the app for free';
 }

@@ -3802,4 +3802,140 @@ class AppLocalizationsAr extends AppLocalizations {
   String freeReadingHizbLabel(String number) {
     return 'حزب $number';
   }
+
+  @override
+  String get misbahaScreenTitle => 'المسبحة الإلكترونية';
+
+  @override
+  String get misbahaSelectedDhikrLabel => 'الذكر المختار';
+
+  @override
+  String get misbahaChooseDhikrPrompt => 'اختر ذكراً للتسبيح';
+
+  @override
+  String get misbahaTapToChooseHint =>
+      'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك';
+
+  @override
+  String get misbahaListeningLabel => 'جاري الاستماع...';
+
+  @override
+  String get misbahaTapOrHoldHint => 'انقر أو اضغط مطولاً';
+
+  @override
+  String get misbahaResetButton => 'إعادة';
+
+  @override
+  String get misbahaSoundButton => 'الصوت';
+
+  @override
+  String get misbahaChooseDhikrTitle => 'اختر ذكراً';
+
+  @override
+  String qiyamCalcLoadError(String error) {
+    return 'خطأ في تحميل الأوقات: $error';
+  }
+
+  @override
+  String get qiyamCalcScreenTitle => 'حاسبة الليل';
+
+  @override
+  String get qiyamCalcMidnightTitle => 'منتصف الليل الشرعي';
+
+  @override
+  String get qiyamCalcMidnightSubtitle => 'ينتهي فيه وقت العشاء الاختياري';
+
+  @override
+  String get qiyamCalcLastThirdTitle => 'بداية الثلث الأخير';
+
+  @override
+  String get qiyamCalcLastThirdSubtitle => 'أفضل وقت لصلاة القيام والوتر';
+
+  @override
+  String get qiyamStageIstighfarTitle => 'الاستغفار';
+
+  @override
+  String get qiyamStageIstighfarSubtitle => 'تطهير القلب والروح';
+
+  @override
+  String get qiyamStageDuaTitle => 'الدعاء';
+
+  @override
+  String get qiyamStageDuaSubtitle => 'مناجاة الرحمن في السحر';
+
+  @override
+  String get qiyamStageSalahTitle => 'صلاة القيام';
+
+  @override
+  String get qiyamStageSalahSubtitle => 'طول القنوت والركوع';
+
+  @override
+  String get qiyamStageWitrTitle => 'الوتر';
+
+  @override
+  String get qiyamStageWitrSubtitle => 'خاتمة صلاة الليل';
+
+  @override
+  String get paymentMethodsScreenTitle => 'طريقة الدفع';
+
+  @override
+  String get paymentMethodEdahabiaTitle => 'الذهبية / CIB';
+
+  @override
+  String get paymentMethodVisaTitle => 'فيزا / ماستركارد';
+
+  @override
+  String get paymentSupportTitle => 'صدقة جارية';
+
+  @override
+  String get paymentSupportMessage =>
+      'بمساهمتك البسيطة، تجعل \"تقوى\" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.';
+
+  @override
+  String get paymentContinueButton => 'المتابعة للدفع';
+
+  @override
+  String get paymentComingSoonMessage => 'سيتم تفعيل الدفع قريباً إن شاء الله';
+
+  @override
+  String get qiyamOnboardingTitle => 'مرحباً بك في قيام الليل';
+
+  @override
+  String get qiyamOnboardingDescription =>
+      'رحلة إيمانية هادئة في جوف الليل، تبدأ بالذكر، وتمر بالقرآن، وتكتمل بالصلاة والاستغفار.';
+
+  @override
+  String get qiyamOnboardingStep1 => 'استعد بالذكر والثناء';
+
+  @override
+  String get qiyamOnboardingStep2 => 'رتل آيات الله بتدبر';
+
+  @override
+  String get qiyamOnboardingStep3 => 'ناجِ ربك بالصلاة والدعاء';
+
+  @override
+  String get qiyamOnboardingStep4 => 'اختم بالاستغفار والأسحار';
+
+  @override
+  String get qiyamOnboardingStartButton => 'ابدأ الرحلة الآن';
+
+  @override
+  String get subscriptionScreenTitle => 'الاشتراك';
+
+  @override
+  String get subscriptionIntroText => 'الاشتراكات لاستمرار المشروع.';
+
+  @override
+  String get subscriptionFreeAccessNote =>
+      'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.';
+
+  @override
+  String get subscriptionHonorSystemNote =>
+      'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.';
+
+  @override
+  String get subscriptionPayMonthlyButton => 'بإمكاني الدفع شهرياً';
+
+  @override
+  String get subscriptionUseFreeButton => 'أريد استخدام التطبيق مجاناً';
 }

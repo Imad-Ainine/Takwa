@@ -6961,6 +6961,264 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حزب {number}'**
   String freeReadingHizbLabel(String number);
+
+  /// No description provided for @misbahaScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المسبحة الإلكترونية'**
+  String get misbahaScreenTitle;
+
+  /// No description provided for @misbahaSelectedDhikrLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الذكر المختار'**
+  String get misbahaSelectedDhikrLabel;
+
+  /// No description provided for @misbahaChooseDhikrPrompt.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ذكراً للتسبيح'**
+  String get misbahaChooseDhikrPrompt;
+
+  /// No description provided for @misbahaTapToChooseHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'انقر هنا لاختيار ذكر من القائمة لتركيز عبادتك'**
+  String get misbahaTapToChooseHint;
+
+  /// No description provided for @misbahaListeningLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'جاري الاستماع...'**
+  String get misbahaListeningLabel;
+
+  /// No description provided for @misbahaTapOrHoldHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'انقر أو اضغط مطولاً'**
+  String get misbahaTapOrHoldHint;
+
+  /// No description provided for @misbahaResetButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة'**
+  String get misbahaResetButton;
+
+  /// No description provided for @misbahaSoundButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصوت'**
+  String get misbahaSoundButton;
+
+  /// No description provided for @misbahaChooseDhikrTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر ذكراً'**
+  String get misbahaChooseDhikrTitle;
+
+  /// No description provided for @qiyamCalcLoadError.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطأ في تحميل الأوقات: {error}'**
+  String qiyamCalcLoadError(String error);
+
+  /// No description provided for @qiyamCalcScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حاسبة الليل'**
+  String get qiyamCalcScreenTitle;
+
+  /// No description provided for @qiyamCalcMidnightTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتصف الليل الشرعي'**
+  String get qiyamCalcMidnightTitle;
+
+  /// No description provided for @qiyamCalcMidnightSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ينتهي فيه وقت العشاء الاختياري'**
+  String get qiyamCalcMidnightSubtitle;
+
+  /// No description provided for @qiyamCalcLastThirdTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بداية الثلث الأخير'**
+  String get qiyamCalcLastThirdTitle;
+
+  /// No description provided for @qiyamCalcLastThirdSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أفضل وقت لصلاة القيام والوتر'**
+  String get qiyamCalcLastThirdSubtitle;
+
+  /// No description provided for @qiyamStageIstighfarTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاستغفار'**
+  String get qiyamStageIstighfarTitle;
+
+  /// No description provided for @qiyamStageIstighfarSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تطهير القلب والروح'**
+  String get qiyamStageIstighfarSubtitle;
+
+  /// No description provided for @qiyamStageDuaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدعاء'**
+  String get qiyamStageDuaTitle;
+
+  /// No description provided for @qiyamStageDuaSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مناجاة الرحمن في السحر'**
+  String get qiyamStageDuaSubtitle;
+
+  /// No description provided for @qiyamStageSalahTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صلاة القيام'**
+  String get qiyamStageSalahTitle;
+
+  /// No description provided for @qiyamStageSalahSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طول القنوت والركوع'**
+  String get qiyamStageSalahSubtitle;
+
+  /// No description provided for @qiyamStageWitrTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوتر'**
+  String get qiyamStageWitrTitle;
+
+  /// No description provided for @qiyamStageWitrSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'خاتمة صلاة الليل'**
+  String get qiyamStageWitrSubtitle;
+
+  /// No description provided for @paymentMethodsScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة الدفع'**
+  String get paymentMethodsScreenTitle;
+
+  /// No description provided for @paymentMethodEdahabiaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الذهبية / CIB'**
+  String get paymentMethodEdahabiaTitle;
+
+  /// No description provided for @paymentMethodVisaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فيزا / ماستركارد'**
+  String get paymentMethodVisaTitle;
+
+  /// No description provided for @paymentSupportTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صدقة جارية'**
+  String get paymentSupportTitle;
+
+  /// No description provided for @paymentSupportMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'بمساهمتك البسيطة، تجعل \"تقوى\" متاحاً لملايين المسلمين كصدقة جارية عنك وعن والديك. 100دج أو 10€  شهرياً تضمن استمرار هذا العمل وتطويره الدائم.'**
+  String get paymentSupportMessage;
+
+  /// No description provided for @paymentContinueButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'المتابعة للدفع'**
+  String get paymentContinueButton;
+
+  /// No description provided for @paymentComingSoonMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيتم تفعيل الدفع قريباً إن شاء الله'**
+  String get paymentComingSoonMessage;
+
+  /// No description provided for @qiyamOnboardingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مرحباً بك في قيام الليل'**
+  String get qiyamOnboardingTitle;
+
+  /// No description provided for @qiyamOnboardingDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'رحلة إيمانية هادئة في جوف الليل، تبدأ بالذكر، وتمر بالقرآن، وتكتمل بالصلاة والاستغفار.'**
+  String get qiyamOnboardingDescription;
+
+  /// No description provided for @qiyamOnboardingStep1.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعد بالذكر والثناء'**
+  String get qiyamOnboardingStep1;
+
+  /// No description provided for @qiyamOnboardingStep2.
+  ///
+  /// In ar, this message translates to:
+  /// **'رتل آيات الله بتدبر'**
+  String get qiyamOnboardingStep2;
+
+  /// No description provided for @qiyamOnboardingStep3.
+  ///
+  /// In ar, this message translates to:
+  /// **'ناجِ ربك بالصلاة والدعاء'**
+  String get qiyamOnboardingStep3;
+
+  /// No description provided for @qiyamOnboardingStep4.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختم بالاستغفار والأسحار'**
+  String get qiyamOnboardingStep4;
+
+  /// No description provided for @qiyamOnboardingStartButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الرحلة الآن'**
+  String get qiyamOnboardingStartButton;
+
+  /// No description provided for @subscriptionScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاشتراك'**
+  String get subscriptionScreenTitle;
+
+  /// No description provided for @subscriptionIntroText.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاشتراكات لاستمرار المشروع.'**
+  String get subscriptionIntroText;
+
+  /// No description provided for @subscriptionFreeAccessNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل من لا يستطيع سداد الاشتراك مرحب به للاستفادة من التطبيق مجاناً.'**
+  String get subscriptionFreeAccessNote;
+
+  /// No description provided for @subscriptionHonorSystemNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'ما لم نعلن على خلاف ذلك، لا نقوم بالتأكد من سداد المستخدم لرسوم الاشتراك. ونقصد ترك ذلك لرغبة المستخدم.'**
+  String get subscriptionHonorSystemNote;
+
+  /// No description provided for @subscriptionPayMonthlyButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'بإمكاني الدفع شهرياً'**
+  String get subscriptionPayMonthlyButton;
+
+  /// No description provided for @subscriptionUseFreeButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'أريد استخدام التطبيق مجاناً'**
+  String get subscriptionUseFreeButton;
 }
 
 class _AppLocalizationsDelegate

@@ -354,11 +354,12 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
   }
 
   Widget _buildStageInfo(BuildContext context, QiyamSessionState session) {
+    final l10n = AppLocalizations.of(context)!;
     final stage = session.currentStage;
     return Column(
       children: [
         Text(
-          stage.title,
+          qiyamStageTitle(l10n, stage.id),
           style: context.typography.displayMedium.copyWith(
             fontSize: 28,
             color: context.colors.gold,
@@ -367,7 +368,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
-          stage.subtitle,
+          qiyamStageSubtitle(l10n, stage.id),
           style: context.typography.bodyLarge.copyWith(
             color: context.colors.textSecondary,
           ),

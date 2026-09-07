@@ -159,5 +159,23 @@
       "placeholderMessage": "Tell us how we can help...",
       "submit": "Send Message"
     }
+  },
+  "Auth": {
+    "title": "Sign In",
+    "subtitle": "Use the same account you signed up with in the Takwa app.",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Your password",
+    "submit": "Sign In",
+    "signingIn": "Signing in…",
+    "errorInvalidCredentials": "Incorrect email or password. Please try again.",
+    "mobileAccountNote": "This signs into the same account as the Takwa mobile app."
+  },
+  "Dashboard": {
+    "title": "Your Dashboard",
+    "welcome": "Signed in as {email}.",
+    "placeholderNote": "This is a foundation page — your prayer stats and achievements will appear here in a future update.",
+    "signOut": "Sign Out"
   }
 }

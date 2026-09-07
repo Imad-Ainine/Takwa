@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/qiyam/providers/qiyam_providers.dart';
+import 'package:takwa/features/quran/utils/quran_helpers.dart' show localizedNumeral;
+import 'package:takwa/l10n/app_localizations.dart';
 
 class QiyamOnboardingOverlay extends ConsumerStatefulWidget {
   const QiyamOnboardingOverlay({super.key});
@@ -107,8 +109,9 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
   }
 
   Widget _buildTitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Text(
-      'مرحباً بك في قيام الليل',
+      l10n.qiyamOnboardingTitle,
       style: context.typography.displayMedium.copyWith(
         color: context.colors.gold,
         fontSize: 28,
@@ -119,8 +122,9 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
   }
 
   Widget _buildDescription(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Text(
-      'رحلة إيمانية هادئة في جوف الليل، تبدأ بالذكر، وتمر بالقرآن، وتكتمل بالصلاة والاستغفار.',
+      l10n.qiyamOnboardingDescription,
       style: context.typography.bodyLarge.copyWith(
         color: Colors.white.withOpacity(0.8),
         height: 1.6,
@@ -130,12 +134,13 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
   }
 
   Widget _buildSteps(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        _buildStepItem(context, '١', 'استعد بالذكر والثناء'),
-        _buildStepItem(context, '٢', 'رتل آيات الله بتدبر'),
-        _buildStepItem(context, '٣', 'ناجِ ربك بالصلاة والدعاء'),
-        _buildStepItem(context, '٤', 'اختم بالاستغفار والأسحار'),
+        _buildStepItem(context, localizedNumeral(context, 1), l10n.qiyamOnboardingStep1),
+        _buildStepItem(context, localizedNumeral(context, 2), l10n.qiyamOnboardingStep2),
+        _buildStepItem(context, localizedNumeral(context, 3), l10n.qiyamOnboardingStep3),
+        _buildStepItem(context, localizedNumeral(context, 4), l10n.qiyamOnboardingStep4),
       ],
     );
   }
@@ -172,6 +177,7 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
   }
 
   Widget _buildStartButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 56,
@@ -187,9 +193,9 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
           ),
           elevation: 8,
         ),
-        child: const Text(
-          'ابدأ الرحلة الآن',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        child: Text(
+          l10n.qiyamOnboardingStartButton,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
