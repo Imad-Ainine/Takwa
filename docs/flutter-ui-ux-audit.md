@@ -103,6 +103,15 @@ migrated), M18 (no `print()` left in `lib/`).
   `Colors.redAccent/orange/amber/greenAccent` at every brightness; amber-as-text on a light surface
   was ~1.8:1. Dark mode keeps the original accents; light mode now uses the theme's `dangerText`/
   `warningText`/`successText` roles plus one darkened orange, all clearing 4.5:1.
+- **Refactor Plan item 29 (`AppBarWidget` rollout)**, +6 screens — `qiyam_virtues_screen`,
+  `qiyam_sunnah_guide_screen`, `qiyam_beginner_guide_screen`, `qiyam_sleep_calculator_screen`,
+  `qiyam_calculator_screen`, `payment_methods_screen` each hand-rolled the same
+  `Row(CustomLeadingButton, Spacer, Text(title), Spacer)` header; all six now use
+  `Scaffold.appBar: AppBarWidget(...)` instead, dropping the duplicated `_buildAppBar` method in
+  each. `qiyam_calculator_screen` got a small correctness fix as a side effect: its header used to
+  live *inside* the `AsyncValue.when(data: ...)` branch, so there was no back button at all while
+  prayer times were loading or failed to load — hoisting the app bar to `Scaffold.appBar` fixes that
+  for every state. 22 of ~50 screens now use `AppBarWidget`, up from 16.
 
 ⏳ **Still open, deliberately not attempted here** (needs either visual QA on a device/simulator —
 unavailable in this environment, same limitation the original audit had — or design assets this
@@ -120,8 +129,13 @@ pass doesn't have):
   `GestureDetector`s remain. Not swept mechanically here: several of those are drag/pan gestures,
   not taps, and misclassifying one would regress a real interaction with no way to catch it without
   a device to test on.
-- **Refactor Plan item 29 (`AppBarWidget` rollout)** — 16 of the app's ~50 screens have adopted it
-  so far.
+- **Refactor Plan item 29 (`AppBarWidget` rollout), remainder** — the rest of the ~50 screens fall
+  into two buckets, neither of which is a safe drop-in: (a) screens whose header carries a `TabBar`
+  (`manage_custom_ibadah_screen`, `khatma_history_screen`, `achievements_screen`'s `SliverAppBar`) —
+  `AppBarWidget` has no `bottom:` slot for that today; (b) screens with a bespoke header shape
+  (a two-line title+subtitle, a trailing decorative element, no title text at all, or a
+  scroll-scaled layout like `misbaha_screen`'s `LayoutBuilder`) where swapping in the standardized
+  centered-title bar is a visual-design call this pass can't verify without a device.
 - **Refactor Plan item 30 (golden test matrix)** — `test/golden/main_shell_golden_test.dart` exists
   as a scaffold; the full {light, dark, Ramadan} × {1.0×, 1.5× text} × 6-screen matrix described in
   the plan hasn't been built out.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_time_picker.dart';
@@ -22,68 +23,41 @@ class _QiyamSleepCalculatorScreenState
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off Row(CustomLeadingButton + title)
+      // (audit item 29) — consistent with the rest of the app's app bars.
+      appBar: AppBarWidget(
+        title: l10n.qiyamSleepCalcTitle,
+        leading: const CustomLeadingButton(),
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
             child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
-            child: Column(
-              children: [
-                _buildAppBar(context),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildHeader(context),
-                        const SizedBox(height: AppSpacing.xxxl),
-                        _buildWakeupSelector(context),
-                        const SizedBox(height: AppSpacing.xxxl),
-                        Text(
-                          l10n.qiyamSleepCalcBestTimesLabel,
-                          style: context.typography.displayMedium.copyWith(
-                            fontSize: 20,
-                            color: context.colors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        ..._buildCycleCards(context),
-                        const SizedBox(height: AppSpacing.xxxl),
-                      ],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  const SizedBox(height: AppSpacing.xxxl),
+                  _buildWakeupSelector(context),
+                  const SizedBox(height: AppSpacing.xxxl),
+                  Text(
+                    l10n.qiyamSleepCalcBestTimesLabel,
+                    style: context.typography.displayMedium.copyWith(
+                      fontSize: 20,
+                      color: context.colors.textPrimary,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.lg),
+                  ..._buildCycleCards(context),
+                  const SizedBox(height: AppSpacing.xxxl),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppBar(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: 10,
-      ),
-      child: Row(
-        children: [
-          const CustomLeadingButton(),
-          const Spacer(),
-          Text(
-            l10n.qiyamSleepCalcTitle,
-            style: context.typography.displayMedium.copyWith(
-              fontSize: 20,
-              color: context.colors.gold,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Spacer(),
-          const SizedBox(width: 40), // Placeholder for symmetry
         ],
       ),
     );
