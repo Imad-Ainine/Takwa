@@ -63,7 +63,7 @@ dependencies:
 
   # ── Environment Variables ──
   flutter_dotenv: ^6.0.0
-  geocoding: ^4.0.0
+  geocoding: ^5.0.0
 
   # ── Quran & Audio ──
   quran_library: ^4.0.0
