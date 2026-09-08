@@ -835,6 +835,7 @@ class _NotifSettingsButton extends ConsumerWidget {
   void _showNotifSettings(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: context.colors.card,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(

@@ -786,6 +786,11 @@ class _PrayerRow extends StatelessWidget {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
+      // _PrayerStatusSheet has no hand-rolled grab handle (unlike most of
+      // this app's other sheets), so this one is a safe, isolated place to
+      // add the M6 drag handle instead of introducing a visual duplicate.
+      showDragHandle: true,
       backgroundColor: context.colors.card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

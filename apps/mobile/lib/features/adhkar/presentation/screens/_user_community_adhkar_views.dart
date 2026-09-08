@@ -30,6 +30,7 @@ class UserAdhkarTabView extends ConsumerWidget {
         icon: const Icon(Icons.add_rounded),
         onPressed: () => showModalBottomSheet(
           context: context,
+          useSafeArea: true,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (_) => const AddAdhkarSheet(),
@@ -124,6 +125,7 @@ class _UserAdhkarCardState extends ConsumerState<_UserAdhkarCard>
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _ShareToCommunitySheet(item: widget.item),

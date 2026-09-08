@@ -659,6 +659,7 @@ class _UserDuasTabView extends ConsumerWidget {
         onPressed: () {
           showModalBottomSheet(
             context: context,
+            useSafeArea: true,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (_) => const AddDuaSheet(),
@@ -791,6 +792,7 @@ class _UserDuaCard extends ConsumerWidget {
                   icon: Icon(Icons.public_rounded, color: style.teal, size: 20),
                   onPressed: () => showModalBottomSheet(
                     context: context,
+                    useSafeArea: true,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (_) =>

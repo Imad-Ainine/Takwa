@@ -364,6 +364,7 @@ class SelectSetting extends StatelessWidget {
   void _showPicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: context.colors.background,
       shape: const RoundedRectangleBorder(
