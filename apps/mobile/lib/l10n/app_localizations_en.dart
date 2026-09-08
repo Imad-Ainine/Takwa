@@ -1829,6 +1829,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quranReaderListenAyahOption => 'Listen to verse';
 
   @override
+  String get quranReaderComingSoon => 'This feature is coming soon';
+
+  @override
+  String get quranReaderAudioError => 'Could not play the audio, check your connection';
+
+  @override
   String get quranReaderSettingsTitle => 'Reading Settings';
 
   @override

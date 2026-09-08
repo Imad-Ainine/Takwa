@@ -118,12 +118,17 @@ const kDefaultReciters = <QuranReciter>[
 // ─── Audio State ─────────────────────────────────────────────
 class QuranAudioState {
   final bool isPlaying, isLoading;
+  // Set when the last playAyah() attempt failed (e.g. no network) so the UI
+  // can surface it instead of looking like a silent no-op; cleared as soon
+  // as a new play attempt starts.
+  final bool hasError;
   final int surah, ayah;
   final double speed;
   final String reciterId;
   const QuranAudioState({
     this.isPlaying = false,
     this.isLoading = false,
+    this.hasError = false,
     this.surah = 1,
     this.ayah = 1,
     this.speed = 1.0,
@@ -132,6 +137,7 @@ class QuranAudioState {
   QuranAudioState copyWith({
     bool? isPlaying,
     bool? isLoading,
+    bool? hasError,
     int? surah,
     int? ayah,
     double? speed,
@@ -139,6 +145,7 @@ class QuranAudioState {
   }) => QuranAudioState(
     isPlaying: isPlaying ?? this.isPlaying,
     isLoading: isLoading ?? this.isLoading,
+    hasError: hasError ?? this.hasError,
     surah: surah ?? this.surah,
     ayah: ayah ?? this.ayah,
     speed: speed ?? this.speed,

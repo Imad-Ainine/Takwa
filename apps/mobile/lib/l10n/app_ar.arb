@@ -1136,6 +1136,8 @@
   "quranReaderTafsirOption": "التفسير الميسر",
   "quranReaderTranslationOption": "الترجمة",
   "quranReaderListenAyahOption": "استماع للآية",
+  "quranReaderComingSoon": "هذه الميزة قيد التطوير قريباً",
+  "quranReaderAudioError": "تعذر تشغيل الصوت، تحقق من اتصالك بالإنترنت",
   "quranReaderSettingsTitle": "إعدادات القراءة",
   "quranReaderFontSizeLabel": "حجم الخط",
   "quranReaderBackgroundStyleLabel": "نمط الخلفية",

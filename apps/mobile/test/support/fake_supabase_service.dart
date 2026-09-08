@@ -23,6 +23,10 @@ class FakeSupabaseService implements SupabaseService {
   final List<Map<String, dynamic>> books = [];
   final Map<String, Map<String, dynamic>> bookProgressByBookId = {};
   final Map<String, Map<String, dynamic>> pdfSessionsByBookId = {};
+  // Keyed by "surahNum:ayahNum", mirroring the real table's unique constraint.
+  final Map<String, Map<String, dynamic>> quranBookmarksByKey = {};
+  Map<String, dynamic>? quranLastRead;
+  final Map<String, Map<String, dynamic>> khatmaSessionsById = {};
 
   /// Calls made, in order — lets a test assert what was pushed without
   /// caring about internal storage shape (e.g. "was upsertDailyRecord
@@ -319,4 +323,41 @@ class FakeSupabaseService implements SupabaseService {
   @override
   Future<List<Map<String, dynamic>>> getReminders() async =>
       remindersByLocalId.values.toList();
+
+  // ─────────────── QURAN (bookmarks, last read, khatma sessions) ───────────────
+  @override
+  Future<void> upsertQuranBookmark(Map<String, dynamic> bookmark) async {
+    callLog.add('upsertQuranBookmark');
+    final key = '${bookmark['surah_num']}:${bookmark['ayah_num']}';
+    quranBookmarksByKey[key] = Map.of(bookmark);
+  }
+
+  @override
+  Future<void> deleteQuranBookmark(int surahNum, int ayahNum) async {
+    callLog.add('deleteQuranBookmark');
+    quranBookmarksByKey.remove('$surahNum:$ayahNum');
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getQuranBookmarks() async =>
+      quranBookmarksByKey.values.toList();
+
+  @override
+  Future<void> upsertQuranLastRead(Map<String, dynamic> lastRead) async {
+    callLog.add('upsertQuranLastRead');
+    quranLastRead = Map.of(lastRead);
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getQuranLastRead() async => quranLastRead;
+
+  @override
+  Future<void> upsertKhatmaSession(Map<String, dynamic> session) async {
+    callLog.add('upsertKhatmaSession:${session['id']}');
+    khatmaSessionsById[session['id'] as String] = Map.of(session);
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getKhatmaSessions() async =>
+      khatmaSessionsById.values.toList();
 }

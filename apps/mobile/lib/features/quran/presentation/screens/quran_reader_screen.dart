@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
@@ -26,12 +27,18 @@ class QuranReaderScreen extends ConsumerStatefulWidget {
   final bool startFromKhatma;
   final int? initialSurah;
   final int? initialPage;
+  // Unique-quran-wide ayah number (AyahModel.ayahUQNumber) to jump to and
+  // briefly highlight on open — e.g. from the daily-verse card or a shared
+  // ayah link. Only used together with initialPage (the page that ayah is
+  // on); ignored if initialPage is null.
+  final int? initialAyahUQNumber;
 
   const QuranReaderScreen({
     super.key,
     this.startFromKhatma = false,
     this.initialSurah,
     this.initialPage,
+    this.initialAyahUQNumber,
   });
 
   @override
@@ -123,9 +130,46 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     _transformationController = TransformationController();
     _transformationController.addListener(_onTransformationChanged);
 
+    // Restore the persisted font-size/zoom preference (quranStateProvider's
+    // fontSize is the source of truth _applyFontScale writes to) instead of
+    // always starting at 100%. Without this, every fresh QuranReaderScreen
+    // silently ignored whatever the reader-settings sheet had saved — the
+    // slider always looked reset after leaving and reopening the reader.
+    final savedFontSize = ref.read(quranStateProvider).fontSize;
+    final savedScale = (savedFontSize / 22.0).clamp(0.85, 2.0);
+    _currentScale = savedScale;
+    _isZoomed = (savedScale - 1.0).abs() > 0.02;
+    _transformationController.value = Matrix4.diagonal3Values(
+      savedScale,
+      savedScale,
+      1.0,
+    );
+
     // Crucial: lock quran_library internal scale factor to 1.0 so flowing layout mode is never triggered
     try {
       ql.QuranLibrary.quranCtrl.state.scaleFactor.value = 1.0;
+    } catch (_) {}
+
+    // quran_library's QuranCtrl (its page controller included) is a
+    // GetX-lifetime singleton, not scoped to this screen: it survives
+    // across every QuranReaderScreen instance for as long as the app
+    // process is alive. The `pageIndex` constructor param passed to
+    // ql.QuranLibraryScreen below only ever updates its *display* value
+    // (and is silently ignored altogether when pageIndex == 0, i.e. page
+    // 1) — it never actually moves that shared page controller. So without
+    // this explicit jump, "Continue Reading" (or any other entry point)
+    // could open showing whatever page a previous reader session last
+    // scrolled to, rather than the page this screen was asked to open.
+    // ql.QuranLibrary().jumpToPage()/jumpToAyah() are the library's own
+    // documented, tested APIs for this — already used elsewhere in this
+    // file (_onPrevPage, _jumpToSurah, ...) — so this uses the same path
+    // instead of relying on the constructor param.
+    try {
+      if (widget.initialAyahUQNumber != null) {
+        ql.QuranLibrary().jumpToAyah(startPage, widget.initialAyahUQNumber!);
+      } else {
+        ql.QuranLibrary().jumpToPage(startPage);
+      }
     } catch (_) {}
   }
 
@@ -454,6 +498,68 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     );
   }
 
+  // Looks up the full AyahModel for (surahNum, ayahNum) from the shared
+  // quran_library data — needed for the actual ayah text (share) and its
+  // quran-wide unique number (deep-link/highlight). Returns null rather
+  // than throwing if the library data isn't ready or the numbers are out
+  // of range, so callers can fall back gracefully.
+  ql.AyahModel? _findAyah(int surahNum, int ayahNum) {
+    try {
+      final surahs = ql.QuranLibrary.quranCtrl.surahs;
+      if (surahNum < 1 || surahNum > surahs.length) return null;
+      final ayahs = surahs[surahNum - 1].ayahs;
+      for (final a in ayahs) {
+        if (a.ayahNumber == ayahNum) return a;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _shareAyah(int surahNum, int ayahNum) {
+    final l10n = AppLocalizations.of(context)!;
+    final ayah = _findAyah(surahNum, ayahNum);
+    final surahName = ayah?.arabicName ?? localizedSurahName(context, surahNum);
+    final text = ayah?.text.trim();
+    final reference = l10n.quranReaderAyahRefLabel(
+      localizedNumeral(context, ayahNum),
+      surahName,
+    );
+    final link = 'https://takwa.app/quran?surah=$surahNum&ayah=$ayahNum';
+    final shareText = [
+      if (text != null && text.isNotEmpty) '"$text"',
+      reference,
+      link,
+    ].join('\n\n');
+    SharePlus.instance.share(ShareParams(text: shareText));
+  }
+
+  void _saveAyahBookmark(int surahNum, int ayahNum) {
+    final ayah = _findAyah(surahNum, ayahNum);
+    final surahName = ayah?.arabicName ?? localizedSurahName(context, surahNum);
+    ref
+        .read(quranBookmarksProvider.notifier)
+        .add(
+          QuranBookmark(
+            surahNum: surahNum,
+            ayahNum: ayahNum,
+            page: ayah?.page ?? _currentPage,
+            surahName: surahName,
+            savedAt: DateTime.now(),
+          ),
+        );
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.quranReaderBookmarkSaved),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   void _showAyahOptions(int surahNum, int ayahNum) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
@@ -462,6 +568,14 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
       builder: (_) => _AyahOptionsSheet(
         surahNum: surahNum,
         ayahNum: ayahNum,
+        onSave: () {
+          Navigator.pop(context);
+          _saveAyahBookmark(surahNum, ayahNum);
+        },
+        onShare: () {
+          Navigator.pop(context);
+          _shareAyah(surahNum, ayahNum);
+        },
         onPlay: () {
           Navigator.pop(context);
           ref.read(quranAudioProvider.notifier).togglePlay(surahNum, ayahNum);
@@ -482,7 +596,11 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
         onThemeChanged: (t) =>
             ref.read(quranStateProvider.notifier).setTheme(t),
         onScaleChanged: _applyFontScale,
-        onResetScale: _resetZoom,
+        // Goes through _applyFontScale (not the bare _resetZoom used by the
+        // double-tap gesture) so resetting here also persists fontSize back
+        // to its default — otherwise the next time this reader opened, the
+        // restored-on-init scale would silently undo the reset.
+        onResetScale: () => _applyFontScale(1.0),
         onReciterTap: () {
           Navigator.pop(context);
           _showReciterPicker();
@@ -518,6 +636,25 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   // ── Build ───────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    // Surfaces ayah-audio failures (e.g. no network) as a snackbar instead
+    // of the previous silent no-op — playAyah() already resets isPlaying/
+    // isLoading on failure, so without this the only sign anything went
+    // wrong was the play button quietly going back to its idle state.
+    ref.listen(quranAudioProvider, (prev, next) {
+      if (next.hasError && prev?.hasError != true) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.quranReaderAudioError,
+            ),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
+
     final state = ref.watch(quranStateProvider);
     final audio = ref.watch(quranAudioProvider);
     final bookmarks = ref.watch(quranBookmarksProvider);
@@ -2131,13 +2268,32 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
 
 class _AyahOptionsSheet extends StatelessWidget {
   final int surahNum, ayahNum;
-  final VoidCallback onPlay;
+  final VoidCallback onSave, onShare, onPlay;
 
   const _AyahOptionsSheet({
     required this.surahNum,
     required this.ayahNum,
+    required this.onSave,
+    required this.onShare,
     required this.onPlay,
   });
+
+  void _showComingSoon(BuildContext context) {
+    // Capture the messenger before popping — once this sheet's route starts
+    // closing, its own context is on the way out, so look it up first.
+    final messenger = ScaffoldMessenger.of(context);
+    final message = AppLocalizations.of(context)!.quranReaderComingSoon;
+    Navigator.pop(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2181,22 +2337,22 @@ class _AyahOptionsSheet extends StatelessWidget {
           _OptionRow(
             emoji: '⭐',
             label: l10n.quranReaderSaveAyahOption,
-            onTap: () => Navigator.pop(context),
+            onTap: onSave,
           ),
           _OptionRow(
             emoji: '📤',
             label: l10n.quranReaderShareAyahOption,
-            onTap: () => Navigator.pop(context),
+            onTap: onShare,
           ),
           _OptionRow(
             emoji: '📖',
             label: l10n.quranReaderTafsirOption,
-            onTap: () => Navigator.pop(context),
+            onTap: () => _showComingSoon(context),
           ),
           _OptionRow(
             emoji: '🌐',
             label: l10n.quranReaderTranslationOption,
-            onTap: () => Navigator.pop(context),
+            onTap: () => _showComingSoon(context),
           ),
           _OptionRow(
             emoji: '🔊',
