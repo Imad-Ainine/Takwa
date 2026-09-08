@@ -26,6 +26,7 @@ class PrayerSelectionSheet extends StatefulWidget {
   }) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: context.colors.background,
       shape: const RoundedRectangleBorder(

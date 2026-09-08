@@ -19,6 +19,7 @@ class RemindersListScreen extends ConsumerWidget {
   void _showAddReminderSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const AddReminderBottomSheet(),

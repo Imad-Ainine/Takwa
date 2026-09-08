@@ -382,6 +382,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: context.colors.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

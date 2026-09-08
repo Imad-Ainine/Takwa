@@ -391,6 +391,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _showFontSizeDialog() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _FontSizeSheet(
@@ -404,6 +405,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _showSurahPicker() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _SurahPickerSheet(
@@ -419,6 +421,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _showJuzPicker() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _JuzPickerSheet(
@@ -435,6 +438,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final audio = ref.read(quranAudioProvider);
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _ReciterSheet(
@@ -465,6 +469,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final surah = kSurahData[idx];
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _DownloadSheet(
         surah: surah,
@@ -489,6 +494,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _showKhatmaStats() {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _KhatmaStatsSheet(
         pagesRead: _sessionPagesRead,
@@ -564,6 +570,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _AyahOptionsSheet(
         surahNum: surahNum,
@@ -588,6 +595,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final state = ref.read(quranStateProvider);
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => _SettingsSheet(

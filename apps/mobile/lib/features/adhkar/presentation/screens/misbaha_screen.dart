@@ -539,6 +539,7 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
   ) {
     showModalBottomSheet(
       context: context,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {

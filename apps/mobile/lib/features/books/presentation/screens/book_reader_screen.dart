@@ -473,6 +473,7 @@ class _TopBar extends StatelessWidget {
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
+                    useSafeArea: true,
                     backgroundColor: Colors.transparent,
                     isScrollControlled: true,
                     builder: (_) => _SettingsSheet(
