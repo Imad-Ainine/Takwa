@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
@@ -334,8 +335,11 @@ class _PageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return TakwaTappable(
       onTap: onTap,
+      // No semanticLabel: the visible Text below already carries the page
+      // number into the semantics tree.
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: Container(
         decoration: BoxDecoration(
           color: style.card,

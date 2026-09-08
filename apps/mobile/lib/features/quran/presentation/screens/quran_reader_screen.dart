@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
@@ -1456,9 +1457,14 @@ class _TapIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = GestureDetector(
+    // TakwaTappable is opaque by default already, matching the explicit
+    // HitTestBehavior.opaque this GestureDetector used to set.
+    Widget child = TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      // A toolbar icon button, sized by its own padding rather than a
+      // fixed box — see quran_widgets.dart's icon buttons for why
+      // minTapSize is null here.
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.sm),
         child: Stack(
@@ -1746,8 +1752,13 @@ class _BottomBar extends StatelessWidget {
                     const Spacer(),
 
                     // Play/pause button
-                    GestureDetector(
+                    TakwaTappable(
                       onTap: onTogglePlay,
+                      // Sits in a fixed-height audio toolbar row — see
+                      // quran_widgets.dart's icon buttons for why
+                      // minTapSize is null here.
+                      minTapSize: null,
+                      borderRadius: BorderRadius.circular(19),
                       child: Container(
                         width: 38,
                         height: 38,
@@ -1828,8 +1839,10 @@ class _BottomBar extends StatelessWidget {
                     const SizedBox(width: AppSpacing.sm),
 
                     // Stop
-                    GestureDetector(
+                    TakwaTappable(
                       onTap: onStop,
+                      minTapSize: null,
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                       child: Container(
                         width: 28,
                         height: 28,
@@ -1863,9 +1876,10 @@ class _BottomBar extends StatelessWidget {
     VoidCallback? onTap,
   }) => Tooltip(
     message: tooltip,
-    child: GestureDetector(
+    // No semanticLabel: the Tooltip above already contributes one.
+    child: TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Icon(icon, size: 22, color: color),
@@ -1884,15 +1898,16 @@ class _BottomBar extends StatelessWidget {
     VoidCallback onTap, {
     String? tooltip,
   }) {
-    Widget btn = GestureDetector(
+    Widget btn = TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xs),
         child: Icon(icon, color: color, size: 20),
       ),
     );
     if (tooltip != null) {
+      // No semanticLabel on the tappable above: this Tooltip supplies one.
       btn = Tooltip(message: tooltip, child: btn);
     }
     return btn;
@@ -2124,8 +2139,10 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                GestureDetector(
+                TakwaTappable(
                   onTap: () => Navigator.pop(context),
+                  // Inline with the dialog title via spaceBetween.
+                  minTapSize: null,
                   child: const Icon(
                     Icons.close,
                     color: Colors.white38,

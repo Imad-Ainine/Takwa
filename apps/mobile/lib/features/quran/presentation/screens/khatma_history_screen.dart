@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
@@ -614,8 +615,12 @@ class _KhatmaCard extends StatelessWidget {
           Row(
             children: [
               if (onDelete != null)
-                GestureDetector(
+                TakwaTappable(
                   onTap: onDelete,
+                  semanticLabel: l10n.commonDelete,
+                  // Sits inline in the card's header row.
+                  minTapSize: null,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(

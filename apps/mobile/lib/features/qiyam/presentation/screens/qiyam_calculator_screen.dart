@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
@@ -17,6 +18,15 @@ class QiyamCalculatorScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off Row(CustomLeadingButton + title)
+      // built inside the `data` branch below (audit item 29) — that also
+      // meant there was no back button at all while prayer times were
+      // loading or failed to load; hoisting it to Scaffold.appBar fixes
+      // that for free.
+      appBar: AppBarWidget(
+        title: l10n.qiyamCalcScreenTitle,
+        leading: const CustomLeadingButton(),
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -51,58 +61,30 @@ class QiyamCalculatorScreen extends ConsumerWidget {
     final midnight = maghrib.add(totalNight ~/ 2);
     final lastThirdStart = fajrAdjusted.subtract(totalNight ~/ 3);
 
-    return Column(
-      children: [
-        _buildAppTopBar(context),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: Column(
-              children: [
-                _buildTimeCard(
-                  context,
-                  title: l10n.qiyamCalcMidnightTitle,
-                  time: midnight,
-                  subtitle: l10n.qiyamCalcMidnightSubtitle,
-                  icon: Icons.brightness_3,
-                  color: context.colors.teal,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _buildTimeCard(
-                  context,
-                  title: l10n.qiyamCalcLastThirdTitle,
-                  time: lastThirdStart,
-                  subtitle: l10n.qiyamCalcLastThirdSubtitle,
-                  icon: Icons.auto_awesome,
-                  color: context.colors.gold,
-                  isHighlight: true,
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-                _buildinfoSection(context),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAppTopBar(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Row(
+      child: Column(
         children: [
-          const CustomLeadingButton(),
-          const SizedBox(width: AppSpacing.md),
-          Text(
-            l10n.qiyamCalcScreenTitle,
-            style: context.typography.displayMedium.copyWith(
-              fontSize: 22,
-              color: context.colors.gold,
-              fontWeight: FontWeight.bold,
-            ),
+          _buildTimeCard(
+            context,
+            title: l10n.qiyamCalcMidnightTitle,
+            time: midnight,
+            subtitle: l10n.qiyamCalcMidnightSubtitle,
+            icon: Icons.brightness_3,
+            color: context.colors.teal,
           ),
+          const SizedBox(height: AppSpacing.lg),
+          _buildTimeCard(
+            context,
+            title: l10n.qiyamCalcLastThirdTitle,
+            time: lastThirdStart,
+            subtitle: l10n.qiyamCalcLastThirdSubtitle,
+            icon: Icons.auto_awesome,
+            color: context.colors.gold,
+            isHighlight: true,
+          ),
+          const SizedBox(height: AppSpacing.xxl),
+          _buildinfoSection(context),
         ],
       ),
     );
