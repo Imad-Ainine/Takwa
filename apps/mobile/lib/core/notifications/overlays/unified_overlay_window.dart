@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 
 import '../../providers/adhkar_providers.dart';
 import 'package:takwa/features/duas/data/duas_data.dart';
@@ -779,8 +780,11 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         ),
 
         // زر الإغلاق الذهبي
-        GestureDetector(
+        TakwaTappable(
           onTap: _closeOverlay,
+          // Inline in the header row alongside the category name.
+          minTapSize: null,
+          borderRadius: BorderRadius.circular(15),
           child: Container(
             width: 30,
             height: 30,

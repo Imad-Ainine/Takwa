@@ -144,6 +144,26 @@ migrated), M18 (no `print()` left in `lib/`).
   own doc comment — duplicates that content in the semantics tree instead of reusing what the
   visible `Text` children already expose. Removed both; `_PageItem` in this pass follows the
   corrected rule (omits `semanticLabel` since its child `Text` already shows the same page number).
+- **§H3 `TakwaTappable` rollout — the `onTap`-only category is now done.** Swept the remaining 21
+  sites across `mosques_screen` (2), `free_reading_screen` (2), `create_khatma_screen` (5 — one more
+  turned up than the original scan counted), `unified_overlay_window.dart` (1 of 3 — see below), and
+  `quran_screen.dart`/`quran_reader_screen.dart` (8 and 7 respectively, likewise one more each than
+  first counted — the original classification script's per-file tally was approximate; re-running it
+  after each file confirmed the true count before moving on). All 33 genuinely convertible `onTap`-only
+  `GestureDetector`s app-wide are now `TakwaTappable`; re-running the classification afterward finds
+  **zero** remaining except four deliberate exceptions:
+  - `animated_drawer.dart`'s and `unified_overlay_window.dart`'s full-screen tap-to-dismiss scrims —
+    same reasoning as the drawer scrim noted above.
+  - `unified_overlay_window.dart`'s `GestureDetector(onTap: () {}, child: _buildCard())` — a no-op
+    handler that exists purely to *absorb* taps on the notification card so they don't fall through
+    to the dismiss scrim behind it, not a button. `_buildCard()` likely has its own internal tappable
+    content; wrapping the whole card in `TakwaTappable` would visibly scale/tint the entire card on
+    any tap inside it, including taps meant for something else.
+  - `custom_leading_button.dart`'s back/close button — see below, unchanged from the last pass's
+    reasoning.
+  Two more structural margin-vs-`Padding` fixes were needed along the way (same bug as
+  `KhatmaActionCard`): `free_reading_screen.dart`'s "last read" banner and `quran_screen.dart`'s
+  Khatma/Free-Reading action buttons.
 
 ⏳ **Still open, deliberately not attempted here** (needs either visual QA on a device/simulator —
 unavailable in this environment, same limitation the original audit had — or design assets this
@@ -157,16 +177,15 @@ pass doesn't have):
   ARB placeholder text) rather than chrome, per the audit's own distinction — but a real pass needs
   someone to sort which is which, and commissioning/adopting a line-icon set for the rest is a
   design decision, not a code one.
-- **§H3 `TakwaTappable` rollout, remainder** — 21 more `onTap`-only sites are still on bare
-  `GestureDetector`, concentrated in `quran_screen.dart` (5), `quran_reader_screen.dart` (5),
-  `create_khatma_screen.dart` (4), `unified_overlay_window.dart` (3), `mosques_screen.dart` (2), and
-  `free_reading_screen.dart` (2) — plus `custom_leading_button.dart`'s back/close button, deliberately
-  skipped despite being `onTap`-only: it's the single most-reused interactive widget in the app (every
-  `AppBarWidget` screen and dozens more), with its own already-working custom press animation
-  (a 1.0→0.9 `ScaleTransition`) that would need removing first to avoid stacking two press effects,
-  and any resulting size/feel change would show up on nearly every screen — too high a blast radius
-  to change without a device to verify against. On top of these: the ~100 sites mixing in
-  drag/long-press/double-tap that need a per-site read rather than the mechanical rule used here.
+- **§H3 `TakwaTappable` rollout, remainder** — the `onTap`-only category is done (see above); ~100
+  `GestureDetector`s remain app-wide that mix in drag/long-press/double-tap alongside `onTap` and need
+  a per-site read rather than the mechanical rule used here — that read is what's left. Plus
+  `custom_leading_button.dart`'s back/close button, deliberately skipped despite being `onTap`-only:
+  it's the single most-reused interactive widget in the app (every `AppBarWidget` screen and dozens
+  more), with its own already-working custom press animation (a 1.0→0.9 `ScaleTransition`) that would
+  need removing first to avoid stacking two press effects, and any resulting size/feel change would
+  show up on nearly every screen — too high a blast radius to change without a device to verify
+  against.
 - **Refactor Plan item 29 (`AppBarWidget` rollout), remainder** — the rest of the ~50 screens fall
   into two buckets, neither of which is a safe drop-in: (a) screens whose header carries a `TabBar`
   (`manage_custom_ibadah_screen`, `khatma_history_screen`, `achievements_screen`'s `SliverAppBar`) —
