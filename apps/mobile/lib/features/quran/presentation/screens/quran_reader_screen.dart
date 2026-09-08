@@ -653,9 +653,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.quranReaderAudioError,
-            ),
+            content: Text(AppLocalizations.of(context)!.quranReaderAudioError),
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
           ),
@@ -1400,7 +1398,9 @@ class _TopBar extends StatelessWidget {
                         : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? _kGold.withValues(alpha: 0.35) : Colors.black12,
+                      color: isDark
+                          ? _kGold.withValues(alpha: 0.35)
+                          : Colors.black12,
                       width: 1,
                     ),
                   ),
@@ -3252,30 +3252,35 @@ class _ReciterSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: isSelected ? _kGold : Colors.white12),
               ),
-              child: ListTile(
-                onTap: () => onSelectReciter(r),
-                leading: Icon(
-                  isSelected
-                      ? Icons.check_circle_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                  color: isSelected ? _kGold : Colors.white38,
-                ),
-                title: Text(
-                  r.nameAr,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 16,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: isSelected ? Colors.white : Colors.white70,
+              child: Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(14),
+                child: ListTile(
+                  onTap: () => onSelectReciter(r),
+                  leading: Icon(
+                    isSelected
+                        ? Icons.check_circle_rounded
+                        : Icons.radio_button_unchecked_rounded,
+                    color: isSelected ? _kGold : Colors.white38,
                   ),
-                ),
-                subtitle: Text(
-                  r.nameEn,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  title: Text(
+                    r.nameAr,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 16,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected ? Colors.white : Colors.white70,
+                    ),
+                  ),
+                  subtitle: Text(
+                    r.nameEn,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  ),
                 ),
               ),
             );
