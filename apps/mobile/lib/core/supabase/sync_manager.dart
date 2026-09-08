@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers/database_providers.dart';
 import '../../core/database/app_database.dart';
 import '../../features/books/providers/books_reading_provider.dart';
+import '../../features/quran/providers/quran_providers.dart';
 import 'supabase_config.dart';
 import 'supabase_providers.dart';
 import 'supabase_service.dart';
@@ -56,6 +57,7 @@ class SyncManager {
       await _syncReminders();
       await _syncUserAdhkar();
       await _syncUserDuas();
+      await _syncQuran();
     } finally {
       _syncing = false;
       _ref.read(isSyncingProvider.notifier).state = false;
@@ -462,6 +464,20 @@ class SyncManager {
       }
     } catch (e) {
       developer.log('Failed to sync user duas: $e', name: 'SyncManager');
+    }
+  }
+
+  /// Pulls Quran bookmarks, the last-read position, and Khatma sessions
+  /// from Supabase. Pushing local changes back happens as they occur (see
+  /// quran_providers.dart's notifiers), so this side only needs to pull —
+  /// same split as _syncBookProgress/readingProgressProvider.
+  Future<void> _syncQuran() async {
+    try {
+      await _ref.read(quranLastReadProvider.notifier).syncFromRemote();
+      await _ref.read(quranBookmarksProvider.notifier).syncFromRemote();
+      await _ref.read(khatmaExProvider.notifier).syncFromRemote();
+    } catch (e) {
+      developer.log('Failed to sync quran data: $e', name: 'SyncManager');
     }
   }
 }

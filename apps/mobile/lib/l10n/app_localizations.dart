@@ -3434,6 +3434,18 @@ abstract class AppLocalizations {
   /// **'استماع للآية'**
   String get quranReaderListenAyahOption;
 
+  /// No description provided for @quranReaderComingSoon.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه الميزة قيد التطوير قريباً'**
+  String get quranReaderComingSoon;
+
+  /// No description provided for @quranReaderAudioError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تشغيل الصوت، تحقق من اتصالك بالإنترنت'**
+  String get quranReaderAudioError;
+
   /// No description provided for @quranReaderSettingsTitle.
   ///
   /// In ar, this message translates to:

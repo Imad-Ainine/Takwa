@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
@@ -197,9 +198,17 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               children: [
                 _surahChip(verse['surahName'] as String, style),
                 const Spacer(),
-                _tinyBtn(Icons.share_rounded, () {}, style),
+                _tinyBtn(
+                  Icons.share_rounded,
+                  () => _shareVerse(verse),
+                  style,
+                ),
                 const SizedBox(width: 6),
-                _tinyBtn(Icons.refresh_rounded, () => setState(() {}), style),
+                _tinyBtn(
+                  Icons.refresh_rounded,
+                  () => ref.read(dailyVerseRefreshProvider.notifier).state++,
+                  style,
+                ),
               ],
             ),
           ),
@@ -222,7 +231,8 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                 GestureDetector(
                   onTap: () => _push(
                     QuranReaderScreen(
-                      initialSurah: verse['surahNumber'] as int,
+                      initialPage: verse['page'] as int,
+                      initialAyahUQNumber: verse['ayahUQNumber'] as int,
                     ),
                   ),
                   child: Icon(
@@ -588,6 +598,23 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
 
   void _push(Widget screen) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  void _shareVerse(Map<String, dynamic> verse) {
+    final l10n = AppLocalizations.of(context)!;
+    final surahNum = verse['surahNumber'] as int;
+    final ayahNum = verse['ayahNumber'] as int;
+    final reference = l10n.quranReaderAyahRefLabel(
+      localizedNumeral(context, ayahNum),
+      verse['surahName'] as String,
+    );
+    final link = 'https://takwa.app/quran?surah=$surahNum&ayah=$ayahNum';
+    final shareText = [
+      '"${verse['text'] as String}"',
+      reference,
+      link,
+    ].join('\n\n');
+    SharePlus.instance.share(ShareParams(text: shareText));
   }
 }
 

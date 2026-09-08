@@ -150,6 +150,21 @@ abstract class SupabaseService {
   Future<void> deleteReminder(int localId);
 
   Future<List<Map<String, dynamic>>> getReminders();
+
+  // ─────────────── QURAN (bookmarks, last read, khatma sessions) ───────────────
+  Future<void> upsertQuranBookmark(Map<String, dynamic> bookmark);
+
+  Future<void> deleteQuranBookmark(int surahNum, int ayahNum);
+
+  Future<List<Map<String, dynamic>>> getQuranBookmarks();
+
+  Future<void> upsertQuranLastRead(Map<String, dynamic> lastRead);
+
+  Future<Map<String, dynamic>?> getQuranLastRead();
+
+  Future<void> upsertKhatmaSession(Map<String, dynamic> session);
+
+  Future<List<Map<String, dynamic>>> getKhatmaSessions();
 }
 
 /// Real implementation, talking to an injected [SupabaseClient].
@@ -824,6 +839,128 @@ class SupabaseClientService implements SupabaseService {
           .from('reminders')
           .select('local_id, title, icon_name, time, is_enabled')
           .eq('user_id', userId);
+      return List<Map<String, dynamic>>.from(data);
+    });
+  }
+
+  // ─────────────────────────────────────────
+  //  QURAN (bookmarks, last read, khatma sessions)
+  // ─────────────────────────────────────────
+  @override
+  Future<void> upsertQuranBookmark(Map<String, dynamic> bookmark) async {
+    final userId = _uid;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('quran_bookmarks').upsert({
+        'user_id': userId,
+        'surah_num': bookmark['surah_num'],
+        'ayah_num': bookmark['ayah_num'],
+        'page': bookmark['page'],
+        'surah_name': bookmark['surah_name'],
+        'saved_at': bookmark['saved_at'],
+      }, onConflict: 'user_id,surah_num,ayah_num'),
+    );
+  }
+
+  @override
+  Future<void> deleteQuranBookmark(int surahNum, int ayahNum) async {
+    final userId = _uid;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db
+          .from('quran_bookmarks')
+          .delete()
+          .eq('user_id', userId)
+          .eq('surah_num', surahNum)
+          .eq('ayah_num', ayahNum),
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getQuranBookmarks() async {
+    final userId = _uid;
+    if (userId == null) return [];
+
+    return _safeRequest<List<Map<String, dynamic>>>(() async {
+      final data = await _db
+          .from('quran_bookmarks')
+          .select('surah_num, ayah_num, page, surah_name, saved_at')
+          .eq('user_id', userId);
+      return List<Map<String, dynamic>>.from(data);
+    });
+  }
+
+  @override
+  Future<void> upsertQuranLastRead(Map<String, dynamic> lastRead) async {
+    final userId = _uid;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('quran_last_read').upsert({
+        'user_id': userId,
+        'surah_num': lastRead['surah_num'],
+        'ayah_num': lastRead['ayah_num'],
+        'page': lastRead['page'],
+        'surah_name': lastRead['surah_name'],
+        'saved_at': lastRead['saved_at'],
+      }),
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getQuranLastRead() async {
+    final userId = _uid;
+    if (userId == null) return null;
+
+    return _safeRequest<Map<String, dynamic>?>(() async {
+      final data = await _db
+          .from('quran_last_read')
+          .select('surah_num, ayah_num, page, surah_name, saved_at')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return data;
+    });
+  }
+
+  @override
+  Future<void> upsertKhatmaSession(Map<String, dynamic> session) async {
+    final userId = _uid;
+    if (userId == null) return;
+
+    await _safeRequest(
+      () async => await _db.from('khatma_sessions').upsert({
+        'user_id': userId,
+        'id': session['id'],
+        'label': session['label'],
+        'type': session['type'],
+        'start_date': session['start_date'],
+        'end_date': session['end_date'],
+        'completed_date': session['completed_date'],
+        'cancelled_date': session['cancelled_date'],
+        'start_page': session['start_page'],
+        'current_page': session['current_page'],
+        'pages_read': session['pages_read'],
+        'notifications_enabled': session['notifications_enabled'],
+        'daily_pages': session['daily_pages'],
+        'total_reading_seconds': session['total_reading_seconds'],
+        'reading_sessions_count': session['reading_sessions_count'],
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'user_id,id'),
+    );
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getKhatmaSessions() async {
+    final userId = _uid;
+    if (userId == null) return [];
+
+    return _safeRequest<List<Map<String, dynamic>>>(() async {
+      final data = await _db.from('khatma_sessions').select().eq(
+        'user_id',
+        userId,
+      );
       return List<Map<String, dynamic>>.from(data);
     });
   }

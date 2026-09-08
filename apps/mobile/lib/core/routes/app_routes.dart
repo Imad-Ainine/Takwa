@@ -177,6 +177,7 @@ class AppRoutes {
             startFromKhatma: args?['startFromKhatma'] ?? false,
             initialSurah: args?['initialSurah'],
             initialPage: args?['initialPage'],
+            initialAyahUQNumber: args?['initialAyahUQNumber'],
           ),
         );
       case Routes.aiMemorize:

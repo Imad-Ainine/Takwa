@@ -887,6 +887,8 @@
   "quranReaderTafsirOption": "Simplified Tafsir",
   "quranReaderTranslationOption": "Translation",
   "quranReaderListenAyahOption": "Listen to verse",
+  "quranReaderComingSoon": "This feature is coming soon",
+  "quranReaderAudioError": "Could not play the audio, check your connection",
   "quranReaderSettingsTitle": "Reading Settings",
   "quranReaderFontSizeLabel": "Font Size",
   "quranReaderBackgroundStyleLabel": "Background Style",
