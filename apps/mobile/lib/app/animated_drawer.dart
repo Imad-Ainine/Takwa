@@ -117,66 +117,78 @@ class _DrawerScaffoldState extends ConsumerState<DrawerScaffold>
     // the scale/rotate pivot moves from centerLeft to centerStart so the
     // "push back" hinges on the same edge the drawer actually opens from.
     final isRtl = Directionality.of(context) == TextDirection.rtl;
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      body: Stack(
-        children: [
-          // ── الـ Drawer (خلف الشاشة) ──
-          PositionedDirectional(
-            top: 0,
-            bottom: 0,
-            start: 0,
-            width: _drawerWidth,
-            child: _DrawerContent(onClose: _close),
-          ),
+    final isOpen = ref.watch(drawerOpenProvider);
+    // Was no back-button handling at all (audit §M8): with the drawer open,
+    // Android back popped the whole screen behind it instead of just
+    // closing the drawer — the platform-standard drawer behavior.
+    return PopScope(
+      canPop: !isOpen,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _close();
+      },
+      child: Scaffold(
+        backgroundColor: context.colors.background,
+        body: Stack(
+          children: [
+            // ── الـ Drawer (خلف الشاشة) ──
+            PositionedDirectional(
+              top: 0,
+              bottom: 0,
+              start: 0,
+              width: _drawerWidth,
+              child: _DrawerContent(onClose: _close),
+            ),
 
-          // ── الشاشة الرئيسية (فوق الـ Drawer) ──
-          AnimatedBuilder(
-            animation: _ctrl,
-            builder: (_, child) => Transform(
-              // translate()/scale() are deprecated in this Flutter version's
-              // vector_math in favor of the ByDouble/Values variants —
-              // multiply() by an explicit translation/scale matrix is the
-              // non-deprecated equivalent (same right-multiply semantics
-              // the old cascade had).
-              transform: Matrix4.identity()
-                ..multiply(
-                  Matrix4.translationValues(
-                    isRtl ? -_slide.value : _slide.value,
-                    0.0,
-                    0.0,
+            // ── الشاشة الرئيسية (فوق الـ Drawer) ──
+            AnimatedBuilder(
+              animation: _ctrl,
+              builder: (_, child) => Transform(
+                // translate()/scale() are deprecated in this Flutter version's
+                // vector_math in favor of the ByDouble/Values variants —
+                // multiply() by an explicit translation/scale matrix is the
+                // non-deprecated equivalent (same right-multiply semantics
+                // the old cascade had).
+                transform: Matrix4.identity()
+                  ..multiply(
+                    Matrix4.translationValues(
+                      isRtl ? -_slide.value : _slide.value,
+                      0.0,
+                      0.0,
+                    ),
+                  )
+                  ..multiply(
+                    Matrix4.diagonal3Values(_scale.value, _scale.value, 1.0),
+                  )
+                  ..rotateZ(isRtl ? -_rotate.value : _rotate.value),
+                alignment: AlignmentDirectional.centerStart,
+                child: ClipRRect(
+                  borderRadius: _radius.value ?? BorderRadius.zero,
+                  child: child,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  widget.child,
+
+                  // overlay عند فتح الـ Drawer
+                  AnimatedBuilder(
+                    animation: _fade,
+                    builder: (_, _) => _fade.value > 0
+                        ? GestureDetector(
+                            onTap: _close,
+                            child: Container(
+                              color: Colors.black.withValues(
+                                alpha: _fade.value,
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
                   ),
-                )
-                ..multiply(
-                  Matrix4.diagonal3Values(_scale.value, _scale.value, 1.0),
-                )
-                ..rotateZ(isRtl ? -_rotate.value : _rotate.value),
-              alignment: AlignmentDirectional.centerStart,
-              child: ClipRRect(
-                borderRadius: _radius.value ?? BorderRadius.zero,
-                child: child,
+                ],
               ),
             ),
-            child: Stack(
-              children: [
-                widget.child,
-
-                // overlay عند فتح الـ Drawer
-                AnimatedBuilder(
-                  animation: _fade,
-                  builder: (_, _) => _fade.value > 0
-                      ? GestureDetector(
-                          onTap: _close,
-                          child: Container(
-                            color: Colors.black.withValues(alpha: _fade.value),
-                          ),
-                        )
-                      : const SizedBox(),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
