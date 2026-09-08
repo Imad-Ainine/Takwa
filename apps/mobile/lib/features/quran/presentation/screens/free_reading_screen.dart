@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/quran/data/quran_models.dart';
 import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
@@ -447,27 +448,34 @@ class _IndexTab extends StatelessWidget {
     return Column(
       children: [
         // Last read banner
-        GestureDetector(
-          onTap: lastRead != null ? () => onTap(lastRead!.page) : null,
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            decoration: BoxDecoration(
-              color: style.isRamadan ? style.gold : const Color(0xFFD07010),
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            child: Center(
-              child: Text(
-                lastRead != null
-                    ? l10n.freeReadingLastReadLabel(
-                        lastRead!.surahName,
-                        localizedNumeral(context, lastRead!.page),
-                      )
-                    : l10n.freeReadingLastReadNone,
-                style: style.naskh(
-                  15,
-                  color: Colors.white,
-                  weight: FontWeight.bold,
+        // The margin moved to this outer Padding, off the Container below —
+        // see quran_widgets.dart's KhatmaActionCard for why: TakwaTappable's
+        // ClipRRect needs to clip the *decorated* box, not a box that still
+        // carries the margin's transparent inset.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+          child: TakwaTappable(
+            onTap: lastRead != null ? () => onTap(lastRead!.page) : null,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                color: style.isRamadan ? style.gold : const Color(0xFFD07010),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Center(
+                child: Text(
+                  lastRead != null
+                      ? l10n.freeReadingLastReadLabel(
+                          lastRead!.surahName,
+                          localizedNumeral(context, lastRead!.page),
+                        )
+                      : l10n.freeReadingLastReadNone,
+                  style: style.naskh(
+                    15,
+                    color: Colors.white,
+                    weight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -491,8 +499,11 @@ class _IndexTab extends StatelessWidget {
                   !'$page'.contains(query)) {
                 return const SizedBox();
               }
-              return GestureDetector(
+              return TakwaTappable(
                 onTap: () => onTap(page),
+                // No semanticLabel: the visible page-number Text below
+                // already carries this into the semantics tree.
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
                   decoration: BoxDecoration(
                     color: style.card,

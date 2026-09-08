@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import '../../data/quran_models.dart';
@@ -182,10 +183,12 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
+                    TakwaTappable(
                       onTap: () {
                         // edit name
                       },
+                      // Inline with the label text via spaceBetween.
+                      minTapSize: null,
                       child: Icon(
                         Icons.edit_rounded,
                         color: style.gold,
@@ -309,7 +312,7 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
     AdaptiveStyle style,
   ) {
     final selected = _type == type;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: () {
         HapticFeedback.selectionClick();
         setState(() => _type = type);
@@ -380,8 +383,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),
-                GestureDetector(
+                TakwaTappable(
                   onTap: () => _pickDate(style),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -762,8 +766,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
         children: [
           if (_step > 0)
             Expanded(
-              child: GestureDetector(
+              child: TakwaTappable(
                 onTap: () => setState(() => _step--),
+                borderRadius: BorderRadius.circular(14),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
@@ -782,8 +787,9 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
           if (_step > 0) const SizedBox(width: 10),
           Expanded(
             flex: 2,
-            child: GestureDetector(
+            child: TakwaTappable(
               onTap: _onNextTap,
+              borderRadius: BorderRadius.circular(14),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(

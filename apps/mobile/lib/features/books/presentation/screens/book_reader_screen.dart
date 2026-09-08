@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/books/data/books_data.dart';
 import 'package:takwa/features/books/providers/books_reading_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -948,8 +949,9 @@ class _IconBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = currentTheme == ReaderTheme.dark;
-    return GestureDetector(
+    return TakwaTappable(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(23),
       child: Container(
         width: 46,
         height: 46,

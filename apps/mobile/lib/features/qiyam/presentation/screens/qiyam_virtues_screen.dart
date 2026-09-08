@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_bar_widget.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -12,19 +13,21 @@ class QiyamVirtuesScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.background,
+      // AppBarWidget instead of a one-off Row(CustomLeadingButton + title)
+      // (audit item 29) — consistent with the rest of the app's app bars.
+      appBar: AppBarWidget(
+        title: l10n.qiyamVirtuesScreenTitle,
+        leading: const CustomLeadingButton(),
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
             child: CustomPatternBackground(pattern: BackgroundPattern.adhkar),
           ),
           SafeArea(
-            child: Column(
+            child: ListView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
               children: [
-                _buildAppBar(context),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    children: [
                       _buildVirtueSection(
                         context,
                         title: l10n.qiyamVirtuesFromQuran,
@@ -59,38 +62,9 @@ class QiyamVirtuesScreen extends StatelessWidget {
                           'قال الفضيل بن عياض: "إذا لم تقدر على قيام الليل، وصيام النهار، فاعلم أنك محروم، كبلتك خطيئتك"',
                         ],
                       ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppBar(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: 10,
-      ),
-      child: Row(
-        children: [
-          const CustomLeadingButton(),
-          const Spacer(),
-          Text(
-            l10n.qiyamVirtuesScreenTitle,
-            style: context.typography.displayMedium.copyWith(
-              fontSize: 22,
-              color: context.colors.gold,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const Spacer(),
-          const SizedBox(width: 40),
         ],
       ),
     );

@@ -11,6 +11,7 @@ import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -653,8 +654,9 @@ class _PrayerHeader extends StatelessWidget {
                             ],
                           ),
                         ),
-                        GestureDetector(
+                        TakwaTappable(
                           onTap: onRefresh,
+                          borderRadius: BorderRadius.circular(20),
                           child: Container(
                             width: 40,
                             height: 40,

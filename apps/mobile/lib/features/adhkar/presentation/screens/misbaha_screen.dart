@@ -7,6 +7,7 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/adhkar/providers/misbaha_provider.dart';
 import 'package:takwa/features/quran/utils/quran_helpers.dart' show localizedNumeral;
 import 'package:takwa/l10n/app_localizations.dart';
@@ -233,11 +234,14 @@ class _MisbahaScreenState extends ConsumerState<MisbahaScreen>
                       ),
                       const Spacer(),
                       if (hasDhikr)
-                        GestureDetector(
+                        TakwaTappable(
                           onTap: () {
                             HapticFeedback.lightImpact();
                             ref.read(misbahaProvider.notifier).clearDhikr();
                           },
+                          // Inline next to the label above via Spacer().
+                          minTapSize: null,
+                          borderRadius: BorderRadius.circular(13),
                           child: Container(
                             padding: const EdgeInsets.all(AppSpacing.xs),
                             decoration: BoxDecoration(
