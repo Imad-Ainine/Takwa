@@ -67,9 +67,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   child: SizedBox(height: AppSpacing.md),
                 ),
                 SliverToBoxAdapter(child: _buildVerseCard(dailyVerse, style)),
-                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                const SliverToBoxAdapter(child: SizedBox(height: 20)),
                 SliverToBoxAdapter(child: _buildKhatmaButton(khatma, style)),
-                const SliverToBoxAdapter(child: SizedBox(height: 10)),
+                const SliverToBoxAdapter(child: SizedBox(height: 20)),
                 SliverToBoxAdapter(child: _buildFreeReadingButton(style)),
                 const SliverToBoxAdapter(child: SizedBox(height: 18)),
                 SliverToBoxAdapter(child: _buildGrid(style)),
@@ -110,7 +110,9 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   decoration: BoxDecoration(
                     color: style.gold.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: style.gold.withValues(alpha: 0.45)),
+                    border: Border.all(
+                      color: style.gold.withValues(alpha: 0.45),
+                    ),
                   ),
                   child: Text(
                     l10n.quranScreenTitle,
@@ -135,7 +137,11 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: style.gold.withValues(alpha: 0.35)),
                 ),
-                child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
+                child: Icon(
+                  Icons.menu_book_rounded,
+                  color: style.gold,
+                  size: 22,
+                ),
               ),
             ),
           ],
@@ -205,11 +211,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               children: [
                 _surahChip(verse['surahName'] as String, style),
                 const Spacer(),
-                _tinyBtn(
-                  Icons.share_rounded,
-                  () => _shareVerse(verse),
-                  style,
-                ),
+                _tinyBtn(Icons.share_rounded, () => _shareVerse(verse), style),
                 const SizedBox(width: 6),
                 _tinyBtn(
                   Icons.refresh_rounded,
@@ -341,11 +343,15 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
           vertical: 18,
         ),
         decoration: BoxDecoration(
-          color: style.isRamadan ? style.gold.withValues(alpha: 0.9) : style.teal,
+          color: style.isRamadan
+              ? style.gold.withValues(alpha: 0.9)
+              : style.teal,
           borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: (style.isRamadan ? style.gold : style.teal).withValues(alpha: 0.4),
+              color: (style.isRamadan ? style.gold : style.teal).withValues(
+                alpha: 0.4,
+              ),
               blurRadius: 15,
               offset: const Offset(0, 6),
             ),
@@ -358,7 +364,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   ? Icons.chevron_left
                   : Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
-              style.textSec,
+              Colors.white,
               () => _push(const KhatmaHistoryScreen()),
             ),
             const SizedBox(width: 14),
@@ -441,7 +447,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
                   ? Icons.chevron_left
                   : Icons.chevron_right,
               style.text.withValues(alpha: 0.15),
-              style.textSec,
+              Colors.white,
               () => _push(const FreeReadingScreen()),
             ),
             const SizedBox(width: 14),
@@ -486,14 +492,14 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
   // callers pass play_arrow_rounded/add, which should never flip).
   Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
       GestureDetector(
-    onTap: f,
-    child: Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-      child: Icon(icon, color: fg, size: 22),
-    ),
-  );
+        onTap: f,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
+          child: Icon(icon, color: fg, size: 22),
+        ),
+      );
 
   Widget _buildGrid(AdaptiveStyle style) {
     final l10n = AppLocalizations.of(context)!;
@@ -516,15 +522,15 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
             : const Color(0xFF1A5C3A),
         onTap: () => _push(const KhatmaProgressScreen()),
       ),
-      _GridItem(
-        icon: Icons.settings_rounded,
-        title: l10n.settingsScreenTitle,
-        subtitle: l10n.quranScreenSettingsGridSubtitle,
-        color: style.isRamadan
-            ? style.gold.withValues(alpha: 0.7)
-            : const Color(0xFF7A6833),
-        onTap: () => _push(const KhatmaSettingsScreen()),
-      ),
+      // _GridItem(
+      //   icon: Icons.settings_rounded,
+      //   title: l10n.settingsScreenTitle,
+      //   subtitle: l10n.quranScreenSettingsGridSubtitle,
+      //   color: style.isRamadan
+      //       ? style.gold.withValues(alpha: 0.7)
+      //       : const Color(0xFF7A6833),
+      //   onTap: () => _push(const KhatmaSettingsScreen()),
+      // ),
       _GridItem(
         isAi: true,
         title: l10n.quranScreenAiMemorizeTitle,
@@ -541,10 +547,10 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
       child: GridView.count(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        crossAxisCount: 2,
+        crossAxisCount: 3,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 1.1,
+        childAspectRatio: 0.8,
         children: items.map((item) => _buildGridItem(item, style)).toList(),
       ),
     );
@@ -554,6 +560,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
     return GestureDetector(
       onTap: item.onTap,
       child: Container(
+        constraints: const BoxConstraints(minHeight: 50, maxHeight: 60),
         decoration: BoxDecoration(
           color: style.card,
           borderRadius: BorderRadius.circular(18),
@@ -567,7 +574,7 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               height: 52,
               decoration: BoxDecoration(
                 color: item.color,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(50),
               ),
               child: item.isAi
                   ? Center(
