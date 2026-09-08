@@ -1804,7 +1804,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quranReaderComingSoon => 'هذه الميزة قيد التطوير قريباً';
 
   @override
-  String get quranReaderAudioError => 'تعذر تشغيل الصوت، تحقق من اتصالك بالإنترنت';
+  String get quranReaderAudioError =>
+      'تعذر تشغيل الصوت، تحقق من اتصالك بالإنترنت';
 
   @override
   String get quranReaderSettingsTitle => 'إعدادات القراءة';

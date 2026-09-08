@@ -21,7 +21,7 @@ class SectionHeader extends StatelessWidget {
           Text(
             title,
             style: context.typography.headingMedium.copyWith(
-              fontSize: 15,
+              fontSize: 19,
               color: context.colors.textSecondary,
               fontWeight: FontWeight.w600,
             ),
@@ -51,7 +51,11 @@ class SettingsCard extends StatelessWidget {
       children: [
         if (title != null)
           Padding(
-            padding: const EdgeInsetsDirectional.only(start: 4, bottom: 8, top: 4),
+            padding: const EdgeInsetsDirectional.only(
+              start: 4,
+              bottom: 8,
+              top: 4,
+            ),
             child: Text(
               title!,
               style: context.typography.caption.copyWith(
@@ -66,7 +70,9 @@ class SettingsCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: context.colors.card.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
+            border: Border.all(
+              color: context.colors.border.withValues(alpha: 0.5),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -138,10 +144,14 @@ class ToggleSetting extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: (accentColor ?? context.colors.gold).withValues(alpha: 0.12),
+                  color: (accentColor ?? context.colors.gold).withValues(
+                    alpha: 0.12,
+                  ),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
-                    color: (accentColor ?? context.colors.gold).withValues(alpha: 0.1),
+                    color: (accentColor ?? context.colors.gold).withValues(
+                      alpha: 0.1,
+                    ),
                     width: 1,
                   ),
                 ),
@@ -158,7 +168,7 @@ class ToggleSetting extends StatelessWidget {
                   Text(
                     label,
                     style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: value ? FontWeight.w600 : FontWeight.w400,
                       color: context.colors.textPrimary,
                       height: 1.3,
@@ -253,15 +263,16 @@ class ActionSetting extends StatelessWidget {
                   Text(
                     label,
                     style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
+                      fontSize: 15,
                       color: color,
+                      fontWeight: FontWeight.w600,
                       height: 1.3,
                     ),
                   ),
                   Text(
                     sublabel,
                     style: context.typography.caption.copyWith(
-                      fontSize: 10.5,
+                      fontSize: 12,
                       color: context.colors.textSecondary,
                       height: 1.3,
                     ),
@@ -332,7 +343,8 @@ class SelectSetting extends StatelessWidget {
                   Text(
                     label,
                     style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                       color: context.colors.textPrimary,
                       height: 1.3,
                     ),
@@ -439,7 +451,9 @@ class SelectSetting extends StatelessWidget {
                             border: Border.all(
                               color: isSelected
                                   ? context.colors.gold.withValues(alpha: 0.3)
-                                  : context.colors.border.withValues(alpha: 0.5),
+                                  : context.colors.border.withValues(
+                                      alpha: 0.5,
+                                    ),
                               width: isSelected ? 1.5 : 1,
                             ),
                           ),
@@ -529,7 +543,7 @@ class CheckboxSetting extends StatelessWidget {
                   Text(
                     label,
                     style: context.typography.bodyMedium.copyWith(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: context.colors.textPrimary,
                       height: 1.3,
                     ),
@@ -537,7 +551,7 @@ class CheckboxSetting extends StatelessWidget {
                   Text(
                     sublabel,
                     style: context.typography.caption.copyWith(
-                      fontSize: 10.5,
+                      fontSize: 12,
                       color: context.colors.textSecondary,
                       height: 1.3,
                     ),
@@ -665,7 +679,7 @@ class TimeSetting extends StatelessWidget {
               child: Text(
                 label,
                 style: context.typography.bodyMedium.copyWith(
-                  fontSize: 13,
+                  fontSize: 15,
                   color: context.colors.textPrimary,
                 ),
               ),
@@ -732,7 +746,7 @@ class SliderSetting extends StatelessWidget {
               Text(
                 label,
                 style: context.typography.bodyMedium.copyWith(
-                  fontSize: 13,
+                  fontSize: 15,
                   color: context.colors.textPrimary,
                 ),
               ),

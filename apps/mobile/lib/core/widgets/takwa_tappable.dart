@@ -107,6 +107,7 @@ class _TakwaTappableState extends State<TakwaTappable> {
             child: ClipRRect(
               borderRadius: widget.borderRadius,
               child: Stack(
+                fit: StackFit.passthrough,
                 children: [
                   widget.child,
                   Positioned.fill(

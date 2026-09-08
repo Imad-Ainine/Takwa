@@ -1269,14 +1269,14 @@ class _QuickIbadahGridMerged extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: AppSpacing.sm),
         GridView.count(
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 1.1,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1.15,
           children: items
               .map(
                 (item) => _IbadahChipMerged(
@@ -1325,7 +1325,9 @@ class _IbadahChipMerged extends ConsumerWidget {
       },
       borderRadius: BorderRadius.circular(14),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
+        duration: AppMotion.fast,
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: done
               ? LinearGradient(
@@ -1338,7 +1340,7 @@ class _IbadahChipMerged extends ConsumerWidget {
           color: done ? null : s.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: done ? s.success.withValues(alpha: 0.3) : s.border,
+            color: done ? s.success.withValues(alpha: 0.35) : s.border,
           ),
           boxShadow: done
               ? [BoxShadow(color: s.success.withValues(alpha: 0.1), blurRadius: 8)]
@@ -1348,34 +1350,49 @@ class _IbadahChipMerged extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
+              clipBehavior: Clip.none,
               alignment: Alignment.topRight,
               children: [
                 Text(emoji, style: const TextStyle(fontSize: 24)),
                 if (done)
-                  Container(
-                    width: 15,
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: style.success,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: s.card, width: 1.5),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '✓',
-                        style: TextStyle(fontSize: 8, color: Colors.white),
+                  Positioned(
+                    top: -2,
+                    right: -4,
+                    child: Container(
+                      width: 15,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        color: style.success,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: s.card, width: 1.5),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '✓',
+                          style: TextStyle(
+                            fontSize: 8,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 5),
-            Text(
-              label,
-              style: s.caption(
-                bodyFont: true,
-                color: done ? s.success : s.textSec,
-                weight: done ? FontWeight.w600 : FontWeight.w400,
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: s.caption(
+                  bodyFont: true,
+                  color: done ? s.success : s.textSec,
+                  weight: done ? FontWeight.w600 : FontWeight.w400,
+                ),
               ),
             ),
           ],
@@ -1431,7 +1448,7 @@ class _FeatureRow extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 0.81,
+          childAspectRatio: 0.8,
           children: _features(
             l10n,
           ).map((f) => _FeatureItem(f: f, style: s)).toList(),
@@ -1457,6 +1474,8 @@ class _FeatureItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadius.xl),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -1477,14 +1496,14 @@ class _FeatureItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: s.gold.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Text(f.$1, style: const TextStyle(fontSize: 22)),
+              child: Text(f.$1, style: const TextStyle(fontSize: 20)),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Text(

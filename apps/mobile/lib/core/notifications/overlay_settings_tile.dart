@@ -114,7 +114,7 @@ class OverlayNotificationSettings extends ConsumerWidget {
                             Text(
                               '📊',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 18,
                                 color: context.colors.teal,
                               ),
                             ),
@@ -179,8 +179,8 @@ class _IntervalSelector extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Text(
               l10n.overlaySettingIntervalHeader,
-              style: context.typography.bodySmall.copyWith(
-                fontSize: 13,
+              style: context.typography.bodyMedium.copyWith(
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: context.colors.textPrimary,
               ),
@@ -216,7 +216,7 @@ class _IntervalSelector extends StatelessWidget {
                 child: Text(
                   opt.label,
                   style: context.typography.caption.copyWith(
-                    fontSize: 11,
+                    fontSize: 12,
                     color: isSelected
                         ? context.colors.gold
                         : context.colors.textSecondary,
