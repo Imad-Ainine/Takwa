@@ -5,6 +5,7 @@ import '../../providers/quran_providers.dart';
 import '../../utils/quran_helpers.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import '../widgets/quran_widgets.dart';
@@ -337,15 +338,18 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                               (l10n.quranReaderThemeWhite, ReaderTheme.white),
                             ])
                               Expanded(
-                                child: GestureDetector(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xs,
+                                  ),
+                                  child: TakwaTappable(
                                   onTap: () => ref
                                       .read(quranStateProvider.notifier)
                                       .setTheme(theme.$2),
+                                  minTapSize: null,
+                                  borderRadius: BorderRadius.circular(10),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.xs,
-                                    ),
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 10,
                                     ),
@@ -372,6 +376,7 @@ class KhatmaExtendedSettingsScreen extends ConsumerWidget {
                                       ),
                                     ),
                                   ),
+                                ),
                                 ),
                               ),
                           ],

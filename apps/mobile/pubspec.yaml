@@ -20,7 +20,7 @@ dependencies:
     path: ../../packages/takwa_ui
 
   # ── State Management ──
-  flutter_riverpod: ^3.4.3
+  flutter_riverpod: ^2.5.1
 
   # ── Database (Drift/SQLite) ──
   drift: ^2.18.0
@@ -71,14 +71,14 @@ dependencies:
   audio_service: ^0.18.18
 
   # ── PDF and Images ──
-  syncfusion_flutter_pdfviewer: ^34.2.6   # upgraded to resolve win32 ^6.x conflict
+  syncfusion_flutter_pdfviewer: ^34.2.6 # upgraded to resolve win32 ^6.x conflict
   cached_network_image: ^3.4.1
 
   # ── Adhan Background & UI ──
   # Bumped to 11.0.1 for built-in Kotlin (KGP) support — has breaking API changes,
   # see https://pub.dev/packages/flutter_foreground_task/changelog
   flutter_foreground_task: ^11.0.1
-  wakelock_plus: ^1.8.0         # 1.8.0 migrated to built-in Kotlin KGP
+  wakelock_plus: ^1.8.0 # 1.8.0 migrated to built-in Kotlin KGP
   flutter_overlay_window: ^0.5.0
   http: ^1.6.0
   speech_to_text: ^7.4.0
@@ -90,12 +90,12 @@ dependencies:
   share_plus: ^13.3.0
   sound_mode: ^3.0.1
   custom_refresh_indicator: ^4.0.1
-  sensors_plus: ^7.1.0          # 7.1.0 added built-in Kotlin support
+  sensors_plus: ^7.1.0 # 7.1.0 added built-in Kotlin support
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^4.0.0
   drift_dev: ^2.18.0
   build_runner: ^2.4.11
   flutter_launcher_icons: ^0.14.4

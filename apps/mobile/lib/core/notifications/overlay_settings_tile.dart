@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 import '../theme/app_theme.dart';
@@ -193,8 +194,10 @@ class _IntervalSelector extends StatelessWidget {
           runSpacing: 8,
           children: options.map((opt) {
             final isSelected = opt.mins == value;
-            return GestureDetector(
+            return TakwaTappable(
               onTap: () => onChanged(opt.mins),
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(
