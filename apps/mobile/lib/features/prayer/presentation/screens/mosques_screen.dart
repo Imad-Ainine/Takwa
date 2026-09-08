@@ -348,8 +348,8 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: const BoxDecoration(
-                    color: AppColors.gold,
+                  decoration: BoxDecoration(
+                    color: style.gold,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -381,7 +381,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                   formattedDistance,
                   style: style.naskh(
                     14,
-                    color: AppColors.gold,
+                    color: style.gold,
                     weight: FontWeight.bold,
                   ),
                 ),
@@ -432,7 +432,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.gold,
+                        color: style.gold,
                         borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
                       child: Row(
@@ -469,15 +469,15 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: style.bg,
-                          border: Border.all(color: AppColors.gold),
+                          border: Border.all(color: style.gold),
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.call_outlined,
-                              color: AppColors.gold,
+                              color: style.gold,
                               size: 18,
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -485,7 +485,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                               l10n.mosquesCallButton,
                               style: style.naskh(
                                 14,
-                                color: AppColors.gold,
+                                color: style.gold,
                                 weight: FontWeight.bold,
                               ),
                             ),
@@ -582,7 +582,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             Icon(
               Icons.location_off_rounded,
               size: 48,
-              color: AppColors.gold.withValues(alpha: 0.5),
+              color: style.gold.withValues(alpha: 0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(

@@ -152,7 +152,7 @@ class OnboardingScreen extends ConsumerWidget {
                         Geolocator.openLocationSettings();
                       },
                     ),
-                    backgroundColor: AppColors.danger,
+                    backgroundColor: context.colors.danger,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -186,7 +186,7 @@ class OnboardingScreen extends ConsumerWidget {
                         Geolocator.openAppSettings();
                       },
                     ),
-                    backgroundColor: AppColors.danger,
+                    backgroundColor: context.colors.danger,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -314,12 +314,12 @@ class _StepIndicator extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
-                color: active ? AppColors.gold : AppColors.border,
+                color: active ? context.colors.gold : context.colors.border,
                 borderRadius: BorderRadius.circular(2),
                 boxShadow: active
                     ? [
                         BoxShadow(
-                          color: AppColors.gold.withValues(alpha: 0.4),
+                          color: context.colors.gold.withValues(alpha: 0.4),
                           blurRadius: 8,
                         ),
                       ]
@@ -354,7 +354,7 @@ class _IntroStep extends StatelessWidget {
           ),
           _InfoCard(
             title: data.title(l10n),
-            titleColor: AppColors.gold,
+            titleColor: context.colors.gold,
             subtitle: data.subtitle(l10n),
             hint: l10n.onboardingEditLaterHint,
             primaryLabel: l10n.onboardingContinueButton,
@@ -415,7 +415,7 @@ class _LocationStep extends StatelessWidget {
           ),
           _InfoCard(
             title: l10n.onboardingLocationTitle,
-            titleColor: AppColors.gold,
+            titleColor: context.colors.gold,
             subtitle: l10n.onboardingLocationSubtitle,
             hint: l10n.onboardingLocationHint,
             primaryLabel: l10n.onboardingLocationAllowButton,
@@ -496,7 +496,7 @@ class _NotificationsStepState extends State<_NotificationsStep>
           ),
           _InfoCard(
             title: l10n.onboardingNotificationsTitle,
-            titleColor: AppColors.gold,
+            titleColor: context.colors.gold,
             subtitle: l10n.onboardingNotificationsSubtitle,
             hint: l10n.onboardingNotificationsHint,
             primaryLabel: l10n.onboardingNotificationsAllowButton,
@@ -538,10 +538,10 @@ class _GenderStep extends StatelessWidget {
               children: [
                 Text(
                   l10n.onboardingGenderTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Amiri',
                     fontSize: 26,
-                    color: AppColors.gold,
+                    color: context.colors.gold,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -577,10 +577,10 @@ class _GenderStep extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.goldDim,
+                      color: context.colors.goldDim,
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.gold.withValues(alpha: 0.2),
+                        color: context.colors.gold.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -590,10 +590,10 @@ class _GenderStep extends StatelessWidget {
                         Expanded(
                           child: Text(
                             l10n.onboardingGenderInfoHint,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'NotoNaskhArabic',
                               fontSize: 11,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                               height: 1.6,
                             ),
                           ),
@@ -685,18 +685,18 @@ class _GenderCardState extends State<_GenderCard>
                     colors: [Color(0x30C8A96E), Color(0x183AAFA9)],
                   )
                 : null,
-            color: widget.selected ? null : AppColors.card,
+            color: widget.selected ? null : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: widget.selected
-                  ? AppColors.gold.withValues(alpha: 0.6)
-                  : AppColors.border,
+                  ? context.colors.gold.withValues(alpha: 0.6)
+                  : context.colors.border,
               width: widget.selected ? 2.5 : 1,
             ),
             boxShadow: widget.selected
                 ? [
                     BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.2),
+                      color: context.colors.gold.withValues(alpha: 0.2),
                       blurRadius: 16,
                       spreadRadius: 2,
                     ),
@@ -715,16 +715,16 @@ class _GenderCardState extends State<_GenderCard>
                   gradient: widget.selected
                       ? RadialGradient(
                           colors: [
-                            AppColors.gold.withValues(alpha: 0.25),
-                            AppColors.gold.withValues(alpha: 0.05),
+                            context.colors.gold.withValues(alpha: 0.25),
+                            context.colors.gold.withValues(alpha: 0.05),
                           ],
                         )
                       : null,
-                  color: widget.selected ? null : AppColors.card2,
+                  color: widget.selected ? null : context.colors.card2,
                   border: Border.all(
                     color: widget.selected
-                        ? AppColors.gold.withValues(alpha: 0.5)
-                        : AppColors.border,
+                        ? context.colors.gold.withValues(alpha: 0.5)
+                        : context.colors.border,
                     width: widget.selected ? 2.5 : 1.5,
                   ),
                 ),
@@ -742,8 +742,8 @@ class _GenderCardState extends State<_GenderCard>
                   fontFamily: 'Amiri',
                   fontSize: 18,
                   color: widget.selected
-                      ? AppColors.gold
-                      : AppColors.textSecondary,
+                      ? context.colors.gold
+                      : context.colors.textSecondary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -755,22 +755,22 @@ class _GenderCardState extends State<_GenderCard>
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.gold, AppColors.teal],
+                    gradient: LinearGradient(
+                      colors: [context.colors.gold, context.colors.teal],
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.gold.withValues(alpha: 0.4),
+                        color: context.colors.gold.withValues(alpha: 0.4),
                         blurRadius: 8,
                       ),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.check_rounded,
                       size: 14,
-                      color: AppColors.night,
+                      color: context.colors.night,
                     ),
                   ),
                 ),
@@ -861,12 +861,12 @@ class _AuthStepState extends State<_AuthStep>
                       colors: [Color(0x30C8A96E), Color(0x10C8A96E)],
                     ),
                     border: Border.all(
-                      color: AppColors.gold.withValues(alpha: 0.4),
+                      color: context.colors.gold.withValues(alpha: 0.4),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.gold.withValues(alpha: 0.2),
+                        color: context.colors.gold.withValues(alpha: 0.2),
                         blurRadius: 20,
                       ),
                     ],
@@ -884,10 +884,10 @@ class _AuthStepState extends State<_AuthStep>
                 children: [
                   Text(
                     l10n.appName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 28,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -895,10 +895,10 @@ class _AuthStepState extends State<_AuthStep>
                   Text(
                     l10n.onboardingSignInSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -910,9 +910,9 @@ class _AuthStepState extends State<_AuthStep>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.card,
+                  color: context.colors.card,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.colors.border),
                 ),
                 child: Column(
                   children: [
@@ -936,10 +936,10 @@ class _AuthStepState extends State<_AuthStep>
                   onTap: widget.onSkip,
                   child: Text(
                     l10n.onboardingContinueWithoutAccount,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
-                      color: AppColors.textDim,
+                      color: context.colors.textDim,
                     ),
                   ),
                 ),
@@ -963,17 +963,17 @@ class _BenefitRow extends StatelessWidget {
       const SizedBox(width: 10),
       Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'NotoNaskhArabic',
           fontSize: 13,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
       const Spacer(),
-      const Icon(
+      Icon(
         Icons.check_circle_rounded,
         size: 16,
-        color: AppColors.success,
+        color: context.colors.success,
       ),
     ],
   );
@@ -1040,20 +1040,20 @@ class _PlanStepState extends State<_PlanStep>
                 children: [
                   Text(
                     l10n.onboardingChoosePlanTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 26,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     l10n.onboardingChoosePlanSubtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -1073,7 +1073,7 @@ class _PlanStepState extends State<_PlanStep>
                       title: l10n.onboardingPremiumTitle,
                       desc: l10n.onboardingPremiumDesc,
                       badge: l10n.onboardingPremiumBadge,
-                      badgeColor: AppColors.gold,
+                      badgeColor: context.colors.gold,
                       price: l10n.onboardingPremiumPrice,
                       features: [
                         l10n.onboardingPremiumFeature1,
@@ -1158,23 +1158,23 @@ class _PlanCard extends StatelessWidget {
           gradient: selected
               ? LinearGradient(
                   colors: [
-                    AppColors.gold.withValues(alpha: 0.12),
-                    AppColors.teal.withValues(alpha: 0.06),
+                    context.colors.gold.withValues(alpha: 0.12),
+                    context.colors.teal.withValues(alpha: 0.06),
                   ],
                 )
               : null,
-          color: selected ? null : AppColors.card,
+          color: selected ? null : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: selected
-                ? AppColors.gold.withValues(alpha: 0.5)
-                : AppColors.border,
+                ? context.colors.gold.withValues(alpha: 0.5)
+                : context.colors.border,
             width: selected ? 2 : 1,
           ),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: AppColors.gold.withValues(alpha: 0.15),
+                    color: context.colors.gold.withValues(alpha: 0.15),
                     blurRadius: 12,
                   ),
                 ]
@@ -1191,18 +1191,18 @@ class _PlanCard extends StatelessWidget {
                   height: 22,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: selected ? AppColors.gold : Colors.transparent,
+                    color: selected ? context.colors.gold : Colors.transparent,
                     border: Border.all(
-                      color: selected ? AppColors.gold : AppColors.border,
+                      color: selected ? context.colors.gold : context.colors.border,
                       width: 2,
                     ),
                   ),
                   child: selected
-                      ? const Center(
+                      ? Center(
                           child: Icon(
                             Icons.check_rounded,
                             size: 12,
-                            color: AppColors.night,
+                            color: context.colors.night,
                           ),
                         )
                       : null,
@@ -1211,10 +1211,10 @@ class _PlanCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 13,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1226,10 +1226,10 @@ class _PlanCard extends StatelessWidget {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: (badgeColor ?? AppColors.gold).withValues(alpha: 0.15),
+                      color: (badgeColor ?? context.colors.gold).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: (badgeColor ?? AppColors.gold).withValues(alpha: 0.3),
+                        color: (badgeColor ?? context.colors.gold).withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
@@ -1237,7 +1237,7 @@ class _PlanCard extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 10,
-                        color: badgeColor ?? AppColors.gold,
+                        color: badgeColor ?? context.colors.gold,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -1246,10 +1246,10 @@ class _PlanCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     price!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
-                      color: AppColors.gold,
+                      color: context.colors.gold,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -1259,10 +1259,10 @@ class _PlanCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               desc,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.6,
               ),
             ),
@@ -1299,10 +1299,10 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 36),
       decoration: BoxDecoration(
-        color: AppColors.card.withValues(alpha: 0.95),
+        color: context.colors.card.withValues(alpha: 0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        border: const Border(
-          top: BorderSide(color: AppColors.border, width: 1),
+        border: Border(
+          top: BorderSide(color: context.colors.border, width: 1),
         ),
         boxShadow: [
           BoxShadow(
@@ -1321,7 +1321,7 @@ class _InfoCard extends StatelessWidget {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1339,10 +1339,10 @@ class _InfoCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 14,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               height: 1.7,
               fontWeight: FontWeight.w600,
             ),
@@ -1351,10 +1351,10 @@ class _InfoCard extends StatelessWidget {
           Text(
             hint,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 11,
-              color: AppColors.textDim,
+              color: context.colors.textDim,
             ),
           ),
           const SizedBox(height: AppSpacing.xl),
@@ -1369,10 +1369,10 @@ class _InfoCard extends StatelessWidget {
               onTap: onSkip,
               child: Text(
                 skipLabel!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'NotoNaskhArabic',
                   fontSize: 13,
-                  color: AppColors.textDim,
+                  color: context.colors.textDim,
                 ),
               ),
             ),
@@ -1412,10 +1412,10 @@ class _BottomActions extends StatelessWidget {
             onTap: onSkip,
             child: Text(
               skipLabel!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'NotoNaskhArabic',
                 fontSize: 13,
-                color: AppColors.textDim,
+                color: context.colors.textDim,
               ),
             ),
           ),
@@ -1762,7 +1762,7 @@ class _OverlayStepState extends State<_OverlayStep>
           ),
           _InfoCard(
             title: AppLocalizations.of(context)!.onboardingOverlayTitle,
-            titleColor: AppColors.teal,
+            titleColor: context.colors.teal,
             subtitle: AppLocalizations.of(context)!.onboardingOverlaySubtitle,
             hint: AppLocalizations.of(context)!.onboardingOverlayHint,
             primaryLabel: AppLocalizations.of(
@@ -1918,7 +1918,7 @@ class _BackgroundStepState extends State<_BackgroundStep>
           ),
           _InfoCard(
             title: AppLocalizations.of(context)!.onboardingBackgroundTitle,
-            titleColor: AppColors.gold,
+            titleColor: context.colors.gold,
             subtitle: AppLocalizations.of(
               context,
             )!.onboardingBackgroundSubtitle,
