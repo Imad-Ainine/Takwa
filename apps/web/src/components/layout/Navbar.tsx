@@ -38,12 +38,13 @@ export default function Navbar() {
               width={130}
               height={55}
               className="logo-img"
+              sizes="130px"
               priority
             />
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="nav-links" role="menubar">
+          <div className="nav-links">
             <a href="#features" className="nav-link">{t('features')}</a>
             <a href="#screenshots" className="nav-link">{t('screenshots')}</a>
             <Link href="/support" className="nav-link">{t('support')}</Link>

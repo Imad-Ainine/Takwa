@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, Amiri } from 'next/font/google';
 import '../globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -6,6 +7,20 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+	subsets: ['latin'],
+	display: 'swap',
+	variable: '--font-sans',
+	weight: ['400', '500', '600', '700', '800'],
+});
+
+const amiri = Amiri({
+	subsets: ['arabic', 'latin'],
+	display: 'swap',
+	variable: '--font-amiri',
+	weight: ['400', '700'],
+});
 
 export async function generateMetadata({
 	params,
@@ -97,10 +112,12 @@ export default async function RootLayout({
 			dir={direction}
 			data-scroll-behavior='smooth'
 			suppressHydrationWarning>
-			<body className={locale === 'ar' ? 'amiri' : ''} suppressHydrationWarning>
+			<body
+				className={`${plusJakartaSans.variable} ${amiri.variable} ${locale === 'ar' ? 'amiri' : ''}`}
+				suppressHydrationWarning>
 				<NextIntlClientProvider messages={messages}>
 					<Navbar />
-					<main>{children}</main>
+					<div className="main-wrapper">{children}</div>
 					<Footer />
 				</NextIntlClientProvider>
 			</body>

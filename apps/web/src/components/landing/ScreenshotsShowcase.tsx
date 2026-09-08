@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
@@ -112,13 +113,14 @@ export default function ScreenshotsShowcase() {
             <div className="featured-phone-frame" ref={lightboxRef}>
               <div className="featured-dynamic-island" />
               {selectedShot && (
-                <img
-                  src={`/screenshots/${selectedShot.index}.jpg`}
+                <Image
+                  src={`/screenshots/${selectedShot.index}.webp`}
                   alt={t(`items.${selectedShot.index}.title` as any)}
-                  width={500}
-                  height={667}
+                  width={286}
+                  height={612}
                   className="featured-screen-img w-full"
-                  loading="lazy"
+                  sizes="(max-width: 600px) 240px, 286px"
+                  style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: "32px" }}
                 />
               )}
             </div>
@@ -141,13 +143,14 @@ export default function ScreenshotsShowcase() {
                 aria-pressed={selectedIdx === i}
               >
                 <div className="thumb-phone-frame">
-                  <img
-                    src={`/screenshots/${shot.index}.jpg`}
+                  <Image
+                    src={`/screenshots/${shot.index}.webp`}
                     alt={t(`items.${shot.index}.title` as any)}
                     width={110}
                     height={236}
                     className="thumb-screen-img"
-                    loading="lazy"
+                    sizes="110px"
+                    style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: "12px" }}
                   />
                   {selectedIdx === i && <div className="thumb-active-overlay" aria-hidden="true" />}
                 </div>

@@ -30,60 +30,19 @@ export default function HeroSection({
     if (prefersReducedMotion || !heroRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Content entrance
-      gsap.from('.hero-anim-badge', {
+      // Floating badges gentle entrance without hiding LCP elements
+      gsap.from('.floating-card-chip', {
         opacity: 0,
-        y: -15,
-        duration: 0.8,
-        ease: 'power3.out',
-      });
-
-      gsap.from('.hero-anim-title', {
-        opacity: 0,
-        y: 25,
-        duration: 0.9,
-        delay: 0.15,
-        ease: 'power3.out',
-      });
-
-      gsap.from('.hero-anim-desc', {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        delay: 0.3,
-        ease: 'power3.out',
-      });
-
-      gsap.from('.hero-anim-cta', {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        delay: 0.45,
-        ease: 'power3.out',
-      });
-
-      gsap.from('.hero-anim-chips', {
-        opacity: 0,
-        y: 15,
-        duration: 0.8,
-        delay: 0.6,
-        stagger: 0.1,
-        ease: 'power3.out',
-      });
-
-      // Phone mockup 3D entrance and floating loop
-      gsap.from(mockupRef.current, {
-        opacity: 0,
-        scale: 0.92,
-        y: 40,
-        duration: 1.2,
-        delay: 0.25,
-        ease: 'power3.out',
+        scale: 0.9,
+        duration: 0.6,
+        delay: 0.2,
+        stagger: 0.15,
+        ease: 'power2.out',
       });
 
       // Continuous subtle floating effect
       gsap.to('.mockup-phone-primary', {
-        y: '-=12',
+        y: '-=10',
         duration: 3.5,
         repeat: -1,
         yoyo: true,
@@ -215,13 +174,13 @@ export default function HeroSection({
                 <div className="phone-speaker" />
                 <div className="phone-screen-container">
                   <Image
-                    src="/screenshots/2.jpg"
+                    src="/screenshots/2.webp"
                     alt="Takwa Prayer Schedule Screen"
                     width={270}
                     height={580}
                     className="phone-screen-img"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    priority
+                    sizes="260px"
+                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
                   />
                 </div>
               </div>
@@ -233,13 +192,14 @@ export default function HeroSection({
                 <div className="phone-dynamic-island" />
                 <div className="phone-screen-container">
                   <Image
-                    src="/screenshots/0.jpg"
+                    src="/screenshots/0.webp"
                     alt="Takwa Main Dashboard Screen"
                     width={290}
                     height={620}
                     className="phone-screen-img"
                     priority
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    sizes="(max-width: 580px) 240px, 290px"
+                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
                   />
                 </div>
               </div>
@@ -436,6 +396,7 @@ export default function HeroSection({
           width: 100%;
           height: auto;
           object-fit: cover;
+          border-radius: 36px;
         }
 
         /* Primary Foreground Phone */

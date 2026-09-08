@@ -5,9 +5,6 @@ import { useTranslations } from 'next-intl';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 const FEATURE_ICONS = [
   {
@@ -80,28 +77,38 @@ export default function FeaturesSection() {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      gsap.from('.features-header', {
-        opacity: 0,
-        y: 30,
-        duration: 0.9,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: '.features-header',
-          start: 'top 82%',
-        },
-      });
+      gsap.fromTo(
+        '.features-header',
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
 
-      gsap.from('.feature-card', {
-        opacity: 0,
-        y: 40,
-        duration: 0.7,
-        ease: 'power3.out',
-        stagger: 0.08,
-        scrollTrigger: {
-          trigger: '.features-grid',
-          start: 'top 78%',
-        },
-      });
+      gsap.fromTo(
+        '.feature-card',
+        { opacity: 0, y: 35 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.out',
+          stagger: 0.06,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+          },
+        }
+      );
     }, sectionRef);
 
     return () => ctx.revert();
@@ -171,9 +178,11 @@ export default function FeaturesSection() {
         .feature-card {
           padding: 30px 26px;
           cursor: default;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
         }
         .feature-card:hover {
           border-color: var(--feature-border, rgba(200, 169, 110, 0.45));
+          box-shadow: 0 12px 30px -10px var(--feature-color, rgba(0, 0, 0, 0.5));
         }
         .feature-icon-wrap {
           position: relative;
