@@ -421,7 +421,10 @@ class _DrawerHeader extends ConsumerWidget {
                                 const SizedBox(width: AppSpacing.xs),
                                 Icon(
                                   Icons.arrow_forward_ios_rounded,
-                                  size: 8,
+                                  // Was 8px, under audit §M5's 12dp
+                                  // decorative floor — sub-legible next to
+                                  // an 11px label.
+                                  size: 12,
                                   color: context.colors.gold,
                                 ),
                               ],
