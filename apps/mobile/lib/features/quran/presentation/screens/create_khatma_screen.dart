@@ -562,15 +562,25 @@ class _CreateKhatmaScreenState extends ConsumerState<CreateKhatmaScreen> {
       initialDate: _startDate,
       firstDate: DateTime.now().subtract(const Duration(days: 30)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (ctx, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: ColorScheme.dark(
-            primary: style.isRamadan ? style.gold : style.teal,
-            surface: style.card,
+      // Was `Theme(data: ThemeData.dark().copyWith(...))` (audit §M11): a
+      // brand-new ThemeData carries none of the app's ThemeExtensions, so
+      // any context.colors/AdaptiveStyle read inside the picker's subtree
+      // hit `extension<...>()!` on null and crashed — and it forced a dark
+      // picker even in light mode. Copying the *ambient* theme instead
+      // keeps every extension intact and only tints the accent/surface.
+      builder: (ctx, child) {
+        final base = Theme.of(context);
+        return Theme(
+          data: base.copyWith(
+            colorScheme: base.colorScheme.copyWith(
+              primary: style.isRamadan ? style.gold : style.teal,
+              surface: style.card,
+              onSurface: style.text,
+            ),
           ),
-        ),
-        child: child!,
-      ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) setState(() => _startDate = picked);
   }

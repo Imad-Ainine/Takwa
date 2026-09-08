@@ -347,7 +347,16 @@ class _HomeHeader extends StatelessWidget {
         : l10n.homeGreetingEvening;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 47, 16, 10),
+      // Was a hardcoded `47` guessing the status-bar height (audit §M3) —
+      // wrong on any device whose status bar isn't ~37dp (punch-hole
+      // cameras, tall notches, landscape). This isn't wrapped in a
+      // SafeArea, so MediaQuery's own top inset is the correct value.
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.paddingOf(context).top + 10,
+        16,
+        10,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
