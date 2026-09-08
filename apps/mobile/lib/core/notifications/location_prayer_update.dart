@@ -52,6 +52,8 @@ class LocationPrayerManager {
 
   /// تحديث الموقع يدوياً
   static Future<LocationResult> refreshLocation(dynamic ref) async {
+    final Geocoding geocoding = Geocoding();
+
     try {
       // تحقق من الإذن
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -90,7 +92,7 @@ class LocationPrayerManager {
         const Locale('ar'),
       ).overlayServiceUnknownCity;
       try {
-        final placemarks = await placemarkFromCoordinates(lat, lng);
+        final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
           cityName =

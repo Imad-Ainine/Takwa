@@ -731,6 +731,7 @@ class _OverlayTaskHandler extends TaskHandler {
   //  LOCATION UPDATE
   // ──────────────────────────────────────
   Future<void> _handleLocationUpdate() async {
+    final Geocoding geocoding = Geocoding();
     try {
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -745,7 +746,7 @@ class _OverlayTaskHandler extends TaskHandler {
 
       String cityName = _l10n.overlayServiceUnknownCity;
       try {
-        final placemarks = await placemarkFromCoordinates(lat, lng);
+        final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
           cityName =

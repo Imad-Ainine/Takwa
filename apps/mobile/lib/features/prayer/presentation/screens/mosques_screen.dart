@@ -31,6 +31,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     const Locale('ar'),
   ).overlayServiceDefaultCity;
   Position? _currentPosition;
+  final Geocoding geocoding = Geocoding();
 
   @override
   void initState() {
@@ -50,7 +51,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
           _currentPosition = pos;
         });
       }
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placemarks = await geocoding.placemarkFromCoordinates(
         pos.latitude,
         pos.longitude,
       );
@@ -276,8 +277,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         left: 16,
                         right: 16,
                       ),
-                      itemCount:
-                          mosques.length + 1, // +1 for the Hadith footer
+                      itemCount: mosques.length + 1, // +1 for the Hadith footer
                       itemBuilder: (context, index) {
                         if (index == mosques.length) {
                           return _buildHadithFooter(style, l10n);
@@ -575,7 +575,11 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     );
   }
 
-  Widget _buildErrorState(Object err, AdaptiveStyle style, AppLocalizations l10n) {
+  Widget _buildErrorState(
+    Object err,
+    AdaptiveStyle style,
+    AppLocalizations l10n,
+  ) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xxl),
