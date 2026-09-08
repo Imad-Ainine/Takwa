@@ -11,7 +11,7 @@ import '../../utils/quran_helpers.dart';
 import 'create_khatma_screen.dart';
 import 'khatma_history_screen.dart';
 import 'khatma_progress_screen.dart';
-import 'khatma_settings_screen.dart';
+// import 'khatma_settings_screen.dart';
 import 'ai_memorize_screen.dart';
 import 'quran_reader_screen.dart';
 import 'free_reading_screen.dart';
