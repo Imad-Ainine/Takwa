@@ -120,16 +120,23 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
               ],
             ),
             const Spacer(),
-            // Quran icon button
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: style.gold.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: style.gold.withValues(alpha: 0.35)),
+            // Quran icon button — jumps straight to the last reading
+            // checkpoint (quranLastReadProvider), same position the "last
+            // read" banner on the Free Reading screen opens. Previously
+            // just a decorative Container with no GestureDetector at all —
+            // tapping it did nothing.
+            GestureDetector(
+              onTap: () => _goToLastRead(l10n),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: style.gold.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: style.gold.withValues(alpha: 0.35)),
+                ),
+                child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
               ),
-              child: Icon(Icons.menu_book_rounded, color: style.gold, size: 22),
             ),
           ],
         ),
@@ -598,6 +605,22 @@ class _QuranScreenState extends ConsumerState<QuranScreen>
 
   void _push(Widget screen) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  void _goToLastRead(AppLocalizations l10n) {
+    final lastRead = ref.read(quranLastReadProvider);
+    if (lastRead == null) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.freeReadingLastReadNone),
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    _push(QuranReaderScreen(initialPage: lastRead.page));
   }
 
   void _shareVerse(Map<String, dynamic> verse) {
