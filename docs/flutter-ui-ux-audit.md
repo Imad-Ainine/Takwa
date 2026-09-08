@@ -112,6 +112,21 @@ migrated), M18 (no `print()` left in `lib/`).
   live *inside* the `AsyncValue.when(data: ...)` branch, so there was no back button at all while
   prayer times were loading or failed to load — hoisting the app bar to `Scaffold.appBar` fixes that
   for every state. 22 of ~50 screens now use `AppBarWidget`, up from 16.
+- **§H3 `TakwaTappable` rollout**, +7 sites in `quran_widgets.dart` — a first-pass scan classified
+  all ~137 `GestureDetector`s app-wide by callback shape: 37 have `onTap` as their *only* callback
+  (no drag/long-press/double-tap alongside it), making them unambiguous, mechanically-safe
+  conversions; the other ~100 mix in gesture types `TakwaTappable` doesn't model and were left
+  alone. Converted the 7 `onTap`-only sites in this one file as a first slice (`DailyVerseCard`'s
+  drill-in chevron and two icon buttons, `KhatmaActionCard`'s outer tap area and its two
+  `_circleBtn`s, `FeatureGridItem`, `AyahBlock`'s play marker), following the wrapper's own
+  documented guidance throughout: `minTapSize: null` for anything sitting inline in a `Row`/`Wrap`
+  next to other content (forcing 48dp there would eat into the layout rather than usefully growing
+  the tap target), the default 48dp for standalone controls, and `borderRadius` matched to each
+  child's own decoration so the press-tint clips to the same shape. One structural fix alongside
+  it: `KhatmaActionCard` had its outer `margin:` on the same `Container` the `GestureDetector`
+  wrapped, which would have put `TakwaTappable`'s rounded press-tint at the margin's outer (un-inset)
+  edge instead of the card's actual edge — moved the margin to a `Padding` outside the tappable so
+  the two rounded rects line up.
 
 ⏳ **Still open, deliberately not attempted here** (needs either visual QA on a device/simulator —
 unavailable in this environment, same limitation the original audit had — or design assets this
@@ -125,10 +140,11 @@ pass doesn't have):
   ARB placeholder text) rather than chrome, per the audit's own distinction — but a real pass needs
   someone to sort which is which, and commissioning/adopting a line-icon set for the rest is a
   design decision, not a code one.
-- **§H3 `TakwaTappable` rollout** — the wrapper exists and a few screens use it; ~130
-  `GestureDetector`s remain. Not swept mechanically here: several of those are drag/pan gestures,
-  not taps, and misclassifying one would regress a real interaction with no way to catch it without
-  a device to test on.
+- **§H3 `TakwaTappable` rollout, remainder** — 30 more `onTap`-only sites identified (see above) are
+  still on bare `GestureDetector`, plus the ~100 sites mixing in drag/long-press/double-tap that
+  need a per-site read rather than the mechanical rule used here, across dozens of files. This pass
+  covered one file as a proof of the classification and the pattern to follow; the rest is the same
+  work at volume.
 - **Refactor Plan item 29 (`AppBarWidget` rollout), remainder** — the rest of the ~50 screens fall
   into two buckets, neither of which is a safe drop-in: (a) screens whose header carries a `TabBar`
   (`manage_custom_ibadah_screen`, `khatma_history_screen`, `achievements_screen`'s `SliverAppBar`) —
@@ -136,9 +152,12 @@ pass doesn't have):
   (a two-line title+subtitle, a trailing decorative element, no title text at all, or a
   scroll-scaled layout like `misbaha_screen`'s `LayoutBuilder`) where swapping in the standardized
   centered-title bar is a visual-design call this pass can't verify without a device.
-- **Refactor Plan item 30 (golden test matrix)** — `test/golden/main_shell_golden_test.dart` exists
-  as a scaffold; the full {light, dark, Ramadan} × {1.0×, 1.5× text} × 6-screen matrix described in
-  the plan hasn't been built out.
+**Correction to the previous pass's note on item 30 (golden tests):** that note was wrong — re-
+reading `main_shell_golden_test.dart` shows the full matrix already exists: all 3 themes × both text
+scales × all 5 bottom-nav screens (30 cases, `test/golden/README.md` documents the one remaining
+manual step). Nothing left to build here; the only blocker is a real `flutter test --update-goldens`
+run, from a machine with the Flutter SDK, to generate baseline images and wire it into CI — the
+README already spells out those steps in full. Not open work, just an unblockable-from-here step.
 - **M7** (66→93 SnackBars as the app has grown, still only a handful with an action) and **M8**
   (no `barrierDismissible` review) — noted, not swept: adding a retry/undo action needs a real
   retry callback at each site, which is a per-site judgment call at this volume.

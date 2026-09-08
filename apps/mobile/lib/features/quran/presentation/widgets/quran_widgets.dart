@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import 'package:takwa/core/theme/ramadan_theme.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import '../../utils/quran_helpers.dart';
 import '../../utils/quran_painters.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -79,8 +80,14 @@ class DailyVerseCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(14, 4, 14, 14),
               child: Row(
                 children: [
-                  GestureDetector(
+                  TakwaTappable(
                     onTap: onNavigate,
+                    // Inline alongside the Spacer()+badge below (audit
+                    // §H3) — forcing the platform's 48dp minimum here would
+                    // just eat into that spacer rather than usefully
+                    // enlarging the tap target, per TakwaTappable's own
+                    // guidance for compact inline controls.
+                    minTapSize: null,
                     // Resolved by hand (Icon has no matchTextDirection
                     // param): chevron_right in LTR / chevron_left in RTL
                     // always points "forward" regardless of layout
@@ -126,8 +133,13 @@ class DailyVerseCard extends StatelessWidget {
   );
 
   Widget _iconBtn(IconData icon, VoidCallback onTap, AdaptiveStyle style) =>
-      GestureDetector(
+      TakwaTappable(
         onTap: onTap,
+        // Sits inline with a sibling icon button in the same row (audit
+        // §H3) — see the drill-in chevron above for why minTapSize is null
+        // here.
+        minTapSize: null,
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
@@ -186,27 +198,36 @@ class KhatmaActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: 18,
-        ),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
+    // The margin moved from the Container below to this outer Padding: the
+    // TakwaTappable's ClipRRect clips to its child's own bounds at
+    // AppRadius.xl, which needs to be the *decorated* box, not a box that
+    // still has the margin's transparent inset baked in — otherwise the
+    // press-tint's rounded corners land on the margin's outer edge instead
+    // of the card's actual (inset) edge.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+      child: TakwaTappable(
+        onTap: onTap,
+        semanticLabel: '$title. $subtitle',
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: 18,
+          ),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
             // Back arrow button — chevron_left in LTR / chevron_right in
             // RTL always points "backward".
             if (onBack != null)
@@ -244,14 +265,15 @@ class KhatmaActionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            // Action icon button
-            _circleBtn(
-              actionIcon,
-              Colors.white.withValues(alpha: 0.25),
-              Colors.white,
-              onTap,
-            ),
-          ],
+              // Action icon button
+              _circleBtn(
+                actionIcon,
+                Colors.white.withValues(alpha: 0.25),
+                Colors.white,
+                onTap,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -260,8 +282,9 @@ class KhatmaActionCard extends StatelessWidget {
   // Callers resolve the correct chevron direction themselves (Icon has no
   // matchTextDirection param) before passing `icon` in.
   Widget _circleBtn(IconData icon, Color bg, Color fg, VoidCallback f) =>
-      GestureDetector(
+      TakwaTappable(
         onTap: f,
+        borderRadius: const BorderRadius.all(Radius.circular(22)),
         child: Container(
           width: 44,
           height: 44,
@@ -296,8 +319,10 @@ class FeatureGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return TakwaTappable(
       onTap: onTap,
+      semanticLabel: '$title. $subtitle',
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(
           color: style.card,
@@ -637,8 +662,12 @@ class AyahBlock extends StatelessWidget {
               style: style.amiri(fontSize, color: c, height: 1.8),
             ),
             const SizedBox(width: AppSpacing.sm),
-            GestureDetector(
+            TakwaTappable(
               onTap: onPlay,
+              // Sits inline in a Wrap next to the ayah text (audit §H3) —
+              // see the drill-in chevron above for why minTapSize is null.
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(14),
               child: CustomPaint(
                 size: const Size(28, 28),
                 painter: VerseMarkerPaint(
