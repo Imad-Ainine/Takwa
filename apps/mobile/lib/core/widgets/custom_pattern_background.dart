@@ -52,7 +52,10 @@ class _CustomPatternBackgroundState
     _ctrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
-    )..repeat();
+    );
+    // Actual start/stop is decided in didChangeDependencies below (it needs
+    // MediaQuery, which isn't available this early) and the `ref.listen` in
+    // build — not here unconditionally.
   }
 
   @override
@@ -62,22 +65,43 @@ class _CustomPatternBackgroundState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Used to be decided inline in build() (audit §M16: a side effect there
+    // makes build() non-idempotent — Flutter is free to call it more than
+    // once for the same frame, so _ctrl.stop()/.repeat() could fire
+    // redundantly on every rebuild for no reason). MediaQuery's reduce-motion
+    // flag can change mid-session, and didChangeDependencies is exactly the
+    // lifecycle hook Flutter re-runs when a dependency like that changes; the
+    // Ramadan-mode half of this same decision is handled by the ref.listen
+    // registered in build below.
+    _syncAnimation(ref.read(ramadanModeProvider).value ?? false);
+  }
+
+  // This drives a purely decorative starfield twinkle + lantern flicker
+  // (see RamadanBgPainter) — exactly the ambient motion the platform's
+  // reduce-motion setting exists to suppress. The painter still renders its
+  // static content at whatever frame the controller is parked on; only the
+  // animation itself stops. Stays off entirely outside Ramadan mode.
+  void _syncAnimation(bool isRamadan) {
+    final shouldRun = isRamadan && !prefersReducedMotion(context);
+    if (shouldRun && !_ctrl.isAnimating) {
+      _ctrl.repeat();
+    } else if (!shouldRun && _ctrl.isAnimating) {
+      _ctrl.stop();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
-    // This drives a purely decorative starfield twinkle + lantern flicker
-    // (see RamadanBgPainter) — exactly the ambient motion the platform's
-    // reduce-motion setting exists to suppress. The painter still renders
-    // its static content at whatever frame the controller is parked on;
-    // only the animation itself stops.
-    final reduceMotion = prefersReducedMotion(context);
-
-    // Optimization: stop the animation outside Ramadan mode, or when the
-    // user prefers reduced motion, to save resources.
-    if ((!isRamadan || reduceMotion) && _ctrl.isAnimating) {
-      _ctrl.stop();
-    } else if (isRamadan && !reduceMotion && !_ctrl.isAnimating) {
-      _ctrl.repeat();
-    }
+    // Registered on every build, but Riverpod only invokes the callback when
+    // the provider's value actually changes, and always after this build
+    // finishes — the sanctioned way to run a side effect off a watched
+    // provider instead of mutating _ctrl inline above.
+    ref.listen<AsyncValue<bool>>(ramadanModeProvider, (_, next) {
+      _syncAnimation(next.value ?? false);
+    });
 
     if (isRamadan) {
       final brightness = Theme.of(context).brightness;
