@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import gsap from 'gsap';
 
 interface HeroSectionProps {
   apkVersion?: string;
@@ -13,63 +12,13 @@ interface HeroSectionProps {
 
 export default function HeroSection({
   apkVersion = '1.0.0',
-  apkSize = '62.4 MB',
+  apkSize = '',
   apkUrl = '#download',
 }: HeroSectionProps) {
   const t = useTranslations('HomePage');
   const heroRef = useRef<HTMLDivElement>(null);
   const mockupRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Respect prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
-
-    if (prefersReducedMotion || !heroRef.current) return;
-
-    const ctx = gsap.context(() => {
-      // Floating badges gentle entrance without hiding LCP elements
-      gsap.from('.floating-card-chip', {
-        opacity: 0,
-        scale: 0.9,
-        duration: 0.6,
-        delay: 0.2,
-        stagger: 0.15,
-        ease: 'power2.out',
-      });
-
-      // Continuous subtle floating effect
-      gsap.to('.mockup-phone-primary', {
-        y: '-=10',
-        duration: 3.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      gsap.to('.mockup-phone-secondary', {
-        y: '+=10',
-        duration: 4,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        delay: 0.5,
-      });
-
-      gsap.to('.floating-card-chip', {
-        y: '-=8',
-        duration: 2.8,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        stagger: 0.4,
-      });
-    }, heroRef);
-
-    return () => ctx.revert();
-  }, []);
 
   return (
     <section ref={heroRef} className="hero-section" id="hero">
@@ -99,7 +48,7 @@ export default function HeroSection({
           {/* Primary & Secondary CTAs */}
           <div className="hero-cta-group hero-anim-cta">
             <a
-              href="#download"
+              href={apkUrl || '#download'}
               className="btn-primary hero-btn-main"
               id="hero-download-cta"
             >
@@ -119,7 +68,7 @@ export default function HeroSection({
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               <span>{t('heroCtaDownload')}</span>
-              <span className="cta-sub-badge">v{apkVersion}</span>
+              <span className="cta-sub-badge">v{apkVersion}{apkSize ? ` • ${apkSize}` : ''}</span>
             </a>
 
             <a href="#features" className="btn-outline">
@@ -176,11 +125,13 @@ export default function HeroSection({
                   <Image
                     src="/screenshots/2.webp"
                     alt="Takwa Prayer Schedule Screen"
-                    width={270}
-                    height={580}
+                    width={260}
+                    height={550}
                     className="phone-screen-img"
-                    sizes="260px"
-                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                    sizes="(max-width: 580px) 220px, 260px"
+                    priority
+                    loading="eager"
+                    style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'cover' }}
                   />
                 </div>
               </div>
@@ -195,11 +146,12 @@ export default function HeroSection({
                     src="/screenshots/0.webp"
                     alt="Takwa Main Dashboard Screen"
                     width={290}
-                    height={620}
+                    height={614}
                     className="phone-screen-img"
                     priority
+                    loading="eager"
                     sizes="(max-width: 580px) 240px, 290px"
-                    style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                    style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'cover' }}
                   />
                 </div>
               </div>
@@ -390,29 +342,66 @@ export default function HeroSection({
           position: relative;
           overflow: hidden;
           border-radius: 36px;
+          aspect-ratio: 580 / 1227;
         }
         .phone-screen-img {
           display: block;
           width: 100%;
           height: auto;
+          aspect-ratio: 580 / 1227;
           object-fit: cover;
           border-radius: 36px;
+        }
+
+        @keyframes floatPrimary {
+          0%, 100% {
+            transform: rotate(-3deg) translate3d(0, 10px, 0);
+          }
+          50% {
+            transform: rotate(-3deg) translate3d(0, 0px, 0);
+          }
+        }
+        @keyframes floatSecondary {
+          0%, 100% {
+            transform: rotate(10deg) translate3d(90px, -25px, 0);
+          }
+          50% {
+            transform: rotate(10deg) translate3d(90px, -15px, 0);
+          }
+        }
+        @keyframes floatChipTop {
+          0%, 100% {
+            transform: translate3d(0, 0, 0);
+          }
+          50% {
+            transform: translate3d(0, -8px, 0);
+          }
+        }
+        @keyframes floatChipBottom {
+          0%, 100% {
+            transform: translate3d(0, 0, 0);
+          }
+          50% {
+            transform: translate3d(0, 8px, 0);
+          }
         }
 
         /* Primary Foreground Phone */
         .mockup-phone-primary {
           width: 290px;
           z-index: 10;
-          transform: rotate(-3deg) translateY(10px);
+          will-change: transform;
+          animation: floatPrimary 4.5s ease-in-out infinite;
         }
 
         /* Secondary Background Phone */
         .mockup-phone-secondary {
           width: 260px;
           z-index: 4;
-          transform: rotate(10deg) translate(90px, -25px);
           opacity: 0.75;
           filter: brightness(0.85);
+          will-change: transform;
+          animation: floatSecondary 5.5s ease-in-out infinite 0.5s;
         }
 
         /* Floating Cards */
@@ -429,14 +418,26 @@ export default function HeroSection({
           box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5),
             0 0 15px rgba(229, 185, 88, 0.2);
           z-index: 25;
+          will-change: transform;
         }
         .card-prayer {
           top: 18%;
           left: -48px;
+          animation: floatChipTop 3.8s ease-in-out infinite;
         }
         .card-streak {
           bottom: 15%;
           right: -36px;
+          animation: floatChipBottom 4.2s ease-in-out infinite 0.6s;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .mockup-phone-primary,
+          .mockup-phone-secondary,
+          .card-prayer,
+          .card-streak {
+            animation: none !important;
+          }
         }
         .floating-icon {
           font-size: 1.5rem;

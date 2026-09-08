@@ -2,12 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 interface DownloadSectionProps {
   apkUrl?: string;
@@ -17,20 +12,13 @@ interface DownloadSectionProps {
   sha1?: string;
 }
 
-interface PlatformStatus {
-  key: string;
-  nameKey: string;
-  statusKey: string;
-  active: boolean;
-  icon: string;
-}
 
-const PLATFORMS: PlatformStatus[] = [
+const PLATFORMS = [
   { key: 'android', nameKey: 'downloadHub.platforms.android.name', statusKey: 'downloadHub.platforms.android.status', active: true, icon: '🤖' },
   { key: 'play', nameKey: 'downloadHub.platforms.play.name', statusKey: 'downloadHub.platforms.play.status', active: false, icon: '🏪' },
   { key: 'ios', nameKey: 'downloadHub.platforms.ios.name', statusKey: 'downloadHub.platforms.ios.status', active: false, icon: '🍎' },
   { key: 'web', nameKey: 'downloadHub.platforms.web.name', statusKey: 'downloadHub.platforms.web.status', active: true, icon: '🌐' },
-];
+] as const;
 
 // Simple SVG QR Code component (pattern-based placeholder that looks like a real QR)
 function QRCodeDisplay({ url }: { url: string }) {
@@ -64,9 +52,10 @@ function QRCodeDisplay({ url }: { url: string }) {
     return (
       <div className="qr-placeholder">
         <div className="qr-loading-grid">
-          {Array.from({ length: 81 }).map((_, i) => (
-            <div key={i} className={`qr-cell ${(Math.random() > 0.5 || [0, 1, 2, 8, 9, 10, 18, 19, 20, 63, 64, 65, 72, 73, 74]) ? 'qr-cell-dark' : ''}`} />
-          ))}
+          {Array.from({ length: 81 }).map((_, i) => {
+            const isDark = [0, 1, 2, 8, 9, 10, 18, 19, 20, 24, 28, 32, 36, 40, 48, 54, 63, 64, 65, 72, 73, 74].includes(i);
+            return <div key={i} className={`qr-cell ${isDark ? 'qr-cell-dark' : ''}`} />;
+          })}
         </div>
       </div>
     );
@@ -92,26 +81,24 @@ export default function DownloadSection({
   const [copiedSha, setCopiedSha] = useState<'sha256' | 'sha1' | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const el = sectionRef.current;
+    if (!el) return;
     const pref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (pref || !sectionRef.current) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.from('.download-header', {
-        opacity: 0, y: 30, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: '.download-header', start: 'top 82%' },
-      });
-      gsap.from('.download-main-card', {
-        opacity: 0, x: -30, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: '.download-main-card', start: 'top 80%' },
-      });
-      gsap.from('.download-side-panel', {
-        opacity: 0, x: 30, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: '.download-side-panel', start: 'top 80%' },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
+    if (pref) {
+      el.classList.add('download-visible');
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('download-visible');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -50px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const copyHash = useCallback(async (type: 'sha256' | 'sha1', value: string) => {
@@ -200,6 +187,7 @@ export default function DownloadSection({
                         <div className="checksum-value-wrap">
                           <code className="checksum-code">{sha256.slice(0, 16)}…</code>
                           <button
+                            type="button"
                             className="copy-btn"
                             onClick={() => copyHash('sha256', sha256)}
                             aria-label="Copy SHA-256 hash"
@@ -219,6 +207,7 @@ export default function DownloadSection({
                         <div className="checksum-value-wrap">
                           <code className="checksum-code">{sha1.slice(0, 16)}…</code>
                           <button
+                            type="button"
                             className="copy-btn"
                             onClick={() => copyHash('sha1', sha1)}
                             aria-label="Copy SHA-1 hash"
@@ -244,7 +233,7 @@ export default function DownloadSection({
 
             {/* Install Guide Steps */}
             <div className="install-guide">
-              <h4 className="guide-title">{t('downloadHub.installGuide.title')}</h4>
+              <h3 className="guide-title">{t('downloadHub.installGuide.title')}</h3>
               <div className="guide-steps">
                 {(['step1', 'step2', 'step3'] as const).map((step, i) => (
                   <div className="guide-step" key={step}>
@@ -267,10 +256,10 @@ export default function DownloadSection({
                 <div key={platform.key} className={`platform-item ${platform.active ? 'platform-active' : 'platform-coming'}`}>
                   <span className="platform-icon">{platform.icon}</span>
                   <div className="platform-info">
-                    <span className="platform-name">{t(platform.nameKey as any)}</span>
+                    <span className="platform-name">{t(platform.nameKey)}</span>
                     <span className={`platform-status ${platform.active ? 'status-active' : 'status-pending'}`}>
                       {platform.active ? '● ' : '○ '}
-                      {t(platform.statusKey as any)}
+                      {t(platform.statusKey)}
                     </span>
                   </div>
                 </div>
@@ -299,6 +288,9 @@ export default function DownloadSection({
           text-align: center;
           max-width: 680px;
           margin: 0 auto 56px;
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
         }
         .download-section-title {
           font-size: clamp(1.9rem, 3.5vw, 2.9rem);
@@ -322,6 +314,26 @@ export default function DownloadSection({
         /* Main Card */
         .download-main-card {
           padding: 36px;
+          opacity: 0;
+          transform: translateX(-30px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+        .download-side-panel {
+          opacity: 0;
+          transform: translateX(30px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+        .download-visible .download-header {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .download-visible .download-main-card {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        .download-visible .download-side-panel {
+          opacity: 1;
+          transform: translateX(0);
         }
         .download-card-glow {
           position: absolute;

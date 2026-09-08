@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 interface PrayerSchedule {
   name: string;
@@ -13,10 +13,9 @@ interface PrayerSchedule {
 
 export default function PrayerTimesTicker() {
   const t = useTranslations('HomePage.ticker');
-  const locale = useLocale();
 
   // Representative standard prayer timetable (dynamically updated relative to user time)
-  const [schedule, setSchedule] = useState<PrayerSchedule[]>([
+  const [schedule] = useState<PrayerSchedule[]>([
     { name: t('fajr'), key: 'fajr', time: '05:12', hours: 5, minutes: 12 },
     { name: t('dhuhr'), key: 'dhuhr', time: '12:45', hours: 12, minutes: 45 },
     { name: t('asr'), key: 'asr', time: '16:15', hours: 16, minutes: 15 },
@@ -41,7 +40,7 @@ export default function PrayerTimesTicker() {
         (p) => p.hours * 60 + p.minutes > currentMinutes
       );
 
-      let targetDate = new Date();
+      const targetDate = new Date();
       if (!upcoming) {
         upcoming = schedule[0];
         targetDate.setDate(targetDate.getDate() + 1);

@@ -3,10 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
-
-
 
 type TabKey = 'all' | 'worship' | 'quran' | 'habits' | 'adhkar';
 
@@ -30,7 +26,6 @@ export default function ScreenshotsShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [selectedIdx, setSelectedIdx] = useState(0);
-  const lightboxRef = useRef<HTMLDivElement>(null);
 
   const filteredShots = SCREENSHOTS.filter(
     (s) => activeTab === 'all' || s.tab === activeTab
@@ -39,44 +34,26 @@ export default function ScreenshotsShowcase() {
   const selectedShot = filteredShots[selectedIdx] ?? filteredShots[0];
 
   useEffect(() => {
-    setSelectedIdx(0);
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const el = sectionRef.current;
+    if (!el) return;
     const pref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (pref || !sectionRef.current) return;
+    if (pref) {
+      el.classList.add('showcase-visible');
+      return;
+    }
 
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.from('.screenshots-header', {
-        opacity: 0, y: 30, duration: 0.8, ease: 'power3.out',
-        scrollTrigger: { trigger: '.screenshots-header', start: 'top 82%' },
-      });
-      gsap.from('.tab-nav-item', {
-        opacity: 0, y: 15, duration: 0.5, stagger: 0.07, ease: 'power2.out',
-        scrollTrigger: { trigger: '.tabs-nav', start: 'top 85%' },
-      });
-      gsap.from('.screenshots-stage', {
-        opacity: 0, scale: 0.96, duration: 0.9, ease: 'power3.out',
-        scrollTrigger: { trigger: '.screenshots-stage', start: 'top 80%' },
-      });
-      gsap.from('.thumb-grid-item', {
-        opacity: 0, y: 20, duration: 0.5, stagger: 0.06, ease: 'power2.out',
-        scrollTrigger: { trigger: '.thumbs-grid', start: 'top 82%' },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('showcase-visible');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -50px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
-
-  // Animate lightbox image change
-  useEffect(() => {
-    if (!lightboxRef.current) return;
-    const pref = typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (pref) return;
-    gsap.fromTo(lightboxRef.current, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out' });
-  }, [selectedIdx, activeTab]);
 
   return (
     <section ref={sectionRef} className="section screenshots-section" id="screenshots">
@@ -96,10 +73,15 @@ export default function ScreenshotsShowcase() {
           {TABS.map((tab) => (
             <button
               key={tab}
+              type="button"
               role="tab"
               aria-selected={activeTab === tab}
+              aria-label={t(`tabs.${tab}`)}
               className={`tab-nav-item ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                setSelectedIdx(0);
+              }}
             >
               {t(`tabs.${tab}`)}
             </button>
@@ -110,24 +92,25 @@ export default function ScreenshotsShowcase() {
         <div className="screenshots-stage">
           {/* Featured Large Preview */}
           <div className="featured-preview">
-            <div className="featured-phone-frame" ref={lightboxRef}>
+            <div className="featured-phone-frame">
               <div className="featured-dynamic-island" />
               {selectedShot && (
                 <Image
+                  key={`${selectedShot.index}-${activeTab}`}
                   src={`/screenshots/${selectedShot.index}.webp`}
-                  alt={t(`items.${selectedShot.index}.title` as any)}
+                  alt={t(`items.${selectedShot.index}.title` as Parameters<typeof t>[0])}
                   width={286}
-                  height={612}
+                  height={605}
                   className="featured-screen-img w-full"
                   sizes="(max-width: 600px) 240px, 286px"
-                  style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: "32px" }}
+                  style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'contain', borderRadius: "32px" }}
                 />
               )}
             </div>
             {selectedShot && (
               <div className="featured-caption">
-                <h4 className="caption-title">{t(`items.${selectedShot.index}.title` as any)}</h4>
-                <p className="caption-desc">{t(`items.${selectedShot.index}.desc` as any)}</p>
+                <h3 className="caption-title">{t(`items.${selectedShot.index}.title` as Parameters<typeof t>[0])}</h3>
+                <p className="caption-desc">{t(`items.${selectedShot.index}.desc` as Parameters<typeof t>[0])}</p>
               </div>
             )}
           </div>
@@ -137,22 +120,23 @@ export default function ScreenshotsShowcase() {
             {filteredShots.map((shot, i) => (
               <button
                 key={shot.index}
+                type="button"
                 className={`thumb-grid-item ${selectedIdx === i ? 'active' : ''}`}
                 onClick={() => setSelectedIdx(i)}
-                aria-label={t(`items.${shot.index}.title` as any)}
+                aria-label={t(`items.${shot.index}.title` as Parameters<typeof t>[0])}
                 aria-pressed={selectedIdx === i}
               >
                 <div className="thumb-phone-frame">
                   <Image
                     src={`/screenshots/${shot.index}.webp`}
-                    alt={t(`items.${shot.index}.title` as any)}
+                    alt={t(`items.${shot.index}.title` as Parameters<typeof t>[0])}
                     width={110}
-                    height={236}
+                    height={233}
                     className="thumb-screen-img"
-                    sizes="110px"
-                    style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: "12px" }}
+                    sizes="(max-width: 600px) 78px, (max-width: 900px) 90px, 110px"
+                    style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'contain', borderRadius: "12px" }}
                   />
-                  {selectedIdx === i && <div className="thumb-active-overlay" aria-hidden="true" />}
+                  {selectedIdx === i && <div className="thumb-active-overlay" />}
                 </div>
               </button>
             ))}
@@ -169,6 +153,9 @@ export default function ScreenshotsShowcase() {
           text-align: center;
           max-width: 680px;
           margin: 0 auto 48px;
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
         }
         .screenshots-title {
           font-size: clamp(1.9rem, 3.5vw, 2.9rem);
@@ -188,6 +175,9 @@ export default function ScreenshotsShowcase() {
           gap: 10px;
           flex-wrap: wrap;
           margin-bottom: 48px;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 0.7s ease 0.08s, transform 0.7s ease 0.08s;
         }
         .tab-nav-item {
           padding: 8px 20px;
@@ -216,6 +206,19 @@ export default function ScreenshotsShowcase() {
           display: flex;
           gap: 48px;
           align-items: flex-start;
+          opacity: 0;
+          transform: scale(0.97);
+          transition: opacity 0.8s ease 0.12s, transform 0.8s ease 0.12s;
+        }
+
+        :global(.showcase-visible) .screenshots-header,
+        :global(.showcase-visible) .tabs-nav {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        :global(.showcase-visible) .screenshots-stage {
+          opacity: 1;
+          transform: scale(1);
         }
 
         /* Featured Preview */
@@ -250,12 +253,18 @@ export default function ScreenshotsShowcase() {
           border-radius: 20px;
           z-index: 10;
         }
+        @keyframes shotFadeIn {
+          from { opacity: 0.25; transform: scale(0.98); }
+          to { opacity: 1; transform: scale(1); }
+        }
         .featured-screen-img {
           border-radius: 34px;
           display: block;
           width: 100%;
           height: auto;
+          aspect-ratio: 580 / 1227;
           object-fit: contain;
+          animation: shotFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .featured-caption {
           text-align: center;
@@ -309,6 +318,7 @@ export default function ScreenshotsShowcase() {
           display: block;
           width: 100%;
           height: auto;
+          aspect-ratio: 580 / 1227;
           object-fit: contain;
         }
         .thumb-active-overlay {

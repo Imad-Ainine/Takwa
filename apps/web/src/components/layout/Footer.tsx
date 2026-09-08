@@ -17,9 +17,10 @@ export default function Footer() {
 						<Image
 							src='/logo.png'
 							alt='Takwa Logo'
-							width={140}
+							width={132}
 							height={60}
 							className='logo-img'
+							style={{ aspectRatio: '1492 / 678', height: 'auto' }}
 						/>
 					</div>
 					<p className='footer-tagline'>
@@ -29,7 +30,7 @@ export default function Footer() {
 
 				<div className='footer-grid'>
 					<div className='footer-column'>
-						<h4>{t('home')}</h4>
+						<h3>{t('home')}</h3>
 						<ul>
 							<li>
 								<Link href='/'>{t('home')}</Link>
@@ -40,7 +41,7 @@ export default function Footer() {
 						</ul>
 					</div>
 					<div className='footer-column'>
-						<h4>{t('legal')}</h4>
+						<h3>{t('legal')}</h3>
 						<ul>
 							<li>
 								<Link href='/privacy'>{t('privacy')}</Link>
@@ -83,6 +84,12 @@ export default function Footer() {
 					gap: 8px;
 					margin-bottom: 15px;
 				}
+				.logo-img {
+					object-fit: contain;
+					height: 44px;
+					width: auto;
+					aspect-ratio: 1492 / 678;
+				}
 				.logo-text {
 					font-weight: 700;
 					color: var(--text-primary);
@@ -95,7 +102,7 @@ export default function Footer() {
 					display: flex;
 					gap: 60px;
 				}
-				.footer-column h4 {
+				.footer-column h3 {
 					color: var(--text-primary);
 					margin-bottom: 20px;
 					font-size: 1.1rem;

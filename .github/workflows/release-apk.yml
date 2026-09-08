@@ -1,19 +1,21 @@
-name: Build & Upload APK to Supabase
+name: Build & Release APK
 
 on:
     push:
         tags:
-            - "v*.*.*" # Triggers when you push a tag like v1.0.0
+            - "v*.*.*" # Triggers on git tags like v1.0.1
     workflow_dispatch:
         inputs:
             version:
-                description: "Version tag (e.g., 1.0.0)"
+                description: "Version (e.g., 1.0.1)"
                 required: true
                 default: "1.0.0"
 
 jobs:
-    build-and-upload:
+    build-and-release:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write # needed to create GitHub Releases
         defaults:
             run:
                 working-directory: apps/mobile
@@ -22,6 +24,7 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v4
 
+            # ── Resolve version ─────────────────────────────────────────────
             - name: Extract Version
               id: get_version
               run: |
@@ -32,6 +35,7 @@ jobs:
                     echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
                   fi
 
+            # ── Flutter setup ────────────────────────────────────────────────
             - name: Set up Java
               uses: actions/setup-java@v4
               with:
@@ -45,71 +49,135 @@ jobs:
                   flutter-version: "3.47.2"
                   cache: true
 
-            - name: Install dependencies
+            - name: Install Flutter dependencies
               run: flutter pub get
 
-            # Setup environment variables for Flutter build
-            - name: Create .env
+            # ── Environment ───────────────────────────────────────────────────
+            - name: Create .env for Flutter build
               run: |
                   cat > .env <<'EOF'
                   SUPABASE_URL=${{ secrets.SUPABASE_URL }}
                   SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
                   EOF
 
-            - name: Build Android APK
-              run: flutter build apk --release --build-name=${{ steps.get_version.outputs.VERSION }}
+            # ── Build ─────────────────────────────────────────────────────────
+            - name: Build Android APK (universal)
+              run: |
+                  flutter build apk --release \
+                    --build-name=${{ steps.get_version.outputs.VERSION }} \
+                    --build-number=${GITHUB_RUN_NUMBER:-1}
 
-            - name: Compute Checksums & Rename APK
+            # ── Checksums & rename ────────────────────────────────────────────
+            - name: Compute checksums & rename APK
               id: checksums
+              working-directory: apps/mobile
               run: |
                   VERSION="${{ steps.get_version.outputs.VERSION }}"
-                  APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
+                  APK_SRC="build/app/outputs/flutter-apk/app-release.apk"
                   TARGET_FILE="takwa-v${VERSION}.apk"
 
-                  cp "$APK_PATH" "$TARGET_FILE"
+                  cp "$APK_SRC" "$TARGET_FILE"
+
+                  SIZE_BYTES=$(stat -c%s "$TARGET_FILE")
+                  SIZE_MB=$(awk "BEGIN {printf \"%.2f\", ${SIZE_BYTES}/1048576}")
 
                   SHA256=$(sha256sum "$TARGET_FILE" | awk '{print $1}')
-                  SHA1=$(sha1sum "$TARGET_FILE" | awk '{print $1}')
+                  SHA1=$(sha1sum   "$TARGET_FILE" | awk '{print $1}')
 
-                  echo "SHA256: $SHA256"
-                  echo "SHA1: $SHA1"
+                  echo "TARGET_FILE=$TARGET_FILE"   >> $GITHUB_OUTPUT
+                  echo "SIZE_BYTES=$SIZE_BYTES"     >> $GITHUB_OUTPUT
+                  echo "SIZE_MB=$SIZE_MB"           >> $GITHUB_OUTPUT
+                  echo "SHA256=$SHA256"             >> $GITHUB_OUTPUT
+                  echo "SHA1=$SHA1"                 >> $GITHUB_OUTPUT
 
-                  echo "TARGET_FILE=$TARGET_FILE" >> $GITHUB_OUTPUT
-                  echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
-                  echo "SHA1=$SHA1" >> $GITHUB_OUTPUT
+                  echo "=== Release summary ==="
+                  echo "  File : $TARGET_FILE"
+                  echo "  Size : ${SIZE_MB} MB"
+                  echo "  SHA256: $SHA256"
+                  echo "  SHA1  : $SHA1"
 
-            - name: Upload APK to Supabase Storage
+            # ── GitHub Release (hosts the APK — no file-size limit) ───────────
+            - name: Create GitHub Release & upload APK
+              id: gh_release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: v${{ steps.get_version.outputs.VERSION }}
+                  name: "Takwa v${{ steps.get_version.outputs.VERSION }}"
+                  body: |
+                      ## 🕌 Takwa v${{ steps.get_version.outputs.VERSION }}
+
+                      ### Download
+                      Download the APK directly from the Assets section below or from the [Takwa website](https://takwa-app.vercel.app/#download).
+
+                      ### Verification
+                      | Algorithm | Hash |
+                      |-----------|------|
+                      | SHA-256 | `${{ steps.checksums.outputs.SHA256 }}` |
+                      | SHA-1   | `${{ steps.checksums.outputs.SHA1 }}` |
+
+                      ### Installation
+                      1. Download `takwa-v${{ steps.get_version.outputs.VERSION }}.apk`
+                      2. Enable *Install from unknown sources* in Android settings
+                      3. Open the APK file to install
+                  files: apps/mobile/${{ steps.checksums.outputs.TARGET_FILE }}
+                  generate_release_notes: true
+                  make_latest: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            # ── Publish manifest.json to Supabase (metadata only, <1 KB) ─────
+            #    The landing page & dashboard read this file at request time,
+            #    so no Vercel redeploy is needed after each release.
+            - name: Publish release manifest to Supabase
               run: |
                   VERSION="${{ steps.get_version.outputs.VERSION }}"
-                  FILE_NAME="${{ steps.checksums.outputs.TARGET_FILE }}"
-                  BUCKET="releases"
+                  SHA256="${{ steps.checksums.outputs.SHA256 }}"
+                  SHA1="${{ steps.checksums.outputs.SHA1 }}"
+                  SIZE_MB="${{ steps.checksums.outputs.SIZE_MB }}"
+                  SIZE_BYTES="${{ steps.checksums.outputs.SIZE_BYTES }}"
+                  RELEASED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
-                  echo "Uploading $FILE_NAME to Supabase Storage ($BUCKET)..."
+                  # Prefer the GitHub Release asset URL so the file is served
+                  # from GitHub's CDN (no size limits, no bandwidth costs).
+                  GH_APK_URL="${{ steps.gh_release.outputs.url }}"
+                  # Fallback: direct asset download URL from GitHub Releases
+                  REPO="${{ github.repository }}"
+                  DIRECT_URL="https://github.com/${REPO}/releases/download/v${VERSION}/takwa-v${VERSION}.apk"
 
-                  HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
-                    -X POST "${{ secrets.SUPABASE_URL }}/storage/v1/object/${BUCKET}/${FILE_NAME}" \
-                    -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-                    -H "Content-Type: application/vnd.android.package-archive" \
+                  MANIFEST=$(cat <<EOF
+                  {
+                    "version": "${VERSION}",
+                    "apkUrl": "${DIRECT_URL}",
+                    "size": "${SIZE_MB} MB",
+                    "sizeBytes": ${SIZE_BYTES},
+                    "sha256": "${SHA256}",
+                    "sha1": "${SHA1}",
+                    "releasedAt": "${RELEASED_AT}",
+                    "githubRelease": "${GH_APK_URL}"
+                  }
+                  EOF
+                  )
+
+                  SUPABASE_URL="${{ secrets.SUPABASE_URL }}"
+                  SERVICE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+                  BUCKET="apk-releases"
+
+                  echo "Publishing manifest.json to Supabase (${BUCKET})..."
+                  echo "$MANIFEST"
+
+                  HTTP_CODE=$(echo "$MANIFEST" | curl -s -o response.json -w "%{http_code}" \
+                    -X POST "${SUPABASE_URL}/storage/v1/object/${BUCKET}/manifest.json" \
+                    -H "Authorization: Bearer ${SERVICE_KEY}" \
+                    -H "Content-Type: application/json" \
                     -H "x-upsert: true" \
-                    --data-binary "@${FILE_NAME}")
+                    --data-binary @-)
 
                   if [ "$HTTP_CODE" -ne 200 ] && [ "$HTTP_CODE" -ne 201 ]; then
-                    echo "Upload failed with status $HTTP_CODE"
+                    echo "❌ Supabase manifest upload failed (HTTP $HTTP_CODE):"
                     cat response.json
                     exit 1
                   fi
 
-                  echo "Successfully uploaded $FILE_NAME to Supabase Storage!"
-
-            - name: Create GitHub Release (Optional)
-              uses: softprops/action-gh-release@v2
-              if: startsWith(github.ref, 'refs/tags/')
-              with:
-                  files: apps/mobile/${{ steps.checksums.outputs.TARGET_FILE }}
-                  body: |
-                      ### Takwa v${{ steps.get_version.outputs.VERSION }}
-
-                      **SHA-256:** `${{ steps.checksums.outputs.SHA256 }}`
-                      **SHA-1:** `${{ steps.checksums.outputs.SHA1 }}`
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  echo "✅ manifest.json published successfully!"
+                  echo "   Public URL: ${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/manifest.json"
+              working-directory: apps/mobile

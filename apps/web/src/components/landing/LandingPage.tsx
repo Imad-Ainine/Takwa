@@ -1,19 +1,26 @@
-'use client';
-
 import React from 'react';
 import dynamic from 'next/dynamic';
 import HeroSection from '@/components/landing/HeroSection';
-import FeaturesSection from '@/components/landing/FeaturesSection';
-import SpiritualQuoteBanner from '@/components/landing/SpiritualQuoteBanner';
 
-// Dynamically import heavy components to improve initial load
+// Dynamically code-split below-the-fold sections while preserving full SSR for SEO & zero CLS
+const FeaturesSection = dynamic(
+  () => import('@/components/landing/FeaturesSection'),
+  { ssr: true }
+);
+
+const SpiritualQuoteBanner = dynamic(
+  () => import('@/components/landing/SpiritualQuoteBanner'),
+  { ssr: true }
+);
+
 const ScreenshotsShowcase = dynamic(
   () => import('@/components/landing/ScreenshotsShowcase'),
-  { ssr: false }
+  { ssr: true }
 );
+
 const DownloadSection = dynamic(
   () => import('@/components/landing/DownloadSection'),
-  { ssr: false }
+  { ssr: true }
 );
 
 interface HomeProps {
@@ -24,7 +31,7 @@ interface HomeProps {
   sha1?: string;
 }
 
-export default function Home({
+export default function LandingPage({
   apkUrl,
   apkVersion,
   apkSize,

@@ -2,64 +2,53 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
-
 
 const FEATURE_ICONS = [
   {
     key: 'prayerTimes',
     icon: '🕌',
-    gradient: 'from-gold',
     color: 'rgba(229, 185, 88, 0.15)',
     border: 'rgba(229, 185, 88, 0.3)',
   },
   {
     key: 'quran',
     icon: '📖',
-    gradient: 'from-emerald',
     color: 'rgba(16, 185, 129, 0.15)',
     border: 'rgba(16, 185, 129, 0.3)',
   },
   {
     key: 'qibla',
     icon: '🧭',
-    gradient: 'from-teal',
     color: 'rgba(58, 175, 169, 0.15)',
     border: 'rgba(58, 175, 169, 0.3)',
   },
   {
     key: 'checklist',
     icon: '⚖️',
-    gradient: 'from-gold',
     color: 'rgba(229, 185, 88, 0.12)',
     border: 'rgba(229, 185, 88, 0.25)',
   },
   {
     key: 'azkar',
     icon: '📿',
-    gradient: 'from-emerald',
     color: 'rgba(16, 185, 129, 0.12)',
     border: 'rgba(16, 185, 129, 0.25)',
   },
   {
     key: 'asma',
     icon: '✨',
-    gradient: 'from-gold',
     color: 'rgba(245, 223, 168, 0.12)',
     border: 'rgba(245, 223, 168, 0.3)',
   },
   {
     key: 'ramadan',
     icon: '🌙',
-    gradient: 'from-teal',
     color: 'rgba(58, 175, 169, 0.12)',
     border: 'rgba(58, 175, 169, 0.28)',
   },
   {
     key: 'notifications',
     icon: '🛡️',
-    gradient: 'from-emerald',
     color: 'rgba(16, 185, 129, 0.1)',
     border: 'rgba(16, 185, 129, 0.22)',
   },
@@ -70,48 +59,24 @@ export default function FeaturesSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion || !sectionRef.current) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.features-header',
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-          },
+    const el = sectionRef.current;
+    if (!el) return;
+    const pref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (pref) {
+      el.classList.add('features-visible');
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('features-visible');
+          observer.disconnect();
         }
-      );
-
-      gsap.fromTo(
-        '.feature-card',
-        { opacity: 0, y: 35 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-          stagger: 0.06,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-          },
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -50px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -129,7 +94,7 @@ export default function FeaturesSection() {
 
         {/* Features Grid */}
         <div className="features-grid">
-          {FEATURE_ICONS.map(({ key, icon, color, border }) => (
+          {FEATURE_ICONS.map(({ key, icon, color, border }, i) => (
             <div
               key={key}
               className="mihrab-card feature-card"
@@ -137,6 +102,7 @@ export default function FeaturesSection() {
                 {
                   '--feature-color': color,
                   '--feature-border': border,
+                  '--card-delay': `${i * 0.06}s`,
                 } as React.CSSProperties
               }
             >
@@ -155,11 +121,35 @@ export default function FeaturesSection() {
         .features-section {
           background: linear-gradient(180deg, #04011e 0%, #070340 50%, #04011e 100%);
         }
+
+        /* Entrance state — hidden until IntersectionObserver fires */
         .features-header {
           text-align: center;
           max-width: 680px;
           margin: 0 auto 64px;
+          opacity: 0;
+          transform: translateY(28px);
+          transition: opacity 0.75s ease, transform 0.75s ease;
         }
+        .feature-card {
+          padding: 30px 26px;
+          cursor: default;
+          opacity: 0;
+          transform: translateY(30px);
+          transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.55s ease, transform 0.55s ease !important;
+          transition-delay: var(--card-delay, 0s), var(--card-delay, 0s), var(--card-delay, 0s), var(--card-delay, 0s);
+        }
+
+        /* Visible state — added when section enters viewport */
+        .features-visible .features-header {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .features-visible .feature-card {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
         .features-title {
           font-size: clamp(1.9rem, 3.5vw, 2.9rem);
           line-height: 1.2;
@@ -174,11 +164,6 @@ export default function FeaturesSection() {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 20px;
-        }
-        .feature-card {
-          padding: 30px 26px;
-          cursor: default;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
         }
         .feature-card:hover {
           border-color: var(--feature-border, rgba(200, 169, 110, 0.45));
@@ -218,19 +203,13 @@ export default function FeaturesSection() {
         }
 
         @media (max-width: 1100px) {
-          .features-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
+          .features-grid { grid-template-columns: repeat(3, 1fr); }
         }
         @media (max-width: 768px) {
-          .features-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+          .features-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 480px) {
-          .features-grid {
-            grid-template-columns: 1fr;
-          }
+          .features-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </section>

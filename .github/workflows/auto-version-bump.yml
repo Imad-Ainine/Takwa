@@ -1,0 +1,91 @@
+name: Auto Version Bump
+
+# Triggers on every push to main that touches mobile code.
+# Reads the current version from pubspec.yaml, bumps the patch number,
+# commits the change back to main, then creates a git tag —
+# which in turn triggers the release-apk.yml pipeline.
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "apps/mobile/**"
+            - "packages/**"
+            - "!apps/mobile/build/**"  # ignore build output
+
+jobs:
+    bump-version:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # required to push the version commit + tag
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+                  token: ${{ secrets.GITHUB_TOKEN }}
+
+            # ── Read current version from pubspec.yaml ──────────────────────
+            - name: Read current version
+              id: current
+              run: |
+                  VERSION=$(grep '^version:' apps/mobile/pubspec.yaml | sed 's/version: //;s/+.*//' | tr -d '[:space:]')
+                  echo "Current version: $VERSION"
+                  echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+            # ── Skip if this commit was itself a version-bump commit ─────────
+            - name: Check if already a version-bump commit
+              id: skip_check
+              run: |
+                  LAST_MSG=$(git log -1 --pretty=%s)
+                  echo "Last commit: $LAST_MSG"
+                  if echo "$LAST_MSG" | grep -qE '^\[release\] bump version'; then
+                    echo "SKIP=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "SKIP=false" >> $GITHUB_OUTPUT
+                  fi
+
+            # ── Compute next patch version ───────────────────────────────────
+            - name: Compute next version
+              id: next
+              if: steps.skip_check.outputs.SKIP == 'false'
+              run: |
+                  CURRENT="${{ steps.current.outputs.VERSION }}"
+                  IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+                  NEXT_PATCH=$((PATCH + 1))
+                  NEXT="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+                  echo "New version: $NEXT"
+                  echo "VERSION=$NEXT" >> $GITHUB_OUTPUT
+                  # Also compute build number from run number to avoid duplicate versionCodes
+                  echo "BUILD=${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+            # ── Update pubspec.yaml ──────────────────────────────────────────
+            - name: Update pubspec.yaml
+              if: steps.skip_check.outputs.SKIP == 'false'
+              run: |
+                  NEXT="${{ steps.next.outputs.VERSION }}"
+                  BUILD="${{ steps.next.outputs.BUILD }}"
+                  # Update the version line, preserving the +buildNumber
+                  sed -i "s/^version: .*/version: ${NEXT}+${BUILD}/" apps/mobile/pubspec.yaml
+                  echo "Updated pubspec.yaml to version: ${NEXT}+${BUILD}"
+                  grep '^version:' apps/mobile/pubspec.yaml
+
+            # ── Commit & tag ─────────────────────────────────────────────────
+            - name: Commit, tag & push
+              if: steps.skip_check.outputs.SKIP == 'false'
+              run: |
+                  NEXT="${{ steps.next.outputs.VERSION }}"
+
+                  git config user.name  "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+
+                  git add apps/mobile/pubspec.yaml
+                  git commit -m "[release] bump version to v${NEXT}"
+
+                  # Create annotated tag — this triggers release-apk.yml
+                  git tag -a "v${NEXT}" -m "Release v${NEXT}"
+
+                  # Push the commit and the tag
+                  git push origin main --follow-tags

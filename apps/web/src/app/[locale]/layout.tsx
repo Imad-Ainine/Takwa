@@ -83,7 +83,7 @@ export async function generateMetadata({
 export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
-	maximumScale: 1,
+	maximumScale: 5,
 };
 
 export default async function RootLayout({
@@ -110,8 +110,10 @@ export default async function RootLayout({
 		<html
 			lang={locale}
 			dir={direction}
-			data-scroll-behavior='smooth'
 			suppressHydrationWarning>
+			<head>
+				<link rel="dns-prefetch" href="https://github.com" />
+			</head>
 			<body
 				className={`${plusJakartaSans.variable} ${amiri.variable} ${locale === 'ar' ? 'amiri' : ''}`}
 				suppressHydrationWarning>

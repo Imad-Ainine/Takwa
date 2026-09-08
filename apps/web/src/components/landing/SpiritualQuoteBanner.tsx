@@ -2,30 +2,31 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import gsap from 'gsap';
-import ScrollTrigger from 'gsap/ScrollTrigger';
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
 
 export default function SpiritualQuoteBanner() {
   const t = useTranslations('HomePage.quote');
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const el = sectionRef.current;
+    if (!el) return;
     const pref = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (pref || !sectionRef.current) return;
+    if (pref) {
+      el.classList.add('quote-visible');
+      return;
+    }
 
-    gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
-      gsap.from('.quote-banner-inner', {
-        opacity: 0, y: 30, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: '.quote-banner-inner', start: 'top 85%' },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('quote-visible');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -62,6 +63,13 @@ export default function SpiritualQuoteBanner() {
           position: relative;
           text-align: center;
           max-width: 820px;
+          opacity: 0;
+          transform: translateY(24px);
+          transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        :global(.quote-visible) .quote-banner-inner {
+          opacity: 1;
+          transform: translateY(0);
         }
         .arch-left,
         .arch-right {

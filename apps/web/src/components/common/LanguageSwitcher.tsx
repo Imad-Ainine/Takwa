@@ -85,6 +85,7 @@ export default function LanguageSwitcher() {
 					disabled={isPending}
 					aria-expanded={isOpen}
 					aria-haspopup="listbox"
+					aria-label={`Select language (current: ${activeLocaleObj.label})`}
 				>
 					<svg
 						className="globe-icon"
@@ -94,6 +95,7 @@ export default function LanguageSwitcher() {
 						strokeWidth="2"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						aria-hidden="true"
 					>
 						<circle cx="12" cy="12" r="10" />
 						<line x1="2" y1="12" x2="22" y2="12" />
@@ -108,6 +110,7 @@ export default function LanguageSwitcher() {
 						strokeWidth="2.5"
 						strokeLinecap="round"
 						strokeLinejoin="round"
+						aria-hidden="true"
 					>
 						<polyline points="6 9 12 15 18 9" />
 					</svg>
@@ -124,6 +127,7 @@ export default function LanguageSwitcher() {
 										className={`menu-item ${isActive ? 'selected' : ''}`}
 										onClick={() => switchLocale(l.code)}
 										dir={l.dir}
+										aria-label={`Switch language to ${l.label}`}
 									>
 										<span className="item-label">{l.label}</span>
 										<span className="item-badge">{l.code.toUpperCase()}</span>

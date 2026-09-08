@@ -17,14 +17,14 @@ export default function Support() {
         <div className="support-grid">
           <div className="premium-card support-card">
             <div className="icon">📧</div>
-            <h3>{t('cards.email.title')}</h3>
+            <h2>{t('cards.email.title')}</h2>
             <p>{t('cards.email.content')}</p>
             <a href="mailto:support@takwa-app.com" className="support-link gold-text">support@takwa-app.com</a>
           </div>
 
           <div className="premium-card support-card">
             <div className="icon">💬</div>
-            <h3>{t('cards.social.title')}</h3>
+            <h2>{t('cards.social.title')}</h2>
             <p>{t('cards.social.content')}</p>
             <div className="social-links">
               <span className="gold-text">Twitter</span>
@@ -35,9 +35,9 @@ export default function Support() {
 
           <div className="premium-card support-card">
             <div className="icon">❓</div>
-            <h3>{t('cards.faq.title')}</h3>
+            <h2>{t('cards.faq.title')}</h2>
             <p>{t('cards.faq.content')}</p>
-            <button className="btn-outline" style={{ marginTop: '10px' }}>{t('cards.faq.button')}</button>
+            <button type="button" className="btn-outline" style={{ marginTop: '10px' }}>{t('cards.faq.button')}</button>
           </div>
         </div>
 
@@ -92,7 +92,8 @@ export default function Support() {
           font-size: 2.5rem;
           margin-bottom: 15px;
         }
-        .support-card h3 {
+        .support-card h2 {
+          font-size: 1.3rem;
           margin-bottom: 12px;
           color: var(--text-primary);
         }

@@ -35,11 +35,12 @@ export default function Navbar() {
             <Image
               src="/logo.png"
               alt="Takwa Logo"
-              width={130}
-              height={55}
+              width={132}
+              height={60}
               className="logo-img"
-              sizes="130px"
+              sizes="132px"
               priority
+              style={{ aspectRatio: '1492 / 678', height: 'auto' }}
             />
           </Link>
 
@@ -61,6 +62,8 @@ export default function Navbar() {
 
           {/* Mobile Hamburger */}
           <button
+            type="button"
+            id="mobile-menu-toggle"
             className={`hamburger ${mobileOpen ? 'hamburger-open' : ''}`}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-expanded={mobileOpen}
@@ -136,6 +139,7 @@ export default function Navbar() {
           object-fit: contain;
           height: 44px;
           width: auto;
+          aspect-ratio: 1492 / 678;
         }
         .nav-links {
           display: flex;
