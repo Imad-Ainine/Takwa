@@ -280,16 +280,33 @@ class AppRoutes {
       case Routes.books:
         return MaterialPageRoute(settings: settings, builder: (_) => const BooksLibraryScreen());
       case Routes.booksChapter:
-        final book = settings.arguments as IslamicBook;
+        // Was an unchecked `as IslamicBook` (audit §M2) — any call site that
+        // ever pushes this route without the argument (or the wrong type)
+        // crashed the whole app with an uncaught TypeError instead of
+        // falling back to the same not-found screen every other bad route
+        // already gets.
+        final chapterArgs = settings.arguments;
+        if (chapterArgs is! IslamicBook) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => _RouteNotFoundScreen(routeName: settings.name),
+          );
+        }
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BooksChapterScreen(book: book),
+          builder: (_) => BooksChapterScreen(book: chapterArgs),
         );
       case Routes.booksPdf:
-        final book = settings.arguments as IslamicBook;
+        final pdfArgs = settings.arguments;
+        if (pdfArgs is! IslamicBook) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (_) => _RouteNotFoundScreen(routeName: settings.name),
+          );
+        }
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BookPdfReaderScreen(book: book),
+          builder: (_) => BookPdfReaderScreen(book: pdfArgs),
         );
       default:
         return MaterialPageRoute(
