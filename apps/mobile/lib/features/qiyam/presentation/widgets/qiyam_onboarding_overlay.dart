@@ -167,9 +167,11 @@ class _QiyamOnboardingOverlayState extends ConsumerState<QiyamOnboardingOverlay>
             ),
           ),
           const SizedBox(width: AppSpacing.lg),
-          Text(
-            text,
-            style: context.typography.bodyMedium.copyWith(color: Colors.white),
+          Expanded(
+            child: Text(
+              text,
+              style: context.typography.bodyMedium.copyWith(color: Colors.white),
+            ),
           ),
         ],
       ),

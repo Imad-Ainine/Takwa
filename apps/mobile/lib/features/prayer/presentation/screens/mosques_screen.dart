@@ -51,6 +51,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
           _currentPosition = pos;
         });
       }
+      
       List<Placemark> placemarks = await geocoding.placemarkFromCoordinates(
         pos.latitude,
         pos.longitude,

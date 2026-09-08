@@ -42,9 +42,16 @@ class BooksChapterScreen extends ConsumerWidget {
       backgroundColor: colors.background,
       appBar: AppBarWidget(
         title: book.titleAr,
-        height: 260,
+        firstShade: c1,
+        secondShade: c2,
+        height: 280,
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -52,6 +59,7 @@ class BooksChapterScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const CustomLeadingButton(),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -60,7 +68,7 @@ class BooksChapterScreen extends ConsumerWidget {
                           book.titleAr,
                           style: const TextStyle(
                             fontFamily: 'Amiri',
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                             height: 1.2,
@@ -81,51 +89,58 @@ class BooksChapterScreen extends ConsumerWidget {
                           book.authorAr,
                           style: TextStyle(
                             fontFamily: 'Amiri',
-                            fontSize: 14,
+                            fontSize: 13,
                             color: Colors.white.withValues(alpha: 0.9),
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.start,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.lg),
+                  const SizedBox(width: AppSpacing.md),
                   Hero(
                     tag: 'book-emoji-${book.id}',
                     child: Text(
                       book.emoji,
-                      style: const TextStyle(fontSize: 48),
+                      style: const TextStyle(fontSize: 44),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              // Stats row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _StatChip(
-                    label: book.categoryLabel,
-                    icon: Icons.category_outlined,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _StatChip(
-                    label: l10n.booksChapterPagesCount(book.totalPages),
-                    icon: Icons.menu_book_rounded,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _StatChip(
-                    label: l10n.booksChapterMinutesAbbrev(
-                      book.estimatedReadingMinutes,
-                    ),
-                    icon: Icons.schedule_rounded,
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
+              // Stats row
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _StatChip(
+                      label: book.categoryLabel,
+                      icon: Icons.category_outlined,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    _StatChip(
+                      label: l10n.booksChapterPagesCount(book.totalPages),
+                      icon: Icons.menu_book_rounded,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    _StatChip(
+                      label: l10n.booksChapterMinutesAbbrev(
+                        book.estimatedReadingMinutes,
+                      ),
+                      icon: Icons.schedule_rounded,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               _ReadingProgressBar(book: book, accentColor: Colors.white),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
             ],
           ),
         ),
@@ -402,7 +417,9 @@ class _ChapterItem extends StatelessWidget {
           color: isCurrent ? accentColor.withValues(alpha: 0.05) : colors.card,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isCurrent ? accentColor.withValues(alpha: 0.3) : colors.border,
+            color: isCurrent
+                ? accentColor.withValues(alpha: 0.3)
+                : colors.border,
             width: isCurrent ? 2 : 1,
           ),
         ),

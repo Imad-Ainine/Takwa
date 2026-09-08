@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:adhan/adhan.dart' as adhan;
@@ -50,12 +51,366 @@ class LocationPrayerManager {
     }
   }
 
-  /// تحديث الموقع يدوياً
+  /// طلب وتحديث الموقع بتجربة مستخدم مثالية تشمل معالجة التعطيل والأذونات
+  static Future<LocationResult> requestAndUpdateLocation(
+    BuildContext context,
+    dynamic ref, {
+    bool showFeedbackSnackBar = true,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    // 1. التحقق من تفعيل خدمة تحديد الموقع (GPS)
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (!context.mounted) return LocationResult.serviceDisabled;
+
+      final shouldOpen = await showEnableGpsDialog(context);
+      if (shouldOpen) {
+        await Geolocator.openLocationSettings();
+
+        // فحص دوري خفيف عند عودة المستخدم من الإعدادات
+        for (int i = 0; i < 20; i++) {
+          await Future.delayed(const Duration(milliseconds: 1000));
+          if (!context.mounted) break;
+          serviceEnabled = await Geolocator.isLocationServiceEnabled();
+          if (serviceEnabled) break;
+        }
+      }
+
+      if (!serviceEnabled) {
+        if (context.mounted && showFeedbackSnackBar) {
+          _showLocationSnackBar(
+            context,
+            message: l10n.locationResultServiceDisabled,
+            isSuccess: false,
+            actionLabel: l10n.locationEnableAction,
+            onAction: () => Geolocator.openLocationSettings(),
+          );
+        }
+        return LocationResult.serviceDisabled;
+      }
+    }
+
+    // 2. التحقق من إذن الوصول للموقع
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (context.mounted && showFeedbackSnackBar) {
+          _showLocationSnackBar(
+            context,
+            message: l10n.locationResultPermissionDenied,
+            isSuccess: false,
+          );
+        }
+        return LocationResult.permissionDenied;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (!context.mounted) return LocationResult.permissionDeniedForever;
+
+      final shouldOpen = await showPermissionSettingsDialog(context);
+      if (shouldOpen) {
+        await Geolocator.openAppSettings();
+
+        for (int i = 0; i < 20; i++) {
+          await Future.delayed(const Duration(milliseconds: 1000));
+          if (!context.mounted) break;
+          final p = await Geolocator.checkPermission();
+          if (p == LocationPermission.always ||
+              p == LocationPermission.whileInUse) {
+            permission = p;
+            break;
+          }
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever ||
+          permission == LocationPermission.denied) {
+        if (context.mounted && showFeedbackSnackBar) {
+          _showLocationSnackBar(
+            context,
+            message: l10n.locationResultPermissionDeniedForever,
+            isSuccess: false,
+            actionLabel: isArabic ? 'الإعدادات' : 'Settings',
+            onAction: () => Geolocator.openAppSettings(),
+          );
+        }
+        return LocationResult.permissionDeniedForever;
+      }
+    }
+
+    // 3. تحديث الموقع وحساب الأوقات
+    final result = await refreshLocation(ref);
+
+    if (!context.mounted) return result;
+
+    if (showFeedbackSnackBar) {
+      if (result.isSuccess) {
+        HapticFeedback.lightImpact();
+        final settings = ref.read(settingsDaoProvider);
+        final city = await settings.get('cityName');
+        if (!context.mounted) return result;
+        final successMsg = (city != null && city.isNotEmpty)
+            ? (isArabic
+                ? 'تم تحديث الموقع بنجاح: $city ✓'
+                : 'Location updated: $city ✓')
+            : l10n.locationResultSuccess;
+
+        _showLocationSnackBar(
+          context,
+          message: successMsg,
+          isSuccess: true,
+        );
+      } else {
+        _showLocationSnackBar(
+          context,
+          message: result.message(l10n),
+          isSuccess: false,
+          actionLabel: isArabic ? 'إعادة المحاولة' : 'Retry',
+          onAction: () => requestAndUpdateLocation(
+            context,
+            ref,
+            showFeedbackSnackBar: showFeedbackSnackBar,
+          ),
+        );
+      }
+    }
+
+    return result;
+  }
+
+  /// نافذة حوار راقية لتفعيل الـ GPS
+  static Future<bool> showEnableGpsDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: ctx.colors.border),
+        ),
+        icon: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: ctx.colors.gold.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.location_off_rounded,
+            color: ctx.colors.gold,
+            size: 28,
+          ),
+        ),
+        title: Text(
+          isArabic ? 'تفعيل خدمة تحديد الموقع' : 'Enable Location Services',
+          textAlign: TextAlign.center,
+          style: ctx.typography.headingMedium.copyWith(
+            fontSize: 18,
+            color: ctx.colors.textPrimary,
+          ),
+        ),
+        content: Text(
+          isArabic
+              ? 'خدمة تحديد الموقع (GPS) مغلقة على هاتفك. يُرجى تفعيلها ليتمكن تطبيق تقوى من معرفة موقعك بدقة وحساب أوقات الصلاة واتجاه القبلة.'
+              : 'GPS is disabled on your device. Please enable it so Takwa can determine your location and calculate accurate prayer times.',
+          textAlign: TextAlign.center,
+          style: ctx.typography.bodyMedium.copyWith(
+            fontSize: 13,
+            color: ctx.colors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: ctx.colors.textSecondary,
+                    side: BorderSide(color: ctx.colors.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(
+                    l10n?.commonCancel ?? (isArabic ? 'إلغاء' : 'Cancel'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ctx.colors.teal,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    isArabic ? 'تفعيل الموقع' : 'Enable GPS',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  /// نافذة حوار راقية لفتح إعدادات إذن الموقع
+  static Future<bool> showPermissionSettingsDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.colors.card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: ctx.colors.border),
+        ),
+        icon: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: ctx.colors.danger.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.location_disabled_rounded,
+            color: ctx.colors.danger,
+            size: 28,
+          ),
+        ),
+        title: Text(
+          isArabic ? 'إذن الموقع مطلوب' : 'Location Permission Required',
+          textAlign: TextAlign.center,
+          style: ctx.typography.headingMedium.copyWith(
+            fontSize: 18,
+            color: ctx.colors.textPrimary,
+          ),
+        ),
+        content: Text(
+          isArabic
+              ? 'تم رفض إذن تحديد الموقع لتطبيق تقوى. يُرجى تفعيل الإذن من إعدادات التطبيق لتتمكن من تحديث موقعك ومواقيت الصلاة.'
+              : 'Location permission is disabled for Takwa. Please enable it in App Settings to update your location and prayer times.',
+          textAlign: TextAlign.center,
+          style: ctx.typography.bodyMedium.copyWith(
+            fontSize: 13,
+            color: ctx.colors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: ctx.colors.textSecondary,
+                    side: BorderSide(color: ctx.colors.border),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(
+                    l10n?.commonCancel ?? (isArabic ? 'إلغاء' : 'Cancel'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ctx.colors.teal,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(
+                    isArabic ? 'فتح الإعدادات' : 'Open Settings',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  static void _showLocationSnackBar(
+    BuildContext context, {
+    required String message,
+    required bool isSuccess,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(
+            fontFamily: 'NotoNaskhArabic',
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        action: (actionLabel != null && onAction != null)
+            ? SnackBarAction(
+                label: actionLabel,
+                textColor: Colors.white,
+                onPressed: onAction,
+              )
+            : null,
+        backgroundColor:
+            isSuccess ? context.colors.success : context.colors.danger,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: Duration(seconds: isSuccess ? 3 : 5),
+      ),
+    );
+  }
+
+  /// تحديث الموقع يدوياً مع أقصى قدر من المرونة للأجهزة الحقيقية
   static Future<LocationResult> refreshLocation(dynamic ref) async {
     final Geocoding geocoding = Geocoding();
 
     try {
-      // تحقق من الإذن
+      // تحقق من تفعيل الخدمة
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         return LocationResult.serviceDisabled;
@@ -72,13 +427,35 @@ class LocationPrayerManager {
         return LocationResult.permissionDeniedForever;
       }
 
-      // الحصول على الموقع
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
+      // الحصول على الموقع (مع آليات استباقية واحتياطية لتفادي أخطاء الأماكن المغلقة)
+      Position? pos;
+      try {
+        pos = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 10),
+          ),
+        );
+      } catch (_) {
+        pos = await Geolocator.getLastKnownPosition();
+      }
+
+      pos ??= await Geolocator.getLastKnownPosition();
+
+      if (pos == null) {
+        try {
+          pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.low,
+              timeLimit: Duration(seconds: 5),
+            ),
+          );
+        } catch (_) {}
+      }
+
+      if (pos == null) {
+        return LocationResult.error;
+      }
 
       final lat = pos.latitude;
       final lng = pos.longitude;
@@ -88,21 +465,43 @@ class LocationPrayerManager {
       TimezoneResolver.setLocalTimezone(tzName);
 
       // حل اسم المدينة (Reverse Geocoding)
-      String cityName = lookupAppLocalizations(
+      final settings = ref.read(settingsDaoProvider);
+      final unknownCity = lookupAppLocalizations(
         const Locale('ar'),
       ).overlayServiceUnknownCity;
+      String cityName = '';
       try {
         final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
-          cityName =
-              '${p.locality ?? p.subAdministrativeArea ?? ''}, ${p.country ?? ''}';
-          if (cityName.startsWith(', ')) cityName = cityName.substring(2);
+          final locality = (p.locality != null && p.locality!.trim().isNotEmpty)
+              ? p.locality!.trim()
+              : (p.subAdministrativeArea != null &&
+                      p.subAdministrativeArea!.trim().isNotEmpty)
+                  ? p.subAdministrativeArea!.trim()
+                  : (p.administrativeArea != null &&
+                          p.administrativeArea!.trim().isNotEmpty)
+                      ? p.administrativeArea!.trim()
+                      : '';
+          final country = p.country?.trim() ?? '';
+          if (locality.isNotEmpty && country.isNotEmpty) {
+            cityName = '$locality, $country';
+          } else if (locality.isNotEmpty) {
+            cityName = locality;
+          } else {
+            cityName = country;
+          }
         }
       } catch (_) {}
 
+      if (cityName.isEmpty) {
+        final savedCity = await settings.get('cityName');
+        cityName = (savedCity != null && savedCity.isNotEmpty)
+            ? savedCity
+            : unknownCity;
+      }
+
       // حفظ في الإعدادات
-      final settings = ref.read(settingsDaoProvider);
       await settings.set('latitude', lat.toString());
       await settings.set('longitude', lng.toString());
       await settings.set('timezone', tzName);
@@ -111,6 +510,9 @@ class LocationPrayerManager {
         'lastLocationUpdate',
         DateTime.now().toIso8601String(),
       );
+
+      // إعادة تقييم موفر أوقات الصلاة فوراً لتحديث الواجهات
+      ref.invalidate(prayerTimesProvider);
 
       // جدولة الإشعارات بالموقع الجديد
       await _scheduleForLocation(ref, lat, lng);
@@ -359,47 +761,11 @@ class _LocationUpdateTileState extends ConsumerState<LocationUpdateTile> {
 
   Future<void> _update() async {
     setState(() => _loading = true);
-    final result = await LocationPrayerManager.refreshLocation(ref);
-    setState(() => _loading = false);
-
-    if (!mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result.message(l10n),
-          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
-        ),
-        action:
-            result == LocationResult.serviceDisabled ||
-                result == LocationResult.permissionDeniedForever
-            ? SnackBarAction(
-                label: l10n.locationEnableAction,
-                textColor: Colors.white,
-                onPressed: () {
-                  if (result == LocationResult.serviceDisabled) {
-                    Geolocator.openLocationSettings();
-                  } else {
-                    Geolocator.openAppSettings();
-                  }
-                },
-              )
-            : null,
-        backgroundColor: result.isSuccess
-            ? context.colors.success
-            : context.colors.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: Duration(
-          seconds:
-              result == LocationResult.serviceDisabled ||
-                  result == LocationResult.permissionDeniedForever
-              ? 5
-              : 3,
-        ),
-      ),
+    final result = await LocationPrayerManager.requestAndUpdateLocation(
+      context,
+      ref,
     );
+    setState(() => _loading = false);
 
     if (result.isSuccess) _loadSaved();
   }

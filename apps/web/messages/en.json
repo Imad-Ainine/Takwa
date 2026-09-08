@@ -4,43 +4,125 @@
     "description": "Takwa is your comprehensive companion for an enlightened Islamic life, crafted with elegance and precision to keep you deeply connected with your faith.",
     "download": "Download Now",
     "learnMore": "Discover More",
-    "featuresTitle": "All Essentials For Your Spiritual Life",
-    "featuresSubtitle": "A premium interface that seamlessly blends Islamic artistry with modern technology.",
+    "heroBadge": "Spiritual Excellence • 100% Free & Ad-Free • Privacy First",
+    "heroCtaDownload": "Download APK Directly",
+    "heroCtaExplore": "Explore Features",
+    "heroCtaScan": "Scan QR to Install",
+    "chipPrayer": "5 Daily Adhans with GPS",
+    "chipHisab": "Daily Hisab Checklist",
+    "chipQuran": "Offline Holy Quran & Audio",
+    "chipPrivacy": "100% Private • Zero Ads",
+    "ticker": {
+      "bismillah": "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+      "fajr": "Fajr",
+      "dhuhr": "Dhuhr",
+      "asr": "Asr",
+      "maghrib": "Maghrib",
+      "isha": "Isha",
+      "nextPrayer": "Next Prayer",
+      "startsIn": "in"
+    },
+    "featuresTitle": "Crafted for Devotion, Engineered for Tranquility",
+    "featuresSubtitle": "A premium interface that seamlessly blends authentic Islamic artistry with state-of-the-art mobile technology.",
+    "featuresTag": "Sacred Features",
     "features": {
       "prayerTimes": {
-        "title": "Precise Prayer Times",
-        "description": "Accurate prayer calculations based on your location with beautifully crafted, customizable Adhan alerts."
+        "title": "Precise Prayer Times & Adhan",
+        "description": "Accurate prayer calculations based on your exact location with beautifully crafted, customizable Adhan alerts and countdowns."
       },
       "quran": {
-        "title": "The Holy Quran",
-        "description": "Immerse yourself in the Word of God with elegant reading modes, translations, and high-quality recitations."
+        "title": "The Holy Quran & Audio",
+        "description": "Immerse yourself in the Word of God with crystal-clear Mushaf typography, translations, and authentic recitations."
       },
       "qibla": {
-        "title": "Qibla Direction",
-        "description": "Find the Qibla with absolute precision anywhere in the world, ensuring you are always oriented towards the Kabah."
+        "title": "Augmented Qibla Compass",
+        "description": "Find the true direction toward the Holy Kaaba instantly with gyro-stabilized compass guidance from anywhere."
+      },
+      "checklist": {
+        "title": "Daily Hisab & Muhasaba",
+        "description": "Track your five prayers, sunnahs, fasting, and good deeds with a dedicated self-accountability checklist."
       },
       "azkar": {
-        "title": "Azkar & Adhkar",
-        "description": "A curated collection of daily remembrances and authentic supplications to bring peace to your heart."
+        "title": "Authentic Adhkar & Tasbih",
+        "description": "Morning and evening remembrances from Hisn al-Muslim paired with an intuitive haptic digital tasbih."
+      },
+      "asma": {
+        "title": "99 Names of Allah (Asmaul Husna)",
+        "description": "Explore each divine name with detailed linguistic meanings, spiritual virtues, and audio pronunciations."
       },
       "ramadan": {
-        "title": "Ramadan Companion",
-        "description": "Specialized features for the holy month, including accurate Imsak, Iftar, and Taraweeh scheduling."
+        "title": "Qiyam & Fasting Companion",
+        "description": "Specialized companion for Qiyam al-Layl (Tahajjud), White Days voluntary fasts, and Ramadan schedules."
       },
       "notifications": {
-        "title": "Premium Spiritual Alerts",
-        "description": "Thoughtfully designed notifications that honor the sanctity and serenity of your daily rituals."
+        "title": "Zero-Tracking & Private Cloud Sync",
+        "description": "Local-first storage with optional private Supabase cloud sync. No intrusive tracking, zero commercial ads."
       }
     },
     "showcase": {
-      "title": "Contemporary Artistry, Timeless Faith",
-      "description": "We believe spiritual tools should be as beautiful as they are functional. Takwa features a curated dark-mode aesthetic, refined gold gradients, and fluid transitions.",
+      "tag": "Visual Experience",
+      "title": "Designed for Serenity & Focus",
+      "subtitle": "Immerse yourself in a distraction-free Islamic companion designed with dark mode elegance, refined gold gradients, and fluid transitions.",
+      "tabs": {
+        "all": "All Screens",
+        "worship": "Prayer & Qibla",
+        "quran": "Holy Quran",
+        "habits": "Hisab & Habits",
+        "adhkar": "Adhkar & Asma"
+      },
+      "items": {
+        "0": { "title": "Home & Next Prayer", "desc": "Live countdown to the next prayer, all daily times at a glance, and your worship progress card." },
+        "1": { "title": "Habit Stats & Streaks", "desc": "Weekly performance charts, Taqwa points, and streak tracking to keep you consistent." },
+        "2": { "title": "Quran Reader – Mushaf Mode", "desc": "Distraction-free Mushaf in premium dark mode with smooth recitation playback." },
+        "3": { "title": "Start a New Khatma", "desc": "Begin a new Quran completion journey or continue a free reading with AI-powered memorisation." },
+        "4": { "title": "Surah Index & Search", "desc": "Browse by Surah, Juz, page, or verse. Instant search across the entire Quran." },
+        "5": { "title": "App Navigation Hub", "desc": "Quick access to all features: Prayer, Quran, Accountability, Names of Allah, and more." },
+        "6": { "title": "Qiyam – Night Prayer", "desc": "A peaceful guided Qiyam session with dhikr, Quran recitation, and last-third-of-night alerts." },
+        "7": { "title": "Dashboard Overview", "desc": "Your spiritual home: prayer countdown, worship card, and today's acts of devotion." },
+        "8": { "title": "Worship Completion Stats", "desc": "Prayer attendance rates, Quran pages read, and devotion analytics at a glance." },
+        "9": { "title": "Adhan & Notifications", "desc": "Customise adhan sounds, silent modes, Fajr wake-up, morning/evening adhkar reminders, and more." }
+      },
       "list": [
         "Premium Dark Mode Experience",
         "Authentic Islamic Geometric Patterns",
         "Fluid & Responsive Interactions",
         "Adaptive Design for All Devices"
       ]
+    },
+    "quote": {
+      "arabic": "أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
+      "surah": "Surah Ar-Ra'd • Verse 28",
+      "translation": "Verily, in the remembrance of Allah do hearts find rest and peace."
+    },
+    "downloadHub": {
+      "tag": "Get Started Immediately",
+      "title": "Download Takwa for Android",
+      "subtitle": "Get our safe early-access release directly onto your phone before the Google Play launch. Fast, secure, and always free.",
+      "qrTitle": "Scan with Your Mobile Camera",
+      "qrSubtitle": "Open your phone camera to download the APK directly to your device.",
+      "ctaButton": "Download APK (v{version})",
+      "badgeAndroid": "Android 8.0+ (ARM64 & Universal)",
+      "badgeSize": "Size: {size}",
+      "shaTitle": "Verified SHA-256 Checksum",
+      "sha1Title": "Verified SHA-1 Checksum",
+      "copied": "Copied to clipboard!",
+      "copy": "Copy Hash",
+      "securityTrust": "Signed & Verified Safe • Zero Malware • Open Architecture",
+      "platforms": {
+        "android": { "name": "Android APK", "status": "Available Now (Direct Download)", "active": true },
+        "play": { "name": "Google Play Store", "status": "Release Under Review", "active": false },
+        "ios": { "name": "iOS App Store", "status": "In Active Development", "active": false },
+        "web": { "name": "Web Companion", "status": "Active Early Access", "active": true }
+      },
+      "installGuide": {
+        "title": "3 Easy Steps to Install on Android",
+        "step1": { "title": "1. Download the APK", "desc": "Tap the button above or scan the QR code to save the file." },
+        "step2": { "title": "2. Enable Unknown Sources", "desc": "When prompted by your browser, tap Settings and allow installation from this source." },
+        "step3": { "title": "3. Open and Begin", "desc": "Tap Install, open Takwa, and set your location for accurate prayer times." }
+      },
+      "sideTitle": "Platform Availability",
+      "privacyTitle": "Zero Ads & Zero Tracking",
+      "privacyBody": "Takwa is built on a local-first architecture with optional encrypted cloud sync. Your spiritual data stays yours — never sold, never analysed for profit."
     }
   },
   "Metadata": {
@@ -50,7 +132,9 @@
   "Navigation": {
     "home": "Home",
     "features": "Features",
+    "screenshots": "Screenshots",
     "download": "Download",
+    "dashboard": "Dashboard",
     "support": "Support",
     "legal": "Legal",
     "privacy": "Privacy Policy",
@@ -175,7 +259,33 @@
   "Dashboard": {
     "title": "Your Dashboard",
     "welcome": "Signed in as {email}.",
-    "placeholderNote": "This is a foundation page — your prayer stats and achievements will appear here in a future update.",
-    "signOut": "Sign Out"
+    "placeholderNote": "This is your personal Takwa web hub. Your synced prayers, daily checklist, and spiritual streaks will be visualized here.",
+    "signOut": "Sign Out",
+    "statsTeaserTitle": "Your Spiritual Companion",
+    "statsTeaserSubtitle": "Sync your prayers and daily checklist across all your devices seamlessly.",
+    "syncActive": "Cloud Sync Active",
+    "lastSync": "Connected to Takwa Cloud",
+    "earlyBadge": "Early Access Release",
+    "verifiedSafe": "100% Verified Safe • Direct Supabase Storage Delivery",
+    "systemRequirements": "Requirements: Android 8.0 (Oreo) or later",
+    "copySha": "Copy Checksum",
+    "copiedSha": "Checksum copied to clipboard!",
+    "installGuideTitle": "How to install this APK on your device",
+    "step1": "Download the APK file directly using the button above.",
+    "step2": "Tap the downloaded file and choose \"Allow from this source\" when prompted.",
+    "step3": "Tap Install and launch Takwa to begin your journey.",
+    "download": {
+      "title": "Download Takwa App",
+      "subtitle": "Before Google Play launch — get the safe APK directly",
+      "version": "Version {version}",
+      "size": "Size: {size}",
+      "platform": "Android — ARM64 & Universal",
+      "badge": "Early Access",
+      "button": "Download APK",
+      "instructions": "Note: Enable \"Install from Unknown Sources\" in your phone settings before installing.",
+      "sha1Label": "SHA-1:",
+      "sha256Label": "SHA-256:",
+      "unavailable": "Download link is not available yet. Please check back later."
+    }
   }
 }

@@ -242,7 +242,7 @@ class SyncManager {
         // 'tasbeeh_count': record.tasbeehCount,
         'fasting_type': record.fastingType.name,
         'sadaqah': record.sadaqah,
-        'ghadh_basar': record.ghadhBasar,
+        // 'ghadh_basar': record.ghadhBasar,
         // 'sadaqah_amount': record.sadaqahAmount,
         'net_points': record.netPoints,
         'taqwa_points': record.taqwaPoints,

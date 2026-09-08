@@ -133,7 +133,11 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
 
   Future<void> _autoDetectLocation() async {
     setState(() => _isLoading = true);
-    final result = await LocationPrayerManager.refreshLocation(ref);
+    final result = await LocationPrayerManager.requestAndUpdateLocation(
+      context,
+      ref,
+      showFeedbackSnackBar: false,
+    );
     setState(() => _isLoading = false);
 
     if (!mounted) return;

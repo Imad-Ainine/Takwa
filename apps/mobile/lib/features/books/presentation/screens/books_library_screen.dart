@@ -21,7 +21,7 @@ class BooksLibraryScreen extends ConsumerStatefulWidget {
 class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
   String _searchQuery = '';
   BookCategory? _selectedCategory;
-  bool _isGridView = false;
+  bool _isGridView = true;
   final _scrollCtrl = ScrollController();
 
   @override
@@ -264,7 +264,9 @@ class _SearchBar extends StatelessWidget {
         textAlign: TextAlign.start,
         decoration: InputDecoration(
           hintText: l10n.booksSearchHint,
-          hintStyle: TextStyle(color: colors.textSecondary.withValues(alpha: 0.5)),
+          hintStyle: TextStyle(
+            color: colors.textSecondary.withValues(alpha: 0.5),
+          ),
           prefixIcon: Icon(Icons.search, color: colors.gold),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(

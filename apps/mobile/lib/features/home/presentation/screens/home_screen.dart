@@ -1924,14 +1924,14 @@ class _BooksSection extends ConsumerWidget {
           ),
         ),
         SizedBox(
-          height: 190,
+          height: 200,
           child: booksAsync.when(
             loading: () => ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               itemCount: 3,
               separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.md),
-              itemBuilder: (_, __) => _Skeleton(style: s, height: 180),
+              itemBuilder: (_, __) => _Skeleton(style: s, height: 190),
             ),
             error: (_, __) => TakwaErrorState(
               compact: true,
@@ -2052,7 +2052,10 @@ class _BookCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 7,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

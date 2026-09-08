@@ -8,6 +8,7 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
+import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -99,6 +100,7 @@ class PrayerScreenState {
   final bool isIqamaPhase;
   final String cityName;
   final bool loading;
+  final bool isUpdatingLocation;
   final String? error;
 
   const PrayerScreenState({
@@ -110,6 +112,7 @@ class PrayerScreenState {
     this.isIqamaPhase = false,
     this.cityName = '',
     this.loading = true,
+    this.isUpdatingLocation = false,
     this.error,
   });
 
@@ -122,6 +125,7 @@ class PrayerScreenState {
     bool? isIqamaPhase,
     String? cityName,
     bool? loading,
+    bool? isUpdatingLocation,
     String? error,
   }) => PrayerScreenState(
     prayers: prayers ?? this.prayers,
@@ -132,6 +136,7 @@ class PrayerScreenState {
     isIqamaPhase: isIqamaPhase ?? this.isIqamaPhase,
     cityName: cityName ?? this.cityName,
     loading: loading ?? this.loading,
+    isUpdatingLocation: isUpdatingLocation ?? this.isUpdatingLocation,
     error: error,
   );
 }
@@ -191,10 +196,37 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
     }, fireImmediately: false);
   }
 
-  Future<void> refresh() async {
-    state = state.copyWith(loading: true);
-    await LocationPrayerManager.refreshLocation(_ref);
-    await _init();
+  Future<void> refresh({BuildContext? context}) async {
+    if (context != null && context.mounted) {
+      state = state.copyWith(isUpdatingLocation: true);
+      try {
+        final result = await LocationPrayerManager.requestAndUpdateLocation(
+          context,
+          _ref,
+        );
+        if (result.isSuccess) {
+          final settings = _ref.read(settingsDaoProvider);
+          final city = await settings.get('cityName') ?? state.cityName;
+          _ref.invalidate(prayerTimesProvider);
+          final prayers = await _ref.read(prayerTimesProvider.future);
+          state = state.copyWith(
+            prayers: prayers,
+            cityName: city,
+            isUpdatingLocation: false,
+            error: null,
+          );
+          _tick();
+        } else {
+          state = state.copyWith(isUpdatingLocation: false);
+        }
+      } catch (e) {
+        state = state.copyWith(isUpdatingLocation: false);
+      }
+    } else {
+      state = state.copyWith(loading: true);
+      await LocationPrayerManager.refreshLocation(_ref);
+      await _init();
+    }
   }
 
   void _startTicker() {
@@ -346,8 +378,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
               ? _LoadingOverlay(style: style)
               : state.error != null
               ? _ErrorView(
-                  onRetry: () =>
-                      ref.read(prayerScreenProvider.notifier).refresh(),
+                  onRetry: () => ref
+                      .read(prayerScreenProvider.notifier)
+                      .refresh(context: context),
                 )
               : _buildContent(context, state, visual, style),
         ],
@@ -367,7 +400,10 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
           // ── Prayer Header ──
           _PrayerHeader(
             cityName: state.cityName,
-            onRefresh: () => ref.read(prayerScreenProvider.notifier).refresh(),
+            onRefresh: () => ref
+                .read(prayerScreenProvider.notifier)
+                .refresh(context: context),
+            isUpdating: state.isUpdatingLocation,
             entryCtrl: _entryCtrl,
             style: style,
           ),
@@ -562,12 +598,14 @@ class _ParticlePainter extends CustomPainter {
 class _PrayerHeader extends StatelessWidget {
   final String cityName;
   final VoidCallback onRefresh;
+  final bool isUpdating;
   final AnimationController entryCtrl;
   final AdaptiveStyle style;
 
   const _PrayerHeader({
     required this.cityName,
     required this.onRefresh,
+    this.isUpdating = false,
     required this.entryCtrl,
     required this.style,
   });
@@ -655,7 +693,7 @@ class _PrayerHeader extends StatelessWidget {
                           ),
                         ),
                         TakwaTappable(
-                          onTap: onRefresh,
+                          onTap: isUpdating ? null : onRefresh,
                           borderRadius: BorderRadius.circular(20),
                           child: Container(
                             width: 40,
@@ -672,10 +710,22 @@ class _PrayerHeader extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            child: Icon(
-                              Icons.refresh_rounded,
-                              size: 20,
-                              color: style.gold,
+                            child: Center(
+                              child: isUpdating
+                                  ? SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: TakwaLoadingIndicator(
+                                        color: style.gold,
+                                        strokeWidth: 2,
+                                        size: 18,
+                                      ),
+                                    )
+                                  : Icon(
+                                      Icons.refresh_rounded,
+                                      size: 20,
+                                      color: style.gold,
+                                    ),
                             ),
                           ),
                         ),
