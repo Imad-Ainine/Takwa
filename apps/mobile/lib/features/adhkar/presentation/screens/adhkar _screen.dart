@@ -10,6 +10,7 @@ import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_time_picker.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/adhkar/presentation/screens/_user_community_adhkar_views.dart';
 import 'package:takwa/core/providers/favorites_providers.dart';
 import 'package:takwa/core/routes/app_routes.dart';
@@ -380,11 +381,15 @@ class _CategoryProgressBar extends StatelessWidget {
               ),
               const Spacer(),
               if (done > 0)
-                GestureDetector(
+                TakwaTappable(
                   onTap: () {
                     HapticFeedback.lightImpact();
                     onReset();
                   },
+                  // A text link inline with the count label above via
+                  // Spacer(), not a boxed control — keep its current
+                  // footprint rather than forcing the 48dp floor.
+                  minTapSize: null,
                   child: Text(
                     l10n.adhkarResetButton,
                     style: context.typography.caption.copyWith(

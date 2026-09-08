@@ -409,7 +409,9 @@ class _LocationStep extends StatelessWidget {
               child: SizedBox(
                 width: 200,
                 height: 200,
-                child: CustomPaint(painter: _LocationIllustration()),
+                child: CustomPaint(
+                  painter: _LocationIllustration(colors: context.colors),
+                ),
               ),
             ),
           ),
@@ -488,7 +490,9 @@ class _NotificationsStepState extends State<_NotificationsStep>
                   child: SizedBox(
                     width: 220,
                     height: 200,
-                    child: CustomPaint(painter: _BellIllustration()),
+                    child: CustomPaint(
+                      painter: _BellIllustration(colors: context.colors),
+                    ),
                   ),
                 ),
               ),
@@ -1026,7 +1030,9 @@ class _PlanStepState extends State<_PlanStep>
                 child: SizedBox(
                   width: 200,
                   height: 160,
-                  child: CustomPaint(painter: _PlanIllustration()),
+                  child: CustomPaint(
+                    painter: _PlanIllustration(colors: context.colors),
+                  ),
                 ),
               ),
             ),
@@ -1426,9 +1432,16 @@ class _BottomActions extends StatelessWidget {
 }
 
 // ── CUSTOM PAINTERS ──
+// Audit §M10: these used to paint from the static `AppColors` alias (which
+// is always the *dark* palette — see app_theme.dart), so every onboarding
+// illustration rendered dark-mode colors even when the device was in light
+// mode. Each painter below now takes the resolved `AppColorsExtension` from
+// its caller's `context.colors` instead, so onboarding matches whichever
+// theme is active like the rest of the app.
 class _OnboardBgPainter extends CustomPainter {
   final double t;
-  _OnboardBgPainter({required this.t});
+  final AppColorsExtension colors;
+  _OnboardBgPainter({required this.t, required this.colors});
 
   static final _rng = math.Random(42);
   static List<Offset>? _stars;
@@ -1437,7 +1450,7 @@ class _OnboardBgPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = AppColors.night,
+      Paint()..color = colors.night,
     );
 
     _stars ??= List.generate(
@@ -1453,7 +1466,7 @@ class _OnboardBgPainter extends CustomPainter {
       canvas.drawCircle(
         _stars![i],
         0.8 + _rng.nextDouble(),
-        Paint()..color = AppColors.gold.withValues(alpha: op),
+        Paint()..color = colors.gold.withValues(alpha: op),
       );
     }
 
@@ -1466,7 +1479,7 @@ class _OnboardBgPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(cx + 10, cy - 4),
       15,
-      Paint()..color = AppColors.night,
+      Paint()..color = colors.night,
     );
 
     canvas.drawCircle(
@@ -1475,7 +1488,7 @@ class _OnboardBgPainter extends CustomPainter {
       Paint()
         ..shader =
             RadialGradient(
-              colors: [AppColors.gold.withValues(alpha: 0.06), Colors.transparent],
+              colors: [colors.gold.withValues(alpha: 0.06), Colors.transparent],
             ).createShader(
               Rect.fromCircle(center: Offset(size.width / 2, -60), radius: 200),
             ),
@@ -1483,10 +1496,13 @@ class _OnboardBgPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_OnboardBgPainter o) => o.t != t;
+  bool shouldRepaint(_OnboardBgPainter o) => o.t != t || o.colors != colors;
 }
 
 class _LocationIllustration extends CustomPainter {
+  final AppColorsExtension colors;
+  _LocationIllustration({required this.colors});
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2, cy = size.height / 2;
@@ -1494,11 +1510,11 @@ class _LocationIllustration extends CustomPainter {
       Rect.fromCenter(center: Offset(cx - 20, cy), width: 120, height: 160),
       const Radius.circular(18),
     );
-    canvas.drawRRect(phone, Paint()..color = const Color(0xFF1A2332));
+    canvas.drawRRect(phone, Paint()..color = colors.card);
     canvas.drawRRect(
       phone,
       Paint()
-        ..color = AppColors.gold.withValues(alpha: 0.3)
+        ..color = colors.gold.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1508,24 +1524,24 @@ class _LocationIllustration extends CustomPainter {
         Offset(cx - 80 + i * 20, cy - 60),
         Offset(cx - 80 + i * 20, cy + 60),
         Paint()
-          ..color = AppColors.border
+          ..color = colors.border
           ..strokeWidth = 0.8,
       );
     }
 
-    _drawPin(canvas, Offset(cx - 20, cy - 20), 16, AppColors.gold);
-    _drawPin(canvas, Offset(cx + 10, cy + 20), 10, AppColors.teal);
+    _drawPin(canvas, Offset(cx - 20, cy - 20), 16, colors.gold);
+    _drawPin(canvas, Offset(cx + 10, cy + 20), 10, colors.teal);
 
     canvas.drawCircle(
       Offset(cx + 60, cy + 20),
       30,
-      Paint()..color = AppColors.teal.withValues(alpha: 0.15),
+      Paint()..color = colors.teal.withValues(alpha: 0.15),
     );
     canvas.drawCircle(
       Offset(cx + 60, cy + 20),
       30,
       Paint()
-        ..color = AppColors.teal
+        ..color = colors.teal
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.5,
     );
@@ -1533,7 +1549,7 @@ class _LocationIllustration extends CustomPainter {
       Offset(cx + 60, cy + 20),
       Offset(cx + 60, cy + 6),
       Paint()
-        ..color = AppColors.gold
+        ..color = colors.gold
         ..strokeWidth = 2
         ..strokeCap = StrokeCap.round,
     );
@@ -1541,7 +1557,7 @@ class _LocationIllustration extends CustomPainter {
       Offset(cx + 60, cy + 20),
       Offset(cx + 70, cy + 20),
       Paint()
-        ..color = AppColors.textSecondary
+        ..color = colors.textSecondary
         ..strokeWidth = 1.5
         ..strokeCap = StrokeCap.round,
     );
@@ -1552,7 +1568,7 @@ class _LocationIllustration extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = AppColors.gold.withValues(alpha: 0.5)
+        ..color = colors.gold.withValues(alpha: 0.5)
         ..strokeWidth = 1.5
         ..style = PaintingStyle.stroke,
     );
@@ -1561,14 +1577,17 @@ class _LocationIllustration extends CustomPainter {
   void _drawPin(Canvas canvas, Offset pos, double r, Color color) {
     canvas.drawCircle(pos, r, Paint()..color = color.withValues(alpha: 0.2));
     canvas.drawCircle(pos, r - 4, Paint()..color = color);
-    canvas.drawCircle(pos, r - 8, Paint()..color = AppColors.night);
+    canvas.drawCircle(pos, r - 8, Paint()..color = colors.night);
   }
 
   @override
-  bool shouldRepaint(covariant _LocationIllustration o) => false;
+  bool shouldRepaint(covariant _LocationIllustration o) => o.colors != colors;
 }
 
 class _BellIllustration extends CustomPainter {
+  final AppColorsExtension colors;
+  _BellIllustration({required this.colors});
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2, cy = size.height / 2;
@@ -1577,7 +1596,7 @@ class _BellIllustration extends CustomPainter {
       canvas.drawCircle(
         Offset(cx, cy),
         40.0 + i * 12,
-        Paint()..color = AppColors.gold.withValues(alpha: 0.03 + i * 0.02),
+        Paint()..color = colors.gold.withValues(alpha: 0.03 + i * 0.02),
       );
     }
 
@@ -1590,21 +1609,21 @@ class _BellIllustration extends CustomPainter {
     bell.quadraticBezierTo(cx - 55, cy - 40, cx, cy - 55);
     bell.close();
 
-    canvas.drawPath(bell, Paint()..color = AppColors.gold.withValues(alpha: 0.85));
+    canvas.drawPath(bell, Paint()..color = colors.gold.withValues(alpha: 0.85));
     canvas.drawPath(
       bell,
       Paint()
-        ..color = AppColors.goldLight
+        ..color = colors.goldLight
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
 
-    canvas.drawCircle(Offset(cx, cy + 44), 10, Paint()..color = AppColors.gold);
+    canvas.drawCircle(Offset(cx, cy + 44), 10, Paint()..color = colors.gold);
     canvas.drawLine(
       Offset(cx, cy + 35),
       Offset(cx, cy + 34),
       Paint()
-        ..color = AppColors.goldLight
+        ..color = colors.goldLight
         ..strokeWidth = 3,
     );
 
@@ -1614,7 +1633,7 @@ class _BellIllustration extends CustomPainter {
       math.pi,
       false,
       Paint()
-        ..color = AppColors.gold
+        ..color = colors.gold
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3,
     );
@@ -1622,7 +1641,7 @@ class _BellIllustration extends CustomPainter {
     canvas.drawCircle(
       Offset(cx + 44, cy - 44),
       20,
-      Paint()..color = AppColors.teal,
+      Paint()..color = colors.teal,
     );
     final tp = TextPainter(
       text: const TextSpan(
@@ -1648,7 +1667,7 @@ class _BellIllustration extends CustomPainter {
         -math.pi / 2,
         false,
         Paint()
-          ..color = AppColors.teal.withValues(alpha: 0.4 - i * 0.1)
+          ..color = colors.teal.withValues(alpha: 0.4 - i * 0.1)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2,
       );
@@ -1656,10 +1675,13 @@ class _BellIllustration extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BellIllustration o) => false;
+  bool shouldRepaint(covariant _BellIllustration o) => o.colors != colors;
 }
 
 class _PlanIllustration extends CustomPainter {
+  final AppColorsExtension colors;
+  _PlanIllustration({required this.colors});
+
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2, cy = size.height / 2;
@@ -1668,22 +1690,22 @@ class _PlanIllustration extends CustomPainter {
         Rect.fromCenter(center: Offset(cx, cy + 20), width: 80, height: 80),
         const Radius.circular(12),
       ),
-      Paint()..color = const Color(0xFF1A2332),
+      Paint()..color = colors.card,
     );
     for (int i = 0; i < 5; i++) {
       final angle = i * math.pi * 0.4 - math.pi;
       canvas.drawCircle(
         Offset(cx + 70 * math.cos(angle), cy + 30 * math.sin(angle)),
         12,
-        Paint()..color = AppColors.gold.withValues(alpha: 0.8),
+        Paint()..color = colors.gold.withValues(alpha: 0.8),
       );
       canvas.drawCircle(
         Offset(cx + 70 * math.cos(angle), cy + 30 * math.sin(angle)),
         8,
-        Paint()..color = AppColors.goldLight.withValues(alpha: 0.5),
+        Paint()..color = colors.goldLight.withValues(alpha: 0.5),
       );
     }
-    _drawStar(canvas, Offset(cx, cy - 50), 20, AppColors.gold);
+    _drawStar(canvas, Offset(cx, cy - 50), 20, colors.gold);
   }
 
   void _drawStar(Canvas canvas, Offset c, double r, Color color) {
@@ -1699,7 +1721,7 @@ class _PlanIllustration extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _PlanIllustration o) => false;
+  bool shouldRepaint(covariant _PlanIllustration o) => o.colors != colors;
 }
 
 // ── STEP: Overlay ──
@@ -1754,7 +1776,10 @@ class _OverlayStepState extends State<_OverlayStep>
                   width: 220,
                   height: 200,
                   child: CustomPaint(
-                    painter: _OverlayIllustration(progress: _floatCtrl.value),
+                    painter: _OverlayIllustration(
+                      progress: _floatCtrl.value,
+                      colors: context.colors,
+                    ),
                   ),
                 ),
               ),
@@ -1781,7 +1806,8 @@ class _OverlayStepState extends State<_OverlayStep>
 
 class _OverlayIllustration extends CustomPainter {
   final double progress;
-  _OverlayIllustration({required this.progress});
+  final AppColorsExtension colors;
+  _OverlayIllustration({required this.progress, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1792,11 +1818,11 @@ class _OverlayIllustration extends CustomPainter {
       Rect.fromCenter(center: Offset(cx, cy + 20), width: 140, height: 100),
       const Radius.circular(12),
     );
-    canvas.drawRRect(appRect, Paint()..color = const Color(0xFF1A2332));
+    canvas.drawRRect(appRect, Paint()..color = colors.card);
     canvas.drawRRect(
       appRect,
       Paint()
-        ..color = AppColors.border
+        ..color = colors.border
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
@@ -1806,7 +1832,7 @@ class _OverlayIllustration extends CustomPainter {
       canvas.drawLine(
         Offset(cx - 50, cy - 10 + i * 15),
         Offset(cx + 50, cy - 10 + i * 15),
-        Paint()..color = AppColors.border.withValues(alpha: 0.3),
+        Paint()..color = colors.border.withValues(alpha: 0.3),
       );
     }
 
@@ -1822,15 +1848,15 @@ class _OverlayIllustration extends CustomPainter {
       overlayRect.inflate(8),
       Paint()
         ..shader = RadialGradient(
-          colors: [AppColors.gold.withValues(alpha: 0.15), Colors.transparent],
+          colors: [colors.gold.withValues(alpha: 0.15), Colors.transparent],
         ).createShader(Rect.fromCircle(center: Offset(cx, floatY), radius: 60)),
     );
 
-    canvas.drawRRect(overlayRect, Paint()..color = AppColors.card);
+    canvas.drawRRect(overlayRect, Paint()..color = colors.card);
     canvas.drawRRect(
       overlayRect,
       Paint()
-        ..color = AppColors.gold.withValues(alpha: 0.6)
+        ..color = colors.gold.withValues(alpha: 0.6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1840,8 +1866,8 @@ class _OverlayIllustration extends CustomPainter {
     final tp = TextPainter(
       text: TextSpan(
         text: l10n.onboardingDemoTasbeehText,
-        style: const TextStyle(
-          color: AppColors.gold,
+        style: TextStyle(
+          color: colors.gold,
           fontSize: 12,
           fontWeight: FontWeight.bold,
         ),
@@ -1853,7 +1879,7 @@ class _OverlayIllustration extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _OverlayIllustration o) =>
-      o.progress != progress;
+      o.progress != progress || o.colors != colors;
 }
 
 // ── STEP: Background ──
@@ -1910,6 +1936,7 @@ class _BackgroundStepState extends State<_BackgroundStep>
                   child: CustomPaint(
                     painter: _BackgroundIllustration(
                       progress: _pulseCtrl.value,
+                      colors: context.colors,
                     ),
                   ),
                 ),
@@ -1939,7 +1966,8 @@ class _BackgroundStepState extends State<_BackgroundStep>
 
 class _BackgroundIllustration extends CustomPainter {
   final double progress;
-  _BackgroundIllustration({required this.progress});
+  final AppColorsExtension colors;
+  _BackgroundIllustration({required this.progress, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1952,7 +1980,7 @@ class _BackgroundIllustration extends CustomPainter {
       canvas.drawCircle(
         Offset(cx, cy),
         r,
-        Paint()..color = AppColors.teal.withValues(alpha: opacity),
+        Paint()..color = colors.teal.withValues(alpha: opacity),
       );
     }
 
@@ -1972,15 +2000,15 @@ class _BackgroundIllustration extends CustomPainter {
       phoneRect.inflate(10),
       Paint()
         ..shader = RadialGradient(
-          colors: [AppColors.teal.withValues(alpha: 0.2), Colors.transparent],
+          colors: [colors.teal.withValues(alpha: 0.2), Colors.transparent],
         ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 100)),
     );
 
-    canvas.drawRRect(phoneRect, Paint()..color = const Color(0xFF1A2332));
+    canvas.drawRRect(phoneRect, Paint()..color = colors.card);
     canvas.drawRRect(
       phoneRect,
       Paint()
-        ..color = AppColors.teal.withValues(alpha: 0.3)
+        ..color = colors.teal.withValues(alpha: 0.3)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -1991,7 +2019,7 @@ class _BackgroundIllustration extends CustomPainter {
       width: 30,
       height: 50,
     );
-    final batteryPaint = Paint()..color = AppColors.teal.withValues(alpha: 0.7);
+    final batteryPaint = Paint()..color = colors.teal.withValues(alpha: 0.7);
     canvas.drawRRect(
       RRect.fromRectAndRadius(batteryRect, const Radius.circular(4)),
       batteryPaint
@@ -2020,7 +2048,7 @@ class _BackgroundIllustration extends CustomPainter {
         ),
         const Radius.circular(2),
       ),
-      batteryPaint..color = AppColors.teal.withValues(alpha: 0.5 + (0.5 * progress)),
+      batteryPaint..color = colors.teal.withValues(alpha: 0.5 + (0.5 * progress)),
     );
 
     // Gear icons around signifying background services
@@ -2035,7 +2063,7 @@ class _BackgroundIllustration extends CustomPainter {
     double rotation,
   ) {
     final paint = Paint()
-      ..color = AppColors.gold.withValues(alpha: 0.6)
+      ..color = colors.gold.withValues(alpha: 0.6)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.save();
@@ -2058,5 +2086,5 @@ class _BackgroundIllustration extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _BackgroundIllustration o) =>
-      o.progress != progress;
+      o.progress != progress || o.colors != colors;
 }

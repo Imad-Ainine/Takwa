@@ -14,6 +14,7 @@
 
 ## Table of contents
 
+0. [Implementation Status](#0-implementation-status)
 1. [Executive Summary](#1-executive-summary)
 2. [Critical Issues (must-fix)](#2-critical-issues-must-fix)
 3. [High-Priority Improvements](#3-high-priority-improvements)
@@ -25,9 +26,189 @@
 
 ---
 
+## 0. Implementation Status
+
+*Last reconciled 2026-09-08 against the code, not just the commit log — every row below was
+re-checked with a fresh `grep`/read, since the original findings were themselves static-analysis
+counts that don't always survive a second look (see the RTL note under §H5).*
+
+**Score today: this is a materially different codebase than the one this audit describes.**
+Every item in §2 (Critical) and §3 (High-Priority) has been addressed. What's left is concentrated
+in §4 (Medium/Low) and the two structurally large Phase 4 items (§H2 emoji→icons, §H3
+GestureDetector→TakwaTappable) that need either design assets or a file-by-file sweep wider than
+one sitting.
+
+### §2 Critical — all 11 resolved
+
+| # | Status |
+|---|---|
+| C1 onPrimary contrast | ✅ Fixed — `onPrimary`/button foreground is `#241B05` (9.4:1+), full `goldText`/`tealText`/`successText`/`warningText`/`dangerText` on-surface ramp added |
+| C2 App bar title contrast | ✅ Fixed — `titleColor` derived via `estimateBrightnessForColor`, not hardcoded white |
+| C3 Forced light status bar | ✅ Fixed — the 16 per-screen `AnnotatedRegion`s are gone; the only 2 left are theme-derived (`main.dart`'s `TakwaApp.builder`) or intentionally independent of app theme (Quran reader's own sepia/night reading theme) |
+| C4 `PrimaryButton` unreachable by screen readers | ✅ Fixed — real `onTap`, `Semantics(button:)`, 48dp min height, `try/finally`, locale-correct font |
+| C5 Ramadan theme drops 11 component themes | ✅ Fixed — `RamadanTheme.dark/light` now call the shared `AppTheme.fromColors` builder; the ~200-line duplicate `ThemeData` and the second type scale are gone |
+| C6 Silent error branches | ✅ Fixed — `TakwaErrorState` shared component exists and is used; the 2 remaining `error: (_, _) => SizedBox()` are documented, deliberate (a toast and a count badge that both have the failure surfaced elsewhere on the same screen) |
+| C7 `Navigator.pop()` on non-route overlays | ✅ Fixed — both the drawer and `guest_mode_guard` sites call the right dismiss API now |
+| C8 Ramadan painter cache thrashing | ✅ Fixed |
+| C9 Forever-looping app bar animation | ✅ Fixed — `AppMotion`/`prefersReducedMotion`/`repeatUnlessReducedMotion` exist and are wired through the app bar and other ambient loops |
+| C10 6-tab bottom nav, emoji, 9.5px labels | ✅ Fixed — 5 destinations, real `Icons.*` (outlined/filled selected state), theme type scale |
+| C11 `MainShell(initialIndex:)` nav desync | ✅ Fixed — `currentTabProvider` is reconciled in `initState`'s post-frame callback |
+
+### §3 High-Priority — all 9 resolved
+
+H1 (type scale rebuilt to a 12–32px, role-based 10-step scale), H2 (bottom nav's emoji are gone —
+see below for the rest of the app), H3 (`TakwaTappable` exists and is adopted in several places —
+see below for the remaining call sites), H4 (chart has `Semantics`, fixed contrast, persistent
+tooltip, `onTapCancel`; `fl_chart`/`scrollable_positioned_list` removed from `pubspec.yaml`), H5
+(RTL — see the correction below), H6 (`AutomaticKeepAliveClientMixin` on all 6 shell tabs plus
+Asma), H7 (`AuthField` rebuilt with focus chaining, `autofillHints`, `AutofillGroup`, a real
+`FormField` driving a visible error border), H8 (sync-status affordance + optimistic checklist
+writes), H9 (splash gates on a readiness future, not a flat timer) are all done.
+
+**Correction to §H5 (RTL):** the original raw counts (`0 EdgeInsetsDirectional`,
+`34 Positioned(left/right)`, `chevron_left`/`chevron_right` "both conventions ship") were accurate
+counts but an overstated *bug* — re-reading the actual call sites: the drawer now opens from the
+correct edge (`PositionedDirectional` + a direction-signed translate + `PopScope` for Android back);
+essentially every drill-in/back chevron in the app (`quran_screen`, `free_reading_screen`,
+`ai_memorize_screen`, `settings_widgets`, `checklist_screen`, `home_screen`,
+`qiyam_dashboard_screen`, `quran_widgets`, …) is already `Directionality.of(context) == rtl ? ... :
+...`, correctly mirrored per-locale; `EdgeInsets.only(left/right:)` is down to 1 site app-wide. The
+remaining absolute `Positioned(left/right:)` sites are decorative corner glows/blobs and symmetric
+`left: 0, right: 0` full-bleed bars — not locale-directional by nature, so `PositionedDirectional`
+wouldn't change their behavior. The remaining `TextAlign.right` sites are all Qur'an/Khatma content
+that's Arabic regardless of UI locale (same reasoning as `quranicVerse`'s fixed Amiri font in
+§app_theme.dart) — not a locale bug either. **Net: RTL is in good shape; no further sweep needed**
+unless a specific screen is visually confirmed wrong (this audit still has no Flutter SDK / device
+to render against).
+
+### §4 Medium/Low — mostly resolved; three fixed in this pass
+
+✅ Done since the original audit: M1 (`settings:` on routes), M2 (404 styled+localized, safe
+argument casts), M3 (real `MediaQuery` insets), M4/M5 (off-grid spacing/icon sizes swept), M6
+(bottom sheets get `useSafeArea`/`showDragHandle`), M9 (`copyWith`/`lerp` implemented for real on
+all 4 extensions), M11 (date picker theme no longer crashes/forces dark), M12 (leaked Arabic
+strings localized), M14 (`Matrix4..scale` fixed), M15 (41 background patterns curated to 3),
+M17 (`use_build_context_synchronously`/`deprecated_member_use` re-enabled, 803 `withOpacity` calls
+migrated), M18 (no `print()` left in `lib/`).
+
+🔧 **Fixed in this pass:**
+- **M10** — `onboarding_screen.dart`'s 6 `CustomPainter`s (37 call sites) hardcoded the static
+  dark-only `AppColors` alias, so onboarding rendered dark-mode illustration colors in light mode.
+  Each painter now takes `AppColorsExtension colors` from its caller's `context.colors`.
+- **M16** — `custom_pattern_background.dart` called `_ctrl.stop()`/`_ctrl.repeat()` inline in
+  `build()`. Moved to `didChangeDependencies` (for the reduce-motion/MediaQuery half) plus a
+  `ref.listen` registered in `build` (for the Ramadan-mode half) — `build()` no longer mutates
+  state as a side effect.
+- **M13 (partial)** — `PasswordStrengthBar`'s weak/medium/good/strong colors were the raw
+  `Colors.redAccent/orange/amber/greenAccent` at every brightness; amber-as-text on a light surface
+  was ~1.8:1. Dark mode keeps the original accents; light mode now uses the theme's `dangerText`/
+  `warningText`/`successText` roles plus one darkened orange, all clearing 4.5:1.
+- **Refactor Plan item 29 (`AppBarWidget` rollout)**, +6 screens — `qiyam_virtues_screen`,
+  `qiyam_sunnah_guide_screen`, `qiyam_beginner_guide_screen`, `qiyam_sleep_calculator_screen`,
+  `qiyam_calculator_screen`, `payment_methods_screen` each hand-rolled the same
+  `Row(CustomLeadingButton, Spacer, Text(title), Spacer)` header; all six now use
+  `Scaffold.appBar: AppBarWidget(...)` instead, dropping the duplicated `_buildAppBar` method in
+  each. `qiyam_calculator_screen` got a small correctness fix as a side effect: its header used to
+  live *inside* the `AsyncValue.when(data: ...)` branch, so there was no back button at all while
+  prayer times were loading or failed to load — hoisting the app bar to `Scaffold.appBar` fixes that
+  for every state. 22 of ~50 screens now use `AppBarWidget`, up from 16.
+- **§H3 `TakwaTappable` rollout**, +7 sites in `quran_widgets.dart` — a first-pass scan classified
+  all ~137 `GestureDetector`s app-wide by callback shape: 37 have `onTap` as their *only* callback
+  (no drag/long-press/double-tap alongside it), making them unambiguous, mechanically-safe
+  conversions; the other ~100 mix in gesture types `TakwaTappable` doesn't model and were left
+  alone. Converted the 7 `onTap`-only sites in this one file as a first slice (`DailyVerseCard`'s
+  drill-in chevron and two icon buttons, `KhatmaActionCard`'s outer tap area and its two
+  `_circleBtn`s, `FeatureGridItem`, `AyahBlock`'s play marker), following the wrapper's own
+  documented guidance throughout: `minTapSize: null` for anything sitting inline in a `Row`/`Wrap`
+  next to other content (forcing 48dp there would eat into the layout rather than usefully growing
+  the tap target), the default 48dp for standalone controls, and `borderRadius` matched to each
+  child's own decoration so the press-tint clips to the same shape. One structural fix alongside
+  it: `KhatmaActionCard` had its outer `margin:` on the same `Container` the `GestureDetector`
+  wrapped, which would have put `TakwaTappable`'s rounded press-tint at the margin's outer (un-inset)
+  edge instead of the card's actual edge — moved the margin to a `Padding` outside the tappable so
+  the two rounded rects line up.
+- **§H3 `TakwaTappable` rollout**, +9 more sites — `qiyam_dashboard_screen`'s play/pause control,
+  `auth_screen`'s "continue as guest" link, `adhkar _screen`'s reset link, `misbaha_screen`'s clear
+  button, `prayer_screen`'s refresh button, `khatma_history_screen`'s delete button,
+  `ai_memorize_screen`'s page-grid item, `book_reader_screen`'s generic `_IconBtn`, and
+  `_user_community_adhkar_views.dart`'s shared `_IconActionButton` (which already had a `Tooltip`,
+  so no `semanticLabel` was added on top of it — same reasoning as below). 16 of the 37 `onTap`-only
+  sites now done.
+  One deliberate exception found while sweeping single-occurrence files: `animated_drawer.dart`'s
+  one `onTap`-only `GestureDetector` is the drawer's full-screen tap-to-dismiss scrim, not a control
+  — wrapping a modal backdrop in a press-scale-and-tint effect would visibly shrink/tint the whole
+  screen on tap, which is not what this component is for. Passing the mechanical "onTap only"
+  filter isn't sufficient on its own; left as a bare `GestureDetector`.
+  Also corrects a mistake in the previous pass: `KhatmaActionCard` and `FeatureGridItem` were given
+  a `semanticLabel` built from their own visible title/subtitle text, which — per `TakwaTappable`'s
+  own doc comment — duplicates that content in the semantics tree instead of reusing what the
+  visible `Text` children already expose. Removed both; `_PageItem` in this pass follows the
+  corrected rule (omits `semanticLabel` since its child `Text` already shows the same page number).
+- **§H3 `TakwaTappable` rollout — the `onTap`-only category is now done.** Swept the remaining 21
+  sites across `mosques_screen` (2), `free_reading_screen` (2), `create_khatma_screen` (5 — one more
+  turned up than the original scan counted), `unified_overlay_window.dart` (1 of 3 — see below), and
+  `quran_screen.dart`/`quran_reader_screen.dart` (8 and 7 respectively, likewise one more each than
+  first counted — the original classification script's per-file tally was approximate; re-running it
+  after each file confirmed the true count before moving on). All 33 genuinely convertible `onTap`-only
+  `GestureDetector`s app-wide are now `TakwaTappable`; re-running the classification afterward finds
+  **zero** remaining except four deliberate exceptions:
+  - `animated_drawer.dart`'s and `unified_overlay_window.dart`'s full-screen tap-to-dismiss scrims —
+    same reasoning as the drawer scrim noted above.
+  - `unified_overlay_window.dart`'s `GestureDetector(onTap: () {}, child: _buildCard())` — a no-op
+    handler that exists purely to *absorb* taps on the notification card so they don't fall through
+    to the dismiss scrim behind it, not a button. `_buildCard()` likely has its own internal tappable
+    content; wrapping the whole card in `TakwaTappable` would visibly scale/tint the entire card on
+    any tap inside it, including taps meant for something else.
+  - `custom_leading_button.dart`'s back/close button — see below, unchanged from the last pass's
+    reasoning.
+  Two more structural margin-vs-`Padding` fixes were needed along the way (same bug as
+  `KhatmaActionCard`): `free_reading_screen.dart`'s "last read" banner and `quran_screen.dart`'s
+  Khatma/Free-Reading action buttons.
+
+⏳ **Still open, deliberately not attempted here** (needs either visual QA on a device/simulator —
+unavailable in this environment, same limitation the original audit had — or design assets this
+pass doesn't have):
+- **M13 (remainder)** — hardcoded hex/`Colors.*` literals in feature code beyond the one component
+  above (`quran_helpers.dart`, `quran_reader_screen.dart`, `prayer_screen.dart`, the overlay
+  windows). Large, and several of these are deliberately-fixed-regardless-of-theme colors (e.g. the
+  Quran night-reading theme), so this needs a per-site read, not a mechanical sweep.
+- **§H2 emoji → icon set** — the bottom nav is fixed; ~660 emoji characters remain across ~50
+  files. Most are legitimate *content* (reaction emoji in `duas_data.dart`, achievement icons,
+  ARB placeholder text) rather than chrome, per the audit's own distinction — but a real pass needs
+  someone to sort which is which, and commissioning/adopting a line-icon set for the rest is a
+  design decision, not a code one.
+- **§H3 `TakwaTappable` rollout, remainder** — the `onTap`-only category is done (see above); ~100
+  `GestureDetector`s remain app-wide that mix in drag/long-press/double-tap alongside `onTap` and need
+  a per-site read rather than the mechanical rule used here — that read is what's left. Plus
+  `custom_leading_button.dart`'s back/close button, deliberately skipped despite being `onTap`-only:
+  it's the single most-reused interactive widget in the app (every `AppBarWidget` screen and dozens
+  more), with its own already-working custom press animation (a 1.0→0.9 `ScaleTransition`) that would
+  need removing first to avoid stacking two press effects, and any resulting size/feel change would
+  show up on nearly every screen — too high a blast radius to change without a device to verify
+  against.
+- **Refactor Plan item 29 (`AppBarWidget` rollout), remainder** — the rest of the ~50 screens fall
+  into two buckets, neither of which is a safe drop-in: (a) screens whose header carries a `TabBar`
+  (`manage_custom_ibadah_screen`, `khatma_history_screen`, `achievements_screen`'s `SliverAppBar`) —
+  `AppBarWidget` has no `bottom:` slot for that today; (b) screens with a bespoke header shape
+  (a two-line title+subtitle, a trailing decorative element, no title text at all, or a
+  scroll-scaled layout like `misbaha_screen`'s `LayoutBuilder`) where swapping in the standardized
+  centered-title bar is a visual-design call this pass can't verify without a device.
+**Correction to the previous pass's note on item 30 (golden tests):** that note was wrong — re-
+reading `main_shell_golden_test.dart` shows the full matrix already exists: all 3 themes × both text
+scales × all 5 bottom-nav screens (30 cases, `test/golden/README.md` documents the one remaining
+manual step). Nothing left to build here; the only blocker is a real `flutter test --update-goldens`
+run, from a machine with the Flutter SDK, to generate baseline images and wire it into CI — the
+README already spells out those steps in full. Not open work, just an unblockable-from-here step.
+- **M7** (66→93 SnackBars as the app has grown, still only a handful with an action) and **M8**
+  (no `barrierDismissible` review) — noted, not swept: adding a retry/undo action needs a real
+  retry callback at each site, which is a per-site judgment call at this volume.
+
+---
+
 ## 1. Executive Summary
 
-**Overall UI/UX score: 5.0 / 10**
+**Overall UI/UX score: 5.0 / 10** *(at the time of the original audit — see §0 above for what's
+changed since)*
 
 A genuinely ambitious app with real craft in places — but the design system is *described* rather
 than *enforced*, and the light theme, accessibility layer, and error states are effectively

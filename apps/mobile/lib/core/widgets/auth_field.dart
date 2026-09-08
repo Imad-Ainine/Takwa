@@ -241,13 +241,20 @@ class PasswordStrengthBar extends StatelessWidget {
         : strength < 0.76
         ? l10n.authPasswordStrengthGood
         : l10n.authPasswordStrengthStrong;
+    // Audit §M13: these were the raw Material accents at every brightness,
+    // and "amber on light is ~1.8:1" as *text* (the bar fill itself doesn't
+    // need text-level contrast, but the label painted in the same color
+    // does). Dark mode keeps the original vivid accents — nothing flagged
+    // those — light mode swaps in darkened versions of the same four hues,
+    // each clearing 4.5:1 on a white/near-white surface.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = strength < 0.26
-        ? Colors.redAccent
+        ? (isDark ? Colors.redAccent : context.colors.dangerText)
         : strength < 0.51
-        ? Colors.orange
+        ? (isDark ? Colors.orange : const Color(0xFF9A3412)) // ~5.8:1 on white
         : strength < 0.76
-        ? Colors.amber
-        : Colors.greenAccent;
+        ? (isDark ? Colors.amber : context.colors.warningText)
+        : (isDark ? Colors.greenAccent : context.colors.successText);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

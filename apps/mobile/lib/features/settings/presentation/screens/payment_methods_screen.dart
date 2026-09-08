@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
+import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
@@ -22,6 +23,12 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      // AppBarWidget instead of a one-off Row(CustomLeadingButton + title)
+      // (audit item 29) — consistent with the rest of the app's app bars.
+      appBar: AppBarWidget(
+        title: l10n.paymentMethodsScreenTitle,
+        leading: CustomLeadingButton(onPressed: () => Navigator.pop(context)),
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -30,7 +37,6 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
           SafeArea(
             child: Column(
               children: [
-                _buildAppBar(context),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
@@ -62,28 +68,6 @@ class _PaymentMethodsScreenState extends ConsumerState<PaymentMethodsScreen> {
                 ),
                 _buildBottomButton(context),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppBar(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.lg,
-        vertical: AppSpacing.sm,
-      ),
-      child: Row(
-        children: [
-          CustomLeadingButton(onPressed: () => Navigator.pop(context)),
-          const SizedBox(width: AppSpacing.md),
-          Text(
-            l10n.paymentMethodsScreenTitle,
-            style: context.typography.headingMedium.copyWith(
-              color: context.colors.textPrimary,
             ),
           ),
         ],

@@ -4429,29 +4429,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get genericErrorMessage =>
-      'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+      'An unexpected error occurred. Please try again.';
 
   @override
-  String get retryButtonLabel => 'إعادة المحاولة';
+  String get retryButtonLabel => 'Retry';
 
   @override
-  String get inlineErrorRetryLabel => 'تعذّر التحميل، اضغط لإعادة المحاولة';
+  String get inlineErrorRetryLabel => 'Couldn\'t load — tap to retry';
 
   @override
   String statsChartBarSemanticLabel(String day, int points) {
-    return '$day: $points نقطة';
+    return '$day: $points points';
   }
 
   @override
-  String get drawerSyncOffline => 'غير متصل';
+  String get drawerSyncOffline => 'Offline';
 
   @override
-  String get drawerSyncSynced => 'تمت المزامنة';
+  String get drawerSyncSynced => 'Synced';
 
   @override
-  String get checklistSaveError => 'تعذّر الحفظ، حاول مرة أخرى';
+  String get checklistSaveError => 'Couldn\'t save, try again';
 
   @override
   String get checklistSyncError =>
-      'تم الحفظ محليًا، وستتم المزامنة مع السحابة عند عودة الاتصال';
+      'Saved locally — will sync to the cloud when you\'re back online';
 }

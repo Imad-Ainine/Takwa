@@ -10,6 +10,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
+import '../../../../core/widgets/takwa_tappable.dart';
 import '../widgets/qiyam_onboarding_overlay.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -407,7 +408,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
           ),
 
           // Play/Pause
-          GestureDetector(
+          TakwaTappable(
             onTap: () {
               final notifier = ref.read(qiyamSessionProvider.notifier);
               if (isRunning) {
@@ -416,6 +417,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
                 notifier.startSession();
               }
             },
+            borderRadius: BorderRadius.circular(40),
             child: Container(
               width: 80,
               height: 80,

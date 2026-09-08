@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
@@ -653,9 +654,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.quranReaderAudioError,
-            ),
+            content: Text(AppLocalizations.of(context)!.quranReaderAudioError),
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
           ),
@@ -1400,7 +1399,9 @@ class _TopBar extends StatelessWidget {
                         : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: isDark ? _kGold.withValues(alpha: 0.35) : Colors.black12,
+                      color: isDark
+                          ? _kGold.withValues(alpha: 0.35)
+                          : Colors.black12,
                       width: 1,
                     ),
                   ),
@@ -1456,9 +1457,14 @@ class _TapIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = GestureDetector(
+    // TakwaTappable is opaque by default already, matching the explicit
+    // HitTestBehavior.opaque this GestureDetector used to set.
+    Widget child = TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      // A toolbar icon button, sized by its own padding rather than a
+      // fixed box — see quran_widgets.dart's icon buttons for why
+      // minTapSize is null here.
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.sm),
         child: Stack(
@@ -1746,8 +1752,13 @@ class _BottomBar extends StatelessWidget {
                     const Spacer(),
 
                     // Play/pause button
-                    GestureDetector(
+                    TakwaTappable(
                       onTap: onTogglePlay,
+                      // Sits in a fixed-height audio toolbar row — see
+                      // quran_widgets.dart's icon buttons for why
+                      // minTapSize is null here.
+                      minTapSize: null,
+                      borderRadius: BorderRadius.circular(19),
                       child: Container(
                         width: 38,
                         height: 38,
@@ -1828,8 +1839,10 @@ class _BottomBar extends StatelessWidget {
                     const SizedBox(width: AppSpacing.sm),
 
                     // Stop
-                    GestureDetector(
+                    TakwaTappable(
                       onTap: onStop,
+                      minTapSize: null,
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
                       child: Container(
                         width: 28,
                         height: 28,
@@ -1863,9 +1876,10 @@ class _BottomBar extends StatelessWidget {
     VoidCallback? onTap,
   }) => Tooltip(
     message: tooltip,
-    child: GestureDetector(
+    // No semanticLabel: the Tooltip above already contributes one.
+    child: TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: Icon(icon, size: 22, color: color),
@@ -1884,15 +1898,16 @@ class _BottomBar extends StatelessWidget {
     VoidCallback onTap, {
     String? tooltip,
   }) {
-    Widget btn = GestureDetector(
+    Widget btn = TakwaTappable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      minTapSize: null,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xs),
         child: Icon(icon, color: color, size: 20),
       ),
     );
     if (tooltip != null) {
+      // No semanticLabel on the tappable above: this Tooltip supplies one.
       btn = Tooltip(message: tooltip, child: btn);
     }
     return btn;
@@ -2124,8 +2139,10 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                GestureDetector(
+                TakwaTappable(
                   onTap: () => Navigator.pop(context),
+                  // Inline with the dialog title via spaceBetween.
+                  minTapSize: null,
                   child: const Icon(
                     Icons.close,
                     color: Colors.white38,
@@ -3252,30 +3269,35 @@ class _ReciterSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: isSelected ? _kGold : Colors.white12),
               ),
-              child: ListTile(
-                onTap: () => onSelectReciter(r),
-                leading: Icon(
-                  isSelected
-                      ? Icons.check_circle_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                  color: isSelected ? _kGold : Colors.white38,
-                ),
-                title: Text(
-                  r.nameAr,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontFamily: 'Amiri',
-                    fontSize: 16,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: isSelected ? Colors.white : Colors.white70,
+              child: Material(
+                color: Colors.transparent,
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(14),
+                child: ListTile(
+                  onTap: () => onSelectReciter(r),
+                  leading: Icon(
+                    isSelected
+                        ? Icons.check_circle_rounded
+                        : Icons.radio_button_unchecked_rounded,
+                    color: isSelected ? _kGold : Colors.white38,
                   ),
-                ),
-                subtitle: Text(
-                  r.nameEn,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  title: Text(
+                    r.nameAr,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontFamily: 'Amiri',
+                      fontSize: 16,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected ? Colors.white : Colors.white70,
+                    ),
+                  ),
+                  subtitle: Text(
+                    r.nameEn,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 11, color: Colors.white38),
+                  ),
                 ),
               ),
             );

@@ -8,6 +8,7 @@ import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/prayer/providers/mosque_provider.dart';
 import 'package:takwa/features/prayer/data/mosque_repository.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
@@ -424,11 +425,12 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: TakwaTappable(
                     onTap: () {
                       HapticFeedback.mediumImpact();
                       _openMap(mosque.lat, mosque.lon);
                     },
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
@@ -460,11 +462,12 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                 if (hasPhone) const SizedBox(width: AppSpacing.md),
                 if (hasPhone)
                   Expanded(
-                    child: GestureDetector(
+                    child: TakwaTappable(
                       onTap: () {
                         HapticFeedback.lightImpact();
                         _callPhone(mosque.phone);
                       },
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(

@@ -205,23 +205,28 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                               decoration: context.decorations.card.copyWith(
                                 color: context.colors.card.withValues(alpha: 0.8),
                               ),
-                              child: ListTile(
-                                leading: Icon(
-                                  Icons.lock_outline_rounded,
-                                  color: context.colors.gold,
-                                ),
-                                title: Text(
-                                  l10n.accountSettingsChangePasswordTile,
-                                  style: context.typography.labelLarge,
-                                ),
-                                trailing: Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 14,
-                                  color: context.colors.textDim,
-                                ),
-                                onTap: () => Navigator.pushNamed(
-                                  context,
-                                  '/update-password',
+                              child: Material(
+                                color: Colors.transparent,
+                                clipBehavior: Clip.antiAlias,
+                                borderRadius: BorderRadius.circular(AppRadius.lg),
+                                child: ListTile(
+                                  leading: Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: context.colors.gold,
+                                  ),
+                                  title: Text(
+                                    l10n.accountSettingsChangePasswordTile,
+                                    style: context.typography.labelLarge,
+                                  ),
+                                  trailing: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 14,
+                                    color: context.colors.textDim,
+                                  ),
+                                  onTap: () => Navigator.pushNamed(
+                                    context,
+                                    '/update-password',
+                                  ),
                                 ),
                               ),
                             ),

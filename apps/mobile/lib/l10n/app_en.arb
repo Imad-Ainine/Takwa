@@ -1943,5 +1943,45 @@
   "guestGuardMessage": "Muhasaba and Statistics need cloud sync to save your progress. Sign in to enable them.",
   "guestGuardSignIn": "Sign in / Create account",
   "guestGuardBack": "Back",
-  "splashQuote": "“Take account of yourselves before you are brought to account”"
+  "splashQuote": "“Take account of yourselves before you are brought to account”",
+  "genericErrorMessage": "An unexpected error occurred. Please try again.",
+  "@genericErrorMessage": {
+    "description": "Generic fallback error message when a section fails to load"
+  },
+  "retryButtonLabel": "Retry",
+  "@retryButtonLabel": {
+    "description": "Generic retry action button label"
+  },
+  "inlineErrorRetryLabel": "Couldn't load — tap to retry",
+  "@inlineErrorRetryLabel": {
+    "description": "Semantic label for a compact inline retry affordance (a small area that failed to load, e.g. a stat tile)"
+  },
+  "statsChartBarSemanticLabel": "{day}: {points} points",
+  "@statsChartBarSemanticLabel": {
+    "description": "Screen-reader label for one bar in the weekly/period performance chart",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "drawerSyncOffline": "Offline",
+  "@drawerSyncOffline": {
+    "description": "Compact connectivity/sync status label shown in the drawer: no network"
+  },
+  "drawerSyncSynced": "Synced",
+  "@drawerSyncSynced": {
+    "description": "Compact connectivity/sync status label shown in the drawer: idle, up to date"
+  },
+  "checklistSaveError": "Couldn't save, try again",
+  "@checklistSaveError": {
+    "description": "Shown when a prayer/ibadah status write to the local database fails"
+  },
+  "checklistSyncError": "Saved locally — will sync to the cloud when you're back online",
+  "@checklistSyncError": {
+    "description": "Shown when the local save succeeded but pushing it to the cloud failed"
+  }
 }

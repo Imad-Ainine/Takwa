@@ -339,15 +339,20 @@ class _MenuTile extends StatelessWidget {
       decoration: context.decorations.card.copyWith(
         color: context.colors.card.withValues(alpha: 0.6),
       ),
-      child: ListTile(
-        onTap: onTap,
-        dense: true,
-        leading: Icon(icon, color: context.colors.gold, size: 22),
-        title: Text(title, style: context.typography.labelLarge),
-        trailing: Icon(
-          Icons.arrow_forward_ios_rounded,
-          size: 14,
-          color: context.colors.textDim,
+      child: Material(
+        color: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: ListTile(
+          onTap: onTap,
+          dense: true,
+          leading: Icon(icon, color: context.colors.gold, size: 22),
+          title: Text(title, style: context.typography.labelLarge),
+          trailing: Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 14,
+            color: context.colors.textDim,
+          ),
         ),
       ),
     );
