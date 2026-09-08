@@ -208,7 +208,9 @@ class KhatmaActionCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
       child: TakwaTappable(
         onTap: onTap,
-        semanticLabel: '$title. $subtitle',
+        // No semanticLabel: the visible title/subtitle Text below already
+        // carries this into the semantics tree — see _PageItem in
+        // ai_memorize_screen.dart for the same call.
         borderRadius: BorderRadius.circular(AppRadius.xl),
         child: Container(
           padding: const EdgeInsets.symmetric(
@@ -321,7 +323,8 @@ class FeatureGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return TakwaTappable(
       onTap: onTap,
-      semanticLabel: '$title. $subtitle',
+      // No semanticLabel: the visible title/subtitle Text below already
+      // carries this into the semantics tree.
       borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(

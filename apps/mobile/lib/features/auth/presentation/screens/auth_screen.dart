@@ -7,6 +7,7 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 
 import '../../../../core/theme/ramadan_theme.dart';
 import '../../../../core/supabase/supabase_config.dart';
@@ -290,9 +291,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                       const SizedBox(height: 28),
                       _anim(
                         3,
-                        GestureDetector(
+                        TakwaTappable(
                           onTap: () =>
                               Navigator.pushReplacementNamed(context, '/'),
+                          // A standalone text link, not a boxed control —
+                          // forcing the platform's 48dp minimum here would
+                          // visibly pad out this one line of text; keep its
+                          // current footprint.
+                          minTapSize: null,
                           child: Text(
                             l10n.authContinueAsGuest,
                             style: s.naskh(

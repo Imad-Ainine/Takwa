@@ -7,6 +7,7 @@ import 'package:takwa/core/providers/user_content_providers.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class UserAdhkarTabView extends ConsumerWidget {
@@ -1030,8 +1031,14 @@ class _IconActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
+      // No semanticLabel: the enclosing Tooltip already contributes one
+      // from `tooltip`.
+      child: TakwaTappable(
         onTap: onTap,
+        // Sits inline in a row of sibling icon actions (edit/delete/etc.)
+        // — see quran_widgets.dart's icon buttons for the same reasoning.
+        minTapSize: null,
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(

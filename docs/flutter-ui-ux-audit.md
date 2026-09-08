@@ -127,6 +127,23 @@ migrated), M18 (no `print()` left in `lib/`).
   wrapped, which would have put `TakwaTappable`'s rounded press-tint at the margin's outer (un-inset)
   edge instead of the card's actual edge — moved the margin to a `Padding` outside the tappable so
   the two rounded rects line up.
+- **§H3 `TakwaTappable` rollout**, +9 more sites — `qiyam_dashboard_screen`'s play/pause control,
+  `auth_screen`'s "continue as guest" link, `adhkar _screen`'s reset link, `misbaha_screen`'s clear
+  button, `prayer_screen`'s refresh button, `khatma_history_screen`'s delete button,
+  `ai_memorize_screen`'s page-grid item, `book_reader_screen`'s generic `_IconBtn`, and
+  `_user_community_adhkar_views.dart`'s shared `_IconActionButton` (which already had a `Tooltip`,
+  so no `semanticLabel` was added on top of it — same reasoning as below). 16 of the 37 `onTap`-only
+  sites now done.
+  One deliberate exception found while sweeping single-occurrence files: `animated_drawer.dart`'s
+  one `onTap`-only `GestureDetector` is the drawer's full-screen tap-to-dismiss scrim, not a control
+  — wrapping a modal backdrop in a press-scale-and-tint effect would visibly shrink/tint the whole
+  screen on tap, which is not what this component is for. Passing the mechanical "onTap only"
+  filter isn't sufficient on its own; left as a bare `GestureDetector`.
+  Also corrects a mistake in the previous pass: `KhatmaActionCard` and `FeatureGridItem` were given
+  a `semanticLabel` built from their own visible title/subtitle text, which — per `TakwaTappable`'s
+  own doc comment — duplicates that content in the semantics tree instead of reusing what the
+  visible `Text` children already expose. Removed both; `_PageItem` in this pass follows the
+  corrected rule (omits `semanticLabel` since its child `Text` already shows the same page number).
 
 ⏳ **Still open, deliberately not attempted here** (needs either visual QA on a device/simulator —
 unavailable in this environment, same limitation the original audit had — or design assets this
@@ -140,11 +157,16 @@ pass doesn't have):
   ARB placeholder text) rather than chrome, per the audit's own distinction — but a real pass needs
   someone to sort which is which, and commissioning/adopting a line-icon set for the rest is a
   design decision, not a code one.
-- **§H3 `TakwaTappable` rollout, remainder** — 30 more `onTap`-only sites identified (see above) are
-  still on bare `GestureDetector`, plus the ~100 sites mixing in drag/long-press/double-tap that
-  need a per-site read rather than the mechanical rule used here, across dozens of files. This pass
-  covered one file as a proof of the classification and the pattern to follow; the rest is the same
-  work at volume.
+- **§H3 `TakwaTappable` rollout, remainder** — 21 more `onTap`-only sites are still on bare
+  `GestureDetector`, concentrated in `quran_screen.dart` (5), `quran_reader_screen.dart` (5),
+  `create_khatma_screen.dart` (4), `unified_overlay_window.dart` (3), `mosques_screen.dart` (2), and
+  `free_reading_screen.dart` (2) — plus `custom_leading_button.dart`'s back/close button, deliberately
+  skipped despite being `onTap`-only: it's the single most-reused interactive widget in the app (every
+  `AppBarWidget` screen and dozens more), with its own already-working custom press animation
+  (a 1.0→0.9 `ScaleTransition`) that would need removing first to avoid stacking two press effects,
+  and any resulting size/feel change would show up on nearly every screen — too high a blast radius
+  to change without a device to verify against. On top of these: the ~100 sites mixing in
+  drag/long-press/double-tap that need a per-site read rather than the mechanical rule used here.
 - **Refactor Plan item 29 (`AppBarWidget` rollout), remainder** — the rest of the ~50 screens fall
   into two buckets, neither of which is a safe drop-in: (a) screens whose header carries a `TabBar`
   (`manage_custom_ibadah_screen`, `khatma_history_screen`, `achievements_screen`'s `SliverAppBar`) —
