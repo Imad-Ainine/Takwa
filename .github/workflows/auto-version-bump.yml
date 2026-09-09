@@ -12,7 +12,8 @@ on:
         paths:
             - "apps/mobile/**"
             - "packages/**"
-            - "!apps/mobile/build/**"  # ignore build output
+            - "!apps/mobile/build/**" # ignore build output
+    workflow_dispatch:
 
 jobs:
     bump-version:
