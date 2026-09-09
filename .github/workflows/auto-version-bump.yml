@@ -59,6 +59,15 @@ jobs:
                   IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
                   NEXT_PATCH=$((PATCH + 1))
                   NEXT="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+
+                  # Ensure tag does not already exist
+                  git fetch --tags
+                  while git rev-parse "v${NEXT}" >/dev/null 2>&1; do
+                    echo "Tag v${NEXT} already exists, incrementing patch version..."
+                    NEXT_PATCH=$((NEXT_PATCH + 1))
+                    NEXT="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+                  done
+
                   echo "New version: $NEXT"
                   echo "VERSION=$NEXT" >> $GITHUB_OUTPUT
                   # Also compute build number from run number to avoid duplicate versionCodes
