@@ -3824,6 +3824,12 @@ abstract class AppLocalizations {
   /// **'خطأ في تحديد الموقع'**
   String get locationResultError;
 
+  /// No description provided for @locationResultCachedLocation.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحديد GPS — يتم استخدام الموقع المحفوظ'**
+  String get locationResultCachedLocation;
+
   /// No description provided for @locationEnableAction.
   ///
   /// In ar, this message translates to:

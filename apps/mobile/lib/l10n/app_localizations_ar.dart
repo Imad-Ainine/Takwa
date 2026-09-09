@@ -2022,6 +2022,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get locationResultError => 'خطأ في تحديد الموقع';
 
   @override
+  String get locationResultCachedLocation =>
+      'تعذّر تحديد GPS — يتم استخدام الموقع المحفوظ';
+
+  @override
   String get locationEnableAction => 'تفعيل';
 
   @override

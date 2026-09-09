@@ -148,22 +148,31 @@ class LocationPrayerManager {
     if (!context.mounted) return result;
 
     if (showFeedbackSnackBar) {
-      if (result.isSuccess) {
+      if (result == LocationResult.cachedLocation) {
+        // GPS فشل لكن الإحداثيات المخزّنة تعمل — نُظهر تنبيهاً محايداً بدلاً من خطأ
+        _showLocationSnackBar(
+          context,
+          message: l10n.locationResultCachedLocation,
+          isSuccess: false,
+          actionLabel: isArabic ? 'إعادة المحاولة' : 'Retry',
+          onAction: () => requestAndUpdateLocation(
+            context,
+            ref,
+            showFeedbackSnackBar: showFeedbackSnackBar,
+          ),
+        );
+      } else if (result.isSuccess) {
         HapticFeedback.lightImpact();
         final settings = ref.read(settingsDaoProvider);
         final city = await settings.get('cityName');
         if (!context.mounted) return result;
         final successMsg = (city != null && city.isNotEmpty)
             ? (isArabic
-                ? 'تم تحديث الموقع بنجاح: $city ✓'
-                : 'Location updated: $city ✓')
+                  ? 'تم تحديث الموقع بنجاح: $city ✓'
+                  : 'Location updated: $city ✓')
             : l10n.locationResultSuccess;
 
-        _showLocationSnackBar(
-          context,
-          message: successMsg,
-          isSuccess: true,
-        );
+        _showLocationSnackBar(context, message: successMsg, isSuccess: true);
       } else {
         _showLocationSnackBar(
           context,
@@ -396,8 +405,9 @@ class LocationPrayerManager {
                 onPressed: onAction,
               )
             : null,
-        backgroundColor:
-            isSuccess ? context.colors.success : context.colors.danger,
+        backgroundColor: isSuccess
+            ? context.colors.success
+            : context.colors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: Duration(seconds: isSuccess ? 3 : 5),
@@ -453,7 +463,22 @@ class LocationPrayerManager {
         } catch (_) {}
       }
 
+      // إذا فشل الـ GPS تماماً، نحاول استخدام الإحداثيات المحفوظة مسبقاً
+      // حتى لا تظهر رسالة خطأ للمستخدم وتبقى أوقات الصلاة تعمل بالبيانات المخزّنة
       if (pos == null) {
+        final settings = ref.read(settingsDaoProvider);
+        final cachedLat = await settings.get('latitude');
+        final cachedLng = await settings.get('longitude');
+        if (cachedLat != null && cachedLng != null) {
+          final lat = double.tryParse(cachedLat);
+          final lng = double.tryParse(cachedLng);
+          if (lat != null && lng != null) {
+            // إعادة تقييم موفر أوقات الصلاة بالإحداثيات المخزّنة
+            ref.invalidate(prayerTimesProvider);
+            await _scheduleForLocation(ref, lat, lng);
+            return LocationResult.cachedLocation;
+          }
+        }
         return LocationResult.error;
       }
 
@@ -477,12 +502,12 @@ class LocationPrayerManager {
           final locality = (p.locality != null && p.locality!.trim().isNotEmpty)
               ? p.locality!.trim()
               : (p.subAdministrativeArea != null &&
-                      p.subAdministrativeArea!.trim().isNotEmpty)
-                  ? p.subAdministrativeArea!.trim()
-                  : (p.administrativeArea != null &&
-                          p.administrativeArea!.trim().isNotEmpty)
-                      ? p.administrativeArea!.trim()
-                      : '';
+                    p.subAdministrativeArea!.trim().isNotEmpty)
+              ? p.subAdministrativeArea!.trim()
+              : (p.administrativeArea != null &&
+                    p.administrativeArea!.trim().isNotEmpty)
+              ? p.administrativeArea!.trim()
+              : '';
           final country = p.country?.trim() ?? '';
           if (locality.isNotEmpty && country.isNotEmpty) {
             cityName = '$locality, $country';
@@ -703,6 +728,9 @@ class PrayerTimesWithTimezone {
 
 enum LocationResult {
   success,
+
+  /// GPS فشل لكن تم استخدام الإحداثيات المخزّنة مسبقاً — النتيجة مقبولة
+  cachedLocation,
   serviceDisabled,
   permissionDenied,
   permissionDeniedForever,
@@ -710,6 +738,7 @@ enum LocationResult {
 
   String message(AppLocalizations l10n) => switch (this) {
     LocationResult.success => l10n.locationResultSuccess,
+    LocationResult.cachedLocation => l10n.locationResultCachedLocation,
     LocationResult.serviceDisabled => l10n.locationResultServiceDisabled,
     LocationResult.permissionDenied => l10n.locationResultPermissionDenied,
     LocationResult.permissionDeniedForever =>
@@ -717,7 +746,8 @@ enum LocationResult {
     LocationResult.error => l10n.locationResultError,
   };
 
-  bool get isSuccess => this == LocationResult.success;
+  bool get isSuccess =>
+      this == LocationResult.success || this == LocationResult.cachedLocation;
 }
 
 class LocationUpdateTile extends ConsumerStatefulWidget {

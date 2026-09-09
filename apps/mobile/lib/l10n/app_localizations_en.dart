@@ -2051,6 +2051,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get locationResultError => 'Error determining location';
 
   @override
+  String get locationResultCachedLocation =>
+      'GPS unavailable — using saved location';
+
+  @override
   String get locationEnableAction => 'Enable';
 
   @override

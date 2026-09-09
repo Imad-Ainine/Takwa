@@ -952,6 +952,7 @@
   "locationResultPermissionDenied": "Location permission denied",
   "locationResultPermissionDeniedForever": "Please enable location permission from Settings",
   "locationResultError": "Error determining location",
+  "locationResultCachedLocation": "GPS unavailable — using saved location",
   "locationEnableAction": "Enable",
   "locationUpdateTileLabel": "Update Location & Prayer Times",
   "timezoneAlgiers": "Algiers (UTC+1)",

@@ -1229,6 +1229,7 @@
   "locationResultPermissionDenied": "تم رفض إذن الموقع",
   "locationResultPermissionDeniedForever": "يرجى تفعيل إذن الموقع من الإعدادات",
   "locationResultError": "خطأ في تحديد الموقع",
+  "locationResultCachedLocation": "تعذّر تحديد GPS — يتم استخدام الموقع المحفوظ",
   "locationEnableAction": "تفعيل",
   "locationUpdateTileLabel": "تحديث الموقع وأوقات الصلاة",
   "timezoneAlgiers": "الجزائر (UTC+1)",
