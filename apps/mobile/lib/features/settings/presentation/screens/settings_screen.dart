@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/providers/theme_provider.dart';
 import 'package:takwa/core/providers/locale_provider.dart';
+import 'package:takwa/core/providers/app_info_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
@@ -77,9 +78,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     const SizedBox(height: AppSpacing.sm),
@@ -199,8 +198,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                               ToggleSetting(
                                 icon: '🥘',
                                 label: l10n.settingsFastingRemindersLabel,
-                                sublabel:
-                                    l10n.settingsFastingRemindersSublabel,
+                                sublabel: l10n.settingsFastingRemindersSublabel,
                                 value: prefs.fastingRemindersOn,
                                 onChanged: (v) =>
                                     _updatePref('fasting_reminders_on', v),
@@ -217,8 +215,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                     await _updatePref(
                                       'evening_reminder_time',
                                       str,
-                                      category:
-                                          NotificationCategory.reminders,
+                                      category: NotificationCategory.reminders,
                                     );
                                   },
                                 ),
@@ -312,10 +309,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           icon: '💎',
                           label: l10n.settingsSubscriptionLabel,
                           sublabel: l10n.settingsSubscriptionSublabel,
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            Routes.subscription,
-                          ),
+                          onTap: () =>
+                              Navigator.pushNamed(context, Routes.subscription),
                         ),
                         const SettingsDivider(),
                         ActionSetting(
@@ -358,7 +353,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            l10n.settingsAppVersionLabel,
+                            '${l10n.appName} — v${ref.watch(appVersionProvider)}',
                             style: context.typography.caption.copyWith(
                               fontSize: 11,
                               color: context.colors.textDim,

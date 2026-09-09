@@ -14,6 +14,7 @@ import '../core/supabase/supabase_config.dart';
 import '../core/providers/auth_providers.dart';
 import '../core/routes/app_routes.dart';
 import '../core/utils/taqwa_level_display.dart';
+import '../core/providers/app_info_provider.dart';
 import 'main_shell.dart' show currentTabProvider;
 import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -386,10 +387,14 @@ class _DrawerHeader extends ConsumerWidget {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: context.colors.gold.withValues(alpha: 0.1),
+                                    color: context.colors.gold.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
-                                      color: context.colors.gold.withValues(alpha: 0.3),
+                                      color: context.colors.gold.withValues(
+                                        alpha: 0.3,
+                                      ),
                                     ),
                                   ),
                                   child: Text(
@@ -456,7 +461,9 @@ class _DrawerHeader extends ConsumerWidget {
             decoration: BoxDecoration(
               color: context.colors.goldDim,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: context.colors.gold.withValues(alpha: 0.15)),
+              border: Border.all(
+                color: context.colors.gold.withValues(alpha: 0.15),
+              ),
             ),
             child: Row(
               children: [
@@ -636,12 +643,7 @@ class _DrawerNavState extends ConsumerState<_DrawerNav>
     _NavItem(Icons.checklist_rounded, l.drawerNavChecklist, '/checklist', 1),
     _NavItem(Icons.mosque_rounded, l.drawerNavPrayer, '/prayer', 2),
     _NavItem(Icons.menu_book_rounded, l.drawerNavBooks, '/books', 3),
-    _NavItem(
-      Icons.bar_chart_rounded,
-      l.drawerNavStatistics,
-      '/statistics',
-      4,
-    ),
+    _NavItem(Icons.bar_chart_rounded, l.drawerNavStatistics, '/statistics', 4),
     // Moved out of the bottom nav (main_shell.dart §C10: 6 destinations was
     // one over Material's guidance) — a reference/browse screen fits an
     // occasional-lookup drawer entry better than a persistent tab. '/asma'
@@ -893,9 +895,12 @@ class _NavRowState extends State<_NavRow> with SingleTickerProviderStateMixin {
 }
 
 // ── تذييل الـ Drawer ──
-class _DrawerFooter extends StatelessWidget {
+class _DrawerFooter extends ConsumerWidget {
+  const _DrawerFooter();
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appInfo = ref.watch(appInfoProvider);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Column(
@@ -928,7 +933,7 @@ class _DrawerFooter extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            AppLocalizations.of(context)!.drawerFooterVersion,
+            appInfo.formattedVersion,
             style: context.typography.caption.copyWith(
               fontSize: 10,
               color: context.colors.textDim,
@@ -1143,7 +1148,9 @@ class _LogoutButton extends ConsumerWidget {
           decoration: BoxDecoration(
             color: context.colors.danger.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: context.colors.danger.withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             children: [
