@@ -171,15 +171,32 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
         if (result == LocationResult.success) {
           city = await settings.get('cityName') ?? city;
         }
+        // If refresh failed but we already have cached coordinates, keep
+        // going with what's stored — prayerTimesProvider will use them.
+        // Only surface an error if we have *nothing* at all.
+        if (!result.isSuccess && savedLat == null && savedLng == null) {
+          // No cached coords and no fresh fix — still try the provider
+          // (it falls back to a default location) but mark as recoverable.
+          // Do NOT call state.copyWith(error: ...) here because the full
+          // _ErrorView obscures the entire screen; a SnackBar from
+          // requestAndUpdateLocation is enough user feedback.
+        }
       }
 
       // حساب أوقات الصلاة باستخدام الـ provider لإبقاء البيانات متزامنة
       final prayers = await _ref.read(prayerTimesProvider.future);
 
-      state = state.copyWith(prayers: prayers, cityName: city, loading: false);
+      state = state.copyWith(
+        prayers: prayers,
+        cityName: city,
+        loading: false,
+        error: null, // clear any previous error so the screen shows content
+      );
 
       _startTicker();
     } catch (e) {
+      // Only show _ErrorView for a hard failure that prevented prayer times
+      // from loading at all (e.g., database initialisation error).
       state = state.copyWith(loading: false, error: e.toString());
     }
   }
@@ -193,6 +210,19 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
         state = state.copyWith(prayers: prayers);
         _tick(); // تحديث فوري للحسابات عند تغير الأوقات
       });
+    }, fireImmediately: false);
+
+    // Also listen to cityName changes in the DAO so that background-service
+    // location updates (which write to SettingsDao via _syncLocationFromBackground
+    // in main.dart) are reflected in the header without a full screen rebuild.
+    _ref.listen<AsyncValue<String?>>(settingStreamProvider('cityName'), (
+      prev,
+      next,
+    ) {
+      final city = next.valueOrNull;
+      if (city != null && city.isNotEmpty && city != state.cityName) {
+        state = state.copyWith(cityName: city);
+      }
     }, fireImmediately: false);
   }
 
@@ -217,10 +247,14 @@ class PrayerNotifier extends StateNotifier<PrayerScreenState> {
           );
           _tick();
         } else {
-          state = state.copyWith(isUpdatingLocation: false);
+          // requestAndUpdateLocation already showed a coloured SnackBar with
+          // the specific failure reason and a "Retry" action. Just reset the
+          // spinner and clear any full-screen error that was showing so the
+          // user can see the (possibly stale) prayer times while they retry.
+          state = state.copyWith(isUpdatingLocation: false, error: null);
         }
       } catch (e) {
-        state = state.copyWith(isUpdatingLocation: false);
+        state = state.copyWith(isUpdatingLocation: false, error: null);
       }
     } else {
       state = state.copyWith(loading: true);
@@ -967,7 +1001,9 @@ class _CountdownRing extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: visual.secondaryColor.withValues(alpha: 0.06 + i * 0.04),
+                    color: visual.secondaryColor.withValues(
+                      alpha: 0.06 + i * 0.04,
+                    ),
                     width: 1,
                   ),
                 ),
@@ -1040,7 +1076,9 @@ class _CountdownRing extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
                     ),
                     child: Text(
                       isIqama
@@ -1108,7 +1146,11 @@ class _CountdownArcPainter extends CustomPainter {
           endAngle: 3 * math.pi / 2,
           colors: isIqama
               ? [successColor, tealColor, successColor]
-              : [primaryColor, Colors.white.withValues(alpha: 0.9), primaryColor],
+              : [
+                  primaryColor,
+                  Colors.white.withValues(alpha: 0.9),
+                  primaryColor,
+                ],
         ).createShader(rect)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 16
@@ -1615,7 +1657,9 @@ class _MihrabPrayerChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: isActive ? 0.15 : 0.05),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-        border: Border.all(color: color.withValues(alpha: isActive ? 0.3 : 0.1)),
+        border: Border.all(
+          color: color.withValues(alpha: isActive ? 0.3 : 0.1),
+        ),
       ),
       child: Text(
         label,

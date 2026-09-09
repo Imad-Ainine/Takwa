@@ -209,6 +209,11 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
       await settings.set('latitude', lat);
       await settings.set('longitude', lng);
       if (cityName != null) await settings.set('cityName', cityName);
+      // Force prayerTimesProvider to recompute with the new coordinates
+      // immediately. The provider already watches settingStreamProvider(
+      // 'latitude'/'longitude') reactively, but invalidating guarantees a
+      // synchronous rebuild even if the SQLite stream debounces.
+      ref.invalidate(prayerTimesProvider);
     }
   }
 

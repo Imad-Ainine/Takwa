@@ -6,6 +6,7 @@ import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import '../../utils/quran_helpers.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/providers/app_info_provider.dart';
 import 'package:takwa/core/theme/ramadan_theme.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -262,7 +263,7 @@ class KhatmaSettingsScreen extends ConsumerWidget {
                           style,
                           Icons.info_outline,
                           l10n.khatmaVersionLabel,
-                          '1.0.0',
+                          ref.watch(appVersionProvider),
                         ),
                         Divider(
                           color: style.gold.withValues(alpha: 0.05),

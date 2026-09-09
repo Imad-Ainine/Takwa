@@ -983,7 +983,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAppVersionLabel.
   ///
   /// In ar, this message translates to:
-  /// **'تقوى — v1.0.0'**
+  /// **'تقوى — v1.0.5'**
   String get settingsAppVersionLabel;
 
   /// No description provided for @settingsTestNotifSheetTitle.
@@ -1871,7 +1871,7 @@ abstract class AppLocalizations {
   /// App version label shown in the drawer footer
   ///
   /// In ar, this message translates to:
-  /// **' v1.0'**
+  /// **' v1.0.5'**
   String get drawerFooterVersion;
 
   /// No description provided for @commonSave.

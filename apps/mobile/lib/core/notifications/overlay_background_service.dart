@@ -45,6 +45,11 @@ const _kSilentModeEnabledKey = 'silent_mode_enabled';
 const _kSilentDurationMinsKey = 'silent_duration_mins';
 const _kAutoSilentAfterAdhanKey = 'auto_silent_after_adhan';
 const _kSilentModeVibrationKey = 'silent_vibration_enabled';
+// Adhan mode ('sound' | 'vibrate' | 'silent') and flip-to-silence setting —
+// mirrored from SQLite via SettingsPrefsBridge so the background isolate can
+// read the canonical values without Riverpod access.
+const _kAdhanModeKey = 'adhan_mode';
+const _kFlipToSilenceKey = 'flip_to_silence_enabled';
 
 // ─────────────────────────────────────────
 //  TIMINGS
@@ -175,6 +180,8 @@ class OverlayBackgroundService {
     bool? overlayEnabled,
     bool? adhanSoundEnabled,
     int? popupIntervalMins,
+    String? adhanMode,
+    bool? flipToSilenceEnabled,
   }) {
     final Map<String, dynamic> data = {};
     if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
@@ -183,6 +190,10 @@ class OverlayBackgroundService {
     }
     if (popupIntervalMins != null) {
       data['popup_interval_minutes'] = popupIntervalMins;
+    }
+    if (adhanMode != null) data['adhan_mode'] = adhanMode;
+    if (flipToSilenceEnabled != null) {
+      data['flip_to_silence_enabled'] = flipToSilenceEnabled;
     }
 
     if (data.isNotEmpty) FlutterForegroundTask.sendDataToTask(data);
@@ -205,6 +216,14 @@ class _OverlayTaskHandler extends TaskHandler {
   bool _silentModeEnabled = false;
   int _silentDurationMins = 20;
   double _adhanVolumeLevel = 1.0;
+  // Canonical adhan mode — matches UserPreferences.adhanMode values:
+  // 'sound' | 'vibrate' | 'silent'. Sent to the main isolate so
+  // handleForegroundData can make the right decision about audio.
+  String _adhanMode = 'sound';
+  // Whether the face-down / flip-to-silence feature is enabled.
+  // Forwarded to the system overlay so UnifiedOverlayWindow can also
+  // respect the setting if it handles its own audio in future.
+  bool _flipToSilenceEnabled = true;
 
   final _random = math.Random();
 
@@ -249,6 +268,12 @@ class _OverlayTaskHandler extends TaskHandler {
       if (data.containsKey('popup_interval_minutes')) {
         _popupIntervalMins = data['popup_interval_minutes'] as int;
       }
+      if (data.containsKey('adhan_mode')) {
+        _adhanMode = data['adhan_mode'] as String;
+      }
+      if (data.containsKey('flip_to_silence_enabled')) {
+        _flipToSilenceEnabled = data['flip_to_silence_enabled'] as bool;
+      }
     }
   }
 
@@ -280,6 +305,8 @@ class _OverlayTaskHandler extends TaskHandler {
     _silentModeEnabled = prefs.getBool(_kSilentModeEnabledKey) ?? false;
     _silentDurationMins = prefs.getInt(_kSilentDurationMinsKey) ?? 20;
     _adhanVolumeLevel = prefs.getDouble('adhan_volume_level') ?? 1.0;
+    _adhanMode = prefs.getString(_kAdhanModeKey) ?? 'sound';
+    _flipToSilenceEnabled = prefs.getBool(_kFlipToSilenceKey) ?? true;
   }
 
   // ──────────────────────────────────────
@@ -421,6 +448,8 @@ class _OverlayTaskHandler extends TaskHandler {
             'emoji': prayer.emoji,
             'time': DateFormat('HH:mm').format(prayer.time),
             'volume': _adhanVolumeLevel,
+            'adhanMode': _adhanMode,
+            'flipToSilenceEnabled': _flipToSilenceEnabled,
             'silentMode': _silentModeEnabled,
             'silentDuration': _silentDurationMins,
           });
@@ -432,7 +461,12 @@ class _OverlayTaskHandler extends TaskHandler {
           'prayer': prayer.nameAr,
           'emoji': prayer.emoji,
           'time': DateFormat('HH:mm').format(prayer.time),
-          'sound': _adhanSoundEnabled,
+          // Send the canonical adhan mode string so the main isolate's
+          // handleForegroundData can make the correct sound/screen decision.
+          // The old 'sound' bool key is kept alongside for backward compat
+          // with any cached version of the task handler still in memory.
+          'adhanMode': _adhanMode,
+          'sound': _adhanMode == 'sound', // legacy compat
         });
 
         debugPrint('🕌 أُطلق أذان ${prayer.nameAr} مع الـ Overlay');
@@ -733,34 +767,66 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _handleLocationUpdate() async {
     final Geocoding geocoding = Geocoding();
     try {
-      final pos = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
-        ),
-      );
+      // Try a high-accuracy fix first; fall back to last-known position if
+      // the hardware fix times out (common indoors / weak GPS signal).
+      Position? pos;
+      try {
+        pos = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 12),
+          ),
+        );
+      } catch (_) {
+        pos = await Geolocator.getLastKnownPosition();
+      }
+
+      if (pos == null) {
+        debugPrint('OverlayService: No position available for location update');
+        // Restore the foreground notification to the normal next-prayer display
+        // so the "جارٍ تحديث الموقع…" text doesn't stay there forever.
+        await _updateForegroundNotification();
+        return;
+      }
 
       final lat = pos.latitude;
       final lng = pos.longitude;
       final tzName = TimezoneResolver.resolveFromCoordinates(lat, lng);
 
-      String cityName = _l10n.overlayServiceUnknownCity;
+      // Build a clean city string — avoid leading/trailing punctuation when
+      // any of the geocoding fields are null or empty.
+      final prefs = await SharedPreferences.getInstance();
+      String cityName =
+          prefs.getString(_kCityNameKey) ?? _l10n.overlayServiceUnknownCity;
       try {
         final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
         if (placemarks.isNotEmpty) {
           final p = placemarks.first;
-          cityName =
-              '${p.locality ?? p.subAdministrativeArea ?? ''}'
-              '${p.country != null ? ", ${p.country}" : ""}';
+          final parts = <String>[
+            if (p.locality != null && p.locality!.trim().isNotEmpty)
+              p.locality!.trim()
+            else if (p.subAdministrativeArea != null &&
+                p.subAdministrativeArea!.trim().isNotEmpty)
+              p.subAdministrativeArea!.trim()
+            else if (p.administrativeArea != null &&
+                p.administrativeArea!.trim().isNotEmpty)
+              p.administrativeArea!.trim(),
+            if (p.country != null && p.country!.trim().isNotEmpty)
+              p.country!.trim(),
+          ];
+          if (parts.isNotEmpty) cityName = parts.join(', ');
         }
-      } catch (_) {}
+      } catch (_) {
+        // Reverse-geocoding failed — keep the previously saved city name.
+      }
 
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_kLatKey, lat.toString());
       await prefs.setString(_kLngKey, lng.toString());
       await prefs.setString('timezone', tzName);
       await prefs.setString(_kCityNameKey, cityName);
 
+      // Notify the main isolate so it can write the same values to SettingsDao
+      // and trigger a reactive rebuild of prayerTimesProvider.
       FlutterForegroundTask.sendDataToMain({
         'action': 'location_updated',
         'latitude': lat,
@@ -772,6 +838,8 @@ class _OverlayTaskHandler extends TaskHandler {
       await _updateForegroundNotification();
     } catch (e) {
       debugPrint('OverlayService: Location update failed: $e');
+      // Restore normal foreground notification on failure too.
+      await _updateForegroundNotification();
     }
   }
 

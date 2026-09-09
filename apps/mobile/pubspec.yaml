@@ -92,6 +92,7 @@ dependencies:
   sound_mode: ^3.0.1
   custom_refresh_indicator: ^4.0.1
   sensors_plus: ^7.1.0 # 7.1.0 added built-in Kotlin support
+  flutter_islamic_icons: ^1.0.2
 
 dev_dependencies:
   flutter_test:

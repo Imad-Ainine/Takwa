@@ -11,6 +11,7 @@ import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 import 'dart:async';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
+import 'package:takwa/features/settings/data/user_preferences.dart';
 import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -34,6 +35,9 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   late final AnimationController _entryCtrl;
   StreamSubscription<AccelerometerEvent>? _sensorSub;
   Timer? _vibrationTimer;
+  // Prevents _silenceAdhan from being called repeatedly while the phone
+  // stays face-down (the accelerometer stream fires ~50 times/sec).
+  bool _silenced = false;
 
   @override
   void initState() {
@@ -68,14 +72,20 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   }
 
   Future<void> _initializePreferences() async {
-    // Wait for the provider to finish loading the preferences
-    final prefs = await ref.read(userPreferencesProvider.future);
+    // Use the synchronously cached value when available so sensors and
+    // wakelock are set up as quickly as possible. Only await if the
+    // provider hasn't finished loading yet (first cold start).
+    final UserPreferences prefs =
+        ref.read(userPreferencesProvider).valueOrNull ??
+        await ref.read(userPreferencesProvider.future);
     if (!mounted) return;
 
     if (prefs.wakeScreenEnabled) {
       WakelockPlus.enable();
     }
 
+    // Sensors must be active before audio starts so no face-down event
+    // is missed in the gap between the await returning and play() being called.
     _initSensors(prefs);
     _initVibration(prefs);
 
@@ -91,12 +101,11 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     if (mode == 'vibrate' || (mode == 'sound' && prefs.vibrateWithAdhan)) {
       _vibrationTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
         if (AdhanAudioPlayer.isPlaying || mode == 'vibrate') {
-          // Vibrate if playing or if only vibrating
           HapticFeedback.vibrate();
         }
       });
       if (mode == 'vibrate') {
-        // Stop vibrating after a duration (e.g., 3 minutes max) since there's no player.playing state if sound is skipped
+        // Stop vibrating after 3 minutes max (no audio state to track).
         Future.delayed(const Duration(minutes: 3), () {
           _vibrationTimer?.cancel();
         });
@@ -105,19 +114,34 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   }
 
   void _initSensors(prefs) {
-    if (prefs.flipToSilenceEnabled) {
-      _sensorSub = accelerometerEventStream().listen((event) {
-        // If device is flipped face down (Z axis is significantly negative)
-        if (event.z < -8.0) {
-          _silenceAdhan();
-        }
-      });
-    }
+    // Only attach the listener when the setting is enabled.  If disabled,
+    // _sensorSub stays null — no accelerometer usage at all.
+    if (!prefs.flipToSilenceEnabled) return;
+
+    _sensorSub = accelerometerEventStream().listen((event) {
+      // Z axis strongly negative = face-down (gravity vector pointing up).
+      // Threshold -8.0 m/s² (~0.82 g) is well below the ±9.8 full-flip
+      // signal while ignoring normal landscape tilts (~±5 m/s²).
+      if (event.z < -8.0) {
+        _silenceAdhan();
+      }
+    });
   }
 
-  void _silenceAdhan() {
-    AdhanAudioPlayer.stop();
+  /// Stops all Adhan audio and vibration immediately.
+  ///
+  /// Called either by the face-down sensor or programmatically.
+  /// The screen remains open so the user can see the prayer name and
+  /// choose to close or go to prayer — matching the expected UX.
+  Future<void> _silenceAdhan() async {
+    if (_silenced) return; // already silenced — ignore repeated sensor events
+    _silenced = true;
+
     _vibrationTimer?.cancel();
+    await AdhanAudioPlayer.stop();
+
+    // Give a brief haptic confirmation so the user knows face-down worked.
+    if (mounted) HapticFeedback.mediumImpact();
   }
 
   Future<void> _initAudio(prefs) async {
@@ -153,12 +177,14 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
   void _close() {
     AdhanAudioPlayer.stop();
+    _vibrationTimer?.cancel();
     _applyAutoSilent();
     Navigator.of(context).pop();
   }
 
   void _goToPrayer() {
     AdhanAudioPlayer.stop();
+    _vibrationTimer?.cancel();
     _applyAutoSilent();
     Navigator.of(context).popUntil((r) => r.isFirst);
     Navigator.of(context).pushNamed('/prayer');
@@ -193,7 +219,10 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       // navigation — so canPop: true (always allow) preserves that.
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) AdhanAudioPlayer.stop();
+        if (didPop) {
+          AdhanAudioPlayer.stop();
+          _vibrationTimer?.cancel();
+        }
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -275,9 +304,9 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: const Color(
-                                      0xFFD4AF37,
-                                    ).withValues(alpha: 0.3 * (1 - wrappedPulse)),
+                                    color: const Color(0xFFD4AF37).withValues(
+                                      alpha: 0.3 * (1 - wrappedPulse),
+                                    ),
                                     width: 1.5,
                                   ),
                                 ),
@@ -291,7 +320,9 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                                 shape: BoxShape.circle,
                                 gradient: RadialGradient(
                                   colors: [
-                                    const Color(0xFFD4AF37).withValues(alpha: 0.3),
+                                    const Color(
+                                      0xFFD4AF37,
+                                    ).withValues(alpha: 0.3),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -476,10 +507,14 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD4AF37).withValues(alpha: 0.08),
+                          color: const Color(
+                            0xFFD4AF37,
+                          ).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(AppRadius.lg),
                           border: Border.all(
-                            color: const Color(0xFFD4AF37).withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFFD4AF37,
+                            ).withValues(alpha: 0.2),
                           ),
                         ),
                         child: Column(

@@ -464,7 +464,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsBismillah => 'بسم الله الرحمن الرحيم';
 
   @override
-  String get settingsAppVersionLabel => 'تقوى — v1.0.0';
+  String get settingsAppVersionLabel => 'تقوى — v1.0.5';
 
   @override
   String get settingsTestNotifSheetTitle => 'اختبار الإشعارات';
@@ -953,7 +953,7 @@ class AppLocalizationsAr extends AppLocalizations {
       '\"حَاسِبُوا أَنفُسَكُمْ قَبْلَ أَنْ تُحَاسَبُوا\"';
 
   @override
-  String get drawerFooterVersion => ' v1.0';
+  String get drawerFooterVersion => ' v1.0.5';
 
   @override
   String get commonSave => 'حفظ';

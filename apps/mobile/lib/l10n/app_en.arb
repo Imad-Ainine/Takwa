@@ -303,7 +303,7 @@
   "settingsLogoutLabel": "Sign out",
   "settingsLogoutSublabel": "Sign out of your account or guest mode",
   "settingsBismillah": "In the name of Allah, the Most Gracious, the Most Merciful",
-  "settingsAppVersionLabel": "Taqwa — v1.0.0",
+  "settingsAppVersionLabel": "Taqwa — v1.0.5",
   "settingsTestNotifSheetTitle": "Test notifications",
   "settingsTestNotifPlainLabel": "Regular notification",
   "settingsTestNotifPlainSublabel": "The standard system notification",
@@ -623,7 +623,7 @@
   "@drawerFooterQuote": {
     "description": "Islamic quote shown in the drawer footer"
   },
-  "drawerFooterVersion": " v1.0",
+  "drawerFooterVersion": " v1.0.5",
   "@drawerFooterVersion": {
     "description": "App version label shown in the drawer footer"
   },

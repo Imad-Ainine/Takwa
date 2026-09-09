@@ -303,7 +303,7 @@
   "settingsLogoutLabel": "تسجيل الخروج",
   "settingsLogoutSublabel": "الخروج من الحساب أو وضع الزائر",
   "settingsBismillah": "بسم الله الرحمن الرحيم",
-  "settingsAppVersionLabel": "تقوى — v1.0.0",
+  "settingsAppVersionLabel": "تقوى — v1.0.5",
   "settingsTestNotifSheetTitle": "اختبار الإشعارات",
   "settingsTestNotifPlainLabel": "إشعار عادي",
   "settingsTestNotifPlainSublabel": "إشعار النظام التقليدي",
@@ -623,7 +623,7 @@
   "@drawerFooterQuote": {
     "description": "Islamic quote shown in the drawer footer"
   },
-  "drawerFooterVersion": " v1.0",
+  "drawerFooterVersion": " v1.0.5",
   "@drawerFooterVersion": {
     "description": "App version label shown in the drawer footer"
   },

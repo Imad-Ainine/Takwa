@@ -7,6 +7,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import '../routes/app_routes.dart';
 import 'notifications_service.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
+import '../../features/settings/data/user_preferences.dart';
 
 class AdhanAudioPlayer {
   static AudioPlayer? _player;
@@ -55,8 +56,11 @@ class AdhanAudioPlayer {
 
 class AdhanAutoTrigger {
   static Timer? _checkTimer;
+  // Key is '<prayerName>_<dayOfYear>' — unique per prayer per day.
   static String? _lastTriggeredPrayer;
-  static DateTime? _lastTriggeredTime;
+  // Guards concurrent executions: avoids stacking multiple async _check
+  // calls when the provider is slow to resolve on the first tick.
+  static bool _checking = false;
 
   /// يبدأ مراقبة أوقات الصلاة كل ثانية بدقة عالية
   static void start(WidgetRef ref, GlobalKey<NavigatorState> navigatorKey) {
@@ -76,45 +80,58 @@ class AdhanAutoTrigger {
     WidgetRef ref,
     GlobalKey<NavigatorState> navigatorKey,
   ) async {
+    if (_checking) return; // prevent overlapping async calls
+    _checking = true;
     try {
       final prayers = ref.read(prayerTimesProvider).value;
       if (prayers == null) return;
 
-      final prefs = await ref.read(userPreferencesProvider.future);
+      // Read preferences synchronously from the cached value to avoid a
+      // per-second async database hit. Fall back to the future only if the
+      // value has not loaded yet (first launch).
+      final UserPreferences prefs =
+          ref.read(userPreferencesProvider).valueOrNull ??
+          await ref.read(userPreferencesProvider.future);
 
       final adhanMode = prefs.adhanMode;
       final playSound = adhanMode == 'sound';
       final adhanVolumeLevel = prefs.adhanVolumeLevel;
-
       final adhanScreen = prefs.adhanScreenEnabled;
-
-      // Read the user-selected adhan sound
       final adhanSoundFile = prefs.adhanSound;
 
       final now = DateTime.now();
       for (final prayer in prayers) {
         final diffSecs = now.difference(prayer.time).inSeconds;
-        // نُطلق الشاشة فقط عند وقت الصلاة تماماً (0-180 ثانية)
-        if (diffSecs < 0 || diffSecs > 180) {
-          continue;
-        }
+        // Trigger window: from prayer time up to 3 minutes after, to
+        // survive the app being momentarily backgrounded at the exact second.
+        if (diffSecs < 0 || diffSecs > 180) continue;
 
-        final key = '${prayer.name}_${prayer.time.day}';
+        // Unique key per prayer per calendar day — the only deduplication
+        // guard needed. The old 30-minute cross-prayer wall was removed
+        // because it blocked a prayer that falls within 30 min of the
+        // previous one (e.g., Dhuhr at 13:00 and Asr at 13:20 in summer).
+        final key =
+            '${prayer.name}_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
         if (_lastTriggeredPrayer == key) continue;
 
-        // تجنب إعادة التشغيل في نفس الفترة (30 دقيقة)
-        if (_lastTriggeredTime != null &&
-            now.difference(_lastTriggeredTime!).inMinutes < 30) {
-          continue;
+        // Guard: don't push the Adhan screen if it's already on top.
+        final nav = navigatorKey.currentState;
+        bool adhanAlreadyVisible = false;
+        if (nav != null) {
+          nav.popUntil((route) {
+            if (route.settings.name == Routes.adhan) {
+              adhanAlreadyVisible = true;
+            }
+            return true; // never actually pop anything
+          });
         }
 
         _lastTriggeredPrayer = key;
-        _lastTriggeredTime = now;
 
         debugPrint('🕌 Auto-trigger adhan: ${prayer.nameAr}');
 
         // تشغيل صوت الأذان المختار من الإعدادات
-        if (playSound) {
+        if (playSound && !AdhanAudioPlayer.isPlaying) {
           await AdhanAudioPlayer.play(
             asset: 'assets/sounds/$adhanSoundFile',
             volume: adhanVolumeLevel,
@@ -122,7 +139,7 @@ class AdhanAutoTrigger {
         }
 
         // فتح شاشة الأذان
-        if (adhanScreen) {
+        if (adhanScreen && !adhanAlreadyVisible) {
           FlutterForegroundTask.wakeUpScreen();
           final ctx = navigatorKey.currentContext;
           if (ctx != null) {
@@ -138,6 +155,8 @@ class AdhanAutoTrigger {
       }
     } catch (e) {
       debugPrint('AdhanAutoTrigger: error: $e');
+    } finally {
+      _checking = false;
     }
   }
 
@@ -151,17 +170,27 @@ class AdhanAutoTrigger {
     if (action != 'show_adhan') return;
 
     final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
-    final requestPlaySound = (data['sound'] as bool?) ?? true;
+    // The background service now sends 'adhanMode' (the canonical string);
+    // fall back to interpreting the legacy bool 'sound' field so older
+    // background isolates still work correctly.
+    final String adhanModeFromBg =
+        (data['adhanMode'] as String?) ??
+        ((data['sound'] as bool?) == true ? 'sound' : 'silent');
 
-    final prefs = await ref.read(userPreferencesProvider.future);
+    // Prefer the live Riverpod value (already cached); only await if loading.
+    final UserPreferences prefs =
+        ref.read(userPreferencesProvider).valueOrNull ??
+        await ref.read(userPreferencesProvider.future);
+
     final adhanMode = prefs.adhanMode;
     final playSoundPref = adhanMode == 'sound';
-    final adhanVolumeLevel = prefs.adhanVolumeLevel;
+    // Only play if both the user setting AND the background signal agree.
+    final shouldPlaySound = playSoundPref && adhanModeFromBg == 'sound';
 
+    final adhanVolumeLevel = prefs.adhanVolumeLevel;
     final adhanScreen = prefs.adhanScreenEnabled;
 
-    if (playSoundPref && requestPlaySound) {
-      // Read the user-selected adhan sound file
+    if (shouldPlaySound && !AdhanAudioPlayer.isPlaying) {
       final adhanSoundFile = prefs.adhanSound;
       await AdhanAudioPlayer.play(
         asset: 'assets/sounds/$adhanSoundFile',
@@ -170,8 +199,20 @@ class AdhanAutoTrigger {
     }
 
     if (adhanScreen) {
-      await Future.delayed(const Duration(milliseconds: 300));
-      navigatorKey.currentState?.pushNamed(Routes.adhan, arguments: prayerName);
+      // Guard: don't push on top of an already-visible Adhan screen.
+      bool adhanAlreadyVisible = false;
+      navigatorKey.currentState?.popUntil((route) {
+        if (route.settings.name == Routes.adhan) adhanAlreadyVisible = true;
+        return true;
+      });
+
+      if (!adhanAlreadyVisible) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        navigatorKey.currentState?.pushNamed(
+          Routes.adhan,
+          arguments: prayerName,
+        );
+      }
     }
   }
 }

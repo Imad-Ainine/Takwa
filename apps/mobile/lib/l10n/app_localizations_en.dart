@@ -485,7 +485,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'In the name of Allah, the Most Gracious, the Most Merciful';
 
   @override
-  String get settingsAppVersionLabel => 'Taqwa — v1.0.0';
+  String get settingsAppVersionLabel => 'Taqwa — v1.0.5';
 
   @override
   String get settingsTestNotifSheetTitle => 'Test notifications';
@@ -976,7 +976,7 @@ class AppLocalizationsEn extends AppLocalizations {
       '\"Take account of yourselves before you are taken to account\"';
 
   @override
-  String get drawerFooterVersion => ' v1.0';
+  String get drawerFooterVersion => ' v1.0.5';
 
   @override
   String get commonSave => 'Save';

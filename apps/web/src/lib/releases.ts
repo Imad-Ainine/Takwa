@@ -17,7 +17,7 @@ export interface ReleaseInfo {
  * 3. Falls back to NEXT_PUBLIC_APK_* environment variables.
  */
 export async function getLatestRelease(): Promise<ReleaseInfo> {
-  const defaultVersion = process.env.NEXT_PUBLIC_APK_VERSION || '1.0.4';
+  const defaultVersion = process.env.NEXT_PUBLIC_APK_VERSION || '1.0.5';
   const defaultUrl = process.env.NEXT_PUBLIC_APK_URL || `/api/releases/download?version=${defaultVersion}`;
   const defaultSize = process.env.NEXT_PUBLIC_APK_SIZE || '';
   const defaultSha256 = process.env.NEXT_PUBLIC_APK_SHA256 || '';
