@@ -123,14 +123,15 @@ export default function HeroSection({
                 <div className="phone-speaker" />
                 <div className="phone-screen-container">
                   <Image
-                    src="/screenshots/2.webp"
+                    src="/screenshots/1.webp"
                     alt="Takwa Prayer Schedule Screen"
                     width={260}
                     height={550}
                     className="phone-screen-img"
                     sizes="(max-width: 580px) 220px, 260px"
-                    loading="lazy"
-                    fetchPriority="low"
+                    priority
+                    fetchPriority="high"
+                    decoding="sync"
                     unoptimized
                     style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'cover' }}
                   />
