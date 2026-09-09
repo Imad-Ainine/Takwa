@@ -16,31 +16,43 @@ export async function updateSession(
 	request: NextRequest,
 	response: NextResponse
 ) {
-	const supabase = createServerClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			cookies: {
-				getAll() {
-					return request.cookies.getAll();
-				},
-				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value }) =>
-						request.cookies.set(name, value)
-					);
-					cookiesToSet.forEach(({ name, value, options }) =>
-						response.cookies.set(name, value, options)
-					);
-				},
-			},
-		}
-	);
+	const supabaseUrl =
+		process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+	const supabaseKey =
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
-	// Do not remove: this is what actually triggers a token refresh when
-	// the access token has expired. Reading the session without calling a
-	// method that talks to Supabase (e.g. just decoding the JWT locally)
-	// would silently skip the refresh.
-	await supabase.auth.getUser();
+	// If Supabase environment variables are missing (e.g. not configured on Vercel),
+	// skip session refresh gracefully instead of crashing the middleware with a 500 error.
+	if (!supabaseUrl || !supabaseKey) {
+		return response;
+	}
+
+	try {
+		const supabase = createServerClient(
+			supabaseUrl,
+			supabaseKey,
+			{
+				cookies: {
+					getAll() {
+						return request.cookies.getAll();
+					},
+					setAll(cookiesToSet) {
+						cookiesToSet.forEach(({ name, value }) =>
+							request.cookies.set(name, value)
+						);
+						cookiesToSet.forEach(({ name, value, options }) =>
+							response.cookies.set(name, value, options)
+						);
+					},
+				},
+			}
+		);
+
+		// Triggers token refresh if expired
+		await supabase.auth.getUser();
+	} catch (error) {
+		console.error('[Supabase Middleware] Session refresh error:', error);
+	}
 
 	return response;
 }
