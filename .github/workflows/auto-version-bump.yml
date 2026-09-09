@@ -90,6 +90,10 @@ jobs:
                   # Create annotated tag — this triggers release-apk.yml
                   git tag -a "v${NEXT}" -m "Release v${NEXT}"
 
+                  # Pull any commits that landed on remote since we checked out,
+                  # then push. --rebase keeps the version-bump commit on top.
+                  git pull --rebase https://x-access-token:${{ secrets.RELEASE_TOKEN }}@github.com/${{ github.repository }}.git main
+
                   # Push the commit and the tag.
                   # Using RELEASE_TOKEN so the tag push event can trigger
                   # release-apk.yml (GITHUB_TOKEN is blocked from doing this).
