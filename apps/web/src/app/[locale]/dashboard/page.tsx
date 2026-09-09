@@ -1,12 +1,13 @@
 import { getTranslations } from 'next-intl/server';
 import { redirect } from '@/i18n/routing';
 import { createClient } from '@/lib/supabase/server';
+import { getLatestRelease } from '@/lib/releases';
 import { signOut } from './actions';
 import styles from './dashboard.module.css';
 
 /**
  * Dashboard — shows user info + APK early-access download card.
- * APK metadata is injected at build time via NEXT_PUBLIC_APK_* env vars.
+ * APK metadata is dynamically resolved via getLatestRelease().
  */
 export default async function DashboardPage({
 	params,
@@ -25,11 +26,13 @@ export default async function DashboardPage({
 		redirect({ href: '/login', locale });
 	}
 
-	const apkUrl = process.env.NEXT_PUBLIC_APK_URL || '';
-	const apkVersion = process.env.NEXT_PUBLIC_APK_VERSION || '1.0.0';
-	const apkSize = process.env.NEXT_PUBLIC_APK_SIZE || '';
-	const apkSha1 = process.env.NEXT_PUBLIC_APK_SHA1 || '';
-	const apkSha256 = process.env.NEXT_PUBLIC_APK_SHA256 || '';
+	const release = await getLatestRelease();
+	const apkUrl = release.apkUrl;
+	const apkVersion = release.version;
+	const apkSize = release.size;
+	const apkSha1 = release.sha1;
+	const apkSha256 = release.sha256;
+	const downloadFilename = release.downloadFilename;
 
 	return (
 		<div className={styles.page}>
@@ -85,7 +88,7 @@ export default async function DashboardPage({
 						<a
 							id="download-apk-btn"
 							href={apkUrl}
-							download={`takwa-v${apkVersion}.apk`}
+							download={downloadFilename}
 							className={styles.downloadBtn}
 						>
 							<span className={styles.downloadBtnIcon}>⬇️</span>

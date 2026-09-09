@@ -187,6 +187,11 @@ jobs:
                   SERVICE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
                   BUCKET="apk-releases"
 
+                  if [ -z "$SERVICE_KEY" ] || [ -z "$SUPABASE_URL" ]; then
+                    echo "⚠️ SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL secret is not configured. Skipping Supabase manifest upload."
+                    exit 0
+                  fi
+
                   echo "Publishing manifest.json to Supabase (${BUCKET})..."
                   echo "$MANIFEST"
 
@@ -198,11 +203,10 @@ jobs:
                     --data-binary @-)
 
                   if [ "$HTTP_CODE" -ne 200 ] && [ "$HTTP_CODE" -ne 201 ]; then
-                    echo "❌ Supabase manifest upload failed (HTTP $HTTP_CODE):"
+                    echo "⚠️ Supabase manifest upload failed (HTTP $HTTP_CODE):"
                     cat response.json
-                    exit 1
+                  else
+                    echo "✅ manifest.json published successfully!"
+                    echo "   Public URL: ${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/manifest.json"
                   fi
-
-                  echo "✅ manifest.json published successfully!"
-                  echo "   Public URL: ${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/manifest.json"
               working-directory: apps/mobile
