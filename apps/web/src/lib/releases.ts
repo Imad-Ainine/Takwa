@@ -12,6 +12,7 @@ export interface ReleaseInfo {
 /**
  * Automatically resolves the latest released APK metadata.
  * 1. Checks GitHub Releases API for the latest published release (auto-updates after CI build).
+ *    NOTE: For private repos, set GITHUB_TOKEN as a server-side env var on Vercel.
  * 2. Falls back to Supabase Storage manifest.json if configured.
  * 3. Falls back to NEXT_PUBLIC_APK_* environment variables.
  */
@@ -22,15 +23,23 @@ export async function getLatestRelease(): Promise<ReleaseInfo> {
   const defaultSha256 = process.env.NEXT_PUBLIC_APK_SHA256 || '';
   const defaultSha1 = process.env.NEXT_PUBLIC_APK_SHA1 || '';
 
-  // 1. Try GitHub Releases API (Public, cached with Next.js revalidate)
+  // 1. Try GitHub Releases API
+  // For private repos this REQUIRES a server-side GITHUB_TOKEN env var on Vercel.
   try {
     const repo = process.env.GITHUB_REPO || 'Imad-Ainine/Takwa';
+    const githubToken = process.env.GITHUB_TOKEN; // server-side only, never NEXT_PUBLIC_
+
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'Takwa-App',
+    };
+    if (githubToken) {
+      headers['Authorization'] = `Bearer ${githubToken}`;
+    }
+
     const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
       next: { revalidate: 60 },
-      headers: {
-        Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'Takwa-App',
-      },
+      headers,
     });
 
     if (res.ok) {
