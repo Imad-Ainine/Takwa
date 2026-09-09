@@ -26,7 +26,9 @@ jobs:
               uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-                  token: ${{ secrets.GITHUB_TOKEN }}
+                  # RELEASE_TOKEN is a PAT — GITHUB_TOKEN cannot trigger
+                  # other workflows (release-apk.yml), but a PAT can.
+                  token: ${{ secrets.RELEASE_TOKEN }}
 
             # ── Read current version from pubspec.yaml ──────────────────────
             - name: Read current version
@@ -88,5 +90,7 @@ jobs:
                   # Create annotated tag — this triggers release-apk.yml
                   git tag -a "v${NEXT}" -m "Release v${NEXT}"
 
-                  # Push the commit and the tag
-                  git push origin main --follow-tags
+                  # Push the commit and the tag.
+                  # Using RELEASE_TOKEN so the tag push event can trigger
+                  # release-apk.yml (GITHUB_TOKEN is blocked from doing this).
+                  git push https://x-access-token:${{ secrets.RELEASE_TOKEN }}@github.com/${{ github.repository }}.git main --follow-tags
