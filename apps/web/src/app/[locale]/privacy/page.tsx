@@ -55,51 +55,6 @@ export default function PrivacyPolicy() {
           </p>
         </section>
       </div>
-
-      <style jsx>{`
-        .policy-page {
-          padding: 100px 0;
-          line-height: 1.8;
-          color: var(--text-secondary);
-        }
-        .policy-page h1 {
-          font-size: 3rem;
-          margin-bottom: 10px;
-        }
-        .last-updated {
-          margin-bottom: 40px;
-          font-style: italic;
-        }
-        .policy-section {
-          margin-bottom: 40px;
-          background: var(--card);
-          padding: 30px;
-          border-radius: var(--radius-card);
-          border: 1px solid var(--border);
-        }
-        .policy-section h2 {
-          color: var(--gold-light);
-          margin-bottom: 20px;
-          font-family: 'Amiri', serif;
-        }
-        .policy-section p {
-          margin-bottom: 15px;
-        }
-        .policy-section ul {
-          padding-left: 20px;
-          margin-bottom: 15px;
-        }
-        :global([dir="rtl"]) .policy-section ul {
-          padding-left: 0;
-          padding-right: 20px;
-        }
-        .policy-section ul li {
-          margin-bottom: 10px;
-        }
-        .policy-section strong {
-          color: var(--text-primary);
-        }
-      `}</style>
     </div>
   );
 }
