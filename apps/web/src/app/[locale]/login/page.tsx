@@ -27,14 +27,21 @@ export default function LoginPage() {
 		setError(null);
 		setLoading(true);
 
-		const supabase = createClient();
-		const { error: signInError } = await supabase.auth.signInWithPassword({
-			email,
-			password,
-		});
+		try {
+			const supabase = createClient();
+			const { error: signInError } = await supabase.auth.signInWithPassword({
+				email,
+				password,
+			});
 
-		if (signInError) {
-			setError(t('errorInvalidCredentials'));
+			if (signInError) {
+				setError(t('errorInvalidCredentials'));
+				setLoading(false);
+				return;
+			}
+		} catch (err: any) {
+			console.error('Login error:', err);
+			setError(err?.message || t('errorInvalidCredentials'));
 			setLoading(false);
 			return;
 		}

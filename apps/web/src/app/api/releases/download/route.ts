@@ -43,19 +43,16 @@ export async function GET(request: NextRequest) {
   const bucket = process.env.SUPABASE_APK_BUCKET || 'apk-releases';
   const githubRepo = process.env.GITHUB_REPO || 'Imad-Ainine/Takkwa';
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json(
-      { error: 'Supabase credentials not configured.' },
-      { status: 503 }
-    );
-  }
-
-  // Resolve version: query param > manifest > env var fallback
   let version = searchParams.get('version');
 
-  if (!version) {
-    const manifest = await getManifest(supabaseUrl, serviceRoleKey, bucket);
-    version = manifest?.version ?? process.env.NEXT_PUBLIC_APK_VERSION ?? null;
+  if (supabaseUrl && serviceRoleKey) {
+    if (!version) {
+      const manifest = await getManifest(supabaseUrl, serviceRoleKey, bucket);
+      version = manifest?.version ?? process.env.NEXT_PUBLIC_APK_VERSION ?? '1.0.0';
+    }
+  } else {
+    // If Supabase credentials are not set on Vercel, fallback to env var or default version
+    version = version || process.env.NEXT_PUBLIC_APK_VERSION || '1.0.0';
   }
 
   if (!version) {
