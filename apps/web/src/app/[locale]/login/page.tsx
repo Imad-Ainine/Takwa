@@ -39,9 +39,11 @@ export default function LoginPage() {
 				setLoading(false);
 				return;
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error('Login error:', err);
-			setError(err?.message || t('errorInvalidCredentials'));
+			const message =
+				err instanceof Error ? err.message : t('errorInvalidCredentials');
+			setError(message);
 			setLoading(false);
 			return;
 		}
