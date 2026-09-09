@@ -8,13 +8,14 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [360, 480, 640, 750, 828, 1080, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 31536000,
   },
   compress: true,
   poweredByHeader: false,
   async headers() {
     return [
       {
-        source: '/screenshots/:path*',
+        source: '/:all*(svg|jpg|png|webp|avif|ico|woff2)',
         headers: [
           {
             key: 'Cache-Control',
@@ -23,7 +24,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/icons/:path*',
+        source: '/screenshots/:path*',
         headers: [
           {
             key: 'Cache-Control',

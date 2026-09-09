@@ -1,27 +1,8 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
 import HeroSection from '@/components/landing/HeroSection';
-
-// Dynamically code-split below-the-fold sections while preserving full SSR for SEO & zero CLS
-const FeaturesSection = dynamic(
-  () => import('@/components/landing/FeaturesSection'),
-  { ssr: true }
-);
-
-const SpiritualQuoteBanner = dynamic(
-  () => import('@/components/landing/SpiritualQuoteBanner'),
-  { ssr: true }
-);
-
-const ScreenshotsShowcase = dynamic(
-  () => import('@/components/landing/ScreenshotsShowcase'),
-  { ssr: true }
-);
-
-const DownloadSection = dynamic(
-  () => import('@/components/landing/DownloadSection'),
-  { ssr: true }
-);
+import FeaturesSection from '@/components/landing/FeaturesSection';
+import SpiritualQuoteBanner from '@/components/landing/SpiritualQuoteBanner';
+import ScreenshotsShowcase from '@/components/landing/ScreenshotsShowcase';
+import DownloadSection from '@/components/landing/DownloadSection';
 
 interface HomeProps {
   apkUrl?: string;

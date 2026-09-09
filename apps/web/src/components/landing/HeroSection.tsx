@@ -129,10 +129,8 @@ export default function HeroSection({
                     height={550}
                     className="phone-screen-img"
                     sizes="(max-width: 580px) 220px, 260px"
-                    priority
-                    fetchPriority="high"
-                    decoding="sync"
-                    unoptimized
+                    loading="lazy"
+                    fetchPriority="low"
                     style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'cover' }}
                   />
                 </div>
@@ -153,7 +151,6 @@ export default function HeroSection({
                     priority
                     fetchPriority="high"
                     decoding="sync"
-                    unoptimized
                     sizes="(max-width: 580px) 240px, 290px"
                     style={{ width: '100%', height: 'auto', aspectRatio: '580 / 1227', objectFit: 'cover' }}
                   />

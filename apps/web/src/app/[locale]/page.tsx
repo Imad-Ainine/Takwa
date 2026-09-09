@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import LandingPage from '@/components/landing/LandingPage';
 import { getLatestRelease } from '@/lib/releases';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 /**
  * Landing page — Server Component.
