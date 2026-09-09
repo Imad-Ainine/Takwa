@@ -64,8 +64,18 @@ jobs:
             - name: Set up release signing keystore
               working-directory: apps/mobile/android
               run: |
+                  if [ -z "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+                    echo "::error::Secret KEYSTORE_BASE64 is empty or missing!"
+                    exit 1
+                  fi
+
                   # Decode the base64 keystore stored in GitHub Secrets
                   echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/takwa-release-key.jks
+
+                  if [ ! -s app/takwa-release-key.jks ]; then
+                    echo "::error::app/takwa-release-key.jks is empty or failed to decode!"
+                    exit 1
+                  fi
 
                   # Write key.properties so Gradle can find it
                   cat > key.properties <<EOF

@@ -49,14 +49,22 @@ android {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String?
             keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storeFile = keystoreProperties["storeFile"]?.let { path ->
+                val f = file(path)
+                if (f.exists()) f else rootProject.file(path)
+            }
             storePassword = keystoreProperties["storePassword"] as String?
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            val releaseSigning = signingConfigs.getByName("release")
+            signingConfig = if (releaseSigning.storeFile?.exists() == true) {
+                releaseSigning
+            } else {
+                signingConfigs.getByName("debug")
+            }
             // Enable shrinking, obfuscation, and optimization
             isMinifyEnabled = true
             isShrinkResources = true
@@ -68,7 +76,7 @@ android {
 
         debug {
             // 1. Signing Config (Always use debug keystore)
-            signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("debug")
             //isDebuggable = false
             isMinifyEnabled = false
             isShrinkResources = false
