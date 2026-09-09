@@ -23,4 +23,7 @@
 -dontwarn com.google.android.play.core.**
 -keep class com.google.android.play.core.** { *; }
 
-# Add specific rules for other plugins here
+# Google Sign-in & Play Services Auth (protect from R8 stripping)
+-keep class com.google.android.gms.auth.api.signin.** { *; }
+-keep class com.google.android.gms.common.api.** { *; }
+-dontwarn com.google.android.gms.**
