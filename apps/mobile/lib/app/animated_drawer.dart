@@ -268,7 +268,7 @@ class _DrawerContent extends ConsumerWidget {
                   _LogoutButton(onClose: onClose),
 
                 // ── تذييل ──
-                _DrawerFooter(),
+                const _DrawerFooter(),
               ],
             ),
           ),
