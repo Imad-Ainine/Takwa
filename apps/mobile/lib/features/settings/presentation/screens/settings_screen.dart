@@ -9,7 +9,7 @@ import 'package:takwa/l10n/app_localizations.dart';
 import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/notifications/overlays/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
@@ -56,7 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       // AppBarWidget instead of a one-off SliverAppBar — consistent with
       // the rest of the app's app bars (audit item 29).
       appBar: AppBarWidget(
-        leading: const CustomLeadingButton(),
+        leading: const DrawerMenuButton(),
         title: l10n.settingsScreenTitle,
         actions: [
           Center(

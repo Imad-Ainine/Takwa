@@ -10,7 +10,7 @@ import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
@@ -696,7 +696,7 @@ class _PrayerHeader extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                     child: Row(
                       children: [
-                        const CustomLeadingButton(),
+                        const DrawerMenuButton(),
                         const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(

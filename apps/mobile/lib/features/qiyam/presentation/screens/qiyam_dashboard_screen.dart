@@ -8,7 +8,7 @@ import 'package:takwa/features/qiyam/providers/qiyam_providers.dart';
 import 'package:takwa/app/main_shell.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
-import '../../../../core/widgets/custom_leading_button.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
 import '../../../../core/widgets/takwa_tappable.dart';
 import '../widgets/qiyam_onboarding_overlay.dart';
@@ -160,7 +160,7 @@ class _QiyamDashboardScreenState extends ConsumerState<QiyamDashboardScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const CustomLeadingButton(),
+          const DrawerMenuButton(),
           Column(
             children: [
               Text(

@@ -11,7 +11,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/core/providers/database_providers.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
@@ -22,7 +22,9 @@ const _kArabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '�
 String _localizedDigits(BuildContext context, int n) {
   final isArabic = Localizations.localeOf(context).languageCode == 'ar';
   final s = n.toString();
-  return isArabic ? s.split('').map((c) => _kArabicDigits[int.parse(c)]).join() : s;
+  return isArabic
+      ? s.split('').map((c) => _kArabicDigits[int.parse(c)]).join()
+      : s;
 }
 
 String _signedPoints(BuildContext context, int points) {
@@ -299,13 +301,16 @@ class _TopBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [context.colors.gold.withValues(alpha: 0.12), Colors.transparent],
+          colors: [
+            context.colors.gold.withValues(alpha: 0.12),
+            Colors.transparent,
+          ],
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CustomLeadingButton(),
+          const DrawerMenuButton(),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -614,7 +619,8 @@ class _PrayersGroup extends ConsumerWidget {
     return _GroupCard(
       icon: '🕌',
       title: l10n.checklistFivePrayersTitle,
-      trailing: '${_localizedDigits(context, _countPerformed)} / ${_localizedDigits(context, 5)}',
+      trailing:
+          '${_localizedDigits(context, _countPerformed)} / ${_localizedDigits(context, 5)}',
       trailingColor: context.colors.gold,
       children: _prayerKeys.map((p) {
         final status = _statusOf(p.$2);
@@ -908,10 +914,14 @@ class _StatusOption extends StatelessWidget {
           vertical: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.12) : context.colors.card,
+          color: isSelected
+              ? color.withValues(alpha: 0.12)
+              : context.colors.card,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: isSelected ? color.withValues(alpha: 0.4) : context.colors.border,
+            color: isSelected
+                ? color.withValues(alpha: 0.4)
+                : context.colors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -1382,10 +1392,14 @@ class _FastingSelector extends ConsumerWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 7),
           decoration: BoxDecoration(
-            color: selected ? color.withValues(alpha: 0.15) : context.colors.card,
+            color: selected
+                ? color.withValues(alpha: 0.15)
+                : context.colors.card,
             borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
-              color: selected ? color.withValues(alpha: 0.4) : context.colors.border,
+              color: selected
+                  ? color.withValues(alpha: 0.4)
+                  : context.colors.border,
               width: selected ? 1.5 : 1,
             ),
           ),
@@ -1452,7 +1466,9 @@ class _ProhibitionsGroup extends ConsumerWidget {
           decoration: BoxDecoration(
             color: context.colors.danger.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: context.colors.danger.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: context.colors.danger.withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             children: [
@@ -1788,14 +1804,14 @@ class _DayNoteFieldState extends ConsumerState<_DayNoteField> {
       saved = await _saveAndSync(ref, context, () async {
         final rec = await ref.read(dailyRecordDaoProvider).getOrCreateToday();
         final db = ref.read(appDatabaseProvider);
-        await (db.update(db.dailyRecords)
-              ..where((r) => r.id.equals(rec.id)))
-            .write(
-              DailyRecordsCompanion(
-                notes: Value(_ctrl.text.trim()),
-                updatedAt: Value(DateTime.now()),
-              ),
-            );
+        await (db.update(
+          db.dailyRecords,
+        )..where((r) => r.id.equals(rec.id))).write(
+          DailyRecordsCompanion(
+            notes: Value(_ctrl.text.trim()),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
         return ref.read(dailyRecordDaoProvider).getOrCreateToday();
       });
     } finally {

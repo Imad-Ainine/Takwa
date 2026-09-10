@@ -15,7 +15,7 @@ import 'package:takwa/core/widgets/guest_mode_guard.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 /// فلتر الفترة الزمنية
@@ -183,7 +183,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen>
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
                   expandedHeight: 120,
-                  leading: const CustomLeadingButton(),
+                  leading: const DrawerMenuButton(),
                   flexibleSpace: FlexibleSpaceBar(
                     collapseMode: CollapseMode.pin,
                     background: _StatsTopBar(hijri: hijri),
@@ -952,7 +952,9 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                         : isSelected
                                         ? [
                                             context.colors.teal,
-                                            context.colors.teal.withValues(alpha: 0.6),
+                                            context.colors.teal.withValues(
+                                              alpha: 0.6,
+                                            ),
                                           ]
                                         // Was colors.border -> colors.card2:
                                         // a hairline-border color used as a
@@ -963,8 +965,9 @@ class _WeeklyChartState extends State<_WeeklyChart>
                                         // visually secondary to gold/teal.
                                         : [
                                             context.colors.textDim,
-                                            context.colors.textDim
-                                                .withValues(alpha: 0.4),
+                                            context.colors.textDim.withValues(
+                                              alpha: 0.4,
+                                            ),
                                           ],
                                   ),
                                   borderRadius: const BorderRadius.vertical(
@@ -1228,8 +1231,7 @@ class _PrayerAttendanceCard extends ConsumerWidget {
             ),
             error: (_, _) => TakwaErrorState(
               compact: true,
-              onRetry: () =>
-                  ref.invalidate(periodPrayerRatesProvider(range)),
+              onRetry: () => ref.invalidate(periodPrayerRatesProvider(range)),
             ),
             data: (rates) => Column(
               children: rates
@@ -1452,10 +1454,15 @@ class _AchievementBadge extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [context.colors.gold.withValues(alpha: 0.12), Colors.transparent],
+            colors: [
+              context.colors.gold.withValues(alpha: 0.12),
+              Colors.transparent,
+            ],
           ),
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: context.colors.gold.withValues(alpha: 0.25)),
+          border: Border.all(
+            color: context.colors.gold.withValues(alpha: 0.25),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1550,7 +1557,9 @@ class _AchievementDialog extends StatelessWidget {
               decoration: BoxDecoration(
                 color: context.colors.gold.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.xl),
-                border: Border.all(color: context.colors.gold.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: context.colors.gold.withValues(alpha: 0.2),
+                ),
               ),
               child: Text(
                 AppLocalizations.of(
@@ -1773,7 +1782,9 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                 ],
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: context.colors.gold.withValues(alpha: 0.4)),
+              border: Border.all(
+                color: context.colors.gold.withValues(alpha: 0.4),
+              ),
               boxShadow: [
                 BoxShadow(
                   color: context.colors.gold.withValues(alpha: 0.15),
@@ -1812,7 +1823,9 @@ class _AchievementToastState extends ConsumerState<_AchievementToast>
                         widget.achievement.descAr,
                         style: context.typography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: context.colors.background.withValues(alpha: 0.8),
+                          color: context.colors.background.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                       ),
                     ],

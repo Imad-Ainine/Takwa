@@ -4,8 +4,8 @@ import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/features/achievements/domain/models/achievement_definition.dart';
 import 'package:takwa/features/achievements/presentation/widgets/achievement_card.dart';
 import 'package:takwa/features/achievements/providers/achievements_providers.dart';
-import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
+import 'package:takwa/app/animated_drawer.dart';
 import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -96,9 +96,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   child: Center(child: TakwaLoadingIndicator()),
                 ),
                 error: (e, s) => SliverFillRemaining(
-                  child: Center(
-                    child: Text(l10n.checklistErrorPrefix('$e')),
-                  ),
+                  child: Center(child: Text(l10n.checklistErrorPrefix('$e'))),
                 ),
               ),
 
@@ -124,7 +122,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
       backgroundColor: Colors.transparent,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
-      leading: const CustomLeadingButton(),
+      leading: const DrawerMenuButton(),
       title: Text(
         l10n.achievementsScreenTitle,
         style: context.typography.headingLarge.copyWith(
@@ -158,7 +156,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                   decoration: BoxDecoration(
                     gradient: colors.cardGradient,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: colors.gold.withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: colors.gold.withValues(alpha: 0.2),
+                    ),
                     boxShadow: context.shadows.card,
                   ),
                   child: Row(
@@ -329,7 +329,10 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
           color: colors.background,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           border: Border(
-            top: BorderSide(color: colors.gold.withValues(alpha: 0.3), width: 1.5),
+            top: BorderSide(
+              color: colors.gold.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
           ),
         ),
         child: Column(
@@ -380,7 +383,9 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                 decoration: BoxDecoration(
                   color: colors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(color: colors.success.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    color: colors.success.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -388,9 +393,7 @@ class _AchievementsScreenState extends ConsumerState<AchievementsScreen>
                     Icon(Icons.verified_rounded, color: colors.success),
                     const SizedBox(width: 10),
                     Text(
-                      l10n.achievementsAchievedOnLabel(
-                        _formatDate(a.earnedAt),
-                      ),
+                      l10n.achievementsAchievedOnLabel(_formatDate(a.earnedAt)),
                       style: context.typography.labelMedium.copyWith(
                         color: colors.success,
                         fontWeight: FontWeight.w600,
