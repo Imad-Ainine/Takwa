@@ -13,6 +13,8 @@ import 'package:takwa/core/widgets/primary_button.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/features/settings/data/user_preferences.dart';
 import 'package:takwa/core/notifications/adhan_auto_trigger.dart';
+import 'package:takwa/core/notifications/adhan_foreground_service.dart';
+import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class AdhanOverlayScreen extends ConsumerStatefulWidget {
@@ -135,12 +137,18 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   /// choose to close or go to prayer — matching the expected UX.
   Future<void> _silenceAdhan() async {
     if (_silenced) return; // already silenced — ignore repeated sensor events
-    _silenced = true;
+    if (mounted) {
+      setState(() {
+        _silenced = true;
+      });
+    } else {
+      _silenced = true;
+    }
 
     _vibrationTimer?.cancel();
     await AdhanAudioPlayer.stop();
 
-    // Give a brief haptic confirmation so the user knows face-down worked.
+    // Give a brief haptic confirmation so the user knows silence worked.
     if (mounted) HapticFeedback.mediumImpact();
   }
 
@@ -148,7 +156,16 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     // Respect the adhan mode (sound vs silent/vibrate)
     final mode = prefs.adhanMode;
 
-    if (mode == 'silent' || mode == 'vibrate') return;
+    if (mode == 'silent' || mode == 'vibrate') {
+      if (mounted) {
+        setState(() {
+          _silenced = true;
+        });
+      } else {
+        _silenced = true;
+      }
+      return;
+    }
 
     // Use the user-selected sound file
     final soundFile = prefs.adhanSound;
@@ -161,6 +178,11 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     } else {
       await AdhanAudioPlayer.setVolume(volume);
     }
+    if (mounted) {
+      setState(() {
+        _silenced = false;
+      });
+    }
   }
 
   @override
@@ -169,6 +191,8 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _sensorSub?.cancel();
     _vibrationTimer?.cancel();
+    AdhanAudioPlayer.stop();
+    AdhanForegroundService.stopAdhanService();
     _pulseCtrl.dispose();
     _starsCtrl.dispose();
     _entryCtrl.dispose();
@@ -178,16 +202,26 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   void _close() {
     AdhanAudioPlayer.stop();
     _vibrationTimer?.cancel();
+    AdhanForegroundService.stopAdhanService();
     _applyAutoSilent();
-    Navigator.of(context).pop();
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).pushReplacementNamed(Routes.home);
+    }
   }
 
   void _goToPrayer() {
     AdhanAudioPlayer.stop();
     _vibrationTimer?.cancel();
+    AdhanForegroundService.stopAdhanService();
     _applyAutoSilent();
-    Navigator.of(context).popUntil((r) => r.isFirst);
-    Navigator.of(context).pushNamed('/prayer');
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).popUntil((r) => r.isFirst);
+      Navigator.of(context).pushNamed(Routes.prayer);
+    } else {
+      Navigator.of(context).pushReplacementNamed(Routes.prayer);
+    }
   }
 
   Future<void> _applyAutoSilent() async {
@@ -222,6 +256,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
         if (didPop) {
           AdhanAudioPlayer.stop();
           _vibrationTimer?.cancel();
+          AdhanForegroundService.stopAdhanService();
         }
       },
       child: Scaffold(
@@ -277,6 +312,86 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Top action bar (Mute Adhan & Quick Close)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: _close,
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.white70,
+                            size: 26,
+                          ),
+                          tooltip: l10n.adhanOverlayCloseButton,
+                        ),
+                        InkWell(
+                          onTap: _silenceAdhan,
+                          borderRadius: BorderRadius.circular(20),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _silenced
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : const Color(
+                                      0xFFD4AF37,
+                                    ).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: _silenced
+                                    ? Colors.white24
+                                    : const Color(
+                                        0xFFD4AF37,
+                                      ).withValues(alpha: 0.6),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _silenced
+                                      ? Icons.volume_off_rounded
+                                      : Icons.volume_up_rounded,
+                                  color: _silenced
+                                      ? Colors.white60
+                                      : const Color(0xFFD4AF37),
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _silenced
+                                      ? (Localizations.localeOf(context).languageCode == 'ar'
+                                          ? 'الصوت متوقف'
+                                          : 'Muted')
+                                      : (Localizations.localeOf(context).languageCode == 'ar'
+                                          ? 'إيقاف الصوت'
+                                          : 'Stop Audio'),
+                                  style: TextStyle(
+                                    fontFamily: 'NotoNaskhArabic',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: _silenced
+                                        ? Colors.white60
+                                        : const Color(0xFFD4AF37),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   const Spacer(flex: 2),
 
                   // Radiant pulse circle

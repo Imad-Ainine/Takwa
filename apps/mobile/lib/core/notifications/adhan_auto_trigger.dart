@@ -141,6 +141,7 @@ class AdhanAutoTrigger {
         // فتح شاشة الأذان
         if (adhanScreen && !adhanAlreadyVisible) {
           FlutterForegroundTask.wakeUpScreen();
+          FlutterForegroundTask.launchApp();
           final ctx = navigatorKey.currentContext;
           if (ctx != null) {
             await Future.delayed(const Duration(milliseconds: 300));
@@ -199,6 +200,8 @@ class AdhanAutoTrigger {
     }
 
     if (adhanScreen) {
+      FlutterForegroundTask.wakeUpScreen();
+      FlutterForegroundTask.launchApp();
       // Guard: don't push on top of an already-visible Adhan screen.
       bool adhanAlreadyVisible = false;
       navigatorKey.currentState?.popUntil((route) {

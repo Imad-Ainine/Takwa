@@ -16,6 +16,7 @@ import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/providers/adhkar_providers.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
+import 'package:takwa/core/utils/timezone_resolver.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/app/main_shell.dart' show currentTabProvider;
 import 'package:takwa/l10n/app_localizations.dart';
@@ -97,14 +98,13 @@ class NotifChannels {
     const Locale('ar'),
   );
 
-  /// قناة الأذان — أعلى أولوية مع صوت الأذان
+  /// قناة تنبيه وقت الصلاة — أعلى أولوية مع نغمة الإشعار القياسية (بدون تشغيل صوت الأذان)
   static final AndroidNotificationChannel prayerSound =
       AndroidNotificationChannel(
-        'prayer_adhan_sound',
+        'prayer_time_alert',
         _l10n.notifChannelPrayerSoundName,
         description: _l10n.notifChannelPrayerSoundDesc,
         importance: Importance.max,
-        sound: const RawResourceAndroidNotificationSound('adhan'),
         playSound: true,
         enableVibration: true,
         enableLights: true,
@@ -283,12 +283,24 @@ class NotificationsService {
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
+      try {
+        await androidPlugin?.deleteNotificationChannel('prayer_adhan_sound');
+      } catch (_) {}
       for (final channel in NotifChannels.all) {
         await androidPlugin?.createNotificationChannel(channel);
       }
     }
 
     _initialized = true;
+  }
+
+  /// فحص إذا تم فتح التطبيق عبر النقر على إشعار عند الإقلاع
+  static Future<NotificationResponse?> getLaunchNotificationResponse() async {
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details != null && details.didNotificationLaunchApp) {
+      return details.notificationResponse;
+    }
+    return null;
   }
 
   // ── طلب الأذون ──
@@ -362,9 +374,9 @@ class NotificationsService {
 
     for (int i = 0; i < prayers.length; i++) {
       final prayer = prayers[i];
-      // Localized display name for whatever the user's locale is — the
-      // notification itself used to always say prayer.nameAr regardless
-      // (see the i18n audit's notification-text finding).
+      // تخطي الشروق من إشعارات الأذان (notifId = -1)
+      if (prayer.notifId <= 0) continue;
+
       final prayerName = prayerLocalizedName(l10n, prayer.name);
 
       // 1. تنبيه قبل الأذان بـ 15 دقيقة
@@ -382,17 +394,14 @@ class NotificationsService {
         }
       }
 
-      // 2. إشعار الأذان مع الصوت أو الاهتزاز أو الصامت
+      // 2. إشعار دخول وقت الصلاة — تنبيه واضح بنغمة الإشعار العادية بدون تشغيل صوت الأذان
       if (prayer.time.isAfter(now)) {
         AndroidNotificationChannel selectedChannel = NotifChannels.prayerSound;
-        String? soundAsset = 'adhan';
 
         if (adhanMode == 'vibrate') {
           selectedChannel = NotifChannels.prayerVibrate;
-          soundAsset = null;
         } else if (adhanMode == 'silent') {
           selectedChannel = NotifChannels.prayerSilent;
-          soundAsset = null;
         }
 
         await _scheduleExact(
@@ -404,7 +413,7 @@ class NotificationsService {
           body: l10n.notifAdhanBody,
           scheduledTime: prayer.time,
           channelId: selectedChannel.id,
-          sound: soundAsset,
+          sound: null, // لا نغمة أذان في الإشعار، الصوت يتم تشغيله حصراً في شاشة الأذان
           payload: 'prayer:${prayer.name}',
           fullScreenIntent:
               adhanMode != 'silent', // Show full screen overlay unless silent
@@ -808,6 +817,10 @@ class NotificationsService {
     final tzTime = tz.TZDateTime.from(scheduledTime, tz.local);
     if (tzTime.isBefore(tz.TZDateTime.now(tz.local))) return;
 
+    final isSilent = channelId == NotifChannels.prayerSilent.id;
+    final isVibrateOnly = channelId == NotifChannels.prayerVibrate.id;
+    final shouldPlaySound = !isSilent && !isVibrateOnly;
+
     await _plugin.zonedSchedule(
       id,
       title,
@@ -822,8 +835,8 @@ class NotificationsService {
           sound: sound != null
               ? RawResourceAndroidNotificationSound(sound)
               : null,
-          playSound: sound != null,
-          enableVibration: true,
+          playSound: shouldPlaySound,
+          enableVibration: !isSilent,
           fullScreenIntent: fullScreenIntent,
           category: fullScreenIntent ? AndroidNotificationCategory.alarm : null,
           audioAttributesUsage: fullScreenIntent
@@ -836,8 +849,8 @@ class NotificationsService {
         iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
-          presentSound: sound != null,
-          sound: sound != null ? 'adhan.aiff' : null,
+          presentSound: shouldPlaySound,
+          sound: sound != null ? '$sound.aiff' : null,
           interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       ),
@@ -1038,55 +1051,90 @@ class PrayerTimesService {
     required double longitude,
     required String madhab,
     required String method,
+    String? highLatitudeRule,
+    int fajrOffset = 0,
+    int sunriseOffset = 0,
+    int dhuhrOffset = 0,
+    int asrOffset = 0,
+    int maghribOffset = 0,
+    int ishaOffset = 0,
     DateTime? date,
+    String? timezone,
   }) async {
-    final d = date ?? DateTime.now();
+    TimezoneResolver.ensureInitialized();
+    if (timezone != null && timezone.isNotEmpty) {
+      TimezoneResolver.setLocalTimezone(timezone);
+    }
+
+    final localNow = tz.TZDateTime.now(tz.local);
+    final targetDate = date != null
+        ? tz.TZDateTime(tz.local, date.year, date.month, date.day)
+        : localNow;
+
     final coords = adhan.Coordinates(latitude, longitude);
-    final params = _calcParams(method, madhab);
-    final dc = adhan.DateComponents(d.year, d.month, d.day);
+    final params = _calcParams(
+      method,
+      madhab,
+      highLatitudeRule: highLatitudeRule,
+      fajrOffset: fajrOffset,
+      sunriseOffset: sunriseOffset,
+      dhuhrOffset: dhuhrOffset,
+      asrOffset: asrOffset,
+      maghribOffset: maghribOffset,
+      ishaOffset: ishaOffset,
+    );
+    final dc = adhan.DateComponents(
+      targetDate.year,
+      targetDate.month,
+      targetDate.day,
+    );
     final times = adhan.PrayerTimes(coords, dc, params);
+
+    DateTime toLocal(DateTime utcTime) {
+      return tz.TZDateTime.from(utcTime, tz.local);
+    }
 
     return [
       PrayerTimeInfo(
         name: 'fajr',
         nameAr: 'الفجر',
         emoji: '🌙',
-        time: times.fajr,
+        time: toLocal(times.fajr),
         notifId: NotifIds.fajr,
       ),
       PrayerTimeInfo(
         name: 'sunrise',
         nameAr: 'الشروق',
         emoji: '🌅',
-        time: times.sunrise,
+        time: toLocal(times.sunrise),
         notifId: -1, // لا يوجد إشعار للشروق حالياً
       ),
       PrayerTimeInfo(
         name: 'dhuhr',
         nameAr: 'الظهر',
         emoji: '☀️',
-        time: times.dhuhr,
+        time: toLocal(times.dhuhr),
         notifId: NotifIds.dhuhr,
       ),
       PrayerTimeInfo(
         name: 'asr',
         nameAr: 'العصر',
         emoji: '🌤',
-        time: times.asr,
+        time: toLocal(times.asr),
         notifId: NotifIds.asr,
       ),
       PrayerTimeInfo(
         name: 'maghrib',
         nameAr: 'المغرب',
         emoji: '🌆',
-        time: times.maghrib,
+        time: toLocal(times.maghrib),
         notifId: NotifIds.maghrib,
       ),
       PrayerTimeInfo(
         name: 'isha',
         nameAr: 'العشاء',
         emoji: '🌃',
-        time: times.isha,
+        time: toLocal(times.isha),
         notifId: NotifIds.isha,
       ),
     ];
@@ -1130,7 +1178,17 @@ class PrayerTimesService {
     return '${d.inMinutes} دقيقة';
   }
 
-  static adhan.CalculationParameters _calcParams(String method, String madhab) {
+  static adhan.CalculationParameters _calcParams(
+    String method,
+    String madhab, {
+    String? highLatitudeRule,
+    int fajrOffset = 0,
+    int sunriseOffset = 0,
+    int dhuhrOffset = 0,
+    int asrOffset = 0,
+    int maghribOffset = 0,
+    int ishaOffset = 0,
+  }) {
     adhan.CalculationParameters p;
     switch (method) {
       case 'Algeria':
@@ -1155,13 +1213,52 @@ class PrayerTimesService {
       case 'UmmAlQura':
         p = adhan.CalculationMethod.umm_al_qura.getParameters();
         break;
+      case 'Dubai':
+        p = adhan.CalculationMethod.dubai.getParameters();
+        break;
+      case 'Kuwait':
+        p = adhan.CalculationMethod.kuwait.getParameters();
+        break;
+      case 'Qatar':
+        p = adhan.CalculationMethod.qatar.getParameters();
+        break;
+      case 'Singapore':
+        p = adhan.CalculationMethod.singapore.getParameters();
+        break;
+      case 'Turkey':
+        p = adhan.CalculationMethod.turkey.getParameters();
+        break;
+      case 'Tehran':
+        p = adhan.CalculationMethod.tehran.getParameters();
+        break;
       case 'ISNA':
         p = adhan.CalculationMethod.north_america.getParameters();
         break;
+      case 'MWL':
       default:
         p = adhan.CalculationMethod.muslim_world_league.getParameters();
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
     }
     p.madhab = madhab == 'hanafi' ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
+
+    // تطبيق قاعدة خطوط العرض العالية
+    if (highLatitudeRule == 'seventh_of_the_night') {
+      p.highLatitudeRule = adhan.HighLatitudeRule.seventh_of_the_night;
+    } else if (highLatitudeRule == 'twilight_angle') {
+      p.highLatitudeRule = adhan.HighLatitudeRule.twilight_angle;
+    } else {
+      p.highLatitudeRule = adhan.HighLatitudeRule.middle_of_the_night;
+    }
+
+    // تطبيق الفروق اليدوية بالدقائق
+    p.adjustments.fajr += fajrOffset;
+    p.adjustments.sunrise += sunriseOffset;
+    p.adjustments.dhuhr += dhuhrOffset;
+    p.adjustments.asr += asrOffset;
+    p.adjustments.maghrib += maghribOffset;
+    p.adjustments.isha += ishaOffset;
+
     return p;
   }
 }
@@ -1256,6 +1353,9 @@ final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
   final savedLng =
       ref.watch(settingStreamProvider('longitude')).value ??
       await settings.get('longitude');
+  final savedTz =
+      ref.watch(settingStreamProvider('timezone')).value ??
+      await settings.get('timezone');
 
   double lat, lng;
   if (savedLat != null && savedLng != null) {
@@ -1271,11 +1371,21 @@ final prayerTimesProvider = FutureProvider<List<PrayerTimeInfo>>((ref) async {
     }
   }
 
+  final tzName = savedTz ?? TimezoneResolver.resolveFromCoordinates(lat, lng);
+
   return PrayerTimesService.calculate(
     latitude: lat,
     longitude: lng,
     madhab: prefs.madhab,
     method: prefs.calcMethod,
+    highLatitudeRule: prefs.highLatitudeRule,
+    fajrOffset: prefs.fajrOffset,
+    sunriseOffset: prefs.sunriseOffset,
+    dhuhrOffset: prefs.dhuhrOffset,
+    asrOffset: prefs.asrOffset,
+    maghribOffset: prefs.maghribOffset,
+    ishaOffset: prefs.ishaOffset,
+    timezone: tzName,
   );
 });
 

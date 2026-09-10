@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:adhan/adhan.dart' as adhan;
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 import 'package:geocoding/geocoding.dart';
 import '../providers/database_providers.dart';
@@ -16,9 +14,6 @@ import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 class LocationPrayerManager {
-  static bool _scheduled = false;
-  static DateTime? _lastUpdate;
-
   /// التهيئة الكاملة عند بدء التطبيق
   static Future<void> initialize(dynamic ref) async {
     TimezoneResolver.ensureInitialized();
@@ -49,6 +44,8 @@ class LocationPrayerManager {
       final lng = double.tryParse(savedLng ?? '') ?? 3.0;
       await _scheduleForLocation(ref, lat, lng);
     }
+
+    scheduleMidnightReschedule(ref);
   }
 
   /// طلب وتحديث الموقع بتجربة مستخدم مثالية تشمل معالجة التعطيل والأذونات
@@ -423,6 +420,8 @@ class LocationPrayerManager {
       // تحقق من تفعيل الخدمة
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
+        final fallback = await _fallbackToCachedCoordinates(ref);
+        if (fallback != null) return fallback;
         return LocationResult.serviceDisabled;
       }
 
@@ -430,10 +429,14 @@ class LocationPrayerManager {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
+          final fallback = await _fallbackToCachedCoordinates(ref);
+          if (fallback != null) return fallback;
           return LocationResult.permissionDenied;
         }
       }
       if (permission == LocationPermission.deniedForever) {
+        final fallback = await _fallbackToCachedCoordinates(ref);
+        if (fallback != null) return fallback;
         return LocationResult.permissionDeniedForever;
       }
 
@@ -443,7 +446,7 @@ class LocationPrayerManager {
         pos = await Geolocator.getCurrentPosition(
           locationSettings: const LocationSettings(
             accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 10),
+            timeLimit: Duration(seconds: 8),
           ),
         );
       } catch (_) {
@@ -457,28 +460,16 @@ class LocationPrayerManager {
           pos = await Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.low,
-              timeLimit: Duration(seconds: 5),
+              timeLimit: Duration(seconds: 4),
             ),
           );
         } catch (_) {}
       }
 
       // إذا فشل الـ GPS تماماً، نحاول استخدام الإحداثيات المحفوظة مسبقاً
-      // حتى لا تظهر رسالة خطأ للمستخدم وتبقى أوقات الصلاة تعمل بالبيانات المخزّنة
       if (pos == null) {
-        final settings = ref.read(settingsDaoProvider);
-        final cachedLat = await settings.get('latitude');
-        final cachedLng = await settings.get('longitude');
-        if (cachedLat != null && cachedLng != null) {
-          final lat = double.tryParse(cachedLat);
-          final lng = double.tryParse(cachedLng);
-          if (lat != null && lng != null) {
-            // إعادة تقييم موفر أوقات الصلاة بالإحداثيات المخزّنة
-            ref.invalidate(prayerTimesProvider);
-            await _scheduleForLocation(ref, lat, lng);
-            return LocationResult.cachedLocation;
-          }
-        }
+        final fallback = await _fallbackToCachedCoordinates(ref);
+        if (fallback != null) return fallback;
         return LocationResult.error;
       }
 
@@ -544,12 +535,40 @@ class LocationPrayerManager {
 
       return LocationResult.success;
     } on LocationServiceDisabledException {
-      return LocationResult.serviceDisabled;
+      final fallback = await _fallbackToCachedCoordinates(ref);
+      return fallback ?? LocationResult.serviceDisabled;
     } on PermissionDeniedException {
-      return LocationResult.permissionDenied;
+      final fallback = await _fallbackToCachedCoordinates(ref);
+      return fallback ?? LocationResult.permissionDenied;
     } catch (e) {
-      return LocationResult.error;
+      final fallback = await _fallbackToCachedCoordinates(ref);
+      return fallback ?? LocationResult.error;
     }
+  }
+
+  /// محاولة استخدام الإحداثيات المحفوظة مسبقاً لحساب أوقات الصلاة في حال تعذر GPS
+  static Future<LocationResult?> _fallbackToCachedCoordinates(
+    dynamic ref,
+  ) async {
+    try {
+      final settings = ref.read(settingsDaoProvider);
+      final cachedLat = await settings.get('latitude');
+      final cachedLng = await settings.get('longitude');
+      final cachedTz = await settings.get('timezone');
+      if (cachedLat != null && cachedLng != null) {
+        final lat = double.tryParse(cachedLat);
+        final lng = double.tryParse(cachedLng);
+        if (lat != null && lng != null) {
+          if (cachedTz != null && cachedTz.isNotEmpty) {
+            TimezoneResolver.setLocalTimezone(cachedTz);
+          }
+          ref.invalidate(prayerTimesProvider);
+          await _scheduleForLocation(ref, lat, lng);
+          return LocationResult.cachedLocation;
+        }
+      }
+    } catch (_) {}
+    return null;
   }
 
   /// جدولة إشعارات الصلاة لموقع محدد
@@ -558,22 +577,23 @@ class LocationPrayerManager {
     double lat,
     double lng,
   ) async {
-    if (_scheduled &&
-        _lastUpdate != null &&
-        DateTime.now().difference(_lastUpdate!).inMinutes < 10) {
-      return;
-    }
-
     final prefs = await ref.read(userPreferencesProvider.future);
 
     if (!prefs.prayerReminder) return;
 
-    // حساب الأوقات بالـ timezone الصحيح
-    final prayers = await PrayerTimesWithTimezone.calculate(
+    // حساب الأوقات بالـ timezone الصحيح والمعاملات الكاملة الموحدة
+    final prayers = await PrayerTimesService.calculate(
       latitude: lat,
       longitude: lng,
       madhab: prefs.madhab,
       method: prefs.calcMethod,
+      highLatitudeRule: prefs.highLatitudeRule,
+      fajrOffset: prefs.fajrOffset,
+      sunriseOffset: prefs.sunriseOffset,
+      dhuhrOffset: prefs.dhuhrOffset,
+      asrOffset: prefs.asrOffset,
+      maghribOffset: prefs.maghribOffset,
+      ishaOffset: prefs.ishaOffset,
     );
 
     await NotificationsService.schedulePrayerNotifications(
@@ -583,9 +603,6 @@ class LocationPrayerManager {
       iqamaEnabled: prefs.iqamaNotif,
       adhanMode: prefs.adhanMode,
     );
-
-    _scheduled = true;
-    _lastUpdate = DateTime.now();
   }
 
   /// إعادة الجدولة عند منتصف الليل (لليوم الجديد)
@@ -603,111 +620,37 @@ class LocationPrayerManager {
 }
 
 class PrayerTimesWithTimezone {
-  /// حساب الأوقات مع مراعاة الـ timezone المحلي
+  /// حساب الأوقات مع مراعاة الـ timezone المحلي والتحويل الدقيق
   static Future<List<PrayerTimeInfo>> calculate({
     required double latitude,
     required double longitude,
     required String madhab,
     required String method,
+    String? highLatitudeRule,
+    int fajrOffset = 0,
+    int sunriseOffset = 0,
+    int dhuhrOffset = 0,
+    int asrOffset = 0,
+    int maghribOffset = 0,
+    int ishaOffset = 0,
     DateTime? date,
-  }) async {
-    final d = date ?? DateTime.now();
-
-    // تحويل للـ timezone المحلي
-    final localNow = tz.TZDateTime.now(tz.local);
-    final localDate = date != null
-        ? tz.TZDateTime(tz.local, date.year, date.month, date.day)
-        : localNow;
-
-    final coords = adhan.Coordinates(latitude, longitude);
-    final params = _buildParams(method, madhab);
-    final dateComponents = adhan.DateComponents(
-      localDate.year,
-      localDate.month,
-      localDate.day,
+    String? timezone,
+  }) {
+    return PrayerTimesService.calculate(
+      latitude: latitude,
+      longitude: longitude,
+      madhab: madhab,
+      method: method,
+      highLatitudeRule: highLatitudeRule,
+      fajrOffset: fajrOffset,
+      sunriseOffset: sunriseOffset,
+      dhuhrOffset: dhuhrOffset,
+      asrOffset: asrOffset,
+      maghribOffset: maghribOffset,
+      ishaOffset: ishaOffset,
+      date: date,
+      timezone: timezone,
     );
-    final times = adhan.PrayerTimes(coords, dateComponents, params);
-
-    // تحويل أوقات الصلاة للـ timezone المحلي
-    DateTime toLocal(DateTime utcTime) {
-      return tz.TZDateTime.from(utcTime, tz.local);
-    }
-
-    return [
-      PrayerTimeInfo(
-        name: 'fajr',
-        nameAr: 'الفجر',
-        emoji: '🌅',
-        time: toLocal(times.fajr),
-        notifId: NotifIds.fajr,
-      ),
-      PrayerTimeInfo(
-        name: 'dhuhr',
-        nameAr: 'الظهر',
-        emoji: '☀️',
-        time: toLocal(times.dhuhr),
-        notifId: NotifIds.dhuhr,
-      ),
-      PrayerTimeInfo(
-        name: 'asr',
-        nameAr: 'العصر',
-        emoji: '🌤',
-        time: toLocal(times.asr),
-        notifId: NotifIds.asr,
-      ),
-      PrayerTimeInfo(
-        name: 'maghrib',
-        nameAr: 'المغرب',
-        emoji: '🌆',
-        time: toLocal(times.maghrib),
-        notifId: NotifIds.maghrib,
-      ),
-      PrayerTimeInfo(
-        name: 'isha',
-        nameAr: 'العشاء',
-        emoji: '🌃',
-        time: toLocal(times.isha),
-        notifId: NotifIds.isha,
-      ),
-    ];
-  }
-
-  static adhan.CalculationParameters _buildParams(
-    String method,
-    String madhab,
-  ) {
-    adhan.CalculationParameters p;
-    switch (method) {
-      case 'Algeria':
-        p = adhan.CalculationMethod.egyptian.getParameters();
-        p.fajrAngle = 18.0;
-        p.ishaAngle = 17.0;
-        p.methodAdjustments.fajr = 0;
-        p.methodAdjustments.dhuhr = 0;
-        p.methodAdjustments.asr = 1;
-        p.methodAdjustments.maghrib = 5;
-        p.methodAdjustments.isha = 0;
-        break;
-      case 'Egypt':
-        p = adhan.CalculationMethod.egyptian.getParameters();
-        break;
-      case 'Karachi':
-        p = adhan.CalculationMethod.karachi.getParameters();
-        break;
-      case 'UmmAlQura':
-        p = adhan.CalculationMethod.umm_al_qura.getParameters();
-        break;
-      case 'ISNA':
-        p = adhan.CalculationMethod.north_america.getParameters();
-        break;
-      case 'MWL':
-      default:
-        p = adhan.CalculationMethod.muslim_world_league.getParameters();
-        p.fajrAngle = 18.0;
-        p.ishaAngle = 17.0;
-    }
-    p.madhab = madhab == 'hanafi' ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
-    return p;
   }
 
   /// اسم الـ timezone المترجم لواجهة المستخدم

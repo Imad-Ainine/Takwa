@@ -60,6 +60,15 @@ class UserPreferences {
   final bool adhanAlarmEnabled;
   final bool ongoingNotifEnabled;
 
+  // ── Calculation adjustments ──
+  final String highLatitudeRule;
+  final int fajrOffset;
+  final int sunriseOffset;
+  final int dhuhrOffset;
+  final int asrOffset;
+  final int maghribOffset;
+  final int ishaOffset;
+
   const UserPreferences({
     this.madhab = 'shafi',
     this.calcMethod = 'MWL',
@@ -105,6 +114,13 @@ class UserPreferences {
     this.vibrateWithAdhan = true,
     this.adhanAlarmEnabled = true,
     this.ongoingNotifEnabled = true,
+    this.highLatitudeRule = 'middle_of_the_night',
+    this.fajrOffset = 0,
+    this.sunriseOffset = 0,
+    this.dhuhrOffset = 0,
+    this.asrOffset = 0,
+    this.maghribOffset = 0,
+    this.ishaOffset = 0,
   });
 
   UserPreferences copyWith({
@@ -152,6 +168,13 @@ class UserPreferences {
     bool? vibrateWithAdhan,
     bool? adhanAlarmEnabled,
     bool? ongoingNotifEnabled,
+    String? highLatitudeRule,
+    int? fajrOffset,
+    int? sunriseOffset,
+    int? dhuhrOffset,
+    int? asrOffset,
+    int? maghribOffset,
+    int? ishaOffset,
   }) {
     return UserPreferences(
       madhab: madhab ?? this.madhab,
@@ -202,6 +225,13 @@ class UserPreferences {
       vibrateWithAdhan: vibrateWithAdhan ?? this.vibrateWithAdhan,
       adhanAlarmEnabled: adhanAlarmEnabled ?? this.adhanAlarmEnabled,
       ongoingNotifEnabled: ongoingNotifEnabled ?? this.ongoingNotifEnabled,
+      highLatitudeRule: highLatitudeRule ?? this.highLatitudeRule,
+      fajrOffset: fajrOffset ?? this.fajrOffset,
+      sunriseOffset: sunriseOffset ?? this.sunriseOffset,
+      dhuhrOffset: dhuhrOffset ?? this.dhuhrOffset,
+      asrOffset: asrOffset ?? this.asrOffset,
+      maghribOffset: maghribOffset ?? this.maghribOffset,
+      ishaOffset: ishaOffset ?? this.ishaOffset,
     );
   }
 
@@ -256,6 +286,13 @@ class UserPreferences {
       'vibrate_with_adhan': vibrateWithAdhan,
       'adhan_alarm_enabled': adhanAlarmEnabled,
       'ongoing_notif_enabled': ongoingNotifEnabled,
+      'high_latitude_rule': highLatitudeRule,
+      'fajr_offset': fajrOffset,
+      'sunrise_offset': sunriseOffset,
+      'dhuhr_offset': dhuhrOffset,
+      'asr_offset': asrOffset,
+      'maghrib_offset': maghribOffset,
+      'isha_offset': ishaOffset,
     };
   }
 
@@ -451,6 +488,25 @@ class UserPreferences {
         map['ongoing_notif_enabled'] ?? map['ongoingNotifEnabled'],
         defaultVal: true,
       ),
+      highLatitudeRule:
+          map['high_latitude_rule'] ??
+          map['highLatitudeRule'] ??
+          'middle_of_the_night',
+      fajrOffset: parseInt(map['fajr_offset'] ?? map['fajrOffset'], defaultVal: 0),
+      sunriseOffset: parseInt(
+        map['sunrise_offset'] ?? map['sunriseOffset'],
+        defaultVal: 0,
+      ),
+      dhuhrOffset: parseInt(
+        map['dhuhr_offset'] ?? map['dhuhrOffset'],
+        defaultVal: 0,
+      ),
+      asrOffset: parseInt(map['asr_offset'] ?? map['asrOffset'], defaultVal: 0),
+      maghribOffset: parseInt(
+        map['maghrib_offset'] ?? map['maghribOffset'],
+        defaultVal: 0,
+      ),
+      ishaOffset: parseInt(map['isha_offset'] ?? map['ishaOffset'], defaultVal: 0),
     );
   }
 }

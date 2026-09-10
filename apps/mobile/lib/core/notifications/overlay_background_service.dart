@@ -713,7 +713,7 @@ class _OverlayTaskHandler extends TaskHandler {
       final latStr = prefs.getString(_kLatKey);
       final lngStr = prefs.getString(_kLngKey);
       final madhab = prefs.getString(_kMadhabKey) ?? 'shafi';
-      final method = prefs.getString(_kCalcMethodKey) ?? 'MWL';
+      final method = prefs.getString(_kCalcMethodKey) ?? 'Algeria';
 
       final lat = latStr != null ? double.tryParse(latStr) ?? 36.7 : 36.7;
       final lng = lngStr != null ? double.tryParse(lngStr) ?? 3.0 : 3.0;
@@ -721,24 +721,36 @@ class _OverlayTaskHandler extends TaskHandler {
 
       final coords = adhan.Coordinates(lat, lng);
       final dateComponents = adhan.DateComponents(now.year, now.month, now.day);
-      final params = _buildAdhanParams(method, madhab);
+      final params = _buildAdhanParams(method, madhab, prefs);
       final times = adhan.PrayerTimes(coords, dateComponents, params);
 
+      // adhan.PrayerTimes returns UTC times; convert to local timezone
       _todayPrayers = [
-        _PrayerInfo('fajr', 'الفجر', '🌅', times.fajr),
-        _PrayerInfo('dhuhr', 'الظهر', '☀️', times.dhuhr),
-        _PrayerInfo('asr', 'العصر', '🌤', times.asr),
-        _PrayerInfo('maghrib', 'المغرب', '🌆', times.maghrib),
-        _PrayerInfo('isha', 'العشاء', '🌃', times.isha),
+        _PrayerInfo('fajr', 'الفجر', '🌅', times.fajr.toLocal()),
+        _PrayerInfo('dhuhr', 'الظهر', '☀️', times.dhuhr.toLocal()),
+        _PrayerInfo('asr', 'العصر', '🌤', times.asr.toLocal()),
+        _PrayerInfo('maghrib', 'المغرب', '🌆', times.maghrib.toLocal()),
+        _PrayerInfo('isha', 'العشاء', '🌃', times.isha.toLocal()),
       ];
     } catch (e) {
       debugPrint('OverlayService: Failed to compute prayer times: $e');
     }
   }
 
-  adhan.CalculationParameters _buildAdhanParams(String method, String madhab) {
+  adhan.CalculationParameters _buildAdhanParams(
+    String method,
+    String madhab,
+    SharedPreferences prefs,
+  ) {
     adhan.CalculationParameters p;
     switch (method) {
+      case 'Algeria':
+        p = adhan.CalculationMethod.muslim_world_league.getParameters();
+        p.fajrAngle = 18.0;
+        p.ishaAngle = 17.0;
+        p.adjustments.dhuhr = 5;
+        p.adjustments.maghrib = 3;
+        break;
       case 'Egypt':
         p = adhan.CalculationMethod.egyptian.getParameters();
         break;
@@ -747,6 +759,24 @@ class _OverlayTaskHandler extends TaskHandler {
         break;
       case 'UmmAlQura':
         p = adhan.CalculationMethod.umm_al_qura.getParameters();
+        break;
+      case 'Dubai':
+        p = adhan.CalculationMethod.dubai.getParameters();
+        break;
+      case 'Kuwait':
+        p = adhan.CalculationMethod.kuwait.getParameters();
+        break;
+      case 'Qatar':
+        p = adhan.CalculationMethod.qatar.getParameters();
+        break;
+      case 'Singapore':
+        p = adhan.CalculationMethod.singapore.getParameters();
+        break;
+      case 'Turkey':
+        p = adhan.CalculationMethod.turkey.getParameters();
+        break;
+      case 'Tehran':
+        p = adhan.CalculationMethod.tehran.getParameters();
         break;
       case 'ISNA':
         p = adhan.CalculationMethod.north_america.getParameters();
@@ -758,6 +788,15 @@ class _OverlayTaskHandler extends TaskHandler {
         p.ishaAngle = 17.0;
     }
     p.madhab = (madhab == 'hanafi') ? adhan.Madhab.hanafi : adhan.Madhab.shafi;
+
+    // Apply manual minute offsets if configured
+    p.adjustments.fajr += prefs.getInt('fajr_offset') ?? 0;
+    p.adjustments.sunrise += prefs.getInt('sunrise_offset') ?? 0;
+    p.adjustments.dhuhr += prefs.getInt('dhuhr_offset') ?? 0;
+    p.adjustments.asr += prefs.getInt('asr_offset') ?? 0;
+    p.adjustments.maghrib += prefs.getInt('maghrib_offset') ?? 0;
+    p.adjustments.isha += prefs.getInt('isha_offset') ?? 0;
+
     return p;
   }
 

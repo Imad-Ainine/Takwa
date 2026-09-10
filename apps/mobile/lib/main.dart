@@ -149,8 +149,25 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
     // بدء مراقبة أوقات الصلاة لتشغيل الأذان تلقائياً
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AdhanAutoTrigger.start(ref, NotificationRouter.navigatorKey);
+      LocationPrayerManager.initialize(ref);
       _setupAuthListener();
+      _checkNotificationLaunch();
     });
+  }
+
+  Future<void> _checkNotificationLaunch() async {
+    try {
+      final response =
+          await NotificationsService.getLaunchNotificationResponse();
+      if (response != null && response.payload != null) {
+        final payload = response.payload!;
+        Future.delayed(const Duration(milliseconds: 300), () {
+          NotificationRouter.route(payload);
+        });
+      }
+    } catch (e) {
+      debugPrint('Launch notification check error: $e');
+    }
   }
 
   void _setupAuthListener() {

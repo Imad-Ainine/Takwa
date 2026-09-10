@@ -1074,6 +1074,13 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
       // ── Prayer calculation ──────────────────────────────────────
       'madhab': 'madhab',
       'calc_method': 'calc_method',
+      'high_latitude_rule': 'high_latitude_rule',
+      'fajr_offset': 'fajr_offset',
+      'sunrise_offset': 'sunrise_offset',
+      'dhuhr_offset': 'dhuhr_offset',
+      'asr_offset': 'asr_offset',
+      'maghrib_offset': 'maghrib_offset',
+      'isha_offset': 'isha_offset',
 
       // ── General toggles ─────────────────────────────────────────
       'prayer_reminder': 'prayer_reminder',
