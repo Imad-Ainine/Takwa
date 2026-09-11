@@ -936,14 +936,14 @@ class _PrayerNameBadge extends StatelessWidget {
           isIqama
               ? l10n.prayerScreenIqamaTimeFor(name)
               : l10n.prayerScreenPrayerFor(name),
-          style: style.amiri(28, color: Colors.white, weight: FontWeight.w700),
+          style: style.amiri(28, color: style.text, weight: FontWeight.w700),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           isIqama
               ? l10n.prayerScreenEstablishPrayer
               : l10n.prayerScreenNextPrayerLabel,
-          style: style.naskh(13, color: Colors.white.withValues(alpha: 0.6)),
+          style: style.naskh(13, color: style.textDim),
         ),
       ],
     );
@@ -1019,6 +1019,11 @@ class _CountdownRing extends StatelessWidget {
                 successColor: context.colors.success,
                 tealColor: context.colors.teal,
                 isIqama: isIqama,
+                // The track/end-dot sit on this card's own `style.bg`
+                // background (not the fixed-color inner disc below), so —
+                // like everything else in this file — a hardcoded white was
+                // nearly invisible in light mode.
+                onSurfaceColor: style.text,
               ),
             ),
 
@@ -1107,6 +1112,7 @@ class _CountdownArcPainter extends CustomPainter {
   final Color successColor;
   final Color tealColor;
   final bool isIqama;
+  final Color onSurfaceColor;
 
   _CountdownArcPainter({
     required this.progress,
@@ -1114,6 +1120,7 @@ class _CountdownArcPainter extends CustomPainter {
     required this.successColor,
     required this.tealColor,
     required this.isIqama,
+    required this.onSurfaceColor,
   });
 
   @override
@@ -1127,7 +1134,7 @@ class _CountdownArcPainter extends CustomPainter {
       c,
       r,
       Paint()
-        ..color = Colors.white.withValues(alpha: 0.08)
+        ..color = onSurfaceColor.withValues(alpha: 0.08)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 10,
     );
@@ -1197,7 +1204,9 @@ class _CountdownArcPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CountdownArcPainter old) =>
-      old.progress != progress || old.isIqama != isIqama;
+      old.progress != progress ||
+      old.isIqama != isIqama ||
+      old.onSurfaceColor != onSurfaceColor;
 }
 
 // ── صف الأذان والإقامة ──
@@ -1236,6 +1245,7 @@ class _AdhanIqamaRow extends StatelessWidget {
             color: style.gold,
             isActive: !isIqamaPhase,
             subtitle: l10n.prayerScreenSalvationSlogan,
+            style: style,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -1249,6 +1259,7 @@ class _AdhanIqamaRow extends StatelessWidget {
             color: context.colors.success,
             isActive: isIqamaPhase,
             subtitle: l10n.prayerScreenIqamaAfterMinutes(iqamaOffset),
+            style: style,
           ),
         ),
       ],
@@ -1261,6 +1272,7 @@ class _TimeCard extends StatelessWidget {
   final Color color;
   final bool isActive;
   final String? subtitle;
+  final AdaptiveStyle style;
 
   const _TimeCard({
     required this.label,
@@ -1269,6 +1281,7 @@ class _TimeCard extends StatelessWidget {
     required this.color,
     required this.isActive,
     this.subtitle,
+    required this.style,
   });
 
   @override

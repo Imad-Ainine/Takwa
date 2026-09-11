@@ -48,7 +48,10 @@ class _BooksLibraryScreenState extends ConsumerState<BooksLibraryScreen> {
             onPressed: () => setState(() => _isGridView = !_isGridView),
             icon: Icon(
               _isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded,
-              color: Colors.white,
+              // Was hardcoded Colors.white — invisible in light mode, where
+              // AppBarWidget's showBackground gradient leans light (its own
+              // title text already accounts for this; actions: icons didn't).
+              color: AppBarWidget.foregroundColorFor(context),
             ),
             tooltip: _isGridView
                 ? l10n.booksListViewTooltip

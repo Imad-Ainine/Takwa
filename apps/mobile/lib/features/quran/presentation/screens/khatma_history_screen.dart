@@ -673,7 +673,9 @@ class _KhatmaCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: session.progress,
-              backgroundColor: Colors.white.withValues(alpha: 0.08),
+              // Was Colors.white — the unfilled track all but vanished on
+              // this card's light-mode `style.card` background.
+              backgroundColor: style.text.withValues(alpha: 0.08),
               valueColor: AlwaysStoppedAnimation<Color>(
                 session.isCompleted ? style.gold : style.textDim,
               ),
