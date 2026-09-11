@@ -1134,6 +1134,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhanSoundYusufIslam => 'يوسف إسلام';
 
   @override
+  String get notifPermissionWarningTitle =>
+      'قد لا تعمل إشعارات وأوقات الأذان في وقتها';
+
+  @override
+  String get notifPermissionWarningBody =>
+      'امنح إذن الإشعارات والمنبهات الدقيقة ليعمل تذكير الأذان وشاشته في وقتهما بالضبط.';
+
+  @override
   String get adhanSettingsAccountSectionTitle => 'إعدادات الحساب';
 
   @override

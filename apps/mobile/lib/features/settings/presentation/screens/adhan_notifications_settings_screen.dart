@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
@@ -39,6 +40,19 @@ final adhanPreviewPlayerProvider = Provider.autoDispose((ref) {
 });
 
 final currentlyPlayingAdhanProvider = StateProvider<String?>((ref) => null);
+
+/// Whether the OS notification + exact-alarm permissions are currently
+/// granted. `NotificationsManager.scheduleAll()` silently returns doing
+/// nothing at all if either is missing (`if (!await NotificationsService.
+/// checkPermissions()) return;`) — no prayer-time notification, no
+/// full-screen-intent Adhan-screen launch, and nothing in the UI ever
+/// said so. Both were previously only ever requested once, during
+/// onboarding. Re-read via `ref.invalidate(notificationPermissionsGranted
+/// Provider)` after a permission request completes. See
+/// docs/specs/adhan-overlay-auto-open.md R6.
+final notificationPermissionsGrantedProvider = FutureProvider<bool>((ref) {
+  return NotificationsService.checkPermissions();
+});
 
 class AdhanNotificationSettingsScreen extends ConsumerWidget {
   const AdhanNotificationSettingsScreen({super.key});
@@ -83,13 +97,30 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                       error: (err, _) => Center(
                         child: Text(l10n.checklistErrorPrefix(err.toString())),
                       ),
-                      data: (prefs) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SectionHeader(
-                            icon: '🕌',
-                            title: l10n.adhanSettingsAccountSectionTitle,
-                          ),
+                      data: (prefs) {
+                        final permissionGranted = ref
+                            .watch(notificationPermissionsGrantedProvider)
+                            .valueOrNull;
+                        final needsPermission = permissionGranted == false;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (needsPermission) ...[
+                              _NotificationPermissionWarning(
+                                onGrant: () async {
+                                  await NotificationsService.requestPermissions();
+                                  ref.invalidate(
+                                    notificationPermissionsGrantedProvider,
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                            ],
+                            SectionHeader(
+                              icon: '🕌',
+                              title: l10n.adhanSettingsAccountSectionTitle,
+                            ),
                           SettingsCard(
                             children: [
                               SelectSetting(
@@ -406,7 +437,8 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                             ],
                           ),
                         ],
-                      ),
+                      );
+                      },
                     ),
                     const SizedBox(height: AppSpacing.xxxl),
                   ]),
@@ -576,6 +608,95 @@ class _OffsetStepButton extends StatelessWidget {
               ? context.colors.textPrimary
               : context.colors.textSecondary.withValues(alpha: 0.4),
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  NOTIFICATION / EXACT-ALARM PERMISSION WARNING
+// ─────────────────────────────────────────
+/// Same visual pattern as overlay_settings_tile.dart's
+/// `_OverlayPermissionWarning` (kept as a separate private widget since
+/// that one isn't exported) — a tinted warning card + a "grant
+/// permission" action, shown whenever `NotificationsManager.scheduleAll()`
+/// would otherwise silently do nothing.
+class _NotificationPermissionWarning extends StatelessWidget {
+  final Future<void> Function() onGrant;
+
+  const _NotificationPermissionWarning({required this.onGrant});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: context.colors.warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: context.colors.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '⚠️',
+                style: TextStyle(fontSize: 16, color: context.colors.warningText),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.notifPermissionWarningTitle,
+                  style: context.typography.bodyMedium.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.warningText,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.notifPermissionWarningBody,
+            style: context.typography.caption.copyWith(
+              fontSize: 12,
+              color: context.colors.warningText,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TakwaTappable(
+              onTap: onGrant,
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colors.warning.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: context.colors.warning),
+                ),
+                child: Text(
+                  l10n.overlayPermissionGrantButton,
+                  style: context.typography.caption.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.warningText,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

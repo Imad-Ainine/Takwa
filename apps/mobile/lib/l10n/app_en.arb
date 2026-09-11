@@ -686,6 +686,8 @@
   "adhanSoundHafizMurad": "Hafiz Murad",
   "adhanSoundSharifDoman": "Sharif Doman",
   "adhanSoundYusufIslam": "Yusuf Islam",
+  "notifPermissionWarningTitle": "Adhan notifications and times may not fire on time",
+  "notifPermissionWarningBody": "Grant the notifications and exact-alarm permissions so the adhan reminder and screen fire exactly when they should.",
   "adhanSettingsAccountSectionTitle": "Account Settings",
   "adhanMadhabLabel": "Madhab",
   "madhabShafi": "Shafi'i, Maliki, Hanbali",

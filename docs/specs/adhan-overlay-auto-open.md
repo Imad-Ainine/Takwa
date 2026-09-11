@@ -1,5 +1,54 @@
 # Spec: Reliable Auto-Open of the Adhan Overlay at Prayer Time
 
+## 0. Implementation status (updated after two implementation passes)
+
+- **R1/R2 (overlay permission never requested/surfaced) — done.** `overlay_settings_tile.dart`
+  now requests the "draw over other apps" permission when "Adhan screen"/popups are enabled, and
+  shows a warning + one-tap fix whenever it's missing. See `settings-notifications-improvements.md`
+  §0 for the exact commit.
+- **R6 — the original framing was incomplete: a third, OS-native path already existed and mostly
+  satisfies it; the real remaining gap was a permission, not the polling itself.** §2 below only
+  covered two paths (`AdhanAutoTrigger`'s foreground timer, and the background isolate's system
+  overlay). A third, independent path was missed in the original investigation:
+  `NotificationsService.schedulePrayerNotifications()` (`notifications_service.dart`) already
+  schedules a `flutter_local_notifications` `zonedSchedule(...)` for every prayer, with
+  `androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle` (a real Android
+  `AlarmManager.setExactAndAllowWhileIdle`-backed exact alarm — exactly what R6 asked for) and
+  `fullScreenIntent: adhanMode != 'silent'` — Android's own "launch this UI now, locked screen or
+  not" mechanism, the same one alarm-clock apps use, requiring no polling at all. Its payload
+  (`'prayer:${prayer.name}'`) is routed to `Routes.adhan` by `NotificationRouter.route()`, wired
+  for both a live app (`onDidReceiveNotificationResponse`) and a cold app launch
+  (`main.dart`'s `_checkNotificationLaunch()` reading `getNotificationAppLaunchDetails()`). This is
+  called from `LocationPrayerManager._scheduleForLocation()`, itself reachable from app startup and
+  location refresh — so it's live, not dead code.
+
+  What made this exact-alarm path unreliable in practice was the **same class of bug as R1/R2**,
+  just for a different permission pair: `NotificationsManager.scheduleAll()` — the entry point that
+  calls `schedulePrayerNotifications()` — opens with
+  `if (!await NotificationsService.checkPermissions()) return;`, silently scheduling *nothing* if
+  either the base notification permission or Android 12+'s exact-alarm permission
+  (`Permission.scheduleExactAlarm`, already used by the existing-but-underused
+  `NotificationsService.requestPermissions()`/`checkPermissions()`) isn't granted. Exactly like the
+  overlay permission, this was only ever requested once, at onboarding — never re-checked, never
+  surfaced in Settings. Fixed the same way: a warning banner + one-tap grant action added to
+  `adhan_notifications_settings_screen.dart`, backed by a `notificationPermissionsGrantedProvider`.
+
+  Net effect: R6's actual ask (exact, Doze-resistant, no-polling delivery) was already
+  architecturally in place; this pass made sure the permission gate in front of it doesn't silently
+  disable it. The two polling loops (§2.1/§2.2) haven't been removed — they still add a duplicate,
+  faster-reacting foreground path and remain the system-overlay-window mechanism for the
+  backgrounded/killed case, which the full-screen-intent notification doesn't replace one-for-one
+  (see the open question below about whether both can fire for the same prayer).
+- **Not yet done:** R3 (verify the background service restarts on boot — `flutter_foreground_task`
+  is configured with `autoRunOnBoot: true`, which likely already covers this, but wasn't
+  independently re-verified), R5/R7 (dedupe verification between the notification path added to
+  this picture and the two pre-existing polling paths — now a three-way check, not two), and
+  confirming on a real device that the full-screen-intent notification actually auto-launches when
+  the app is killed and the screen is locked (Android's full-screen-intent behavior has tightened
+  across OS versions and device OEM skins vary; this can't be verified without hardware).
+- No Flutter/Dart toolchain was available in either pass to run `flutter analyze`/tests; changes
+  were reviewed by hand and validated via the repo's own CI on `main` after each push.
+
 ## 1. Problem statement
 
 The Adhan overlay/screen should open automatically the moment a prayer starts, in every app

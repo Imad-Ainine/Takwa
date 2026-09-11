@@ -2228,6 +2228,18 @@ abstract class AppLocalizations {
   /// **'يوسف إسلام'**
   String get adhanSoundYusufIslam;
 
+  /// No description provided for @notifPermissionWarningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قد لا تعمل إشعارات وأوقات الأذان في وقتها'**
+  String get notifPermissionWarningTitle;
+
+  /// No description provided for @notifPermissionWarningBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'امنح إذن الإشعارات والمنبهات الدقيقة ليعمل تذكير الأذان وشاشته في وقتهما بالضبط.'**
+  String get notifPermissionWarningBody;
+
   /// No description provided for @adhanSettingsAccountSectionTitle.
   ///
   /// In ar, this message translates to:

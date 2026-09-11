@@ -1158,6 +1158,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhanSoundYusufIslam => 'Yusuf Islam';
 
   @override
+  String get notifPermissionWarningTitle =>
+      'Adhan notifications and times may not fire on time';
+
+  @override
+  String get notifPermissionWarningBody =>
+      'Grant the notifications and exact-alarm permissions so the adhan reminder and screen fire exactly when they should.';
+
+  @override
   String get adhanSettingsAccountSectionTitle => 'Account Settings';
 
   @override

@@ -686,6 +686,8 @@
   "adhanSoundHafizMurad": "حافظ مراد",
   "adhanSoundSharifDoman": "شريف دومان",
   "adhanSoundYusufIslam": "يوسف إسلام",
+  "notifPermissionWarningTitle": "قد لا تعمل إشعارات وأوقات الأذان في وقتها",
+  "notifPermissionWarningBody": "امنح إذن الإشعارات والمنبهات الدقيقة ليعمل تذكير الأذان وشاشته في وقتهما بالضبط.",
   "adhanSettingsAccountSectionTitle": "إعدادات الحساب",
   "adhanMadhabLabel": "المذهب",
   "madhabShafi": "شافعي، مالكي، حنبلي",
