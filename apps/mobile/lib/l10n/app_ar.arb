@@ -1373,7 +1373,7 @@
   "settingDisabled": "معطل",
   "syncStatusSyncing": "جاري المزامنة...",
   "syncStatusSuccess": "تمت المزامنة بنجاح",
-  "overlaySettingsSectionTitle": "الأذكار والإشعارات",
+  "overlaySettingsSectionTitle": "تنبيهات الشاشة",
   "overlaySettingAdhanScreenLabel": "شاشة الأذان التلقائية",
   "overlaySettingAdhanScreenSublabel": "يُظهر شاشة الأذان عند دخول وقت الصلاة",
   "overlaySettingAdhanSoundLabel": "صوت الأذان",

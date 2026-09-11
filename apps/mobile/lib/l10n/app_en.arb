@@ -1046,7 +1046,7 @@
   "settingDisabled": "Disabled",
   "syncStatusSyncing": "Syncing...",
   "syncStatusSuccess": "Synced successfully",
-  "overlaySettingsSectionTitle": "Adhkar & Notifications",
+  "overlaySettingsSectionTitle": "On-Screen Alerts",
   "overlaySettingAdhanScreenLabel": "Automatic Adhan Screen",
   "overlaySettingAdhanScreenSublabel": "Show adhan screen when prayer time starts",
   "overlaySettingAdhanSoundLabel": "Adhan Audio",

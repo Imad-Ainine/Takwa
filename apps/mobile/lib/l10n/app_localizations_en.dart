@@ -2361,7 +2361,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncStatusSuccess => 'Synced successfully';
 
   @override
-  String get overlaySettingsSectionTitle => 'Adhkar & Notifications';
+  String get overlaySettingsSectionTitle => 'On-Screen Alerts';
 
   @override
   String get overlaySettingAdhanScreenLabel => 'Automatic Adhan Screen';

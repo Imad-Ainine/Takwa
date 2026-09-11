@@ -4391,7 +4391,7 @@ abstract class AppLocalizations {
   /// No description provided for @overlaySettingsSectionTitle.
   ///
   /// In ar, this message translates to:
-  /// **'الأذكار والإشعارات'**
+  /// **'تنبيهات الشاشة'**
   String get overlaySettingsSectionTitle;
 
   /// No description provided for @overlaySettingAdhanScreenLabel.

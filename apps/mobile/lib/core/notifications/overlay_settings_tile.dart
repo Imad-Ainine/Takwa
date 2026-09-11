@@ -60,7 +60,17 @@ class OverlayNotificationSettings extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(title: l10n.overlaySettingsSectionTitle, icon: '📿'),
+            // Renamed from a near-duplicate of the "🔔 Adhan & Notification
+            // Settings" section title just above it in settings_screen.dart
+            // — the two used to be almost indistinguishable ("Adhan &
+            // Notification Settings" vs "Adhkar & Notifications"), so a
+            // user looking for "does the adhan screen open automatically"
+            // had no real signal for which section to check. This section
+            // is specifically the things that appear *on top of* other
+            // apps (the adhan screen + the adhkar/dua popups), hence 🪟 and
+            // a name that says so. See docs/specs/settings-notifications-
+            // improvements.md R2.
+            SectionHeader(title: l10n.overlaySettingsSectionTitle, icon: '🪟'),
             SettingsCard(
               children: [
                 // ── شاشة الأذان التلقائية ──

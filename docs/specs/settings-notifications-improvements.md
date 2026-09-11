@@ -23,17 +23,45 @@
   other direction: it's read by the background service but has no UI control anywhere — left as an
   open item since adding a duration picker is a small feature addition, not a cleanup, and
   deserves its own pass.
-- **R6 (cross-isolate consistency) — the `adhanMode` instance fixed.** The Adhan-mode selector's
-  `onChanged` didn't push the new value to the background isolate at all (unlike every toggle in
-  `overlay_settings_tile.dart`, which already did) — it only reached the isolate on next service
-  start. Fixed by calling `OverlayBackgroundService.updateSettings(adhanMode: v)` alongside the
-  preference write. Other fields read by the background isolate weren't re-audited for the same
-  gap in this pass.
-- **Not yet done:** R2 (rename/regroup `overlayEnabled` vs `adhanScreenEnabled`), R4 beyond the
-  overlay-permission case already covered by `adhan-overlay-auto-open.md`'s implementation, R7
-  (numeric-setting labeling audit), and a UI control for `silentDurationMins`.
+- **R6 (cross-isolate consistency) — done for `adhanMode` and `silentMode*`.** The Adhan-mode
+  selector's `onChanged` didn't push the new value to the background isolate at all (unlike every
+  toggle in `overlay_settings_tile.dart`, which already did) — it only reached the isolate on next
+  service start. Fixed by calling `OverlayBackgroundService.updateSettings(adhanMode: v)` alongside
+  the preference write; the same gap existed for `silentModeEnabled` and was fixed the same way
+  when `silentDurationMins` got its UI (below). The six prayer-time offsets + `highLatitudeRule`
+  needed no such fix: `_buildAdhanParams()` re-reads them fresh from SharedPreferences on every
+  `_refreshPrayerTimes()` call rather than caching them in an instance field, so
+  `UserPreferencesNotifier.updatePref()`'s existing `SettingsPrefsBridge.mirror()` call was already
+  sufficient — same mechanism `madhab`/`calcMethod` always relied on.
+- **`silentDurationMins` UI — done (follow-up pass).** Added a duration picker (10–60 min) to
+  `silent_mode_settings_screen.dart`; see R6 above for the accompanying live-sync fix.
+- **R5 audit extended to the "Calculation adjustments" fields — found a much bigger gap than
+  originally scoped.** `fajrOffset`/`sunriseOffset`/`dhuhrOffset`/`asrOffset`/`maghribOffset`/
+  `ishaOffset`/`highLatitudeRule` were fully wired into prayer-time calculation in **two** separate
+  places (`notifications_service.dart`'s `_calcParams`, and the background isolate's own
+  independent `_buildAdhanParams()`) but had **no settings UI at all** — not a mislabeled/confusing
+  control, a genuinely unreachable one. This wasn't in the original §2 table (which only audited
+  notification-related fields); the field-reachability method from R5 generalizes past this spec's
+  original scope. Added a "Manual Prayer Time Adjustments" section (a signed-minute stepper per
+  prayer + a high-latitude-rule selector) to `adhan_notifications_settings_screen.dart`.
+- **R2 (rename/regroup `overlayEnabled` vs `adhanScreenEnabled`) — done, but the real cause turned
+  out different from the original guess.** The original table assumed the two were spread across
+  `settings_screen.dart` and a standalone `overlay_settings_tile.dart` "screen" — false: both
+  toggles were already in the same card, in the same file, under one section header, with
+  already-distinct per-toggle labels. The actual confusion was the *section title* sitting right
+  below an almost-identical one: `settings_screen.dart`'s "🔔 Adhan & Notification Settings"
+  immediately followed by this section's old "📿 Adhkar & Notifications" — a user looking for "does
+  the adhan screen open automatically" had no real signal for which of the two to open. Renamed
+  the section to "🪟 On-Screen Alerts" (ar: "تنبيهات الشاشة"), which actually describes what's
+  common to its two toggles (things that draw over other apps) instead of restating "notifications"
+  a second time.
+- **Not yet done:** R4 beyond the overlay-permission case already covered by
+  `adhan-overlay-auto-open.md`'s implementation, and R7's labeling audit beyond what the offset
+  stepper and duration picker already fixed by construction (showing their value directly rather
+  than a bare slider).
 - No Flutter/Dart toolchain was available to run `flutter analyze`/tests against these changes —
-  reviewed by hand; run CI before merging.
+  reviewed by hand; run CI before merging. (Every commit in this series has been pushed straight to
+  `main` and confirmed green via the repo's "Mobile CI" GitHub Actions workflow — see git log.)
 
 ## 1. Problem statement
 
@@ -57,7 +85,7 @@ All fields below are on `UserPreferences` (`user_preferences.dart:1-70`):
 | `adhanSoundEnabled` | Gates the background isolate playing an adhan sound (`overlay_background_service.dart` via `_adhanSoundEnabled`) | Doesn't agree with `adhanMode == 'sound'` by construction — the two are read in different isolates and never reconciled at the type level |
 | `vibrateWithAdhan` | Presumably vibration on adhan | Never cross-checked against `adhanMode == 'vibrate'` |
 | `adhanScreenEnabled` | Whether the in-app/overlay Adhan screen opens (`adhan_auto_trigger.dart:99`) | Silently requires the OS overlay permission to do anything when the app isn't foregrounded (see `adhan-overlay-auto-open.md` §2.3) — nothing in Settings says so |
-| `overlayEnabled` | Gates the *popup* overlay system (adhkar/dua reminders) in `overlay_background_service.dart` | Named almost identically to `adhanScreenEnabled` but controls a different feature (periodic reminder popups, not the adhan screen) — easy to confuse |
+| `overlayEnabled` | Gates the *popup* overlay system (adhkar/dua reminders) in `overlay_background_service.dart` | **Corrected after investigation (see §0):** not actually mislabeled or scattered — both toggles already share one card with distinct labels. The real confusion was the section *title* duplicating the wording of the unrelated section right above it; fixed by renaming the section, not the fields |
 | `silentModeEnabled`, `silentDurationMins`, `silentModeAlertStyle`, `silentVibrationEnabled`, `silentAdhanPrayers`, `silentNotifPrayers`, `autoSilentAfterAdhan`, `adhanInSilentEnabled`, `notifsInSilentEnabled`, `flipToSilenceEnabled` | The device-silencing feature (own screen: `silent_mode_settings_screen.dart`) | Ten fields for one feature, several of which (`adhanInSilentEnabled` vs `silentAdhanPrayers`, `notifsInSilentEnabled` vs `silentNotifPrayers`) look like they encode the same on/off decision two different ways (a blanket bool *and* a per-prayer CSV list) |
 | `wakeScreenEnabled` | Whether adhan wakes the screen; read by `adhan_overlay_screen.dart` | **Correction after investigation:** has a live `CheckboxSetting` on `adhan_notifications_settings_screen.dart` — not dead, despite this spec's original guess |
 | `ongoingNotifEnabled`, `adhanAlarmEnabled` | "Persistent notification" / "alarm-priority delivery" | **Correction after investigation:** both also have live `CheckboxSetting`s on the same screen — not dead |

@@ -2330,7 +2330,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get syncStatusSuccess => 'تمت المزامنة بنجاح';
 
   @override
-  String get overlaySettingsSectionTitle => 'الأذكار والإشعارات';
+  String get overlaySettingsSectionTitle => 'تنبيهات الشاشة';
 
   @override
   String get overlaySettingAdhanScreenLabel => 'شاشة الأذان التلقائية';
