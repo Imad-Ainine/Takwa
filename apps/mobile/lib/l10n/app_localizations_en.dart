@@ -1211,7 +1211,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get highLatitudeRuleTwilightAngle => 'Twilight Angle';
 
   @override
-  String get settingsAdjustmentsSectionTitle => 'Manual Prayer Time Adjustments';
+  String get settingsAdjustmentsSectionTitle =>
+      'Manual Prayer Time Adjustments';
 
   @override
   String get settingsAdjustmentsSectionSublabel =>
@@ -2424,7 +2425,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overlayPermissionWarningBody =>
-      'Grant the "display over other apps" permission so this keeps working even when the app is closed.';
+      'Grant the \"display over other apps\" permission so this keeps working even when the app is closed.';
 
   @override
   String get overlayPermissionGrantButton => 'Grant permission';
