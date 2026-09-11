@@ -328,8 +328,6 @@ class SupabaseClientService implements SupabaseService {
       'adhan_mode': 'sound',
       'ongoing_notif_enabled': true,
       'auto_silent_after_adhan': false,
-      'adhan_in_silent_enabled': true,
-      'notifs_in_silent_enabled': true,
       'vibrate_with_adhan': false,
       'adhan_volume_level': 1.0,
       'silent_mode_enabled': false,

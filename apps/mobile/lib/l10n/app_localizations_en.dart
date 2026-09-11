@@ -2387,6 +2387,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get overlayPermissionWarningTitle =>
+      'The Adhan screen and popups won\'t work once the app is closed';
+
+  @override
+  String get overlayPermissionWarningBody =>
+      'Grant the "display over other apps" permission so this keeps working even when the app is closed.';
+
+  @override
+  String get overlayPermissionGrantButton => 'Grant permission';
+
+  @override
   String get adhkarTabMorning => 'Morning';
 
   @override

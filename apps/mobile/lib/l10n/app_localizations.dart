@@ -4436,6 +4436,24 @@ abstract class AppLocalizations {
   /// **'ستظهر النوافذ ~{count} مرة يومياً'**
   String overlaySettingDailyCount(int count);
 
+  /// No description provided for @overlayPermissionWarningTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لن تعمل شاشة الأذان أو النوافذ المنبثقة عند إغلاق التطبيق'**
+  String get overlayPermissionWarningTitle;
+
+  /// No description provided for @overlayPermissionWarningBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'امنح إذن «العرض فوق التطبيقات الأخرى» ليستمر عملها حتى عند إغلاق التطبيق.'**
+  String get overlayPermissionWarningBody;
+
+  /// No description provided for @overlayPermissionGrantButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'منح الإذن'**
+  String get overlayPermissionGrantButton;
+
   /// No description provided for @adhkarTabMorning.
   ///
   /// In ar, this message translates to:

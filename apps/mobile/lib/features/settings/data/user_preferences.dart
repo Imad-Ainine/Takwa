@@ -52,8 +52,12 @@ class UserPreferences {
 
   final bool autoSilentAfterAdhan;
 
-  final bool adhanInSilentEnabled;
-  final bool notifsInSilentEnabled;
+  // `adhanInSilentEnabled`/`notifsInSilentEnabled` (blanket "allow during
+  // silent mode" bools) were removed here — they had no reachable UI
+  // control and nothing read them; `silentAdhanPrayers`/
+  // `silentNotifPrayers` (the per-prayer allow-lists below) are the only
+  // storage for that decision now. See
+  // docs/specs/settings-notifications-improvements.md R3/R5.
   final bool flipToSilenceEnabled;
   final bool wakeScreenEnabled;
   final bool vibrateWithAdhan;
@@ -107,8 +111,6 @@ class UserPreferences {
     this.silentAdhanPrayers = 'fajr,dhuhr,asr,maghrib,isha,jumuah',
     this.silentNotifPrayers = 'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
     this.autoSilentAfterAdhan = false,
-    this.adhanInSilentEnabled = true,
-    this.notifsInSilentEnabled = true,
     this.flipToSilenceEnabled = true,
     this.wakeScreenEnabled = true,
     this.vibrateWithAdhan = true,
@@ -161,8 +163,6 @@ class UserPreferences {
     String? silentAdhanPrayers,
     String? silentNotifPrayers,
     bool? autoSilentAfterAdhan,
-    bool? adhanInSilentEnabled,
-    bool? notifsInSilentEnabled,
     bool? flipToSilenceEnabled,
     bool? wakeScreenEnabled,
     bool? vibrateWithAdhan,
@@ -217,9 +217,6 @@ class UserPreferences {
       silentAdhanPrayers: silentAdhanPrayers ?? this.silentAdhanPrayers,
       silentNotifPrayers: silentNotifPrayers ?? this.silentNotifPrayers,
       autoSilentAfterAdhan: autoSilentAfterAdhan ?? this.autoSilentAfterAdhan,
-      adhanInSilentEnabled: adhanInSilentEnabled ?? this.adhanInSilentEnabled,
-      notifsInSilentEnabled:
-          notifsInSilentEnabled ?? this.notifsInSilentEnabled,
       flipToSilenceEnabled: flipToSilenceEnabled ?? this.flipToSilenceEnabled,
       wakeScreenEnabled: wakeScreenEnabled ?? this.wakeScreenEnabled,
       vibrateWithAdhan: vibrateWithAdhan ?? this.vibrateWithAdhan,
@@ -279,8 +276,6 @@ class UserPreferences {
       'silent_adhan_prayers': silentAdhanPrayers,
       'silent_notif_prayers': silentNotifPrayers,
       'auto_silent_after_adhan': autoSilentAfterAdhan,
-      'adhan_in_silent_enabled': adhanInSilentEnabled,
-      'notifs_in_silent_enabled': notifsInSilentEnabled,
       'flip_to_silence_enabled': flipToSilenceEnabled,
       'wake_screen_enabled': wakeScreenEnabled,
       'vibrate_with_adhan': vibrateWithAdhan,
@@ -459,14 +454,6 @@ class UserPreferences {
           'fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah',
       autoSilentAfterAdhan: parseBool(
         map['auto_silent_after_adhan'] ?? map['autoSilentAfterAdhan'],
-      ),
-      adhanInSilentEnabled: parseBool(
-        map['adhan_in_silent_enabled'] ?? map['adhanInSilentEnabled'],
-        defaultVal: true,
-      ),
-      notifsInSilentEnabled: parseBool(
-        map['notifs_in_silent_enabled'] ?? map['notifsInSilentEnabled'],
-        defaultVal: true,
       ),
       flipToSilenceEnabled: parseBool(
         map['flip_to_silence_enabled'] ?? map['flipToSilenceEnabled'],
