@@ -1,9 +1,10 @@
 name: Auto Version Bump
 
-# Triggers on every push to main that touches mobile code.
-# Reads the current version from pubspec.yaml, bumps the patch number,
-# commits the change back to main, then creates a git tag —
-# which in turn triggers the release-apk.yml pipeline.
+# Triggers on every push to main that touches mobile code (always a patch
+# bump), or manually via workflow_dispatch (choose patch/minor/major).
+# Reads the current version from pubspec.yaml, bumps it, commits the change
+# back to main, then creates a git tag — which in turn triggers the
+# release-apk.yml pipeline.
 
 on:
     push:
@@ -14,6 +15,16 @@ on:
             - "packages/**"
             - "!apps/mobile/build/**" # ignore build output
     workflow_dispatch:
+        inputs:
+            bump_type:
+                description: "Which part of X.Y.Z to bump (push-triggered runs always use patch)"
+                required: true
+                default: "patch"
+                type: choice
+                options:
+                    - patch
+                    - minor
+                    - major
 
 jobs:
     bump-version:
@@ -50,24 +61,40 @@ jobs:
                     echo "SKIP=false" >> $GITHUB_OUTPUT
                   fi
 
-            # ── Compute next patch version ───────────────────────────────────
+            # ── Compute next version ──────────────────────────────────────────
+            # Manual runs (workflow_dispatch) can bump patch/minor/major via
+            # the bump_type input; a plain push to main always bumps patch,
+            # same as before.
             - name: Compute next version
               id: next
               if: steps.skip_check.outputs.SKIP == 'false'
               run: |
                   CURRENT="${{ steps.current.outputs.VERSION }}"
+                  BUMP_TYPE="${{ github.event.inputs.bump_type || 'patch' }}"
                   IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-                  NEXT_PATCH=$((PATCH + 1))
-                  NEXT="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+
+                  case "$BUMP_TYPE" in
+                    major)
+                      MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+                      ;;
+                    minor)
+                      MINOR=$((MINOR + 1)); PATCH=0
+                      ;;
+                    patch|*)
+                      PATCH=$((PATCH + 1))
+                      ;;
+                  esac
+                  NEXT="${MAJOR}.${MINOR}.${PATCH}"
 
                   # Ensure tag does not already exist
                   git fetch --tags
                   while git rev-parse "v${NEXT}" >/dev/null 2>&1; do
                     echo "Tag v${NEXT} already exists, incrementing patch version..."
-                    NEXT_PATCH=$((NEXT_PATCH + 1))
-                    NEXT="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+                    PATCH=$((PATCH + 1))
+                    NEXT="${MAJOR}.${MINOR}.${PATCH}"
                   done
 
+                  echo "Bump type: $BUMP_TYPE"
                   echo "New version: $NEXT"
                   echo "VERSION=$NEXT" >> $GITHUB_OUTPUT
                   # Also compute build number from run number to avoid duplicate versionCodes

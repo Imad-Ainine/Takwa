@@ -11,7 +11,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({
-  apkVersion = '1.0.0',
+  apkVersion = '',
   apkSize = '',
   apkUrl = '#download',
 }: HeroSectionProps) {
@@ -68,7 +68,9 @@ export default function HeroSection({
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               <span>{t('heroCtaDownload')}</span>
-              <span className="cta-sub-badge">v{apkVersion}{apkSize ? ` • ${apkSize}` : ''}</span>
+              {apkVersion && (
+                <span className="cta-sub-badge">v{apkVersion}{apkSize ? ` • ${apkSize}` : ''}</span>
+              )}
             </a>
 
             <a href="#features" className="btn-outline">

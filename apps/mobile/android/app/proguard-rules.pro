@@ -27,3 +27,12 @@
 -keep class com.google.android.gms.auth.api.signin.** { *; }
 -keep class com.google.android.gms.common.api.** { *; }
 -dontwarn com.google.android.gms.**
+
+# Geolocator / Geocoding (Baseflow) & Play Services Location — neither plugin
+# ships its own consumer proguard rules, so without these the release build
+# (minifyEnabled/shrinkResources, unlike debug) can silently break location
+# fixes/reverse-geocoding that work fine in a debug run.
+-keep class com.baseflow.geolocator.** { *; }
+-keep class com.baseflow.geocoding.** { *; }
+-keep class com.google.android.gms.location.** { *; }
+-dontwarn com.baseflow.**
