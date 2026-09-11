@@ -138,6 +138,22 @@ class OverlayBackgroundService {
     }
   }
 
+  /// Whether the OS-level "display over other apps" permission is
+  /// currently granted. The Adhan screen and the adhkar/dua popups can
+  /// only auto-open while the app is backgrounded/killed if this is
+  /// granted (see docs/specs/adhan-overlay-auto-open.md) — used by the
+  /// Settings UI so an enabled toggle never silently no-ops.
+  static Future<bool> isOverlayPermissionGranted() async {
+    try {
+      return await ow.FlutterOverlayWindow.isPermissionGranted().timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => false,
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<bool> requestPermissions() async {
     try {
       final perm = await FlutterForegroundTask.checkNotificationPermission()

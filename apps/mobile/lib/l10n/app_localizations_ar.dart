@@ -2356,6 +2356,17 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get overlayPermissionWarningTitle =>
+      'لن تعمل شاشة الأذان أو النوافذ المنبثقة عند إغلاق التطبيق';
+
+  @override
+  String get overlayPermissionWarningBody =>
+      'امنح إذن «العرض فوق التطبيقات الأخرى» ليستمر عملها حتى عند إغلاق التطبيق.';
+
+  @override
+  String get overlayPermissionGrantButton => 'منح الإذن';
+
+  @override
   String get adhkarTabMorning => 'الصباح';
 
   @override

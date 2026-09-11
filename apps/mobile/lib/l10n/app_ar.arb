@@ -1381,6 +1381,9 @@
       }
     }
   },
+  "overlayPermissionWarningTitle": "لن تعمل شاشة الأذان أو النوافذ المنبثقة عند إغلاق التطبيق",
+  "overlayPermissionWarningBody": "امنح إذن «العرض فوق التطبيقات الأخرى» ليستمر عملها حتى عند إغلاق التطبيق.",
+  "overlayPermissionGrantButton": "منح الإذن",
   "adhkarTabMorning": "الصباح",
   "adhkarTabEvening": "المساء",
   "adhkarTabAfterPrayer": "بعد الصلاة",

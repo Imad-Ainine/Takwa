@@ -10,6 +10,16 @@ import '../theme/app_theme.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
 import '../../features/settings/presentation/widgets/settings_widgets.dart';
 
+/// Whether the OS "display over other apps" permission is currently
+/// granted. Both the Adhan screen and the adhkar/dua popups depend on it
+/// to fire while the app is backgrounded or killed — see
+/// docs/specs/adhan-overlay-auto-open.md. Re-read via
+/// `ref.invalidate(overlayPermissionGrantedProvider)` after a permission
+/// request completes.
+final overlayPermissionGrantedProvider = FutureProvider<bool>((ref) {
+  return OverlayBackgroundService.isOverlayPermissionGranted();
+});
+
 // ─────────────────────────────────────────
 //  OVERLAY SETTINGS SECTION
 // ─────────────────────────────────────────
@@ -30,116 +40,235 @@ class OverlayNotificationSettings extends ConsumerWidget {
         compact: true,
         onRetry: () => ref.invalidate(userPreferencesProvider),
       ),
-      data: (prefs) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SectionHeader(title: l10n.overlaySettingsSectionTitle, icon: '📿'),
-          SettingsCard(
-            children: [
-              // ── شاشة الأذان التلقائية ──
-              ToggleSetting(
-                icon: '🕌',
-                label: l10n.overlaySettingAdhanScreenLabel,
-                sublabel: l10n.overlaySettingAdhanScreenSublabel,
-                value: prefs.adhanScreenEnabled,
-                onChanged: (v) => ref
-                    .read(userPreferencesProvider.notifier)
-                    .updatePref('adhan_screen_enabled', v),
-              ),
-              const SettingsDivider(),
+      data: (prefs) {
+        // Make sure enabling either toggle below actually asks for the
+        // permission it silently depends on, instead of leaving the
+        // toggle "on" with no effect once the app is closed.
+        Future<void> ensureOverlayPermission() async {
+          OverlayBackgroundService.start();
+          await OverlayBackgroundService.requestPermissions();
+          ref.invalidate(overlayPermissionGrantedProvider);
+        }
 
-              // ── صوت الأذان ──
-              ToggleSetting(
-                icon: '🔊',
-                label: l10n.overlaySettingAdhanSoundLabel,
-                sublabel: l10n.overlaySettingAdhanSoundSublabel,
-                value: prefs.adhanSoundEnabled,
-                onChanged: (v) {
-                  ref
-                      .read(userPreferencesProvider.notifier)
-                      .updatePref('adhan_sound_enabled', v);
-                  OverlayBackgroundService.updateSettings(adhanSoundEnabled: v);
-                },
-              ),
-              const SettingsDivider(),
+        final permissionGranted = ref
+            .watch(overlayPermissionGrantedProvider)
+            .valueOrNull;
+        final needsPermission =
+            (prefs.adhanScreenEnabled || prefs.overlayEnabled) &&
+            permissionGranted == false;
 
-              // ── نوافذ الأذكار المنبثقة ──
-              ToggleSetting(
-                icon: '📿',
-                label: l10n.overlaySettingPopupsLabel,
-                sublabel: l10n.overlaySettingPopupsSublabel,
-                value: prefs.overlayEnabled,
-                onChanged: (v) {
-                  ref
-                      .read(userPreferencesProvider.notifier)
-                      .updatePref('overlay_popups_enabled', v);
-                  OverlayBackgroundService.updateSettings(overlayEnabled: v);
-                },
-              ),
-              if (prefs.overlayEnabled) ...[
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SectionHeader(title: l10n.overlaySettingsSectionTitle, icon: '📿'),
+            SettingsCard(
+              children: [
+                // ── شاشة الأذان التلقائية ──
+                ToggleSetting(
+                  icon: '🕌',
+                  label: l10n.overlaySettingAdhanScreenLabel,
+                  sublabel: l10n.overlaySettingAdhanScreenSublabel,
+                  value: prefs.adhanScreenEnabled,
+                  onChanged: (v) {
+                    ref
+                        .read(userPreferencesProvider.notifier)
+                        .updatePref('adhan_screen_enabled', v);
+                    if (v) ensureOverlayPermission();
+                  },
+                ),
                 const SettingsDivider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: AppSpacing.sm,
+
+                // ── صوت الأذان ──
+                ToggleSetting(
+                  icon: '🔊',
+                  label: l10n.overlaySettingAdhanSoundLabel,
+                  sublabel: l10n.overlaySettingAdhanSoundSublabel,
+                  value: prefs.adhanSoundEnabled,
+                  onChanged: (v) {
+                    ref
+                        .read(userPreferencesProvider.notifier)
+                        .updatePref('adhan_sound_enabled', v);
+                    OverlayBackgroundService.updateSettings(
+                      adhanSoundEnabled: v,
+                    );
+                  },
+                ),
+                const SettingsDivider(),
+
+                // ── نوافذ الأذكار المنبثقة ──
+                ToggleSetting(
+                  icon: '📿',
+                  label: l10n.overlaySettingPopupsLabel,
+                  sublabel: l10n.overlaySettingPopupsSublabel,
+                  value: prefs.overlayEnabled,
+                  onChanged: (v) {
+                    ref
+                        .read(userPreferencesProvider.notifier)
+                        .updatePref('overlay_popups_enabled', v);
+                    OverlayBackgroundService.updateSettings(overlayEnabled: v);
+                    if (v) ensureOverlayPermission();
+                  },
+                ),
+                if (needsPermission) ...[
+                  const SettingsDivider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: _OverlayPermissionWarning(
+                      onGrant: ensureOverlayPermission,
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      _IntervalSelector(
-                        value: prefs.popupIntervalMins,
-                        onChanged: (v) {
-                          ref
-                              .read(userPreferencesProvider.notifier)
-                              .updatePref('popup_interval_minutes', v);
-                          OverlayBackgroundService.updateSettings(
-                            popupIntervalMins: v,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      // إحصاء: عدد المرات في اليوم
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: 10,
+                ],
+                if (prefs.overlayEnabled) ...[
+                  const SettingsDivider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Column(
+                      children: [
+                        _IntervalSelector(
+                          value: prefs.popupIntervalMins,
+                          onChanged: (v) {
+                            ref
+                                .read(userPreferencesProvider.notifier)
+                                .updatePref('popup_interval_minutes', v);
+                            OverlayBackgroundService.updateSettings(
+                              popupIntervalMins: v,
+                            );
+                          },
                         ),
-                        decoration: BoxDecoration(
-                          color: context.colors.teal.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                          border: Border.all(
-                            color: context.colors.teal.withValues(alpha: 0.15),
+                        const SizedBox(height: AppSpacing.md),
+                        // إحصاء: عدد المرات في اليوم
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.colors.teal.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(
+                              color: context.colors.teal.withValues(
+                                alpha: 0.15,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                '📊',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: context.colors.teal,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  l10n.overlaySettingDailyCount(
+                                    (1440 / prefs.popupIntervalMins).floor(),
+                                  ),
+                                  style: context.typography.caption.copyWith(
+                                    color: context.colors.teal,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Text(
-                              '📊',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: context.colors.teal,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                l10n.overlaySettingDailyCount(
-                                  (1440 / prefs.popupIntervalMins).floor(),
-                                ),
-                                style: context.typography.caption.copyWith(
-                                  color: context.colors.teal,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  OVERLAY PERMISSION WARNING BANNER
+// ─────────────────────────────────────────
+class _OverlayPermissionWarning extends StatelessWidget {
+  final Future<void> Function() onGrant;
+
+  const _OverlayPermissionWarning({required this.onGrant});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: context.colors.warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: context.colors.warning.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('⚠️', style: TextStyle(fontSize: 16, color: context.colors.warningText)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.overlayPermissionWarningTitle,
+                  style: context.typography.bodyMedium.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.warningText,
                   ),
                 ),
-              ],
+              ),
             ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.overlayPermissionWarningBody,
+            style: context.typography.caption.copyWith(
+              fontSize: 12,
+              color: context.colors.warningText,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TakwaTappable(
+              onTap: onGrant,
+              minTapSize: null,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colors.warning.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: context.colors.warning),
+                ),
+                child: Text(
+                  l10n.overlayPermissionGrantButton,
+                  style: context.typography.caption.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: context.colors.warningText,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

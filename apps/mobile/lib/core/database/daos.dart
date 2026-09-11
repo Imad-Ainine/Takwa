@@ -322,6 +322,16 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     return s == 'true' || s == '1';
   }
 
+  /// Parses a Supabase timestamp value (ISO 8601 string, or already a
+  /// [DateTime]) into a [DateTime]. Returns null if missing/unparseable —
+  /// callers should then treat the remote record as having no reliable
+  /// freshness signal (see [upsertFromRemote]).
+  DateTime? _parseDateTime(dynamic v) {
+    if (v == null) return null;
+    if (v is DateTime) return v;
+    return DateTime.tryParse(v.toString());
+  }
+
   PrayerStatus _parsePrayerStatus(dynamic v) {
     if (v == null) return PrayerStatus.notDue;
     if (v is int) {
@@ -413,9 +423,32 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     }
   }
 
-  /// Sync from remote Supabase record
+  /// Sync from remote Supabase record.
+  ///
+  /// A full sync pushes the last 7 local days *then* pulls the last 30
+  /// remote days on every app start (see `SyncManager._syncDailyRecords`).
+  /// If an earlier push for a date failed (flaky connectivity, a cold auth
+  /// session, an RLS hiccup — see docs/specs/achievements-statistics-db-
+  /// persistence-fix.md), the remote copy of that date is stale, and a
+  /// blind overwrite here would clobber the correct local
+  /// prayers/points/streak data with it — exactly the "log a day, it's
+  /// gone the next day" bug. So this only applies the incoming row when it
+  /// is actually newer than what's already stored locally; a stale/absent
+  /// remote copy is left alone and gets caught up by the *next* push
+  /// instead (the last-7-days push isn't conditional on last sync having
+  /// succeeded, so it keeps retrying on its own).
   Future<void> upsertFromRemote(Map<String, dynamic> data) async {
     final date = DateTime.parse(data['date'] as String);
+    final remoteUpdatedAt = _parseDateTime(data['updated_at']);
+
+    final existing = await getRecordByDate(date);
+    if (existing != null &&
+        remoteUpdatedAt != null &&
+        !remoteUpdatedAt.isAfter(existing.updatedAt)) {
+      // Local row is at least as fresh as the remote one — nothing to pull.
+      return;
+    }
+
     final companion = DailyRecordsCompanion(
       date: Value(date),
       fajrStatus: Value(_parsePrayerStatus(data['fajr_status'])),
@@ -433,7 +466,10 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       netPoints: Value(_toInt(data['net_points'])),
       taqwaPoints: Value(_toInt(data['taqwa_points'])),
       notes: Value(data['notes'] as String?),
-      updatedAt: Value(DateTime.now()),
+      // Stamp local `updatedAt` with the remote row's own timestamp (not
+      // "now") so the next comparison above reflects when the data was
+      // actually last changed, not when it happened to be pulled.
+      updatedAt: Value(remoteUpdatedAt ?? DateTime.now()),
     );
 
     await into(dailyRecords).insert(
