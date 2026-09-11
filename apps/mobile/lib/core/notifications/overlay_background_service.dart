@@ -37,7 +37,6 @@ const _kLastPopupMsKey = 'last_adhkar_popup_ms';
 const _kLastAdhkarNotifMsKey = 'last_adhkar_notif_ms';
 const _kLastDuaNotifMsKey = 'last_dua_notif_ms';
 const _kOverlayEnabledKey = 'overlay_popups_enabled';
-const _kAdhanSoundEnabledKey = 'adhan_sound_enabled';
 const _kPreAdhanNotifEnabledKey = 'pre_adhan_notif_enabled';
 const _kPopupIntervalMinsKey = 'popup_interval_minutes';
 const _kAdhanScreenTriggeredKey = 'adhan_screen_triggered';
@@ -194,16 +193,12 @@ class OverlayBackgroundService {
   /// تحديث إعدادات الـ overlay من التطبيق الرئيسي
   static void updateSettings({
     bool? overlayEnabled,
-    bool? adhanSoundEnabled,
     int? popupIntervalMins,
     String? adhanMode,
     bool? flipToSilenceEnabled,
   }) {
     final Map<String, dynamic> data = {};
     if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
-    if (adhanSoundEnabled != null) {
-      data['adhan_sound_enabled'] = adhanSoundEnabled;
-    }
     if (popupIntervalMins != null) {
       data['popup_interval_minutes'] = popupIntervalMins;
     }
@@ -227,12 +222,6 @@ class _OverlayTaskHandler extends TaskHandler {
 
   // إعدادات قابلة للتحديث ديناميكياً
   bool _overlayEnabled = true;
-  // Legacy flag — no longer used to decide whether to play the adhan
-  // sound (see the `_adhanMode == 'sound'` check in
-  // _checkAndTriggerAdhan). Kept only so old `adhan_sound_enabled` values
-  // synced from Supabase / SharedPreferences don't crash the parser;
-  // `adhanMode` is the single source of truth now.
-  bool _adhanSoundEnabled = true;
   int _popupIntervalMins = _kDefaultPopupIntervalMins;
   bool _silentModeEnabled = false;
   int _silentDurationMins = 20;
@@ -280,9 +269,6 @@ class _OverlayTaskHandler extends TaskHandler {
       if (data.containsKey('overlay_popups_enabled')) {
         _overlayEnabled = data['overlay_popups_enabled'] as bool;
       }
-      if (data.containsKey('adhan_sound_enabled')) {
-        _adhanSoundEnabled = data['adhan_sound_enabled'] as bool;
-      }
       if (data.containsKey('adhan_volume_level')) {
         _adhanVolumeLevel = data['adhan_volume_level'] as double;
       }
@@ -320,7 +306,6 @@ class _OverlayTaskHandler extends TaskHandler {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     _overlayEnabled = prefs.getBool(_kOverlayEnabledKey) ?? true;
-    _adhanSoundEnabled = prefs.getBool(_kAdhanSoundEnabledKey) ?? true;
     _popupIntervalMins =
         prefs.getInt(_kPopupIntervalMinsKey) ?? _kDefaultPopupIntervalMins;
     _silentModeEnabled = prefs.getBool(_kSilentModeEnabledKey) ?? false;
@@ -442,13 +427,14 @@ class _OverlayTaskHandler extends TaskHandler {
         // إرسال إشعار الأذان مع الصوت
         //
         // Gated on `_adhanMode == 'sound'` (the single "نمط الأذان" selector
-        // in Settings → Adhan), not the legacy `_adhanSoundEnabled` flag —
-        // that flag lived on a *different* settings screen
-        // (OverlayNotificationSettings) with no link back to `adhanMode`,
-        // so a user picking "silent" or "vibrate" there could still get an
-        // adhan sound notification from this background isolate while the
-        // foreground path (AdhanAutoTrigger, which already only checks
-        // `adhanMode`) correctly stayed silent. See
+        // in Settings → Adhan). This used to be a separate
+        // `_adhanSoundEnabled` flag fed by a toggle on a *different*
+        // settings screen (OverlayNotificationSettings) with no link back
+        // to `adhanMode` — so a user picking "silent" or "vibrate" there
+        // could still get an adhan sound notification from this background
+        // isolate, while the foreground path (AdhanAutoTrigger, which
+        // already only checked `adhanMode`) correctly stayed silent. That
+        // flag (and its now-unused toggle) were removed; see
         // docs/specs/settings-notifications-improvements.md R1.
         if (_adhanMode == 'sound') {
           await _scheduleAdhanNotification(prayer);
