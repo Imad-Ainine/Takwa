@@ -10,6 +10,7 @@ import '../providers/database_providers.dart';
 import 'notifications_service.dart';
 import '../utils/timezone_resolver.dart';
 import '../../features/settings/providers/user_preferences_provider.dart';
+import '../../features/settings/presentation/widgets/location_picker_sheet.dart';
 import 'package:takwa/core/providers/locale_provider.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -170,6 +171,21 @@ class LocationPrayerManager {
             : l10n.locationResultSuccess;
 
         _showLocationSnackBar(context, message: successMsg, isSuccess: true);
+      } else if (result == LocationResult.error) {
+        // A blind retry here just repeats the exact same GPS/network fix
+        // that already failed (often: no fix at all indoors, and no cached
+        // coordinates yet on a fresh install) — offering it as the only way
+        // forward left the user stuck retrying the same failure with no
+        // escape. Open the manual location picker instead, which itself has
+        // an "auto-detect" retry option *plus* a curated city list, so
+        // nothing is lost versus the old retry-only action.
+        _showLocationSnackBar(
+          context,
+          message: result.message(l10n),
+          isSuccess: false,
+          actionLabel: isArabic ? 'اختيار يدوي' : 'Choose manually',
+          onAction: () => LocationPickerSheet.show(context),
+        );
       } else {
         _showLocationSnackBar(
           context,
@@ -480,6 +496,27 @@ class LocationPrayerManager {
         }
       }
 
+      // A genuinely cold GPS fix (no A-GPS assistance data yet, e.g. right
+      // after a fresh install) can legitimately take longer than the 6+15=21s
+      // budget above, especially indoors with no Wi-Fi/network-based fix
+      // available either. One last, more patient attempt before giving up —
+      // still bounded, so a device with location truly unavailable doesn't
+      // hang indefinitely.
+      if (pos == null) {
+        try {
+          pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+              timeLimit: Duration(seconds: 25),
+            ),
+          );
+        } catch (e) {
+          debugPrint(
+            '[LocationPrayerManager] high-accuracy fix failed: $e',
+          );
+        }
+      }
+
       // إذا فشل الـ GPS تماماً، نحاول استخدام الإحداثيات المحفوظة مسبقاً
       if (pos == null) {
         final fallback = await _fallbackToCachedCoordinates(ref);
@@ -587,7 +624,12 @@ class LocationPrayerManager {
           return LocationResult.cachedLocation;
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      // Previously swallowed with no trace at all — if this genuinely has
+      // cached coordinates and still fails here, it was invisible even in
+      // logcat. Now at least diagnosable.
+      debugPrint('[LocationPrayerManager] _fallbackToCachedCoordinates failed: $e');
+    }
     return null;
   }
 

@@ -2270,6 +2270,18 @@ abstract class AppLocalizations {
   /// **'طريقة الحساب'**
   String get adhanCalcMethodLabel;
 
+  /// No description provided for @adhanLocationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الموقع'**
+  String get adhanLocationLabel;
+
+  /// No description provided for @adhanLocationSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط لتحديد موقعك أو اختياره يدوياً'**
+  String get adhanLocationSublabel;
+
   /// No description provided for @calcMethodAlgeria.
   ///
   /// In ar, this message translates to:

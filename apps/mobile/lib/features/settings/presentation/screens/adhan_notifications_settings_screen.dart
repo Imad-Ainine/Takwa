@@ -11,7 +11,9 @@ import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
+import 'package:takwa/core/providers/database_providers.dart';
 import '../widgets/settings_widgets.dart';
+import '../widgets/location_picker_sheet.dart';
 import 'silent_mode_settings_screen.dart';
 import '../widgets/prayer_selection_sheet.dart';
 import 'package:takwa/l10n/app_localizations.dart';
@@ -157,6 +159,31 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('calc_method', v),
+                              ),
+                              const SettingsDivider(),
+                              Builder(
+                                builder: (context) {
+                                  // `cityName` isn't part of UserPreferences —
+                                  // it's written directly via SettingsDao by
+                                  // LocationPrayerManager/the background
+                                  // isolate — so it's watched separately here,
+                                  // same pattern prayer_screen.dart uses.
+                                  final cityName = ref
+                                      .watch(settingStreamProvider('cityName'))
+                                      .value;
+                                  return ActionSetting(
+                                    icon: '📍',
+                                    label: l10n.adhanLocationLabel,
+                                    sublabel:
+                                        (cityName != null &&
+                                            cityName.isNotEmpty)
+                                        ? cityName
+                                        : l10n.adhanLocationSublabel,
+                                    onTap: () => LocationPickerSheet.show(
+                                      context,
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),

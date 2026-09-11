@@ -693,6 +693,8 @@
   "madhabShafi": "شافعي، مالكي، حنبلي",
   "madhabHanafi": "حنفي",
   "adhanCalcMethodLabel": "طريقة الحساب",
+  "adhanLocationLabel": "الموقع",
+  "adhanLocationSublabel": "اضغط لتحديد موقعك أو اختياره يدوياً",
   "calcMethodAlgeria": "الجزائر (وزارة الشؤون الدينية)",
   "calcMethodMWL": "رابطة العالم الإسلامي",
   "calcMethodEgypt": "دار الإفتاء المصرية",

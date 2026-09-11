@@ -1181,6 +1181,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adhanCalcMethodLabel => 'Calculation Method';
 
   @override
+  String get adhanLocationLabel => 'Location';
+
+  @override
+  String get adhanLocationSublabel => 'Tap to auto-detect or choose manually';
+
+  @override
   String get calcMethodAlgeria => 'Algeria (Ministry of Religious Affairs)';
 
   @override
