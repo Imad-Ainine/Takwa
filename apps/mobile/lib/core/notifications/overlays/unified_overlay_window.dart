@@ -39,6 +39,15 @@ class _PopupItem {
   final String categoryName;
   final bool isDua;
 
+  /// True for the synthetic item built when this overlay is shown because a
+  /// prayer just started (`type: 'prayer'` in `shareData`), rather than a
+  /// randomly-picked adhkar/dua. Fixes docs/specs/adhan-overlay-auto-open.md
+  /// R4: previously `_pickRandom()` had no branch for `_filter == 'prayer'`,
+  /// so a killed app showed a random adhkar/dua card instead of actually
+  /// announcing which prayer had started.
+  final bool isPrayerAnnouncement;
+  final IconData sourceIcon;
+
   const _PopupItem({
     required this.arabic,
     required this.emoji,
@@ -47,6 +56,8 @@ class _PopupItem {
     this.meaning,
     this.fadl,
     this.source,
+    this.isPrayerAnnouncement = false,
+    this.sourceIcon = Icons.auto_stories_rounded,
   });
 }
 
@@ -425,7 +436,12 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     _startCloseTimer();
 
     FlutterOverlayWindow.overlayListener.listen((data) {
-      if (data is Map && data.containsKey('type')) {
+      if (data is Map && data['type'] == 'prayer') {
+        // A prayer just started (OverlayBackgroundService._checkAndTriggerAdhan)
+        // — show the actual announcement instead of falling through to a
+        // random adhkar/dua card (adhan-overlay-auto-open.md R4).
+        _showPrayerAnnouncement(data);
+      } else if (data is Map && data.containsKey('type')) {
         setState(() {
           _filter = data['type'];
         });
@@ -460,6 +476,39 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     _slideCtrl.reverse().then((_) {
       FlutterOverlayWindow.closeOverlay();
     });
+  }
+
+  /// Builds and shows the actual Adhan announcement card for the prayer
+  /// named in [data] (from `OverlayBackgroundService`'s `shareData`), rather
+  /// than picking a random adhkar/dua — see `_PopupItem.isPrayerAnnouncement`.
+  void _showPrayerAnnouncement(Map data) {
+    final prayerName = data['prayer'] as String? ?? '';
+    final emoji = data['emoji'] as String? ?? '🕌';
+    final time = data['time'] as String?;
+
+    final item = _PopupItem(
+      arabic: _l10n.overlayServicePrayerTimeOverlayContent(prayerName),
+      emoji: emoji,
+      categoryName: _l10n.overlayServicePrayerTimeOverlayTitle,
+      isDua: false,
+      isPrayerAnnouncement: true,
+      sourceIcon: Icons.access_time_rounded,
+      source: time != null ? _l10n.overlayPrayerAnnouncementTimeLabel(time) : null,
+    );
+
+    _filter = null;
+    if (_current == null) {
+      setState(() => _current = item);
+      _slideCtrl.forward();
+      _startCloseTimer();
+    } else {
+      _slideCtrl.reverse().then((_) {
+        if (!mounted) return;
+        setState(() => _current = item);
+        _slideCtrl.forward();
+        _startCloseTimer();
+      });
+    }
   }
 
   void _pickRandom({bool animate = false}) {
@@ -751,7 +800,11 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
               Row(
                 children: [
                   Text(
-                    item.isDua ? _l10n.overlayTypeDua : _l10n.overlayTypeDhikr,
+                    item.isPrayerAnnouncement
+                        ? _l10n.overlayTypePrayer
+                        : (item.isDua
+                              ? _l10n.overlayTypeDua
+                              : _l10n.overlayTypeDhikr),
                     style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 10,
@@ -877,11 +930,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.auto_stories_rounded,
-              color: _IGold.gold2,
-              size: 12,
-            ),
+            Icon(item.sourceIcon, color: _IGold.gold2, size: 12),
             const SizedBox(width: 6),
             Flexible(
               child: Text(

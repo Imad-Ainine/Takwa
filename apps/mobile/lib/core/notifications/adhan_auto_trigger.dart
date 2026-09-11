@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../routes/app_routes.dart';
 import 'notifications_service.dart';
@@ -62,6 +63,64 @@ class AdhanAutoTrigger {
   // calls when the provider is slow to resolve on the first tick.
   static bool _checking = false;
 
+  // Same SharedPreferences keys/format `OverlayBackgroundService` uses for
+  // its own per-prayer-per-day dedupe (`_kTriggeredPrayersKey`/
+  // `_kTriggeredPrayersDateKey`, format `'$year-$month-$day'` with no
+  // zero-padding — kept identical on purpose, not just similar). Reading
+  // and writing the *same* keys (SharedPreferences is native platform
+  // storage, so both isolates genuinely see each other's writes) closes the
+  // remaining gap from docs/specs/adhan-overlay-auto-open.md R7: previously
+  // `_lastTriggeredPrayer` (this isolate, in-memory, reset on every app
+  // restart) and the background isolate's persisted set were two entirely
+  // separate stores that could disagree — e.g. after the main isolate
+  // restarts mid-window, it had no way to know the background isolate
+  // already fired for a prayer today, or vice versa.
+  static const _kTriggeredPrayersKey = 'overlay_triggered_prayers';
+  static const _kTriggeredPrayersDateKey = 'overlay_triggered_prayers_date';
+
+  static String _sharedDateKey(DateTime dt) =>
+      '${dt.year}-${dt.month}-${dt.day}';
+
+  /// Whether [prayerName] (the internal id, e.g. 'fajr') was already marked
+  /// triggered today by *either* isolate.
+  static Future<bool> _alreadyTriggeredSharedly(String prayerName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todayKey = _sharedDateKey(DateTime.now());
+      if ((prefs.getString(_kTriggeredPrayersDateKey) ?? '') != todayKey) {
+        return false;
+      }
+      final raw = prefs.getString(_kTriggeredPrayersKey) ?? '';
+      return raw.isNotEmpty && raw.split(',').contains(prayerName);
+    } catch (e) {
+      // SharedPreferences unavailable — fall back to this isolate's own
+      // in-memory guard only, same as before this fix existed.
+      debugPrint('AdhanAutoTrigger: shared dedupe read failed: $e');
+      return false;
+    }
+  }
+
+  /// Marks [prayerName] triggered today in the store shared with
+  /// `OverlayBackgroundService`.
+  static Future<void> _markTriggeredSharedly(String prayerName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final todayKey = _sharedDateKey(DateTime.now());
+      Set<String> triggered;
+      if ((prefs.getString(_kTriggeredPrayersDateKey) ?? '') != todayKey) {
+        triggered = {};
+        await prefs.setString(_kTriggeredPrayersDateKey, todayKey);
+      } else {
+        final raw = prefs.getString(_kTriggeredPrayersKey) ?? '';
+        triggered = raw.isEmpty ? {} : raw.split(',').toSet();
+      }
+      triggered.add(prayerName);
+      await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
+    } catch (e) {
+      debugPrint('AdhanAutoTrigger: shared dedupe write failed: $e');
+    }
+  }
+
   /// يبدأ مراقبة أوقات الصلاة كل ثانية بدقة عالية
   static void start(WidgetRef ref, GlobalKey<NavigatorState> navigatorKey) {
     _checkTimer?.cancel();
@@ -120,6 +179,15 @@ class AdhanAutoTrigger {
         final key = _dailyKey(prayer.name, now);
         if (_lastTriggeredPrayer == key) continue;
 
+        // R7: also defer to the store shared with the background isolate —
+        // catches the case where *this* isolate just (re)started (so its
+        // own in-memory `_lastTriggeredPrayer` is empty) but the background
+        // isolate already fired for this prayer today.
+        if (await _alreadyTriggeredSharedly(prayer.name)) {
+          _lastTriggeredPrayer = key;
+          continue;
+        }
+
         // Guard: don't push the Adhan screen if it's already on top.
         final nav = navigatorKey.currentState;
         bool adhanAlreadyVisible = false;
@@ -133,6 +201,7 @@ class AdhanAutoTrigger {
         }
 
         _lastTriggeredPrayer = key;
+        await _markTriggeredSharedly(prayer.name);
 
         debugPrint('🕌 Auto-trigger adhan: ${prayer.nameAr}');
 

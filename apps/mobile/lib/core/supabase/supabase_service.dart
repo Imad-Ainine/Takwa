@@ -322,7 +322,6 @@ class SupabaseClientService implements SupabaseService {
       'theme_mode': 'system',
       'adhan_sound': 'Adhan-Makkah.mp3',
       'overlay_popups_enabled': true,
-      'adhan_sound_enabled': true,
       'adhan_screen_enabled': true,
       'popup_interval_minutes': 24,
       'adhan_mode': 'sound',

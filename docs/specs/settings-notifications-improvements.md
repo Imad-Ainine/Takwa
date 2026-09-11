@@ -55,13 +55,29 @@
   the section to "🪟 On-Screen Alerts" (ar: "تنبيهات الشاشة"), which actually describes what's
   common to its two toggles (things that draw over other apps) instead of restating "notifications"
   a second time.
-- **Not yet done:** R4 beyond the overlay-permission case already covered by
-  `adhan-overlay-auto-open.md`'s implementation, and R7's labeling audit beyond what the offset
-  stepper and duration picker already fixed by construction (showing their value directly rather
-  than a bare slider).
-- No Flutter/Dart toolchain was available to run `flutter analyze`/tests against these changes —
-  reviewed by hand; run CI before merging. (Every commit in this series has been pushed straight to
-  `main` and confirmed green via the repo's "Mobile CI" GitHub Actions workflow — see git log.)
+- **R4's other half (notification/exact-alarm permission, not just the overlay permission) — done.**
+  Landed under `adhan-overlay-auto-open.md` R6 (`notificationPermissionsGrantedProvider` + a warning
+  banner on `adhan_notifications_settings_screen.dart`) — the line above marking this "not yet done"
+  was stale as of this pass.
+- **R1's actual residual — done.** Fixing the background isolate's sound-gating bug (above) left
+  `adhanSoundEnabled` itself as a dead field still round-tripped through `UserPreferences`/
+  `toMap`/`fromMap`/`copyWith`, the `SettingsDao`↔Supabase key mapping, and the new-user
+  default-settings seed, with no reachable UI control and nothing left reading it. Removed
+  everywhere, same treatment R3/R5 gave `adhanInSilentEnabled`/`notifsInSilentEnabled` (the
+  historical schema-v4 key rename stays in the migration list, same precedent).
+- **R6's actual residual — done.** `flipToSilenceEnabled` and `adhanVolumeLevel` were the two
+  fields that fell through the earlier cross-isolate-consistency pass: `updateSettings()` already
+  had a `flipToSilenceEnabled` parameter but no caller ever passed it, and had no
+  `adhanVolumeLevel` parameter at all even though the background isolate's `onReceiveData` already
+  understood that key. Both toggles' `onChanged` now call `OverlayBackgroundService.updateSettings(
+  ...)` alongside the preference write, same pattern `adhanMode` uses.
+- **R7's remaining gap (volume slider had no value readout) — done.** `SliderSetting` gained an
+  optional `valueLabelBuilder`; the adhan-volume slider now shows e.g. "80%" next to its label. The
+  various `TimeOfDay` pickers elsewhere in Settings remain unaudited for this — lower priority, left
+  open.
+- A Flutter/Dart toolchain (3.47.2 stable) was available for this pass — `flutter analyze` (whole
+  project) and `flutter test` (whole suite) both pass clean after all of the above, in addition to
+  the by-hand review earlier passes relied on.
 
 ## 1. Problem statement
 

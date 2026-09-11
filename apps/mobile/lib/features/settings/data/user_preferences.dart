@@ -35,7 +35,15 @@ class UserPreferences {
 
   // ── Overlay / in-screen settings ──
   final bool overlayEnabled;
-  final bool adhanSoundEnabled;
+  // `adhanSoundEnabled` was removed here too (see the note below on
+  // `adhanInSilentEnabled`/`notifsInSilentEnabled`): the background isolate
+  // used to gate its adhan sound notification on this separate flag
+  // instead of `adhanMode`, so a user setting `adhanMode` to silent/vibrate
+  // could still get a sound notification from it — a real bug, not just a
+  // naming overlap (fixed by making the background isolate check
+  // `adhanMode == 'sound'` directly). Once that consumer was gone, this
+  // field had no reachable UI control and nothing left reading it. See
+  // docs/specs/settings-notifications-improvements.md R1.
   final bool adhanScreenEnabled;
   final int popupIntervalMins;
   final double adhanVolumeLevel;
@@ -99,7 +107,6 @@ class UserPreferences {
     this.themeMode = 'system',
     this.adhanSound = 'Adhan-Makkah.mp3',
     this.overlayEnabled = true,
-    this.adhanSoundEnabled = true,
     this.adhanScreenEnabled = true,
     this.popupIntervalMins = 24,
     this.adhanMode = 'sound',
@@ -151,7 +158,6 @@ class UserPreferences {
     String? themeMode,
     String? adhanSound,
     bool? overlayEnabled,
-    bool? adhanSoundEnabled,
     bool? adhanScreenEnabled,
     int? popupIntervalMins,
     String? adhanMode,
@@ -204,7 +210,6 @@ class UserPreferences {
       themeMode: themeMode ?? this.themeMode,
       adhanSound: adhanSound ?? this.adhanSound,
       overlayEnabled: overlayEnabled ?? this.overlayEnabled,
-      adhanSoundEnabled: adhanSoundEnabled ?? this.adhanSoundEnabled,
       adhanScreenEnabled: adhanScreenEnabled ?? this.adhanScreenEnabled,
       popupIntervalMins: popupIntervalMins ?? this.popupIntervalMins,
       adhanMode: adhanMode ?? this.adhanMode,
@@ -264,7 +269,6 @@ class UserPreferences {
       'theme_mode': themeMode,
       'adhan_sound': adhanSound,
       'overlay_popups_enabled': overlayEnabled,
-      'adhan_sound_enabled': adhanSoundEnabled,
       'adhan_screen_enabled': adhanScreenEnabled,
       'popup_interval_minutes': popupIntervalMins,
       'adhan_mode': adhanMode,
@@ -410,10 +414,6 @@ class UserPreferences {
       adhanSound: map['adhan_sound'] ?? map['adhanSound'] ?? 'Adhan-Makkah.mp3',
       overlayEnabled: parseBool(
         map['overlay_popups_enabled'] ?? map['overlayEnabled'],
-        defaultVal: true,
-      ),
-      adhanSoundEnabled: parseBool(
-        map['adhan_sound_enabled'] ?? map['adhanSoundEnabled'],
         defaultVal: true,
       ),
       adhanScreenEnabled: parseBool(

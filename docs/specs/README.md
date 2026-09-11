@@ -13,4 +13,6 @@ Each spec is anchored to current file paths and line numbers so it can be handed
 implements it (human or agent) without re-deriving the investigation. Format: problem statement →
 root cause (where applicable) → requirements in EARS form → acceptance criteria → test plan.
 
-None of these specs have been implemented yet — this commit adds the specs only.
+All three specs have gone through multiple implementation passes since this commit added them —
+see each spec's own "§0. Implementation status" section for what's done and what (if anything)
+remains open.

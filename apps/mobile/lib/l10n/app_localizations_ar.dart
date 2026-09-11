@@ -2338,6 +2338,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get syncStatusSuccess => 'تمت المزامنة بنجاح';
 
   @override
+  String get syncStatusError =>
+      'تعذّرت آخر مزامنة، ستتم إعادة المحاولة تلقائيًا';
+
+  @override
+  String syncStatusPending(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count عنصر بانتظار المزامنة',
+      many: '$count عنصرًا بانتظار المزامنة',
+      few: '$count عناصر بانتظار المزامنة',
+      two: 'عنصران بانتظار المزامنة',
+      one: 'عنصر واحد بانتظار المزامنة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get overlaySettingsSectionTitle => 'تنبيهات الشاشة';
 
   @override
@@ -2638,6 +2656,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get overlayTypeDhikr => 'ذكر';
+
+  @override
+  String get overlayTypePrayer => 'أذان';
+
+  @override
+  String overlayPrayerAnnouncementTimeLabel(String time) {
+    return 'الساعة $time';
+  }
 
   @override
   String get overlayTapOutsideToClose => 'اضغط خارجاً للإغلاق';

@@ -253,6 +253,42 @@ class BookReadingProgress extends Table {
 }
 
 // ─────────────────────────────────────────
+//  TABLE: sync_outbox
+// ─────────────────────────────────────────
+//
+// A generic "pending push" outbox, added to fix docs/specs/
+// achievements-statistics-db-persistence-fix.md R2/R3: a row here means the
+// last push of that entity to Supabase failed (or hasn't been attempted
+// yet), so:
+//   - SyncManager retries every pending row on the next fullSync() instead
+//     of only ever pushing the last few days once and silently giving up
+//     on failure (R2).
+//   - A pull for that same entity is skipped while it's pending, so a
+//     stale/absent remote copy can never race ahead and clobber the (still
+//     un-pushed, but correct) local row (R3).
+// One table covers `daily_records` (key: ISO date string), `achievements`,
+// `custom_ibadah_log` and `prohibitions_log` (key: local row id as string)
+// rather than a separate boolean column per table, per the spec's own
+// recommendation.
+@TableIndex(
+  name: 'idx_sync_outbox_table_key',
+  columns: {#entityTable, #entityKey},
+)
+class SyncOutbox extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get entityTable => text()();
+  TextColumn get entityKey => text()();
+  TextColumn get lastError => text().nullable()();
+  IntColumn get attempts => integer().withDefault(const Constant(1))();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {entityTable, entityKey},
+  ];
+}
+
+// ─────────────────────────────────────────
 //  DATABASE CLASS
 // ─────────────────────────────────────────
 @DriftDatabase(
@@ -269,6 +305,7 @@ class BookReadingProgress extends Table {
     UserAdhkar,
     UserDuas,
     BookReadingProgress,
+    SyncOutbox,
   ],
   daos: [
     DailyRecordDao,
@@ -281,6 +318,7 @@ class BookReadingProgress extends Table {
     UserAdhkarDao,
     UserDuasDao,
     BookProgressDao,
+    SyncOutboxDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -293,7 +331,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -302,6 +340,10 @@ class AppDatabase extends _$AppDatabase {
       await _seedDefaultData();
     },
     onUpgrade: (Migrator m, int from, int to) async {
+      if (from < 9) {
+        await m.createTable(syncOutbox);
+        await m.createIndex(idxSyncOutboxTableKey);
+      }
       if (from < 8) {
         // RamadanProgress.recordId isn't filtered on by any query today,
         // but it's a FK like the other two indexed below — indexing it now

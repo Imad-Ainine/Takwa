@@ -2370,6 +2370,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncStatusSuccess => 'Synced successfully';
 
   @override
+  String get syncStatusError => 'Last sync failed, will retry automatically';
+
+  @override
+  String syncStatusPending(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items pending sync',
+      one: '1 item pending sync',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get overlaySettingsSectionTitle => 'On-Screen Alerts';
 
   @override
@@ -2673,6 +2687,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get overlayTypeDhikr => 'Dhikr';
+
+  @override
+  String get overlayTypePrayer => 'Adhan';
+
+  @override
+  String overlayPrayerAnnouncementTimeLabel(String time) {
+    return 'At $time';
+  }
 
   @override
   String get overlayTapOutsideToClose => 'Tap outside to close';

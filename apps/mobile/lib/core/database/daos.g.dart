@@ -8,6 +8,7 @@ mixin _$DailyRecordDaoMixin on DatabaseAccessor<AppDatabase> {
   $ProhibitionsLogTable get prohibitionsLog => attachedDatabase.prohibitionsLog;
   $CustomIbadahTable get customIbadah => attachedDatabase.customIbadah;
   $CustomIbadahLogTable get customIbadahLog => attachedDatabase.customIbadahLog;
+  $SyncOutboxTable get syncOutbox => attachedDatabase.syncOutbox;
   DailyRecordDaoManager get managers => DailyRecordDaoManager(this);
 }
 
@@ -28,6 +29,20 @@ class DailyRecordDaoManager {
         _db.attachedDatabase,
         _db.customIbadahLog,
       );
+  $$SyncOutboxTableTableManager get syncOutbox =>
+      $$SyncOutboxTableTableManager(_db.attachedDatabase, _db.syncOutbox);
+}
+
+mixin _$SyncOutboxDaoMixin on DatabaseAccessor<AppDatabase> {
+  $SyncOutboxTable get syncOutbox => attachedDatabase.syncOutbox;
+  SyncOutboxDaoManager get managers => SyncOutboxDaoManager(this);
+}
+
+class SyncOutboxDaoManager {
+  final _$SyncOutboxDaoMixin _db;
+  SyncOutboxDaoManager(this._db);
+  $$SyncOutboxTableTableManager get syncOutbox =>
+      $$SyncOutboxTableTableManager(_db.attachedDatabase, _db.syncOutbox);
 }
 
 mixin _$StatsDaoMixin on DatabaseAccessor<AppDatabase> {

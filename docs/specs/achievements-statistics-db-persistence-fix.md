@@ -1,5 +1,53 @@
 # Spec: Fix Achievements/Statistics Not Persisting ("save today, gone tomorrow")
 
+## 0. Implementation status (updated after a second implementation pass)
+
+- **R1 (only apply a pull if the remote row is actually newer) — done (first pass).**
+  `DailyRecordDao.upsertFromRemote()` compares the remote `updated_at` against the local row's
+  `updatedAt` and skips the pull if the local copy is at least as fresh — the actual fix for "log a
+  day, it's gone the next day." See `sync_manager.dart`/`daos.dart` git history for that commit.
+- **R2/R3 (pending-push outbox + retry, and blocking a pull while a push is pending) — done
+  (second pass).** Added a generic `SyncOutbox` table (`app_database.dart`, schema v9) keyed by
+  `(entityTable, entityKey)` rather than a bool column per table, per this spec's own suggestion —
+  covers `daily_records` (key: ISO date), `achievements`, and `custom_ibadah_log` (key: local row
+  id). `syncDailyRecord`/`syncAchievement`/`syncCustomIbadahLog`/`syncProhibition` now mark an
+  entity pending on failure and clear it on success; `_syncDailyRecords`/`_syncCustomIbadah`/
+  `_syncProhibitions` retry every pending entity for their table before doing their normal
+  last-N-days push. `DailyRecordDao.upsertFromRemote` now skips a pull entirely for any date that
+  still has a pending outbox entry (R3), rather than only comparing timestamps.
+- **R4 (push/pull the previously-commented-out fields) — done, except `ghadh_basar` which
+  genuinely is still blocked.** Checked `apps/mobile/docs/schema.sql` directly: `witr`, `rawatib`,
+  `quran_verses`, `quran_juzaa`, `after_prayer_adhkar`, `tasbeeh_count`, `sadaqah_amount`,
+  `deducted_points`, and `mood` all already exist on the remote `daily_records` table — the
+  original spec's "blocked on a migration" framing was wrong for these nine; they were just
+  commented out. Uncommented in `syncDailyRecord` (push) and added symmetrically to
+  `upsertFromRemote` (pull). `ghadh_basar` is the one field confirmed **not** present remotely
+  (absent from `docs/schema.sql`'s column list) — left commented out with a note; still needs an
+  actual Supabase migration.
+- **R5 (per-step isolation in `fullSync()`) — done.** All eleven `fullSync()` steps (not just the
+  six flagged as critical) now run through a shared `_runStep()` helper that catches and records a
+  per-step exception instead of letting it propagate and skip every step after it.
+- **R6 (surface sync health, not just a debug log) — done.** Added `lastSyncErrorProvider`
+  (set from the joined per-step errors after each `fullSync()`) and `pendingSyncCountProvider` (a
+  live stream over the `SyncOutbox` table). `SyncStatusIndicator` (used on the Settings, Adhan
+  Notifications, and Silent Mode screens) now shows a warning state and the pending count instead
+  of unconditionally claiming "synced successfully."
+- **Not yet done / known gaps:**
+  - `syncProhibition()` (the push function for `prohibitions_log`) is still never actually called
+    from anywhere in the app — `logProhibition()` writes locally and the daily record's aggregate
+    points get pushed via `syncDailyRecord`, but the raw per-prohibition row never reaches
+    Supabase. Outbox instrumentation was added to `syncProhibition`/`_syncProhibitions` so it'll
+    behave correctly the moment something calls it, but wiring an actual call site (e.g. from
+    `checklist_screen.dart`'s `_ProhibitionRow`, alongside its existing `syncDailyRecord` call) is
+    separate, out-of-scope work — flagged rather than silently left.
+  - `ghadh_basar` push/pull (see R4 above) needs an actual Supabase column migration.
+  - Real multi-day, multi-failure end-to-end testing against a live Supabase project (per this
+    spec's own acceptance criteria) wasn't possible in this environment — verified by code reading
+    plus `flutter analyze`/`flutter test` (whole project/suite, both clean) rather than a live
+    device/backend run.
+- A Flutter/Dart toolchain (3.47.2 stable) was available for this pass — `flutter analyze` (whole
+  project) and `flutter test` (whole suite) both pass clean after all of the above.
+
 ## 1. Problem statement
 
 Reported symptom: the user fills in a day's checklist (prayers, Qur'an, adhkar, etc.), the
