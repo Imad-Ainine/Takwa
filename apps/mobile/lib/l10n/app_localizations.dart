@@ -4400,6 +4400,18 @@ abstract class AppLocalizations {
   /// **'تمت المزامنة بنجاح'**
   String get syncStatusSuccess;
 
+  /// No description provided for @syncStatusError.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّرت آخر مزامنة، ستتم إعادة المحاولة تلقائيًا'**
+  String get syncStatusError;
+
+  /// No description provided for @syncStatusPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count, plural, one{عنصر واحد بانتظار المزامنة} two{عنصران بانتظار المزامنة} few{{count} عناصر بانتظار المزامنة} many{{count} عنصرًا بانتظار المزامنة} other{{count} عنصر بانتظار المزامنة}}'**
+  String syncStatusPending(num count);
+
   /// No description provided for @overlaySettingsSectionTitle.
   ///
   /// In ar, this message translates to:
@@ -4963,6 +4975,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ذكر'**
   String get overlayTypeDhikr;
+
+  /// No description provided for @overlayTypePrayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذان'**
+  String get overlayTypePrayer;
+
+  /// No description provided for @overlayPrayerAnnouncementTimeLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الساعة {time}'**
+  String overlayPrayerAnnouncementTimeLabel(String time);
 
   /// No description provided for @overlayTapOutsideToClose.
   ///

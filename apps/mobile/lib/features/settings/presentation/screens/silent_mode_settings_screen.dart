@@ -25,6 +25,8 @@ class SilentModeSettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
+    final syncError = ref.watch(lastSyncErrorProvider);
+    final pendingSyncCount = ref.watch(pendingSyncCountProvider).value ?? 0;
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -37,7 +39,11 @@ class SilentModeSettingsScreen extends ConsumerWidget {
           Center(
             child: Padding(
               padding: const EdgeInsetsDirectional.only(start: 16),
-              child: SyncStatusIndicator(isSyncing: isSyncing),
+              child: SyncStatusIndicator(
+                isSyncing: isSyncing,
+                syncError: syncError,
+                pendingCount: pendingSyncCount,
+              ),
             ),
           ),
         ],

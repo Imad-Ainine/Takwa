@@ -9,7 +9,13 @@ part 'daos.g.dart';
 //  DAO 1: DailyRecordDao
 // ─────────────────────────────────────────
 @DriftAccessor(
-  tables: [DailyRecords, ProhibitionsLog, CustomIbadahLog, CustomIbadah],
+  tables: [
+    DailyRecords,
+    ProhibitionsLog,
+    CustomIbadahLog,
+    CustomIbadah,
+    SyncOutbox,
+  ],
 )
 class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     with _$DailyRecordDaoMixin {
@@ -204,6 +210,15 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     )..where((p) => p.recordId.equals(recordId))).get();
   }
 
+  /// Looks up a single prohibition-log row by its local id — used by
+  /// `SyncManager._syncProhibitions` to retry a push that's pending in the
+  /// `SyncOutbox` (see achievements-statistics-db-persistence-fix.md R2).
+  Future<ProhibitionsLogData?> getProhibitionById(int id) {
+    return (select(
+      prohibitionsLog,
+    )..where((p) => p.id.equals(id))).getSingleOrNull();
+  }
+
   Future<DailyRecord?> getRecordByDate(DateTime date) {
     return (select(
       dailyRecords,
@@ -321,6 +336,21 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     final s = v.toString().toLowerCase();
     return s == 'true' || s == '1';
   }
+
+  /// Safely coerce a dynamic JSON value to [double].
+  double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is double) return v;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+
+  /// The key `SyncOutbox` rows use for a `daily_records` entity — matches
+  /// the date string `SyncManager.syncDailyRecord`/`_dateKey` pushes with,
+  /// so a pending push for a date and a pull for that same date agree on
+  /// what "this date" means.
+  String _dailyRecordOutboxKey(DateTime date) =>
+      date.toIso8601String().split('T')[0];
 
   /// Parses a Supabase timestamp value (ISO 8601 string, or already a
   /// [DateTime]) into a [DateTime]. Returns null if missing/unparseable —
@@ -441,6 +471,22 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
     final date = DateTime.parse(data['date'] as String);
     final remoteUpdatedAt = _parseDateTime(data['updated_at']);
 
+    // R3: if this date's local row has a push still pending in the outbox
+    // (the last push attempt failed or hasn't happened yet), the remote
+    // copy we'd be pulling is by definition not caught up with local — never
+    // let it overwrite netPoints/taqwaPoints/prayer-status/etc. for this
+    // date. The pending push itself will catch the remote copy up on a
+    // later retry; this pull just has to stay out of the way until then.
+    final pendingKey = _dailyRecordOutboxKey(date);
+    final pending =
+        await (select(syncOutbox)..where(
+              (o) =>
+                  o.entityTable.equals('daily_records') &
+                  o.entityKey.equals(pendingKey),
+            ))
+            .getSingleOrNull();
+    if (pending != null) return;
+
     final existing = await getRecordByDate(date);
     if (existing != null &&
         remoteUpdatedAt != null &&
@@ -457,14 +503,26 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       maghribStatus: Value(_parsePrayerStatus(data['maghrib_status'])),
       ishaStatus: Value(_parsePrayerStatus(data['isha_status'])),
       nightPrayer: Value(_toBool(data['night_prayer'])),
+      witr: Value(_toBool(data['witr'])),
+      rawatib: Value(_toInt(data['rawatib'])),
       quranPages: Value(_toInt(data['quran_pages'])),
+      quranVerses: Value(_toInt(data['quran_verses'])),
+      quranJuzaa: Value(_toDouble(data['quran_juzaa'])),
       morningAdhkar: Value(_toBool(data['morning_adhkar'])),
       eveningAdhkar: Value(_toBool(data['evening_adhkar'])),
+      afterPrayerAdhkar: Value(_toBool(data['after_prayer_adhkar'])),
+      tasbeehCount: Value(_toInt(data['tasbeeh_count'])),
       fastingType: Value(_parseFastingType(data['fasting_type'])),
       sadaqah: Value(_toBool(data['sadaqah'])),
-      ghadhBasar: Value(_toBool(data['ghadh_basar'])),
+      sadaqahAmount: Value(_toDouble(data['sadaqah_amount'])),
+      // ghadh_basar isn't pulled back here on purpose — it isn't pushed
+      // either (see SyncManager.syncDailyRecord), since the remote table
+      // doesn't have that column yet. Leaving the local value untouched
+      // (Value.absent()) is correct until that migration lands.
       netPoints: Value(_toInt(data['net_points'])),
       taqwaPoints: Value(_toInt(data['taqwa_points'])),
+      deductedPoints: Value(_toInt(data['deducted_points'])),
+      mood: Value(data['mood'] as String?),
       notes: Value(data['notes'] as String?),
       // Stamp local `updatedAt` with the remote row's own timestamp (not
       // "now") so the next comparison above reflects when the data was
@@ -476,6 +534,74 @@ class DailyRecordDao extends DatabaseAccessor<AppDatabase>
       companion,
       onConflict: DoUpdate((old) => companion, target: [dailyRecords.date]),
     );
+  }
+}
+
+// ─────────────────────────────────────────
+//  DAO: SyncOutboxDao
+// ─────────────────────────────────────────
+//
+// See `SyncOutbox` in app_database.dart for why this table exists
+// (docs/specs/achievements-statistics-db-persistence-fix.md R2/R3).
+@DriftAccessor(tables: [SyncOutbox])
+class SyncOutboxDao extends DatabaseAccessor<AppDatabase>
+    with _$SyncOutboxDaoMixin {
+  SyncOutboxDao(super.db);
+
+  /// Record that pushing [entityTable]/[entityKey] to Supabase just failed
+  /// (or hasn't succeeded yet), so the next `fullSync()` retries it instead
+  /// of silently dropping it forever.
+  Future<void> markPending(
+    String entityTable,
+    String entityKey,
+    String error,
+  ) async {
+    await into(syncOutbox).insert(
+      SyncOutboxCompanion.insert(
+        entityTable: entityTable,
+        entityKey: entityKey,
+        lastError: Value(error),
+        updatedAt: Value(DateTime.now()),
+      ),
+      onConflict: DoUpdate(
+        (old) => SyncOutboxCompanion.custom(
+          lastError: Variable(error),
+          attempts: old.attempts + const Constant(1),
+          updatedAt: Variable(DateTime.now()),
+        ),
+        target: [syncOutbox.entityTable, syncOutbox.entityKey],
+      ),
+    );
+  }
+
+  /// Clear a pending entry after a successful push.
+  Future<void> clearPending(String entityTable, String entityKey) async {
+    await (delete(syncOutbox)..where(
+          (o) =>
+              o.entityTable.equals(entityTable) &
+              o.entityKey.equals(entityKey),
+        ))
+        .go();
+  }
+
+  /// All keys currently pending push for [entityTable] (e.g. the ISO date
+  /// strings of `daily_records` rows whose last push failed).
+  Future<List<String>> getPendingKeys(String entityTable) async {
+    final rows = await (select(
+      syncOutbox,
+    )..where((o) => o.entityTable.equals(entityTable))).get();
+    return rows.map((r) => r.entityKey).toList();
+  }
+
+  /// Total number of entities awaiting a retried push, across all tables —
+  /// surfaced to the UI so a stuck sync is visible instead of silent (R6).
+  Future<int> pendingCount() async {
+    final rows = await select(syncOutbox).get();
+    return rows.length;
+  }
+
+  Stream<int> watchPendingCount() {
+    return select(syncOutbox).watch().map((rows) => rows.length);
   }
 }
 
@@ -1163,7 +1289,10 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
 
       // ── Overlay / screen settings ───────────────────────────────
       'overlay_popups_enabled': 'overlay_popups_enabled',
-      'adhan_sound_enabled': 'adhan_sound_enabled',
+      // 'adhan_sound_enabled' intentionally dropped from this mapping too —
+      // UserPreferences no longer has a field for it (see
+      // docs/specs/settings-notifications-improvements.md R1); any
+      // lingering remote rows for old accounts are simply ignored on pull.
       'adhan_screen_enabled': 'adhan_screen_enabled',
       'popup_interval_minutes': 'popup_interval_minutes',
 
@@ -1503,6 +1632,13 @@ class CustomIbadahDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<CustomIbadahLogData>> getLogsForDate(DateTime date) {
     return (select(customIbadahLog)..where((t) => t.date.equals(date))).get();
+  }
+
+  /// Looks up a single log row by its local id — used by
+  /// `SyncManager._syncCustomIbadah` to retry a push that's pending in the
+  /// `SyncOutbox` (see achievements-statistics-db-persistence-fix.md R2).
+  Future<CustomIbadahLogData?> getLogById(int id) {
+    return (select(customIbadahLog)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
   Future<void> logIbadah(

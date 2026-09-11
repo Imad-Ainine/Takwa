@@ -72,10 +72,12 @@ export default async function DashboardPage({
 							<span className={styles.metaIcon}>📱</span>
 							<span>{t('download.platform')}</span>
 						</div>
-						<div className={styles.metaPill}>
-							<span className={styles.metaIcon}>🏷️</span>
-							<span>{t('download.version', { version: apkVersion })}</span>
-						</div>
+						{apkVersion && (
+							<div className={styles.metaPill}>
+								<span className={styles.metaIcon}>🏷️</span>
+								<span>{t('download.version', { version: apkVersion })}</span>
+							</div>
+						)}
 						{apkSize && (
 							<div className={styles.metaPill}>
 								<span className={styles.metaIcon}>⚖️</span>

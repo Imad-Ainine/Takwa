@@ -71,7 +71,7 @@ function QRCodeDisplay({ url }: { url: string }) {
 
 export default function DownloadSection({
   apkUrl = '',
-  apkVersion = '1.0.0',
+  apkVersion = '',
   apkSize = '',
   sha256 = '',
   sha1 = '',

@@ -571,11 +571,26 @@ class SyncStatusIndicator extends StatelessWidget {
   final bool isSyncing;
   final DateTime? lastSynced;
 
+  /// Non-null when the last `fullSync()` had at least one step fail (R6 of
+  /// achievements-statistics-db-persistence-fix.md) — surfaces that instead
+  /// of always claiming "synced successfully" while a step is silently
+  /// behind.
+  final String? syncError;
+
+  /// Count of entities still awaiting a retried push (`SyncOutbox`) — the
+  /// other half of R6: a user can now tell sync is behind even when the
+  /// *last* attempt didn't itself throw (e.g. offline since).
+  final int pendingCount;
+
   const SyncStatusIndicator({
     super.key,
     required this.isSyncing,
     this.lastSynced,
+    this.syncError,
+    this.pendingCount = 0,
   });
+
+  bool get _hasIssue => !isSyncing && (syncError != null || pendingCount > 0);
 
   @override
   Widget build(BuildContext context) {
@@ -587,7 +602,11 @@ class SyncStatusIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.card.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: _hasIssue
+              ? context.colors.warning.withValues(alpha: 0.6)
+              : context.colors.border.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -595,19 +614,34 @@ class SyncStatusIndicator extends StatelessWidget {
           _buildIndicator(context),
           const SizedBox(width: AppSpacing.sm),
           Text(
-            isSyncing
-                ? (AppLocalizations.of(context)?.syncStatusSyncing ??
-                      'جاري المزامنة...')
-                : (AppLocalizations.of(context)?.syncStatusSuccess ??
-                      'تمت المزامنة بنجاح'),
+            _statusText(context),
             style: context.typography.caption.copyWith(
-              color: context.colors.textSecondary,
+              color: _hasIssue
+                  ? context.colors.warningText
+                  : context.colors.textSecondary,
               fontSize: 10,
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _statusText(BuildContext context) {
+    if (isSyncing) {
+      return AppLocalizations.of(context)?.syncStatusSyncing ??
+          'جاري المزامنة...';
+    }
+    if (syncError != null) {
+      return AppLocalizations.of(context)?.syncStatusError ??
+          'تعذّرت آخر مزامنة، ستتم إعادة المحاولة تلقائيًا';
+    }
+    if (pendingCount > 0) {
+      return AppLocalizations.of(context)?.syncStatusPending(pendingCount) ??
+          '$pendingCount عنصر بانتظار المزامنة';
+    }
+    return AppLocalizations.of(context)?.syncStatusSuccess ??
+        'تمت المزامنة بنجاح';
   }
 
   Widget _buildIndicator(BuildContext context) {
@@ -619,6 +653,13 @@ class SyncStatusIndicator extends StatelessWidget {
           strokeWidth: 1.5,
           valueColor: AlwaysStoppedAnimation<Color>(context.colors.gold),
         ),
+      );
+    }
+    if (_hasIssue) {
+      return Icon(
+        Icons.sync_problem_rounded,
+        size: 14,
+        color: context.colors.warningText,
       );
     }
     return Icon(
@@ -722,6 +763,13 @@ class SliderSetting extends StatelessWidget {
   final double max;
   final int? divisions;
 
+  /// Formats [value] into a short readout shown at the end of the label
+  /// row (e.g. "80%") — a bare slider gives no indication of its concrete
+  /// effect until dragged. Optional so existing callers that don't pass it
+  /// keep their previous look; see
+  /// docs/specs/settings-notifications-improvements.md R7.
+  final String Function(double value)? valueLabelBuilder;
+
   const SliderSetting({
     super.key,
     required this.icon,
@@ -731,6 +779,7 @@ class SliderSetting extends StatelessWidget {
     this.min = 0,
     this.max = 1,
     this.divisions,
+    this.valueLabelBuilder,
   });
 
   @override
@@ -744,13 +793,24 @@ class SliderSetting extends StatelessWidget {
             children: [
               Text(icon, style: const TextStyle(fontSize: 18)),
               const SizedBox(width: AppSpacing.md),
-              Text(
-                label,
-                style: context.typography.bodyMedium.copyWith(
-                  fontSize: 15,
-                  color: context.colors.textPrimary,
+              Expanded(
+                child: Text(
+                  label,
+                  style: context.typography.bodyMedium.copyWith(
+                    fontSize: 15,
+                    color: context.colors.textPrimary,
+                  ),
                 ),
               ),
+              if (valueLabelBuilder != null)
+                Text(
+                  valueLabelBuilder!(value),
+                  style: context.typography.caption.copyWith(
+                    fontSize: 13,
+                    color: context.colors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),

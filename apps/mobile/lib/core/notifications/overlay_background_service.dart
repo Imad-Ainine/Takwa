@@ -198,6 +198,7 @@ class OverlayBackgroundService {
     bool? flipToSilenceEnabled,
     bool? silentModeEnabled,
     int? silentDurationMins,
+    double? adhanVolumeLevel,
   }) {
     final Map<String, dynamic> data = {};
     if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
@@ -213,6 +214,15 @@ class OverlayBackgroundService {
     }
     if (silentDurationMins != null) {
       data['silent_duration_mins'] = silentDurationMins;
+    }
+    // `_OverlayTaskHandler.onReceiveData` already understood this key (see
+    // below) — it just had no way to receive it live, since neither this
+    // parameter nor a call site existed. Without this, a volume change in
+    // Settings only reached the background isolate on its next full
+    // restart, same class of gap `adhanMode` had before R6's earlier fix.
+    // See docs/specs/settings-notifications-improvements.md R6.
+    if (adhanVolumeLevel != null) {
+      data['adhan_volume_level'] = adhanVolumeLevel;
     }
 
     if (data.isNotEmpty) FlutterForegroundTask.sendDataToTask(data);

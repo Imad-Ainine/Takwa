@@ -49,6 +49,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     super.build(context); // required by AutomaticKeepAliveClientMixin
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
+    final syncError = ref.watch(lastSyncErrorProvider);
+    final pendingSyncCount = ref.watch(pendingSyncCountProvider).value ?? 0;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -62,7 +64,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: SyncStatusIndicator(isSyncing: isSyncing),
+              child: SyncStatusIndicator(
+                isSyncing: isSyncing,
+                syncError: syncError,
+                pendingCount: pendingSyncCount,
+              ),
             ),
           ),
         ],

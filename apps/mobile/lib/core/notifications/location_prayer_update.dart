@@ -441,29 +441,43 @@ class LocationPrayerManager {
       }
 
       // الحصول على الموقع (مع آليات استباقية واحتياطية لتفادي أخطاء الأماكن المغلقة)
-      Position? pos;
-      try {
-        pos = await Geolocator.getCurrentPosition(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 8),
-          ),
-        );
-      } catch (_) {
-        pos = await Geolocator.getLastKnownPosition();
-      }
-
-      pos ??= await Geolocator.getLastKnownPosition();
+      //
+      // ملاحظة مهمة: على تثبيت جديد تماماً للتطبيق (مثل APK الإصدار الذي
+      // يُثبّت لأول مرة على جهاز حقيقي) لا توجد أي إحداثيات مخزّنة بعد،
+      // لذا فشل أول محاولة GPS (شائع جداً داخل المباني عند أول إصلاح بارد)
+      // يؤدي مباشرة لخطأ صريح دون أي شبكة أمان — بعكس بيئة التطوير حيث تكون
+      // هناك إحداثيات محفوظة من جلسات سابقة تُستخدم كبديل صامت. لتفادي هذا
+      // نُجرّب أولاً الموقع الأخير المعروف (فوري) ثم إصلاحاً سريعاً منخفض
+      // الدقة (يعتمد على الشبكة/الواي فاي ويعمل عادة داخل المباني) قبل
+      // الانتقال إلى إصلاح GPS أدق وأطول انتظاراً.
+      Position? pos = await Geolocator.getLastKnownPosition();
 
       if (pos == null) {
         try {
           pos = await Geolocator.getCurrentPosition(
             locationSettings: const LocationSettings(
               accuracy: LocationAccuracy.low,
-              timeLimit: Duration(seconds: 4),
+              timeLimit: Duration(seconds: 6),
             ),
           );
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('[LocationPrayerManager] low-accuracy fix failed: $e');
+        }
+      }
+
+      if (pos == null) {
+        try {
+          pos = await Geolocator.getCurrentPosition(
+            locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: Duration(seconds: 15),
+            ),
+          );
+        } catch (e) {
+          debugPrint(
+            '[LocationPrayerManager] medium-accuracy fix failed: $e',
+          );
+        }
       }
 
       // إذا فشل الـ GPS تماماً، نحاول استخدام الإحداثيات المحفوظة مسبقاً
@@ -534,13 +548,19 @@ class LocationPrayerManager {
       await _scheduleForLocation(ref, lat, lng);
 
       return LocationResult.success;
-    } on LocationServiceDisabledException {
+    } on LocationServiceDisabledException catch (e) {
+      debugPrint('[LocationPrayerManager] service disabled: $e');
       final fallback = await _fallbackToCachedCoordinates(ref);
       return fallback ?? LocationResult.serviceDisabled;
-    } on PermissionDeniedException {
+    } on PermissionDeniedException catch (e) {
+      debugPrint('[LocationPrayerManager] permission denied: $e');
       final fallback = await _fallbackToCachedCoordinates(ref);
       return fallback ?? LocationResult.permissionDenied;
-    } catch (e) {
+    } catch (e, st) {
+      // مهم: كانت هذه الاستثناءات تُبتلع بصمت تام سابقاً، مما جعل تشخيص
+      // فشل الموقع في بنية الإصدار (release/minified) على جهاز حقيقي
+      // مستحيلاً. الآن تظهر في adb logcat لتشخيص أي مشكلة مشابهة لاحقاً.
+      debugPrint('[LocationPrayerManager] refreshLocation failed: $e\n$st');
       final fallback = await _fallbackToCachedCoordinates(ref);
       return fallback ?? LocationResult.error;
     }

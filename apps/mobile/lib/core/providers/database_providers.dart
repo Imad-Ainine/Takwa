@@ -46,6 +46,10 @@ final bookProgressDaoProvider = Provider<BookProgressDao>((ref) {
   return BookProgressDao(ref.watch(appDatabaseProvider));
 });
 
+final syncOutboxDaoProvider = Provider<SyncOutboxDao>((ref) {
+  return SyncOutboxDao(ref.watch(appDatabaseProvider));
+});
+
 // ── سجل اليوم (Stream) ──
 final todayRecordProvider = StreamProvider<DailyRecord?>((ref) {
   return ref.watch(dailyRecordDaoProvider).watchTodayRecord();

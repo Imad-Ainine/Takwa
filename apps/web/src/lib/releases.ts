@@ -11,20 +11,66 @@ export interface ReleaseInfo {
 
 /**
  * Automatically resolves the latest released APK metadata.
- * 1. Checks GitHub Releases API for the latest published release (auto-updates after CI build).
- *    NOTE: For private repos, set GITHUB_TOKEN as a server-side env var on Vercel.
- * 2. Falls back to Supabase Storage manifest.json if configured.
+ * 1. Checks Supabase Storage manifest.json first — release-apk.yml publishes
+ *    it (with a service-role key, no rate limit) as the very last step of
+ *    every release, so it's the most reliable "source of truth" and needs
+ *    no Vercel redeploy to pick up a new version.
+ * 2. Falls back to the GitHub Releases API. NOTE: unauthenticated requests
+ *    are rate-limited to 60/hour — set a server-side GITHUB_TOKEN env var on
+ *    Vercel to avoid this silently falling through on a busy deploy.
  * 3. Falls back to NEXT_PUBLIC_APK_* environment variables.
+ *
+ * If none of the above resolve, version/apkUrl come back as empty strings
+ * rather than a hardcoded version number — a stale-but-plausible-looking
+ * fallback (e.g. "v1.0.5") is worse than an honestly empty one, since callers
+ * can detect the empty string and hide the download/version UI instead of
+ * showing a number that quietly drifts further from reality with every
+ * release. Always check `release.apkUrl`/`release.version` for truthiness
+ * before rendering them.
  */
 export async function getLatestRelease(): Promise<ReleaseInfo> {
-  const defaultVersion = process.env.NEXT_PUBLIC_APK_VERSION || '1.0.5';
-  const defaultUrl = process.env.NEXT_PUBLIC_APK_URL || `/api/releases/download?version=${defaultVersion}`;
-  const defaultSize = process.env.NEXT_PUBLIC_APK_SIZE || '';
-  const defaultSha256 = process.env.NEXT_PUBLIC_APK_SHA256 || '';
-  const defaultSha1 = process.env.NEXT_PUBLIC_APK_SHA1 || '';
+  const envVersion = process.env.NEXT_PUBLIC_APK_VERSION || '';
+  const envUrl = process.env.NEXT_PUBLIC_APK_URL || (envVersion ? `/api/releases/download?version=${envVersion}` : '');
+  const envSize = process.env.NEXT_PUBLIC_APK_SIZE || '';
+  const envSha256 = process.env.NEXT_PUBLIC_APK_SHA256 || '';
+  const envSha1 = process.env.NEXT_PUBLIC_APK_SHA1 || '';
 
-  // 1. Try GitHub Releases API
-  // For private repos this REQUIRES a server-side GITHUB_TOKEN env var on Vercel.
+  // 1. Try Supabase Storage manifest first
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const bucket = process.env.SUPABASE_APK_BUCKET || 'apk-releases';
+
+  if (supabaseUrl && serviceRoleKey) {
+    try {
+      const supabase = createClient(supabaseUrl, serviceRoleKey, {
+        auth: { persistSession: false },
+      });
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .download('manifest.json');
+
+      if (!error && data) {
+        const manifest = JSON.parse(await data.text());
+        if (manifest.version && manifest.apkUrl) {
+          return {
+            version: manifest.version,
+            apkUrl: manifest.apkUrl,
+            size: manifest.size || envSize,
+            sha256: manifest.sha256 || envSha256,
+            sha1: manifest.sha1 || envSha1,
+            downloadFilename: `takwa-v${manifest.version}.apk`,
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('[getLatestRelease] Error checking Supabase storage:', err);
+    }
+  }
+
+  // 2. Try GitHub Releases API
+  // For private repos (or to avoid the 60/hour unauthenticated rate limit)
+  // this needs a server-side GITHUB_TOKEN env var on Vercel.
   try {
     const repo = process.env.GITHUB_REPO || 'Imad-Ainine/Takwa';
     const githubToken = process.env.GITHUB_TOKEN; // server-side only, never NEXT_PUBLIC_
@@ -56,54 +102,37 @@ export async function getLatestRelease(): Promise<ReleaseInfo> {
           version,
           apkUrl: apkAsset.browser_download_url,
           size: sizeMb,
-          sha256: sha256Match ? sha256Match[1] : defaultSha256,
-          sha1: sha1Match ? sha1Match[1] : defaultSha1,
+          sha256: sha256Match ? sha256Match[1] : envSha256,
+          sha1: sha1Match ? sha1Match[1] : envSha1,
           downloadFilename: apkAsset.name || `takwa-v${version}.apk`,
         };
       }
+    } else if (res.status === 403) {
+      console.warn('[getLatestRelease] GitHub API rate-limited (set GITHUB_TOKEN on Vercel to fix)');
     }
   } catch (err) {
     console.warn('[getLatestRelease] Error checking GitHub Releases API:', err);
   }
 
-  // 2. Try Supabase Storage manifest fallback
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const bucket = process.env.SUPABASE_APK_BUCKET || 'apk-releases';
-
-  if (supabaseUrl && serviceRoleKey) {
-    try {
-      const supabase = createClient(supabaseUrl, serviceRoleKey, {
-        auth: { persistSession: false },
-      });
-
-      const { data, error } = await supabase.storage
-        .from(bucket)
-        .download('manifest.json');
-
-      if (!error && data) {
-        const manifest = JSON.parse(await data.text());
-        const version = manifest.version || defaultVersion;
-        return {
-          version,
-          apkUrl: manifest.apkUrl || defaultUrl,
-          size: manifest.size || defaultSize,
-          sha256: manifest.sha256 || defaultSha256,
-          sha1: manifest.sha1 || defaultSha1,
-          downloadFilename: `takwa-v${version}.apk`,
-        };
-      }
-    } catch (err) {
-      console.warn('[getLatestRelease] Error checking Supabase storage:', err);
-    }
+  // 3. Explicit env var override, if configured
+  if (envVersion && envUrl) {
+    return {
+      version: envVersion,
+      apkUrl: envUrl,
+      size: envSize,
+      sha256: envSha256,
+      sha1: envSha1,
+      downloadFilename: `takwa-v${envVersion}.apk`,
+    };
   }
 
+  // 4. Nothing resolved — return empty rather than a fabricated version.
   return {
-    version: defaultVersion,
-    apkUrl: defaultUrl,
-    size: defaultSize,
-    sha256: defaultSha256,
-    sha1: defaultSha1,
-    downloadFilename: `takwa-v${defaultVersion}.apk`,
+    version: '',
+    apkUrl: '',
+    size: '',
+    sha256: '',
+    sha1: '',
+    downloadFilename: '',
   };
 }

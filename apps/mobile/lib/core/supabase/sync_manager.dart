@@ -16,6 +16,21 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 final isSyncingProvider = StateProvider<bool>((ref) => false);
 
+/// Non-debug-log signal for the last `fullSync()` (R6 of
+/// achievements-statistics-db-persistence-fix.md): null once a sync
+/// completes with no per-step failures, otherwise a joined summary of every
+/// step that threw. Read by the Settings screen so a stuck/partial sync is
+/// visible to the user instead of only ever appearing in `developer.log`.
+final lastSyncErrorProvider = StateProvider<String?>((ref) => null);
+
+/// Live count of entities still awaiting a retried push (the `SyncOutbox`
+/// table) — the other half of R6's "surface sync health" ask. Backed by a
+/// DB watch so it updates the moment a push succeeds/fails, with no manual
+/// invalidation needed.
+final pendingSyncCountProvider = StreamProvider<int>((ref) {
+  return ref.watch(syncOutboxDaoProvider).watchPendingCount();
+});
+
 final syncManagerProvider = Provider((ref) => SyncManager(ref));
 
 /// The real connectivity check, wrapped behind a provider so tests can
@@ -46,26 +61,85 @@ class SyncManager {
 
     _syncing = true;
     _ref.read(isSyncingProvider.notifier).state = true;
+    // R5: each step used to run inside one flat try/finally, so a throw
+    // from any one of them (a schema mismatch, an RLS rejection, a dropped
+    // connection mid-step) skipped every step after it — e.g. a failure
+    // pulling daily records could silently mean settings/achievements/
+    // reminders never synced that session either, with nothing to show for
+    // it but a debug log. Isolating each step means one bad step no longer
+    // takes the rest of the sync down with it.
+    final stepErrors = <String>[];
     try {
-      await _syncDailyRecords();
-      await _syncProhibitions();
-      await _syncCustomIbadah();
-      await _syncAchievements();
-      await _syncSettings();
-      await _syncStats();
-      await _syncBookProgress();
-      await _syncReminders();
-      await _syncUserAdhkar();
-      await _syncUserDuas();
-      await _syncQuran();
+      await _runStep('dailyRecords', _syncDailyRecords, stepErrors);
+      await _runStep('prohibitions', _syncProhibitions, stepErrors);
+      await _runStep('customIbadah', _syncCustomIbadah, stepErrors);
+      await _runStep('achievements', _syncAchievements, stepErrors);
+      await _runStep('settings', _syncSettings, stepErrors);
+      await _runStep('stats', _syncStats, stepErrors);
+      await _runStep('bookProgress', _syncBookProgress, stepErrors);
+      await _runStep('reminders', _syncReminders, stepErrors);
+      await _runStep('userAdhkar', _syncUserAdhkar, stepErrors);
+      await _runStep('userDuas', _syncUserDuas, stepErrors);
+      await _runStep('quran', _syncQuran, stepErrors);
     } finally {
       _syncing = false;
       _ref.read(isSyncingProvider.notifier).state = false;
+      _ref.read(lastSyncErrorProvider.notifier).state = stepErrors.isEmpty
+          ? null
+          : stepErrors.join('; ');
     }
   }
 
+  /// Runs one `fullSync()` step in isolation: a throw is logged and
+  /// recorded in [stepErrors] (surfaced via [lastSyncErrorProvider]) rather
+  /// than propagating and aborting every step still to come.
+  Future<void> _runStep(
+    String name,
+    Future<void> Function() step,
+    List<String> stepErrors,
+  ) async {
+    try {
+      await step();
+    } catch (e, st) {
+      developer.log(
+        'fullSync step "$name" failed: $e',
+        name: 'SyncManager',
+        stackTrace: st,
+      );
+      stepErrors.add('$name: $e');
+    }
+  }
+
+  /// The key `SyncOutbox` rows use for a `daily_records` entity — must
+  /// match `DailyRecordDao._dailyRecordOutboxKey` exactly, since a pending
+  /// push and a pull for the same date need to agree on what "this date"
+  /// means.
+  String _dateKey(DateTime date) => date.toIso8601String().split('T')[0];
+
   Future<void> _syncDailyRecords() async {
     final dao = _ref.read(dailyRecordDaoProvider);
+    final outbox = _ref.read(syncOutboxDaoProvider);
+
+    // 0. Retry any previously-failed pushes first (R2). These can be older
+    // than the 7-day window pushed below — e.g. the app wasn't opened again
+    // for over a week after a push failed — so the plain "last 7 days" loop
+    // alone wouldn't necessarily catch them back up.
+    final pendingDates = await outbox.getPendingKeys('daily_records');
+    for (final dateStr in pendingDates) {
+      final date = DateTime.tryParse(dateStr);
+      if (date == null) {
+        await outbox.clearPending('daily_records', dateStr);
+        continue;
+      }
+      final record = await dao.getRecordByDate(date);
+      if (record == null) {
+        // The local row this was pending for doesn't exist anymore —
+        // nothing left to retry.
+        await outbox.clearPending('daily_records', dateStr);
+        continue;
+      }
+      await syncDailyRecord(record);
+    }
 
     // 1. Push recent local records to Supabase (e.g., last 7 days)
     final localRecords = await dao.getLastNDays(7);
@@ -86,13 +160,31 @@ class SyncManager {
   }
 
   Future<void> _syncProhibitions() async {
+    final dao = _ref.read(dailyRecordDaoProvider);
+    final outbox = _ref.read(syncOutboxDaoProvider);
+
+    // Retry any previously-failed prohibition-log pushes (R2).
+    final pendingIds = await outbox.getPendingKeys('prohibitions_log');
+    for (final idStr in pendingIds) {
+      final id = int.tryParse(idStr);
+      if (id == null) {
+        await outbox.clearPending('prohibitions_log', idStr);
+        continue;
+      }
+      final log = await dao.getProhibitionById(id);
+      if (log == null) {
+        await outbox.clearPending('prohibitions_log', idStr);
+        continue;
+      }
+      await syncProhibition(log);
+    }
+
     final from = DateTime.now().subtract(const Duration(days: 14));
     final remoteLogs = await _service.getProhibitionLogs(
       from: from,
       to: DateTime.now(),
     );
 
-    final dao = _ref.read(dailyRecordDaoProvider);
     for (final log in remoteLogs) {
       await dao.upsertProhibitionFromRemote(log);
     }
@@ -100,6 +192,23 @@ class SyncManager {
 
   Future<void> _syncCustomIbadah() async {
     final ibadahDao = _ref.read(customIbadahDaoProvider);
+    final outbox = _ref.read(syncOutboxDaoProvider);
+
+    // Retry any previously-failed custom-ibadah-log pushes (R2).
+    final pendingIds = await outbox.getPendingKeys('custom_ibadah_log');
+    for (final idStr in pendingIds) {
+      final id = int.tryParse(idStr);
+      if (id == null) {
+        await outbox.clearPending('custom_ibadah_log', idStr);
+        continue;
+      }
+      final log = await ibadahDao.getLogById(id);
+      if (log == null) {
+        await outbox.clearPending('custom_ibadah_log', idStr);
+        continue;
+      }
+      await syncCustomIbadahLog(log);
+    }
 
     // 1. Push local logs (last 7 days)
     for (int i = 0; i < 7; i++) {
@@ -230,28 +339,37 @@ class SyncManager {
         'maghrib_status': record.maghribStatus.name,
         'isha_status': record.ishaStatus.name,
         'night_prayer': record.nightPrayer,
-        // Removed newer columns that might throw "column does not exist" on remote:
-        // 'witr': record.witr,
-        // 'rawatib': record.rawatib,
+        'witr': record.witr,
+        'rawatib': record.rawatib,
         'quran_pages': record.quranPages,
-        // 'quran_verses': record.quranVerses,
-        // 'quran_juzaa': record.quranJuzaa,
+        'quran_verses': record.quranVerses,
+        'quran_juzaa': record.quranJuzaa,
         'morning_adhkar': record.morningAdhkar,
         'evening_adhkar': record.eveningAdhkar,
-        // 'after_prayer_adhkar': record.afterPrayerAdhkar,
-        // 'tasbeeh_count': record.tasbeehCount,
+        'after_prayer_adhkar': record.afterPrayerAdhkar,
+        'tasbeeh_count': record.tasbeehCount,
         'fasting_type': record.fastingType.name,
         'sadaqah': record.sadaqah,
+        // 'ghadh_basar' is intentionally still omitted: unlike the other
+        // fields uncommented above (which docs/schema.sql confirms already
+        // exist on the remote `daily_records` table), `ghadh_basar` is not
+        // in that remote schema yet — sending it would throw "column does
+        // not exist". Needs an actual Supabase migration before it can be
+        // pushed (see achievements-statistics-db-persistence-fix.md R4).
         // 'ghadh_basar': record.ghadhBasar,
-        // 'sadaqah_amount': record.sadaqahAmount,
+        'sadaqah_amount': record.sadaqahAmount,
         'net_points': record.netPoints,
         'taqwa_points': record.taqwaPoints,
-        // 'deducted_points': record.deductedPoints,
-        // 'mood': record.mood,
+        'deducted_points': record.deductedPoints,
+        'mood': record.mood,
         'notes': record.notes,
       });
+      await _ref.read(syncOutboxDaoProvider).clearPending('daily_records', _dateKey(record.date));
     } catch (e) {
       developer.log('syncDailyRecord exception: $e', name: 'SyncManager');
+      await _ref
+          .read(syncOutboxDaoProvider)
+          .markPending('daily_records', _dateKey(record.date), e.toString());
     }
   }
 
@@ -261,14 +379,23 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
-    await _service.upsertAchievement({
-      'type': achievement.type,
-      'title_ar': achievement.titleAr,
-      'desc_ar': achievement.descAr,
-      'emoji': achievement.emoji,
-      'points_reward': achievement.pointsReward,
-      'earned_at': achievement.earnedAt.toIso8601String(),
-    });
+    final key = achievement.id.toString();
+    try {
+      await _service.upsertAchievement({
+        'type': achievement.type,
+        'title_ar': achievement.titleAr,
+        'desc_ar': achievement.descAr,
+        'emoji': achievement.emoji,
+        'points_reward': achievement.pointsReward,
+        'earned_at': achievement.earnedAt.toIso8601String(),
+      });
+      await _ref.read(syncOutboxDaoProvider).clearPending('achievements', key);
+    } catch (e) {
+      developer.log('syncAchievement exception: $e', name: 'SyncManager');
+      await _ref
+          .read(syncOutboxDaoProvider)
+          .markPending('achievements', key, e.toString());
+    }
   }
 
   /// Sync prohibition log
@@ -277,6 +404,7 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
+    final key = log.id.toString();
     try {
       await _service.upsertProhibitionLog({
         'record_id': log.recordId,
@@ -287,8 +415,14 @@ class SyncManager {
         'deduct_points': log.deductPoints,
         'notes': log.notes,
       });
+      await _ref
+          .read(syncOutboxDaoProvider)
+          .clearPending('prohibitions_log', key);
     } catch (e) {
       developer.log('syncProhibition exception: $e', name: 'SyncManager');
+      await _ref
+          .read(syncOutboxDaoProvider)
+          .markPending('prohibitions_log', key, e.toString());
     }
   }
 
@@ -328,6 +462,9 @@ class SyncManager {
     final isAuth = _ref.read(currentUserProvider) != null;
     if (!isOnline || !isAuth) return;
 
+    final outbox = _ref.read(syncOutboxDaoProvider);
+    final key = log.id.toString();
+
     try {
       await _service.upsertCustomIbadahLog({
         'ibadah_id': log.ibadahId,
@@ -342,6 +479,7 @@ class SyncManager {
       if (dr != null) {
         await syncDailyRecord(dr);
       }
+      await outbox.clearPending('custom_ibadah_log', key);
     } catch (e) {
       if (e.toString().contains('23503')) {
         // Foreign key violation: custom_ibadah might be missing on remote
@@ -368,11 +506,17 @@ class SyncManager {
             if (dr != null) {
               await syncDailyRecord(dr);
             }
+            await outbox.clearPending('custom_ibadah_log', key);
+            return;
           }
         } catch (retryError) {
-          // Fallback or ignore
+          developer.log(
+            'syncCustomIbadahLog retry exception: $retryError',
+            name: 'SyncManager',
+          );
         }
       }
+      await outbox.markPending('custom_ibadah_log', key, e.toString());
     }
   }
 

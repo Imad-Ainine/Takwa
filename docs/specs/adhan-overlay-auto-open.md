@@ -76,14 +76,33 @@
   persistent/non-auto-closing card while the prayer window is active, ideally audio) — a UI design
   task, not a dedupe fix, and out of scope for this pass; flagged here rather than left
   undiscovered.
+- **R4 (`UnifiedOverlayWindow` had no `'prayer'` branch) — done (fourth pass).** Added
+  `_PopupItem.isPrayerAnnouncement`/`sourceIcon` and a `_showPrayerAnnouncement()` path triggered
+  when `shareData` sends `type: 'prayer'`, so the killed-app overlay now shows the actual prayer
+  name/emoji/time (reusing the existing `overlayServicePrayerTimeOverlayTitle`/`Content` strings)
+  instead of falling through to a random adhkar/dua card from the unfiltered pool. Audio was
+  already covered separately: `_scheduleAdhanNotification` fires a real system notification on a
+  dedicated `NotifChannels.prayerSound` channel, which plays regardless of app/isolate state, so
+  this fix only needed to correct the *visual* content.
+- **R7 (fourth pass) — the two dedupe stores are now the same store, not just no-longer-racing on
+  one path.** `AdhanAutoTrigger` now reads and writes the exact same `SharedPreferences` keys/date
+  format (`overlay_triggered_prayers`/`overlay_triggered_prayers_date`, `'$year-$month-$day'`) that
+  `OverlayBackgroundService._checkAndTriggerAdhan` already used privately — since SharedPreferences
+  is native platform storage, both isolates now genuinely observe each other's writes. `_check()`
+  defers to this shared store before firing (covers a main-isolate restart mid-window when its own
+  in-memory `_lastTriggeredPrayer` is empty but the background isolate already fired today) and
+  writes to it after firing (so the background isolate's own loop — which already checked this key
+  — also sees it).
 - **Not yet done:** R3 (verify the background service restarts on boot — `flutter_foreground_task`
   is configured with `autoRunOnBoot: true`, which likely already covers this, but wasn't
-  independently re-verified), the `UnifiedOverlayWindow` `'prayer'` branch above, and confirming on
-  a real device that the full-screen-intent notification actually auto-launches when the app is
-  killed and the screen is locked (Android's full-screen-intent behavior has tightened across OS
-  versions and device OEM skins vary; this can't be verified without hardware).
-- No Flutter/Dart toolchain was available in either pass to run `flutter analyze`/tests; changes
-  were reviewed by hand and validated via the repo's own CI on `main` after each push.
+  independently re-verified), R6's polling loops were not removed (deliberately — see the note
+  below on why replacing them wasn't attempted in this pass), and confirming on a real device that
+  the full-screen-intent notification actually auto-launches when the app is killed and the screen
+  is locked (Android's full-screen-intent behavior has tightened across OS versions and device OEM
+  skins vary; this can't be verified without hardware).
+- A Flutter/Dart toolchain (3.47.2 stable) was available for this fourth pass —
+  `flutter analyze` (whole project) and `flutter test` (whole suite) both pass clean after these
+  changes, in addition to the by-hand review the first three passes relied on.
 
 ## 1. Problem statement
 

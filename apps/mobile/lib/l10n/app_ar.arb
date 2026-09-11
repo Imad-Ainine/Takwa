@@ -1375,6 +1375,8 @@
   "settingDisabled": "معطل",
   "syncStatusSyncing": "جاري المزامنة...",
   "syncStatusSuccess": "تمت المزامنة بنجاح",
+  "syncStatusError": "تعذّرت آخر مزامنة، ستتم إعادة المحاولة تلقائيًا",
+  "syncStatusPending": "{count, plural, one{عنصر واحد بانتظار المزامنة} two{عنصران بانتظار المزامنة} few{{count} عناصر بانتظار المزامنة} many{{count} عنصرًا بانتظار المزامنة} other{{count} عنصر بانتظار المزامنة}}",
   "overlaySettingsSectionTitle": "تنبيهات الشاشة",
   "overlaySettingAdhanScreenLabel": "شاشة الأذان التلقائية",
   "overlaySettingAdhanScreenSublabel": "يُظهر شاشة الأذان عند دخول وقت الصلاة",
@@ -1525,6 +1527,13 @@
   "overlayDuaGeneral": "دعاء عام",
   "overlayTypeDua": "دعاء",
   "overlayTypeDhikr": "ذكر",
+  "overlayTypePrayer": "أذان",
+  "overlayPrayerAnnouncementTimeLabel": "الساعة {time}",
+  "@overlayPrayerAnnouncementTimeLabel": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "overlayTapOutsideToClose": "اضغط خارجاً للإغلاق",
   "forgotPasswordEnterEmail": "يرجى إدخال البريد الإلكتروني",
   "forgotPasswordInvalidEmailFormat": "صيغة البريد الإلكتروني غير صحيحة",

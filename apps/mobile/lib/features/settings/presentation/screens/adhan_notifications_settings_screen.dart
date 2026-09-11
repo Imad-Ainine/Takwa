@@ -61,6 +61,8 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prefsAsync = ref.watch(userPreferencesProvider);
     final isSyncing = ref.watch(isSyncingProvider);
+    final syncError = ref.watch(lastSyncErrorProvider);
+    final pendingSyncCount = ref.watch(pendingSyncCountProvider).value ?? 0;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -74,7 +76,11 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
           Center(
             child: Padding(
               padding: const EdgeInsetsDirectional.only(start: 16),
-              child: SyncStatusIndicator(isSyncing: isSyncing),
+              child: SyncStatusIndicator(
+                isSyncing: isSyncing,
+                syncError: syncError,
+                pendingCount: pendingSyncCount,
+              ),
             ),
           ),
         ],
@@ -308,9 +314,21 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 icon: '🔊',
                                 label: l10n.adhanVolumeLabel,
                                 value: prefs.adhanVolumeLevel,
-                                onChanged: (v) => ref
-                                    .read(userPreferencesProvider.notifier)
-                                    .updatePref('adhan_volume_level', v),
+                                valueLabelBuilder: (v) =>
+                                    '${(v * 100).round()}%',
+                                onChanged: (v) {
+                                  ref
+                                      .read(userPreferencesProvider.notifier)
+                                      .updatePref('adhan_volume_level', v);
+                                  // Same reasoning as adhanMode above: push
+                                  // the new volume to the background
+                                  // isolate right away instead of leaving
+                                  // it stuck at whatever it was on last
+                                  // service start (R6).
+                                  OverlayBackgroundService.updateSettings(
+                                    adhanVolumeLevel: v,
+                                  );
+                                },
                               ),
                               const SettingsDivider(),
                               ToggleSetting(
@@ -412,9 +430,19 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 label: l10n.adhanFlipToSilenceLabel,
                                 sublabel: l10n.adhanFlipToSilenceSublabel,
                                 value: prefs.flipToSilenceEnabled,
-                                onChanged: (v) => ref
-                                    .read(userPreferencesProvider.notifier)
-                                    .updatePref('flip_to_silence_enabled', v),
+                                onChanged: (v) {
+                                  ref
+                                      .read(userPreferencesProvider.notifier)
+                                      .updatePref('flip_to_silence_enabled', v);
+                                  // `updateSettings()` already had a
+                                  // `flipToSilenceEnabled` parameter — this
+                                  // toggle just never called it, so the
+                                  // background isolate kept using whatever
+                                  // value it loaded on its last start (R6).
+                                  OverlayBackgroundService.updateSettings(
+                                    flipToSilenceEnabled: v,
+                                  );
+                                },
                               ),
                               const SettingsDivider(),
                               CheckboxSetting(
