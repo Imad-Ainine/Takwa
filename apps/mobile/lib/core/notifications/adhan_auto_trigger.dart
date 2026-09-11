@@ -76,6 +76,13 @@ class AdhanAutoTrigger {
     AdhanAudioPlayer.stop();
   }
 
+  /// Unique key per prayer per calendar day, shared by [_check] and
+  /// [handleForegroundData] so they claim the same [_lastTriggeredPrayer]
+  /// slot instead of deduplicating independently. See the audit note on
+  /// [handleForegroundData] for why this matters.
+  static String _dailyKey(String prayerName, DateTime now) =>
+      '${prayerName}_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+
   static Future<void> _check(
     WidgetRef ref,
     GlobalKey<NavigatorState> navigatorKey,
@@ -110,8 +117,7 @@ class AdhanAutoTrigger {
         // guard needed. The old 30-minute cross-prayer wall was removed
         // because it blocked a prayer that falls within 30 min of the
         // previous one (e.g., Dhuhr at 13:00 and Asr at 13:20 in summer).
-        final key =
-            '${prayer.name}_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+        final key = _dailyKey(prayer.name, now);
         if (_lastTriggeredPrayer == key) continue;
 
         // Guard: don't push the Adhan screen if it's already on top.
@@ -162,6 +168,22 @@ class AdhanAutoTrigger {
   }
 
   /// يُستدعى من foreground task عند استلام بيانات الأذان
+  ///
+  /// This and [_check] are two independent triggers for the *same* event
+  /// (a prayer starting) that can both be live at once — the background
+  /// foreground-task isolate is started on every app open
+  /// (`OverlayBackgroundService.start()` in main_shell.dart/home_screen.dart)
+  /// right alongside this class's own 1s foreground timer, so in ordinary
+  /// use both are usually polling simultaneously. Each used to dedupe
+  /// independently — [_check] via the in-memory [_lastTriggeredPrayer], this
+  /// method only via a live scan of the navigator stack for `Routes.adhan`
+  /// — which left a real race: both push after their own 300ms
+  /// `Future.delayed`, so if this method's scan ran *before* [_check]'s
+  /// delayed push had actually landed, it would see no Adhan screen yet and
+  /// push a second one. Both now claim the same [_lastTriggeredPrayer] slot
+  /// synchronously, before either awaits anything, so whichever runs first
+  /// wins and the other returns immediately. See
+  /// docs/specs/adhan-overlay-auto-open.md R7.
   static Future<void> handleForegroundData(
     Map data,
     GlobalKey<NavigatorState> navigatorKey,
@@ -169,6 +191,20 @@ class AdhanAutoTrigger {
   ) async {
     final action = data['action'];
     if (action != 'show_adhan') return;
+
+    // Claim the shared per-prayer-per-day slot before doing anything else
+    // (in particular, before the `await` a few lines down) so this and
+    // [_check] can't both slip past their guards in the same race window.
+    // `prayerKey` (the internal 'fajr'/'dhuhr'/... id, not the Arabic
+    // display name) is only present once overlay_background_service.dart
+    // sends it — absent, this falls back to the pre-existing
+    // navigator-stack-only guard below, same as before this fix.
+    final prayerKey = data['prayerKey'] as String?;
+    if (prayerKey != null) {
+      final key = _dailyKey(prayerKey, DateTime.now());
+      if (_lastTriggeredPrayer == key) return;
+      _lastTriggeredPrayer = key;
+    }
 
     final prayerName = (data['prayer'] as String?) ?? 'الصلاة';
     // The background service now sends 'adhanMode' (the canonical string);

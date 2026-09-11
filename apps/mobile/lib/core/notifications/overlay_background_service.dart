@@ -490,6 +490,12 @@ class _OverlayTaskHandler extends TaskHandler {
         FlutterForegroundTask.sendDataToMain({
           'action': 'show_adhan',
           'prayer': prayer.nameAr,
+          // Internal id ('fajr'/'dhuhr'/…), not the Arabic display name
+          // above — lets AdhanAutoTrigger.handleForegroundData build the
+          // same per-prayer-per-day dedupe key AdhanAutoTrigger._check
+          // uses, closing a race where both could push the Adhan screen
+          // for the same prayer. See docs/specs/adhan-overlay-auto-open.md R7.
+          'prayerKey': prayer.name,
           'emoji': prayer.emoji,
           'time': DateFormat('HH:mm').format(prayer.time),
           // Send the canonical adhan mode string so the main isolate's

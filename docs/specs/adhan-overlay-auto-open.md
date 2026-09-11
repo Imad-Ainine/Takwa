@@ -39,13 +39,49 @@
   faster-reacting foreground path and remain the system-overlay-window mechanism for the
   backgrounded/killed case, which the full-screen-intent notification doesn't replace one-for-one
   (see the open question below about whether both can fire for the same prayer).
+- **R7 (duplicate-trigger audit, third pass) — found and fixed a real race between the two
+  in-app paths; found and documented a much bigger issue with the third.**
+
+  **Fixed:** `AdhanAutoTrigger._check()` (the foreground 1s timer) and
+  `AdhanAutoTrigger.handleForegroundData()` (invoked when the background isolate's
+  `sendDataToMain` reaches the main isolate) are two independent triggers for the *same* prayer
+  that are normally BOTH live at once in ordinary use — the background service starts on every app
+  open, right alongside the foreground timer, not just in some rare edge case. Before this fix,
+  each deduped independently: `_check()` via the in-memory `_lastTriggeredPrayer` key,
+  `handleForegroundData()` only via a live scan of the navigator stack for `Routes.adhan`. Both
+  push after their own 300ms `Future.delayed`, so a real (not just theoretical) race existed: if
+  `handleForegroundData()`'s scan ran before `_check()`'s delayed push had actually landed on the
+  stack, it saw no Adhan screen yet and pushed a second one — meaning a user with the app open at
+  prayer time could see two stacked, identical Adhan screens, discovering the duplicate only on
+  dismissing the first. Fixed by having both claim the same `_lastTriggeredPrayer` slot
+  synchronously, before either awaits anything, so whichever runs first wins and the other returns
+  immediately — closing the race deterministically rather than relying on timing.
+  `overlay_background_service.dart`'s `sendDataToMain` payload gained a `prayerKey` field (the
+  internal `'fajr'`/`'dhuhr'`/… id) so `handleForegroundData()` can build the identical dedupe key
+  `_check()` uses; both already draw from the same `'fajr'`/`'dhuhr'`/… naming convention shared
+  with `PrayerTimeInfo`/`_PrayerInfo`, so the two keys are guaranteed to match for the same prayer.
+
+  **Found, not fixed — larger issue:** the system overlay window (`ow.FlutterOverlayWindow.
+  showOverlay` + `shareData({'type': 'prayer', ...})`, the path meant to reach the user when the
+  app is fully killed) does not actually show anything resembling an Adhan screen.
+  `UnifiedOverlayWindow._pickRandom()` (`overlays/unified_overlay_window.dart:465-473`) only
+  special-cases `_filter == 'adhkar'` and `_filter == 'dua'` — `'prayer'` matches neither, so it
+  falls through to the unfiltered pool and shows a **random** adhkar/dua card, indistinguishable
+  from the routine popups that already appear every ~24 minutes, auto-closing in 15 seconds, with
+  no adhan audio played from that isolate at all. So in the one app state (killed) where the
+  full-screen-intent notification is the only thing that can reliably reach the user, the *other*
+  candidate mechanism for that same state doesn't announce the prayer at all — it's not a
+  duplicate-trigger problem, it's closer to the opposite: this path was never actually finished.
+  Fixing it means adding a real `'prayer'` branch to `UnifiedOverlayWindow` (prayer name, a
+  persistent/non-auto-closing card while the prayer window is active, ideally audio) — a UI design
+  task, not a dedupe fix, and out of scope for this pass; flagged here rather than left
+  undiscovered.
 - **Not yet done:** R3 (verify the background service restarts on boot — `flutter_foreground_task`
   is configured with `autoRunOnBoot: true`, which likely already covers this, but wasn't
-  independently re-verified), R5/R7 (dedupe verification between the notification path added to
-  this picture and the two pre-existing polling paths — now a three-way check, not two), and
-  confirming on a real device that the full-screen-intent notification actually auto-launches when
-  the app is killed and the screen is locked (Android's full-screen-intent behavior has tightened
-  across OS versions and device OEM skins vary; this can't be verified without hardware).
+  independently re-verified), the `UnifiedOverlayWindow` `'prayer'` branch above, and confirming on
+  a real device that the full-screen-intent notification actually auto-launches when the app is
+  killed and the screen is locked (Android's full-screen-intent behavior has tightened across OS
+  versions and device OEM skins vary; this can't be verified without hardware).
 - No Flutter/Dart toolchain was available in either pass to run `flutter analyze`/tests; changes
   were reviewed by hand and validated via the repo's own CI on `main` after each push.
 
