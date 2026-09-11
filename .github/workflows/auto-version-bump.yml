@@ -117,8 +117,13 @@ jobs:
               run: |
                   NEXT="${{ steps.next.outputs.VERSION }}"
 
-                  git config user.name  "github-actions[bot]"
-                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  # Attributed to your own GitHub account (via its noreply
+                  # address, so the real email never lands in git history)
+                  # instead of github-actions[bot], so automated release
+                  # commits don't add a separate bot entry to the repo's
+                  # Contributors list.
+                  git config user.name  "Imad Ainine"
+                  git config user.email "81334818+Imad-Ainine@users.noreply.github.com"
 
                   git add apps/mobile/pubspec.yaml
                   git commit -m "[release] bump version to v${NEXT}"
