@@ -125,6 +125,13 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
     final isRamadan = ref.watch(ramadanModeProvider).value ?? false;
     final style = AdaptiveStyle(context, isRamadan);
     final prayersAsyncValue = ref.watch(prayerTimesProvider);
+    // This screen passes its own `child:` into AppBarWidget instead of using
+    // its built-in title, so it doesn't get that widget's brightness-aware
+    // titleColor (see app_bar_widget.dart) — it was hardcoding Colors.white
+    // here instead, invisible in light mode where showBackground's gradient
+    // leans light. Mirrors the same dark-mode-only condition.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final headerFg = isDark ? Colors.white : context.colors.textPrimary;
 
     // If you haven't secured a location yet, show a loader instead of querying the API
     if (_currentPosition == null) {
@@ -174,7 +181,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             l10n.mosquesNearbyTitle,
                             style: style.amiri(
                               22,
-                              color: Colors.white,
+                              color: headerFg,
                               weight: FontWeight.bold,
                             ),
                           ),
@@ -193,15 +200,16 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                         vertical: AppSpacing.sm,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(AppRadius.xl),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.location_on_rounded,
-                            color: Colors.white,
+                            color: headerFg,
                             size: 18,
                           ),
                           const SizedBox(width: AppSpacing.sm),
@@ -209,7 +217,7 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                             l10n.mosquesCurrentLocationLabel(_cityName),
                             style: style.naskh(
                               14,
-                              color: Colors.white,
+                              color: headerFg,
                               weight: FontWeight.w600,
                             ),
                           ),
@@ -227,24 +235,26 @@ class _MosquesScreenState extends ConsumerState<MosquesScreen> {
                       height: 120,
                       width: 200,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: (isDark ? Colors.white : Colors.black)
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.3),
+                          color: (isDark ? Colors.white : Colors.black)
+                              .withValues(alpha: 0.3),
                         ),
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.map_outlined,
                             size: 80,
-                            color: Colors.white24,
+                            color: headerFg.withValues(alpha: 0.24),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.location_on_rounded,
                             size: 48,
-                            color: Colors.white,
+                            color: headerFg,
                           ),
                           Positioned(
                             bottom: 4,

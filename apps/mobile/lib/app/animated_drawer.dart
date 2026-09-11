@@ -962,12 +962,12 @@ class DrawerMenuButton extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isOpen
               ? context.colors.goldDim
-              : Colors.white.withValues(alpha: 0.08),
+              : context.colors.textPrimary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isOpen
                 ? context.colors.gold.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.12),
+                : context.colors.textPrimary.withValues(alpha: 0.12),
           ),
         ),
         child: Center(

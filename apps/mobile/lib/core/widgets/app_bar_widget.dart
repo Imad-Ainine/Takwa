@@ -59,6 +59,46 @@ class AppBarWidget extends StatefulWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => Size.fromHeight(height);
+
+  /// Adaptive foreground color for content sitting directly on this bar's
+  /// background — same computation the built-in title uses internally (see
+  /// the comment in `_AppBarWidgetState.build`). Callers that pass their own
+  /// `actions:` icons/buttons (or a custom `child:`, when it isn't sitting on
+  /// its own fixed-color surface — a per-item brand gradient, say) should use
+  /// this instead of hardcoding `Colors.white`: the built-in title already
+  /// avoided that exact bug, but a caller-supplied action icon still can — a
+  /// hardcoded white read fine on the dark-mode gradient and disappeared on
+  /// light mode's near-white one.
+  static Color foregroundColorFor(
+    BuildContext context, {
+    bool showBackground = true,
+    Color? firstShade,
+    Color? secondShade,
+  }) {
+    final colors = context.colors;
+    if (!showBackground) return colors.textPrimary;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasCustomGradient = firstShade != null && secondShade != null;
+    final gradientColors = hasCustomGradient
+        ? [firstShade, secondShade]
+        : (isDark
+              ? [
+                  colors.gold.withValues(alpha: 0.75),
+                  colors.background.withValues(alpha: 0.85),
+                ]
+              : [
+                  colors.background.withValues(alpha: 0.65),
+                  colors.gold.withValues(alpha: 0.80),
+                ]);
+    final gradientMid = Color.alphaBlend(
+      Color.lerp(gradientColors.first, gradientColors.last, 0.5)!,
+      colors.background,
+    );
+    return ThemeData.estimateBrightnessForColor(gradientMid) == Brightness.dark
+        ? Colors.white
+        : colors.textPrimary;
+  }
 }
 
 class _AppBarWidgetState extends State<AppBarWidget>
@@ -177,17 +217,12 @@ class _AppBarWidgetState extends State<AppBarWidget>
     // be hardcoded white whenever showBackground was true, which in light mode
     // put white text over the near-white end of the default gradient (~1.05:1)
     // and leaned on a drop shadow to stay readable.
-    // The gradient stops are translucent, so composite them over the surface
-    // they are painted on before judging brightness.
-    final gradientMid = Color.alphaBlend(
-      Color.lerp(gradient.colors.first, gradient.colors.last, 0.5)!,
-      colors.background,
+    final titleColor = AppBarWidget.foregroundColorFor(
+      context,
+      showBackground: widget.showBackground,
+      firstShade: widget.firstShade,
+      secondShade: widget.secondShade,
     );
-    final titleColor = widget.showBackground
-        ? (ThemeData.estimateBrightnessForColor(gradientMid) == Brightness.dark
-              ? Colors.white
-              : colors.textPrimary)
-        : colors.textPrimary;
 
     // Decorative circle opacities adapt to brightness so they stay subtle in
     // light mode and properly atmospheric in dark mode.
