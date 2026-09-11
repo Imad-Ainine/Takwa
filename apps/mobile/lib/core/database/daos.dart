@@ -1183,8 +1183,11 @@ class SettingsDao extends DatabaseAccessor<AppDatabase>
       'silent_adhan_prayers': 'silent_adhan_prayers',
       'silent_notif_prayers': 'silent_notif_prayers',
       'auto_silent_after_adhan': 'auto_silent_after_adhan',
-      'adhan_in_silent_enabled': 'adhan_in_silent_enabled',
-      'notifs_in_silent_enabled': 'notifs_in_silent_enabled',
+      // 'adhan_in_silent_enabled'/'notifs_in_silent_enabled' intentionally
+      // dropped from this mapping — UserPreferences no longer has a field
+      // for them (see docs/specs/settings-notifications-improvements.md
+      // R3/R5); any lingering remote rows for old accounts are simply
+      // ignored on pull now.
     };
 
     for (final entry in mapping.entries) {

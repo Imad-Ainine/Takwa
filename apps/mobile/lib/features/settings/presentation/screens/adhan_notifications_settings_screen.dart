@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/theme/app_theme.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
@@ -149,9 +150,23 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                   'vibrate': l10n.adhanModeVibrate,
                                   'silent': l10n.adhanModeSilent,
                                 },
-                                onChanged: (v) => ref
-                                    .read(userPreferencesProvider.notifier)
-                                    .updatePref('adhan_mode', v),
+                                onChanged: (v) {
+                                  ref
+                                      .read(userPreferencesProvider.notifier)
+                                      .updatePref('adhan_mode', v);
+                                  // Push the new mode to the background
+                                  // foreground-task isolate right away — it
+                                  // only reads SharedPreferences on its own
+                                  // start, so without this the adhan-time
+                                  // sound decision there would keep using
+                                  // the old mode until the app/service next
+                                  // restarts. See
+                                  // docs/specs/settings-notifications-
+                                  // improvements.md R6.
+                                  OverlayBackgroundService.updateSettings(
+                                    adhanMode: v,
+                                  );
+                                },
                               ),
                               const SettingsDivider(),
                               SliderSetting(

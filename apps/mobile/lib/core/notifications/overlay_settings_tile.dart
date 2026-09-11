@@ -78,22 +78,13 @@ class OverlayNotificationSettings extends ConsumerWidget {
                 ),
                 const SettingsDivider(),
 
-                // ── صوت الأذان ──
-                ToggleSetting(
-                  icon: '🔊',
-                  label: l10n.overlaySettingAdhanSoundLabel,
-                  sublabel: l10n.overlaySettingAdhanSoundSublabel,
-                  value: prefs.adhanSoundEnabled,
-                  onChanged: (v) {
-                    ref
-                        .read(userPreferencesProvider.notifier)
-                        .updatePref('adhan_sound_enabled', v);
-                    OverlayBackgroundService.updateSettings(
-                      adhanSoundEnabled: v,
-                    );
-                  },
-                ),
-                const SettingsDivider(),
+                // NOTE: the old standalone "صوت الأذان" (adhan sound)
+                // toggle used to live here, separately from the "نمط
+                // الأذان" (sound/vibrate/silent) selector on the Adhan
+                // settings screen — the two could disagree, which was a
+                // real bug (see docs/specs/settings-notifications-
+                // improvements.md R1). Removed; `adhanMode` is now the
+                // single control for whether the adhan makes sound.
 
                 // ── نوافذ الأذكار المنبثقة ──
                 ToggleSetting(

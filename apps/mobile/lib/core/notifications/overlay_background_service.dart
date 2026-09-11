@@ -227,6 +227,11 @@ class _OverlayTaskHandler extends TaskHandler {
 
   // إعدادات قابلة للتحديث ديناميكياً
   bool _overlayEnabled = true;
+  // Legacy flag — no longer used to decide whether to play the adhan
+  // sound (see the `_adhanMode == 'sound'` check in
+  // _checkAndTriggerAdhan). Kept only so old `adhan_sound_enabled` values
+  // synced from Supabase / SharedPreferences don't crash the parser;
+  // `adhanMode` is the single source of truth now.
   bool _adhanSoundEnabled = true;
   int _popupIntervalMins = _kDefaultPopupIntervalMins;
   bool _silentModeEnabled = false;
@@ -435,7 +440,17 @@ class _OverlayTaskHandler extends TaskHandler {
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
         // إرسال إشعار الأذان مع الصوت
-        if (_adhanSoundEnabled) {
+        //
+        // Gated on `_adhanMode == 'sound'` (the single "نمط الأذان" selector
+        // in Settings → Adhan), not the legacy `_adhanSoundEnabled` flag —
+        // that flag lived on a *different* settings screen
+        // (OverlayNotificationSettings) with no link back to `adhanMode`,
+        // so a user picking "silent" or "vibrate" there could still get an
+        // adhan sound notification from this background isolate while the
+        // foreground path (AdhanAutoTrigger, which already only checks
+        // `adhanMode`) correctly stayed silent. See
+        // docs/specs/settings-notifications-improvements.md R1.
+        if (_adhanMode == 'sound') {
           await _scheduleAdhanNotification(prayer);
         }
 
