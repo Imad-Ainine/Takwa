@@ -3664,6 +3664,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get silentModeAlertToneVibrate => 'Tone with vibration';
 
   @override
+  String get silentModeDurationLabel => 'Silence duration after Adhan';
+
+  @override
+  String get silentModeDurationSublabel =>
+      'How long the phone stays silenced automatically after each prayer time starts';
+
+  @override
+  String silentModeDurationMinutes(num mins) {
+    String _temp0 = intl.Intl.pluralLogic(
+      mins,
+      locale: localeName,
+      other: '$mins minutes',
+      one: '1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get booksChapterAboutTitle => 'About the Book';
 
   @override

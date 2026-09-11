@@ -196,6 +196,8 @@ class OverlayBackgroundService {
     int? popupIntervalMins,
     String? adhanMode,
     bool? flipToSilenceEnabled,
+    bool? silentModeEnabled,
+    int? silentDurationMins,
   }) {
     final Map<String, dynamic> data = {};
     if (overlayEnabled != null) data['overlay_popups_enabled'] = overlayEnabled;
@@ -205,6 +207,12 @@ class OverlayBackgroundService {
     if (adhanMode != null) data['adhan_mode'] = adhanMode;
     if (flipToSilenceEnabled != null) {
       data['flip_to_silence_enabled'] = flipToSilenceEnabled;
+    }
+    if (silentModeEnabled != null) {
+      data['silent_mode_enabled'] = silentModeEnabled;
+    }
+    if (silentDurationMins != null) {
+      data['silent_duration_mins'] = silentDurationMins;
     }
 
     if (data.isNotEmpty) FlutterForegroundTask.sendDataToTask(data);
@@ -280,6 +288,12 @@ class _OverlayTaskHandler extends TaskHandler {
       }
       if (data.containsKey('flip_to_silence_enabled')) {
         _flipToSilenceEnabled = data['flip_to_silence_enabled'] as bool;
+      }
+      if (data.containsKey('silent_mode_enabled')) {
+        _silentModeEnabled = data['silent_mode_enabled'] as bool;
+      }
+      if (data.containsKey('silent_duration_mins')) {
+        _silentDurationMins = data['silent_duration_mins'] as int;
       }
     }
   }

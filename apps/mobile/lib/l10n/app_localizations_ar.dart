@@ -3626,6 +3626,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get silentModeAlertToneVibrate => 'نغمة مع اهتزاز';
 
   @override
+  String get silentModeDurationLabel => 'مدة الصمت بعد الأذان';
+
+  @override
+  String get silentModeDurationSublabel =>
+      'مدة إسكات الهاتف تلقائياً بعد دخول وقت كل صلاة';
+
+  @override
+  String silentModeDurationMinutes(num mins) {
+    String _temp0 = intl.Intl.pluralLogic(
+      mins,
+      locale: localeName,
+      other: '$mins دقيقة',
+      many: '$mins دقيقة',
+      few: '$mins دقائق',
+      two: 'دقيقتان',
+      one: 'دقيقة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get booksChapterAboutTitle => 'عن الكتاب';
 
   @override

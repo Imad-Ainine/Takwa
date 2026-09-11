@@ -6674,6 +6674,24 @@ abstract class AppLocalizations {
   /// **'نغمة مع اهتزاز'**
   String get silentModeAlertToneVibrate;
 
+  /// No description provided for @silentModeDurationLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة الصمت بعد الأذان'**
+  String get silentModeDurationLabel;
+
+  /// No description provided for @silentModeDurationSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدة إسكات الهاتف تلقائياً بعد دخول وقت كل صلاة'**
+  String get silentModeDurationSublabel;
+
+  /// Silent-mode duration option label, e.g. "20 minutes"
+  ///
+  /// In ar, this message translates to:
+  /// **'{mins, plural, one{دقيقة واحدة} two{دقيقتان} few{{mins} دقائق} many{{mins} دقيقة} other{{mins} دقيقة}}'**
+  String silentModeDurationMinutes(num mins);
+
   /// No description provided for @booksChapterAboutTitle.
   ///
   /// In ar, this message translates to:

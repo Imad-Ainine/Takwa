@@ -2010,6 +2010,17 @@
   "silentModeAlertVibrateOnly": "اهتزاز فقط",
   "silentModeAlertToneOnly": "نغمة بدون اهتزاز",
   "silentModeAlertToneVibrate": "نغمة مع اهتزاز",
+  "silentModeDurationLabel": "مدة الصمت بعد الأذان",
+  "silentModeDurationSublabel": "مدة إسكات الهاتف تلقائياً بعد دخول وقت كل صلاة",
+  "silentModeDurationMinutes": "{mins, plural, one{دقيقة واحدة} two{دقيقتان} few{{mins} دقائق} many{{mins} دقيقة} other{{mins} دقيقة}}",
+  "@silentModeDurationMinutes": {
+    "description": "Silent-mode duration option label, e.g. \"20 minutes\"",
+    "placeholders": {
+      "mins": {
+        "type": "num"
+      }
+    }
+  },
   "booksChapterAboutTitle": "عن الكتاب",
   "booksChapterTocTitle": "الفصول المحتواة",
   "booksChapterPagesCount": "{count, plural, one{صفحة واحدة} two{صفحتان} few{{count} صفحات} many{{count} صفحة} other{{count} صفحة}}",
