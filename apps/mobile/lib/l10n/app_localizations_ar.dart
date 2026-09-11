@@ -1157,6 +1157,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adhanCalcMethodLabel => 'طريقة الحساب';
 
   @override
+  String get adhanLocationLabel => 'الموقع';
+
+  @override
+  String get adhanLocationSublabel => 'اضغط لتحديد موقعك أو اختياره يدوياً';
+
+  @override
   String get calcMethodAlgeria => 'الجزائر (وزارة الشؤون الدينية)';
 
   @override

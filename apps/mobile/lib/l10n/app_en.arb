@@ -693,6 +693,8 @@
   "madhabShafi": "Shafi'i, Maliki, Hanbali",
   "madhabHanafi": "Hanafi",
   "adhanCalcMethodLabel": "Calculation Method",
+  "adhanLocationLabel": "Location",
+  "adhanLocationSublabel": "Tap to auto-detect or choose manually",
   "calcMethodAlgeria": "Algeria (Ministry of Religious Affairs)",
   "calcMethodMWL": "Muslim World League",
   "calcMethodEgypt": "Egyptian General Authority",
