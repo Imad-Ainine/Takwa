@@ -2294,6 +2294,48 @@ abstract class AppLocalizations {
   /// **'أمريكا الشمالية'**
   String get calcMethodISNA;
 
+  /// No description provided for @highLatitudeRuleLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'قاعدة خطوط العرض العليا'**
+  String get highLatitudeRuleLabel;
+
+  /// No description provided for @highLatitudeRuleMiddleOfNight.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتصف الليل'**
+  String get highLatitudeRuleMiddleOfNight;
+
+  /// No description provided for @highLatitudeRuleSeventhOfNight.
+  ///
+  /// In ar, this message translates to:
+  /// **'سُبع الليل'**
+  String get highLatitudeRuleSeventhOfNight;
+
+  /// No description provided for @highLatitudeRuleTwilightAngle.
+  ///
+  /// In ar, this message translates to:
+  /// **'زاوية الشفق'**
+  String get highLatitudeRuleTwilightAngle;
+
+  /// No description provided for @settingsAdjustmentsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل أوقات الصلاة يدوياً'**
+  String get settingsAdjustmentsSectionTitle;
+
+  /// No description provided for @settingsAdjustmentsSectionSublabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إذا اختلف وقت الأذان في مسجدك عن الوقت المحسوب، يمكنك ضبط كل صلاة بالدقائق'**
+  String get settingsAdjustmentsSectionSublabel;
+
+  /// Compact signed minute-offset label, e.g. "+3 د" or "-2 د"
+  ///
+  /// In ar, this message translates to:
+  /// **'{value} د'**
+  String settingsOffsetMinutesShort(String value);
+
   /// No description provided for @adhanSoundSectionTitle.
   ///
   /// In ar, this message translates to:

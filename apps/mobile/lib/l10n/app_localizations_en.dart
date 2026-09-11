@@ -1191,6 +1191,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get calcMethodISNA => 'North America (ISNA)';
 
   @override
+  String get highLatitudeRuleLabel => 'High Latitude Rule';
+
+  @override
+  String get highLatitudeRuleMiddleOfNight => 'Middle of the Night';
+
+  @override
+  String get highLatitudeRuleSeventhOfNight => 'Seventh of the Night';
+
+  @override
+  String get highLatitudeRuleTwilightAngle => 'Twilight Angle';
+
+  @override
+  String get settingsAdjustmentsSectionTitle => 'Manual Prayer Time Adjustments';
+
+  @override
+  String get settingsAdjustmentsSectionSublabel =>
+      'If your mosque\'s adhan time differs from the calculated time, fine-tune each prayer by minutes';
+
+  @override
+  String settingsOffsetMinutesShort(String value) {
+    return '$value min';
+  }
+
+  @override
   String get adhanSoundSectionTitle => 'Adhan Sound';
 
   @override

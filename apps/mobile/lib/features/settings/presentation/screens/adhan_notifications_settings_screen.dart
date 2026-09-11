@@ -7,6 +7,7 @@ import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
+import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/features/settings/providers/user_preferences_provider.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import '../widgets/settings_widgets.dart';
@@ -119,6 +120,109 @@ class AdhanNotificationSettingsScreen extends ConsumerWidget {
                                 onChanged: (v) => ref
                                     .read(userPreferencesProvider.notifier)
                                     .updatePref('calc_method', v),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+                          // Manual per-prayer minute offsets + high-latitude
+                          // rule — these were previously stored/consumed
+                          // (packages/takwa_core's adhan.CalculationParameters
+                          // .adjustments, via notifications_service.dart and
+                          // location_prayer_update.dart) but had NO settings
+                          // UI anywhere, so a user could never actually set
+                          // them. See docs/specs/settings-notifications-
+                          // improvements.md R5.
+                          SectionHeader(
+                            icon: '🧭',
+                            title: l10n.settingsAdjustmentsSectionTitle,
+                          ),
+                          SettingsCard(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  14,
+                                  10,
+                                  14,
+                                  4,
+                                ),
+                                child: Text(
+                                  l10n.settingsAdjustmentsSectionSublabel,
+                                  style: context.typography.caption.copyWith(
+                                    fontSize: 12,
+                                    color: context.colors.textSecondary,
+                                  ),
+                                ),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '🌅',
+                                label: l10n.prayerFajr,
+                                value: prefs.fajrOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('fajr_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '🌄',
+                                label: l10n.prayerSunrise,
+                                value: prefs.sunriseOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('sunrise_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '☀️',
+                                label: l10n.prayerDhuhr,
+                                value: prefs.dhuhrOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('dhuhr_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '🌤',
+                                label: l10n.prayerAsr,
+                                value: prefs.asrOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('asr_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '🌆',
+                                label: l10n.prayerMaghrib,
+                                value: prefs.maghribOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('maghrib_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              _PrayerOffsetRow(
+                                icon: '🌃',
+                                label: l10n.prayerIsha,
+                                value: prefs.ishaOffset,
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('isha_offset', v),
+                              ),
+                              const SettingsDivider(),
+                              SelectSetting(
+                                icon: '🌐',
+                                label: l10n.highLatitudeRuleLabel,
+                                value: prefs.highLatitudeRule,
+                                options: {
+                                  'middle_of_the_night':
+                                      l10n.highLatitudeRuleMiddleOfNight,
+                                  'seventh_of_the_night':
+                                      l10n.highLatitudeRuleSeventhOfNight,
+                                  'twilight_angle':
+                                      l10n.highLatitudeRuleTwilightAngle,
+                                },
+                                onChanged: (v) => ref
+                                    .read(userPreferencesProvider.notifier)
+                                    .updatePref('high_latitude_rule', v),
                               ),
                             ],
                           ),
@@ -364,6 +468,114 @@ class AdhanSoundPreviewButton extends ConsumerWidget {
         visualDensity: VisualDensity.compact,
         padding: EdgeInsets.zero,
         constraints: const BoxConstraints(),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────
+//  PER-PRAYER MINUTE OFFSET ROW
+// ─────────────────────────────────────────
+/// A single "− N min +" stepper row for one prayer's manual calculation
+/// offset (`fajr_offset`, `dhuhr_offset`, …). Kept as a plain +/- stepper
+/// rather than a [SliderSetting] since a slider that never shows its
+/// current value would just reproduce the "can't tell what it's set to"
+/// problem this whole section exists to fix (docs/specs/settings-
+/// notifications-improvements.md R7) — a ±1 min-at-a-time stepper needs
+/// its value visible to be usable at all.
+class _PrayerOffsetRow extends StatelessWidget {
+  final String icon;
+  final String label;
+  final int value;
+  final ValueChanged<int> onChanged;
+
+  static const int _min = -30;
+  static const int _max = 30;
+
+  const _PrayerOffsetRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final signed = value > 0 ? '+$value' : '$value';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Row(
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              label,
+              style: context.typography.bodyMedium.copyWith(
+                fontSize: 15,
+                color: context.colors.textPrimary,
+              ),
+            ),
+          ),
+          _OffsetStepButton(
+            icon: Icons.remove_rounded,
+            onTap: value > _min ? () => onChanged(value - 1) : null,
+          ),
+          SizedBox(
+            width: 56,
+            child: Text(
+              l10n.settingsOffsetMinutesShort(signed),
+              textAlign: TextAlign.center,
+              style: context.typography.bodyMedium.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: value == 0
+                    ? context.colors.textSecondary
+                    : context.colors.gold,
+              ),
+            ),
+          ),
+          _OffsetStepButton(
+            icon: Icons.add_rounded,
+            onTap: value < _max ? () => onChanged(value + 1) : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OffsetStepButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _OffsetStepButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return TakwaTappable(
+      onTap: onTap,
+      minTapSize: null,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: Container(
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: context.colors.card.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
+        ),
+        child: Icon(
+          icon,
+          size: 16,
+          color: enabled
+              ? context.colors.textPrimary
+              : context.colors.textSecondary.withValues(alpha: 0.4),
+        ),
       ),
     );
   }

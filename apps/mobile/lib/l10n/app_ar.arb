@@ -697,6 +697,21 @@
   "calcMethodKarachi": "جامعة كراتشي",
   "calcMethodUmmAlQura": "أم القرى (مكة المكرمة)",
   "calcMethodISNA": "أمريكا الشمالية",
+  "highLatitudeRuleLabel": "قاعدة خطوط العرض العليا",
+  "highLatitudeRuleMiddleOfNight": "منتصف الليل",
+  "highLatitudeRuleSeventhOfNight": "سُبع الليل",
+  "highLatitudeRuleTwilightAngle": "زاوية الشفق",
+  "settingsAdjustmentsSectionTitle": "تعديل أوقات الصلاة يدوياً",
+  "settingsAdjustmentsSectionSublabel": "إذا اختلف وقت الأذان في مسجدك عن الوقت المحسوب، يمكنك ضبط كل صلاة بالدقائق",
+  "settingsOffsetMinutesShort": "{value} د",
+  "@settingsOffsetMinutesShort": {
+    "description": "Compact signed minute-offset label, e.g. \"+3 د\" or \"-2 د\"",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
   "adhanSoundSectionTitle": "صوت الأذان",
   "adhanModeLabel": "وضع الأذان",
   "adhanModeSound": "صوت",

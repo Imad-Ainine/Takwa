@@ -1167,6 +1167,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get calcMethodISNA => 'أمريكا الشمالية';
 
   @override
+  String get highLatitudeRuleLabel => 'قاعدة خطوط العرض العليا';
+
+  @override
+  String get highLatitudeRuleMiddleOfNight => 'منتصف الليل';
+
+  @override
+  String get highLatitudeRuleSeventhOfNight => 'سُبع الليل';
+
+  @override
+  String get highLatitudeRuleTwilightAngle => 'زاوية الشفق';
+
+  @override
+  String get settingsAdjustmentsSectionTitle => 'تعديل أوقات الصلاة يدوياً';
+
+  @override
+  String get settingsAdjustmentsSectionSublabel =>
+      'إذا اختلف وقت الأذان في مسجدك عن الوقت المحسوب، يمكنك ضبط كل صلاة بالدقائق';
+
+  @override
+  String settingsOffsetMinutesShort(String value) {
+    return '$value د';
+  }
+
+  @override
   String get adhanSoundSectionTitle => 'صوت الأذان';
 
   @override
