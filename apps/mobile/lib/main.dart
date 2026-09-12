@@ -27,6 +27,7 @@ import 'package:quran_library/quran_library.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/notifications/overlays/unified_overlay_window.dart';
+import 'package:takwa/core/home_widget/prayer_home_widget_service.dart';
 
 // ────────────────────────────────────────────
 //  OVERLAY ENTRY POINT
@@ -150,6 +151,7 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AdhanAutoTrigger.start(ref, NotificationRouter.navigatorKey);
       LocationPrayerManager.initialize(ref);
+      PrayerHomeWidgetService.init();
       _setupAuthListener();
       _checkNotificationLaunch();
     });
@@ -242,6 +244,25 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
     // picks the theme's font — Amiri/NotoNaskhArabic for Arabic (unchanged),
     // Poppins for English — see appFontFamily()/appBodyFontFamily().
     final locale = ref.watch(localeProvider);
+
+    // Keep the home-screen prayer widget in step with whichever changed:
+    // new prayer times (location/settings) or just the display language.
+    // Both listeners resolve the *other* half from `ref.read` so a locale
+    // switch alone (no new prayer computation) still refreshes the labels.
+    ref.listen(prayerTimesProvider, (_, next) {
+      next.whenData(
+        (prayers) => PrayerHomeWidgetService.update(
+          prayers: prayers,
+          locale: ref.read(localeProvider),
+        ),
+      );
+    });
+    ref.listen(localeProvider, (_, nextLocale) {
+      final prayers = ref.read(prayerTimesProvider).value;
+      if (prayers != null) {
+        PrayerHomeWidgetService.update(prayers: prayers, locale: nextLocale);
+      }
+    });
 
     return WithForegroundTask(
       child: MaterialApp(

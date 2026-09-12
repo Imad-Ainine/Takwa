@@ -31,6 +31,9 @@ dependencies:
   # ── Calendar ──
   hijri: ^3.0.0
 
+  # ── Home Screen Widgets (Android AppWidget / iOS WidgetKit) ──
+  home_widget: ^0.9.4
+
   flutter_localizations:
     sdk: flutter
 

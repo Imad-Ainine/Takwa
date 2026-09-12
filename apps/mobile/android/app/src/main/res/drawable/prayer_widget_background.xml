@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark green card, matching the app's Islamic/prayer-times color language
+     (see the teal/gold palette used across the Duas & Prayer screens). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="20dp" />
+    <gradient
+        android:angle="135"
+        android:startColor="#1F4D37"
+        android:endColor="#0F2E20" />
+</shape>
