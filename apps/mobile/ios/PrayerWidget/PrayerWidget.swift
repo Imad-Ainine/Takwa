@@ -114,12 +114,13 @@ private struct PrayerProvider: TimelineProvider {
 private struct PrayerWidgetEntryView: View {
     let entry: PrayerEntry
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.widgetFamily) private var family
 
     var body: some View {
         let theme = TakwaWidgetTheme.resolve(colorScheme)
         Group {
             if let data = entry.data {
-                PrayerContentView(data: data, theme: theme)
+                PrayerContentView(data: data, theme: theme, showCountdown: family == .systemLarge)
                     .environment(\.layoutDirection, data.isRtl ? .rightToLeft : .leftToRight)
             } else {
                 Text("افتح تطبيق تقوى لعرض أوقات الصلاة")
@@ -129,13 +130,16 @@ private struct PrayerWidgetEntryView: View {
                     .padding()
             }
         }
-        .containerBackground(for: .widget) { theme.backgroundGradient }
+        .containerBackground(for: .widget) { TakwaWidgetBackgroundView(theme: theme) }
     }
 }
 
 private struct PrayerContentView: View {
     let data: PrayerWidgetData
     let theme: TakwaWidgetTheme
+    /// Only the `.systemLarge` family has room for the countdown row — the
+    /// `.systemMedium` layout stays exactly as compact as before.
+    let showCountdown: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -162,10 +166,51 @@ private struct PrayerContentView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .foregroundColor(isNext ? theme.gold : theme.textPrimary)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                }
+            }
+            if showCountdown, let countdown = data.nextCountdown() {
+                Spacer(minLength: 4)
+                VStack(spacing: 8) {
+                    Text(countdown.label)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(theme.gold)
+                    ProgressView(value: countdown.progress)
+                        .tint(theme.gold)
+                        .background(theme.progressTrack)
                 }
             }
         }
         .padding(14)
+    }
+}
+
+private extension PrayerWidgetData {
+    struct Countdown {
+        let label: String
+        let progress: Double
+    }
+
+    /// Same computation as Android's `PrayerWidgetLargeProvider.bindExtra` —
+    /// elapsed fraction between the previous and next prayer, plus a
+    /// "remaining" label. `nil` once there's nothing left to count down to
+    /// today (after Isha, before tomorrow's data has been pushed).
+    func nextCountdown(asOf now: Date = Date()) -> Countdown? {
+        let previous = prayers.last { $0.date <= now }?.date
+        guard let next = prayers.first(where: { $0.date > now }) else { return nil }
+
+        let start = previous ?? next.date.addingTimeInterval(-6 * 3600)
+        let total = max(next.date.timeIntervalSince(start), 1)
+        let elapsed = min(max(now.timeIntervalSince(start), 0), total)
+
+        let remaining = Int(next.date.timeIntervalSince(now) / 60)
+        let hours = remaining / 60
+        let minutes = remaining % 60
+        let label = hours > 0
+            ? "متبقٍ \(hours) س \(minutes) د لـ \(next.label)"
+            : "متبقٍ \(minutes) د لـ \(next.label)"
+        return Countdown(label: label, progress: elapsed / total)
     }
 }
 
@@ -182,7 +227,13 @@ struct PrayerWidget: Widget {
         }
         .configurationDisplayName("أوقات الصلاة")
         .description("يعرض مواقيت الصلاة اليوم مع تمييز الصلاة القادمة.")
-        .supportedFamilies([.systemMedium])
+        // .systemLarge shows the same 5 prayers plus a countdown bar to the
+        // next one (PrayerContentView's `showCountdown`) — the WidgetKit
+        // equivalent of Android's separate PrayerWidgetLargeProvider; here
+        // it's one Widget whose view adapts to `\.widgetFamily` instead of
+        // a second provider, since WidgetKit (unlike AppWidgetProviderInfo)
+        // lets one widget declare several sizes.
+        .supportedFamilies([.systemMedium, .systemLarge])
     }
 }
 

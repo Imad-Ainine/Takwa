@@ -65,6 +65,19 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/prayer_widget_info" />
         </receiver>
+        <!-- Home screen prayer-times widget, 4×3 "large" size variant with
+             a countdown row — a separate picker entry, sharing all its
+             prayer-data rendering with PrayerWidgetProvider above via
+             subclassing (see PrayerWidgetLargeProvider.kt). -->
+        <receiver android:name=".PrayerWidgetLargeProvider"
+            android:label="تقوى - أوقات الصلاة (كبير)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/prayer_widget_large_info" />
+        </receiver>
         <!-- Home screen "dua of the day" widget -->
         <receiver android:name=".DuaOfDayWidgetProvider"
             android:label="تقوى - دعاء اليوم"

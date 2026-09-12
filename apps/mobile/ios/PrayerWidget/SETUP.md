@@ -98,11 +98,17 @@ device/simulator.
 - `TakwaWidgetTheme.swift` holds the brand light/dark colors shared by all
   four widgets (mirrors `AppColorsExtension` in
   `packages/takwa_ui/lib/src/theme/app_colors.dart`) — change the palette
-  there once, not per widget file.
-- All four ship one size for now (`.systemMedium`, ~4×2 cells). Add
-  `.systemLarge` to a widget's `supportedFamilies` and a second layout
-  branch in its content view later for a bigger variant (e.g. the
-  countdown-timer style from the original prayer-widget reference
-  screenshots).
+  there once, not per widget file. It also defines
+  `TakwaWidgetBackgroundView` (the brand gradient + gold/teal accent sheen +
+  rub el hizb corner motif every widget's `containerBackground` uses) — same
+  reasoning, change the background once, not per widget.
+- Dua/dhikr/verse ship one size (`.systemMedium`, ~4×2 cells). Prayer times
+  additionally supports `.systemLarge` (~4×3): the same 5-prayer row plus a
+  countdown bar to the next prayer (`PrayerContentView`'s `showCountdown`,
+  gated on `\.widgetFamily`) — the countdown-timer variant from the
+  original reference screenshots. Giving the other three the same
+  `.systemLarge` treatment later just means branching their content view
+  the same way; no new provider/kind needed since WidgetKit — unlike
+  Android's AppWidgetProviderInfo — lets one widget declare several sizes.
 - No Podfile changes are needed — the extension only uses WidgetKit/SwiftUI
   and `UserDefaults`, no Flutter engine or CocoaPods dependency.

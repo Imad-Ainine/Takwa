@@ -21,6 +21,16 @@ struct TakwaWidgetTheme {
     /// Same reasoning as `gold`, for teal (`AppColorsExtension.tealText`).
     let teal: Color
     let divider: Color
+    /// Progress-bar track for the large prayer widget's countdown bar.
+    let progressTrack: Color
+    /// Brand gold→teal sheen laid over the card gradient — same ARGB as
+    /// `AppColorsExtension.cardGradient`/Android's `widget_overlay_*`, see
+    /// `TakwaWidgetBackgroundView`.
+    let overlayGold: Color
+    let overlayTeal: Color
+    /// Rub el hizb corner motif stroke — same brand gold as `overlayGold`,
+    /// just a touch more opaque so the outline actually reads.
+    let motif: Color
 
     // ≈ AppColorsExtension.light
     static let light = TakwaWidgetTheme(
@@ -31,7 +41,11 @@ struct TakwaWidgetTheme {
         textSecondary: Color(red: 0.294, green: 0.333, blue: 0.388), // #4B5563
         gold: Color(red: 0.420, green: 0.325, blue: 0.125), // goldText #6B5320
         teal: Color(red: 0.059, green: 0.361, blue: 0.341), // tealText #0F5C57
-        divider: Color.black.opacity(0.1)
+        divider: Color.black.opacity(0.1),
+        progressTrack: Color.black.opacity(0.1),
+        overlayGold: Color(red: 0.784, green: 0.663, blue: 0.431).opacity(0.0625), // #10C8A96E
+        overlayTeal: Color(red: 0.227, green: 0.686, blue: 0.663).opacity(0.039), // #0A3AAFA9
+        motif: Color(red: 0.784, green: 0.663, blue: 0.431).opacity(0.12)
     )
 
     // ≈ AppColorsExtension.dark
@@ -43,7 +57,11 @@ struct TakwaWidgetTheme {
         textSecondary: Color(red: 0.561, green: 0.639, blue: 0.733), // #8FA3BB
         gold: Color(red: 0.784, green: 0.663, blue: 0.431), // gold #C8A96E
         teal: Color(red: 0.227, green: 0.686, blue: 0.663), // teal #3AAFA9
-        divider: Color.white.opacity(0.15)
+        divider: Color.white.opacity(0.15),
+        progressTrack: Color.white.opacity(0.15),
+        overlayGold: Color(red: 0.784, green: 0.663, blue: 0.431).opacity(0.125), // #20C8A96E
+        overlayTeal: Color(red: 0.227, green: 0.686, blue: 0.663).opacity(0.051), // #0D3AAFA9
+        motif: Color(red: 0.784, green: 0.663, blue: 0.431).opacity(0.15)
     )
 
     static func resolve(_ scheme: ColorScheme) -> TakwaWidgetTheme {
@@ -56,5 +74,61 @@ struct TakwaWidgetTheme {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    /// The brand accent wash laid over `backgroundGradient` — see
+    /// `TakwaWidgetBackgroundView`.
+    var accentSheen: LinearGradient {
+        LinearGradient(
+            colors: [overlayGold, overlayTeal],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+}
+
+/// Two squares, one rotated 45° over the other — the "rub el hizb" symbol
+/// used throughout Islamic art (and to mark Quran section divisions).
+/// Purely decorative: a low-opacity outline tucked into one corner behind
+/// the real content, same idea as Android's `ic_widget_islamic_motif.xml`.
+struct RubElHizbMotif: Shape {
+    func path(in rect: CGRect) -> Path {
+        let inset = rect.width * 0.18
+        let square = CGRect(
+            x: rect.minX + inset,
+            y: rect.minY + inset,
+            width: rect.width - inset * 2,
+            height: rect.height - inset * 2
+        )
+        var path = Path()
+        path.addRect(square)
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let rotation = CGAffineTransform(translationX: center.x, y: center.y)
+            .rotated(by: .pi / 4)
+            .translatedBy(x: -center.x, y: -center.y)
+        path.addPath(Path(square), transform: rotation)
+        return path
+    }
+}
+
+/// Shared background for every Takwa home-screen widget: the brand card
+/// gradient, the gold→teal accent sheen, and the corner motif — used via
+/// `.containerBackground(for: .widget) { TakwaWidgetBackgroundView(theme:
+/// theme) }` so it's declared once instead of per-widget.
+struct TakwaWidgetBackgroundView: View {
+    let theme: TakwaWidgetTheme
+
+    var body: some View {
+        ZStack {
+            theme.backgroundGradient
+            theme.accentSheen
+            GeometryReader { geo in
+                let size = min(geo.size.width, geo.size.height) * 1.05
+                RubElHizbMotif()
+                    .stroke(theme.motif, lineWidth: 2)
+                    .frame(width: size, height: size)
+                    .position(x: geo.size.width - size * 0.28, y: geo.size.height - size * 0.28)
+            }
+        }
     }
 }

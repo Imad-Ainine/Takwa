@@ -92,7 +92,7 @@ private struct DailyQuoteEntryView: View {
                     .padding()
             }
         }
-        .containerBackground(for: .widget) { theme.backgroundGradient }
+        .containerBackground(for: .widget) { TakwaWidgetBackgroundView(theme: theme) }
     }
 }
 

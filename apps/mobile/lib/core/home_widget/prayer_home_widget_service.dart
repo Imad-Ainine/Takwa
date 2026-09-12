@@ -26,6 +26,11 @@ class PrayerHomeWidgetService {
   /// AndroidManifest.xml (see PrayerWidgetProvider.kt).
   static const androidWidgetName = 'PrayerWidgetProvider';
 
+  /// The 4×3 "large" size variant (PrayerWidgetLargeProvider.kt) — a
+  /// separate picker entry, but it reads the exact same `_dataKey` payload,
+  /// so every push here has to reach it too, not just [androidWidgetName].
+  static const androidLargeWidgetName = 'PrayerWidgetLargeProvider';
+
   /// Must match the `kind:` the iOS extension registers its Widget under
   /// (see ios/PrayerWidget/PrayerWidget.swift).
   static const iOSWidgetName = 'PrayerWidget';
@@ -99,10 +104,15 @@ class PrayerHomeWidgetService {
       };
 
       await HomeWidget.saveWidgetData<String>(_dataKey, jsonEncode(payload));
+      // Both size variants read this same payload but are registered as
+      // two separate AppWidgetProviders, so each needs its own
+      // updateWidget()/scheduleWidgetUpdates() call — home_widget has no
+      // "these names share one push" shorthand.
       await HomeWidget.updateWidget(
         androidName: androidWidgetName,
         iOSName: iOSWidgetName,
       );
+      await HomeWidget.updateWidget(androidName: androidLargeWidgetName);
 
       final upcoming = ordered
           .map((p) => p.time)
@@ -112,6 +122,10 @@ class PrayerHomeWidgetService {
         await HomeWidget.scheduleWidgetUpdates(
           upcoming,
           androidName: androidWidgetName,
+        );
+        await HomeWidget.scheduleWidgetUpdates(
+          upcoming,
+          androidName: androidLargeWidgetName,
         );
       }
     } catch (e) {

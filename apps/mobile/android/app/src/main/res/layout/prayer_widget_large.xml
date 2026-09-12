@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Home-screen prayer-times widget (RemoteViews — no custom views, only what
-  AppWidgets support: FrameLayout/LinearLayout/TextView).
-
-  Filled in by PrayerWidgetProvider.kt from the JSON PrayerHomeWidgetService
-  (Dart) last wrote; nothing here computes a prayer time. Direction (RTL for
-  Arabic) is set by the provider on prayer_widget_content, not baked in here.
-
-  Each cell's label/time TextViews are `match_parent` width (not
-  wrap_content) with `autoSizeTextType="uniform"` — that gives autosize an
-  actual bound to shrink against, so resizing the widget narrower (down to
-  minResizeWidth in prayer_widget_info.xml) shrinks the prayer times to fit
-  instead of clipping or overflowing the cell.
+  4×3 "large" size variant of the prayer-times widget — same 5 cells as
+  prayer_widget.xml (identical ids, so PrayerWidgetProvider's bindContent
+  works unchanged) plus a countdown row for the next prayer, filled in by
+  PrayerWidgetLargeProvider.kt's bindExtra() override. This is the "live
+  countdown bar" variant noted as a future addition in docs/home_widget.md
+  since the very first round of this feature — a separate picker entry
+  rather than a second layout swapped at runtime, so it shows up as its own
+  4×3 widget alongside the compact 4×2 one.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/prayer_widget_root"
@@ -80,12 +76,6 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <!-- A bare <View> is not one of the view classes RemoteViews
-             supports inflating remotely (only FrameLayout/LinearLayout/
-             RelativeLayout/GridLayout and specific widgets like TextView
-             are) — using one here made this widget fail to bind at all
-             ("Couldn't add widget"). FrameLayout is supported and gives
-             the identical 1dp divider line. -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -93,7 +83,7 @@
             android:layout_marginBottom="8dp"
             android:background="@color/widget_divider" />
 
-        <!-- 5 prayer cells, evenly spaced -->
+        <!-- 5 prayer cells, evenly spaced — same ids as prayer_widget.xml -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,24 +102,24 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp" />
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp" />
                 <TextView
                     android:id="@+id/prayer_widget_time_0"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
                     android:textStyle="bold"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="9sp"
-                    android:autoSizeMaxTextSize="13sp" />
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -145,24 +135,24 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp" />
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp" />
                 <TextView
                     android:id="@+id/prayer_widget_time_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
                     android:textStyle="bold"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="9sp"
-                    android:autoSizeMaxTextSize="13sp" />
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -178,24 +168,24 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp" />
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp" />
                 <TextView
                     android:id="@+id/prayer_widget_time_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
                     android:textStyle="bold"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="9sp"
-                    android:autoSizeMaxTextSize="13sp" />
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -211,24 +201,24 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp" />
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp" />
                 <TextView
                     android:id="@+id/prayer_widget_time_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
                     android:textStyle="bold"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="9sp"
-                    android:autoSizeMaxTextSize="13sp" />
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -244,25 +234,60 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="8sp"
-                    android:autoSizeMaxTextSize="11sp" />
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp" />
                 <TextView
                     android:id="@+id/prayer_widget_time_4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:textColor="@color/widget_text_primary"
                     android:textStyle="bold"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     android:maxLines="1"
                     android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="9sp"
-                    android:autoSizeMaxTextSize="13sp" />
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeMaxTextSize="15sp" />
             </LinearLayout>
+        </LinearLayout>
+
+        <!-- Countdown to next prayer — the extra row this size variant has
+             over the compact one. Filled in by
+             PrayerWidgetLargeProvider.bindExtra(); hidden whenever there's
+             no "next" prayer to count down to (e.g. after Isha, before
+             tomorrow's data has been pushed). -->
+        <LinearLayout
+            android:id="@+id/prayer_widget_countdown"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/prayer_widget_countdown_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/widget_gold"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:maxLines="1" />
+
+            <ProgressBar
+                android:id="@+id/prayer_widget_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="8dp"
+                android:max="100"
+                android:progressTint="@color/widget_gold"
+                android:progressBackgroundTint="@color/widget_progress_track" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
