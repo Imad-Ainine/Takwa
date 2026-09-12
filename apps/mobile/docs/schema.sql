@@ -349,3 +349,10 @@
 | `notifs_in_silent_enabled` | `bool` |  Nullable |
 | `vibrate_with_adhan` | `bool` |  Nullable |
 | `silent_duration_mins` | `int4` |  Nullable |
+| `high_latitude_rule` | `text` |  Nullable |
+| `fajr_offset` | `int4` |  Nullable |
+| `sunrise_offset` | `int4` |  Nullable |
+| `dhuhr_offset` | `int4` |  Nullable |
+| `asr_offset` | `int4` |  Nullable |
+| `maghrib_offset` | `int4` |  Nullable |
+| `isha_offset` | `int4` |  Nullable |

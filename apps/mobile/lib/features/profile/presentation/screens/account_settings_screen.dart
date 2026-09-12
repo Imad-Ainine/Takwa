@@ -7,6 +7,7 @@ import '../../../../core/widgets/custom_leading_button.dart';
 import '../../../../core/widgets/custom_pattern_background.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/takwa_loading_indicator.dart';
+import '../../../../core/supabase/supabase_config.dart';
 import '../../../../core/supabase/supabase_providers.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
@@ -52,8 +53,16 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     setState(() => _isSaving = true);
 
     try {
-      // Simulate save delay
-      await Future.delayed(const Duration(milliseconds: 800));
+      // Was a `Future.delayed` placeholder that never actually wrote
+      // anything — the name field always looked "saved" (success snackbar
+      // + pop) but the profile row was untouched. This is the same
+      // updateProfile() the rest of the app already uses to write to
+      // Supabase's `profiles` table; userProfileProvider is a realtime
+      // stream on that table, so every screen showing the name picks up
+      // the change automatically once this succeeds.
+      await ref.read(supabaseServiceProvider).updateProfile({
+        'username': _nameController.text.trim(),
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
