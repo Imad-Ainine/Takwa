@@ -31,9 +31,10 @@ private struct PrayerWidgetData: Decodable {
     let nextKey: String?
     let prayers: [PrayerInfo]
 
-    /// Same data, but with `nextKey` recomputed for a given moment — used to
-    /// build one timeline entry per prayer so the highlight moves on its own
-    /// (see `PrayerProvider.getTimeline`).
+    /// Same data, but with `nextKey` recomputed for a given moment — called
+    /// once per `getTimeline()` invocation so each reload picks up the
+    /// correct "next prayer" without the app having to push again (see
+    /// `PrayerProvider.getTimeline`).
     func withNextKey(asOf date: Date) -> PrayerWidgetData {
         let next = prayers.first { $0.date > date }?.key
         return PrayerWidgetData(
@@ -81,22 +82,21 @@ private struct PrayerProvider: TimelineProvider {
             return
         }
 
-        // One entry for right now, plus one at each remaining prayer time
-        // today, so the "next prayer" highlight advances on WidgetKit's own
-        // schedule instead of needing the app to push again between prayers.
-        var entryDates = [now]
-        entryDates.append(contentsOf: data.prayers.map(\.date).filter { $0 > now })
-        entryDates.sort()
-
-        let entries = entryDates.map { date in
-            PrayerEntry(date: date, data: data.withNextKey(asOf: date))
-        }
+        // A single entry for "now", like every other widget here
+        // (DailyQuoteProvider included) — no multi-entry timeline. The
+        // "next prayer" highlight still advances on its own: the reload
+        // policy below fires exactly when that next prayer's time arrives,
+        // so the *following* getTimeline() call recomputes nextKey fresh
+        // from the same stored prayer list and picks up the prayer after
+        // it, without ever needing to pre-build one entry per prayer.
+        let nextPrayerDate = data.prayers.first { $0.date > now }?.date
+        let entry = PrayerEntry(date: now, data: data.withNextKey(asOf: now))
 
         // By the time the last known prayer has passed, the app should have
         // pushed tomorrow's times (see PrayerHomeWidgetService); ask again
         // shortly after in case it hasn't run in the background.
-        let reloadDate = (entryDates.last ?? now).addingTimeInterval(30 * 60)
-        completion(Timeline(entries: entries, policy: .after(reloadDate)))
+        let reloadDate = nextPrayerDate ?? now.addingTimeInterval(30 * 60)
+        completion(Timeline(entries: [entry], policy: .after(reloadDate)))
     }
 
     private func loadData() -> PrayerWidgetData? {
