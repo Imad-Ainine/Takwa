@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:math';
+import 'package:flutter/widgets.dart' show BuildContext;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../../core/providers/database_providers.dart';
 import '../../../core/providers/shared_preferences_provider.dart';
@@ -62,6 +62,15 @@ class QuranStateNotifier extends StateNotifier<QuranReadingState> {
 // ─────────────────────────────────────────────────────────────
 // Audio
 // ─────────────────────────────────────────────────────────────
+// Built on quran_library's own AudioCtrl/TafsirCtrl engine (GetX-based)
+// rather than a separate hand-rolled player: AudioCtrl.playAyah() already
+// gives continuous ayah-by-ayah playback through a surah, automatic ayah
+// highlighting, and automatic page-turning as playback crosses a page
+// boundary, all wired through the same audio_service background/lock-screen
+// session the app registers (see MainActivity/Info.plist). This notifier is
+// a thin Riverpod bridge over AudioCtrl's Rx state so the rest of the
+// reader screen (top/bottom bars) keeps watching plain Riverpod state
+// exactly as before.
 final quranAudioProvider =
     StateNotifierProvider<QuranAudioNotifier, QuranAudioState>(
       (ref) => QuranAudioNotifier(),
@@ -69,95 +78,106 @@ final quranAudioProvider =
 
 class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
   QuranAudioNotifier() : super(const QuranAudioState()) {
-    // Subscribe once; playAyah only changes the URL being played.
-    _playerStateSub = _player.playerStateStream.listen((s) {
-      if (s.processingState == ProcessingState.completed) {
-        state = state.copyWith(isPlaying: false);
-      }
+    final audioState = ql.AudioCtrl.instance.state;
+    _isPlayingSub = audioState.isPlaying.listen((playing) {
+      state = state.copyWith(isPlaying: playing);
+    });
+    _isPreparingSub = audioState.isAudioPreparing.listen((preparing) {
+      state = state.copyWith(isLoading: preparing);
+    });
+    _currentAyahSub = audioState.currentAyahUniqueNumber.listen((uq) {
+      final (surah, ayah) = _surahAyahFromUQ(uq);
+      state = state.copyWith(surah: surah, ayah: ayah);
     });
   }
-  final _player = AudioPlayer();
-  StreamSubscription<PlayerState>? _playerStateSub;
-  String _reciterBaseUrl(String reciterId) =>
-      'https://cdn.islamic.network/quran/audio/128/$reciterId/';
 
-  // Guards against a stale async response clobbering newer state: if the
-  // user taps a different ayah (or the same one again — "reload") before
-  // the previous playAyah() call's setUrl()/play() has resolved, only the
-  // most recent call is allowed to write its result into `state`. Without
-  // this, a slow first request completing after a faster second one could
-  // flip `isPlaying`/`surah`/`ayah` back to stale values even though the
-  // player itself had already moved on — the "stale state on reload" bug.
-  int _playRequestId = 0;
+  StreamSubscription? _isPlayingSub, _isPreparingSub, _currentAyahSub;
 
+  /// Reciter selection is currently cosmetic only (persisted, shown in the
+  /// picker) — AudioCtrl.playAyah() plays through the engine's own default
+  /// reciter/reader source rather than this app's CDN-id scheme. Wiring the
+  /// picker into AudioCtrl's own reader list is tracked separately; it
+  /// isn't required for tafsir/translation/continuous-surah playback.
   Future<void> setReciter(String reciterId) async {
     state = state.copyWith(reciterId: reciterId);
-    if (state.isPlaying) {
-      await playAyah(state.surah, state.ayah);
-    }
   }
 
-  Future<void> playAyah(int surah, int ayah) async {
-    final requestId = ++_playRequestId;
-    state = state.copyWith(
-      isLoading: true,
-      isPlaying: false,
-      hasError: false,
-      surah: surah,
-      ayah: ayah,
+  /// Ayah for (surahNum, ayahNum), or null if not found.
+  ql.AyahModel? _ayah(int surahNum, int ayahNum) {
+    final surahs = ql.QuranLibrary.quranCtrl.surahs;
+    if (surahNum < 1 || surahNum > surahs.length) return null;
+    for (final a in surahs[surahNum - 1].ayahs) {
+      if (a.ayahNumber == ayahNum) return a;
+    }
+    return null;
+  }
+
+  (int surah, int ayah) _surahAyahFromUQ(int uq) {
+    final surahs = ql.QuranLibrary.quranCtrl.surahs;
+    for (var i = 0; i < surahs.length; i++) {
+      for (final a in surahs[i].ayahs) {
+        if (a.ayahUQNumber == uq) return (i + 1, a.ayahNumber);
+      }
+    }
+    return (1, 1);
+  }
+
+  /// Plays [ayahNum] of [surahNum]. [playSingleAyah] true stops after that
+  /// one ayah (the ayah-options sheet's "Listen"); false continues
+  /// ayah-by-ayah through the rest of the surah (the reader's main play
+  /// controls), with highlighting and page-turning following along.
+  Future<void> playAyah(
+    BuildContext context,
+    int surahNum,
+    int ayahNum, {
+    bool playSingleAyah = false,
+  }) async {
+    final ayah = _ayah(surahNum, ayahNum);
+    if (ayah == null) return;
+    await ql.AudioCtrl.instance.playAyah(
+      context,
+      ayah.ayahUQNumber,
+      playSingleAyah: playSingleAyah,
     );
-    try {
-      final absAyah = _absoluteAyah(surah, ayah);
-      final base = _reciterBaseUrl(state.reciterId);
-      await _player.setUrl('$base$absAyah.mp3');
-      await _player.setSpeed(state.speed);
-      await _player.play();
-      if (requestId != _playRequestId) return; // superseded, drop the result
-      state = state.copyWith(isLoading: false, isPlaying: true);
-    } catch (_) {
-      if (requestId != _playRequestId) return;
-      state = state.copyWith(
-        isLoading: false,
-        isPlaying: false,
-        hasError: true,
-      );
-    }
   }
 
-  Future<void> togglePlay(int surah, int ayah) async {
-    if (state.isPlaying && state.surah == surah && state.ayah == ayah) {
-      _playRequestId++; // invalidate any in-flight playAyah for this ayah
-      await _player.pause();
-      state = state.copyWith(isPlaying: false);
+  /// Toggles whole-surah playback starting at [ayahNum] (the reader's top
+  /// and bottom bar play buttons, which always pass ayah 1 — "play this
+  /// surah"): pauses if that surah is already playing, resumes in place if
+  /// it's already loaded but paused, otherwise starts it fresh.
+  Future<void> togglePlay(BuildContext context, int surahNum, int ayahNum) async {
+    final audioState = ql.AudioCtrl.instance.state;
+    final surahs = ql.QuranLibrary.quranCtrl.surahs;
+    if (surahNum < 1 || surahNum > surahs.length) return;
+    final isThisSurahLoaded = surahs[surahNum - 1].ayahs.any(
+      (a) => a.ayahUQNumber == audioState.currentAyahUniqueNumber.value,
+    );
+    if (isThisSurahLoaded && audioState.audioPlayer.playing) {
+      await audioState.audioPlayer.pause();
+      audioState.isPlaying.value = false;
+    } else if (isThisSurahLoaded) {
+      audioState.isPlaying.value = true;
+      await audioState.audioPlayer.play();
     } else {
-      await playAyah(surah, ayah);
+      await playAyah(context, surahNum, ayahNum, playSingleAyah: false);
     }
   }
 
   Future<void> stop() async {
-    _playRequestId++; // invalidate any in-flight playAyah call
-    await _player.stop();
-    state = state.copyWith(isPlaying: false, isLoading: false);
+    final audioState = ql.AudioCtrl.instance.state;
+    await audioState.stopAllAudio();
   }
 
   Future<void> setSpeed(double s) async {
     state = state.copyWith(speed: s);
-    await _player.setSpeed(s);
-  }
-
-  int _absoluteAyah(int surah, int ayah) {
-    int abs = 0;
-    final surahs = ql.QuranLibrary.quranCtrl.surahsList;
-    for (int i = 0; i < surah - 1 && i < surahs.length; i++) {
-      abs += surahs[i].ayahsNumber;
-    }
-    return abs + ayah;
+    await ql.AudioCtrl.instance.state.audioPlayer.setSpeed(s);
   }
 
   @override
   void dispose() {
-    _playerStateSub?.cancel();
-    _player.dispose();
+    _isPlayingSub?.cancel();
+    _isPreparingSub?.cancel();
+    _currentAyahSub?.cancel();
     super.dispose();
   }
 }

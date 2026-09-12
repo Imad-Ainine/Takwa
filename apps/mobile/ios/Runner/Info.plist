@@ -85,5 +85,14 @@
         <string>نحتاج إلى التعرف على الصوت لحساب الذكر صوتياً</string>
         <key>UIViewControllerBasedStatusBarAppearance</key>
         <false/>
+        <!-- Lets Quran surah/ayah recitation keep playing, and keeps the
+             lock-screen / Control Center media controls (play, pause,
+             AirPods remote) live, while the app is backgrounded. Required
+             by the audio_service package that quran_library's AudioCtrl
+             registers its AudioHandler with. -->
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>audio</string>
+        </array>
     </dict>
 </plist>

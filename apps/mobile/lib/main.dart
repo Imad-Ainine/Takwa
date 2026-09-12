@@ -23,6 +23,7 @@ import 'package:takwa/core/routes/app_routes.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:quran_library/quran_library.dart';
+import 'package:takwa/features/quran/data/muyassar_tafsir_loader.dart';
 
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
@@ -124,6 +125,15 @@ void main() async {
     await QuranLibrary.init();
   } catch (e) {
     debugPrint('QuranLibrary init error: $e');
+  }
+
+  try {
+    // Registers "التفسير الميسر" as a selectable tafsir — quran_library
+    // doesn't bundle it, so this must run after QuranLibrary.init() (which
+    // sets up TafsirCtrl) and before the reader screen can be opened.
+    await MuyassarTafsirLoader.register();
+  } catch (e) {
+    debugPrint('Muyassar tafsir registration error: $e');
   }
 
   runApp(
