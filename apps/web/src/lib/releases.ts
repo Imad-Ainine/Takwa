@@ -136,3 +136,21 @@ export async function getLatestRelease(): Promise<ReleaseInfo> {
     downloadFilename: '',
   };
 }
+
+/**
+ * The iOS install link (TestFlight public link, or an App Store link once
+ * published) — set via the NEXT_PUBLIC_IOS_APP_URL env var in the Vercel
+ * project settings. Unlike the Android APK there's no GitHub Release asset
+ * or checksum to resolve automatically: TestFlight builds are uploaded
+ * straight to App Store Connect by release-testflight.yml (see
+ * docs/ios-testflight-setup.md), and Apple never exposes a public,
+ * machine-readable "latest build" URL the way GitHub Releases does — the
+ * Public Link itself is a fixed URL you copy once from App Store Connect
+ * after enabling it, so an env var is the correct source of truth here.
+ *
+ * Returns an empty string (never a placeholder) until that link exists, so
+ * callers can hide the iOS download UI instead of showing a dead link.
+ */
+export function getIosAppUrl(): string {
+  return process.env.NEXT_PUBLIC_IOS_APP_URL || '';
+}

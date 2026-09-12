@@ -10,6 +10,7 @@ interface HomeProps {
   apkSize?: string;
   sha256?: string;
   sha1?: string;
+  iosUrl?: string;
 }
 
 export default function LandingPage({
@@ -18,6 +19,7 @@ export default function LandingPage({
   apkSize,
   sha256,
   sha1,
+  iosUrl,
 }: HomeProps) {
   return (
     <main id="main-content">
@@ -25,6 +27,7 @@ export default function LandingPage({
         apkUrl={apkUrl}
         apkVersion={apkVersion}
         apkSize={apkSize}
+        iosUrl={iosUrl}
       />
       <FeaturesSection />
       <SpiritualQuoteBanner />
@@ -35,6 +38,7 @@ export default function LandingPage({
         apkSize={apkSize}
         sha256={sha256}
         sha1={sha1}
+        iosUrl={iosUrl}
       />
     </main>
   );
