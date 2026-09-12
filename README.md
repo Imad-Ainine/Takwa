@@ -64,6 +64,15 @@ npm run mobile:bootstrap
 
 ## 🌐 Deployment
 
+### iOS (TestFlight)
+
+Every `v*.*.*` release tag also builds a signed `.ipa` and uploads it to
+TestFlight via [`release-testflight.yml`](.github/workflows/release-testflight.yml)
+— the closest iOS equivalent to downloading the Android APK directly, since
+Apple has no unsigned-install path like Android's "unknown sources". See
+[`docs/ios-testflight-setup.md`](docs/ios-testflight-setup.md) for the
+one-time Apple Developer account & signing setup this requires.
+
 ### Web (Vercel)
 
 The web application is set up for automated deployment via Vercel:

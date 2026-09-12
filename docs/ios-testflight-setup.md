@@ -1,0 +1,144 @@
+# iOS Distribution via TestFlight
+
+This is the one-time setup that turns on `.github/workflows/release-testflight.yml`
+so pushing a `v*.*.*` tag (the same tag that builds the Android APK) also builds
+a signed iOS `.ipa` and uploads it to TestFlight.
+
+## Why this isn't "just build an iOS APK"
+
+Android lets you build an unsigned `.apk`, host it anywhere, and let anyone
+install it directly ("unknown sources"). iOS has no equivalent: every app
+that runs on a real iPhone must be signed by a certificate tied to a paid
+**Apple Developer Program** account, and the installing device has to be
+authorized one of these ways:
+
+| Method | Who can install | Cost / review |
+|---|---|---|
+| **TestFlight** (what this workflow does) | Anyone with an invite, or anyone with the link once you turn on the *Public Link* | $99/yr account; internal testers install instantly, external testers need a quick Apple "Beta App Review" (usually well under 48h) |
+| Ad-hoc `.ipa` | Only iPhones whose UDID was registered in the provisioning profile beforehand (100/yr cap) | $99/yr account, no review, but not usable by the general public |
+| App Store | Anyone | $99/yr account, full App Review (days, can be rejected) |
+
+TestFlight is the closest thing to "download and install like Android," so
+that's what `release-testflight.yml` targets. Builds expire after 90 days —
+you'll want to cut a new release at least that often to keep testers on a
+working build (a normal Takwa release tag already does this).
+
+## One-time setup
+
+### 1. Enroll in the Apple Developer Program
+https://developer.apple.com/programs/ — $99/year, needs an Apple ID.
+Note your **Team ID** (Membership page, or top-right of developer.apple.com
+once enrolled) — that's `APPLE_TEAM_ID` below.
+
+### 2. Register the App ID
+In [Certificates, Identifiers & Profiles → Identifiers](https://developer.apple.com/account/resources/identifiers/list),
+create an App ID with bundle identifier **`com.takwa`** (must match
+`PRODUCT_BUNDLE_IDENTIFIER` in `apps/mobile/ios/Runner.xcodeproj`).
+
+### 3. Create an Apple Distribution certificate
+1. On a Mac, open **Keychain Access → Certificate Assistant → Request a
+   Certificate from a Certificate Authority**, save the `.certSigningRequest`
+   to disk.
+2. In [Certificates, Identifiers & Profiles → Certificates](https://developer.apple.com/account/resources/certificates/list),
+   create an **Apple Distribution** certificate, uploading that CSR.
+3. Download the issued certificate, double-click to install it into
+   Keychain Access, then find it under **My Certificates**, right-click →
+   **Export...** as a `.p12` file. Set an export password — that password
+   is `APPLE_DIST_CERTIFICATE_PASSWORD`.
+4. Base64-encode it for GitHub Secrets:
+   ```bash
+   base64 -i Certificates.p12 | pbcopy   # macOS
+   base64 -w0 Certificates.p12           # Linux
+   ```
+   That output is `APPLE_DIST_CERTIFICATE_BASE64`.
+
+*(No Mac available? A teammate with one can do steps 3–4 and hand you just
+the resulting `.p12` + password — nothing else about this setup needs a Mac.)*
+
+### 4. Create an App Store provisioning profile
+In [Certificates, Identifiers & Profiles → Profiles](https://developer.apple.com/account/resources/profiles/list),
+create a profile of type **App Store Connect** (formerly "App Store"),
+selecting the `com.takwa` App ID and the distribution certificate from
+step 3. Download it, then:
+
+```bash
+base64 -i Takwa_AppStore.mobileprovision | pbcopy   # macOS
+base64 -w0 Takwa_AppStore.mobileprovision           # Linux
+```
+
+That's `APPLE_PROVISIONING_PROFILE_BASE64`. Also note the profile's exact
+**Name** as you typed it when creating it — that's `APPLE_PROVISIONING_PROFILE_NAME`
+(the workflow's `ExportOptions.plist` looks up the profile by this name, not
+its filename).
+
+### 5. Create an App Store Connect API key
+In [App Store Connect → Users and Access → Integrations → App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api),
+create a key with **App Manager** access. Apple lets you download the
+`.p8` private key file **exactly once**, so save it somewhere safe. Note:
+
+- `APP_STORE_CONNECT_API_KEY_ID` — the Key ID shown in the list
+- `APP_STORE_CONNECT_API_ISSUER_ID` — the Issuer ID shown above the key list
+- `APP_STORE_CONNECT_API_KEY_P8` — the **raw contents** of the downloaded
+  `AuthKey_<key_id>.p8` file, pasted as-is (not base64-encoded):
+  ```bash
+  cat AuthKey_XXXXXXXXXX.p8 | pbcopy   # macOS
+  cat AuthKey_XXXXXXXXXX.p8            # Linux — copy the output
+  ```
+
+### 6. Create the app record in App Store Connect
+In [App Store Connect → My Apps → +](https://appstoreconnect.apple.com/apps),
+create a new app with bundle ID `com.takwa`. The workflow can only upload a
+build once this app record exists.
+
+### 7. Add the GitHub repo secrets
+In the repo's **Settings → Secrets and variables → Actions**, add:
+
+| Secret | Value |
+|---|---|
+| `APPLE_TEAM_ID` | from step 1 |
+| `APPLE_DIST_CERTIFICATE_BASE64` | from step 3 |
+| `APPLE_DIST_CERTIFICATE_PASSWORD` | the `.p12` export password from step 3 |
+| `APPLE_PROVISIONING_PROFILE_BASE64` | from step 4 |
+| `APPLE_PROVISIONING_PROFILE_NAME` | the profile's Name from step 4 |
+| `APP_STORE_CONNECT_API_KEY_ID` | from step 5 |
+| `APP_STORE_CONNECT_API_ISSUER_ID` | from step 5 |
+| `APP_STORE_CONNECT_API_KEY_P8` | from step 5 |
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_WEB_CLIENT_ID`, and
+`SUPABASE_IOS_CLIENT_ID` are reused from the existing Android release setup
+— nothing new needed there.
+
+Until all eight Apple secrets above are present, `release-testflight.yml`
+detects that in its `check-secrets` job and **skips the build with a
+warning** instead of failing your release — pushing a normal `v*.*.*` tag
+stays safe to do at any point during this setup.
+
+## Running it
+
+- **Automatic**: push a tag like `v1.0.26` — the same tag `release-apk.yml`
+  already reacts to.
+- **Manual**: Actions tab → *Release iOS to TestFlight* → *Run workflow*.
+
+A successful run uploads the build to App Store Connect; it then takes
+Apple roughly 10–30 minutes to finish processing before it's selectable
+under the app's **TestFlight** tab.
+
+## Getting it to your users
+
+1. **Internal testers** (up to 100 people on your App Store Connect team):
+   add them under TestFlight → Internal Testing — they get access
+   immediately, no Apple review.
+2. **External testers / public link**: create an External Testing group,
+   add the build, and submit for **Beta App Review** (a lighter check than
+   full App Review, typically resolved within a day). Once approved, turn
+   on **Public Link** — anyone with that link can install via the
+   TestFlight app, no invite needed. This is the direct equivalent of the
+   Android APK link on the website.
+
+## Renewals to plan for
+
+- The Distribution certificate expires after 1 year, the provisioning
+  profile can expire sooner — regenerate and update the two `APPLE_*_BASE64`
+  secrets when the workflow starts failing signing with an expiry error.
+- Each TestFlight build itself expires 90 days after upload — cutting a
+  release at least that often keeps existing testers on a working build.
