@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import LandingPage from '@/components/landing/LandingPage';
-import { getLatestRelease } from '@/lib/releases';
+import { getLatestRelease, getIosAppUrl } from '@/lib/releases';
 
 export const revalidate = 60;
 
@@ -13,6 +13,7 @@ export default async function Home() {
   await getTranslations('HomePage'); // preload translations on server
 
   const release = await getLatestRelease();
+  const iosUrl = getIosAppUrl();
 
   return (
     <LandingPage
@@ -21,6 +22,7 @@ export default async function Home() {
       apkSize={release.size}
       sha256={release.sha256}
       sha1={release.sha1}
+      iosUrl={iosUrl}
     />
   );
 }

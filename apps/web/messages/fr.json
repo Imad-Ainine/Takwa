@@ -7,6 +7,7 @@
     "heroBadge": "Excellence Spirituelle • 100% Gratuit & Sans Pub • Confidentialité Totale",
     "heroCtaDownload": "Télécharger l'APK Directement",
     "heroCtaExplore": "Découvrir les Fonctionnalités",
+    "heroIosNote": "Également disponible sur iPhone via TestFlight",
     "heroCtaScan": "Scanner le QR Code",
     "chipPrayer": "5 Adhans Quotidiens par GPS",
     "chipHisab": "Checklist Quotidienne du Hisab",
@@ -126,18 +127,28 @@
     },
     "downloadHub": {
       "tag": "Commencez en Quelques Secondes",
-      "title": "Téléchargez Takwa pour Android",
-      "subtitle": "Accédez directement à la version en avant-première sécurisée sur votre smartphone avant la sortie sur le Google Play Store. Gratuit, sécurisé et respectueux de votre vie privée.",
+      "title": "Téléchargez Takwa",
+      "subtitle": "Accédez directement à notre version en avant-première sécurisée — Android dès maintenant, iOS via TestFlight. Gratuit, sécurisé et respectueux de votre vie privée.",
       "qrTitle": "Scannez avec Votre Appareil Photo",
       "qrSubtitle": "Pointez l'appareil photo de votre mobile pour télécharger directement le fichier APK.",
+      "qrTitleIos": "Scannez avec l'Appareil Photo de Votre iPhone",
+      "qrSubtitleIos": "Pointez l'appareil photo de votre iPhone pour ouvrir le lien d'installation TestFlight.",
       "ctaButton": "Télécharger l'APK (v{version})",
+      "iosCtaButton": "Rejoindre la Bêta iOS (TestFlight)",
       "badgeAndroid": "Android 8.0+ (ARM64 & Universel)",
+      "badgeIos": "iOS 13+ • via TestFlight",
       "badgeSize": "Taille : {size}",
       "shaTitle": "Empreinte SHA-256 Vérifiée",
       "sha1Title": "Empreinte SHA-1 Vérifiée",
       "copied": "Empreinte copiée dans le presse-papier !",
       "copy": "Copier l'Empreinte",
+      "comingSoonBadge": "Bientôt Disponible — Accès Anticipé",
       "securityTrust": "Fichier Vérifié & Certifié • Zéro Logiciel Malveillant • Architecture Transparente",
+      "platformTabs": {
+        "ariaLabel": "Choisissez une plateforme",
+        "android": "Android",
+        "ios": "iOS"
+      },
       "platforms": {
         "android": {
           "name": "Android APK",
@@ -152,6 +163,7 @@
         "ios": {
           "name": "iOS App Store",
           "status": "En Cours de Développement",
+          "statusActive": "Disponible Dès Maintenant (Bêta TestFlight)",
           "active": false
         },
         "web": {
@@ -169,6 +181,21 @@
         "step2": {
           "title": "2. Autoriser la Source",
           "desc": "Dans la fenêtre qui apparaît, appuyez sur Paramètres et activez \"Autoriser cette source\"."
+        },
+        "step3": {
+          "title": "3. Installer et Ouvrir",
+          "desc": "Appuyez sur Installer, lancez Takwa et autorisez la localisation pour régler les heures de prière."
+        }
+      },
+      "installGuideIos": {
+        "title": "Installation Facile en 3 Étapes sur iOS",
+        "step1": {
+          "title": "1. Installer TestFlight",
+          "desc": "Installez l'application gratuite TestFlight depuis l'App Store si ce n'est pas déjà fait."
+        },
+        "step2": {
+          "title": "2. Ouvrir le Lien Bêta",
+          "desc": "Appuyez sur le bouton ci-dessus ou scannez le QR code avec votre iPhone pour ouvrir la bêta Takwa dans TestFlight."
         },
         "step3": {
           "title": "3. Installer et Ouvrir",

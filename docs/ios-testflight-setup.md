@@ -161,6 +161,24 @@ under the app's **TestFlight** tab.
    TestFlight app, no invite needed. This is the direct equivalent of the
    Android APK link on the website.
 
+### Wiring the Public Link into takwa-app.vercel.app
+
+Once you have that Public Link (or, later, an App Store link), set it as
+the `NEXT_PUBLIC_IOS_APP_URL` environment variable on the web app's Vercel
+project (same place `NEXT_PUBLIC_APK_*` already lives) and redeploy. The
+Download section on the site (`apps/web/src/components/landing/DownloadSection.tsx`)
+picks it up automatically:
+
+- An **iOS tab** appears next to Android with its own QR code and a
+  "Join the iOS Beta" button pointing at that link.
+- The **Platform Availability** sidebar flips iOS from "In Active
+  Development" to "Available Now (TestFlight Beta)".
+- The hero section shows a small "Also available on iPhone via TestFlight"
+  note linking down to it.
+
+Until that env var is set, the site keeps showing iOS as "coming soon" —
+nothing breaks or shows a dead link in the meantime.
+
 ## Renewals to plan for
 
 - The Distribution certificate expires after 1 year, the provisioning

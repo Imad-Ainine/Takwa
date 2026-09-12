@@ -8,12 +8,14 @@ interface HeroSectionProps {
   apkVersion?: string;
   apkSize?: string;
   apkUrl?: string;
+  iosUrl?: string;
 }
 
 export default function HeroSection({
   apkVersion = '',
   apkSize = '',
   apkUrl = '#download',
+  iosUrl = '',
 }: HeroSectionProps) {
   const t = useTranslations('HomePage');
   const heroRef = useRef<HTMLDivElement>(null);
@@ -91,6 +93,14 @@ export default function HeroSection({
               </svg>
             </a>
           </div>
+
+          {/* iOS note — only shown once a TestFlight/App Store link exists */}
+          {iosUrl && (
+            <a href="#download" className="hero-ios-note hero-anim-cta">
+              <span aria-hidden="true">🍎</span>
+              <span>{t('heroIosNote')}</span>
+            </a>
+          )}
 
           {/* Value Props Pills */}
           <div className="hero-chips-wrap hero-anim-chips">
