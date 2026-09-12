@@ -11,6 +11,7 @@ import 'package:takwa/core/database/app_database.dart';
 import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/providers/database_providers.dart';
+import 'package:takwa/core/utils/hijri_display.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_error_state.dart';
@@ -120,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     final hijri = HijriCalendar.now();
     final hijriStr =
-        '${hijri.hDay} ${_hMonth(context, hijri.hMonth)} ${hijri.hYear}';
+        '${hijri.hDay} ${hijriMonthName(AppLocalizations.of(context)!, hijri.hMonth)} ${hijri.hYear}';
     final languageCode = Localizations.localeOf(context).languageCode;
     final miladi = DateFormat(
       languageCode == 'ar' ? 'EEEE، d MMMM yyyy' : 'EEEE, d MMMM yyyy',
@@ -299,24 +300,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ],
       ),
     );
-  }
-
-  static String _hMonth(BuildContext context, int m) {
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      l10n.hijriMuharram,
-      l10n.hijriSafar,
-      l10n.hijriRabiAlAwwal,
-      l10n.hijriRabiAlThani,
-      l10n.hijriJumadaAlAwwal,
-      l10n.hijriJumadaAlThani,
-      l10n.hijriRajab,
-      l10n.hijriShaban,
-      l10n.hijriRamadan,
-      l10n.hijriShawwal,
-      l10n.hijriDhulQadah,
-      l10n.hijriDhulHijjah,
-    ][m - 1];
   }
 }
 
