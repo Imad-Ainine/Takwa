@@ -59,7 +59,10 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <View
+        <!-- FrameLayout, not a bare <View> — see prayer_widget.xml's own
+             comment on this: <View> isn't in RemoteViews' supported view
+             class whitelist. -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"

@@ -74,7 +74,13 @@
                 android:maxLines="1" />
         </LinearLayout>
 
-        <View
+        <!-- A bare <View> is not one of the view classes RemoteViews
+             supports inflating remotely (only FrameLayout/LinearLayout/
+             RelativeLayout/GridLayout and specific widgets like TextView
+             are) — using one here made this widget fail to bind at all
+             ("Couldn't add widget"). FrameLayout is supported and gives
+             the identical 1dp divider line. -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="8dp"
