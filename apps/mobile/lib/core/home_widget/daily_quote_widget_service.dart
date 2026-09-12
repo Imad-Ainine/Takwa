@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:home_widget/home_widget.dart';
 
-import '../providers/adhkar_providers.dart' show kAdhkarData, DhikrItem;
-import '../../features/duas/data/duas_data.dart' show kDuasData, DuaItem;
+import '../providers/adhkar_providers.dart' show kAdhkarData;
+import '../../features/duas/data/duas_data.dart' show kDuasData;
 
 /// Keeps the "Dua of the Day" and "Dhikr of the Day" home-screen widgets in
 /// sync — same idea as `PrayerHomeWidgetService`, just for content that
