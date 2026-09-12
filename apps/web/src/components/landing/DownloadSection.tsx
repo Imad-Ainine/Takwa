@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/routing';
 
 type PlatformKey = 'android' | 'ios';
 
@@ -136,6 +137,13 @@ export default function DownloadSection({
   // Scanning the QR always lands somewhere useful, even pre-launch: the
   // platform's real link once it exists, otherwise the download page itself.
   const qrUrl = downloadUrl !== '#' ? downloadUrl : 'https://takwa-app.com/#download';
+  // The native iOS app needs TestFlight (blocked on Apple Developer Program
+  // signing — see docs/ios-testflight-setup.md). Until that link exists,
+  // don't leave iPhone visitors with a dead "coming soon" button: point
+  // them at the Web Companion instead, which already runs today and syncs
+  // through the same Supabase backend the mobile app uses, and can be
+  // added to the iPhone Home Screen for an app-like shortcut.
+  const showIosInterim = !isAndroid && !isAvailable;
 
   return (
     <section ref={sectionRef} className="section download-section" id="download">
@@ -187,10 +195,14 @@ export default function DownloadSection({
                 <QRCodeDisplay
                   key={qrUrl}
                   url={qrUrl}
-                  alt={isAndroid ? 'Scan to download the Takwa APK' : 'Scan to open the Takwa iOS install link'}
+                  alt={isAndroid ? 'Scan to download the Takwa APK' : showIosInterim ? 'Scan to open the Takwa website' : 'Scan to open the Takwa iOS install link'}
                 />
-                <p className="qr-hint">{isAndroid ? t('downloadHub.qrTitle') : t('downloadHub.qrTitleIos')}</p>
-                <p className="qr-subhint">{isAndroid ? t('downloadHub.qrSubtitle') : t('downloadHub.qrSubtitleIos')}</p>
+                <p className="qr-hint">
+                  {isAndroid ? t('downloadHub.qrTitle') : showIosInterim ? t('downloadHub.qrTitleIosInterim') : t('downloadHub.qrTitleIos')}
+                </p>
+                <p className="qr-subhint">
+                  {isAndroid ? t('downloadHub.qrSubtitle') : showIosInterim ? t('downloadHub.qrSubtitleIosInterim') : t('downloadHub.qrSubtitleIos')}
+                </p>
               </div>
 
               {/* Meta Information */}
@@ -198,7 +210,9 @@ export default function DownloadSection({
                 <div className="dl-platform-badge">
                   <span className="platform-logo" aria-hidden="true">{isAndroid ? '🤖' : '🍎'}</span>
                   <div>
-                    <span className="platform-badge-name">{isAndroid ? t('downloadHub.badgeAndroid') : t('downloadHub.badgeIos')}</span>
+                    <span className="platform-badge-name">
+                      {isAndroid ? t('downloadHub.badgeAndroid') : showIosInterim ? t('downloadHub.badgeIosInterim') : t('downloadHub.badgeIos')}
+                    </span>
                     {isAndroid && apkSize && (
                       <span className="platform-badge-size">
                         {t('downloadHub.badgeSize', { size: apkSize })}
@@ -208,7 +222,18 @@ export default function DownloadSection({
                 </div>
 
                 {/* Primary Download / Install Button */}
-                {isAvailable ? (
+                {showIosInterim ? (
+                  <>
+                    <Link href="/login" className="btn-primary dl-btn" id="main-ios-interim-btn">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
+                      </svg>
+                      {t('downloadHub.iosInterimCtaButton')}
+                    </Link>
+                    <p className="ios-interim-note">{t('downloadHub.iosInterimNote')}</p>
+                  </>
+                ) : isAvailable ? (
                   isAndroid ? (
                     <a
                       href={downloadUrl}
@@ -306,7 +331,7 @@ export default function DownloadSection({
             {/* Install Guide Steps */}
             <div className="install-guide">
               <h3 className="guide-title">
-                {isAndroid ? t('downloadHub.installGuide.title') : t('downloadHub.installGuideIos.title')}
+                {t(`downloadHub.${isAndroid ? 'installGuide' : showIosInterim ? 'installGuideIosInterim' : 'installGuideIos'}.title`)}
               </h3>
               <div className="guide-steps">
                 {(['step1', 'step2', 'step3'] as const).map((step, i) => (
@@ -314,10 +339,10 @@ export default function DownloadSection({
                     <div className="step-number">{i + 1}</div>
                     <div>
                       <strong className="step-title">
-                        {t(`downloadHub.${isAndroid ? 'installGuide' : 'installGuideIos'}.${step}.title`)}
+                        {t(`downloadHub.${isAndroid ? 'installGuide' : showIosInterim ? 'installGuideIosInterim' : 'installGuideIos'}.${step}.title`)}
                       </strong>
                       <p className="step-desc">
-                        {t(`downloadHub.${isAndroid ? 'installGuide' : 'installGuideIos'}.${step}.desc`)}
+                        {t(`downloadHub.${isAndroid ? 'installGuide' : showIosInterim ? 'installGuideIosInterim' : 'installGuideIos'}.${step}.desc`)}
                       </p>
                     </div>
                   </div>

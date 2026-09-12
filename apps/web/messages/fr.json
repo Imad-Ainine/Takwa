@@ -133,10 +133,15 @@
       "qrSubtitle": "Pointez l'appareil photo de votre mobile pour télécharger directement le fichier APK.",
       "qrTitleIos": "Scannez avec l'Appareil Photo de Votre iPhone",
       "qrSubtitleIos": "Pointez l'appareil photo de votre iPhone pour ouvrir le lien d'installation TestFlight.",
+      "qrTitleIosInterim": "Scannez pour Ouvrir sur iPhone",
+      "qrSubtitleIosInterim": "Ouvrez l'appareil photo de votre iPhone pour lancer le Compagnon Web dans Safari.",
       "ctaButton": "Télécharger l'APK (v{version})",
       "iosCtaButton": "Rejoindre la Bêta iOS (TestFlight)",
+      "iosInterimCtaButton": "Ouvrir le Compagnon Web",
+      "iosInterimNote": "L'application iOS native termine sa configuration TestFlight — connectez-vous dès maintenant au Compagnon Web, ou ajoutez-le à votre écran d'accueil pour un raccourci façon application.",
       "badgeAndroid": "Android 8.0+ (ARM64 & Universel)",
       "badgeIos": "iOS 13+ • via TestFlight",
+      "badgeIosInterim": "iOS 13+ • Compagnon Web disponible maintenant",
       "badgeSize": "Taille : {size}",
       "shaTitle": "Empreinte SHA-256 Vérifiée",
       "sha1Title": "Empreinte SHA-1 Vérifiée",
@@ -200,6 +205,21 @@
         "step3": {
           "title": "3. Installer et Ouvrir",
           "desc": "Appuyez sur Installer, lancez Takwa et autorisez la localisation pour régler les heures de prière."
+        }
+      },
+      "installGuideIosInterim": {
+        "title": "Utilisez Takwa sur iPhone Dès Aujourd'hui",
+        "step1": {
+          "title": "1. Ouvrir le Compagnon Web",
+          "desc": "Appuyez sur le bouton ci-dessus ou scannez le QR code pour vous connecter avec votre compte Takwa dans Safari."
+        },
+        "step2": {
+          "title": "2. Appuyez sur Partager puis Sur l'Écran d'Accueil",
+          "desc": "Dans le menu Partager de Safari, choisissez \"Sur l'écran d'accueil\" pour l'installer comme une application."
+        },
+        "step3": {
+          "title": "3. Lancez-le Comme une Application",
+          "desc": "Ouvrez Takwa depuis votre écran d'accueil à tout moment — l'application iOS native arrive bientôt via TestFlight."
         }
       },
       "sideTitle": "Disponibilité des Plateformes",

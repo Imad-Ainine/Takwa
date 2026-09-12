@@ -77,6 +77,17 @@ export async function generateMetadata({
 			shortcut: '/logo.png',
 			apple: '/apple-touch-icon.png',
 		},
+		// iOS has no unsigned "sideload" install path (see
+		// docs/ios-testflight-setup.md), so until the native app is on
+		// TestFlight, iPhone visitors are pointed at the Web Companion
+		// (DownloadSection's iOS tab). This is what makes "Add to Home
+		// Screen" in Safari launch it full-screen, without browser chrome,
+		// instead of just bookmarking the page.
+		appleWebApp: {
+			capable: true,
+			statusBarStyle: 'black-translucent',
+			title: 'Takwa',
+		},
 	};
 }
 

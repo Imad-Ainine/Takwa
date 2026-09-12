@@ -103,10 +103,15 @@
       "qrSubtitle": "Open your phone camera to download the APK directly to your device.",
       "qrTitleIos": "Scan with Your iPhone Camera",
       "qrSubtitleIos": "Open your iPhone camera to open the TestFlight install link.",
+      "qrTitleIosInterim": "Scan to Open on iPhone",
+      "qrSubtitleIosInterim": "Open your iPhone camera to launch the Web Companion in Safari.",
       "ctaButton": "Download APK (v{version})",
       "iosCtaButton": "Join the iOS Beta (TestFlight)",
+      "iosInterimCtaButton": "Open Web Companion",
+      "iosInterimNote": "The native iOS app is finishing TestFlight setup — sign in to the Web Companion now, or add it to your Home Screen for an app-like shortcut.",
       "badgeAndroid": "Android 8.0+ (ARM64 & Universal)",
       "badgeIos": "iOS 13+ • via TestFlight",
+      "badgeIosInterim": "iOS 13+ • Web Companion available now",
       "badgeSize": "Size: {size}",
       "shaTitle": "Verified SHA-256 Checksum",
       "sha1Title": "Verified SHA-1 Checksum",
@@ -136,6 +141,12 @@
         "step1": { "title": "1. Get TestFlight", "desc": "Install Apple's free TestFlight app from the App Store, if you don't have it yet." },
         "step2": { "title": "2. Open the Beta Link", "desc": "Tap the button above or scan the QR code with your iPhone to open the Takwa beta in TestFlight." },
         "step3": { "title": "3. Install and Begin", "desc": "Tap Install, open Takwa, and set your location for accurate prayer times." }
+      },
+      "installGuideIosInterim": {
+        "title": "Use Takwa on iPhone Today",
+        "step1": { "title": "1. Open the Web Companion", "desc": "Tap the button above or scan the QR code to sign in with your Takwa account in Safari." },
+        "step2": { "title": "2. Tap Share, Then Add to Home Screen", "desc": "In Safari's Share menu, choose \"Add to Home Screen\" to install it like an app." },
+        "step3": { "title": "3. Launch It Like an App", "desc": "Open Takwa from your Home Screen anytime — the native iOS app is on its way via TestFlight." }
       },
       "sideTitle": "Platform Availability",
       "privacyTitle": "Zero Ads & Zero Tracking",
