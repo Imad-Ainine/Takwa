@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../notifications/notifications_service.dart';
 import '../utils/hijri_display.dart';
 import '../utils/prayer_display.dart';
+import 'home_widget_ids.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 /// Keeps the home-screen prayer-times widget (Android `PrayerWidgetProvider`
@@ -29,10 +30,9 @@ class PrayerHomeWidgetService {
   /// (see ios/PrayerWidget/PrayerWidget.swift).
   static const iOSWidgetName = 'PrayerWidget';
 
-  /// Shared storage container the iOS app target and the widget extension
-  /// both read/write. Must match the App Group added to *both* targets'
-  /// entitlements in Xcode — see ios/PrayerWidget/SETUP.md.
-  static const iOSAppGroupId = 'group.com.takwa.PrayerWidget';
+  /// Shared storage container the iOS app target and every widget
+  /// extension both read/write. See [HomeWidgetIds.iOSAppGroupId].
+  static const iOSAppGroupId = HomeWidgetIds.iOSAppGroupId;
 
   static const _dataKey = 'prayer_widget_data';
 

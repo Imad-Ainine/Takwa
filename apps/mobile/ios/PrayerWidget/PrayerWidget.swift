@@ -111,55 +111,48 @@ private struct PrayerProvider: TimelineProvider {
 
 // MARK: - View
 
-private let backgroundGradient = LinearGradient(
-    colors: [
-        Color(red: 0.12, green: 0.30, blue: 0.22),
-        Color(red: 0.06, green: 0.18, blue: 0.13),
-    ],
-    startPoint: .topLeading,
-    endPoint: .bottomTrailing
-)
-private let highlightColor = Color(red: 0.95, green: 0.77, blue: 0.45)
-
 private struct PrayerWidgetEntryView: View {
     let entry: PrayerEntry
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        let theme = TakwaWidgetTheme.resolve(colorScheme)
         Group {
             if let data = entry.data {
-                PrayerContentView(data: data)
+                PrayerContentView(data: data, theme: theme)
                     .environment(\.layoutDirection, data.isRtl ? .rightToLeft : .leftToRight)
             } else {
                 Text("افتح تطبيق تقوى لعرض أوقات الصلاة")
                     .font(.caption)
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
                     .multilineTextAlignment(.center)
                     .padding()
             }
         }
-        .containerBackground(for: .widget) { backgroundGradient }
+        .containerBackground(for: .widget) { theme.backgroundGradient }
     }
 }
 
 private struct PrayerContentView: View {
     let data: PrayerWidgetData
+    let theme: TakwaWidgetTheme
 
     var body: some View {
         VStack(spacing: 8) {
             HStack {
                 Text(data.hijri)
                     .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(theme.textSecondary)
                 Spacer()
                 Text(data.weekday)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
+                    .foregroundColor(theme.textPrimary)
                 Spacer()
                 Text(data.gregorian)
                     .font(.system(size: 11))
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(theme.textSecondary)
             }
-            Divider().overlay(Color.white.opacity(0.2))
+            Divider().overlay(theme.divider)
             HStack(spacing: 0) {
                 ForEach(data.prayers, id: \.key) { prayer in
                     let isNext = prayer.key == data.nextKey
@@ -168,7 +161,7 @@ private struct PrayerContentView: View {
                         Text(prayer.time).font(.system(size: 13, weight: .bold))
                     }
                     .frame(maxWidth: .infinity)
-                    .foregroundColor(isNext ? highlightColor : .white)
+                    .foregroundColor(isNext ? theme.gold : theme.textPrimary)
                 }
             }
         }
@@ -193,9 +186,6 @@ struct PrayerWidget: Widget {
     }
 }
 
-@main
-struct PrayerWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        PrayerWidget()
-    }
-}
+// `@main` for the whole extension lives in TakwaWidgetsBundle.swift, which
+// lists this widget alongside DuaOfDayWidget/DhikrOfDayWidget — a WidgetKit
+// extension has exactly one entry point for every Widget it hosts.
