@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -488,7 +489,7 @@ class AdhkarNotificationService {
     }
 
     final dhikr = _randomDhikr(AdhkarCategory.sleep);
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       _sleepId,
       '🌙 ${l10n.notifAdhkarSleepTitle}',
       dhikr.arabic
@@ -536,7 +537,7 @@ class AdhkarNotificationService {
 
     final dhikr = _randomDhikr(AdhkarCategory.morning);
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       _morningId,
       '🌅 ${l10n.notifAdhkarMorningTitle}',
       dhikr.arabic
@@ -590,7 +591,7 @@ class AdhkarNotificationService {
 
     final dhikr = _randomDhikr(AdhkarCategory.evening);
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       _eveningId,
       '🌆 ${l10n.notifAdhkarEveningTitle}',
       dhikr.arabic
@@ -648,7 +649,7 @@ class AdhkarNotificationService {
         ? '${arabic.substring(0, 100)}...'
         : arabic;
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       _dhikrId,
       '📿 ذكر اليوم',
       preview,
@@ -727,6 +728,54 @@ class AdhkarNotificationService {
   }
 
   static Future<void> _cancelId(int id) => _plugin.cancel(id);
+
+  static Future<void> _safeZonedSchedule(
+    int id,
+    String? title,
+    String? body,
+    tz.TZDateTime scheduledDate,
+    NotificationDetails notificationDetails, {
+    required AndroidScheduleMode androidScheduleMode,
+    required UILocalNotificationDateInterpretation
+        uiLocalNotificationDateInterpretation,
+    DateTimeComponents? matchDateTimeComponents,
+    String? payload,
+  }) async {
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: androidScheduleMode,
+        uiLocalNotificationDateInterpretation:
+            uiLocalNotificationDateInterpretation,
+        matchDateTimeComponents: matchDateTimeComponents,
+        payload: payload,
+      );
+    } on PlatformException catch (e) {
+      if (e.code == 'exact_alarms_not_permitted' ||
+          (e.message?.contains('exact_alarms_not_permitted') ?? false)) {
+        try {
+          await _plugin.zonedSchedule(
+            id,
+            title,
+            body,
+            scheduledDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                uiLocalNotificationDateInterpretation,
+            matchDateTimeComponents: matchDateTimeComponents,
+            payload: payload,
+          );
+        } catch (_) {}
+      }
+    } catch (e) {
+      debugPrint('[AdhkarNotificationService] _safeZonedSchedule error: $e');
+    }
+  }
 
   static NotificationDetails _buildDetails({
     required String channelId,

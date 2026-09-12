@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -460,7 +461,7 @@ class NotificationsService {
     final eveningMessages = _eveningMessages(l10n);
     final msg = eveningMessages[now.weekday % eveningMessages.length];
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       NotifIds.eveningMuhasaba,
       '📝 ${l10n.notifMuhasabaTitle}',
       msg,
@@ -804,6 +805,69 @@ class NotificationsService {
 
   // ─────────────────── PRIVATE ───────────────────
 
+  /// جدولة آمنة تدعم التراجع التلقائي إلى inexactAllowWhileIdle في حال عدم توفر
+  /// إذن التنبيه الدقيق (SCHEDULE_EXACT_ALARM) على أندرويد 12+، وتمنع انهيار التطبيق.
+  static Future<void> _safeZonedSchedule(
+    int id,
+    String? title,
+    String? body,
+    tz.TZDateTime scheduledDate,
+    NotificationDetails notificationDetails, {
+    required AndroidScheduleMode androidScheduleMode,
+    required UILocalNotificationDateInterpretation
+        uiLocalNotificationDateInterpretation,
+    DateTimeComponents? matchDateTimeComponents,
+    String? payload,
+  }) async {
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: androidScheduleMode,
+        uiLocalNotificationDateInterpretation:
+            uiLocalNotificationDateInterpretation,
+        matchDateTimeComponents: matchDateTimeComponents,
+        payload: payload,
+      );
+    } on PlatformException catch (e) {
+      if (e.code == 'exact_alarms_not_permitted' ||
+          (e.message?.contains('exact_alarms_not_permitted') ?? false)) {
+        debugPrint(
+          '[NotificationsService] exact alarms not permitted, falling back to inexact for id $id',
+        );
+        try {
+          await _plugin.zonedSchedule(
+            id,
+            title,
+            body,
+            scheduledDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                uiLocalNotificationDateInterpretation,
+            matchDateTimeComponents: matchDateTimeComponents,
+            payload: payload,
+          );
+        } catch (fallbackErr) {
+          debugPrint(
+            '[NotificationsService] fallback scheduling failed for id $id: $fallbackErr',
+          );
+        }
+      } else {
+        debugPrint(
+          '[NotificationsService] PlatformException scheduling id $id: $e',
+        );
+      }
+    } catch (e, st) {
+      debugPrint(
+        '[NotificationsService] failed to schedule notification id $id: $e\n$st',
+      );
+    }
+  }
+
   static Future<void> _scheduleExact({
     required int id,
     required String title,
@@ -821,7 +885,7 @@ class NotificationsService {
     final isVibrateOnly = channelId == NotifChannels.prayerVibrate.id;
     final shouldPlaySound = !isSilent && !isVibrateOnly;
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       id,
       title,
       body,
@@ -883,7 +947,7 @@ class NotificationsService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       id,
       title,
       body,
@@ -947,7 +1011,7 @@ class NotificationsService {
       date = date.add(const Duration(days: 1));
     }
 
-    await _plugin.zonedSchedule(
+    await _safeZonedSchedule(
       id,
       title,
       body,

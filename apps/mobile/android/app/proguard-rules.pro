@@ -35,4 +35,9 @@
 -keep class com.baseflow.geolocator.** { *; }
 -keep class com.baseflow.geocoding.** { *; }
 -keep class com.google.android.gms.location.** { *; }
+-keep class com.google.android.gms.tasks.** { *; }
 -dontwarn com.baseflow.**
+
+# Flutter Local Notifications
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+

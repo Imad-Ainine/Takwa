@@ -147,17 +147,22 @@ class LocationPrayerManager {
 
     if (showFeedbackSnackBar) {
       if (result == LocationResult.cachedLocation) {
-        // GPS فشل لكن الإحداثيات المخزّنة تعمل — نُظهر تنبيهاً محايداً بدلاً من خطأ
+        // GPS لم يجد إشارة جديدة لكن الإحداثيات المخزّنة تعمل بدقة — نُظهر نجاح استخدام الموقع المحفوظ
+        final settings = ref.read(settingsDaoProvider);
+        final city = await settings.get('cityName');
+        if (!context.mounted) return result;
+        final cachedMsg = (city != null && city.isNotEmpty)
+            ? (isArabic
+                ? 'تم استخدام الموقع المحفوظ: $city'
+                : 'Using saved location: $city')
+            : l10n.locationResultCachedLocation;
+
         _showLocationSnackBar(
           context,
-          message: l10n.locationResultCachedLocation,
-          isSuccess: false,
-          actionLabel: isArabic ? 'إعادة المحاولة' : 'Retry',
-          onAction: () => requestAndUpdateLocation(
-            context,
-            ref,
-            showFeedbackSnackBar: showFeedbackSnackBar,
-          ),
+          message: cachedMsg,
+          isSuccess: true,
+          actionLabel: isArabic ? 'اختيار يدوي' : 'Choose manually',
+          onAction: () => LocationPickerSheet.show(context),
         );
       } else if (result.isSuccess) {
         HapticFeedback.lightImpact();
@@ -581,8 +586,12 @@ class LocationPrayerManager {
       // إعادة تقييم موفر أوقات الصلاة فوراً لتحديث الواجهات
       ref.invalidate(prayerTimesProvider);
 
-      // جدولة الإشعارات بالموقع الجديد
-      await _scheduleForLocation(ref, lat, lng);
+      // جدولة الإشعارات بالموقع الجديد (فشل الجدولة لا يجب أن يُفشل نجاح تحديد الموقع)
+      try {
+        await _scheduleForLocation(ref, lat, lng);
+      } catch (e) {
+        debugPrint('[LocationPrayerManager] notification scheduling failed: $e');
+      }
 
       return LocationResult.success;
     } on LocationServiceDisabledException catch (e) {
@@ -603,6 +612,33 @@ class LocationPrayerManager {
     }
   }
 
+  /// تعيين الموقع يدوياً لمدينة محددة وتحديث أوقات الصلاة والإشعارات
+  static Future<void> setManualLocation(
+    dynamic ref, {
+    required double latitude,
+    required double longitude,
+    required String timezone,
+    required String cityName,
+  }) async {
+    final settings = ref.read(settingsDaoProvider);
+    await settings.set('latitude', latitude.toString());
+    await settings.set('longitude', longitude.toString());
+    await settings.set('timezone', timezone);
+    await settings.set('cityName', cityName);
+    await settings.set(
+      'lastLocationUpdate',
+      DateTime.now().toIso8601String(),
+    );
+
+    TimezoneResolver.setLocalTimezone(timezone);
+    ref.invalidate(prayerTimesProvider);
+    try {
+      await _scheduleForLocation(ref, latitude, longitude);
+    } catch (e) {
+      debugPrint('[LocationPrayerManager] setManualLocation schedule failed: $e');
+    }
+  }
+
   /// محاولة استخدام الإحداثيات المحفوظة مسبقاً لحساب أوقات الصلاة في حال تعذر GPS
   static Future<LocationResult?> _fallbackToCachedCoordinates(
     dynamic ref,
@@ -620,7 +656,11 @@ class LocationPrayerManager {
             TimezoneResolver.setLocalTimezone(cachedTz);
           }
           ref.invalidate(prayerTimesProvider);
-          await _scheduleForLocation(ref, lat, lng);
+          try {
+            await _scheduleForLocation(ref, lat, lng);
+          } catch (e) {
+            debugPrint('[LocationPrayerManager] _scheduleForLocation in fallback failed: $e');
+          }
           return LocationResult.cachedLocation;
         }
       }
@@ -639,32 +679,36 @@ class LocationPrayerManager {
     double lat,
     double lng,
   ) async {
-    final prefs = await ref.read(userPreferencesProvider.future);
+    try {
+      final prefs = await ref.read(userPreferencesProvider.future);
 
-    if (!prefs.prayerReminder) return;
+      if (!prefs.prayerReminder) return;
 
-    // حساب الأوقات بالـ timezone الصحيح والمعاملات الكاملة الموحدة
-    final prayers = await PrayerTimesService.calculate(
-      latitude: lat,
-      longitude: lng,
-      madhab: prefs.madhab,
-      method: prefs.calcMethod,
-      highLatitudeRule: prefs.highLatitudeRule,
-      fajrOffset: prefs.fajrOffset,
-      sunriseOffset: prefs.sunriseOffset,
-      dhuhrOffset: prefs.dhuhrOffset,
-      asrOffset: prefs.asrOffset,
-      maghribOffset: prefs.maghribOffset,
-      ishaOffset: prefs.ishaOffset,
-    );
+      // حساب الأوقات بالـ timezone الصحيح والمعاملات الكاملة الموحدة
+      final prayers = await PrayerTimesService.calculate(
+        latitude: lat,
+        longitude: lng,
+        madhab: prefs.madhab,
+        method: prefs.calcMethod,
+        highLatitudeRule: prefs.highLatitudeRule,
+        fajrOffset: prefs.fajrOffset,
+        sunriseOffset: prefs.sunriseOffset,
+        dhuhrOffset: prefs.dhuhrOffset,
+        asrOffset: prefs.asrOffset,
+        maghribOffset: prefs.maghribOffset,
+        ishaOffset: prefs.ishaOffset,
+      );
 
-    await NotificationsService.schedulePrayerNotifications(
-      prayers: prayers,
-      l10n: lookupAppLocalizations(ref.read(localeProvider)),
-      preAdhanEnabled: prefs.preAdhanNotif,
-      iqamaEnabled: prefs.iqamaNotif,
-      adhanMode: prefs.adhanMode,
-    );
+      await NotificationsService.schedulePrayerNotifications(
+        prayers: prayers,
+        l10n: lookupAppLocalizations(ref.read(localeProvider)),
+        preAdhanEnabled: prefs.preAdhanNotif,
+        iqamaEnabled: prefs.iqamaNotif,
+        adhanMode: prefs.adhanMode,
+      );
+    } catch (e, st) {
+      debugPrint('[LocationPrayerManager] _scheduleForLocation failed: $e\n$st');
+    }
   }
 
   /// إعادة الجدولة عند منتصف الليل (لليوم الجديد)

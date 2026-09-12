@@ -2,27 +2,142 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
-import 'package:takwa/core/utils/timezone_resolver.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/providers/database_providers.dart';
 import '../../../../core/notifications/location_prayer_update.dart';
 import 'package:takwa/l10n/app_localizations.dart';
+
+sealed class LocationPickerSelection {
+  const LocationPickerSelection();
+}
+
+class AutoDetectLocationSelection extends LocationPickerSelection {
+  const AutoDetectLocationSelection();
+}
+
+class ManualCityLocationSelection extends LocationPickerSelection {
+  final Map<String, dynamic> cityData;
+  const ManualCityLocationSelection(this.cityData);
+}
 
 class LocationPickerSheet extends ConsumerStatefulWidget {
   const LocationPickerSheet({super.key});
 
   /// Helper to show this bottom sheet
-  static Future<void> show(BuildContext context) {
-    return showModalBottomSheet(
+  static Future<void> show(BuildContext context) async {
+    final selection = await showModalBottomSheet<LocationPickerSelection>(
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const LocationPickerSheet(),
     );
+
+    if (!context.mounted || selection == null) return;
+
+    final ref = ProviderScope.containerOf(context, listen: false);
+
+    switch (selection) {
+      case AutoDetectLocationSelection():
+        final l10n = AppLocalizations.of(context);
+        final isArabic =
+            Localizations.maybeLocaleOf(context)?.languageCode == 'ar';
+
+        // Show immediate floating progress indicator on host screen
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.removeCurrentSnackBar();
+        messenger.showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: TakwaLoadingIndicator(
+                    size: 18,
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n?.overlayServiceUpdatingLocation ??
+                        (isArabic
+                            ? '🔄 جاري تحديث الموقع...'
+                            : '🔄 Updating location...'),
+                    style: const TextStyle(
+                      fontFamily: 'NotoNaskhArabic',
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: context.colors.card,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+              side: BorderSide(color: context.colors.border),
+            ),
+            duration: const Duration(seconds: 10),
+          ),
+        );
+
+        // Update location and display success message
+        await LocationPrayerManager.requestAndUpdateLocation(
+          context,
+          ref,
+          showFeedbackSnackBar: true,
+        );
+        break;
+
+      case ManualCityLocationSelection(:final cityData):
+        final isArabic =
+            Localizations.maybeLocaleOf(context)?.languageCode == 'ar';
+        final localizedName = isArabic
+            ? cityData['name'] as String
+            : cityData['nameEn'] as String;
+
+        await LocationPrayerManager.setManualLocation(
+          ref,
+          latitude: (cityData['lat'] as num).toDouble(),
+          longitude: (cityData['lng'] as num).toDouble(),
+          timezone: cityData['tz'] as String,
+          cityName: localizedName,
+        );
+
+        if (context.mounted) {
+          final l10n = AppLocalizations.of(context);
+          final successText = l10n?.locationPickerLocationSetTo(localizedName) ??
+              (isArabic
+                  ? 'تم تحيين الموقع إلى $localizedName ✓'
+                  : 'Location set to $localizedName ✓');
+
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.removeCurrentSnackBar();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                successText,
+                style: const TextStyle(
+                  fontFamily: 'NotoNaskhArabic',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: context.colors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        break;
+    }
   }
 
   @override
@@ -31,8 +146,6 @@ class LocationPickerSheet extends ConsumerStatefulWidget {
 }
 
 class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
-  bool _isLoading = false;
-
   // List of professional curated cities with pre-defined coordinates and timezones
   // Used as a fallback and an easy-mode for users who don't want to use GPS.
   // 'name'/'country' are Arabic; 'nameEn'/'countryEn' are the matching
@@ -131,106 +244,14 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
     },
   ];
 
-  Future<void> _autoDetectLocation() async {
-    setState(() => _isLoading = true);
-    final result = await LocationPrayerManager.requestAndUpdateLocation(
-      context,
-      ref,
-      showFeedbackSnackBar: false,
-    );
-    setState(() => _isLoading = false);
-
-    if (!mounted) return;
-
-    if (result.isSuccess) {
-      Navigator.pop(context);
-    }
-
-    _showResultSnackBar(result);
-  }
-
-  Future<void> _selectManualLocation(Map<String, dynamic> cityData) async {
+  void _autoDetectLocation() {
     HapticFeedback.selectionClick();
-
-    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    final localizedName = isArabic
-        ? cityData['name'] as String
-        : cityData['nameEn'] as String;
-
-    final s = ref.read(settingsDaoProvider);
-    await s.set('latitude', cityData['lat'].toString());
-    await s.set('longitude', cityData['lng'].toString());
-    await s.set('timezone', cityData['tz'].toString());
-    await s.set('cityName', localizedName);
-
-    // Set Timezone
-    TimezoneResolver.setLocalTimezone(cityData['tz'] as String);
-
-    // We can't elegantly call private `_scheduleForLocation` directly,
-    // but initializing works, or we can just rely on state notifications.
-    // For now we will trigger a fake 'refreshLocation' or call schedule functions if public
-    // Since LocationPrayerManager doesn't expose manual schedule, we just save and rely on the UI/providers refreshing it.
-
-    if (!mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    Navigator.pop(context);
-    _showSnackBar(l10n.locationPickerLocationSetTo(localizedName), true);
+    Navigator.pop(context, const AutoDetectLocationSelection());
   }
 
-  void _showResultSnackBar(LocationResult result) {
-    final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          result.message(l10n),
-          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
-        ),
-        action:
-            result == LocationResult.serviceDisabled ||
-                result == LocationResult.permissionDeniedForever
-            ? SnackBarAction(
-                label: l10n.locationEnableAction,
-                textColor: Colors.white,
-                onPressed: () {
-                  if (result == LocationResult.serviceDisabled) {
-                    Geolocator.openLocationSettings();
-                  } else {
-                    Geolocator.openAppSettings();
-                  }
-                },
-              )
-            : null,
-        backgroundColor: result.isSuccess
-            ? context.colors.success
-            : context.colors.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: Duration(
-          seconds:
-              result == LocationResult.serviceDisabled ||
-                  result == LocationResult.permissionDeniedForever
-              ? 5
-              : 3,
-        ),
-      ),
-    );
-  }
-
-  void _showSnackBar(String message, bool isSuccess) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(fontFamily: 'NotoNaskhArabic', fontSize: 13),
-        ),
-        backgroundColor: isSuccess
-            ? context.colors.success
-            : context.colors.danger,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+  void _selectManualLocation(Map<String, dynamic> cityData) {
+    HapticFeedback.selectionClick();
+    Navigator.pop(context, ManualCityLocationSelection(cityData));
   }
 
   @override
@@ -359,7 +380,7 @@ class _LocationPickerSheetState extends ConsumerState<LocationPickerSheet> {
                   children: [
                     // Auto-Detect Location Card
                     _AutoDetectCard(
-                      isLoading: _isLoading,
+                      isLoading: false,
                       onTap: _autoDetectLocation,
                     ),
 

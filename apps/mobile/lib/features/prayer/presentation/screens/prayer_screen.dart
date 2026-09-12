@@ -15,6 +15,7 @@ import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:takwa/core/utils/prayer_display.dart';
 import 'package:takwa/l10n/app_localizations.dart';
+import 'package:takwa/features/settings/presentation/widgets/location_picker_sheet.dart';
 
 // ─────────────────────────────────────────
 //  IQAMA OFFSETS (minutes after adhan)
@@ -706,22 +707,33 @@ class _PrayerHeader extends StatelessWidget {
                                 l10n.prayerScreenTitle,
                                 style: style.amiri(26, color: style.gold),
                               ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.location_on_rounded,
-                                    size: 12,
-                                    color: style.textDim,
+                              TakwaTappable(
+                                onTap: () => LocationPickerSheet.show(context),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                    horizontal: 4,
                                   ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    cityName,
-                                    style: style.naskh(
-                                      12,
-                                      color: style.textDim,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.location_on_rounded,
+                                        size: 12,
+                                        color: style.gold,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        cityName,
+                                        style: style.naskh(
+                                          12,
+                                          color: style.textDim,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
