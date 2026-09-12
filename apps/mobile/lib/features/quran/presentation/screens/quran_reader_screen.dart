@@ -597,7 +597,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
           Navigator.pop(context);
           ref
               .read(quranAudioProvider.notifier)
-              .playAyah(context, surahNum, ayahNum, playSingleAyah: true);
+              .playAyah(context, surahNum, ayahNum);
         },
       ),
     );

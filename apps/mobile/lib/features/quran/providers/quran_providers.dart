@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:math';
-import 'package:flutter/widgets.dart' show BuildContext;
+import 'package:flutter/widgets.dart' show BuildContext, Curves;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quran_library/quran_library.dart' as ql;
 import '../../../core/providers/database_providers.dart';
@@ -9,6 +9,7 @@ import '../../../core/providers/shared_preferences_provider.dart';
 import '../../../core/supabase/supabase_config.dart';
 import '../data/quran_models.dart';
 import '../data/quran_prefs_repository.dart';
+import '../data/quran_reciters_setup.dart';
 
 // ─────────────────────────────────────────────────────────────
 // Repository
@@ -62,15 +63,30 @@ class QuranStateNotifier extends StateNotifier<QuranReadingState> {
 // ─────────────────────────────────────────────────────────────
 // Audio
 // ─────────────────────────────────────────────────────────────
-// Built on quran_library's own AudioCtrl/TafsirCtrl engine (GetX-based)
-// rather than a separate hand-rolled player: AudioCtrl.playAyah() already
-// gives continuous ayah-by-ayah playback through a surah, automatic ayah
-// highlighting, and automatic page-turning as playback crosses a page
-// boundary, all wired through the same audio_service background/lock-screen
-// session the app registers (see MainActivity/Info.plist). This notifier is
-// a thin Riverpod bridge over AudioCtrl's Rx state so the rest of the
-// reader screen (top/bottom bars) keeps watching plain Riverpod state
-// exactly as before.
+// Built on quran_library's own AudioCtrl engine (GetX-based) for
+// highlighting/page-turning during playback and for the shared
+// audio_service background/lock-screen session (see MainActivity/
+// Info.plist) — but NOT for continuous whole-surah playback itself.
+// AudioCtrl.playAyah(..., playSingleAyah: false) is quran_library's own
+// API for that, but on native platforms (not web) it *requires* the
+// surah's ayahs be downloaded first through its own download-management
+// sheet — and confirmed by reading quran_library 4.3.0's own source
+// (_playAyahsFile in src/audio/controller/extensions/ayah_ctrl_extension.
+// dart), the check for whether that download actually finished re-reads a
+// variable it captured *before* the download ran and never updates
+// afterwards, so it always evaluates as "still not downloaded" and
+// `return`s without ever playing — silently, even once the download
+// sheet reports done. That's a bug in the package itself, not something
+// fixable from here, and it's exactly what "play doesn't work" is.
+//
+// So whole-surah playback here streams the ayah audio files directly
+// (the same approach quran_library's own web build uses, and the same
+// CDN this app's player used before adopting quran_library) straight
+// into AudioCtrl's own shared AudioPlayer, and replicates just the two
+// bits of that function actually worth keeping: updating
+// state.currentAyahUniqueNumber (which QuranCtrl.toggleAyahSelection
+// turns into the mushaf's ayah highlight) and animating the page
+// controller when playback crosses a page boundary.
 final quranAudioProvider =
     StateNotifierProvider<QuranAudioNotifier, QuranAudioState>(
       (ref) => QuranAudioNotifier(),
@@ -92,14 +108,19 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
   }
 
   StreamSubscription? _isPlayingSub, _isPreparingSub, _currentAyahSub;
+  StreamSubscription? _sequenceSub, _completionSub;
 
-  /// Reciter selection is currently cosmetic only (persisted, shown in the
-  /// picker) — AudioCtrl.playAyah() plays through the engine's own default
-  /// reciter/reader source rather than this app's CDN-id scheme. Wiring the
-  /// picker into AudioCtrl's own reader list is tracked separately; it
-  /// isn't required for tafsir/translation/continuous-surah playback.
   Future<void> setReciter(String reciterId) async {
     state = state.copyWith(reciterId: reciterId);
+    final idx = QuranRecitersSetup.indexOf(reciterId);
+    if (idx == -1) return;
+    final audioState = ql.AudioCtrl.instance.state;
+    audioState.ayahReaderIndex.value = idx;
+    // If a surah is already playing, restart it (from the same ayah) with
+    // the newly selected reciter instead of waiting for the next tap.
+    if (audioState.isPlaying.value) {
+      await _playSurahStreaming(state.surah, state.ayah);
+    }
   }
 
   /// Ayah for (surahNum, ayahNum), or null if not found.
@@ -122,22 +143,17 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
     return (1, 1);
   }
 
-  /// Plays [ayahNum] of [surahNum]. [playSingleAyah] true stops after that
-  /// one ayah (the ayah-options sheet's "Listen"); false continues
-  /// ayah-by-ayah through the rest of the surah (the reader's main play
-  /// controls), with highlighting and page-turning following along.
-  Future<void> playAyah(
-    BuildContext context,
-    int surahNum,
-    int ayahNum, {
-    bool playSingleAyah = false,
-  }) async {
+  /// Plays a single ayah (the ayah-options sheet's "Listen") through
+  /// AudioCtrl.playAyah() — its single-ayah path downloads-then-plays one
+  /// small file in a straight line and doesn't have the stale-check bug
+  /// the multi-ayah path does, so it's fine to use as-is.
+  Future<void> playAyah(BuildContext context, int surahNum, int ayahNum) async {
     final ayah = _ayah(surahNum, ayahNum);
     if (ayah == null) return;
     await ql.AudioCtrl.instance.playAyah(
       context,
       ayah.ayahUQNumber,
-      playSingleAyah: playSingleAyah,
+      playSingleAyah: true,
     );
   }
 
@@ -159,12 +175,82 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
       audioState.isPlaying.value = true;
       await audioState.audioPlayer.play();
     } else {
-      await playAyah(context, surahNum, ayahNum, playSingleAyah: false);
+      await _playSurahStreaming(surahNum, ayahNum);
+    }
+  }
+
+  /// Streams [surahNum] ayah-by-ayah starting at [startAyahNum], straight
+  /// from the network (no local download step — see the class doc comment
+  /// on why the library's own multi-ayah path can't be used for this).
+  Future<void> _playSurahStreaming(int surahNum, int startAyahNum) async {
+    final surahs = ql.QuranLibrary.quranCtrl.surahs;
+    if (surahNum < 1 || surahNum > surahs.length) return;
+    final ayahs = surahs[surahNum - 1].ayahs;
+    if (ayahs.isEmpty) return;
+    final foundIndex = ayahs.indexWhere((a) => a.ayahNumber == startAyahNum);
+    final playAyahs = ayahs.sublist(foundIndex >= 0 ? foundIndex : 0);
+
+    final audioState = ql.AudioCtrl.instance.state;
+    final reader =
+        ql.ReadersConstants.activeAyahReaders[audioState.ayahReaderIndex.value];
+
+    String urlFor(ql.AyahModel a) {
+      if (reader.url == ql.ReadersConstants.ayahs1stSource) {
+        return '${reader.url}${reader.readerNamePath}/${a.ayahUQNumber}.mp3';
+      }
+      final s = surahNum.toString().padLeft(3, '0');
+      final n = a.ayahNumber.toString().padLeft(3, '0');
+      return '${reader.url}${reader.readerNamePath}/$s$n.mp3';
+    }
+
+    await _sequenceSub?.cancel();
+    await _completionSub?.cancel();
+    audioState.isAudioPreparing.value = true;
+    try {
+      await audioState.audioPlayer.stop();
+      await audioState.audioPlayer.setAudioSources(
+        [for (final a in playAyahs) ql.AudioSource.uri(Uri.parse(urlFor(a)))],
+        initialIndex: 0,
+      );
+      await audioState.audioPlayer.setShuffleModeEnabled(false);
+      await audioState.audioPlayer.setLoopMode(ql.LoopMode.off);
+
+      int? lastPage;
+      _sequenceSub = audioState.audioPlayer.sequenceStateStream.listen((seq) {
+        final idx = seq.currentIndex;
+        if (idx == null || idx < 0 || idx >= playAyahs.length) return;
+        final ayah = playAyahs[idx];
+        audioState.currentAyahUniqueNumber.value = ayah.ayahUQNumber;
+        ql.QuranCtrl.instance.toggleAyahSelection(ayah.ayahUQNumber);
+        if (lastPage != null && lastPage != ayah.page) {
+          ql.QuranCtrl.instance.quranPagesController.animateToPage(
+            ayah.page - 1,
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOut,
+          );
+        }
+        lastPage = ayah.page;
+      });
+      _completionSub = audioState.audioPlayer.playerStateStream.listen((s) {
+        if (s.processingState == ql.ProcessingState.completed) {
+          audioState.isPlaying.value = false;
+        }
+      });
+
+      audioState.isAudioPreparing.value = false;
+      audioState.isPlaying.value = true;
+      await audioState.audioPlayer.play();
+    } catch (e) {
+      audioState.isAudioPreparing.value = false;
+      audioState.isPlaying.value = false;
+      developer.log('Failed to stream surah $surahNum: $e', name: 'QuranAudio');
     }
   }
 
   Future<void> stop() async {
     final audioState = ql.AudioCtrl.instance.state;
+    await _sequenceSub?.cancel();
+    await _completionSub?.cancel();
     await audioState.stopAllAudio();
   }
 
@@ -178,6 +264,8 @@ class QuranAudioNotifier extends StateNotifier<QuranAudioState> {
     _isPlayingSub?.cancel();
     _isPreparingSub?.cancel();
     _currentAyahSub?.cancel();
+    _sequenceSub?.cancel();
+    _completionSub?.cancel();
     super.dispose();
   }
 }

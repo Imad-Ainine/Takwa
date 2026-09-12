@@ -24,6 +24,7 @@ import 'package:takwa/core/supabase/supabase_config.dart';
 import 'package:takwa/core/supabase/sync_manager.dart';
 import 'package:quran_library/quran_library.dart';
 import 'package:takwa/features/quran/data/muyassar_tafsir_loader.dart';
+import 'package:takwa/features/quran/data/quran_reciters_setup.dart';
 
 import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
@@ -134,6 +135,16 @@ void main() async {
     await MuyassarTafsirLoader.register();
   } catch (e) {
     debugPrint('Muyassar tafsir registration error: $e');
+  }
+
+  try {
+    // Makes the reciter picker's 7 reciters (the app's own list, e.g.
+    // Alafasy/Saad Al-Ghamdi/Al-Shatri) actually selectable — quran_library's
+    // own reader list is missing 3 of them. Synchronous; just needs to run
+    // after QuranLibrary.init() so ReadersConstants exists.
+    QuranRecitersSetup.register();
+  } catch (e) {
+    debugPrint('Quran reciters setup error: $e');
   }
 
   runApp(
