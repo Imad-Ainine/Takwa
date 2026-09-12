@@ -48,6 +48,7 @@ const _kSilentModeVibrationKey = 'silent_vibration_enabled';
 // mirrored from SQLite via SettingsPrefsBridge so the background isolate can
 // read the canonical values without Riverpod access.
 const _kAdhanModeKey = 'adhan_mode';
+const _kAdhanScreenEnabledKey = 'adhan_screen_enabled';
 const _kFlipToSilenceKey = 'flip_to_silence_enabled';
 
 // ─────────────────────────────────────────
@@ -195,6 +196,7 @@ class OverlayBackgroundService {
     bool? overlayEnabled,
     int? popupIntervalMins,
     String? adhanMode,
+    bool? adhanScreenEnabled,
     bool? flipToSilenceEnabled,
     bool? silentModeEnabled,
     int? silentDurationMins,
@@ -206,6 +208,14 @@ class OverlayBackgroundService {
       data['popup_interval_minutes'] = popupIntervalMins;
     }
     if (adhanMode != null) data['adhan_mode'] = adhanMode;
+    // Lets the background isolate know right away whether the "Adhan
+    // screen" toggle is on, instead of only picking it up on its next full
+    // restart — same class of gap `adhanMode` had before R6. Without this,
+    // toggling the setting off wouldn't stop the killed-app system overlay
+    // from still popping up until the service happened to restart.
+    if (adhanScreenEnabled != null) {
+      data['adhan_screen_enabled'] = adhanScreenEnabled;
+    }
     if (flipToSilenceEnabled != null) {
       data['flip_to_silence_enabled'] = flipToSilenceEnabled;
     }
@@ -248,6 +258,12 @@ class _OverlayTaskHandler extends TaskHandler {
   // 'sound' | 'vibrate' | 'silent'. Sent to the main isolate so
   // handleForegroundData can make the right decision about audio.
   String _adhanMode = 'sound';
+  // Whether the user wants the Adhan screen/overlay to auto-open at prayer
+  // time at all — gates the killed-app system overlay below the same way
+  // `adhanScreenEnabled` already gates the in-app route in
+  // AdhanAutoTrigger.handleForegroundData, so disabling the setting has a
+  // consistent effect regardless of whether the main isolate is alive.
+  bool _adhanScreenEnabled = true;
   // Whether the face-down / flip-to-silence feature is enabled.
   // Forwarded to the system overlay so UnifiedOverlayWindow can also
   // respect the setting if it handles its own audio in future.
@@ -296,6 +312,9 @@ class _OverlayTaskHandler extends TaskHandler {
       if (data.containsKey('adhan_mode')) {
         _adhanMode = data['adhan_mode'] as String;
       }
+      if (data.containsKey('adhan_screen_enabled')) {
+        _adhanScreenEnabled = data['adhan_screen_enabled'] as bool;
+      }
       if (data.containsKey('flip_to_silence_enabled')) {
         _flipToSilenceEnabled = data['flip_to_silence_enabled'] as bool;
       }
@@ -336,6 +355,7 @@ class _OverlayTaskHandler extends TaskHandler {
     _silentDurationMins = prefs.getInt(_kSilentDurationMinsKey) ?? 20;
     _adhanVolumeLevel = prefs.getDouble('adhan_volume_level') ?? 1.0;
     _adhanMode = prefs.getString(_kAdhanModeKey) ?? 'sound';
+    _adhanScreenEnabled = prefs.getBool(_kAdhanScreenEnabledKey) ?? true;
     _flipToSilenceEnabled = prefs.getBool(_kFlipToSilenceKey) ?? true;
   }
 
@@ -448,24 +468,24 @@ class _OverlayTaskHandler extends TaskHandler {
         triggered.add(prayer.name);
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
-        // إرسال إشعار الأذان مع الصوت
-        //
-        // Gated on `_adhanMode == 'sound'` (the single "نمط الأذان" selector
-        // in Settings → Adhan). This used to be a separate
-        // `_adhanSoundEnabled` flag fed by a toggle on a *different*
-        // settings screen (OverlayNotificationSettings) with no link back
-        // to `adhanMode` — so a user picking "silent" or "vibrate" there
-        // could still get an adhan sound notification from this background
-        // isolate, while the foreground path (AdhanAutoTrigger, which
-        // already only checked `adhanMode`) correctly stayed silent. That
-        // flag (and its now-unused toggle) were removed; see
-        // docs/specs/settings-notifications-improvements.md R1.
-        if (_adhanMode == 'sound') {
-          await _scheduleAdhanNotification(prayer);
-        }
+        // إرسال إشعار دخول وقت الصلاة — صامت دائماً بلا صوت (نفس منطق
+        // NotificationsService._scheduleExact لإشعار الأذان المجدول
+        // بالـ AlarmManager): صوت الأذان الفعلي يُشغَّل حصراً داخل شاشة
+        // الأذان (AdhanAudioPlayer/AdhanOverlayScreen) حسب `adhanMode`، وليس
+        // من قناة الإشعار — لذلك هذا الإشعار يُرسل دائماً (بغضّ النظر عن
+        // adhanMode) بالتزامن مع فتح الـ Overlay أدناه بدلاً من الاقتصار
+        // على نمط "sound" فقط. كان يُستخدَم سابقاً `NotifChannels.prayerSound`
+        // مع شرط `_adhanMode == 'sound'` فقط — نفس الفكرة القديمة (`adhanSoundEnabled`)
+        // التي أُزيلت سابقاً (انظر docs/specs/settings-notifications-improvements.md R1)
+        // لكن مطبّقة الآن بالاتجاه الصحيح: صامت دائماً، وليس بصوت أحياناً.
+        await _scheduleAdhanNotification(prayer);
 
-        // فتح الـ Overlay تلقائياً عند وقت الصلاة
+        // فتح الـ Overlay تلقائياً عند وقت الصلاة — فقط إذا كانت "شاشة
+        // الأذان" مفعّلة في الإعدادات؛ هذا هو المسار المكافئ لهذا الإعداد
+        // عندما يكون التطبيق الرئيسي مغلقاً تماماً (لا يوجد isolate رئيسي
+        // ليطبّق فحص adhanScreenEnabled الموجود في handleForegroundData).
         final hasOverlayPerm =
+            _adhanScreenEnabled &&
             await ow.FlutterOverlayWindow.isPermissionGranted();
         if (hasOverlayPerm) {
           await ow.FlutterOverlayWindow.showOverlay(
@@ -523,6 +543,15 @@ class _OverlayTaskHandler extends TaskHandler {
   }
 
   Future<void> _scheduleAdhanNotification(_PrayerInfo prayer) async {
+    // 'vibrate' still buzzes the device via the channel itself (useful when
+    // this notification is the only thing that reaches the user); 'sound'
+    // and 'silent' both stay on the fully silent channel — the real Adhan
+    // audio for 'sound' mode plays from the overlay/AdhanAudioPlayer once it
+    // opens, never from this notification.
+    final channel = _adhanMode == 'vibrate'
+        ? NotifChannels.prayerVibrate
+        : NotifChannels.prayerSilent;
+
     await NotificationsService.showNotification(
       id: prayer.name == 'fajr'
           ? NotifIds.fajr
@@ -536,7 +565,7 @@ class _OverlayTaskHandler extends TaskHandler {
       title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
       body: 'اللهُ أكبر، اللهُ أكبر، حيَّ على الصلاة، حيَّ على الفلاح',
       payload: 'prayer:${prayer.name}',
-      channel: NotifChannels.prayerSound,
+      channel: channel,
     );
   }
 

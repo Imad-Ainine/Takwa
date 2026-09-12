@@ -705,6 +705,7 @@ class LocationPrayerManager {
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
         adhanMode: prefs.adhanMode,
+        adhanScreenEnabled: prefs.adhanScreenEnabled,
       );
     } catch (e, st) {
       debugPrint('[LocationPrayerManager] _scheduleForLocation failed: $e\n$st');

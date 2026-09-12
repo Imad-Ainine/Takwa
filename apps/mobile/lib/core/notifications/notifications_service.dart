@@ -352,6 +352,7 @@ class NotificationsService {
     bool preAdhanEnabled = true,
     bool iqamaEnabled = true,
     String adhanMode = 'sound',
+    bool adhanScreenEnabled = true,
   }) async {
     // إلغاء القديمة
     final ids = [
@@ -395,15 +396,16 @@ class NotificationsService {
         }
       }
 
-      // 2. إشعار دخول وقت الصلاة — تنبيه واضح بنغمة الإشعار العادية بدون تشغيل صوت الأذان
+      // 2. إشعار دخول وقت الصلاة — صامت دائماً (بدون أي صوت من الإشعار نفسه):
+      // صوت الأذان الفعلي (بحسب adhanMode) لا يتم تشغيله إلا حصراً من داخل
+      // شاشة الأذان (AdhanAudioPlayer)، وليس من قناة الإشعار — هذا يمنع
+      // ازدواجية الصوت (نغمة إشعار + صوت أذان معاً) ويجعل الإشعار مجرد
+      // وسيلة موثوقة لفتح شاشة الأذان تلقائياً (fullScreenIntent) حتى لو
+      // كان التطبيق مغلقاً تماماً. الاهتزاز وحده لا يزال يتبع adhanMode.
       if (prayer.time.isAfter(now)) {
-        AndroidNotificationChannel selectedChannel = NotifChannels.prayerSound;
-
-        if (adhanMode == 'vibrate') {
-          selectedChannel = NotifChannels.prayerVibrate;
-        } else if (adhanMode == 'silent') {
-          selectedChannel = NotifChannels.prayerSilent;
-        }
+        final selectedChannel = adhanMode == 'vibrate'
+            ? NotifChannels.prayerVibrate
+            : NotifChannels.prayerSilent;
 
         await _scheduleExact(
           id: prayer.notifId,
@@ -416,8 +418,13 @@ class NotificationsService {
           channelId: selectedChannel.id,
           sound: null, // لا نغمة أذان في الإشعار، الصوت يتم تشغيله حصراً في شاشة الأذان
           payload: 'prayer:${prayer.name}',
-          fullScreenIntent:
-              adhanMode != 'silent', // Show full screen overlay unless silent
+          // مرتبط بإعداد "شاشة الأذان" (adhanScreenEnabled) وليس بنمط الصوت
+          // (adhanMode) — سابقاً كان مرتبطاً بـ `adhanMode != 'silent'`، مما
+          // كان يمنع فتح الشاشة تلقائياً كلياً عندما يختار المستخدم النمط
+          // الصامت، رغم أنه قد يريد رؤية شاشة الأذان بدون صوت. fullScreenIntent
+          // هو ما يجعل أندرويد يفتح التطبيق تلقائياً على شاشة الأذان حتى مع
+          // إغلاق التطبيق أو قفل الشاشة (ضمن حدود النظام والأذونات الممنوحة).
+          fullScreenIntent: adhanScreenEnabled,
         );
       }
 
@@ -1490,6 +1497,7 @@ class NotificationsManager {
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
         adhanMode: prefs.adhanMode,
+        adhanScreenEnabled: prefs.adhanScreenEnabled,
       );
     }
 
@@ -1585,6 +1593,7 @@ class NotificationsManager {
         preAdhanEnabled: prefs.preAdhanNotif,
         iqamaEnabled: prefs.iqamaNotif,
         adhanMode: prefs.adhanMode,
+        adhanScreenEnabled: prefs.adhanScreenEnabled,
       );
     }
 

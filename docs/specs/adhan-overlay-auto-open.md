@@ -103,6 +103,28 @@
 - A Flutter/Dart toolchain (3.47.2 stable) was available for this fourth pass —
   `flutter analyze` (whole project) and `flutter test` (whole suite) both pass clean after these
   changes, in addition to the by-hand review the first three passes relied on.
+- **R6/R1 (fifth pass) — decoupled the exact-alarm notification's sound from its full-screen-intent
+  launch, and made the "entering prayer time" notification silent by default.** The exact-alarm
+  notification (`NotificationsService.schedulePrayerNotifications`, item 2) previously tied
+  `fullScreenIntent` to `adhanMode != 'silent'` — so a user who picked the silent Adhan mode (no
+  audio) also lost the automatic full-screen launch of the Adhan overlay entirely, even though
+  "no sound" and "don't auto-open the screen" are two different preferences
+  (`adhanMode` vs. `adhanScreenEnabled`). `fullScreenIntent` is now tied to `adhanScreenEnabled`
+  instead, and the notification itself never plays a sound regardless of `adhanMode` (it always
+  uses the `prayerSilent`/`prayerVibrate` channel, never `prayerSound`) — the actual Adhan audio is
+  played exclusively by `AdhanAudioPlayer` once the overlay screen opens, never by the OS
+  notification. The same change was made to `OverlayBackgroundService._scheduleAdhanNotification`
+  (the background isolate's own immediate notification, fired in `_checkAndTriggerAdhan` alongside
+  the system-level overlay window) — it used to only fire, with real channel sound, when
+  `adhanMode == 'sound'`; it now always fires silently (vibrating only in `'vibrate'` mode),
+  simultaneously with the system overlay, so a silent notification and the overlay reach the user
+  together regardless of app state. `_checkAndTriggerAdhan`'s system overlay
+  (`ow.FlutterOverlayWindow.showOverlay`) is now also gated on a new `_adhanScreenEnabled` field
+  (mirrored live from `OverlayBackgroundService.updateSettings`, same pattern as `adhanMode`/
+  `adhanVolumeLevel`), so turning "Adhan screen" off has the same effect in the killed-app path as
+  it already did in `AdhanAutoTrigger.handleForegroundData`'s in-app path — previously the system
+  overlay ignored this setting entirely. `flutter analyze`/`flutter test` (whole project/suite)
+  pass clean after this change.
 
 ## 1. Problem statement
 

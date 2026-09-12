@@ -83,6 +83,14 @@ class OverlayNotificationSettings extends ConsumerWidget {
                     ref
                         .read(userPreferencesProvider.notifier)
                         .updatePref('adhan_screen_enabled', v);
+                    // Push the new value to the background foreground-task
+                    // isolate right away — it only reads SharedPreferences
+                    // on its own start, so without this, turning the Adhan
+                    // screen off wouldn't stop the killed-app system overlay
+                    // from still appearing until the service next restarts.
+                    OverlayBackgroundService.updateSettings(
+                      adhanScreenEnabled: v,
+                    );
                     if (v) ensureOverlayPermission();
                   },
                 ),
