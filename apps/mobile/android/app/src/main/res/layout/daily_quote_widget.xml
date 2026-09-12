@@ -7,7 +7,7 @@
   DailyQuoteWidgetService (Dart) last wrote for that widget. Direction
   (RTL for Arabic) is set by the provider on daily_quote_content.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/daily_quote_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
