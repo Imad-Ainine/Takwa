@@ -660,6 +660,14 @@ class SupabaseClientService implements SupabaseService {
       'text_ar': textAr,
       'count': count,
       'category_hint': categoryHint,
+      // `approved` has no server-side default, and getCommunityAdhkar()'s
+      // `.eq('approved', true)` filter is backed by a matching RLS SELECT
+      // policy (see supabase/audit/table_checklist.md) — a row left null
+      // is invisible to everyone forever, with no moderation UI anywhere
+      // in this app to ever flip it. The INSERT policy only checks
+      // `shared_by = auth.uid()`, so setting it true here is allowed and
+      // is what makes a share actually show up in the community tab.
+      'approved': true,
     });
   }
 
@@ -698,6 +706,13 @@ class SupabaseClientService implements SupabaseService {
       'occasion': occasion,
       'source': source,
       'emoji': emoji,
+      // See the matching comment in shareAdhkarToCommunity() above: without
+      // this, the row's `approved` column stays null, getCommunityDuas()'s
+      // `.eq('approved', true)` (backed by an RLS SELECT policy, not just a
+      // client-side filter) hides it from everyone, and nothing in this
+      // app can ever flip it — the dua "shares" successfully but silently
+      // never appears in the Community tab.
+      'approved': true,
     });
   }
 
