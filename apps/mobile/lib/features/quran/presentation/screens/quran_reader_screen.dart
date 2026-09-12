@@ -621,13 +621,35 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
       if (translation) tafsirCtrl.translationLangCode = 'en';
     }
     final isDark = ref.read(quranStateProvider).theme == ReaderTheme.night;
-    ql.showTafsirOnTap(
+    // quran_library's own `showTafsirOnTap` is declared as `extension on
+    // void`, which Dart only lets a library call unqualified from inside
+    // itself — calling it through an `as ql` prefixed import (required
+    // everywhere else in this file) fails to resolve at compile time. So
+    // this shows the same `ShowTafseer` widget that function wraps,
+    // reproducing its bottom-sheet chrome directly instead.
+    showModalBottomSheet(
       context: context,
-      isDark: isDark,
-      ayahNum: ayah.ayahNumber,
-      pageIndex: ayah.page - 1,
-      ayahUQNum: ayah.ayahUQNumber,
-      ayahNumber: ayah.ayahNumber,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      isDismissible: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+        maxWidth: MediaQuery.of(context).size.width,
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (modalContext) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: ql.ShowTafseer(
+          context: modalContext,
+          ayahUQNumber: ayah.ayahUQNumber,
+          ayahNumber: ayah.ayahNumber,
+          pageIndex: ayah.page - 1,
+          isDark: isDark,
+        ),
+      ),
     );
   }
 

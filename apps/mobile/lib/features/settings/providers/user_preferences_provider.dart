@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/daos.dart';
@@ -46,7 +47,7 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     await _dao.set(key, value.toString());
 
     // 2. Trigger syncManager to push the change
-    unawaited(ref.read(syncManagerProvider).syncSettings());
+    unawaited(_syncSettingsSafely());
 
     // 3. Immediately re-build state from local defaults
     final allSettings = await _dao.getAllSettings();
@@ -72,7 +73,7 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     for (final entry in updates.entries) {
       await _dao.set(entry.key, entry.value.toString());
     }
-    unawaited(ref.read(syncManagerProvider).syncSettings());
+    unawaited(_syncSettingsSafely());
     final allSettings = await _dao.getAllSettings();
     state = AsyncData(UserPreferences.fromMap(allSettings));
 
@@ -84,6 +85,29 @@ class UserPreferencesNotifier extends AsyncNotifier<UserPreferences> {
     // Sync all to SharedPreferences
     for (final entry in updates.entries) {
       unawaited(_prefsBridge.mirror(entry.key, entry.value));
+    }
+  }
+
+  /// Pushes local settings to Supabase, recording a failure instead of
+  /// letting it disappear as an unhandled error on this `unawaited()` call.
+  ///
+  /// This push sends the *entire* local settings map in one upsert (see
+  /// SyncManager.syncSettings), so one column the remote table doesn't
+  /// have breaks the push for every setting, silently — and the very next
+  /// full sync's pull would then overwrite local with the stale remote
+  /// row, making an edit look like it "didn't save". Surfacing the error
+  /// here (via the same lastSyncErrorProvider the settings screen already
+  /// watches) at least makes that failure visible instead of invisible.
+  Future<void> _syncSettingsSafely() async {
+    try {
+      await ref.read(syncManagerProvider).syncSettings();
+    } catch (e, st) {
+      developer.log(
+        'Failed to sync settings: $e',
+        name: 'UserPreferencesNotifier',
+        stackTrace: st,
+      );
+      ref.read(lastSyncErrorProvider.notifier).state = 'settings: $e';
     }
   }
 }
