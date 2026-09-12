@@ -28,6 +28,7 @@ import 'package:takwa/core/notifications/overlay_background_service.dart';
 import 'package:takwa/core/notifications/location_prayer_update.dart';
 import 'package:takwa/core/notifications/overlays/unified_overlay_window.dart';
 import 'package:takwa/core/home_widget/prayer_home_widget_service.dart';
+import 'package:takwa/core/home_widget/daily_quote_widget_service.dart';
 
 // ────────────────────────────────────────────
 //  OVERLAY ENTRY POINT
@@ -152,6 +153,7 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
       AdhanAutoTrigger.start(ref, NotificationRouter.navigatorKey);
       LocationPrayerManager.initialize(ref);
       PrayerHomeWidgetService.init();
+      DailyQuoteWidgetService.updateAll(locale: ref.read(localeProvider));
       _setupAuthListener();
       _checkNotificationLaunch();
     });
@@ -262,6 +264,7 @@ class _TakwaAppState extends ConsumerState<TakwaApp> {
       if (prayers != null) {
         PrayerHomeWidgetService.update(prayers: prayers, locale: nextLocale);
       }
+      DailyQuoteWidgetService.updateAll(locale: nextLocale);
     });
 
     return WithForegroundTask(

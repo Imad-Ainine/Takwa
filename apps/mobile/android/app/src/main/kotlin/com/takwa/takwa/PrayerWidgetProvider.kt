@@ -3,9 +3,9 @@ package com.takwa
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 import org.json.JSONArray
@@ -34,6 +34,8 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
         widgetData: SharedPreferences,
     ) {
         val data = parseData(widgetData.getString(DATA_KEY, null))
+        val colorDefault = ContextCompat.getColor(context, R.color.widget_text_primary)
+        val colorHighlight = ContextCompat.getColor(context, R.color.widget_gold)
 
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.prayer_widget)
@@ -48,7 +50,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             } else {
                 views.setViewVisibility(R.id.prayer_widget_content, View.VISIBLE)
                 views.setViewVisibility(R.id.prayer_widget_empty, View.GONE)
-                bindContent(views, data)
+                bindContent(views, data, colorDefault, colorHighlight)
             }
 
             appWidgetManager.updateAppWidget(widgetId, views)
@@ -64,7 +66,12 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
         }
     }
 
-    private fun bindContent(views: RemoteViews, data: JSONObject) {
+    private fun bindContent(
+        views: RemoteViews,
+        data: JSONObject,
+        colorDefault: Int,
+        colorHighlight: Int,
+    ) {
         views.setTextViewText(R.id.prayer_widget_hijri, data.optString("hijri"))
         views.setTextViewText(R.id.prayer_widget_gregorian, data.optString("gregorian"))
         views.setTextViewText(R.id.prayer_widget_weekday, data.optString("weekday"))
@@ -85,7 +92,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             views.setTextViewText(timeId, prayer.optString("time"))
 
             val isNext = nextKey != null && nextKey == prayer.optString("key", null)
-            val color = if (isNext) COLOR_HIGHLIGHT else COLOR_DEFAULT
+            val color = if (isNext) colorHighlight else colorDefault
             views.setTextColor(labelId, color)
             views.setTextColor(timeId, color)
         }
@@ -93,8 +100,6 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
 
     companion object {
         private const val DATA_KEY = "prayer_widget_data"
-        private val COLOR_DEFAULT = Color.parseColor("#FFFFFF")
-        private val COLOR_HIGHLIGHT = Color.parseColor("#F2C572")
 
         /** (container id, label TextView id, time TextView id) per prayer slot. */
         private val CELL_IDS = listOf(
