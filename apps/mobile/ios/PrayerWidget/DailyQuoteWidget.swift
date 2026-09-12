@@ -1,9 +1,10 @@
 import SwiftUI
 import WidgetKit
 
-// Home-screen "Dua of the Day" / "Dhikr of the Day" widgets.
+// Home-screen "Dua of the Day" / "Dhikr of the Day" / "Verse of the Day"
+// widgets.
 //
-// Both read whatever JSON `DailyQuoteWidgetService` (Dart,
+// All three read whatever JSON `DailyQuoteWidgetService` (Dart,
 // lib/core/home_widget/daily_quote_widget_service.dart) last wrote into the
 // shared App Group's UserDefaults — this file picks nothing itself, no
 // "today's dua" logic lives here, only rendering. Same shared-extension
@@ -166,6 +167,24 @@ struct DhikrOfDayWidget: Widget {
         }
         .configurationDisplayName("ذكر اليوم")
         .description("يعرض ذكراً مختاراً من الأذكار الصحيحة، يتغير كل يوم.")
+        .supportedFamilies([.systemMedium])
+    }
+}
+
+struct VerseOfDayWidget: Widget {
+    // Must match `DailyQuoteWidgetService.iOSVerseWidgetName` (Dart).
+    let kind: String = "VerseOfDayWidget"
+    private let fallbackEmptyText = "افتح تطبيق تقوى لعرض آية اليوم"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(
+            kind: kind,
+            provider: DailyQuoteProvider(dataKey: "verse_of_day_widget_data")
+        ) { entry in
+            DailyQuoteEntryView(entry: entry, fallbackEmptyText: fallbackEmptyText)
+        }
+        .configurationDisplayName("آية اليوم")
+        .description("يعرض آية مختارة من القرآن الكريم، تتغير كل يوم.")
         .supportedFamilies([.systemMedium])
     }
 }

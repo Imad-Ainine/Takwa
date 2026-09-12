@@ -105,3 +105,10 @@ class DhikrOfDayWidgetProvider :
         dataKey = "dhikr_of_day_widget_data",
         fallbackEmptyText = "افتح تطبيق تقوى لعرض ذكر اليوم",
     )
+
+/** "Verse of the Day" — reads `verse_of_day_widget_data`. */
+class VerseOfDayWidgetProvider :
+    DailyQuoteWidgetProviderBase(
+        dataKey = "verse_of_day_widget_data",
+        fallbackEmptyText = "افتح تطبيق تقوى لعرض آية اليوم",
+    )

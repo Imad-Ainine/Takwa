@@ -1,7 +1,7 @@
 # Wiring up the iOS widgets
 
-This folder has the Swift/plist/entitlements source for three widgets —
-prayer times, dua of the day, dhikr of the day — but a WidgetKit
+This folder has the Swift/plist/entitlements source for four widgets —
+prayer times, dua of the day, dhikr of the day, verse of the day — but a WidgetKit
 **extension target** can only be added to the Xcode project from inside
 Xcode — its plumbing (product reference, build phases, embed step, scheme)
 isn't something safe to hand-edit into `project.pbxproj` from outside
@@ -11,8 +11,8 @@ regardless, since that's also required to build/run the iOS app at all —
 so doing these steps once in Xcode's UI isn't extra work, just the normal
 place to do it.
 
-All three widgets live in **one** extension target/scheme, added once —
-adding the other two after the first is just dragging in more files, no
+All four widgets live in **one** extension target/scheme, added once —
+adding each new one after the first is just dragging in more files, no
 second target needed (a WidgetKit extension can host any number of
 `Widget`s via one `WidgetBundle`, see `TakwaWidgetsBundle.swift`).
 
@@ -23,7 +23,7 @@ Budget about 10 minutes. All of it is done once and then committed.
 1. Open `ios/Runner.xcworkspace` in Xcode (not `.xcodeproj`).
 2. **File ▸ New ▸ Target…** ▸ iOS ▸ **Widget Extension**.
 3. Product Name: `PrayerWidget` (this is the target/extension's name —
-   it hosts all three widgets, the name doesn't need to change). Uncheck
+   it hosts all four widgets, the name doesn't need to change). Uncheck
    "Include Configuration Intent" (none of these widgets are
    user-configurable). Team/bundle ID: same team as Runner; bundle id
    `com.takwa.PrayerWidget` (Runner's id + `.PrayerWidget`).
@@ -80,8 +80,9 @@ dua/dhikr data where the widgets can read it.
    `DailyQuoteWidgetService` write real data into the shared App Group
    (both run on every app start — see `lib/main.dart`'s
    `_TakwaAppState.initState`).
-3. Long-press the Home Screen ▸ **+** ▸ search "تقوى" ▸ you'll see three
-   widgets to add: **أوقات الصلاة**, **دعاء اليوم**, **ذكر اليوم**.
+3. Long-press the Home Screen ▸ **+** ▸ search "تقوى" ▸ you'll see four
+   widgets to add: **أوقات الصلاة**, **دعاء اليوم**, **ذكر اليوم**,
+   **آية اليوم**.
 
 If a widget shows its "افتح تطبيق تقوى..." placeholder instead of real
 content, the App Group is misconfigured (a mismatched group id somewhere
@@ -91,14 +92,14 @@ device/simulator.
 ## Notes
 
 - Each widget's `kind` string (`"PrayerWidget"` / `"DuaOfDayWidget"` /
-  `"DhikrOfDayWidget"`) must keep matching the corresponding
-  `iOS*WidgetName` constant on the Dart side — that's the name
-  `HomeWidget.updateWidget(iOSName: ...)` looks up.
+  `"DhikrOfDayWidget"` / `"VerseOfDayWidget"`) must keep matching the
+  corresponding `iOS*WidgetName` constant on the Dart side — that's the
+  name `HomeWidget.updateWidget(iOSName: ...)` looks up.
 - `TakwaWidgetTheme.swift` holds the brand light/dark colors shared by all
-  three widgets (mirrors `AppColorsExtension` in
+  four widgets (mirrors `AppColorsExtension` in
   `packages/takwa_ui/lib/src/theme/app_colors.dart`) — change the palette
   there once, not per widget file.
-- All three ship one size for now (`.systemMedium`, ~4×2 cells). Add
+- All four ship one size for now (`.systemMedium`, ~4×2 cells). Add
   `.systemLarge` to a widget's `supportedFamilies` and a second layout
   branch in its content view later for a bigger variant (e.g. the
   countdown-timer style from the original prayer-widget reference
