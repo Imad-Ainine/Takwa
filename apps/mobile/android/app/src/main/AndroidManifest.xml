@@ -85,11 +85,21 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/dhikr_of_day_widget_info" />
         </receiver>
+        <!-- Home screen "verse of the day" widget -->
+        <receiver android:name=".VerseOfDayWidgetProvider"
+            android:label="تقوى - آية اليوم"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/verse_of_day_widget_info" />
+        </receiver>
         <!-- home_widget: re-arms the alarms PrayerHomeWidgetService and
              DailyQuoteWidgetService schedule via
              HomeWidget.scheduleWidgetUpdates() after a reboot, an app
              update, or the exact-alarm permission being re-granted. Shared
-             by all three widgets above — one receiver, keyed by the
+             by all four widgets above — one receiver, keyed by the
              provider class name in each scheduled alarm's own extras.
              Not exported: BOOT_COMPLETED/MY_PACKAGE_REPLACED/the permission
              broadcast are all protected system broadcasts, delivered
