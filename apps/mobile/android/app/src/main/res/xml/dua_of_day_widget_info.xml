@@ -8,6 +8,8 @@
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/daily_quote_widget"
+    android:previewImage="@drawable/dua_of_day_widget_preview"
+    android:previewLayout="@layout/dua_of_day_widget_preview"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen">
 </appwidget-provider>
