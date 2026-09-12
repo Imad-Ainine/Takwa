@@ -36,24 +36,50 @@ create an App ID with bundle identifier **`com.takwa`** (must match
 `PRODUCT_BUNDLE_IDENTIFIER` in `apps/mobile/ios/Runner.xcodeproj`).
 
 ### 3. Create an Apple Distribution certificate
-1. On a Mac, open **Keychain Access → Certificate Assistant → Request a
-   Certificate from a Certificate Authority**, save the `.certSigningRequest`
-   to disk.
-2. In [Certificates, Identifiers & Profiles → Certificates](https://developer.apple.com/account/resources/certificates/list),
-   create an **Apple Distribution** certificate, uploading that CSR.
-3. Download the issued certificate, double-click to install it into
-   Keychain Access, then find it under **My Certificates**, right-click →
-   **Export...** as a `.p12` file. Set an export password — that password
-   is `APPLE_DIST_CERTIFICATE_PASSWORD`.
-4. Base64-encode it for GitHub Secrets:
-   ```bash
-   base64 -i Certificates.p12 | pbcopy   # macOS
-   base64 -w0 Certificates.p12           # Linux
-   ```
-   That output is `APPLE_DIST_CERTIFICATE_BASE64`.
 
-*(No Mac available? A teammate with one can do steps 3–4 and hand you just
-the resulting `.p12` + password — nothing else about this setup needs a Mac.)*
+You need a `.p12` file (private key + signed certificate bundled together).
+Apple's site only ever hands you the signed *certificate* half — you always
+generate the *key* + CSR yourself and combine them locally. Pick whichever
+of these two paths matches what you have available; both produce the same
+`.p12`.
+
+**No Mac needed — OpenSSL (works on Linux/Windows/macOS):**
+```bash
+# 1. Generate a private key
+openssl genrsa -out ios_distribution.key 2048
+
+# 2. Generate a CSR from it (email/name can be anything identifying)
+openssl req -new -key ios_distribution.key -out ios_distribution.csr \
+  -subj "/emailAddress=you@example.com/CN=Your Name/C=US"
+```
+Upload `ios_distribution.csr` at
+[Certificates, Identifiers & Profiles → Certificates → +](https://developer.apple.com/account/resources/certificates/list),
+choosing type **Apple Distribution**. Download the issued certificate
+(`distribution.cer`, DER format), then:
+```bash
+# 3. Convert Apple's .cer to PEM
+openssl x509 -in distribution.cer -inform DER -out ios_distribution.pem -outform PEM
+
+# 4. Bundle your key + Apple's certificate into a .p12, setting an export password
+openssl pkcs12 -export \
+  -inkey ios_distribution.key -in ios_distribution.pem \
+  -out ios_distribution.p12 -password pass:'CHOOSE_A_PASSWORD'
+```
+That password is `APPLE_DIST_CERTIFICATE_PASSWORD`.
+
+**On a Mac instead:** Keychain Access → Certificate Assistant → Request a
+Certificate from a Certificate Authority (produces the CSR), upload it in
+the same Certificates page above, then double-click the downloaded
+certificate to install it into Keychain Access, find it under
+**My Certificates**, right-click → **Export...** as `.p12`, setting a
+password there.
+
+Either way, base64-encode the final `.p12` for GitHub Secrets:
+```bash
+base64 -w0 ios_distribution.p12       # Linux
+base64 -i ios_distribution.p12 | pbcopy   # macOS
+```
+That output is `APPLE_DIST_CERTIFICATE_BASE64`.
 
 ### 4. Create an App Store provisioning profile
 In [Certificates, Identifiers & Profiles → Profiles](https://developer.apple.com/account/resources/profiles/list),
