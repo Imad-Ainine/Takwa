@@ -1,11 +1,17 @@
 # Home screen widgets
 
-Four home-screen widgets (Android AppWidget / iOS WidgetKit), all sharing
+Five home-screen widgets (Android AppWidget / iOS WidgetKit), all sharing
 one visual style — the app's own brand colors (gold/teal accents on a
-navy-to-card-tone gradient), in both light and dark mode:
+navy-to-card-tone gradient, plus a low-opacity rub el hizb geometric motif
+tucked into one corner), in both light and dark mode:
 
 - **Prayer times** — today's five prayer times, next one highlighted.
   Modeled on the reference "ختمة" widget the feature request was based on.
+  Ships in two sizes: the compact 4×2 (`.systemMedium` on iOS,
+  `PrayerWidgetProvider` on Android) and a 4×3 "large" variant
+  (`.systemLarge` / `PrayerWidgetLargeProvider`) that adds a countdown bar
+  to the next prayer — the countdown-timer style from the very first
+  reference screenshots.
 - **Dua of the day** — one dua from the app's own bundled traditional duas,
   rotating daily.
 - **Dhikr of the day** — same idea, from the bundled adhkar, with a "×N"
@@ -63,6 +69,43 @@ not invented separately — and follows the *system's* light/dark setting
   palettes; every widget view resolves `TakwaWidgetTheme.resolve(
   colorScheme)` from `@Environment(\.colorScheme)` once per render.
 
+Every color used for *text* (`widget_text_primary/secondary`, the
+AA-adjusted `widget_gold`/`widget_teal` — not the raw brand accent, which
+fails contrast on a light card) comes from those same two token sets, so
+adding the gradient/motif styling below couldn't regress light-mode
+legibility: the new layers sit at 5-20% opacity, well under what would
+threaten the existing AA-contrast numbers on either background.
+
+### The "Islamic" gradient + motif
+
+Layered into the same one shared background (`takwa_widget_card_background
+.xml` on Android, `TakwaWidgetBackgroundView` on iOS) so every widget got
+this for free with no per-widget change:
+
+1. The original card gradient (unchanged) — the base.
+2. A gold→teal accent sheen at low opacity, using the *exact* ARGB values
+   as `AppColorsExtension.cardGradient` (`widget_overlay_gold/teal` /
+   `TakwaWidgetTheme.overlayGold/Teal`) — the same wash the in-app cards
+   use, not a color invented for the widget.
+3. A "rub el hizb" motif (two squares, one rotated 45°, forming an
+   8-pointed star — used throughout Islamic art and to mark Quran section
+   divisions) stroked at low opacity in one corner, behind the real
+   content (`ic_widget_islamic_motif.xml` / `RubElHizbMotif` Shape).
+
+## Resizing
+
+- Every prayer/label/quote TextView that sits in a width-constrained cell
+  uses `autoSizeTextType="uniform"` (Android) so shrinking the widget
+  narrower scales the text down to fit instead of clipping or overflowing
+  — needs the TextView's width to actually be constrained (`match_parent`
+  in a weighted cell, not `wrap_content`) for autosize to have anything to
+  shrink against.
+- `minResizeWidth` was lowered across all four widgets (prayer: 140dp,
+  dua/dhikr/verse: 150dp) now that autosize covers the narrower cells that
+  unlocks.
+- iOS has no separate "resize" concept — `.systemMedium`/`.systemLarge` are
+  the two sizes WidgetKit itself offers, picked from the widget gallery.
+
 ## Widget-picker previews
 
 Without an explicit preview, Android's "add widget" picker falls back to
@@ -91,22 +134,24 @@ needed there.
 | Push dua/dhikr/verse-of-day data | `lib/core/home_widget/daily_quote_widget_service.dart` |
 | Shared App Group id | `lib/core/home_widget/home_widget_ids.dart` |
 | Shared Hijri month name helper | `lib/core/utils/hijri_display.dart` |
-| Android prayer widget | `PrayerWidgetProvider.kt` + `res/layout/prayer_widget.xml` + `res/xml/prayer_widget_info.xml` |
+| Android prayer widget (compact) | `PrayerWidgetProvider.kt` + `res/layout/prayer_widget.xml` + `res/xml/prayer_widget_info.xml` |
+| Android prayer widget (large, countdown) | `PrayerWidgetLargeProvider.kt` (subclasses the above) + `res/layout/prayer_widget_large.xml` + `res/xml/prayer_widget_large_info.xml` |
 | Android dua/dhikr/verse widgets | `DailyQuoteWidgetProviderBase.kt` (shared base, three thin subclasses) + `res/layout/daily_quote_widget.xml` + `res/xml/{dua,dhikr,verse}_of_day_widget_info.xml` |
 | Android brand colors | `res/values/widget_colors.xml` + `res/values-night/widget_colors.xml` |
-| Android shared card background | `res/drawable/takwa_widget_card_background.xml` |
+| Android shared card background + motif | `res/drawable/takwa_widget_card_background.xml` + `res/drawable{,-night}/ic_widget_islamic_motif.xml` |
 | Android widget-picker previews | `res/layout/*_widget_preview.xml` + `res/drawable-nodpi/*_widget_preview.png` |
-| iOS prayer widget | `ios/PrayerWidget/PrayerWidget.swift` |
+| iOS prayer widget (compact + large) | `ios/PrayerWidget/PrayerWidget.swift` |
 | iOS dua/dhikr/verse widgets | `ios/PrayerWidget/DailyQuoteWidget.swift` (all three, sharing one provider/view) |
-| iOS brand colors | `ios/PrayerWidget/TakwaWidgetTheme.swift` |
+| iOS brand colors + shared background/motif | `ios/PrayerWidget/TakwaWidgetTheme.swift` |
 | iOS `@main` entry point | `ios/PrayerWidget/TakwaWidgetsBundle.swift` (lists all four widgets) |
 | iOS one-time Xcode setup | `ios/PrayerWidget/SETUP.md` |
 
 ## Status
 
-- **Android**: fully wired — `flutter pub get`, build, and all four work.
-  No extra manual step (the `home_widget` plugin's own Gradle module and
-  the manifest `<receiver>` entries handle themselves).
+- **Android**: fully wired — `flutter pub get`, build, and all five (four
+  widgets, prayer times in two sizes) work. No extra manual step (the
+  `home_widget` plugin's own Gradle module and the manifest `<receiver>`
+  entries handle themselves).
 - **iOS**: the Swift/plist/entitlements source for all four widgets is
   ready, but a WidgetKit extension **target** has to be added once from
   inside Xcode — that plumbing can't be scripted safely outside Xcode's
@@ -114,10 +159,9 @@ needed there.
   steps (~10 minutes, one-time, then committed) — adding all four widgets
   is one pass through that setup, not four, since they share a single
   extension target.
-- All four ship one size for now (`.systemMedium` / a resizable ~4×2
-  Android widget). A larger prayer-widget variant with the live countdown
-  bar from the original reference screenshot can be added later as a
-  second layout + widget family.
+- Prayer times ships two sizes (`.systemMedium`/4×2 and `.systemLarge`/4×3
+  with the countdown bar); dua/dhikr/verse ship one (`.systemMedium`/4×2)
+  — see SETUP.md's notes for extending them the same way.
 - The verse-of-the-day pool is deliberately narrow (Juz 30's short surahs)
   for editorial safety — a length filter alone (as used for dua/dhikr)
   risks landing on a fragment that reads oddly out of its original
@@ -130,10 +174,15 @@ needed there.
 1. `flutter pub get` (needed once, to pull in `home_widget` — not run in
    this session since no Flutter SDK is available here).
 2. Run the app on a device/emulator once so all services push real data.
-3. Long-press the home screen → Widgets → search "تقوى" → you'll see four
-   widgets: "أوقات الصلاة", "دعاء اليوم", "ذكر اليوم", "آية اليوم" — each
+3. Long-press the home screen → Widgets → search "تقوى" → you'll see five
+   entries: "أوقات الصلاة" (compact), "أوقات الصلاة (كبير)" (large, with
+   the countdown bar), "دعاء اليوم", "ذكر اليوم", "آية اليوم" — each
    showing realistic sample content in the picker, not just the app icon.
-4. Toggle the device's system dark mode and confirm all four widgets
-   switch between the light and dark palettes.
+4. Toggle the device's system dark mode and confirm all five switch
+   between the light and dark palettes (including the gold/teal sheen and
+   corner motif).
 5. Change the language in Settings and confirm the widgets' labels switch
    too (they redraw within a second via the `localeProvider` listener).
+6. Drag a widget's resize handles to its `minResizeWidth`/`minResizeHeight`
+   and confirm the prayer times/dua/dhikr/verse text shrinks to fit rather
+   than clipping.

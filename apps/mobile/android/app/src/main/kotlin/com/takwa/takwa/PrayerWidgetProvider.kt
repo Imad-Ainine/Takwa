@@ -24,8 +24,16 @@ import org.json.JSONObject
  *    while the app is closed;
  *  - the system's own `updatePeriodMillis` (prayer_widget_info.xml) as a
  *    30-minute fallback.
+ *
+ * `open`/`protected` throughout so [PrayerWidgetLargeProvider] can reuse
+ * every bit of this — the 4×3 "large" size variant is the exact same data
+ * and the exact same 5 cells, just with one extra countdown row that only
+ * it knows how to draw.
  */
-class PrayerWidgetProvider : HomeWidgetProvider() {
+open class PrayerWidgetProvider : HomeWidgetProvider() {
+
+    /** Which layout this size variant inflates — override for a bigger one. */
+    protected open val layoutRes: Int get() = R.layout.prayer_widget
 
     override fun onUpdate(
         context: Context,
@@ -38,7 +46,7 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
         val colorHighlight = ContextCompat.getColor(context, R.color.widget_gold)
 
         appWidgetIds.forEach { widgetId ->
-            val views = RemoteViews(context.packageName, R.layout.prayer_widget)
+            val views = RemoteViews(context.packageName, layoutRes)
             views.setOnClickPendingIntent(
                 R.id.prayer_widget_root,
                 HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java),
@@ -96,13 +104,23 @@ class PrayerWidgetProvider : HomeWidgetProvider() {
             views.setTextColor(labelId, color)
             views.setTextColor(timeId, color)
         }
+
+        bindExtra(views, prayers, nextKey)
     }
+
+    /**
+     * Hook for a size variant to draw anything beyond the 5 cells above —
+     * a no-op here, overridden by [PrayerWidgetLargeProvider] to fill in
+     * the countdown-to-next-prayer row its layout has and this one
+     * doesn't.
+     */
+    protected open fun bindExtra(views: RemoteViews, prayers: JSONArray, nextKey: String?) {}
 
     companion object {
         private const val DATA_KEY = "prayer_widget_data"
 
         /** (container id, label TextView id, time TextView id) per prayer slot. */
-        private val CELL_IDS = listOf(
+        internal val CELL_IDS = listOf(
             Triple(R.id.prayer_widget_cell_0, R.id.prayer_widget_label_0, R.id.prayer_widget_time_0),
             Triple(R.id.prayer_widget_cell_1, R.id.prayer_widget_label_1, R.id.prayer_widget_time_1),
             Triple(R.id.prayer_widget_cell_2, R.id.prayer_widget_label_2, R.id.prayer_widget_time_2),

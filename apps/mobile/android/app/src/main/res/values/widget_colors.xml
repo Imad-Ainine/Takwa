@@ -26,4 +26,13 @@
     <color name="widget_teal">#FF0F5C57</color>
     <!-- hairline divider between the date header and the prayer row -->
     <color name="widget_divider">#1A111827</color>
+    <!-- Brand gold→teal sheen laid over the card gradient — exact same ARGB
+         as AppColorsExtension.light.cardGradient, so the widget's "Islamic"
+         warmth is the app's own accent wash, not an invented tint. Low
+         enough alpha that widget_text_*/widget_gold contrast on top is
+         unaffected. -->
+    <color name="widget_overlay_gold">#10C8A96E</color>
+    <color name="widget_overlay_teal">#0A3AAFA9</color>
+    <!-- Progress track for the large prayer widget's countdown bar. -->
+    <color name="widget_progress_track">#1A111827</color>
 </resources>

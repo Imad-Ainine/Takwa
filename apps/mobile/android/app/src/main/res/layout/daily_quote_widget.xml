@@ -59,7 +59,10 @@
                 android:textColor="@color/widget_gold"
                 android:textStyle="bold"
                 android:textSize="12sp"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="9sp"
+                android:autoSizeMaxTextSize="12sp" />
 
             <TextView
                 android:id="@+id/daily_quote_count"
@@ -84,7 +87,10 @@
             android:textSize="15sp"
             android:lineSpacingMultiplier="1.3"
             android:maxLines="6"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="11sp"
+            android:autoSizeMaxTextSize="15sp" />
 
         <TextView
             android:id="@+id/daily_quote_subtitle"
