@@ -8,6 +8,7 @@ import 'package:takwa/core/widgets/custom_leading_button.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/widgets/takwa_tappable.dart';
 import 'package:quran_library/quran_library.dart' as ql;
+import '../../data/muyassar_tafsir_loader.dart';
 import '../../data/quran_data.dart';
 import '../../data/quran_models.dart';
 import '../../providers/quran_providers.dart';
@@ -584,13 +585,57 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
           Navigator.pop(context);
           _shareAyah(surahNum, ayahNum);
         },
+        onTafsir: () {
+          Navigator.pop(context);
+          _openTafsir(surahNum, ayahNum);
+        },
+        onTranslation: () {
+          Navigator.pop(context);
+          _openTranslation(surahNum, ayahNum);
+        },
         onPlay: () {
           Navigator.pop(context);
-          ref.read(quranAudioProvider.notifier).togglePlay(surahNum, ayahNum);
+          ref
+              .read(quranAudioProvider.notifier)
+              .playAyah(context, surahNum, ayahNum, playSingleAyah: true);
         },
       ),
     );
   }
+
+  // ── Tafsir & Translation ───────────────────────────────────
+  // Both reuse quran_library's own tafsir bottom sheet (font-size controls,
+  // tafsir/translation switcher already built in) — only the initially
+  // selected entry differs between the two.
+  void _openTafsirOrTranslation(int surahNum, int ayahNum, {required bool translation}) {
+    final ayah = _findAyah(surahNum, ayahNum);
+    if (ayah == null) return;
+    final tafsirCtrl = ql.TafsirCtrl.instance;
+    final idx = translation
+        ? tafsirCtrl.tafsirAndTranslationsItems.indexWhere(
+            (e) => e.isTranslation && e.fileName == 'en',
+          )
+        : MuyassarTafsirLoader.indexIn(tafsirCtrl);
+    if (idx != -1) {
+      tafsirCtrl.radioValue.value = idx;
+      if (translation) tafsirCtrl.translationLangCode = 'en';
+    }
+    final isDark = ref.read(quranStateProvider).theme == ReaderTheme.night;
+    ql.showTafsirOnTap(
+      context: context,
+      isDark: isDark,
+      ayahNum: ayah.ayahNumber,
+      pageIndex: ayah.page - 1,
+      ayahUQNum: ayah.ayahUQNumber,
+      ayahNumber: ayah.ayahNumber,
+    );
+  }
+
+  void _openTafsir(int surahNum, int ayahNum) =>
+      _openTafsirOrTranslation(surahNum, ayahNum, translation: false);
+
+  void _openTranslation(int surahNum, int ayahNum) =>
+      _openTafsirOrTranslation(surahNum, ayahNum, translation: true);
 
   void _showSettings() {
     final state = ref.read(quranStateProvider);
@@ -820,7 +865,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                     onFontSize: _showFontSizeDialog,
                     onAudio: () => ref
                         .read(quranAudioProvider.notifier)
-                        .togglePlay(surahNum, 1),
+                        .togglePlay(context, surahNum, 1),
                     onBookmark: _toggleBookmark,
                     onGuide: _showReadingGuide,
                     onSettings: _showSettings,
@@ -849,7 +894,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                     audio: audio,
                     onTogglePlay: () => ref
                         .read(quranAudioProvider.notifier)
-                        .togglePlay(surahNum, 1),
+                        .togglePlay(context, surahNum, 1),
                     onStop: () => ref.read(quranAudioProvider.notifier).stop(),
                     onSpeedTap: () {
                       const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
@@ -2293,32 +2338,17 @@ class _PageNavigationDialogState extends State<_PageNavigationDialog> {
 
 class _AyahOptionsSheet extends StatelessWidget {
   final int surahNum, ayahNum;
-  final VoidCallback onSave, onShare, onPlay;
+  final VoidCallback onSave, onShare, onTafsir, onTranslation, onPlay;
 
   const _AyahOptionsSheet({
     required this.surahNum,
     required this.ayahNum,
     required this.onSave,
     required this.onShare,
+    required this.onTafsir,
+    required this.onTranslation,
     required this.onPlay,
   });
-
-  void _showComingSoon(BuildContext context) {
-    // Capture the messenger before popping — once this sheet's route starts
-    // closing, its own context is on the way out, so look it up first.
-    final messenger = ScaffoldMessenger.of(context);
-    final message = AppLocalizations.of(context)!.quranReaderComingSoon;
-    Navigator.pop(context);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -2372,12 +2402,12 @@ class _AyahOptionsSheet extends StatelessWidget {
           _OptionRow(
             emoji: '📖',
             label: l10n.quranReaderTafsirOption,
-            onTap: () => _showComingSoon(context),
+            onTap: onTafsir,
           ),
           _OptionRow(
             emoji: '🌐',
             label: l10n.quranReaderTranslationOption,
-            onTap: () => _showComingSoon(context),
+            onTap: onTranslation,
           ),
           _OptionRow(
             emoji: '🔊',
