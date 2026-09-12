@@ -7,7 +7,7 @@
   (Dart) last wrote; nothing here computes a prayer time. Direction (RTL for
   Arabic) is set by the provider on prayer_widget_content, not baked in here.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/prayer_widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
