@@ -98,11 +98,24 @@ class AboutMeScreen extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              color: context.colors.goldDim,
               border: Border.all(color: context.colors.gold, width: 3),
               boxShadow: context.shadows.goldGlow,
-              image: const DecorationImage(
-                image: AssetImage('assets/images/dev.png'),
+            ),
+            // ClipOval + Image.asset(errorBuilder: ...) instead of a
+            // DecorationImage: a DecorationImage has no way to react to a
+            // failed/missing asset, so a bad build (e.g. the asset didn't
+            // ship — see assets/images/README.md) used to silently render
+            // an empty gold ring. This falls back to a person icon instead.
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/dev.png',
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Icon(
+                  Icons.person_rounded,
+                  size: 56,
+                  color: context.colors.gold,
+                ),
               ),
             ),
           ),
