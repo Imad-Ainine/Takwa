@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:hijri/hijri_calendar.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:sound_mode/sound_mode.dart';
 import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 import 'dart:async';
@@ -35,7 +34,6 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   late final AnimationController _pulseCtrl;
   late final AnimationController _starsCtrl;
   late final AnimationController _entryCtrl;
-  StreamSubscription<AccelerometerEvent>? _sensorSub;
   Timer? _vibrationTimer;
   // Prevents _silenceAdhan from being called repeatedly while the phone
   // stays face-down (the accelerometer stream fires ~50 times/sec).
@@ -86,13 +84,32 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
       WakelockPlus.enable();
     }
 
-    // Sensors must be active before audio starts so no face-down event
-    // is missed in the gap between the await returning and play() being called.
-    _initSensors(prefs);
+    // Flip-to-silence itself now lives in AdhanAudioPlayer, armed the
+    // moment it starts playing (see _initAudio below and
+    // AdhanAutoTrigger's own play() calls) rather than here — this only
+    // mirrors its `silenced` flag into local UI state, so the button/label
+    // update correctly even if the silence happened before this screen
+    // finished mounting (e.g. audio was already started by
+    // AdhanAutoTrigger and the user flipped the phone during the brief
+    // gap before the route landed).
+    AdhanAudioPlayer.silenced.addListener(_onPlayerSilencedChanged);
+    // Sync any pre-existing value (e.g. audio was already silenced before
+    // this screen mounted) — addListener only fires on future changes.
+    _onPlayerSilencedChanged();
     _initVibration(prefs);
 
     if (widget.autoPlay) {
       await _initAudio(prefs);
+    }
+  }
+
+  void _onPlayerSilencedChanged() {
+    if (!AdhanAudioPlayer.silenced.value || _silenced) return;
+    _vibrationTimer?.cancel();
+    if (mounted) {
+      setState(() => _silenced = true);
+    } else {
+      _silenced = true;
     }
   }
 
@@ -115,28 +132,15 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     }
   }
 
-  void _initSensors(prefs) {
-    // Only attach the listener when the setting is enabled.  If disabled,
-    // _sensorSub stays null — no accelerometer usage at all.
-    if (!prefs.flipToSilenceEnabled) return;
-
-    _sensorSub = accelerometerEventStream().listen((event) {
-      // Z axis strongly negative = face-down (gravity vector pointing up).
-      // Threshold -8.0 m/s² (~0.82 g) is well below the ±9.8 full-flip
-      // signal while ignoring normal landscape tilts (~±5 m/s²).
-      if (event.z < -8.0) {
-        _silenceAdhan();
-      }
-    });
-  }
-
   /// Stops all Adhan audio and vibration immediately.
   ///
-  /// Called either by the face-down sensor or programmatically.
-  /// The screen remains open so the user can see the prayer name and
-  /// choose to close or go to prayer — matching the expected UX.
+  /// Called from the "Stop Audio" button. A face-down flip is now handled
+  /// entirely inside AdhanAudioPlayer (see _onPlayerSilencedChanged above
+  /// for how this screen picks that up), so this only covers the manual
+  /// tap path. The screen remains open so the user can see the prayer
+  /// name and choose to close or go to prayer — matching the expected UX.
   Future<void> _silenceAdhan() async {
-    if (_silenced) return; // already silenced — ignore repeated sensor events
+    if (_silenced) return;
     if (mounted) {
       setState(() {
         _silenced = true;
@@ -147,6 +151,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
 
     _vibrationTimer?.cancel();
     await AdhanAudioPlayer.stop();
+    AdhanAudioPlayer.silenced.value = true;
 
     // Give a brief haptic confirmation so the user knows silence worked.
     if (mounted) HapticFeedback.mediumImpact();
@@ -174,7 +179,11 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
     final volume = prefs.adhanVolumeLevel;
 
     if (!AdhanAudioPlayer.isPlaying) {
-      await AdhanAudioPlayer.play(asset: asset, volume: volume);
+      await AdhanAudioPlayer.play(
+        asset: asset,
+        volume: volume,
+        flipToSilenceEnabled: prefs.flipToSilenceEnabled,
+      );
     } else {
       await AdhanAudioPlayer.setVolume(volume);
     }
@@ -189,7 +198,7 @@ class _AdhanOverlayScreenState extends ConsumerState<AdhanOverlayScreen>
   void dispose() {
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    _sensorSub?.cancel();
+    AdhanAudioPlayer.silenced.removeListener(_onPlayerSilencedChanged);
     _vibrationTimer?.cancel();
     AdhanAudioPlayer.stop();
     AdhanForegroundService.stopAdhanService();

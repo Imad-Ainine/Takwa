@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../routes/app_routes.dart';
@@ -14,12 +16,33 @@ class AdhanAudioPlayer {
   static AudioPlayer? _player;
   static bool _isPlaying = false;
 
+  // Flip-to-silence used to live entirely inside AdhanOverlayScreen's
+  // State, so it only ever worked when that widget actually got mounted.
+  // But playback here is started independently by AdhanAutoTrigger
+  // (_check()/handleForegroundData()) *before* — and sometimes instead of
+  // — the screen route lands (see the navigator-ready retry below): if
+  // the push silently failed to land (the old flat 300ms delay, a
+  // backgrounded app, a cold-launch race), audio would play with no
+  // sensor listener anywhere, so flipping the phone did nothing. Owning
+  // the accelerometer here ties "can the user silence it by flipping"
+  // directly to "is Adhan audio playing" — the actual contract of the
+  // feature — instead of to whether a particular screen happened to build.
+  static StreamSubscription<AccelerometerEvent>? _flipSub;
+
+  /// True once flip-to-silence has fired for the currently playing Adhan.
+  /// AdhanOverlayScreen listens to this instead of running its own sensor
+  /// subscription, so the UI reflects a flip even if it happened before
+  /// (or without) the screen ever mounting.
+  static final ValueNotifier<bool> silenced = ValueNotifier(false);
+
   static Future<void> play({
     String asset = 'assets/sounds/Adhan-Makkah.mp3',
     double volume = 1.0,
+    bool flipToSilenceEnabled = true,
   }) async {
     try {
       await stop();
+      silenced.value = false;
       _player = AudioPlayer();
       await _player!.setVolume(volume);
       await _player!.setAsset(asset);
@@ -28,9 +51,28 @@ class AdhanAudioPlayer {
       });
       await _player!.play();
       _isPlaying = true;
+      if (flipToSilenceEnabled) _armFlipToSilence();
     } catch (e) {
       debugPrint('AdhanAudio: play error: $e');
     }
+  }
+
+  static void _armFlipToSilence() {
+    _flipSub?.cancel();
+    _flipSub = accelerometerEventStream().listen((event) {
+      // Z axis strongly negative = face-down (gravity vector pointing up).
+      // Threshold -8.0 m/s² (~0.82 g) is well below the ±9.8 full-flip
+      // signal while ignoring normal landscape tilts (~±5 m/s²). Same
+      // threshold AdhanOverlayScreen used to apply itself.
+      if (event.z < -8.0) _silenceViaFlip();
+    });
+  }
+
+  static Future<void> _silenceViaFlip() async {
+    if (silenced.value) return; // already silenced this Adhan
+    silenced.value = true;
+    await stop();
+    HapticFeedback.mediumImpact();
   }
 
   static Future<void> setVolume(double volume) async {
@@ -40,6 +82,8 @@ class AdhanAudioPlayer {
   }
 
   static Future<void> stop() async {
+    await _flipSub?.cancel();
+    _flipSub = null;
     try {
       if (_player != null) {
         await _player!.stop();
@@ -210,6 +254,7 @@ class AdhanAutoTrigger {
           await AdhanAudioPlayer.play(
             asset: 'assets/sounds/$adhanSoundFile',
             volume: adhanVolumeLevel,
+            flipToSilenceEnabled: prefs.flipToSilenceEnabled,
           );
         }
 
@@ -217,14 +262,17 @@ class AdhanAutoTrigger {
         if (adhanScreen && !adhanAlreadyVisible) {
           FlutterForegroundTask.wakeUpScreen();
           FlutterForegroundTask.launchApp();
-          final ctx = navigatorKey.currentContext;
-          if (ctx != null) {
-            await Future.delayed(const Duration(milliseconds: 300));
-            navigatorKey.currentState?.pushNamed(
-              Routes.adhan,
-              arguments: prayer.nameAr,
-            );
-          }
+          // Used to bail out here entirely if `navigatorKey.currentContext`
+          // was null at this exact instant, with no retry — a real gap
+          // whenever the widget tree wasn't built yet (e.g. right after
+          // the app was momentarily backgrounded), silently dropping the
+          // Adhan screen for that prayer for the rest of the day. Poll
+          // instead of taking one snapshot.
+          await _waitForNavigatorReady(navigatorKey);
+          navigatorKey.currentState?.pushNamed(
+            Routes.adhan,
+            arguments: prayer.nameAr,
+          );
         }
 
         break;
@@ -301,6 +349,7 @@ class AdhanAutoTrigger {
       await AdhanAudioPlayer.play(
         asset: 'assets/sounds/$adhanSoundFile',
         volume: adhanVolumeLevel,
+        flipToSilenceEnabled: prefs.flipToSilenceEnabled,
       );
     }
 
@@ -315,13 +364,41 @@ class AdhanAutoTrigger {
       });
 
       if (!adhanAlreadyVisible) {
-        await Future.delayed(const Duration(milliseconds: 300));
+        // This is the path that follows a cold launch (FlutterForegroundTask.
+        // launchApp() above, when the app was fully killed) — exactly when a
+        // flat 300ms wait is least likely to be enough for the navigator to
+        // exist yet. Poll instead of guessing a fixed delay.
+        await _waitForNavigatorReady(navigatorKey);
         navigatorKey.currentState?.pushNamed(
           Routes.adhan,
           arguments: prayerName,
         );
       }
     }
+  }
+
+  /// Polls for the app's navigator to be ready to accept a route push,
+  /// instead of a single fixed delay. Needed because both callers above
+  /// may run right after `FlutterForegroundTask.launchApp()` cold-starts
+  /// the app (or right as it's resumed from background) — cases where
+  /// how long the widget tree takes to build varies and can easily exceed
+  /// a flat 300ms, which previously meant the push was silently skipped
+  /// (or, in [_check]'s case, never even attempted) with no retry, so the
+  /// Adhan screen just didn't appear for that prayer.
+  static Future<void> _waitForNavigatorReady(
+    GlobalKey<NavigatorState> navigatorKey, {
+    Duration timeout = const Duration(seconds: 8),
+    Duration pollEvery = const Duration(milliseconds: 200),
+  }) async {
+    final deadline = DateTime.now().add(timeout);
+    while (navigatorKey.currentState == null) {
+      if (DateTime.now().isAfter(deadline)) return;
+      await Future.delayed(pollEvery);
+    }
+    // One extra frame gap even once the state exists, matching the
+    // original intent of the flat delay (let the first frame settle)
+    // without the fixed-timeout failure mode.
+    await Future.delayed(const Duration(milliseconds: 100));
   }
 }
 

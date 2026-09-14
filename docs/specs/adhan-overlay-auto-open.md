@@ -103,6 +103,29 @@
 - A Flutter/Dart toolchain (3.47.2 stable) was available for this fourth pass —
   `flutter analyze` (whole project) and `flutter test` (whole suite) both pass clean after these
   changes, in addition to the by-hand review the first three passes relied on.
+- **Sixth pass — flip-to-silence decoupled from the Adhan screen actually mounting; the
+  screen-push delay's silent-failure mode fixed.** Reported symptom: "Adhan doesn't stop when the
+  phone is flipped, and the Adhan screen doesn't display at prayer time." Root cause for both,
+  traced to the same code: `AdhanAutoTrigger._check()`/`handleForegroundData()` start
+  `AdhanAudioPlayer` playback *independently* of whether `Routes.adhan` (`AdhanOverlayScreen`)
+  actually ends up mounted — and the only flip-to-silence accelerometer listener in the app used to
+  live inside that screen's `State`. Two ways this left audio playing with nothing able to silence
+  it: (1) both callers gated the screen push on a single fixed `Future.delayed(300ms)` with no
+  retry — `_check()` was worse still, bailing out immediately (before even waiting) if
+  `navigatorKey.currentContext` was null at that exact instant, e.g. right after
+  `FlutterForegroundTask.launchApp()` cold-starts the app, when the widget tree reliably isn't
+  built yet within 300ms; (2) even when the push landed, a real (if narrow) window existed between
+  audio starting and the screen's own `initState` attaching its sensor listener. Fixed by moving
+  flip-to-silence into `AdhanAudioPlayer` itself (armed the instant `.play()` starts, torn down in
+  `.stop()`), exposed as a `ValueNotifier<bool> silenced` that `AdhanOverlayScreen` now just
+  mirrors into its local UI state instead of owning a competing sensor subscription — silencing now
+  works whenever Adhan audio is playing, regardless of whether the screen ever mounts. Separately,
+  replaced both flat 300ms delays with a bounded poll (`_waitForNavigatorReady`, up to 8s) for the
+  navigator to actually exist before pushing, closing the silent-failure mode for the screen not
+  appearing after a cold launch. Does not touch the other still-open items on this list (R5's
+  system-overlay duplication, R6's polling loops, or the killed-app `UnifiedOverlayWindow` path
+  still having no audio/flip-to-silence of its own — see R7's "found, not fixed" note above, which
+  remains true for that specific surface).
 - **R6/R1 (fifth pass) — decoupled the exact-alarm notification's sound from its full-screen-intent
   launch, and made the "entering prayer time" notification silent by default.** The exact-alarm
   notification (`NotificationsService.schedulePrayerNotifications`, item 2) previously tied
