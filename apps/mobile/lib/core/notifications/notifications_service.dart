@@ -1358,6 +1358,12 @@ class NotificationRouter {
     }
     final ctx = _navigatorKey.currentContext;
     if (ctx == null) return;
+    // The above polling loop awaited, so the analyzer can no longer prove
+    // `ctx` is still attached to the tree by the time we use it below
+    // (even though it was fetched fresh right after the last await) —
+    // this is the same guard `State.mounted` gives after an await, applied
+    // to a BuildContext obtained via a GlobalKey instead of `this.context`.
+    if (!ctx.mounted) return;
 
     switch (type) {
       case 'prayer':

@@ -39,15 +39,6 @@ class _PopupItem {
   final String categoryName;
   final bool isDua;
 
-  /// True for the synthetic item built when this overlay is shown because a
-  /// prayer just started (`type: 'prayer'` in `shareData`), rather than a
-  /// randomly-picked adhkar/dua. Fixes docs/specs/adhan-overlay-auto-open.md
-  /// R4: previously `_pickRandom()` had no branch for `_filter == 'prayer'`,
-  /// so a killed app showed a random adhkar/dua card instead of actually
-  /// announcing which prayer had started.
-  final bool isPrayerAnnouncement;
-  final IconData sourceIcon;
-
   const _PopupItem({
     required this.arabic,
     required this.emoji,
@@ -56,8 +47,6 @@ class _PopupItem {
     this.meaning,
     this.fadl,
     this.source,
-    this.isPrayerAnnouncement = false,
-    this.sourceIcon = Icons.auto_stories_rounded,
   });
 }
 
@@ -771,11 +760,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
               Row(
                 children: [
                   Text(
-                    item.isPrayerAnnouncement
-                        ? _l10n.overlayTypePrayer
-                        : (item.isDua
-                              ? _l10n.overlayTypeDua
-                              : _l10n.overlayTypeDhikr),
+                    item.isDua ? _l10n.overlayTypeDua : _l10n.overlayTypeDhikr,
                     style: TextStyle(
                       fontFamily: 'Amiri',
                       fontSize: 10,
@@ -901,7 +886,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(item.sourceIcon, color: _IGold.gold2, size: 12),
+            Icon(Icons.auto_stories_rounded, color: _IGold.gold2, size: 12),
             const SizedBox(width: 6),
             Flexible(
               child: Text(
