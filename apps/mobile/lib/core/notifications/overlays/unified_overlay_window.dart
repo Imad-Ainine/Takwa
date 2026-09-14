@@ -886,7 +886,7 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.auto_stories_rounded, color: _IGold.gold2, size: 12),
+            const Icon(Icons.auto_stories_rounded, color: _IGold.gold2, size: 12),
             const SizedBox(width: 6),
             Flexible(
               child: Text(
