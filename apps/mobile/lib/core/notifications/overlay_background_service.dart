@@ -447,7 +447,15 @@ class _OverlayTaskHandler extends TaskHandler {
       if (triggered.contains(prayer.name)) continue;
 
       final diffSecs = now.difference(prayer.time).inSeconds;
-      if (diffSecs >= 0 && diffSecs <= 60) {
+      // Was 60s. Too narrow whenever this isolate's own 1s tick gets
+      // delayed by OS power management (Doze/App Standby/OEM battery
+      // optimization can and does push a "1 second" foreground-task tick
+      // out by several minutes on real devices) — by the time it resumes,
+      // the window had already closed and this prayer was silently never
+      // triggered from here at all. 300s (5 min) gives a delayed tick real
+      // room to still catch it, matching AdhanAutoTrigger's own widened
+      // window below.
+      if (diffSecs >= 0 && diffSecs <= 300) {
         triggered.add(prayer.name);
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
@@ -734,8 +742,72 @@ class _OverlayTaskHandler extends TaskHandler {
         _PrayerInfo('maghrib', 'المغرب', '🌆', times.maghrib.toLocal()),
         _PrayerInfo('isha', 'العشاء', '🌃', times.isha.toLocal()),
       ];
+
+      // Keep today's exact-alarm/full-screen-intent Adhan notifications
+      // (NotificationsService.schedulePrayerNotifications) in sync with
+      // whatever day this isolate thinks it is. That's the one mechanism
+      // meant to fire the Adhan screen right on time regardless of Doze/
+      // App-Standby throttling — the two polling loops (this isolate's own
+      // 1s tick below and AdhanAutoTrigger's in the main isolate) are only
+      // a fallback, bounded by their own dedupe windows, and can't recover
+      // once the OS delays a tick past prayer time. Previously this was
+      // scheduled exactly once, from MainShell on cold start — fine for
+      // that day, but nothing ever rescheduled it for the next one if the
+      // app process (kept alive by this very foreground service) survived
+      // past midnight without a full restart. From the second day onward
+      // the exact alarms were stale/gone, silently degrading the whole
+      // feature to wall-clock polling — which is exactly what "the Adhan
+      // screen opens a few minutes late, with no sound" looks like: by the
+      // time a delayed tick or a reopened app catches up, it may already be
+      // outside the window that plays sound, or outside the window at all.
+      await _rescheduleExactAlarms();
     } catch (e) {
       debugPrint('OverlayService: Failed to compute prayer times: $e');
+    }
+  }
+
+  /// Re-schedules the exact-alarm prayer notifications
+  /// (NotificationsService.schedulePrayerNotifications) for [_todayPrayers].
+  /// Safe to call repeatedly — that method cancels its own notification IDs
+  /// before rescheduling, so calling it again with the same day's prayers
+  /// is a no-op in effect, not a duplicate.
+  Future<void> _rescheduleExactAlarms() async {
+    if (_todayPrayers.isEmpty) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      // Mirrors NotificationsManager.scheduleAll()'s own gate — respect the
+      // user turning prayer reminders off entirely.
+      if (!(prefs.getBool('prayer_reminder') ?? true)) return;
+
+      const notifIds = {
+        'fajr': NotifIds.fajr,
+        'dhuhr': NotifIds.dhuhr,
+        'asr': NotifIds.asr,
+        'maghrib': NotifIds.maghrib,
+        'isha': NotifIds.isha,
+      };
+      final prayers = _todayPrayers
+          .map(
+            (p) => PrayerTimeInfo(
+              name: p.name,
+              nameAr: p.nameAr,
+              emoji: p.emoji,
+              time: p.time,
+              notifId: notifIds[p.name] ?? -1,
+            ),
+          )
+          .toList();
+
+      await NotificationsService.schedulePrayerNotifications(
+        prayers: prayers,
+        l10n: _l10n,
+        preAdhanEnabled: prefs.getBool('pre_adhan_notif') ?? true,
+        iqamaEnabled: prefs.getBool('iqama_notif') ?? true,
+        adhanMode: _adhanMode,
+        adhanScreenEnabled: prefs.getBool('adhan_screen_enabled') ?? true,
+      );
+    } catch (e) {
+      debugPrint('OverlayService: exact-alarm reschedule failed: $e');
     }
   }
 
