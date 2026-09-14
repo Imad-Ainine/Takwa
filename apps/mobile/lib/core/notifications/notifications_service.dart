@@ -1338,11 +1338,24 @@ class NotificationRouter {
   static final _navigatorKey = GlobalKey<NavigatorState>();
   static GlobalKey<NavigatorState> get navigatorKey => _navigatorKey;
 
-  static void route(String payload) {
+  static Future<void> route(String payload) async {
     if (payload.isEmpty) return;
     final parts = payload.split(':');
     final type = parts.isNotEmpty ? parts[0] : '';
     final param = parts.length > 1 ? parts[1] : '';
+
+    // Used to bail out immediately if the navigator wasn't ready at this
+    // exact instant — reliably the case right after a cold launch (the app
+    // was fully killed and this tap/full-screen-intent just started it),
+    // since the widget tree isn't built that fast. That silently dropped
+    // the navigation entirely, no retry — worst for `'prayer'`, where it
+    // meant the Adhan screen just never opened. Poll instead of a single
+    // snapshot, same fix as AdhanAutoTrigger._waitForNavigatorReady.
+    final deadline = DateTime.now().add(const Duration(seconds: 8));
+    while (_navigatorKey.currentContext == null) {
+      if (DateTime.now().isAfter(deadline)) return;
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
     final ctx = _navigatorKey.currentContext;
     if (ctx == null) return;
 

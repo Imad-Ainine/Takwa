@@ -436,12 +436,16 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     _startCloseTimer();
 
     FlutterOverlayWindow.overlayListener.listen((data) {
-      if (data is Map && data['type'] == 'prayer') {
-        // A prayer just started (OverlayBackgroundService._checkAndTriggerAdhan)
-        // — show the actual announcement instead of falling through to a
-        // random adhkar/dua card (adhan-overlay-auto-open.md R4).
-        _showPrayerAnnouncement(data);
-      } else if (data is Map && data.containsKey('type')) {
+      // OverlayBackgroundService._checkAndTriggerAdhan used to also pop a
+      // 'type: prayer' card here on this same system overlay — a second,
+      // separate popup for "prayer time reached" with no audio and no
+      // flip-to-silence of its own, competing with the real Adhan screen.
+      // Removed: the real AdhanOverlayScreen (sound + flip-to-silence) is
+      // now the only surface for prayer time, opened directly via
+      // sendDataToMain when the app is alive, and via the already-scheduled
+      // full-screen-intent notification when it isn't. This overlay is
+      // back to only ever showing the routine adhkar/dua popups below.
+      if (data is Map && data.containsKey('type')) {
         setState(() {
           _filter = data['type'];
         });
@@ -476,39 +480,6 @@ class _UnifiedOverlayWindowState extends State<UnifiedOverlayWindow>
     _slideCtrl.reverse().then((_) {
       FlutterOverlayWindow.closeOverlay();
     });
-  }
-
-  /// Builds and shows the actual Adhan announcement card for the prayer
-  /// named in [data] (from `OverlayBackgroundService`'s `shareData`), rather
-  /// than picking a random adhkar/dua — see `_PopupItem.isPrayerAnnouncement`.
-  void _showPrayerAnnouncement(Map data) {
-    final prayerName = data['prayer'] as String? ?? '';
-    final emoji = data['emoji'] as String? ?? '🕌';
-    final time = data['time'] as String?;
-
-    final item = _PopupItem(
-      arabic: _l10n.overlayServicePrayerTimeOverlayContent(prayerName),
-      emoji: emoji,
-      categoryName: _l10n.overlayServicePrayerTimeOverlayTitle,
-      isDua: false,
-      isPrayerAnnouncement: true,
-      sourceIcon: Icons.access_time_rounded,
-      source: time != null ? _l10n.overlayPrayerAnnouncementTimeLabel(time) : null,
-    );
-
-    _filter = null;
-    if (_current == null) {
-      setState(() => _current = item);
-      _slideCtrl.forward();
-      _startCloseTimer();
-    } else {
-      _slideCtrl.reverse().then((_) {
-        if (!mounted) return;
-        setState(() => _current = item);
-        _slideCtrl.forward();
-        _startCloseTimer();
-      });
-    }
   }
 
   void _pickRandom({bool animate = false}) {

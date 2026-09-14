@@ -103,29 +103,6 @@
 - A Flutter/Dart toolchain (3.47.2 stable) was available for this fourth pass —
   `flutter analyze` (whole project) and `flutter test` (whole suite) both pass clean after these
   changes, in addition to the by-hand review the first three passes relied on.
-- **Sixth pass — flip-to-silence decoupled from the Adhan screen actually mounting; the
-  screen-push delay's silent-failure mode fixed.** Reported symptom: "Adhan doesn't stop when the
-  phone is flipped, and the Adhan screen doesn't display at prayer time." Root cause for both,
-  traced to the same code: `AdhanAutoTrigger._check()`/`handleForegroundData()` start
-  `AdhanAudioPlayer` playback *independently* of whether `Routes.adhan` (`AdhanOverlayScreen`)
-  actually ends up mounted — and the only flip-to-silence accelerometer listener in the app used to
-  live inside that screen's `State`. Two ways this left audio playing with nothing able to silence
-  it: (1) both callers gated the screen push on a single fixed `Future.delayed(300ms)` with no
-  retry — `_check()` was worse still, bailing out immediately (before even waiting) if
-  `navigatorKey.currentContext` was null at that exact instant, e.g. right after
-  `FlutterForegroundTask.launchApp()` cold-starts the app, when the widget tree reliably isn't
-  built yet within 300ms; (2) even when the push landed, a real (if narrow) window existed between
-  audio starting and the screen's own `initState` attaching its sensor listener. Fixed by moving
-  flip-to-silence into `AdhanAudioPlayer` itself (armed the instant `.play()` starts, torn down in
-  `.stop()`), exposed as a `ValueNotifier<bool> silenced` that `AdhanOverlayScreen` now just
-  mirrors into its local UI state instead of owning a competing sensor subscription — silencing now
-  works whenever Adhan audio is playing, regardless of whether the screen ever mounts. Separately,
-  replaced both flat 300ms delays with a bounded poll (`_waitForNavigatorReady`, up to 8s) for the
-  navigator to actually exist before pushing, closing the silent-failure mode for the screen not
-  appearing after a cold launch. Does not touch the other still-open items on this list (R5's
-  system-overlay duplication, R6's polling loops, or the killed-app `UnifiedOverlayWindow` path
-  still having no audio/flip-to-silence of its own — see R7's "found, not fixed" note above, which
-  remains true for that specific surface).
 - **R6/R1 (fifth pass) — decoupled the exact-alarm notification's sound from its full-screen-intent
   launch, and made the "entering prayer time" notification silent by default.** The exact-alarm
   notification (`NotificationsService.schedulePrayerNotifications`, item 2) previously tied
@@ -148,6 +125,56 @@
   it already did in `AdhanAutoTrigger.handleForegroundData`'s in-app path — previously the system
   overlay ignored this setting entirely. `flutter analyze`/`flutter test` (whole project/suite)
   pass clean after this change.
+- **Sixth pass — flip-to-silence decoupled from the Adhan screen actually mounting; the
+  screen-push delay's silent-failure mode fixed.** Reported symptom: "Adhan doesn't stop when the
+  phone is flipped, and the Adhan screen doesn't display at prayer time." Root cause for both,
+  traced to the same code: `AdhanAutoTrigger._check()`/`handleForegroundData()` start
+  `AdhanAudioPlayer` playback *independently* of whether `Routes.adhan` (`AdhanOverlayScreen`)
+  actually ends up mounted — and the only flip-to-silence accelerometer listener in the app used to
+  live inside that screen's `State`. Two ways this left audio playing with nothing able to silence
+  it: (1) both callers gated the screen push on a single fixed `Future.delayed(300ms)` with no
+  retry — `_check()` was worse still, bailing out immediately (before even waiting) if
+  `navigatorKey.currentContext` was null at that exact instant, e.g. right after
+  `FlutterForegroundTask.launchApp()` cold-starts the app, when the widget tree reliably isn't
+  built yet within 300ms; (2) even when the push landed, a real (if narrow) window existed between
+  audio starting and the screen's own `initState` attaching its sensor listener. Fixed by moving
+  flip-to-silence into `AdhanAudioPlayer` itself (armed the instant `.play()` starts, torn down in
+  `.stop()`), exposed as a `ValueNotifier<bool> silenced` that `AdhanOverlayScreen` now just
+  mirrors into its local UI state instead of owning a competing sensor subscription — silencing now
+  works whenever Adhan audio is playing, regardless of whether the screen ever mounts. Separately,
+  replaced both flat 300ms delays with a bounded poll (`_waitForNavigatorReady`, up to 8s) for the
+  navigator to actually exist before pushing, closing the silent-failure mode for the screen not
+  appearing after a cold launch.
+- **Seventh pass — removed the background isolate's own duplicate notification and system-overlay
+  popup for prayer time, per an explicit ask to have exactly one adhan surface.** Two more things
+  `OverlayBackgroundService._checkAndTriggerAdhan` used to do at prayer time, both removed:
+  (1) `_scheduleAdhanNotification` fired a second, separate notification for the same prayer —
+  redundant with, and strictly weaker than, the exact-alarm notification
+  `NotificationsService.schedulePrayerNotifications` already scheduled ahead of time for that same
+  prayer (that one carries `fullScreenIntent`; `NotificationsService.showNotification`, which
+  `_scheduleAdhanNotification` used, has no such parameter, so this was pure duplicate tray clutter
+  with no extra reach) — the method is now deleted entirely, not just uncalled. (2) It popped its
+  own small system-overlay "prayer" card (`ow.FlutterOverlayWindow.showOverlay` +
+  `shareData({'type': 'prayer', ...})`, rendered by `UnifiedOverlayWindow._showPrayerAnnouncement`,
+  added in the fourth pass's R4 fix above) — a second, separate popup competing with the real Adhan
+  screen, with no audio and no flip-to-silence of its own (R7's "found, not fixed" note above was
+  about this exact surface), easy to mistake for "the adhan" while having no way to stop it; both
+  the trigger and `_showPrayerAnnouncement` itself are now removed, so `UnifiedOverlayWindow` is
+  back to only ever showing the routine adhkar/dua popups it started as. The single remaining
+  source of truth for "prayer time reached" is `FlutterForegroundTask.sendDataToMain` (opens the
+  real `AdhanOverlayScreen` immediately, with sound + flip-to-silence, when the main isolate is
+  alive) plus the already-scheduled exact-alarm/full-screen-intent notification (covers the app
+  being fully killed). Separately, closed the same silent-failure class the sixth pass fixed in
+  `AdhanAutoTrigger` for the *third* place it also existed: `NotificationRouter.route()`
+  (`notifications_service.dart`) — used by a tapped notification and by `main.dart`'s
+  `_checkNotificationLaunch()` on cold start — bailed out immediately if
+  `_navigatorKey.currentContext` was null at that instant, with no retry; now polls the same way
+  (up to 8s) before giving up. Still open: R5 (system-overlay duplication when the app is already
+  foregrounded — moot for prayer time now that the system overlay no longer fires for it at all,
+  but still applies to the routine adhkar/dua popups) and R6 (the polling loops themselves weren't
+  replaced with OS-scheduled triggers). No Flutter toolchain was available for this pass — reviewed
+  by hand (brace/paren balance, grepped for leftover references to removed symbols) rather than run
+  through `flutter analyze`/`flutter test`.
 
 ## 1. Problem statement
 
