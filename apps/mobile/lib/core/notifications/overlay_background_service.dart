@@ -468,53 +468,23 @@ class _OverlayTaskHandler extends TaskHandler {
         triggered.add(prayer.name);
         await prefs.setString(_kTriggeredPrayersKey, triggered.join(','));
 
-        // إرسال إشعار دخول وقت الصلاة — صامت دائماً بلا صوت (نفس منطق
-        // NotificationsService._scheduleExact لإشعار الأذان المجدول
-        // بالـ AlarmManager): صوت الأذان الفعلي يُشغَّل حصراً داخل شاشة
-        // الأذان (AdhanAudioPlayer/AdhanOverlayScreen) حسب `adhanMode`، وليس
-        // من قناة الإشعار — لذلك هذا الإشعار يُرسل دائماً (بغضّ النظر عن
-        // adhanMode) بالتزامن مع فتح الـ Overlay أدناه بدلاً من الاقتصار
-        // على نمط "sound" فقط. كان يُستخدَم سابقاً `NotifChannels.prayerSound`
-        // مع شرط `_adhanMode == 'sound'` فقط — نفس الفكرة القديمة (`adhanSoundEnabled`)
-        // التي أُزيلت سابقاً (انظر docs/specs/settings-notifications-improvements.md R1)
-        // لكن مطبّقة الآن بالاتجاه الصحيح: صامت دائماً، وليس بصوت أحياناً.
-        await _scheduleAdhanNotification(prayer);
-
-        // فتح الـ Overlay تلقائياً عند وقت الصلاة — فقط إذا كانت "شاشة
-        // الأذان" مفعّلة في الإعدادات؛ هذا هو المسار المكافئ لهذا الإعداد
-        // عندما يكون التطبيق الرئيسي مغلقاً تماماً (لا يوجد isolate رئيسي
-        // ليطبّق فحص adhanScreenEnabled الموجود في handleForegroundData).
-        final hasOverlayPerm =
-            _adhanScreenEnabled &&
-            await ow.FlutterOverlayWindow.isPermissionGranted();
-        if (hasOverlayPerm) {
-          await ow.FlutterOverlayWindow.showOverlay(
-            enableDrag: true,
-            overlayTitle: _l10n.overlayServicePrayerTimeOverlayTitle,
-            overlayContent: _l10n.overlayServicePrayerTimeOverlayContent(
-              prayer.nameAr,
-            ),
-            flag: ow.OverlayFlag.defaultFlag,
-            alignment: ow.OverlayAlignment.center,
-            visibility: ow.NotificationVisibility.visibilityPublic,
-            height: ow.WindowSize.matchParent,
-            width: ow.WindowSize.matchParent,
-          );
-
-          // إرسال البيانات للـ Overlay
-          await Future.delayed(const Duration(milliseconds: 600));
-          ow.FlutterOverlayWindow.shareData({
-            'type': 'prayer',
-            'prayer': prayer.nameAr,
-            'emoji': prayer.emoji,
-            'time': DateFormat('HH:mm').format(prayer.time),
-            'volume': _adhanVolumeLevel,
-            'adhanMode': _adhanMode,
-            'flipToSilenceEnabled': _flipToSilenceEnabled,
-            'silentMode': _silentModeEnabled,
-            'silentDuration': _silentDurationMins,
-          });
-        }
+        // Prayer time reached. This background isolate used to also (a)
+        // fire its own separate notification via _scheduleAdhanNotification
+        // — redundant with, and weaker than, the exact-alarm notification
+        // NotificationsService.schedulePrayerNotifications already
+        // scheduled ahead of time for this same prayer (that one carries
+        // fullScreenIntent; showNotification() here never could, so this
+        // was pure duplicate tray clutter with no extra reach), and (b)
+        // pop its own small system-overlay "prayer" card
+        // (ow.FlutterOverlayWindow.showOverlay + shareData) — a second,
+        // separate UI competing with the real Adhan screen, with no audio
+        // and no flip-to-silence of its own, easy to mistake for "the
+        // adhan" while having no way to stop it. Both removed: the single
+        // source of truth for "prayer time reached" is now the sendDataToMain
+        // signal below (opens the real AdhanOverlayScreen immediately with
+        // sound + flip-to-silence when the main isolate is alive) plus the
+        // already-scheduled exact-alarm notification (covers the app being
+        // fully killed, via fullScreenIntent).
 
         // إرسال أمر لفتح شاشة الأذان في التطبيق (أو تقليله حسب الإعدادات)
         FlutterForegroundTask.sendDataToMain({
@@ -536,37 +506,10 @@ class _OverlayTaskHandler extends TaskHandler {
           'sound': _adhanMode == 'sound', // legacy compat
         });
 
-        debugPrint('🕌 أُطلق أذان ${prayer.nameAr} مع الـ Overlay');
+        debugPrint('🕌 أُطلق أذان ${prayer.nameAr}');
         return;
       }
     }
-  }
-
-  Future<void> _scheduleAdhanNotification(_PrayerInfo prayer) async {
-    // 'vibrate' still buzzes the device via the channel itself (useful when
-    // this notification is the only thing that reaches the user); 'sound'
-    // and 'silent' both stay on the fully silent channel — the real Adhan
-    // audio for 'sound' mode plays from the overlay/AdhanAudioPlayer once it
-    // opens, never from this notification.
-    final channel = _adhanMode == 'vibrate'
-        ? NotifChannels.prayerVibrate
-        : NotifChannels.prayerSilent;
-
-    await NotificationsService.showNotification(
-      id: prayer.name == 'fajr'
-          ? NotifIds.fajr
-          : prayer.name == 'dhuhr'
-          ? NotifIds.dhuhr
-          : prayer.name == 'asr'
-          ? NotifIds.asr
-          : prayer.name == 'maghrib'
-          ? NotifIds.maghrib
-          : NotifIds.isha,
-      title: '${prayer.emoji} حان وقت ${prayer.nameAr}',
-      body: 'اللهُ أكبر، اللهُ أكبر، حيَّ على الصلاة، حيَّ على الفلاح',
-      payload: 'prayer:${prayer.name}',
-      channel: channel,
-    );
   }
 
   // ──────────────────────────────────────
