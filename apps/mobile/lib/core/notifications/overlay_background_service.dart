@@ -44,12 +44,10 @@ const _kSilentModeEnabledKey = 'silent_mode_enabled';
 const _kSilentDurationMinsKey = 'silent_duration_mins';
 const _kAutoSilentAfterAdhanKey = 'auto_silent_after_adhan';
 const _kSilentModeVibrationKey = 'silent_vibration_enabled';
-// Adhan mode ('sound' | 'vibrate' | 'silent') and flip-to-silence setting —
-// mirrored from SQLite via SettingsPrefsBridge so the background isolate can
-// read the canonical values without Riverpod access.
+// Adhan mode ('sound' | 'vibrate' | 'silent') — mirrored from SQLite via
+// SettingsPrefsBridge so the background isolate can read the canonical
+// value without Riverpod access.
 const _kAdhanModeKey = 'adhan_mode';
-const _kAdhanScreenEnabledKey = 'adhan_screen_enabled';
-const _kFlipToSilenceKey = 'flip_to_silence_enabled';
 
 // ─────────────────────────────────────────
 //  TIMINGS
@@ -253,21 +251,18 @@ class _OverlayTaskHandler extends TaskHandler {
   int _popupIntervalMins = _kDefaultPopupIntervalMins;
   bool _silentModeEnabled = false;
   int _silentDurationMins = 20;
-  double _adhanVolumeLevel = 1.0;
   // Canonical adhan mode — matches UserPreferences.adhanMode values:
   // 'sound' | 'vibrate' | 'silent'. Sent to the main isolate so
   // handleForegroundData can make the right decision about audio.
   String _adhanMode = 'sound';
-  // Whether the user wants the Adhan screen/overlay to auto-open at prayer
-  // time at all — gates the killed-app system overlay below the same way
-  // `adhanScreenEnabled` already gates the in-app route in
-  // AdhanAutoTrigger.handleForegroundData, so disabling the setting has a
-  // consistent effect regardless of whether the main isolate is alive.
-  bool _adhanScreenEnabled = true;
-  // Whether the face-down / flip-to-silence feature is enabled.
-  // Forwarded to the system overlay so UnifiedOverlayWindow can also
-  // respect the setting if it handles its own audio in future.
-  bool _flipToSilenceEnabled = true;
+  // adhanScreenEnabled/flipToSilenceEnabled/adhanVolumeLevel used to be
+  // mirrored here too, to gate/feed this isolate's own system-overlay
+  // "prayer" popup and its (never-added) audio. That popup is gone — see
+  // docs/specs/adhan-overlay-auto-open.md's seventh pass — so this isolate
+  // has nothing left to use them for; onReceiveData/updateSettings on the
+  // main-isolate side still accept and forward them (harmless, just
+  // unread here now) so removing them doesn't require touching those
+  // call sites.
 
   final _random = math.Random();
 
@@ -303,20 +298,11 @@ class _OverlayTaskHandler extends TaskHandler {
       if (data.containsKey('overlay_popups_enabled')) {
         _overlayEnabled = data['overlay_popups_enabled'] as bool;
       }
-      if (data.containsKey('adhan_volume_level')) {
-        _adhanVolumeLevel = data['adhan_volume_level'] as double;
-      }
       if (data.containsKey('popup_interval_minutes')) {
         _popupIntervalMins = data['popup_interval_minutes'] as int;
       }
       if (data.containsKey('adhan_mode')) {
         _adhanMode = data['adhan_mode'] as String;
-      }
-      if (data.containsKey('adhan_screen_enabled')) {
-        _adhanScreenEnabled = data['adhan_screen_enabled'] as bool;
-      }
-      if (data.containsKey('flip_to_silence_enabled')) {
-        _flipToSilenceEnabled = data['flip_to_silence_enabled'] as bool;
       }
       if (data.containsKey('silent_mode_enabled')) {
         _silentModeEnabled = data['silent_mode_enabled'] as bool;
@@ -353,10 +339,7 @@ class _OverlayTaskHandler extends TaskHandler {
         prefs.getInt(_kPopupIntervalMinsKey) ?? _kDefaultPopupIntervalMins;
     _silentModeEnabled = prefs.getBool(_kSilentModeEnabledKey) ?? false;
     _silentDurationMins = prefs.getInt(_kSilentDurationMinsKey) ?? 20;
-    _adhanVolumeLevel = prefs.getDouble('adhan_volume_level') ?? 1.0;
     _adhanMode = prefs.getString(_kAdhanModeKey) ?? 'sound';
-    _adhanScreenEnabled = prefs.getBool(_kAdhanScreenEnabledKey) ?? true;
-    _flipToSilenceEnabled = prefs.getBool(_kFlipToSilenceKey) ?? true;
   }
 
   // ──────────────────────────────────────
