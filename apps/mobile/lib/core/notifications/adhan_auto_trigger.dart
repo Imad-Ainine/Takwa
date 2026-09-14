@@ -212,9 +212,17 @@ class AdhanAutoTrigger {
       final now = DateTime.now();
       for (final prayer in prayers) {
         final diffSecs = now.difference(prayer.time).inSeconds;
-        // Trigger window: from prayer time up to 3 minutes after, to
-        // survive the app being momentarily backgrounded at the exact second.
-        if (diffSecs < 0 || diffSecs > 180) continue;
+        // Trigger window: from prayer time up to 10 minutes after. Was 3
+        // minutes, meant to survive the app being momentarily backgrounded
+        // at the exact second — but this timer only runs at all while the
+        // main isolate is alive and this widget mounted, so the common real
+        // case is a user reopening the app *after* missing the prayer by a
+        // few minutes (screen was off, phone was in a pocket, etc.); a
+        // 3-minute tail missed that reopen more often than not, leaving the
+        // Adhan silently never announced for that prayer at all. Widened to
+        // roughly match the shortest iqama gap (5 min for Maghrib) so it's
+        // still meaningful to show/play when caught late.
+        if (diffSecs < 0 || diffSecs > 600) continue;
 
         // Unique key per prayer per calendar day — the only deduplication
         // guard needed. The old 30-minute cross-prayer wall was removed
