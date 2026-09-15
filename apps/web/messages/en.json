@@ -287,6 +287,9 @@
   "Dashboard": {
     "title": "Your Dashboard",
     "welcome": "Signed in as {email}.",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "We couldn't load your dashboard. Please try again.",
+    "retry": "Try again",
     "placeholderNote": "This is your personal Takwa web hub. Your synced prayers, daily checklist, and spiritual streaks will be visualized here.",
     "signOut": "Sign Out",
     "statsTeaserTitle": "Your Spiritual Companion",

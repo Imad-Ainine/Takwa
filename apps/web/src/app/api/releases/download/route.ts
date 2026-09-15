@@ -18,6 +18,13 @@ export async function GET(request: NextRequest) {
 
   let version = searchParams.get('version');
 
+  // Reject anything that isn't a plain semver-ish version before it reaches
+  // the GitHub URL we redirect to — this is user-supplied input embedded
+  // directly into a URL path segment.
+  if (version && !/^\d+\.\d+\.\d+$/.test(version)) {
+    version = null;
+  }
+
   // If no version supplied, resolve the latest from GitHub Releases API
   if (!version) {
     try {

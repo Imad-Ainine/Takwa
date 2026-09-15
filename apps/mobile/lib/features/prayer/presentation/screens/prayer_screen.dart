@@ -709,7 +709,9 @@ class _PrayerHeader extends StatelessWidget {
                               ),
                               TakwaTappable(
                                 onTap: () => LocationPickerSheet.show(context),
-                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.sm,
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 2,
@@ -1307,12 +1309,12 @@ class _TimeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive
             ? color.withValues(alpha: 0.15)
-            : Colors.white.withValues(alpha: 0.06),
+            : style.text.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: isActive
               ? color.withValues(alpha: 0.4)
-              : Colors.white.withValues(alpha: 0.1),
+              : style.text.withValues(alpha: 0.1),
           width: isActive ? 1.5 : 1,
         ),
         boxShadow: isActive
@@ -1328,7 +1330,7 @@ class _TimeCard extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 10,
-              color: Colors.white.withValues(alpha: 0.55),
+              color: style.textSec,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -1342,7 +1344,7 @@ class _TimeCard extends StatelessWidget {
                     fontFamily: 'NotoNaskhArabic',
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: isActive ? color : Colors.white,
+                    color: isActive ? color : style.text,
                   ),
                 ),
                 TextSpan(
@@ -1353,7 +1355,7 @@ class _TimeCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: isActive
                         ? color.withValues(alpha: 0.85)
-                        : Colors.white.withValues(alpha: 0.45),
+                        : style.textDim,
                   ),
                 ),
               ],
@@ -1454,10 +1456,14 @@ class _DailyPrayersTable extends StatelessWidget {
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.07),
+                        color: context.colors.textPrimary.withValues(
+                          alpha: 0.07,
+                        ),
                         borderRadius: BorderRadius.circular(AppRadius.xl),
                         border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: context.colors.textPrimary.withValues(
+                            alpha: 0.1,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -1465,14 +1471,17 @@ class _DailyPrayersTable extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 10,
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(height: 1, color: Colors.white.withValues(alpha: 0.06)),
+              Container(
+                height: 1,
+                color: context.colors.textPrimary.withValues(alpha: 0.06),
+              ),
 
               ...prayers.asMap().entries.map((e) {
                 final i = e.key;
@@ -1530,7 +1539,9 @@ class _PrayerTableRow extends StatelessWidget {
             ? const BorderRadius.vertical(bottom: Radius.circular(20))
             : null,
         border: isNext
-            ? Border(right: BorderSide(color: visual.secondaryColor, width: 3))
+            ? BorderDirectional(
+                end: BorderSide(color: visual.secondaryColor, width: 3),
+              )
             : null,
       ),
       child: Column(
@@ -1552,10 +1563,10 @@ class _PrayerTableRow extends StatelessWidget {
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 13,
                           color: isNext
-                              ? Colors.white
+                              ? context.colors.textPrimary
                               : isPast
-                              ? Colors.white.withValues(alpha: 0.35)
-                              : Colors.white.withValues(alpha: 0.75),
+                              ? context.colors.textDim
+                              : context.colors.textSecondary,
                           fontWeight: isNext
                               ? FontWeight.w600
                               : FontWeight.w400,
@@ -1584,10 +1595,10 @@ class _PrayerTableRow extends StatelessWidget {
                         fontFamily: 'NotoNaskhArabic',
                         fontSize: 14,
                         color: isNext
-                            ? Colors.white
+                            ? context.colors.textPrimary
                             : isPast
-                            ? Colors.white.withValues(alpha: 0.3)
-                            : Colors.white.withValues(alpha: 0.65),
+                            ? context.colors.textDim
+                            : context.colors.textSecondary,
                         fontWeight: isNext ? FontWeight.w700 : FontWeight.w400,
                       ),
                     ),
@@ -1597,7 +1608,7 @@ class _PrayerTableRow extends StatelessWidget {
                           : l10n.prayerScreenAdhanBadge,
                       color: isNext
                           ? visual.secondaryColor
-                          : Colors.white.withValues(alpha: 0.3),
+                          : context.colors.textDim,
                       isActive: isNext,
                     ),
                   ],
@@ -1610,7 +1621,7 @@ class _PrayerTableRow extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                     ),
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: context.colors.textPrimary.withValues(alpha: 0.08),
                   ),
 
                   // وقت الإقامة
@@ -1625,8 +1636,8 @@ class _PrayerTableRow extends StatelessWidget {
                           color: isNext
                               ? context.colors.success
                               : isPast
-                              ? Colors.white.withValues(alpha: 0.25)
-                              : Colors.white.withValues(alpha: 0.5),
+                              ? context.colors.textDim.withValues(alpha: 0.6)
+                              : context.colors.textDim,
                           fontWeight: isNext
                               ? FontWeight.w700
                               : FontWeight.w400,
@@ -1636,7 +1647,7 @@ class _PrayerTableRow extends StatelessWidget {
                         label: l10n.prayerScreenIqamaBadge,
                         color: isNext
                             ? context.colors.success
-                            : Colors.white.withValues(alpha: 0.2),
+                            : context.colors.textDim,
                         isActive: isNext,
                       ),
                     ],
@@ -1656,7 +1667,10 @@ class _PrayerTableRow extends StatelessWidget {
             ),
           ),
           if (!isLast)
-            Container(height: 1, color: Colors.white.withValues(alpha: 0.04)),
+            Container(
+              height: 1,
+              color: context.colors.textPrimary.withValues(alpha: 0.04),
+            ),
         ],
       ),
     );
@@ -1748,9 +1762,11 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
             vertical: 14,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.06),
+            color: widget.style.text.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            border: Border.all(
+              color: widget.style.text.withValues(alpha: 0.09),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.18),
@@ -1770,11 +1786,11 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
                     children: [
                       TextSpan(
                         text: '$h:$m',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'NotoNaskhArabic',
                           fontSize: 40,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: widget.style.text,
                           height: 1.0,
                         ),
                       ),
@@ -1801,7 +1817,7 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
                     fontFamily: 'NotoNaskhArabic',
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white.withValues(alpha: 0.35),
+                    color: widget.style.textDim,
                   ),
                 ),
               ),
@@ -1825,7 +1841,7 @@ class _LiveClockBannerState extends State<_LiveClockBanner> {
                     style: TextStyle(
                       fontFamily: 'NotoNaskhArabic',
                       fontSize: 11,
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: widget.style.textDim,
                     ),
                   ),
                 ],
@@ -1939,7 +1955,7 @@ class _SunChip extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'NotoNaskhArabic',
               fontSize: 10,
-              color: Colors.white.withValues(alpha: 0.5),
+              color: context.colors.textSecondary,
             ),
           ),
           const SizedBox(height: 3),

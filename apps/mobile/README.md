@@ -163,6 +163,16 @@ flutter run
 dart run build_runner watch --delete-conflicting-outputs
 ```
 
+### Environment variables
+
+Create `apps/mobile/.env` (not committed) with:
+
+| Variable                | Required | Purpose                                                              |
+| ----------------------- | -------- | ---------------------------------------------------------------------- |
+| `SUPABASE_URL`           | Yes      | Supabase project URL — see [`auth_setup_guide.md`](docs/auth_setup_guide.md) |
+| `SUPABASE_ANON_KEY`      | Yes      | Supabase anon/public key                                              |
+| `SENTRY_DSN`             | No       | Enables crash/error reporting via Sentry. Left unset, the app runs with no crash reporting — no events are sent anywhere. |
+
 ---
 
 ## 📦 Dependencies

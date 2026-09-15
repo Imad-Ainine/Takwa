@@ -97,10 +97,15 @@ export default async function DashboardPage({
 							{t('download.button')}
 						</a>
 					) : (
-						<div id="download-apk-unavailable" className={styles.downloadBtnDisabled}>
+						<button
+							id="download-apk-unavailable"
+							type="button"
+							disabled
+							className={styles.downloadBtnDisabled}
+						>
 							<span className={styles.downloadBtnIcon}>⏳</span>
 							{t('download.unavailable')}
-						</div>
+						</button>
 					)}
 
 					<p className={styles.instructions}>{t('download.instructions')}</p>

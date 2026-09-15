@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -8,6 +10,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:takwa/core/utils/app_logger.dart';
 import 'package:takwa/l10n/app_localizations.dart';
 
 import 'package:takwa/core/notifications/notifications_service.dart';
@@ -65,43 +68,57 @@ void notificationTapBackground(NotificationResponse response) {
 // ─────────────────────────────────────────
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppLogger.init();
 
   try {
     await dotenv.load(fileName: ".env");
-  } catch (e) {
-    debugPrint('dotenv.load error: $e');
+  } catch (e, st) {
+    AppLogger.warning('dotenv.load error', e, st);
   }
 
+  // A no-op (no events sent) until SENTRY_DSN is set in .env — see
+  // README.md's "Environment variables" section. Crash/error reporting
+  // only: no performance tracing and no default PII, since this app
+  // handles religious-practice and location data.
+  await SentryFlutter.init((options) {
+    options.dsn = dotenv.env['SENTRY_DSN'] ?? '';
+    options.tracesSampleRate = 0.0;
+    options.sendDefaultPii = false;
+    options.environment = kReleaseMode ? 'production' : 'development';
+  }, appRunner: _runApp);
+}
+
+Future<void> _runApp() async {
   try {
     await initializeDateFormatting('ar', null);
     await initializeDateFormatting('en', null);
-  } catch (e) {
-    debugPrint('DateFormatting error: $e');
+  } catch (e, st) {
+    AppLogger.warning('DateFormatting error', e, st);
   }
 
   try {
     await SupabaseConfig.initialize();
-  } catch (e) {
-    debugPrint('Supabase initialize error: $e');
+  } catch (e, st) {
+    AppLogger.error('Supabase initialize error', e, st);
   }
 
   SharedPreferences? prefs;
   try {
     prefs = await SharedPreferences.getInstance();
-  } catch (e) {
-    debugPrint('SharedPreferences initialize error: $e');
+  } catch (e, st) {
+    AppLogger.error('SharedPreferences initialize error', e, st);
   }
 
   try {
     AdhanForegroundService.initForegroundTask();
-  } catch (e) {
-    debugPrint('AdhanForegroundService error: $e');
+  } catch (e, st) {
+    AppLogger.error('AdhanForegroundService error', e, st);
   }
 
   try {
     OverlayBackgroundService.init();
-  } catch (e) {
-    debugPrint('OverlayBackgroundService error: $e');
+  } catch (e, st) {
+    AppLogger.error('OverlayBackgroundService error', e, st);
   }
 
   try {
@@ -112,20 +129,20 @@ void main() async {
     // The system bars are NOT styled here: main() runs before any ThemeData
     // exists, so anything set now is a guess that is wrong in one brightness.
     // TakwaApp.builder below derives the real style from the resolved theme.
-  } catch (e) {
-    debugPrint('SystemChrome error: $e');
+  } catch (e, st) {
+    AppLogger.warning('SystemChrome error', e, st);
   }
 
   try {
     await NotificationsService.initialize();
-  } catch (e) {
-    debugPrint('NotificationsService initialize error: $e');
+  } catch (e, st) {
+    AppLogger.error('NotificationsService initialize error', e, st);
   }
 
   try {
     await QuranLibrary.init();
-  } catch (e) {
-    debugPrint('QuranLibrary init error: $e');
+  } catch (e, st) {
+    AppLogger.error('QuranLibrary init error', e, st);
   }
 
   try {
@@ -133,8 +150,8 @@ void main() async {
     // doesn't bundle it, so this must run after QuranLibrary.init() (which
     // sets up TafsirCtrl) and before the reader screen can be opened.
     await MuyassarTafsirLoader.register();
-  } catch (e) {
-    debugPrint('Muyassar tafsir registration error: $e');
+  } catch (e, st) {
+    AppLogger.warning('Muyassar tafsir registration error', e, st);
   }
 
   try {
@@ -143,8 +160,8 @@ void main() async {
     // own reader list is missing 3 of them. Synchronous; just needs to run
     // after QuranLibrary.init() so ReadersConstants exists.
     QuranRecitersSetup.register();
-  } catch (e) {
-    debugPrint('Quran reciters setup error: $e');
+  } catch (e, st) {
+    AppLogger.warning('Quran reciters setup error', e, st);
   }
 
   runApp(

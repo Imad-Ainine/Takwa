@@ -361,6 +361,9 @@
   "Dashboard": {
     "title": "Votre Tableau de Bord",
     "welcome": "Connecté en tant que {email}.",
+    "errorTitle": "Une erreur est survenue",
+    "errorMessage": "Impossible de charger votre tableau de bord. Veuillez réessayer.",
+    "retry": "Réessayer",
     "placeholderNote": "Voici votre espace web Takwa. Vos prières synchronisées, votre checklist quotidienne et vos séries spirituelles s'afficheront ici.",
     "signOut": "Se Déconnecter",
     "statsTeaserTitle": "Votre Compagnon Spirituel",

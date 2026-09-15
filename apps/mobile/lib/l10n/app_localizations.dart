@@ -7178,6 +7178,24 @@ abstract class AppLocalizations {
   /// **'اختر ذكراً'**
   String get misbahaChooseDhikrTitle;
 
+  /// Screen-reader label for the main tasbih bead when no target count is set
+  ///
+  /// In ar, this message translates to:
+  /// **'عداد الذكر، {count} مرة'**
+  String misbahaCounterSemanticLabel(int count);
+
+  /// Screen-reader label for the main tasbih bead when a dhikr with a target count is selected
+  ///
+  /// In ar, this message translates to:
+  /// **'عداد الذكر، {count} من {target} مرة'**
+  String misbahaCounterWithTargetSemanticLabel(int count, int target);
+
+  /// Screen-reader label for a dhikr row in the picker list
+  ///
+  /// In ar, this message translates to:
+  /// **'{arabic}، {count} مرة'**
+  String misbahaDhikrItemSemanticLabel(String arabic, int count);
+
   /// No description provided for @qiyamCalcLoadError.
   ///
   /// In ar, this message translates to:
