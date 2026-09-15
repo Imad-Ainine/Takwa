@@ -3975,6 +3975,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get misbahaChooseDhikrTitle => 'Choose a Dhikr';
 
   @override
+  String misbahaCounterSemanticLabel(int count) {
+    return 'Dhikr counter, $count times';
+  }
+
+  @override
+  String misbahaCounterWithTargetSemanticLabel(int count, int target) {
+    return 'Dhikr counter, $count of $target times';
+  }
+
+  @override
+  String misbahaDhikrItemSemanticLabel(String arabic, int count) {
+    return '$arabic, $count times';
+  }
+
+  @override
   String qiyamCalcLoadError(String error) {
     return 'Error loading prayer times: $error';
   }

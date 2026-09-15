@@ -10,6 +10,7 @@ import 'package:takwa/core/notifications/notifications_service.dart';
 import 'package:takwa/core/widgets/app_bar_widget.dart';
 import 'package:takwa/core/widgets/custom_pattern_background.dart';
 import 'package:takwa/app/animated_drawer.dart';
+import 'package:takwa/core/widgets/takwa_error_state.dart';
 import 'package:takwa/core/widgets/takwa_loading_indicator.dart';
 import 'package:takwa/core/notifications/overlays/adhan_overlay_screen.dart';
 import 'package:takwa/core/supabase/supabase_config.dart';
@@ -95,11 +96,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           child: TakwaLoadingIndicator(size: 32),
                         ),
                       ),
-                      error: (err, st) => Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(AppSpacing.xxxl),
-                          child: Text('Error loading settings: $err'),
-                        ),
+                      error: (err, st) => TakwaErrorState(
+                        onRetry: () => ref.invalidate(userPreferencesProvider),
                       ),
                       data: (prefs) => Column(
                         children: [

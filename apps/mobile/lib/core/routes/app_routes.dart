@@ -18,7 +18,7 @@ import 'package:takwa/app/main_shell.dart';
 import 'package:takwa/features/onboarding/onboarding_screen.dart';
 import 'package:takwa/features/auth/presentation/pages/auth_choice_screen.dart';
 import 'package:takwa/features/prayer/presentation/screens/prayer_screen.dart';
-import 'package:takwa/features/adhkar/presentation/screens/adhkar%20_screen.dart';
+import 'package:takwa/features/adhkar/presentation/screens/adhkar_screen.dart';
 import 'package:takwa/features/settings/presentation/screens/about_me_screen.dart';
 import 'package:takwa/features/qibla/presentation/screens/qibla_screen.dart';
 import 'package:takwa/features/duas/presentation/screens/duas_screen.dart';

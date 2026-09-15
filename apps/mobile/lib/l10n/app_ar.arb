@@ -2174,6 +2174,39 @@
   "misbahaResetButton": "إعادة",
   "misbahaSoundButton": "الصوت",
   "misbahaChooseDhikrTitle": "اختر ذكراً",
+  "misbahaCounterSemanticLabel": "عداد الذكر، {count} مرة",
+  "@misbahaCounterSemanticLabel": {
+    "description": "Screen-reader label for the main tasbih bead when no target count is set",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "misbahaCounterWithTargetSemanticLabel": "عداد الذكر، {count} من {target} مرة",
+  "@misbahaCounterWithTargetSemanticLabel": {
+    "description": "Screen-reader label for the main tasbih bead when a dhikr with a target count is selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "misbahaDhikrItemSemanticLabel": "{arabic}، {count} مرة",
+  "@misbahaDhikrItemSemanticLabel": {
+    "description": "Screen-reader label for a dhikr row in the picker list",
+    "placeholders": {
+      "arabic": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "qiyamCalcLoadError": "خطأ في تحميل الأوقات: {error}",
   "@qiyamCalcLoadError": {
     "placeholders": {

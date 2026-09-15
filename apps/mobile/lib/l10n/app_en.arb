@@ -1650,6 +1650,39 @@
   "misbahaResetButton": "Reset",
   "misbahaSoundButton": "Sound",
   "misbahaChooseDhikrTitle": "Choose a Dhikr",
+  "misbahaCounterSemanticLabel": "Dhikr counter, {count} times",
+  "@misbahaCounterSemanticLabel": {
+    "description": "Screen-reader label for the main tasbih bead when no target count is set",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "misbahaCounterWithTargetSemanticLabel": "Dhikr counter, {count} of {target} times",
+  "@misbahaCounterWithTargetSemanticLabel": {
+    "description": "Screen-reader label for the main tasbih bead when a dhikr with a target count is selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "misbahaDhikrItemSemanticLabel": "{arabic}, {count} times",
+  "@misbahaDhikrItemSemanticLabel": {
+    "description": "Screen-reader label for a dhikr row in the picker list",
+    "placeholders": {
+      "arabic": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "qiyamCalcLoadError": "Error loading prayer times: {error}",
   "@qiyamCalcLoadError": {
     "placeholders": {
